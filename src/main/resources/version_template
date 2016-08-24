@@ -1,4 +1,4 @@
-Service=template
+Service=referencedata
 Build=${build}
 Branch=${branch}
 Timestamp=${time}

@@ -1,6 +1,6 @@
-package org.openlmis.template;
+package org.openlmis.referencedata;
 
-import org.openlmis.template.i18n.ExposedMessageSourceImpl;
+import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

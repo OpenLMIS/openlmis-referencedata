@@ -1,6 +1,6 @@
-package org.openlmis.template.web;
+package org.openlmis.referencedata.web;
 
-import org.openlmis.template.i18n.ExposedMessageSource;
+import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class MessageController {
   public String hello() {
     String[] msgArgs = {"world"};
     logger.debug("Returning hello world message");
-    return messageSource.getMessage("template.message.hello", msgArgs, 
+    return messageSource.getMessage("referencedata.message.hello", msgArgs, 
         LocaleContextHolder.getLocale());
   }
 

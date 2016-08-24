@@ -22,7 +22,7 @@ apply plugin: 'jacoco'
 apply plugin: 'pmd'
 
 jar {
-    baseName = 'openlmis-template-service'
+    baseName = 'openlmis-referencedata'
     version  = '0.0.1'
 }
 
@@ -36,7 +36,6 @@ targetCompatibility = 1.8
 
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
-    compile "org.springframework.boot:spring-boot-starter-data-rest"
     compile "org.projectlombok:lombok:1.16.8"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
     compile "org.postgresql:postgresql:9.4.1208"
@@ -51,7 +50,7 @@ flyway {
     url = "$System.env.DATABASE_URL"
     user = "$System.env.POSTGRES_USER"
     password = "$System.env.POSTGRES_PASSWORD"
-    schemas = ['template']
+    schemas = ['referencedata']
     sqlMigrationPrefix = ''
     placeholderPrefix = '#['
     placeholderSuffix = ']'
@@ -126,8 +125,8 @@ checkstyle {
 //Usage: gradle sonarqube
 sonarqube {
     properties {
-        property "sonar.projectName", "OpenLMIS Template Service"
-        property "sonar.projectKey", "org.sonarqube:openlmis-template-service"
+        property "sonar.projectName", "OpenLMIS Reference Data Service"
+        property "sonar.projectKey", "org.sonarqube:openlmis-referencedata"
         property "sonar.host.url", "http://sonar.openlmis.org"
         property "sonar.java.coveragePlugin", "jacoco"
         //Tells SonarQube where the unit tests execution reports are

@@ -22,9 +22,9 @@ services:
     env_file: .env
   image:
     build: .
-    image: openlmis/template-service
-  template-service:
-    image: openlmis/template-service
+    image: openlmis/referencedata
+  referencedata:
+    image: openlmis/referencedata
     links:
       - db
       - log
@@ -42,4 +42,4 @@ services:
   log:
     image: openlmis/rsyslog
     volumes:
-      - '../logs/template-service:/var/log'
+      - '../logs/referencedata:/var/log'
