@@ -18,6 +18,10 @@ public class MessageController {
   @Autowired
   private ExposedMessageSource messageSource;
 
+  /**
+   * Example usage of ExposedMessageSource.
+   * @return hello world message
+   */
   @RequestMapping("/hello")
   public String hello() {
     String[] msgArgs = {"world"};
