@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
  * are made and then bought/sold/exchanged.  Unlike a {@link GlobalProduct} a TradeItem usually
  * has one and only one manufacturer and is shipped in exactly one primary package.
  *
- * TradeItem's also may:
+ * <p>TradeItem's also may:
  * <ul>
  *   <li>have a GlobalTradeItemNumber</li>
  *   <li>a MSRP</li>
