@@ -74,6 +74,10 @@ public class User extends BaseEntity {
   @Getter
   private List<RoleAssignment> roleAssignments = new ArrayList<>();
 
+  private List<Program> homeFacilityPrograms = new ArrayList<>();
+
+  private List<Program> supervisedPrograms = new ArrayList<>();
+
   @PrePersist
   private void prePersist() {
     if (this.verified == null) {
@@ -85,11 +89,35 @@ public class User extends BaseEntity {
     }
   }
 
+  /**
+   * Add role assignments to this user. Also puts a link to user within each role assignment.
+   * 
+   * @param roleAssignments role assignments to add
+   */
   public void assignRoles(RoleAssignment... roleAssignments) {
-    this.roleAssignments.addAll(Arrays.asList(roleAssignments));
+    for (RoleAssignment roleAssignment : Arrays.asList(roleAssignments)) {
+      roleAssignment.assignTo(this);
+      this.roleAssignments.add(roleAssignment);
+    }
   }
 
   public boolean hasRight(RightQuery rightQuery) {
     return roleAssignments.stream().anyMatch(roleAssignment -> roleAssignment.hasRight(rightQuery));
+  }
+  
+  public List<Program> getHomeFacilityPrograms() {
+    return homeFacilityPrograms;
+  }
+  
+  public void addHomeFacilityProgram(Program program) {
+    homeFacilityPrograms.add(program);
+  }
+
+  public List<Program> getSupervisedPrograms() {
+    return supervisedPrograms;
+  }
+
+  public void addSupervisedProgram(Program program) {
+    supervisedPrograms.add(program);
   }
 }

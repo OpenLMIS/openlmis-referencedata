@@ -3,7 +3,6 @@ package org.openlmis.referencedata.domain;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import java.util.List;
@@ -23,6 +22,6 @@ public class RightTest {
     //then
     List<Right> attachedRights = right.getAttachments();
     assertThat(attachedRights.size(), is(1));
-    assertThat(attachedRights.get(0), Is.is(attachment));
+    assertThat(attachedRights.get(0), is(attachment));
   }
 }
