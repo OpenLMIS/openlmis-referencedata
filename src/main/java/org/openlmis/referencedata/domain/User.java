@@ -55,12 +55,6 @@ public class User extends BaseEntity {
   private String timezone;
 
   @ManyToOne
-  @JoinColumn(name = "supervisoryNodeId")
-  @Getter
-  @Setter
-  private SupervisoryNode supervisedNode; //TODO Role based access control for Requisitions
-
-  @ManyToOne
   @JoinColumn(name = "facilityid")
   @Getter
   @Setter
@@ -75,12 +69,6 @@ public class User extends BaseEntity {
   @Getter
   @Setter
   private Boolean active;
-
-  @OneToMany
-  @JoinColumn(name = "roleId")
-  @Getter
-  @Setter
-  private List<Role> roles;
 
   @OneToMany(mappedBy = "user")
   @Getter
