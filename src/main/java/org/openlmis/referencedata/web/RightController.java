@@ -26,7 +26,7 @@ public class RightController {
   @RequestMapping(value = "/rights", method = RequestMethod.POST)
   public ResponseEntity<?> createRight(@RequestBody Right rightDto) {
 
-    Right right = Right.ofType(rightDto.getRightType());
+    Right right = Right.ofType(rightDto.getType());
     right.setName(rightDto.getName());
     right.setDescription(rightDto.getDescription());
     List<Right> attachments = rightDto.getAttachments();

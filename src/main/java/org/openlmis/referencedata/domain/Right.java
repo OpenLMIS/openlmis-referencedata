@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.openlmis.referencedata.domain.BaseEntity;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +11,8 @@ import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -34,7 +34,8 @@ public class Right extends BaseEntity {
   @Column(nullable = false, columnDefinition = TEXT)
   @Getter
   @Setter
-  private RightType rightType;
+  @Enumerated(value = EnumType.STRING)
+  private RightType type;
 
   @Column(columnDefinition = TEXT)
   @Getter
@@ -55,8 +56,8 @@ public class Right extends BaseEntity {
   )
   private List<Role> roles;
 
-  private Right(RightType rightType) {
-    this.rightType = rightType;
+  private Right(RightType type) {
+    this.type = type;
   }
 
   public static Right ofType(RightType rightType) {
@@ -72,7 +73,7 @@ public class Right extends BaseEntity {
    */
   public void attach(Right... attachments) {
     for (Right attachment : attachments) {
-      if (attachment.rightType == rightType) {
+      if (attachment.type == type) {
         this.attachments.add(attachment);
       }
     }

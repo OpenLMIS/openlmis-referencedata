@@ -92,15 +92,15 @@ public class Role extends BaseEntity {
   }
 
   public RightType getRightType() {
-    return rights.get(0).getRightType();
+    return rights.get(0).getType();
   }
 
   private static boolean checkRightTypesMatch(List<Right> rightsList) throws RightTypeException {
     if (rightsList.isEmpty()) {
       return true;
     } else {
-      RightType rightType = rightsList.get(0).getRightType();
-      return rightsList.stream().allMatch(right -> right.getRightType() == rightType);
+      RightType rightType = rightsList.get(0).getType();
+      return rightsList.stream().allMatch(right -> right.getType() == rightType);
     }
   }
 
