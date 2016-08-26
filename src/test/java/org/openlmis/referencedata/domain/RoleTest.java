@@ -13,12 +13,15 @@ public class RoleTest {
 
   private String roleName = "role";
   private String roleDescription = "description";
+  
+  private String right1Name = "right1";
+  private String right2Name = "right2";
 
   @Test
   public void shouldCreateRoleWithDescription() throws RightTypeException {
     //given
-    Right right1 = Right.ofType(RightType.ORDER_FULFILLMENT);
-    Right right2 = Right.ofType(RightType.ORDER_FULFILLMENT);
+    Right right1 = new Right(right1Name, RightType.ORDER_FULFILLMENT);
+    Right right2 = new Right(right2Name, RightType.ORDER_FULFILLMENT);
 
     //when
     Role role = new Role(roleName, roleDescription, right1, right2);
@@ -31,8 +34,8 @@ public class RoleTest {
   @Test
   public void shouldGroupRightsOfSameType() throws RightTypeException {
     //given
-    Right right1 = Right.ofType(RightType.ORDER_FULFILLMENT);
-    Right right2 = Right.ofType(RightType.ORDER_FULFILLMENT);
+    Right right1 = new Right(right1Name, RightType.ORDER_FULFILLMENT);
+    Right right2 = new Right(right2Name, RightType.ORDER_FULFILLMENT);
 
     //when
     Role role = new Role(roleName, right1, right2);
@@ -47,8 +50,8 @@ public class RoleTest {
   @Test(expected = RightTypeException.class)
   public void shouldNotGroupRightsOfDifferentTypes() throws RightTypeException {
     //given
-    Right right1 = Right.ofType(RightType.ORDER_FULFILLMENT);
-    Right right2 = Right.ofType(RightType.SUPERVISION);
+    Right right1 = new Right(right1Name, RightType.ORDER_FULFILLMENT);
+    Right right2 = new Right(right2Name, RightType.SUPERVISION);
 
     //when
     new Role(roleName, right1, right2);
@@ -57,10 +60,10 @@ public class RoleTest {
   @Test
   public void shouldBeAbleToAddRightsOfSameTypeToExistingRole() throws RightTypeException {
     //given
-    Role role = new Role(roleName, Right.ofType(RightType.SUPERVISION));
+    Role role = new Role(roleName, new Right(right1Name, RightType.SUPERVISION));
 
     //when
-    Right additionalRight = Right.ofType(RightType.SUPERVISION);
+    Right additionalRight = new Right(right2Name, RightType.SUPERVISION);
     role.add(additionalRight);
 
     //then
@@ -72,18 +75,18 @@ public class RoleTest {
   @Test(expected = RightTypeException.class)
   public void shouldNotBeAbleToAddRightsOfDifferentTypeToExistingRole() throws RightTypeException {
     //given
-    Role role = new Role(roleName, Right.ofType(RightType.SUPERVISION));
+    Role role = new Role(roleName, new Right(right1Name, RightType.SUPERVISION));
 
     //when
-    Right rightOfDifferentType = Right.ofType(RightType.ORDER_FULFILLMENT);
+    Right rightOfDifferentType = new Right(right2Name, RightType.ORDER_FULFILLMENT);
     role.add(rightOfDifferentType);
   }
 
   @Test
   public void shouldIndicateIfItContainsARight() throws RightTypeException {
     //given
-    Right right1 = Right.ofType(RightType.SUPERVISION);
-    Right right2 = Right.ofType(RightType.SUPERVISION);
+    Right right1 = new Right(right1Name, RightType.SUPERVISION);
+    Right right2 = new Right(right2Name, RightType.SUPERVISION);
     right1.attach(right2);
 
     Role role = new Role(roleName, right1);

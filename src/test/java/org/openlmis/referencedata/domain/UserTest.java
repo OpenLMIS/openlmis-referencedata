@@ -12,7 +12,8 @@ import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 
 public class UserTest {
-  private RightQuery rightQuery = new RightQuery(Right.ofType(RightType.SUPERVISION));
+  private RightQuery rightQuery = new RightQuery(new Right("supervisionRight1",
+      RightType.SUPERVISION));
 
   private RoleAssignment assignment1 = mock(RoleAssignment.class);
 
@@ -33,7 +34,9 @@ public class UserTest {
 
 
     //when
-    user.assignRoles(new DirectRoleAssignment(new Role(roleName, Right.ofType(RightType.REPORTS))));
+    user.assignRoles(new DirectRoleAssignment(new Role(roleName, new Right("reportRight1", 
+        RightType.REPORTS)
+    )));
 
     //then
     assertThat(user.getRoleAssignments().size(), is(1));

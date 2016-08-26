@@ -9,7 +9,7 @@ import org.openlmis.referencedata.exception.RightTypeException;
 
 public class SupervisionRoleAssignmentTest {
 
-  private Right right = Right.ofType(SUPERVISION);
+  private Right right = new Right("right", SUPERVISION);
   private Program program = new Program();
   SupervisoryNode node = new SupervisoryNode();
   private String roleName = "role";
