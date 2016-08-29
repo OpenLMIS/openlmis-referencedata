@@ -36,14 +36,14 @@ targetCompatibility = 1.8
 
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
-    compile "org.projectlombok:lombok:1.16.8"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
+    compile "org.projectlombok:lombok:1.16.8"
     compile "org.postgresql:postgresql:9.4.1208"
     compile "com.github.tomakehurst:wiremock:1.58"
-    compile "org.springframework:spring-test"
 
     testCompile "junit:junit"
     testCompile "org.mockito:mockito-core:1.+"
+    testCompile "org.springframework:spring-test"
 }
 
 idea {
@@ -135,7 +135,7 @@ jacocoTestReport {
 }
 
 checkstyle {
-    toolVersion = "6.19"
+    toolVersion = "7.1"
 }
 
 //Usage: gradle sonarqube
