@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @SuppressWarnings("PMD.UnusedPrivateField")
 @Entity
@@ -74,8 +75,10 @@ public class User extends BaseEntity {
   @Getter
   private List<RoleAssignment> roleAssignments = new ArrayList<>();
 
+  @Transient
   private List<Program> homeFacilityPrograms = new ArrayList<>();
 
+  @Transient
   private List<Program> supervisedPrograms = new ArrayList<>();
 
   @PrePersist
