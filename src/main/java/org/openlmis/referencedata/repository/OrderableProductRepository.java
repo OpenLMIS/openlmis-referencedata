@@ -5,7 +5,7 @@ import org.openlmis.referencedata.domain.OrderableProduct;
 import java.util.UUID;
 
 /**
- * Persistence repository for saving/finding {@link OrderableProduct}
+ * Persistence repository for saving/finding {@link OrderableProduct}.
  */
 public interface OrderableProductRepository extends
     ReferenceDataRepository<OrderableProduct, UUID> {
