@@ -2,6 +2,9 @@ version: "2"
 services:
   builder:
     image: openlmis/dev
+    links:
+      - db
+      - log
     volumes:
       - '.:/app'
     command:
@@ -23,21 +26,8 @@ services:
   image:
     build: .
     image: openlmis/referencedata
-  referencedata:
-    image: openlmis/referencedata
-    links:
-      - db
-      - log
-    ports:
-      - "8080:8080"
-    environment:
-      JAVA_OPTS: '-Dlogging.config=/logback.xml'
-    volumes:
-      - '../logback.xml:/logback.xml'
   db:
     image: openlmis/postgres
-    ports:
-      - "5432"
     env_file: .env
   log:
     image: openlmis/rsyslog
