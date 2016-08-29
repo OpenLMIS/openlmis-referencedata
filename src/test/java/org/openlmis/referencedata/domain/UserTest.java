@@ -121,10 +121,6 @@ public class UserTest {
   @Test
   public void shouldGetSupervisedFacilities() throws RightTypeException {
     //given
-    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
-
-    Program program = new Program();
-    
     SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode(new Facility());
     RequisitionGroup districtGroup = RequisitionGroup.newRequisitionGroup(districtNode, null,
         Collections.singletonList(new Facility()));
@@ -135,6 +131,9 @@ public class UserTest {
         Arrays.asList(new Facility(), new Facility()));
     provinceNode.assignRequisitionGroup(provinceGroup);
     provinceNode.addChildNode(districtNode);
+
+    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
+    Program program = new Program();
 
     RoleAssignment assignment = new SupervisionRoleAssignment(role, program, provinceNode);
 
