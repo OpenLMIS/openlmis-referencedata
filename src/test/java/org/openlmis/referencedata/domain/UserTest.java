@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class UserTest {
@@ -114,5 +116,34 @@ public class UserTest {
     //then
     assertEquals(program1, programs.get(0));
     assertEquals(program2, programs.get(1));
+  }
+
+  @Test
+  public void shouldGetSupervisedFacilities() throws RightTypeException {
+    //given
+    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
+
+    Program program = new Program();
+    
+    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode(new Facility());
+    RequisitionGroup districtGroup = RequisitionGroup.newRequisitionGroup(districtNode, null,
+        Collections.singletonList(new Facility()));
+    districtNode.assignRequisitionGroup(districtGroup);
+
+    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode(new Facility());
+    RequisitionGroup provinceGroup = RequisitionGroup.newRequisitionGroup(provinceNode, null,
+        Arrays.asList(new Facility(), new Facility()));
+    provinceNode.assignRequisitionGroup(provinceGroup);
+    provinceNode.addChildNode(districtNode);
+
+    RoleAssignment assignment = new SupervisionRoleAssignment(role, program, provinceNode);
+
+    user.assignRoles(assignment);
+
+    //when
+    List<Facility> facilities = user.getSupervisedFacilities();
+
+    //then
+    assertThat(facilities.size(), is(3));
   }
 }

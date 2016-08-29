@@ -83,6 +83,8 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       user.addHomeFacilityProgram(program);
     } else {
       user.addSupervisedProgram(program);
+      List<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities();
+      user.addSupervisedFacilities(supervisedFacilities);
     }
   }
 }
