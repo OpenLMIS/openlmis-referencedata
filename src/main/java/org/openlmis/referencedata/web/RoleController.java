@@ -42,12 +42,7 @@ public class RoleController {
   public ResponseEntity<?> createRole(@RequestBody Role roleDto) {
     try {
 
-      List<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
-          rightDto.getId())).collect(toList());
-
-      Role role = new Role(roleDto.getName(),
-          roleDto.getDescription(),
-          rights.toArray(new Right[roleDto.getRights().size()]));
+      Role role = createRoleInstance(roleDto);
 
       roleRepository.save(role);
 
@@ -63,7 +58,7 @@ public class RoleController {
   }
 
   /**
-   * Update an existing role using the provided role object.
+   * Update an existing role using the provided role object. Note, if the role does not
    *
    * @return if successful, the updated role; otherwise an HTTP error
    */
@@ -72,26 +67,19 @@ public class RoleController {
                                       @RequestBody Role roleDto) {
     try {
 
-      UUID roleId = UUID.fromString(id);
-      Role role = roleRepository.findOne(roleId);
+      Role role = roleRepository.findFirstByName(roleDto.getName());
 
       if (role == null) {
-        return ResponseEntity
-            .badRequest()
-            .body(messageSource.getMessage("referencedata.message.role-does-not-exist",
-                null, LocaleContextHolder.getLocale()));
+        role = createRoleInstance(roleDto);
+        role.setId(UUID.fromString(id));
       }
-
+      
       if (!role.getName().equalsIgnoreCase(roleDto.getName())) {
         return ResponseEntity
             .badRequest()
             .body(messageSource.getMessage("referencedata.message.role-name-does-not-match-db",
                 null, LocaleContextHolder.getLocale()));
       }
-
-      List<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
-          rightDto.getId())).collect(toList());
-      role.group(rights.toArray(new Right[rights.size()]));
 
       roleRepository.save(role);
 
@@ -104,5 +92,14 @@ public class RoleController {
           .badRequest()
           .body(messageSource.getMessage(rte.getMessage(), null, LocaleContextHolder.getLocale()));
     }
+  }
+  
+  private Role createRoleInstance(Role roleDto) throws RightTypeException {
+    List<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
+        rightDto.getId())).collect(toList());
+
+    return new Role(roleDto.getName(),
+        roleDto.getDescription(),
+        rights.toArray(new Right[roleDto.getRights().size()]));
   }
 }
