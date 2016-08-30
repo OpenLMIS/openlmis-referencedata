@@ -35,6 +35,20 @@ public class RoleController {
   private ExposedMessageSource messageSource;
 
   /**
+   * Get all roles in the system.
+   *
+   * @return all roles in the system
+   */
+  @RequestMapping(value = "/roles", method = RequestMethod.GET)
+  public ResponseEntity<?> getRoles() {
+    Iterable<Role> roles = roleRepository.findAll();
+
+    return ResponseEntity
+        .ok()
+        .body(roles);
+  }
+
+  /**
    * Create a new role using the provided role object.
    *
    * @return if successful, the new role; otherwise an HTTP error
@@ -95,6 +109,22 @@ public class RoleController {
     }
   }
 
+  /**
+   * Delete an existing role.
+   *
+   * @param id id of role to delete
+   * @return no content
+   */
+  @RequestMapping(value = "/roles/{id}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteRole(@PathVariable("id") String id) {
+
+    roleRepository.delete(UUID.fromString(id));
+
+    return ResponseEntity
+        .noContent()
+        .build();
+  }
+  
   private Role createRoleInstance(Role roleDto) throws RightTypeException, RoleException {
     if (roleDto.getRights().size() == 0) {
       throw new RoleException("referencedata.error.role-must-have-a-right");
