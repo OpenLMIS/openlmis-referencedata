@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
@@ -50,15 +51,16 @@ public class RoleController {
           .status(HttpStatus.CREATED)
           .body(role);
 
-    } catch (RightTypeException rte) {
+    } catch (Exception ex) {
       return ResponseEntity
           .badRequest()
-          .body(messageSource.getMessage(rte.getMessage(), null, LocaleContextHolder.getLocale()));
+          .body(messageSource.getMessage(ex.getMessage(), null, LocaleContextHolder.getLocale()));
     }
   }
 
   /**
-   * Update an existing role using the provided role object. Note, if the role does not
+   * Update an existing role using the provided role object. Note, if the role does not exist, will
+   * create one.
    *
    * @return if successful, the updated role; otherwise an HTTP error
    */
@@ -67,19 +69,18 @@ public class RoleController {
                                       @RequestBody Role roleDto) {
     try {
 
-      Role role = roleRepository.findFirstByName(roleDto.getName());
+      UUID roleId = UUID.fromString(id);
+      Role persistedRole = roleRepository.findOne(roleId);
 
-      if (role == null) {
-        role = createRoleInstance(roleDto);
-        role.setId(UUID.fromString(id));
-      }
-      
-      if (!role.getName().equalsIgnoreCase(roleDto.getName())) {
+      if (persistedRole != null && !persistedRole.getName().equalsIgnoreCase(roleDto.getName())) {
         return ResponseEntity
             .badRequest()
-            .body(messageSource.getMessage("referencedata.message.role-name-does-not-match-db",
+            .body(messageSource.getMessage("referencedata.error.role-name-does-not-match-db",
                 null, LocaleContextHolder.getLocale()));
       }
+
+      Role role = createRoleInstance(roleDto);
+      role.setId(roleId);
 
       roleRepository.save(role);
 
@@ -87,14 +88,18 @@ public class RoleController {
           .ok()
           .body(role);
 
-    } catch (RightTypeException rte) {
+    } catch (Exception ex) {
       return ResponseEntity
           .badRequest()
-          .body(messageSource.getMessage(rte.getMessage(), null, LocaleContextHolder.getLocale()));
+          .body(messageSource.getMessage(ex.getMessage(), null, LocaleContextHolder.getLocale()));
     }
   }
-  
-  private Role createRoleInstance(Role roleDto) throws RightTypeException {
+
+  private Role createRoleInstance(Role roleDto) throws RightTypeException, RoleException {
+    if (roleDto.getRights().size() == 0) {
+      throw new RoleException("referencedata.error.role-must-have-a-right");
+    }
+    
     List<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
         rightDto.getId())).collect(toList());
 

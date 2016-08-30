@@ -51,8 +51,7 @@ public class Right extends BaseEntity {
   private Right parent;
   
   @ManyToMany(
-      mappedBy = "rights",
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+      mappedBy = "rights"
   )
   private List<Role> roles;
 
