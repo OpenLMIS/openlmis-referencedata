@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
@@ -65,10 +66,10 @@ public class RoleController {
           .status(HttpStatus.CREATED)
           .body(role);
 
-    } catch (Exception ex) {
+    } catch (AuthException ae) {
       return ResponseEntity
           .badRequest()
-          .body(messageSource.getMessage(ex.getMessage(), null, LocaleContextHolder.getLocale()));
+          .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
     }
   }
 
@@ -102,10 +103,10 @@ public class RoleController {
           .ok()
           .body(role);
 
-    } catch (Exception ex) {
+    } catch (AuthException ae) {
       return ResponseEntity
           .badRequest()
-          .body(messageSource.getMessage(ex.getMessage(), null, LocaleContextHolder.getLocale()));
+          .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
     }
   }
 
