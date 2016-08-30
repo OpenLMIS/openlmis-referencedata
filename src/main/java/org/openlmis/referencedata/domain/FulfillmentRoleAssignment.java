@@ -39,7 +39,7 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
     super(role);
 
     if (!warehouse.getType().getCode().equalsIgnoreCase("warehouse")) {
-      throw new RoleAssignmentException();
+      throw new RoleAssignmentException("referencedata.error.facility-type-must-be-warehouse");
     }
 
     this.warehouse = warehouse;
