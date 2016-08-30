@@ -26,7 +26,7 @@ public final class TradeItem extends OrderableProduct {
   @ManyToOne
   private GlobalProduct globalProduct;
 
-  private TradeItem(String productCode, long packSize) {
+  private TradeItem(ProductCode productCode, long packSize) {
     super(productCode, packSize);
   }
 
@@ -56,7 +56,8 @@ public final class TradeItem extends OrderableProduct {
   public static TradeItem newTradeItem(String productCode,
                                        long packSize,
                                        GlobalProduct globalProduct) {
-    TradeItem tradeItem = new TradeItem(productCode, packSize);
+    ProductCode code = ProductCode.newProductCode(productCode);
+    TradeItem tradeItem = new TradeItem(code, packSize);
     globalProduct.addTradeItem(tradeItem);
 
     return tradeItem;

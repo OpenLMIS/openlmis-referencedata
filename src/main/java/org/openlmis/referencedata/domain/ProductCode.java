@@ -1,8 +1,14 @@
 package org.openlmis.referencedata.domain;
 
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Embeddable;
+
 /**
- * Represent's a unique product's designation.
+ * Represents a unique product's designation.
  */
+@Embeddable
+@NoArgsConstructor
 public final class ProductCode {
   private String productCode;
 
@@ -10,6 +16,11 @@ public final class ProductCode {
     this.productCode = productCode.replaceAll("\\s", "");
   }
 
+  /**
+   * ProductCode equality ignores whitespace and case.
+   * @param object the ProductCode to test against.
+   * @return true if both represent the same code, false otherwise.
+   */
   @Override
   public final boolean equals(Object object) {
     if (null == object) {
@@ -25,7 +36,7 @@ public final class ProductCode {
 
   @Override
   public final int hashCode() {
-    return productCode.hashCode();
+    return productCode.toUpperCase().hashCode();
   }
 
   @Override
@@ -33,7 +44,13 @@ public final class ProductCode {
     return productCode;
   }
 
+  /**
+   * Creates a new ProductCode value.
+   * @param productCode the product's code
+   * @return a new ProductCode with the given code.  Uses a blank code if given null.
+   */
   public static final ProductCode newProductCode(String productCode) {
-    return new ProductCode(productCode);
+    String workingCode = (null == productCode) ? "" : productCode;
+    return new ProductCode(workingCode);
   }
 }

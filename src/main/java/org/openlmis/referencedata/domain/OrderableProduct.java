@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -21,13 +22,14 @@ import javax.persistence.Table;
 @Table(name = "orderable_products", schema = "referencedata")
 @NoArgsConstructor
 public abstract class OrderableProduct extends BaseEntity {
-  private String productCode;
+  @Embedded
+  private ProductCode productCode;
   private long packSize;
 
   @ElementCollection
   private Set<String> programProducts;
 
-  protected OrderableProduct(String productCode, long packSize) {
+  protected OrderableProduct(ProductCode productCode, long packSize) {
     this.productCode = productCode;
     this.packSize = packSize;
     this.programProducts = new LinkedHashSet<>();
@@ -37,7 +39,7 @@ public abstract class OrderableProduct extends BaseEntity {
    * Return this orderable product's unique product code.
    * @return a copy of this product's unique product code.
    */
-  public final String getProductCode() {
+  public final ProductCode getProductCode() {
     return productCode;
   }
 
@@ -85,11 +87,28 @@ public abstract class OrderableProduct extends BaseEntity {
       return false;
     }
 
-    return ((OrderableProduct) object).productCode.equalsIgnoreCase(this.productCode);
+    return ((OrderableProduct) object).productCode.equals(this.productCode);
   }
 
   @Override
   public final int hashCode() {
     return productCode.hashCode();
+  }
+
+  public void export(Exporter exp) {
+    exp.addProductCode(this.productCode);
+    exp.addPackSize(this.packSize);
+  }
+
+  public interface Importer {
+    public ProductCode provideProductCode();
+
+    public long providePackSize();
+  }
+
+  public interface Exporter {
+    public void addProductCode(ProductCode productCode);
+
+    public void addPackSize(long packSize);
   }
 }

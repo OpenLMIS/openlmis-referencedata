@@ -17,6 +17,12 @@ public class ProductCodeTest {
   }
 
   @Test
+  public void shouldUseBlankProductCodeIfNull() {
+    ProductCode code = ProductCode.newProductCode(null);
+    assertEquals(ProductCode.newProductCode(""), code);
+  }
+
+  @Test
   public void shouldBeEqualByCode() {
     ProductCode codeADupe = ProductCode.newProductCode("codeA");
     assertTrue(codeA.equals(codeADupe));
@@ -37,7 +43,7 @@ public class ProductCodeTest {
 
   @Test
   public void shouldEnforceHashCode() {
-    ProductCode codeADupe = ProductCode.newProductCode("codeA");
+    ProductCode codeADupe = ProductCode.newProductCode("code a");
     assertEquals(codeA.hashCode(), codeADupe.hashCode());
 
     assertNotEquals(codeA.hashCode(), codeB.hashCode());
