@@ -24,7 +24,7 @@ public abstract class BaseCrudRepositoryIntegrationTest<T extends BaseEntity> {
    * Generate a unique instance of given type.
    * @return generated instance
    */
-  abstract T generateInstance();
+  abstract T generateInstance() throws Exception;
 
   private AtomicInteger instanceNumber = new AtomicInteger(0);
 
@@ -37,7 +37,7 @@ public abstract class BaseCrudRepositoryIntegrationTest<T extends BaseEntity> {
   }
 
   @Test
-  public void testCreate() {
+  public void shouldCreate() throws Exception {
     CrudRepository<T, UUID> repository = this.getRepository();
 
     T instance = this.generateInstance();
@@ -50,7 +50,7 @@ public abstract class BaseCrudRepositoryIntegrationTest<T extends BaseEntity> {
   }
 
   @Test
-  public void testFindOne() {
+  public void shouldFindOne() throws Exception {
     CrudRepository<T, UUID> repository = this.getRepository();
 
     T instance = this.generateInstance();
@@ -66,7 +66,7 @@ public abstract class BaseCrudRepositoryIntegrationTest<T extends BaseEntity> {
   }
 
   @Test
-  public void testDelete() {
+  public void shouldDelete() throws Exception {
     CrudRepository<T, UUID> repository = this.getRepository();
 
     T instance = this.generateInstance();
