@@ -87,7 +87,7 @@ public class Role extends BaseEntity {
     if (checkRightTypesMatch(rightsList)) {
       this.rights = rightsList;
     } else {
-      throw new RightTypeException("referencedata.message.rights-are-different-types");
+      throw new RightTypeException("referencedata.error.rights-are-different-types");
     }
   }
 
@@ -117,7 +117,7 @@ public class Role extends BaseEntity {
     if (checkRightTypesMatch(allRights)) {
       rights.addAll(Arrays.asList(additionalRights));
     } else {
-      throw new RightTypeException("referencedata.message.rights-are-different-types");
+      throw new RightTypeException("referencedata.error.rights-are-different-types");
     }
   }
 
