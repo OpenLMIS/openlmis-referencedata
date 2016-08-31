@@ -56,12 +56,22 @@ public class Right extends BaseEntity {
   )
   private List<Role> roles;
 
-  private Right(RightType type) {
+  public Right(String name, RightType type) {
+    this.name = name;
     this.type = type;
   }
 
-  public static Right ofType(RightType rightType) {
-    return new Right(rightType);
+  /**
+   * Constructor for name, type, description.
+   * 
+   * @param name right name
+   * @param type right type
+   * @param description right description
+   */
+  public Right(String name, RightType type, String description) {
+    this.name = name;
+    this.type = type;
+    this.description = description;
   }
 
   /**

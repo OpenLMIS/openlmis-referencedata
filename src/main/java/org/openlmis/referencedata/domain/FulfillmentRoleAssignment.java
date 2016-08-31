@@ -57,4 +57,9 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
 
     return roleMatches && warehouseMatches;
   }
+
+  @Override
+  public void assignTo(User user) {
+    super.assignTo(user);
+  }
 }

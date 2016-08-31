@@ -20,7 +20,7 @@ public class FulfillmentRoleAssignmentTest {
    * Setup constructor.
    */
   public FulfillmentRoleAssignmentTest() throws RightTypeException, RoleAssignmentException {
-    right = Right.ofType(ORDER_FULFILLMENT);
+    right = new Right("right", ORDER_FULFILLMENT);
     warehouse = new Facility();
     warehouse.setType(new FacilityType("warehouse"));
     hospital = new Facility();

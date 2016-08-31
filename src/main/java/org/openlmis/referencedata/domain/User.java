@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @SuppressWarnings("PMD.UnusedPrivateField")
 @Entity
@@ -55,12 +56,6 @@ public class User extends BaseEntity {
   private String timezone;
 
   @ManyToOne
-  @JoinColumn(name = "supervisoryNodeId")
-  @Getter
-  @Setter
-  private SupervisoryNode supervisedNode; //TODO Role based access control for Requisitions
-
-  @ManyToOne
   @JoinColumn(name = "facilityid")
   @Getter
   @Setter
@@ -76,15 +71,18 @@ public class User extends BaseEntity {
   @Setter
   private Boolean active;
 
-  @OneToMany
-  @JoinColumn(name = "roleId")
-  @Getter
-  @Setter
-  private List<Role> roles;
-
   @OneToMany(mappedBy = "user")
   @Getter
   private List<RoleAssignment> roleAssignments = new ArrayList<>();
+
+  @Transient
+  private List<Program> homeFacilityPrograms = new ArrayList<>();
+
+  @Transient
+  private List<Program> supervisedPrograms = new ArrayList<>();
+
+  @Transient
+  private List<Facility> supervisedFacilities = new ArrayList<>();
 
   @PrePersist
   private void prePersist() {
@@ -97,11 +95,43 @@ public class User extends BaseEntity {
     }
   }
 
+  /**
+   * Add role assignments to this user. Also puts a link to user within each role assignment.
+   *
+   * @param roleAssignments role assignments to add
+   */
   public void assignRoles(RoleAssignment... roleAssignments) {
-    this.roleAssignments.addAll(Arrays.asList(roleAssignments));
+    for (RoleAssignment roleAssignment : Arrays.asList(roleAssignments)) {
+      roleAssignment.assignTo(this);
+      this.roleAssignments.add(roleAssignment);
+    }
   }
 
   public boolean hasRight(RightQuery rightQuery) {
     return roleAssignments.stream().anyMatch(roleAssignment -> roleAssignment.hasRight(rightQuery));
+  }
+
+  public List<Program> getHomeFacilityPrograms() {
+    return homeFacilityPrograms;
+  }
+
+  public void addHomeFacilityProgram(Program program) {
+    homeFacilityPrograms.add(program);
+  }
+
+  public List<Program> getSupervisedPrograms() {
+    return supervisedPrograms;
+  }
+
+  public void addSupervisedProgram(Program program) {
+    supervisedPrograms.add(program);
+  }
+
+  public List<Facility> getSupervisedFacilities() {
+    return supervisedFacilities;
+  }
+
+  public void addSupervisedFacilities(List<Facility> facilities) {
+    supervisedFacilities.addAll(facilities);
   }
 }

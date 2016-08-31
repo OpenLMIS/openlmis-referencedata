@@ -1,20 +1,27 @@
 package org.openlmis.referencedata.domain;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 
+import java.util.List;
+
 public class SupervisionRoleAssignmentTest {
 
-  private Right right = Right.ofType(SUPERVISION);
+  private Right right = new Right("right", SUPERVISION);
   private Program program = new Program();
-  SupervisoryNode node = new SupervisoryNode();
-  private String roleName = "role";
-  SupervisionRoleAssignment supervisionRoleAssignment =
-      new SupervisionRoleAssignment(new Role(roleName, right), program, node);
+  private SupervisoryNode node = new SupervisoryNode();
+  private Role role = new Role("role", right);
+  private SupervisionRoleAssignment homeFacilityRoleAssignment =
+      new SupervisionRoleAssignment(role, program);
+  private SupervisionRoleAssignment supervisedRoleAssignment =
+      new SupervisionRoleAssignment(role, program, node);
+  private User user = new User();
 
   public SupervisionRoleAssignmentTest() throws RightTypeException {
   }
@@ -25,7 +32,7 @@ public class SupervisionRoleAssignmentTest {
 
     //when
     RightQuery rightQuery = new RightQuery(right, program, node);
-    boolean hasRight = supervisionRoleAssignment.hasRight(rightQuery);
+    boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then
     assertTrue(hasRight);
@@ -36,7 +43,7 @@ public class SupervisionRoleAssignmentTest {
 
     //when
     RightQuery rightQuery = new RightQuery(right, new Program(), node);
-    boolean hasRight = supervisionRoleAssignment.hasRight(rightQuery);
+    boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then
     assertFalse(hasRight);
@@ -47,9 +54,33 @@ public class SupervisionRoleAssignmentTest {
 
     //when
     RightQuery rightQuery = new RightQuery(right, program, new SupervisoryNode());
-    boolean hasRight = supervisionRoleAssignment.hasRight(rightQuery);
+    boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then
     assertFalse(hasRight);
+  }
+
+  @Test
+  public void shouldAssignHomeFacilityProgramWhenUserAssignedWithNoNode() {
+
+    //when
+    homeFacilityRoleAssignment.assignTo(user);
+    List<Program> programs = user.getHomeFacilityPrograms();
+
+    //then
+    assertThat(programs.size(), is(1));
+    assertThat(programs.get(0), is(program));
+  }
+  
+  @Test
+  public void shouldAssignSupervisedProgramWhenUserAssignedWithNode() {
+
+    //when
+    supervisedRoleAssignment.assignTo(user);
+    List<Program> programs = user.getSupervisedPrograms();
+    
+    //then
+    assertThat(programs.size(), is(1));
+    assertThat(programs.get(0), is(program));
   }
 }

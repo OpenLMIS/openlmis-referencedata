@@ -36,8 +36,8 @@ targetCompatibility = 1.8
 
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
-    compile "org.projectlombok:lombok:1.16.8"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
+    compile "org.projectlombok:lombok:1.16.8"
     compile "org.postgresql:postgresql:9.4.1208"
     compile "com.github.tomakehurst:wiremock:1.58"
     compile "org.springframework:spring-test"
@@ -45,9 +45,27 @@ dependencies {
     compile "com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.4.0"
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.security.oauth:spring-security-oauth2"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0"
 
     testCompile "junit:junit"
     testCompile "org.mockito:mockito-core:1.+"
+    testCompile "org.springframework:spring-test"
+}
+
+idea {
+    project {
+        vcs = 'Git'
+        ipr.withXml { xmlFile ->
+            // enable 'Annotation Processors', source: https://gist.github.com/stephanos/8645809
+            xmlFile.asNode().component
+                    .find { it.@name == 'CompilerConfiguration' }['annotationProcessing'][0]
+                    .replaceNode {
+                annotationProcessing {
+                    profile(default: true, name: 'Default', useClasspath: 'true', enabled: true)
+                }
+            }
+        }
+    }
 }
 
 flyway {
@@ -123,7 +141,7 @@ jacocoTestReport {
 }
 
 checkstyle {
-    toolVersion = "6.19"
+    toolVersion = "7.1"
 }
 
 //Usage: gradle sonarqube

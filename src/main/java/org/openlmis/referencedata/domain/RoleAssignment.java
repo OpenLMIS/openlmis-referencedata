@@ -49,4 +49,8 @@ public abstract class RoleAssignment extends BaseEntity {
   protected abstract List<RightType> getAcceptableRightTypes();
 
   public abstract boolean hasRight(RightQuery rightQuery);
+  
+  public void assignTo(User user) {
+    this.user = user;
+  }
 }

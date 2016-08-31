@@ -33,11 +33,11 @@ public class RoleAssignmentTest {
 
   @Test
   public void shouldAllowCreationWithMatchingRoleTypes() throws RightTypeException {
-    new TestStub(new Role(roleName, Right.ofType(GENERAL_ADMIN)));
+    new TestStub(new Role(roleName, new Right("adminRight1", GENERAL_ADMIN)));
   }
 
   @Test(expected = RightTypeException.class)
   public void shouldNotAllowCreationWithMismatchingRoleTypes() throws RightTypeException {
-    new TestStub(new Role(roleName, Right.ofType(ORDER_FULFILLMENT)));
+    new TestStub(new Role(roleName, new Right("fulfillmentRight1", ORDER_FULFILLMENT)));
   }
 }

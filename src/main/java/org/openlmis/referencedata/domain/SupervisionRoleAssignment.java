@@ -75,4 +75,16 @@ public class SupervisionRoleAssignment extends RoleAssignment {
 
     return roleMatches && programMatches && nodeMatches;
   }
+
+  @Override
+  public void assignTo(User user) {
+    super.assignTo(user);
+    if (supervisoryNode == null) {
+      user.addHomeFacilityProgram(program);
+    } else {
+      user.addSupervisedProgram(program);
+      List<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities();
+      user.addSupervisedFacilities(supervisedFacilities);
+    }
+  }
 }
