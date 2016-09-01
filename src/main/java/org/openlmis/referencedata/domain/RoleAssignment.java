@@ -40,7 +40,7 @@ public abstract class RoleAssignment extends BaseEntity {
     boolean roleTypeAcceptable = acceptableRightTypes.stream()
         .anyMatch(rightType -> rightType == role.getRightType());
     if (!roleTypeAcceptable) {
-      throw new RightTypeException("referencedata.message.type-not-in-acceptable-types");
+      throw new RightTypeException("referencedata.error.type-not-in-acceptable-types");
     }
 
     this.role = role;

@@ -4,7 +4,9 @@ import static java.util.stream.Collectors.toList;
 
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
@@ -34,6 +36,20 @@ public class RoleController {
   private ExposedMessageSource messageSource;
 
   /**
+   * Get all roles in the system.
+   *
+   * @return all roles in the system
+   */
+  @RequestMapping(value = "/roles", method = RequestMethod.GET)
+  public ResponseEntity<?> getRoles() {
+    Iterable<Role> roles = roleRepository.findAll();
+
+    return ResponseEntity
+        .ok()
+        .body(roles);
+  }
+
+  /**
    * Create a new role using the provided role object.
    *
    * @return if successful, the new role; otherwise an HTTP error
@@ -42,12 +58,7 @@ public class RoleController {
   public ResponseEntity<?> createRole(@RequestBody Role roleDto) {
     try {
 
-      List<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
-          rightDto.getId())).collect(toList());
-
-      Role role = new Role(roleDto.getName(),
-          roleDto.getDescription(),
-          rights.toArray(new Right[roleDto.getRights().size()]));
+      Role role = createRoleInstance(roleDto);
 
       roleRepository.save(role);
 
@@ -55,15 +66,16 @@ public class RoleController {
           .status(HttpStatus.CREATED)
           .body(role);
 
-    } catch (RightTypeException rte) {
+    } catch (AuthException ae) {
       return ResponseEntity
           .badRequest()
-          .body(messageSource.getMessage(rte.getMessage(), null, LocaleContextHolder.getLocale()));
+          .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
     }
   }
 
   /**
-   * Update an existing role using the provided role object.
+   * Update an existing role using the provided role object. Note, if the role does not exist, will
+   * create one.
    *
    * @return if successful, the updated role; otherwise an HTTP error
    */
@@ -73,25 +85,17 @@ public class RoleController {
     try {
 
       UUID roleId = UUID.fromString(id);
-      Role role = roleRepository.findOne(roleId);
+      Role persistedRole = roleRepository.findOne(roleId);
 
-      if (role == null) {
+      if (persistedRole != null && !persistedRole.getName().equalsIgnoreCase(roleDto.getName())) {
         return ResponseEntity
             .badRequest()
-            .body(messageSource.getMessage("referencedata.message.role-does-not-exist",
+            .body(messageSource.getMessage("referencedata.error.role-name-does-not-match-db",
                 null, LocaleContextHolder.getLocale()));
       }
 
-      if (!role.getName().equalsIgnoreCase(roleDto.getName())) {
-        return ResponseEntity
-            .badRequest()
-            .body(messageSource.getMessage("referencedata.message.role-name-does-not-match-db",
-                null, LocaleContextHolder.getLocale()));
-      }
-
-      List<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
-          rightDto.getId())).collect(toList());
-      role.group(rights.toArray(new Right[rights.size()]));
+      Role role = createRoleInstance(roleDto);
+      role.setId(roleId);
 
       roleRepository.save(role);
 
@@ -99,10 +103,39 @@ public class RoleController {
           .ok()
           .body(role);
 
-    } catch (RightTypeException rte) {
+    } catch (AuthException ae) {
       return ResponseEntity
           .badRequest()
-          .body(messageSource.getMessage(rte.getMessage(), null, LocaleContextHolder.getLocale()));
+          .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
     }
+  }
+
+  /**
+   * Delete an existing role.
+   *
+   * @param id id of role to delete
+   * @return no content
+   */
+  @RequestMapping(value = "/roles/{id}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteRole(@PathVariable("id") String id) {
+
+    roleRepository.delete(UUID.fromString(id));
+
+    return ResponseEntity
+        .noContent()
+        .build();
+  }
+  
+  private Role createRoleInstance(Role roleDto) throws RightTypeException, RoleException {
+    if (roleDto.getRights().size() == 0) {
+      throw new RoleException("referencedata.error.role-must-have-a-right");
+    }
+    
+    List<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
+        rightDto.getId())).collect(toList());
+
+    return new Role(roleDto.getName(),
+        roleDto.getDescription(),
+        rights.toArray(new Right[roleDto.getRights().size()]));
   }
 }

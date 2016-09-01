@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -41,7 +40,7 @@ public class Right extends BaseEntity {
   @Getter
   @Setter
   private String description;
-  
+
   @OneToMany(mappedBy = "parent")
   @Getter
   private List<Right> attachments = new ArrayList<>();
@@ -51,8 +50,7 @@ public class Right extends BaseEntity {
   private Right parent;
   
   @ManyToMany(
-      mappedBy = "rights",
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+      mappedBy = "rights"
   )
   private List<Role> roles;
 
@@ -63,9 +61,9 @@ public class Right extends BaseEntity {
 
   /**
    * Constructor for name, type, description.
-   * 
-   * @param name right name
-   * @param type right type
+   *
+   * @param name        right name
+   * @param type        right type
    * @param description right description
    */
   public Right(String name, RightType type, String description) {
@@ -76,8 +74,8 @@ public class Right extends BaseEntity {
 
   /**
    * Attach other rights to this one, to create relationships between rights. The attachment is
-   * one-way with this method call. The attached rights must be of the same type; only 
-   * attachments of the same type are attached.
+   * one-way with this method call. The attached rights must be of the same type; only attachments
+   * of the same type are attached.
    *
    * @param attachments the rights being attached
    */
