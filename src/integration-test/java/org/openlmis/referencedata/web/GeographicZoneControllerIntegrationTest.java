@@ -1,62 +1,73 @@
-package referencedata.web;
+package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.Role;
-import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 
-public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  private static final String RESOURCE_URL = "/api/roles";
+public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
+
+  private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
 
   @Autowired
-  private RoleRepository roleRepository;
+  private GeographicLevelRepository geographicLevelRepository;
 
-  private Role role = new Role();
+  @Autowired
+  private GeographicZoneRepository geographicZoneRepository;
+
+  private GeographicZone geoZone = new GeographicZone();
+  private GeographicLevel geoLevel = new GeographicLevel();
 
   @Before
   public void setUp() {
-    role.setName("roleName");
-    roleRepository.save(role);
+    geoLevel.setCode("geoLevelCode");
+    geoLevel.setLevelNumber(1);
+    geographicLevelRepository.save(geoLevel);
+    geoZone.setCode("geoZoneCode");
+    geoZone.setLevel(geoLevel);
+    geographicZoneRepository.save(geoZone);
   }
 
   @Test
-  public void shouldDeleteRole() {
+  public void shouldDeleteGeographicZone() {
 
     restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", role.getId())
+          .pathParam("id", geoZone.getId())
           .when()
           .delete(ID_URL)
           .then()
           .statusCode(204);
 
-    Assert.assertFalse(roleRepository.exists(role.getId()));
+    assertFalse(geographicZoneRepository.exists(geoZone.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldCreateRole() {
+  public void shouldCreateGeographicZone() {
 
-    roleRepository.delete(role);
+    geographicZoneRepository.delete(geoZone);
 
     restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(role)
+          .body(geoZone)
           .when()
           .post(RESOURCE_URL)
           .then()
@@ -66,56 +77,56 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldUpdateRole() {
+  public void shouldUpdateGeographicZone() {
 
-    role.setDescription("OpenLMIS");
+    geoZone.setCode("OpenLMIS");
 
-    Role response = restAssured.given()
+    GeographicZone response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", role.getId())
-          .body(role)
+          .pathParam("id", geoZone.getId())
+          .body(geoZone)
           .when()
           .put(ID_URL)
           .then()
           .statusCode(200)
-          .extract().as(Role.class);
+          .extract().as(GeographicZone.class);
 
-    assertEquals(response.getDescription(), "OpenLMIS");
+    assertEquals(response.getCode(), "OpenLMIS");
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetAllRoles() {
+  public void shouldGetAllGeographicZones() {
 
-    Role[] response = restAssured.given()
+    GeographicZone[] response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when()
           .get(RESOURCE_URL)
           .then()
           .statusCode(200)
-          .extract().as(Role[].class);
+          .extract().as(GeographicZone[].class);
 
-    Iterable<Role> roles = Arrays.asList(response);
-    assertTrue(roles.iterator().hasNext());
+    Iterable<GeographicZone> geographicZones = Arrays.asList(response);
+    assertTrue(geographicZones.iterator().hasNext());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenRole() {
+  public void shouldGetChosenGeographicZone() {
 
-    Role response = restAssured.given()
+    GeographicZone response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", role.getId())
+          .pathParam("id", geoZone.getId())
           .when()
           .get(ID_URL)
           .then()
           .statusCode(200)
-          .extract().as(Role.class);
+          .extract().as(GeographicZone.class);
 
-    assertTrue(roleRepository.exists(response.getId()));
+    assertTrue(geographicZoneRepository.exists(response.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

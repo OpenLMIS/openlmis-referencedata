@@ -1,4 +1,4 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,12 +9,6 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
-import org.openlmis.referencedata.repository.GeographicZoneRepository;
-import org.openlmis.referencedata.repository.RoleRepository;
-import org.openlmis.referencedata.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -68,51 +62,6 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     roles = new ArrayList<>();
     for (int usersCount = 0; usersCount < 5; usersCount++) {
       users.add(repository.save(generateInstance()));
-    }
-  }
-
-  @Test
-  public void testMultipleRoleAssignment() {
-    User user = this.generateInstance();
-    Role role = new Role();
-    role.setName("Test1");
-    user = repository.save(user);
-    List<Role> roles = new ArrayList<>();
-    roles.add(role);
-    roleRepository.save(role);
-    Role role2 = new Role();
-    role2.setName("Test2");
-    roles.add(role2);
-    roleRepository.save(role2);
-    Assert.assertNotEquals(roles, user.getRoles());
-    user.setRoles(roles);
-    user = repository.save(user);
-    Assert.assertEquals(roles, user.getRoles());
-  }
-
-  @Test
-  public void testMultipleUsersRoleAssignment() {
-    for (int rolesCount = 0; rolesCount < 5; rolesCount++) {
-      Role role = new Role();
-      role.setName("Test" + rolesCount);
-      roleRepository.save(role);
-      roles.add(role);
-    }
-    User user1 = this.generateInstance();
-    user1.setRoles(roles);
-    user1.setFirstName("name1");
-    user1 = repository.save(user1);
-    User user2 = this.generateInstance();
-    Assert.assertNotEquals(user1.getRoles(), user2.getRoles());
-    List<Role> user1Roles = new ArrayList<>();
-    user1Roles.addAll(user1.getRoles());
-    user2.setRoles(user1Roles);
-    user2.setFirstName("name2");
-    user2 = repository.save(user2);
-    for (int rolesCount = 0; rolesCount < user1.getRoles().size(); rolesCount++) {
-      Assert.assertEquals(
-              user1.getRoles().get(rolesCount).getId(),
-              user2.getRoles().get(rolesCount).getId());
     }
   }
 

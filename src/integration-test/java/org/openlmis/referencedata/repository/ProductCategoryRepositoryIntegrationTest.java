@@ -1,10 +1,9 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.ProductCategory;
-import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 

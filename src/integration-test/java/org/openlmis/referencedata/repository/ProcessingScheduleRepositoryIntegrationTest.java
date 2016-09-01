@@ -1,10 +1,9 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.collect.Lists;
 

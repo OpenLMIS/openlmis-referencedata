@@ -1,4 +1,4 @@
-package referencedata.web;
+package org.openlmis.referencedata.web;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.After;
@@ -22,7 +22,7 @@ import guru.nidi.ramltester.RamlLoaders;
 import guru.nidi.ramltester.restassured.RestAssuredClient;
 import java.util.Map;
 import java.util.UUID;
-import referencedata.utils.CleanRepositoryHelper;
+import org.openlmis.referencedata.utils.CleanRepositoryHelper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)

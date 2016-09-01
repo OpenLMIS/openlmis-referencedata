@@ -1,7 +1,6 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class GeographicLevelRepositoryIntegrationTest

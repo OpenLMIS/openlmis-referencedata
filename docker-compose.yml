@@ -3,10 +3,16 @@ services:
   referencedata:
     image: openlmis/referencedata
     links:
+      - auth
       - db
       - log
     ports:
       - "8080"
+    env_file: .env
+  auth:
+    image: openlmis/auth
+    ports:
+    - "8081:8080"
     env_file: .env
   db:
     image: openlmis/postgres

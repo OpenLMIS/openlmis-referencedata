@@ -1,4 +1,4 @@
-package referencedata.web;
+package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;

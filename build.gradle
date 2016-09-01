@@ -51,7 +51,6 @@ dependencies {
     testCompile 'io.rest-assured:json-schema-validator:3.0.0'
     testCompile 'io.rest-assured:spring-mock-mvc:3.0.0'
     testCompile "com.jayway.restassured:rest-assured:2.7.0"
-
     testCompile "org.springframework.boot:spring-boot-starter-test"
     testCompile "guru.nidi.raml:raml-tester:0.8.9"
     testCompile "junit:junit"

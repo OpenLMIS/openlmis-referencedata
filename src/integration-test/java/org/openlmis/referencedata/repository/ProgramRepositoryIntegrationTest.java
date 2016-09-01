@@ -1,11 +1,10 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Program> {

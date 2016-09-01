@@ -1,4 +1,4 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import org.junit.Assert;
 import org.junit.Test;

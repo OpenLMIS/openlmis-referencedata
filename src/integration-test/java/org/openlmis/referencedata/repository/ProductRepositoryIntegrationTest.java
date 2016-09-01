@@ -1,9 +1,7 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import org.openlmis.referencedata.domain.Product;
 import org.openlmis.referencedata.domain.ProductCategory;
-import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProductRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Product> {

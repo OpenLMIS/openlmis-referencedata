@@ -1,4 +1,4 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,10 +8,6 @@ import org.openlmis.referencedata.domain.Product;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
-import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.repository.ProductRepository;
-import org.openlmis.referencedata.repository.ProgramProductRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;

@@ -1,22 +1,15 @@
-package referencedata.repository;
+package org.openlmis.referencedata.repository;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.product.domain.Product;
-import org.openlmis.product.domain.ProductCategory;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.Money;
+import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.Product;
+import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
-import org.openlmis.referencedata.repository.BaseCrudRepositoryIntegrationTest;
-import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
-import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.repository.ProductRepository;
-import org.openlmis.referencedata.repository.ProgramProductRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class FacilityTypeApprovedProductRepositoryTest extends
@@ -50,6 +43,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private ProductCategory productCategory;
   private Program program;
   private Product product;
+  private OrderableProduct orderableProduct;
 
   private static final double maxMonthsOfStockDelta = 1e-15;
 
@@ -84,12 +78,22 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     productRepository.save(product);
     programProduct = new ProgramProduct();
     programProduct.setProgram(program);
-    programProduct.setProduct(product);
+    orderableProduct = new OrderableProduct() {
+      @Override
+      public String getDescription() {
+        return "Description";
+      }
+
+      @Override
+      public boolean canFulfill(OrderableProduct product) {
+        return false;
+      }
+    };
+    programProduct.setProduct(orderableProduct);
     programProduct.setProductCategory(productCategory);
     programProduct.setActive(true);
     programProduct.setDosesPerMonth(1);
     programProduct.setFullSupply(true);
-    programProduct.setPricePerPack(new Money("20.99"));
     programProductRepository.save(programProduct);
   }
 

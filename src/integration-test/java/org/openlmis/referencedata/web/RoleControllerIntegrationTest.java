@@ -1,64 +1,62 @@
-package referencedata.web;
+package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
+import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 
+public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
-public class GeographicLevelControllerIntegrationTest extends BaseWebIntegrationTest {
-
-  private static final String RESOURCE_URL = "/api/geographicLevels";
+  private static final String RESOURCE_URL = "/api/roles";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
 
   @Autowired
-  private GeographicLevelRepository geographicLevelRepository;
+  private RoleRepository roleRepository;
 
-  private GeographicLevel geoLevel = new GeographicLevel();
+  private Role role = new Role();
 
   @Before
   public void setUp() {
-    geoLevel.setCode("geoLevelCode");
-    geoLevel.setLevelNumber(1);
-    geographicLevelRepository.save(geoLevel);
+    role.setName("roleName");
+    roleRepository.save(role);
   }
 
   @Test
-  public void shouldDeleteGeographicLevel() {
+  public void shouldDeleteRole() {
 
     restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", geoLevel.getId())
+          .pathParam("id", role.getId())
           .when()
           .delete(ID_URL)
           .then()
           .statusCode(204);
 
-    assertFalse(geographicLevelRepository.exists(geoLevel.getId()));
+    Assert.assertFalse(roleRepository.exists(role.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldCreateGeographicLevel() {
+  public void shouldCreateRole() {
 
-    geographicLevelRepository.delete(geoLevel);
+    roleRepository.delete(role);
 
     restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(geoLevel)
+          .body(role)
           .when()
           .post(RESOURCE_URL)
           .then()
@@ -68,56 +66,56 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldUpdateGeographicLevel() {
+  public void shouldUpdateRole() {
 
-    geoLevel.setCode("OpenLMIS");
+    role.setDescription("OpenLMIS");
 
-    GeographicLevel response = restAssured.given()
+    Role response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", geoLevel.getId())
-          .body(geoLevel)
+          .pathParam("id", role.getId())
+          .body(role)
           .when()
           .put(ID_URL)
           .then()
           .statusCode(200)
-          .extract().as(GeographicLevel.class);
+          .extract().as(Role.class);
 
-    assertEquals(response.getCode(), "OpenLMIS");
+    assertEquals(response.getDescription(), "OpenLMIS");
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetAllGeographicLevels() {
+  public void shouldGetAllRoles() {
 
-    GeographicLevel[] response = restAssured.given()
+    Role[] response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when()
           .get(RESOURCE_URL)
           .then()
           .statusCode(200)
-          .extract().as(GeographicLevel[].class);
+          .extract().as(Role[].class);
 
-    Iterable<GeographicLevel> geographicLevels = Arrays.asList(response);
-    assertTrue(geographicLevels.iterator().hasNext());
+    Iterable<Role> roles = Arrays.asList(response);
+    assertTrue(roles.iterator().hasNext());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenGeographicLevel() {
+  public void shouldGetChosenRole() {
 
-    GeographicLevel response = restAssured.given()
+    Role response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", geoLevel.getId())
+          .pathParam("id", role.getId())
           .when()
           .get(ID_URL)
           .then()
           .statusCode(200)
-          .extract().as(GeographicLevel.class);
+          .extract().as(Role.class);
 
-    assertTrue(geographicLevelRepository.exists(response.getId()));
+    assertTrue(roleRepository.exists(response.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }
