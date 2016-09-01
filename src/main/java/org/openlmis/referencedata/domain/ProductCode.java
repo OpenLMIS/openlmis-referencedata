@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
@@ -40,6 +42,7 @@ public final class ProductCode {
   }
 
   @Override
+  @JsonValue
   public String toString() {
     return productCode;
   }
@@ -49,6 +52,7 @@ public final class ProductCode {
    * @param productCode the product's code
    * @return a new ProductCode with the given code.  Uses a blank code if given null.
    */
+  @JsonCreator
   public static final ProductCode newProductCode(String productCode) {
     String workingCode = (null == productCode) ? "" : productCode;
     return new ProductCode(workingCode);

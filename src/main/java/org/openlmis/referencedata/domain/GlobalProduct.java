@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
@@ -35,9 +37,10 @@ public final class GlobalProduct extends OrderableProduct {
    * @param packSize    the number of dispensing units in the pack
    * @return a new GlobalProduct
    */
-  public static GlobalProduct newGlobalProduct(String productCode,
-                                               String description,
-                                               long packSize) {
+  @JsonCreator
+  public static GlobalProduct newGlobalProduct(@JsonProperty("productCode") String productCode,
+                                               @JsonProperty("description") String description,
+                                               @JsonProperty("packSize") long packSize) {
     ProductCode code = ProductCode.newProductCode(productCode);
     GlobalProduct globalProduct = new GlobalProduct(code, packSize);
     globalProduct.description = description;

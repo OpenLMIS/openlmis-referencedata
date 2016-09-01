@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashSet;
@@ -24,6 +25,8 @@ import javax.persistence.Table;
 public abstract class OrderableProduct extends BaseEntity {
   @Embedded
   private ProductCode productCode;
+
+  @JsonProperty
   private long packSize;
 
   @ElementCollection
@@ -39,6 +42,7 @@ public abstract class OrderableProduct extends BaseEntity {
    * Return this orderable product's unique product code.
    * @return a copy of this product's unique product code.
    */
+  @JsonProperty
   public final ProductCode getProductCode() {
     return productCode;
   }
@@ -52,6 +56,7 @@ public abstract class OrderableProduct extends BaseEntity {
     return programProducts.add("todo");
   }
 
+  @JsonProperty
   public abstract String getDescription();
 
   /**
