@@ -1,6 +1,6 @@
 package org.openlmis.referencedata.web;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -165,7 +165,7 @@ public class RoleController {
           .notFound()
           .build();
     }
-    
+
     try {
 
       LOGGER.debug("Deleting role");
@@ -189,8 +189,8 @@ public class RoleController {
       throw new RoleException("referencedata.error.role-must-have-a-right");
     }
 
-    List<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
-        rightDto.getId())).collect(toList());
+    Set<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
+        rightDto.getId())).collect(toSet());
 
     return new Role(roleDto.getName(),
         roleDto.getDescription(),

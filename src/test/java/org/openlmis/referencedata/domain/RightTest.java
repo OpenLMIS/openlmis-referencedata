@@ -5,7 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Set;
 
 public class RightTest {
   @Test
@@ -20,8 +20,8 @@ public class RightTest {
     right.attach(new Right("fulfillmentRight1", RightType.ORDER_FULFILLMENT));
 
     //then
-    List<Right> attachedRights = right.getAttachments();
+    Set<Right> attachedRights = right.getAttachments();
     assertThat(attachedRights.size(), is(1));
-    assertThat(attachedRights.get(0), is(attachment));
+    assertThat(attachedRights.iterator().next(), is(attachment));
   }
 }

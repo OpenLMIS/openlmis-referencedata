@@ -6,8 +6,8 @@ import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RoleAssignmentTest {
 
@@ -19,8 +19,8 @@ public class RoleAssignmentTest {
     }
 
     @Override
-    protected List<RightType> getAcceptableRightTypes() {
-      List<RightType> acceptableRightTypes = new ArrayList<>();
+    protected Set<RightType> getAcceptableRightTypes() {
+      Set<RightType> acceptableRightTypes = new HashSet<>();
       acceptableRightTypes.add(GENERAL_ADMIN);
       return acceptableRightTypes;
     }

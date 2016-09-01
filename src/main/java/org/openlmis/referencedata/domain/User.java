@@ -9,9 +9,9 @@ import lombok.Setter;
 
 import org.openlmis.referencedata.util.View;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -73,16 +73,16 @@ public class User extends BaseEntity {
 
   @OneToMany(mappedBy = "user")
   @Getter
-  private List<RoleAssignment> roleAssignments = new ArrayList<>();
+  private Set<RoleAssignment> roleAssignments = new HashSet<>();
 
   @Transient
-  private List<Program> homeFacilityPrograms = new ArrayList<>();
+  private Set<Program> homeFacilityPrograms = new HashSet<>();
 
   @Transient
-  private List<Program> supervisedPrograms = new ArrayList<>();
+  private Set<Program> supervisedPrograms = new HashSet<>();
 
   @Transient
-  private List<Facility> supervisedFacilities = new ArrayList<>();
+  private Set<Facility> supervisedFacilities = new HashSet<>();
 
   @PrePersist
   private void prePersist() {
@@ -111,7 +111,7 @@ public class User extends BaseEntity {
     return roleAssignments.stream().anyMatch(roleAssignment -> roleAssignment.hasRight(rightQuery));
   }
 
-  public List<Program> getHomeFacilityPrograms() {
+  public Set<Program> getHomeFacilityPrograms() {
     return homeFacilityPrograms;
   }
 
@@ -119,7 +119,7 @@ public class User extends BaseEntity {
     homeFacilityPrograms.add(program);
   }
 
-  public List<Program> getSupervisedPrograms() {
+  public Set<Program> getSupervisedPrograms() {
     return supervisedPrograms;
   }
 
@@ -127,11 +127,11 @@ public class User extends BaseEntity {
     supervisedPrograms.add(program);
   }
 
-  public List<Facility> getSupervisedFacilities() {
+  public Set<Facility> getSupervisedFacilities() {
     return supervisedFacilities;
   }
 
-  public void addSupervisedFacilities(List<Facility> facilities) {
+  public void addSupervisedFacilities(Set<Facility> facilities) {
     supervisedFacilities.addAll(facilities);
   }
 }

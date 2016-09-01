@@ -1,11 +1,11 @@
 package org.openlmis.referencedata.domain;
 
-import static java.util.Collections.singletonList;
+import static java.util.Collections.singleton;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -46,8 +46,8 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   }
 
   @Override
-  protected List<RightType> getAcceptableRightTypes() {
-    return singletonList(RightType.ORDER_FULFILLMENT);
+  protected Set<RightType> getAcceptableRightTypes() {
+    return singleton(RightType.ORDER_FULFILLMENT);
   }
 
   @Override

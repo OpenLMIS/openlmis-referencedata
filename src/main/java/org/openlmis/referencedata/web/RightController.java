@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -160,7 +160,7 @@ public class RightController {
   private Right createRightInstance(@RequestBody Right rightDto) {
     Right right = new Right(rightDto.getName(), rightDto.getType(),
         rightDto.getDescription());
-    List<Right> attachments = rightDto.getAttachments();
+    Set<Right> attachments = rightDto.getAttachments();
     right.attach(attachments.toArray(new Right[attachments.size()]));
     return right;
   }

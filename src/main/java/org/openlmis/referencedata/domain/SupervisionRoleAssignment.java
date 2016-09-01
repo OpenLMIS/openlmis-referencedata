@@ -1,11 +1,11 @@
 package org.openlmis.referencedata.domain;
 
-import static java.util.Collections.singletonList;
+import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -57,8 +57,8 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   @Override
-  protected List<RightType> getAcceptableRightTypes() {
-    return singletonList(SUPERVISION);
+  protected Set<RightType> getAcceptableRightTypes() {
+    return singleton(SUPERVISION);
   }
 
   @Override
@@ -83,7 +83,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       user.addHomeFacilityProgram(program);
     } else {
       user.addSupervisedProgram(program);
-      List<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities();
+      Set<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities();
       user.addSupervisedFacilities(supervisedFacilities);
     }
   }

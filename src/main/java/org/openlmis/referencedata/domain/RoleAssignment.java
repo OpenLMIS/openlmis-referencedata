@@ -2,7 +2,7 @@ package org.openlmis.referencedata.domain;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -36,7 +36,7 @@ public abstract class RoleAssignment extends BaseEntity {
    * @throws RightTypeException if role passed in has rights which are not an acceptable right type
    */
   public RoleAssignment(Role role) throws RightTypeException {
-    List<RightType> acceptableRightTypes = getAcceptableRightTypes();
+    Set<RightType> acceptableRightTypes = getAcceptableRightTypes();
     boolean roleTypeAcceptable = acceptableRightTypes.stream()
         .anyMatch(rightType -> rightType == role.getRightType());
     if (!roleTypeAcceptable) {
@@ -46,10 +46,10 @@ public abstract class RoleAssignment extends BaseEntity {
     this.role = role;
   }
 
-  protected abstract List<RightType> getAcceptableRightTypes();
+  protected abstract Set<RightType> getAcceptableRightTypes();
 
   public abstract boolean hasRight(RightQuery rightQuery);
-  
+
   public void assignTo(User user) {
     this.user = user;
   }

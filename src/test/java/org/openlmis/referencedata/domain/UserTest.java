@@ -1,7 +1,6 @@
 package org.openlmis.referencedata.domain;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -14,7 +13,7 @@ import org.openlmis.referencedata.exception.RightTypeException;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 public class UserTest {
   private RightQuery rightQuery = new RightQuery(new Right("supervisionRight1",
@@ -36,7 +35,7 @@ public class UserTest {
   @Test
   public void shouldBeAbleToAssignRoleToUser() throws RightTypeException {
     //when
-    user.assignRoles(new DirectRoleAssignment(new Role(roleName, new Right("reportRight1", 
+    user.assignRoles(new DirectRoleAssignment(new Role(roleName, new Right("reportRight1",
         RightType.REPORTS))));
 
     //then
@@ -74,7 +73,7 @@ public class UserTest {
     //then
     assertFalse(hasRight);
   }
-  
+
   @Test
   public void shouldGetHomeFacilityPrograms() throws RightTypeException {
     //given
@@ -87,13 +86,13 @@ public class UserTest {
 
     user.assignRoles(assignment3);
     user.assignRoles(assignment4);
-    
+
     //when
-    List<Program> programs = user.getHomeFacilityPrograms();
-    
+    Set<Program> programs = user.getHomeFacilityPrograms();
+
     //then
-    assertEquals(program1, programs.get(0));
-    assertEquals(program2, programs.get(1));
+    assertTrue(programs.contains(program1));
+    assertTrue(programs.contains(program2));
   }
 
   @Test
@@ -111,11 +110,11 @@ public class UserTest {
     user.assignRoles(assignment4);
 
     //when
-    List<Program> programs = user.getSupervisedPrograms();
+    Set<Program> programs = user.getSupervisedPrograms();
 
     //then
-    assertEquals(program1, programs.get(0));
-    assertEquals(program2, programs.get(1));
+    assertTrue(programs.contains(program1));
+    assertTrue(programs.contains(program2));
   }
 
   @Test
@@ -140,7 +139,7 @@ public class UserTest {
     user.assignRoles(assignment);
 
     //when
-    List<Facility> facilities = user.getSupervisedFacilities();
+    Set<Facility> facilities = user.getSupervisedFacilities();
 
     //then
     assertThat(facilities.size(), is(3));

@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,16 +43,16 @@ public class Right extends BaseEntity {
 
   @OneToMany(mappedBy = "parent")
   @Getter
-  private List<Right> attachments = new ArrayList<>();
+  private Set<Right> attachments = new HashSet<>();
 
   @ManyToOne
   @JoinColumn(name = "parentid")
   private Right parent;
-  
+
   @ManyToMany(
       mappedBy = "rights"
   )
-  private List<Role> roles;
+  private Set<Role> roles;
 
   public Right(String name, RightType type) {
     this.name = name;
