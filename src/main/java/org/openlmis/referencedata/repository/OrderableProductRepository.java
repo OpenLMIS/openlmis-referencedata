@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.repository;
 
 import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.ProductCode;
 
 import java.util.UUID;
 
@@ -15,5 +16,7 @@ public interface OrderableProductRepository extends
 
   @Override
   <S extends OrderableProduct> Iterable<S> save(Iterable<S> entities);
+
+  <S extends OrderableProduct> S findByProductCode(ProductCode code);
 
 }
