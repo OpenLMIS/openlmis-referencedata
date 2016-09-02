@@ -43,27 +43,35 @@ public final class TradeItem extends OrderableProduct {
    * @returns true if we can fulfill for the given product, false otherwise.
    */
   public boolean canFulfill(OrderableProduct product) {
-    return this.equals(product) || globalProduct.equals(product);
+    return this.equals(product) || hasGlobalProduct(product);
   }
 
   /**
    * Factory method to create a new trade item.
    * @param productCode a unique product code
    * @param packSize the # of dispensing units contained
-   * @param globalProduct the global product this can fulfill for
    * @return a new trade item or armageddon if failure
    */
   public static TradeItem newTradeItem(String productCode,
-                                       long packSize,
-                                       GlobalProduct globalProduct) {
+                                       long packSize) {
     ProductCode code = ProductCode.newProductCode(productCode);
     TradeItem tradeItem = new TradeItem(code, packSize);
-    globalProduct.addTradeItem(tradeItem);
 
     return tradeItem;
   }
 
+  /**
+   * Assign a global product.
+   * @param globalProduct the given global product, or null to un-assign.
+   */
   void assignGlobalProduct(GlobalProduct globalProduct) {
     this.globalProduct = globalProduct;
+  }
+
+  /*
+  returns true if we have a global product and the one given is the same, false otherwise.
+   */
+  private boolean hasGlobalProduct(OrderableProduct product) {
+    return null != globalProduct && globalProduct.equals(product);
   }
 }

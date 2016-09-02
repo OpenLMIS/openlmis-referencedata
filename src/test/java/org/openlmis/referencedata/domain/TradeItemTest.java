@@ -12,7 +12,8 @@ public class TradeItemTest {
 
   {
     ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "test", 30);
-    advil = TradeItem.newTradeItem("advil", 10, ibuprofen);
+    advil = TradeItem.newTradeItem("advil", 10);
+    ibuprofen.addTradeItem(advil);
   }
 
   @Test
@@ -34,7 +35,8 @@ public class TradeItemTest {
   public void testEqualsAndHashCode() {
     assertTrue(advil.equals(advil));
 
-    TradeItem advilDupe = TradeItem.newTradeItem("advil", 20, ibuprofen);
+    TradeItem advilDupe = TradeItem.newTradeItem("advil", 20);
+    ibuprofen.addTradeItem(advilDupe);
     assertTrue(advil.equals(advilDupe));
     assertEquals(advil.hashCode(), advilDupe.hashCode());
   }

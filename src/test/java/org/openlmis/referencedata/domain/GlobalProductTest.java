@@ -13,8 +13,10 @@ public class GlobalProductTest {
 
   {
     ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "test desc", 10);
-    advil = TradeItem.newTradeItem("advil", 12, ibuprofen);
-    motrin = TradeItem.newTradeItem("motrin", 12, ibuprofen);
+    advil = TradeItem.newTradeItem("advil", 12);
+    motrin = TradeItem.newTradeItem("motrin", 12);
+    ibuprofen.addTradeItem(advil);
+    ibuprofen.addTradeItem(motrin);
   }
 
   @Test
