@@ -22,8 +22,7 @@ public class GlobalProductController {
    */
   @Transactional
   @RequestMapping(value = "/globalProducts", method = RequestMethod.PUT)
-  public void addOrUpdate(@RequestBody GlobalProduct globalProduct) {
-
+  public void createOrUpdate(@RequestBody GlobalProduct globalProduct) {
     // if it already exists, update or fail if not already a GlobalProduct
     OrderableProduct storedProduct = repository.findByProductCode(globalProduct.getProductCode());
     if ( null != storedProduct ) {

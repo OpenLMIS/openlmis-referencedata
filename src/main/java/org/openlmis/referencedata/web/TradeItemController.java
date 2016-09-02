@@ -21,8 +21,6 @@ public class TradeItemController {
    */
   @RequestMapping(value = "/tradeItems", method = RequestMethod.PUT)
   public TradeItem createOrUpdate(@RequestBody TradeItem tradeItem) {
-    tradeItem.setId(null);
-
     // if it already exists, update or fail if not already a GlobalProduct
     OrderableProduct storedProduct = repository.findByProductCode(tradeItem.getProductCode());
     if ( null != storedProduct ) {
