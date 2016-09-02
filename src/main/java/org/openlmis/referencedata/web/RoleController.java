@@ -2,6 +2,8 @@ package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toSet;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.exception.AuthException;
@@ -10,6 +12,7 @@ import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.util.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,7 @@ public class RoleController {
    *
    * @return all roles in the system
    */
+  @JsonView(View.BasicInformation.class)
   @RequestMapping(value = "/roles", method = RequestMethod.GET)
   public ResponseEntity<?> getAllRoles() {
 

@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.web;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
@@ -16,6 +18,7 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.util.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,7 @@ public class UserController {
    *
    * @return all roles associated with the specified user
    */
+  @JsonView(View.BasicInformation.class)
   @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.GET)
   public ResponseEntity<?> getAllUserRoles(@PathVariable("userId") UUID userId) {
 
@@ -74,6 +78,7 @@ public class UserController {
    * @param roleAssignmentDtos role assignment DTOs to associate to the user
    * @return if successful, the updated user; otherwise an HTTP error
    */
+  @JsonView(View.BasicInformation.class)
   @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.POST)
   public ResponseEntity<?> saveUserRoles(@PathVariable("userId") UUID userId,
                                          @RequestBody Set<RoleAssignmentDto> roleAssignmentDtos) {

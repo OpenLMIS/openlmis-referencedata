@@ -2,10 +2,13 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Collections.singleton;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
+import org.openlmis.referencedata.util.View;
 
 import java.util.Set;
 
@@ -19,6 +22,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 public class FulfillmentRoleAssignment extends RoleAssignment {
 
+  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "warehouseid")
   private Facility warehouse;
