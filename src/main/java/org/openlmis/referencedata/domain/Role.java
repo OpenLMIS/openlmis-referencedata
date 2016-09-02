@@ -44,12 +44,12 @@ public class Role extends BaseEntity {
   @JsonView(View.BasicInformation.class)
   @ManyToMany(
       cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-  )
+      )
   @JoinTable(name = "role_rights",
       schema = "referencedata",
       joinColumns = @JoinColumn(name = "roleid", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false)
-  )
+      )
   @Getter
   private Set<Right> rights;
 
