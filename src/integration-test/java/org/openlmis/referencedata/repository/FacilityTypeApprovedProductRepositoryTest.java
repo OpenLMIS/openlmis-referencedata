@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.Product;
 import org.openlmis.referencedata.domain.ProductCategory;
@@ -32,6 +33,9 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Autowired
   private ProgramProductRepository programProductRepository;
+
+  @Autowired
+  private OrderableProductRepository orderableProductRepository;
 
   FacilityTypeApprovedProductRepository getRepository() {
     return this.ftapRepository;
@@ -78,17 +82,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     productRepository.save(product);
     programProduct = new ProgramProduct();
     programProduct.setProgram(program);
-    orderableProduct = new OrderableProduct() {
-      @Override
-      public String getDescription() {
-        return "Description";
-      }
-
-      @Override
-      public boolean canFulfill(OrderableProduct product) {
-        return false;
-      }
-    };
+    orderableProduct = orderableProductRepository.save(new GlobalProduct());
     programProduct.setProduct(orderableProduct);
     programProduct.setProductCategory(productCategory);
     programProduct.setActive(true);

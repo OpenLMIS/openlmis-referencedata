@@ -3,7 +3,7 @@ package org.openlmis.referencedata.repository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.Product;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
@@ -28,6 +28,9 @@ public class ProgramProductRepositoryIntegrationTest
   @Autowired
   private ProductCategoryRepository productCategoryRepository;
 
+  @Autowired
+  private OrderableProductRepository orderableProductRepository;
+
   private List<ProgramProduct> programProducts;
 
   ProgramProductRepository getRepository() {
@@ -37,20 +40,9 @@ public class ProgramProductRepositoryIntegrationTest
   ProgramProduct generateInstance() {
     Program program = generateProgram();
     ProductCategory productCategory = generateProductCategory();
-    Product product = generateProduct(productCategory);
-    OrderableProduct orderableProduct = new OrderableProduct() {
-      @Override
-      public String getDescription() {
-        return "Description";
-      }
-
-      @Override
-      public boolean canFulfill(OrderableProduct product) {
-        return false;
-      }
-    };
+    GlobalProduct globalProduct = orderableProductRepository.save(new GlobalProduct());
     ProgramProduct programProduct = new ProgramProduct();
-    programProduct.setProduct(orderableProduct);
+    programProduct.setProduct(globalProduct);
     programProduct.setProductCategory(productCategory);
     programProduct.setProgram(program);
     programProduct.setFullSupply(true);

@@ -101,7 +101,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   public void testSearchUsersByAllParametersNull() {
     List<User> receivedUsers = repository.searchUsers(null, null, null, null, null, null);
 
-    Assert.assertEquals(users.size() + 1, receivedUsers.size());
+    Assert.assertEquals(users.size(), receivedUsers.size());
   }
 
   @Test
