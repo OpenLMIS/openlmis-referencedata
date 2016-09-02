@@ -4,6 +4,7 @@ import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.OrderableProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +20,7 @@ public class TradeItemController {
    * Create or update a trade item.
    * @return the trade item that was created or updated.
    */
+  @Transactional
   @RequestMapping(value = "/tradeItems", method = RequestMethod.PUT)
   public TradeItem createOrUpdate(@RequestBody TradeItem tradeItem) {
     // if it already exists, update or fail if not already a GlobalProduct
