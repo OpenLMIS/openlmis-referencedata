@@ -2,6 +2,8 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Collections.singleton;
 
+import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 
@@ -14,6 +16,7 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @DiscriminatorValue("fulfillment")
+@NoArgsConstructor
 public class FulfillmentRoleAssignment extends RoleAssignment {
 
   @ManyToOne

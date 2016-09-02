@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.domain;
 
+import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.exception.RightTypeException;
 
 import java.util.Set;
@@ -19,6 +21,7 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("abstract")
+@NoArgsConstructor
 public abstract class RoleAssignment extends BaseEntity {
 
   @ManyToOne

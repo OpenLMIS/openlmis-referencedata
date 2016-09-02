@@ -3,6 +3,8 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
+import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.exception.RightTypeException;
 
 import java.util.Set;
@@ -14,6 +16,7 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @DiscriminatorValue("supervision")
+@NoArgsConstructor
 public class SupervisionRoleAssignment extends RoleAssignment {
 
   @ManyToOne

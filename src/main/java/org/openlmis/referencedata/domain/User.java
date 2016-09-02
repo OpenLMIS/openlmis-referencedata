@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -71,7 +72,7 @@ public class User extends BaseEntity {
   @Setter
   private Boolean active;
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
 

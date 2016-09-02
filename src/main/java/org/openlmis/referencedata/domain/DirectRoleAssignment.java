@@ -2,6 +2,8 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Arrays.asList;
 
+import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.exception.RightTypeException;
 
 import java.util.HashSet;
@@ -12,6 +14,7 @@ import javax.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("direct")
+@NoArgsConstructor
 public class DirectRoleAssignment extends RoleAssignment {
   public DirectRoleAssignment(Role role) throws RightTypeException {
     super(role);
