@@ -1,14 +1,11 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Right;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,9 +24,6 @@ public class RightController {
   @Autowired
   private RightRepository rightRepository;
 
-  @Autowired
-  private ExposedMessageSource messageSource;
-
   /**
    * Get all rights in the system.
    *
@@ -47,64 +41,26 @@ public class RightController {
   }
 
   /**
-   * Create a new right using the provided right DTO.
+   * Save a right using the provided right DTO. If the right does not exist, will create one. If it
+   * does exist,
    *
-   * @param rightDto right DTO with which to create the right
-   * @return if successful, the new right; otherwise an HTTP error
-   */
-  @RequestMapping(value = "/rights", method = RequestMethod.POST)
-  public ResponseEntity<?> createRight(@RequestBody Right rightDto) {
-
-    Right newRight = createRightInstance(rightDto);
-
-    try {
-
-      LOGGER.debug("Saving new right");
-      rightRepository.save(newRight);
-
-    } catch (DataIntegrityViolationException dive) {
-      LOGGER.error("An error occurred while saving right: " + dive.getRootCause().getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(dive.getRootCause().getMessage());
-    }
-
-    LOGGER.debug("Saved new right with id: " + newRight.getId());
-
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(newRight);
-  }
-
-  /**
-   * Update an existing right using the provided right DTO. Note, if the right does not exist, will
-   * create one.
-   *
-   * @param rightId  id of the right to update
    * @param rightDto provided right DTO
    * @return ResponseEntity containing the updated right
    */
-  @RequestMapping(value = "/rights/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateRight(@PathVariable("id") UUID rightId,
-                                       @RequestBody Right rightDto) {
-
-    LOGGER.debug("Checking if right exists");
-    Right persistedRight = rightRepository.findOne(rightId);
-
-    if (persistedRight != null && !persistedRight.getName().equalsIgnoreCase(rightDto.getName())) {
-      LOGGER.error("Right name does not match existing right");
-      return ResponseEntity
-          .badRequest()
-          .body(messageSource.getMessage("referencedata.error.right-name-does-not-match-db",
-              null, LocaleContextHolder.getLocale()));
-    }
+  @RequestMapping(value = "/rights", method = RequestMethod.PUT)
+  public ResponseEntity<?> saveRight(@RequestBody Right rightDto) {
 
     Right rightToSave = createRightInstance(rightDto);
-    rightToSave.setId(rightId);
+
+    Right storedRight = rightRepository.findFirstByName(rightDto.getName());
+    if (storedRight != null) {
+      LOGGER.debug("Right found in the system, assign id");
+      rightToSave.setId(storedRight.getId());
+    }
 
     try {
 
-      LOGGER.debug("Saving right using id: " + rightId);
+      LOGGER.debug("Saving right");
       rightRepository.save(rightToSave);
 
     } catch (DataIntegrityViolationException dive) {

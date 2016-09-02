@@ -107,17 +107,6 @@ public class RoleController {
   public ResponseEntity<?> updateRole(@PathVariable("id") UUID roleId,
                                       @RequestBody Role roleDto) {
 
-    LOGGER.debug("Checking if role exists");
-    Role persistedRole = roleRepository.findOne(roleId);
-
-    if (persistedRole != null && !persistedRole.getName().equalsIgnoreCase(roleDto.getName())) {
-      LOGGER.error("Role name does not match existing role");
-      return ResponseEntity
-          .badRequest()
-          .body(messageSource.getMessage("referencedata.error.role-name-does-not-match-db",
-              null, LocaleContextHolder.getLocale()));
-    }
-
     Role roleToSave;
 
     try {
@@ -158,8 +147,8 @@ public class RoleController {
   @RequestMapping(value = "/roles/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteRole(@PathVariable("id") UUID roleId) {
 
-    Role persistedRole = roleRepository.findOne(roleId);
-    if (persistedRole == null) {
+    Role storedRole = roleRepository.findOne(roleId);
+    if (storedRole == null) {
       LOGGER.error("Role to delete does not exist");
       return ResponseEntity
           .notFound()
