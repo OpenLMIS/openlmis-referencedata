@@ -63,8 +63,8 @@ public class RoleController {
    * @return specified role
    */
   @JsonView(View.BasicInformation.class)
-  @RequestMapping(value = "/roles/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getRole(@PathVariable("id") UUID roleId) {
+  @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.GET)
+  public ResponseEntity<?> getRole(@PathVariable("roleId") UUID roleId) {
 
     LOGGER.debug("Getting role");
     Role role = roleRepository.findOne(roleId);
@@ -127,8 +127,8 @@ public class RoleController {
    * @param roleDto provided role DTO
    * @return if successful, the updated role; otherwise an HTTP error
    */
-  @RequestMapping(value = "/roles/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateRole(@PathVariable("id") UUID roleId,
+  @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.PUT)
+  public ResponseEntity<?> updateRole(@PathVariable("roleId") UUID roleId,
                                       @RequestBody Role roleDto) {
 
     Role roleToSave;
@@ -168,8 +168,8 @@ public class RoleController {
    * @param roleId id of the role to delete
    * @return no content
    */
-  @RequestMapping(value = "/roles/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteRole(@PathVariable("id") UUID roleId) {
+  @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteRole(@PathVariable("roleId") UUID roleId) {
 
     Role storedRole = roleRepository.findOne(roleId);
     if (storedRole == null) {

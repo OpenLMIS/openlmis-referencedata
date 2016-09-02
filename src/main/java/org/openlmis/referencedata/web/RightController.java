@@ -84,8 +84,8 @@ public class RightController {
    * @param rightId id of the right to delete
    * @return no content
    */
-  @RequestMapping(value = "/rights/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteRight(@PathVariable("id") UUID rightId) {
+  @RequestMapping(value = "/rights/{rightId}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteRight(@PathVariable("rightId") UUID rightId) {
 
     Right persistedRight = rightRepository.findOne(rightId);
     if (persistedRight == null) {
