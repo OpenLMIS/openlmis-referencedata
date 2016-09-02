@@ -10,6 +10,7 @@ import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.util.View;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
@@ -68,5 +69,27 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   @Override
   public void assignTo(User user) {
     super.assignTo(user);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof FulfillmentRoleAssignment)) {
+      return false;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    FulfillmentRoleAssignment that = (FulfillmentRoleAssignment) obj;
+    return Objects.equals(role, that.role)
+        && Objects.equals(user, that.user)
+        && Objects.equals(warehouse, that.warehouse);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), warehouse);
   }
 }

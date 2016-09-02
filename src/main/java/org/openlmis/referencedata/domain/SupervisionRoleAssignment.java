@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.util.View;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
@@ -94,5 +95,28 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       Set<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities();
       user.addSupervisedFacilities(supervisedFacilities);
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof SupervisionRoleAssignment)) {
+      return false;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    SupervisionRoleAssignment that = (SupervisionRoleAssignment) obj;
+    return Objects.equals(role, that.role)
+        && Objects.equals(user, that.user)
+        && Objects.equals(program, that.program)
+        && Objects.equals(supervisoryNode, that.supervisoryNode);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), program, supervisoryNode);
   }
 }

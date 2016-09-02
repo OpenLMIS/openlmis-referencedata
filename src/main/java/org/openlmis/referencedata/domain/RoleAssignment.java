@@ -63,7 +63,7 @@ public abstract class RoleAssignment extends BaseEntity {
   }
 
   @Override
-  public final boolean equals(Object obj) {
+  public boolean equals(Object obj) {
     if (this == obj) {
       return true;
     }
@@ -76,7 +76,7 @@ public abstract class RoleAssignment extends BaseEntity {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hash(role, user);
   }
 }
