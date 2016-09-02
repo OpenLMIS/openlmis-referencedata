@@ -57,6 +57,30 @@ public class RoleController {
   }
 
   /**
+   * Get specified role in the system.
+   *
+   * @param roleId id of the role to get
+   * @return specified role
+   */
+  @JsonView(View.BasicInformation.class)
+  @RequestMapping(value = "/roles/{id}", method = RequestMethod.GET)
+  public ResponseEntity<?> getRole(@PathVariable("id") UUID roleId) {
+
+    LOGGER.debug("Getting role");
+    Role role = roleRepository.findOne(roleId);
+    if (role == null) {
+      LOGGER.error("Role to get does not exist");
+      return ResponseEntity
+          .notFound()
+          .build();
+    }
+
+    return ResponseEntity
+        .ok()
+        .body(role);
+  }
+
+  /**
    * Create a new role using the provided role DTO.
    *
    * @param roleDto role DTO with which to create the role

@@ -146,7 +146,7 @@ public class UserController {
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(user);
+        .body(user.getRoleAssignments());
   }
 
 }
