@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorColumn;
@@ -55,5 +56,23 @@ public abstract class RoleAssignment extends BaseEntity {
 
   public void assignTo(User user) {
     this.user = user;
+  }
+
+  @Override
+  public final boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof RoleAssignment)) {
+      return false;
+    }
+    RoleAssignment that = (RoleAssignment) obj;
+    return Objects.equals(role, that.role)
+        && Objects.equals(user, that.user);
+  }
+
+  @Override
+  public final int hashCode() {
+    return Objects.hash(role, user);
   }
 }
