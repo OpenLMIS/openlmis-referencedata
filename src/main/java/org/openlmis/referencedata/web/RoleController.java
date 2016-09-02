@@ -189,11 +189,11 @@ public class RoleController {
       throw new RoleException("referencedata.error.role-must-have-a-right");
     }
 
-    Set<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository.findOne(
-        rightDto.getId())).collect(toSet());
+    Set<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository
+        .findFirstByName(rightDto.getName())).collect(toSet());
 
     return new Role(roleDto.getName(),
         roleDto.getDescription(),
-        rights.toArray(new Right[roleDto.getRights().size()]));
+        rights.toArray(new Right[rights.size()]));
   }
 }
