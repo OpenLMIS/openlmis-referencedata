@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.DiscriminatorValue;
@@ -21,6 +23,7 @@ import javax.persistence.ManyToOne;
 @DiscriminatorValue("TRADE_ITEM")
 @NoArgsConstructor
 public final class TradeItem extends OrderableProduct {
+  @JsonProperty
   private String manufacturer;
 
   @ManyToOne
@@ -52,8 +55,9 @@ public final class TradeItem extends OrderableProduct {
    * @param packSize the # of dispensing units contained
    * @return a new trade item or armageddon if failure
    */
-  public static TradeItem newTradeItem(String productCode,
-                                       long packSize) {
+  @JsonCreator
+  public static TradeItem newTradeItem(@JsonProperty("productCode") String productCode,
+                                       @JsonProperty("packSize") long packSize) {
     ProductCode code = ProductCode.newProductCode(productCode);
     TradeItem tradeItem = new TradeItem(code, packSize);
 
