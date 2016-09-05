@@ -65,10 +65,19 @@ public class ReferenceDataObjectsRetrieveController extends BaseController {
     return new ResponseEntity<>(products, HttpStatus.OK);
   }
 
+  /**
+   * Method for retrieving ProcessingPeriod object.
+   * @param id ProcessingPeriod id.
+   * @return Response for Request.
+   */
   @RequestMapping(value = "/getProcessingPeriodById", method = RequestMethod.GET)
   public ResponseEntity<?> getProcessingPeriod(@RequestParam(value = "id") UUID id) {
-    ProcessingPeriod processingPeriod = processingPeriodRepository.findOne(id);
-    return new ResponseEntity<>(processingPeriod, HttpStatus.OK);
+    ProcessingPeriod period = processingPeriodRepository.findOne(id);
+    if (period == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } else {
+      return new ResponseEntity<>(period, HttpStatus.OK);
+    }
   }
 
   @RequestMapping(value = "/getAllProcessingPeriods", method = RequestMethod.GET)

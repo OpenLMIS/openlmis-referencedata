@@ -137,6 +137,16 @@ test {
     }
 }
 
+task checkApiIsRaml(type:Exec) {
+    executable "raml-cop"
+    args "src/main/resources/api-definition.yaml"
+}
+
+configure(checkApiIsRaml) {
+    group = JavaBasePlugin.VERIFICATION_GROUP
+    description = 'Verify that the api-specification is valid RAML'
+}
+
 jacocoTestReport {
     group = "reporting"
     description = "Generate Jacoco coverage reports after running tests."
