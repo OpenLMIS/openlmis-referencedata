@@ -3489,27 +3489,9 @@ resourceTypes:
 
 /roles:
     displayName: Role
-    post:
-          is: [ secured ]
-          description: Create new role.
-          body:
-              application/json:
-          responses:
-              "201":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "500":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
     get:
           is: [ secured ]
-          description: Get all roles.
+          description: Get all roles in the system.
           responses:
               "200":
                   headers:
@@ -3517,40 +3499,38 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
-              "404":
+                        description: All roles in the system.
+    post:
+          is: [ secured ]
+          description: Create a new role using the provided role DTO.
+          body:
+              application/json:
+                description: Role DTO with which to create.
+          responses:
+              "201":
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
                   body:
-                     application/json:
-    /{id}:
+                      application/json:
+                        description: Created role.
+              "400":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                      application/json:
+                        description: Root error message.
+    /{roleId}:
           uriParameters:
-            id:
-                displayName: id
+            roleId:
+                displayName: Role ID
                 type: string
                 required: true
                 repeat: false
-          put:
-              is: [ secured ]
-              description: Update existing role.
-              body:
-                  application/json:
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
           get:
               is: [ secured ]
-              description: Get chosen role.
+              description: Get specified role in the system.
               responses:
                   "200":
                       headers:
@@ -3558,50 +3538,58 @@ resourceTypes:
                         X-XSS-Protection:
                       body:
                           application/json:
+                            description: Specified role.
                   "404":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
+          put:
+              is: [ secured ]
+              description: Update an existing role using the provided role DTO. Note, if the role
+               does not exist, will create one.
+              body:
+                  application/json:
+                    description: Role DTO with which to update.
+              responses:
+                  "200":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                          application/json:
+                            description: Updated role.
+                  "400":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                          application/json:
+                            description: Root error message.
           delete:
               is: [ secured ]
-              description: Delete chosen role.
+              description: Delete an existing role.
               responses:
                   "204":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                  "404":
+                  "400":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                  "409":
+                      body:
+                        application/json:
+                          description: Root error message.
+                  "404":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
 
 /rights:
     displayName: Right
-    post:
-          is: [ secured ]
-          description: Create new right.
-          body:
-              application/json:
-          responses:
-              "201":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "500":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
     get:
           is: [ secured ]
-          description: Get all rights.
+          description: Get all rights in the system.
           responses:
               "200":
                   headers:
@@ -3609,60 +3597,51 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
-              "404":
+                        description: All rights in the system.
+    put:
+          is: [ secured ]
+          description: Save a right using the provided right DTO. If the right does not exist, will create one. If it does exist, will update it.
+          body:
+              application/json:
+                description: Right DTO with which to save.
+          responses:
+              "200":
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
-    /{id}:
+                  body:
+                      application/json:
+                        description: Saved right.
+              "400":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                      application/json:
+                        description: Root error message.
+    /{rightId}:
           uriParameters:
-            id:
-                displayName: id
+            rightId:
+                displayName: Right ID
                 type: string
                 required: true
                 repeat: false
-          put:
-              is: [ secured ]
-              description: Update existing right.
-              body:
-                  application/json:
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-          get:
-              is: [ secured ]
-              description: Get chosen right.
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
           delete:
               is: [ secured ]
-              description: Delete chosen right.
+              description: Delete an existing right.
               responses:
                   "204":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                  "404":
+                  "400":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                  "409":
+                      body:
+                        application/json:
+                          description: Root error message.
+                  "404":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
