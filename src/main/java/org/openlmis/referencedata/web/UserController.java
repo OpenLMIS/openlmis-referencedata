@@ -175,20 +175,20 @@ public class UserController {
    *
    * @param userId            id of user to check for right
    * @param rightName         right to check
-   * @param programId         program to check
+   * @param programCode       program to check
    * @param supervisoryNodeId supervisory node to check
-   * @param warehouseId       warehouse to check
+   * @param warehouseCode     warehouse to check
    * @return if successful, true or false depending on if user has the right
    */
   @RequestMapping(value = "/users/{userId}/hasRight", method = RequestMethod.GET)
   public ResponseEntity<?> checkIfUserHasRight(@PathVariable(USER_ID) UUID userId,
                                                @RequestParam(value = "rightName") String rightName,
-                                               @RequestParam(value = "programId",
-                                                   required = false) UUID programId,
+                                               @RequestParam(value = "programCode",
+                                                   required = false) String programCode,
                                                @RequestParam(value = "supervisoryNodeId",
                                                    required = false) UUID supervisoryNodeId,
-                                               @RequestParam(value = "warehouseId",
-                                                   required = false) UUID warehouseId) {
+                                               @RequestParam(value = "warehouseCode",
+                                                   required = false) String warehouseCode) {
 
     User user = userRepository.findOne(userId);
     if (user == null) {
@@ -200,9 +200,9 @@ public class UserController {
 
     RightQuery rightQuery;
     Right right = rightRepository.findFirstByName(rightName);
-    if (programId != null) {
+    if (programCode != null) {
 
-      Program program = programRepository.findOne(programId);
+      Program program = programRepository.findFirstByCode(programCode);
       if (supervisoryNodeId != null) {
 
         SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
@@ -211,9 +211,9 @@ public class UserController {
       } else {
         rightQuery = new RightQuery(right, program);
       }
-    } else if (warehouseId != null) {
+    } else if (warehouseCode != null) {
 
-      Facility warehouse = facilityRepository.findOne(warehouseId);
+      Facility warehouse = facilityRepository.findFirstByCode(warehouseCode);
       rightQuery = new RightQuery(right, warehouse);
 
     } else {
