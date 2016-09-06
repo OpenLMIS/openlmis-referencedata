@@ -169,11 +169,11 @@ public class ProcessingScheduleController extends BaseController {
       String[] msgArgs = {months, days};
       LOGGER.debug("Returning total days and months of schedule processingPeriods");
 
-      return messageSource.getMessage("requisition.message.totalPeriod", msgArgs,
+      return messageSource.getMessage("referencedata.message.totalPeriod", msgArgs,
               LocaleContextHolder.getLocale());
     } else {
       String[] messageArgs = {"0","0"};
-      return messageSource.getMessage("requisition.message.totalPeriod", messageArgs,
+      return messageSource.getMessage("referencedata.message.totalPeriod", messageArgs,
               LocaleContextHolder.getLocale());
     }
   }

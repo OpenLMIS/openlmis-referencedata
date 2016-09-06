@@ -1,11 +1,17 @@
 package org.openlmis.referencedata.domain;
 
-import static java.util.Collections.singletonList;
+import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
-import org.openlmis.referencedata.exception.RightTypeException;
+import com.fasterxml.jackson.annotation.JsonView;
 
-import java.util.List;
+import lombok.NoArgsConstructor;
+
+import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.util.View;
+
+import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -14,12 +20,15 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @DiscriminatorValue("supervision")
+@NoArgsConstructor
 public class SupervisionRoleAssignment extends RoleAssignment {
 
+  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "programid")
   private Program program;
 
+  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "supervisorynodeid")
   private SupervisoryNode supervisoryNode;
@@ -57,8 +66,8 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   @Override
-  protected List<RightType> getAcceptableRightTypes() {
-    return singletonList(SUPERVISION);
+  protected Set<RightType> getAcceptableRightTypes() {
+    return singleton(SUPERVISION);
   }
 
   @Override
@@ -83,8 +92,31 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       user.addHomeFacilityProgram(program);
     } else {
       user.addSupervisedProgram(program);
-      List<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities();
+      Set<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities();
       user.addSupervisedFacilities(supervisedFacilities);
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof SupervisionRoleAssignment)) {
+      return false;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    SupervisionRoleAssignment that = (SupervisionRoleAssignment) obj;
+    return Objects.equals(role, that.role)
+        && Objects.equals(user, that.user)
+        && Objects.equals(program, that.program)
+        && Objects.equals(supervisoryNode, that.supervisoryNode);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), program, supervisoryNode);
   }
 }

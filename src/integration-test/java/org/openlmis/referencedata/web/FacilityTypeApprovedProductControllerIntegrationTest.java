@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.Product;
 import org.openlmis.referencedata.domain.ProductCategory;
@@ -15,6 +16,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
+import org.openlmis.referencedata.repository.OrderableProductRepository;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProductRepository;
 import org.openlmis.referencedata.repository.ProgramProductRepository;
@@ -49,6 +51,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @Autowired
   private ProgramRepository programRepository;
 
+  @Autowired
+  private OrderableProductRepository orderableProductRepository;
+
   private FacilityTypeApprovedProduct facilityTypeAppProd = new FacilityTypeApprovedProduct();
 
   @Before
@@ -78,17 +83,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     program.setPeriodsSkippable(true);
     programRepository.save(program);
 
-    OrderableProduct orderableProduct = new OrderableProduct() {
-      @Override
-      public String getDescription() {
-        return "Description";
-      }
-
-      @Override
-      public boolean canFulfill(OrderableProduct product) {
-        return false;
-      }
-    };
+    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "test", 10);
+    orderableProductRepository.save(orderableProduct);
 
     ProgramProduct programProduct = new ProgramProduct();
     programProduct.setProductCategory(productCategory);
@@ -195,4 +191,5 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertTrue(repository.exists(response.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
+
 }

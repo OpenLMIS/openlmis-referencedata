@@ -7,11 +7,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.Product;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.repository.OrderableProductRepository;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProductRepository;
 import org.openlmis.referencedata.repository.ProgramProductRepository;
@@ -45,6 +47,9 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
 
   @Autowired
   private ProductCategoryRepository productCategoryRepository;
+
+  @Autowired
+  private OrderableProductRepository orderableProductRepository;
 
   private List<ProgramProduct> programProducts;
 
@@ -177,23 +182,14 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
   }
 
   private ProgramProduct generateProgramProduct() {
-    Program program = generateProgram();
     ProductCategory productCategory = generateProductCategory();
     Product product = generateProduct(productCategory);
-    OrderableProduct orderableProduct = new OrderableProduct() {
-      @Override
-      public String getDescription() {
-        return "Description";
-      }
-
-      @Override
-      public boolean canFulfill(OrderableProduct product) {
-        return false;
-      }
-    };
+    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "test", 10);
+    orderableProductRepository.save(orderableProduct);
     ProgramProduct programProduct = new ProgramProduct();
     programProduct.setProduct(orderableProduct);
     programProduct.setProductCategory(productCategory);
+    Program program = generateProgram();
     programProduct.setProgram(program);
     programProduct.setFullSupply(true);
     programProduct.setActive(true);

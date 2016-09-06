@@ -9,7 +9,7 @@ import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 
-import java.util.List;
+import java.util.Set;
 
 public class SupervisionRoleAssignmentTest {
 
@@ -65,11 +65,11 @@ public class SupervisionRoleAssignmentTest {
 
     //when
     homeFacilityRoleAssignment.assignTo(user);
-    List<Program> programs = user.getHomeFacilityPrograms();
+    Set<Program> programs = user.getHomeFacilityPrograms();
 
     //then
     assertThat(programs.size(), is(1));
-    assertThat(programs.get(0), is(program));
+    assertTrue(programs.contains(program));
   }
   
   @Test
@@ -77,10 +77,10 @@ public class SupervisionRoleAssignmentTest {
 
     //when
     supervisedRoleAssignment.assignTo(user);
-    List<Program> programs = user.getSupervisedPrograms();
+    Set<Program> programs = user.getSupervisedPrograms();
     
     //then
     assertThat(programs.size(), is(1));
-    assertThat(programs.get(0), is(program));
+    assertTrue(programs.contains(program));
   }
 }

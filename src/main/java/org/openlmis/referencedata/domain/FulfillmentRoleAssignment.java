@@ -1,11 +1,15 @@
 package org.openlmis.referencedata.domain;
 
-import static java.util.Collections.singletonList;
+import static java.util.Collections.singleton;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
+import org.openlmis.referencedata.util.View;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -16,6 +20,7 @@ import javax.persistence.ManyToOne;
 @DiscriminatorValue("fulfillment")
 public class FulfillmentRoleAssignment extends RoleAssignment {
 
+  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "warehouseid")
   private Facility warehouse;
@@ -46,8 +51,8 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   }
 
   @Override
-  protected List<RightType> getAcceptableRightTypes() {
-    return singletonList(RightType.ORDER_FULFILLMENT);
+  protected Set<RightType> getAcceptableRightTypes() {
+    return singleton(RightType.ORDER_FULFILLMENT);
   }
 
   @Override
@@ -61,5 +66,27 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   @Override
   public void assignTo(User user) {
     super.assignTo(user);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof FulfillmentRoleAssignment)) {
+      return false;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    FulfillmentRoleAssignment that = (FulfillmentRoleAssignment) obj;
+    return Objects.equals(role, that.role)
+        && Objects.equals(user, that.user)
+        && Objects.equals(warehouse, that.warehouse);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), warehouse);
   }
 }

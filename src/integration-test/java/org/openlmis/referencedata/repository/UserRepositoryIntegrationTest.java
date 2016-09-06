@@ -58,6 +58,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   @Before
   public void setUp() {
+
     users = new ArrayList<>();
     roles = new ArrayList<>();
     for (int usersCount = 0; usersCount < 5; usersCount++) {
@@ -101,7 +102,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   public void testSearchUsersByAllParametersNull() {
     List<User> receivedUsers = repository.searchUsers(null, null, null, null, null, null);
 
-    Assert.assertEquals(users.size(), receivedUsers.size());
+    Assert.assertEquals(users.size() + 1, receivedUsers.size());
   }
 
   @Test

@@ -33,9 +33,13 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
 
   private TokenExtractor tokenExtractor = new BearerTokenExtractor();
 
+  @Value("${auth.resourceId}")
+  private String resourceId;
+
+
   @Override
   public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-    resources.resourceId("referencedata");
+    resources.resourceId(resourceId);
   }
 
   @Override

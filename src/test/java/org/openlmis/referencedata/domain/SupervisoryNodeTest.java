@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class SupervisoryNodeTest {
 
@@ -27,7 +28,7 @@ public class SupervisoryNodeTest {
     supervisoryNode1.addChildNode(supervisoryNode2);
     
     //when
-    List<Facility> facilities = supervisoryNode1.getAllSupervisedFacilities();
+    Set<Facility> facilities = supervisoryNode1.getAllSupervisedFacilities();
 
     //then
     assertThat(facilities.size(), is(3));

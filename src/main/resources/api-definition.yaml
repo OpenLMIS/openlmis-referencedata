@@ -879,7 +879,7 @@ resourceTypes:
 /users:
     displayName: User
     get:
-        is: [ secured ]
+        is: [secured]
         description: Get all users.
         responses:
             "200":
