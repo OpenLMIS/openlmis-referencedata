@@ -115,11 +115,11 @@ public class UserController {
         }
         Role role = roleRepository.findOne(roleId);
 
-        UUID programId = roleAssignmentDto.getProgramId();
-        UUID warehouseId = roleAssignmentDto.getWarehouseId();
-        if (programId != null) {
+        String programCode = roleAssignmentDto.getProgramCode();
+        String warehouseCode = roleAssignmentDto.getWarehouseCode();
+        if (programCode != null) {
 
-          Program program = programRepository.findOne(programId);
+          Program program = programRepository.findFirstByCode(programCode);
           UUID supervisoryNodeId = roleAssignmentDto.getSupervisoryNodeId();
           if (supervisoryNodeId != null) {
 
@@ -130,9 +130,9 @@ public class UserController {
             roleAssignment = new SupervisionRoleAssignment(role, program);
           }
 
-        } else if (warehouseId != null) {
+        } else if (warehouseCode != null) {
 
-          Facility warehouse = facilityRepository.findOne(warehouseId);
+          Facility warehouse = facilityRepository.findFirstByCode(warehouseCode);
           roleAssignment = new FulfillmentRoleAssignment(role, warehouse);
 
         } else {

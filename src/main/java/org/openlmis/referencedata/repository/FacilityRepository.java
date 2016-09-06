@@ -11,4 +11,6 @@ public interface FacilityRepository extends ReferenceDataRepository<Facility, UU
 
   @Override
   <S extends Facility> Iterable<S> save(Iterable<S> entities);
+  
+  Facility findFirstByCode(String code);
 }
