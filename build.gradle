@@ -117,6 +117,16 @@ task generateMigration << {
     migrationFile.createNewFile()
 }
 
+task checkApiIsRaml(type:Exec) {
+    executable "raml-cop"
+    args "src/main/resources/api-definition.yaml"
+}
+
+configure(checkApiIsRaml) {
+    group = JavaBasePlugin.VERIFICATION_GROUP
+    description = 'Verify that the api-specification is valid RAML'
+}
+
 test {
     testLogging {
         events 'started', 'passed'
@@ -195,4 +205,9 @@ task generateBuildInfo(type:Copy) {
     doLast{
         delete 'src/main/resources/version_template'
     }
+}
+
+check {
+    dependsOn checkApiIsRaml
+    dependsOn integrationTest
 }

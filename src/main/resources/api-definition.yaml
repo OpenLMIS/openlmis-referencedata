@@ -2212,6 +2212,128 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
+        /roles:
+            get:
+                is: [ secured ]
+                description: Get all roles associated with this user.
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                            application/json:
+                              description: All roles associated with this user.
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+            post:
+                is: [ secured ]
+                description: Assign roles to a user using the provided role assignment DTOs.
+                body:
+                  application/json:
+                    description: Role assignment DTOs to associate to the user.
+                responses:
+                    "201":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                            description: Updated role assignments.
+                    "400":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                            description: Root error message.
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+        /hasRight:
+            get:
+                is: [ secured ]
+                description: Check if user has a right with certain criteria.
+                queryParameters:
+                    rightName:
+                        displayName: Right Name
+                        description: Right to check.
+                        type: string
+                        required: true
+                        repeat: false
+                    programCode:
+                        displayName: Program Code
+                        description: Program to check.
+                        type: string
+                        required: false
+                        repeat: false
+                    supervisoryNodeId:
+                        displayName: Supervisory Node ID
+                        description: Supervisory node to check.
+                        type: string
+                        required: false
+                        repeat: false
+                    warehouseCode:
+                        displayName: Warehouse Code
+                        description: Warehouse to check.
+                        type: string
+                        required: false
+                        repeat: false
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                            application/json:
+                              description: True or false depending on if user has the right.
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+        /programs:
+            get:
+                is: [ secured ]
+                description: Get the programs at a user's home facility or programs that the user supervises.
+                queryParameters:
+                    forHomeFacility:
+                        displayName: forHomeFacility
+                        description: True to get home facility programs, false to get supervised programs; default value is true.
+                        type: boolean
+                        required: false
+                        repeat: false
+                        example: "true"
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                            application/json:
+                              description: Programs associated with this user.
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+        /supervisedFacilities:
+            get:
+                is: [ secured ]
+                description: Get all the facilities that the user supervises.
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                            application/json:
+                              description: All facilities this user supervises.
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
     /search:
             get:
                 is: [ secured ]
@@ -3492,14 +3614,6 @@ resourceTypes:
     get:
           is: [ secured ]
           description: Get all roles in the system.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-                        description: All roles in the system.
     post:
           is: [ secured ]
           description: Create a new role using the provided role DTO.
