@@ -74,6 +74,13 @@ public class UserController {
 
     LOGGER.debug("Getting all roles associated with userId: " + userId);
     User user = userRepository.findOne(userId);
+    if (user == null) {
+      LOGGER.error("User not found");
+      return ResponseEntity
+          .notFound()
+          .build();
+    }
+
     Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
 
     return ResponseEntity
@@ -253,8 +260,8 @@ public class UserController {
   /**
    * Get all the facilities that the user supervises.
    *
-   * @param userId id of user to get programs
-   * @return set of programs
+   * @param userId id of user to get supervised facilities
+   * @return set of supervised facilities
    */
   @RequestMapping(value = "/users/{userId}/supervisedFacilities", method = RequestMethod.GET)
   public ResponseEntity<?> getUserSupervisedFacilities(@PathVariable(USER_ID) UUID userId) {
