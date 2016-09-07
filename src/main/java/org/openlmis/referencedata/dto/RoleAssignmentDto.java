@@ -23,3 +23,4 @@ public class RoleAssignmentDto {
   @Setter
   UUID warehouseId;
 }
+

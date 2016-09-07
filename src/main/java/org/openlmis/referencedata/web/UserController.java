@@ -70,7 +70,7 @@ public class UserController extends BaseController {
       return new ResponseEntity<>(user, HttpStatus.OK);
     } catch (RestClientException ex) {
       ErrorResponse errorResponse =
-            new ErrorResponse("An error occurred while saving user", ex.getMessage());
+          new ErrorResponse("An error occurred while saving user", ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
       return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -123,8 +123,8 @@ public class UserController extends BaseController {
         userRepository.delete(user);
       } catch (DataIntegrityViolationException ex) {
         ErrorResponse errorResponse =
-              new ErrorResponse("User cannot be deleted because of existing dependencies",
-                    ex.getMessage());
+            new ErrorResponse("User cannot be deleted because of existing dependencies",
+                ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
         return new ResponseEntity(HttpStatus.CONFLICT);
       }
@@ -145,14 +145,14 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchUsers(
-          @RequestParam(value = "username", required = false) String username,
-          @RequestParam(value = "firstName", required = false) String firstName,
-          @RequestParam(value = "lastName", required = false) String lastName,
-          @RequestParam(value = "homeFacility", required = false) Facility homeFacility,
-          @RequestParam(value = "active", required = false) Boolean active,
-          @RequestParam(value = "verified", required = false) Boolean verified) {
+      @RequestParam(value = "username", required = false) String username,
+      @RequestParam(value = "firstName", required = false) String firstName,
+      @RequestParam(value = "lastName", required = false) String lastName,
+      @RequestParam(value = "homeFacility", required = false) Facility homeFacility,
+      @RequestParam(value = "active", required = false) Boolean active,
+      @RequestParam(value = "verified", required = false) Boolean verified) {
     List<User> result = userService.searchUsers(username, firstName,
-            lastName, homeFacility, active, verified);
+        lastName, homeFacility, active, verified);
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }

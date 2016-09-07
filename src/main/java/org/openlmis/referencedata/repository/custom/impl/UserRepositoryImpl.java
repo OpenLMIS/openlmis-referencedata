@@ -1,16 +1,17 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
+
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
-
-import java.util.List;
 
 public class UserRepositoryImpl implements UserRepositoryCustom {
 
@@ -19,12 +20,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
   /**
    * Method returns all users with matched parameters.
-   * @param username username of user.
-   * @param firstName firstName of user.
-   * @param lastName lastName of user.
+   *
+   * @param username     username of user.
+   * @param firstName    firstName of user.
+   * @param lastName     lastName of user.
    * @param homeFacility homeFacility of user.
-   * @param active is the account activated.
-   * @param verified is the account verified.
+   * @param active       is the account activated.
+   * @param verified     is the account verified.
    * @return List of users
    */
   public List<User> searchUsers(
@@ -36,39 +38,39 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     Predicate predicate = builder.conjunction();
     if (username != null) {
       predicate = builder.and(
-              predicate,
-              builder.equal(
-                      root.get("username"), username));
+          predicate,
+          builder.equal(
+              root.get("username"), username));
     }
     if (firstName != null) {
       predicate = builder.and(
-              predicate,
-              builder.equal(
-                      root.get("firstName"), firstName));
+          predicate,
+          builder.equal(
+              root.get("firstName"), firstName));
     }
     if (lastName != null) {
       predicate = builder.and(
-              predicate,
-              builder.equal(
-                      root.get("lastName"), lastName));
+          predicate,
+          builder.equal(
+              root.get("lastName"), lastName));
     }
     if (homeFacility != null) {
       predicate = builder.and(
-              predicate,
-              builder.equal(
-                      root.get("homeFacility"), homeFacility));
+          predicate,
+          builder.equal(
+              root.get("homeFacility"), homeFacility));
     }
     if (active != null) {
       predicate = builder.and(
-              predicate,
-              builder.equal(
-                      root.get("active"), active));
+          predicate,
+          builder.equal(
+              root.get("active"), active));
     }
     if (verified != null) {
       predicate = builder.and(
-              predicate,
-              builder.equal(
-                      root.get("verified"), verified));
+          predicate,
+          builder.equal(
+              root.get("verified"), verified));
     }
     query.where(predicate);
     return entityManager.createQuery(query).getResultList();

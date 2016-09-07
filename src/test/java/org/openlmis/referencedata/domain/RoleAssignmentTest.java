@@ -6,9 +6,7 @@ import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class RoleAssignmentTest {

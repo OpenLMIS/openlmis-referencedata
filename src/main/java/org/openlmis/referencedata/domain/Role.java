@@ -1,18 +1,21 @@
 package org.openlmis.referencedata.domain;
 
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.util.View;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,6 +41,7 @@ public class Role extends BaseEntity {
   @Setter
   private String description;
 
+  @JsonView(View.BasicInformation.class)
   @ManyToMany(
       cascade = {CascadeType.PERSIST, CascadeType.MERGE}
       )
@@ -47,7 +51,7 @@ public class Role extends BaseEntity {
       inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false)
       )
   @Getter
-  private List<Right> rights;
+  private Set<Right> rights;
 
   /**
    * Role constructor with name and rights.
@@ -83,7 +87,7 @@ public class Role extends BaseEntity {
    * @throws RightTypeException if the rights do not have the same right type
    */
   public void group(Right... rights) throws RightTypeException {
-    List<Right> rightsList = new ArrayList<>(asList(rights));
+    Set<Right> rightsList = new HashSet<>(asList(rights));
     if (checkRightTypesMatch(rightsList)) {
       this.rights = rightsList;
     } else {
@@ -92,15 +96,15 @@ public class Role extends BaseEntity {
   }
 
   public RightType getRightType() {
-    return rights.get(0).getType();
+    return rights.iterator().next().getType();
   }
 
-  private static boolean checkRightTypesMatch(List<Right> rightsList) throws RightTypeException {
-    if (rightsList.isEmpty()) {
+  private static boolean checkRightTypesMatch(Set<Right> rightSet) throws RightTypeException {
+    if (rightSet.isEmpty()) {
       return true;
     } else {
-      RightType rightType = rightsList.get(0).getType();
-      return rightsList.stream().allMatch(right -> right.getType() == rightType);
+      RightType rightType = rightSet.iterator().next().getType();
+      return rightSet.stream().allMatch(right -> right.getType() == rightType);
     }
   }
 
@@ -111,8 +115,8 @@ public class Role extends BaseEntity {
    * @throws RightTypeException if the resulting rights do not have the same right type
    */
   public void add(Right... additionalRights) throws RightTypeException {
-    List<Right> allRights = concat(rights.stream(), asList(additionalRights).stream())
-        .collect(toList());
+    Set<Right> allRights = concat(rights.stream(), asList(additionalRights).stream())
+        .collect(toSet());
 
     if (checkRightTypesMatch(allRights)) {
       rights.addAll(Arrays.asList(additionalRights));
@@ -129,8 +133,8 @@ public class Role extends BaseEntity {
    * @return true if the role contains the right, false otherwise
    */
   public boolean contains(Right right) {
-    List<Right> attachments = rights.stream().flatMap(r -> r.getAttachments().stream())
-        .collect(toList());
+    Set<Right> attachments = rights.stream().flatMap(r -> r.getAttachments().stream())
+        .collect(toSet());
     return rights.contains(right) || attachments.contains(right);
   }
 }

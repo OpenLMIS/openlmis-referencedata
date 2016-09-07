@@ -1,9 +1,14 @@
 package org.openlmis.referencedata.domain;
 
-import org.openlmis.referencedata.exception.RightTypeException;
+import com.fasterxml.jackson.annotation.JsonView;
 
-import java.util.Set;
 import lombok.NoArgsConstructor;
+
+import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.util.View;
+
+import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -23,6 +28,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 public abstract class RoleAssignment extends BaseEntity {
 
+  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "roleid")
   protected Role role;
@@ -51,8 +57,26 @@ public abstract class RoleAssignment extends BaseEntity {
   protected abstract Set<RightType> getAcceptableRightTypes();
 
   public abstract boolean hasRight(RightQuery rightQuery);
-  
+
   public void assignTo(User user) {
     this.user = user;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof RoleAssignment)) {
+      return false;
+    }
+    RoleAssignment that = (RoleAssignment) obj;
+    return Objects.equals(role, that.role)
+        && Objects.equals(user, that.user);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(role, user);
   }
 }

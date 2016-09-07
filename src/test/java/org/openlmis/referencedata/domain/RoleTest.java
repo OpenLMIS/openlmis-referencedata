@@ -7,13 +7,13 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 
-import java.util.List;
+import java.util.Set;
 
 public class RoleTest {
 
   private String roleName = "role";
   private String roleDescription = "description";
-  
+
   private String right1Name = "right1";
   private String right2Name = "right2";
 
@@ -27,7 +27,7 @@ public class RoleTest {
     Role role = new Role(roleName, roleDescription, right1, right2);
 
     //then
-    List<Right> rights = role.getRights();
+    Set<Right> rights = role.getRights();
     assertThat(rights.size(), is(2));
   }
 
@@ -41,10 +41,10 @@ public class RoleTest {
     Role role = new Role(roleName, right1, right2);
 
     //then
-    List<Right> rights = role.getRights();
+    Set<Right> rights = role.getRights();
     assertThat(rights.size(), is(2));
-    assertThat(rights.get(0), is(right1));
-    assertThat(rights.get(1), is(right2));
+    assertTrue(rights.contains(right1));
+    assertTrue(rights.contains(right2));
   }
 
   @Test(expected = RightTypeException.class)
@@ -67,9 +67,9 @@ public class RoleTest {
     role.add(additionalRight);
 
     //then
-    List<Right> rights = role.getRights();
+    Set<Right> rights = role.getRights();
     assertThat(rights.size(), is(2));
-    assertThat(rights.get(1), is(additionalRight));
+    assertTrue(rights.contains(additionalRight));
   }
 
   @Test(expected = RightTypeException.class)

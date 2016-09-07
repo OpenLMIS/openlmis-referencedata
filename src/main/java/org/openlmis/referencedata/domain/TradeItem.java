@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.DiscriminatorValue;
@@ -21,12 +23,13 @@ import javax.persistence.ManyToOne;
 @DiscriminatorValue("TRADE_ITEM")
 @NoArgsConstructor
 public final class TradeItem extends OrderableProduct {
+  @JsonProperty
   private String manufacturer;
 
   @ManyToOne
   private GlobalProduct globalProduct;
 
-  private TradeItem(String productCode, long packSize) {
+  private TradeItem(ProductCode productCode, long packSize) {
     super(productCode, packSize);
   }
 
@@ -43,26 +46,36 @@ public final class TradeItem extends OrderableProduct {
    * @returns true if we can fulfill for the given product, false otherwise.
    */
   public boolean canFulfill(OrderableProduct product) {
-    return this.equals(product) || globalProduct.equals(product);
+    return this.equals(product) || hasGlobalProduct(product);
   }
 
   /**
    * Factory method to create a new trade item.
    * @param productCode a unique product code
    * @param packSize the # of dispensing units contained
-   * @param globalProduct the global product this can fulfill for
    * @return a new trade item or armageddon if failure
    */
-  public static TradeItem newTradeItem(String productCode,
-                                       long packSize,
-                                       GlobalProduct globalProduct) {
-    TradeItem tradeItem = new TradeItem(productCode, packSize);
-    globalProduct.addTradeItem(tradeItem);
+  @JsonCreator
+  public static TradeItem newTradeItem(@JsonProperty("productCode") String productCode,
+                                       @JsonProperty("packSize") long packSize) {
+    ProductCode code = ProductCode.newProductCode(productCode);
+    TradeItem tradeItem = new TradeItem(code, packSize);
 
     return tradeItem;
   }
 
+  /**
+   * Assign a global product.
+   * @param globalProduct the given global product, or null to un-assign.
+   */
   void assignGlobalProduct(GlobalProduct globalProduct) {
     this.globalProduct = globalProduct;
+  }
+
+  /*
+  returns true if we have a global product and the one given is the same, false otherwise.
+   */
+  private boolean hasGlobalProduct(OrderableProduct product) {
+    return null != globalProduct && globalProduct.equals(product);
   }
 }
