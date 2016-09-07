@@ -2,10 +2,12 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Controller
-public class RightController {
+public class RightController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RightController.class);
 
@@ -34,10 +36,7 @@ public class RightController {
 
     LOGGER.debug("Getting all rights");
     Iterable<Right> rights = rightRepository.findAll();
-
-    return ResponseEntity
-        .ok()
-        .body(rights);
+    return new ResponseEntity<>(rights, HttpStatus.OK);
   }
 
   /**
@@ -76,6 +75,58 @@ public class RightController {
     return ResponseEntity
         .ok()
         .body(rightToSave);
+  }
+
+
+  /**
+   * Allows updating rights.
+   *
+   * @param right A role bound to the request body
+   * @param rightId UUID of role which we want to update
+   * @return ResponseEntity containing the updated role
+   */
+  @RequestMapping(value = "/rights/{id}", method = RequestMethod.PUT)
+  public ResponseEntity<?> updateRight(@RequestBody Right right,
+                                       @PathVariable("id") UUID rightId) {
+
+    Right rightToUpdate = rightRepository.findOne(rightId);
+    try {
+      if (rightToUpdate == null) {
+        rightToUpdate = new Right();
+        LOGGER.info("Creating new right");
+      } else {
+        LOGGER.debug("Updating right with id: " + rightId);
+      }
+
+      rightToUpdate.updateFrom(right);
+      rightToUpdate = rightRepository.save(rightToUpdate);
+
+      LOGGER.debug("Saved right with id: " + rightToUpdate.getId());
+      return new ResponseEntity<Right>(rightToUpdate, HttpStatus.OK);
+    } catch (DataIntegrityViolationException ex) {
+      ErrorResponse errorResponse =
+          new ErrorResponse("An error accurred while saving right with id: "
+              + rightToUpdate.getId(), ex.getMessage());
+      LOGGER.error(errorResponse.getMessage(), ex);
+      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+  }
+
+
+  /**
+   * Get chosen right.
+   *
+   * @param rightId UUID of right whose we want to get
+   * @return Right.
+   */
+  @RequestMapping(value = "/rights/{id}", method = RequestMethod.GET)
+  public ResponseEntity<?> getRight(@PathVariable("id") UUID rightId) {
+    Right right = rightRepository.findOne(rightId);
+    if (right == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } else {
+      return new ResponseEntity<>(right, HttpStatus.OK);
+    }
   }
 
   /**

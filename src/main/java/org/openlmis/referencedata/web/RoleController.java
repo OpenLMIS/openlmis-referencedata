@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Controller
-public class RoleController {
+public class RoleController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
 

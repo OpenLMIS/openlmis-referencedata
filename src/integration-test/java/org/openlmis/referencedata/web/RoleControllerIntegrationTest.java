@@ -1,6 +1,5 @@
 package org.openlmis.referencedata.web;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -45,43 +44,6 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
           .statusCode(204);
 
     Assert.assertFalse(roleRepository.exists(role.getId()));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldCreateRole() {
-
-    roleRepository.delete(role);
-
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(role)
-          .when()
-          .post(RESOURCE_URL)
-          .then()
-          .statusCode(201);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldUpdateRole() {
-
-    role.setDescription("OpenLMIS");
-
-    Role response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", role.getId())
-          .body(role)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(Role.class);
-
-    assertEquals(response.getDescription(), "OpenLMIS");
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

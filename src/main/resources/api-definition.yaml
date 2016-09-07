@@ -198,7 +198,7 @@ schemas:
           "properties": {
               "id": { "type": "string", "required": true, "title": "id" },
               "name": { "type": "string", "required": true, "title": "name" },
-              "rightType": { "type": "string", "required": true, "title": "rightType" },
+              "type": { "type": { "enum":["ORDER_FULFILLMENT", "SUPERVISION", "GENERAL_ADMIN", "REPORTS"] }, "required": true, "title": "type" },
               "description": { "type": "string", "required": false, "title": "description" }
           }
       }
@@ -873,7 +873,7 @@ resourceTypes:
                     X-XSS-Protection:
               500:
                   headers:
-                    X-Content-Type-Options:
+                    X-Content-TPype-Options:
                     X-XSS-Protection:
 
 /users:
@@ -1828,7 +1828,7 @@ resourceTypes:
 
 /rights:
     displayName: Right
-    post:
+    put:
           is: [ secured ]
           description: Create new right.
           body:
@@ -1902,7 +1902,6 @@ resourceTypes:
                         X-Content-Type-Options:
                         X-XSS-Protection:
                       body:
-                          application/json:
           delete:
               is: [ secured ]
               description: Delete chosen right.
@@ -1916,7 +1915,6 @@ resourceTypes:
                         X-Content-Type-Options:
                         X-XSS-Protection:
                       body:
-                          application/json:
                   "409":
                       headers:
                         X-Content-Type-Options:

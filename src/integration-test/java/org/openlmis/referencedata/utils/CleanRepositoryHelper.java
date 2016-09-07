@@ -15,6 +15,7 @@ import org.openlmis.referencedata.repository.ProgramProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -74,6 +75,9 @@ public class CleanRepositoryHelper {
   @Autowired
   private RightRepository rightRepository;
 
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
+
   /**
    * Delete all entities from most of repositories.
    */
@@ -84,6 +88,7 @@ public class CleanRepositoryHelper {
     productRepository.deleteAll();
     periodRepository.deleteAll();
     programRepository.deleteAll();
+    supervisoryNodeRepository.deleteAll();
     deleteAllUsersExceptAdmin();
     productCategoryRepository.deleteAll();
     scheduleRepository.deleteAll();

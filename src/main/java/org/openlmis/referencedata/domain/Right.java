@@ -92,6 +92,17 @@ public class Right extends BaseEntity {
     }
   }
 
+  /**
+   * Copy values of attributes into new or updated Right.
+   *
+   * @param right Right with new values.
+   */
+  public void updateFrom(Right right) {
+    this.name = right.getName();
+    this.type = right.getType();
+    this.description = right.getDescription();
+  }
+
   @Override
   public int hashCode() {
     return name.hashCode();

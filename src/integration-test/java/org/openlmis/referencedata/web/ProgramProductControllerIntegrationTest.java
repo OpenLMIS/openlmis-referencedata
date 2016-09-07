@@ -183,7 +183,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
 
   private ProgramProduct generateProgramProduct() {
     ProductCategory productCategory = generateProductCategory();
-    Product product = generateProduct(productCategory);
     OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "test", 10);
     orderableProductRepository.save(orderableProduct);
     ProgramProduct programProduct = new ProgramProduct();

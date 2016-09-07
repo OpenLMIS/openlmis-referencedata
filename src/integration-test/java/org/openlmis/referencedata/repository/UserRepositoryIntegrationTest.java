@@ -7,14 +7,13 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("PMD.TooManyMethods")
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateFiled"})
 public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<User> {
 
   @Autowired
@@ -32,11 +31,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Autowired
   private FacilityRepository facilityRepository;
 
-  @Autowired
-  private RoleRepository roleRepository;
-
   private List<User> users;
-  private List<Role> roles;
 
   UserRepository getRepository() {
     return this.repository;
@@ -60,7 +55,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   public void setUp() {
 
     users = new ArrayList<>();
-    roles = new ArrayList<>();
+
     for (int usersCount = 0; usersCount < 5; usersCount++) {
       users.add(repository.save(generateInstance()));
     }
