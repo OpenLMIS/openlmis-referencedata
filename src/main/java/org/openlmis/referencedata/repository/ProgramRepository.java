@@ -12,6 +12,6 @@ public interface ProgramRepository extends ReferenceDataRepository<Program, UUID
 
   @Override
   <S extends Program> Iterable<S> save(Iterable<S> entities);
-  
-  Program findFirstByCode(String code);
+
+  <S extends Program> S findByCode(String code);
 }

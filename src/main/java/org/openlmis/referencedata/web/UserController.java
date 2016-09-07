@@ -126,7 +126,7 @@ public class UserController {
         String warehouseCode = roleAssignmentDto.getWarehouseCode();
         if (programCode != null) {
 
-          Program program = programRepository.findFirstByCode(programCode);
+          Program program = programRepository.findByCode(programCode);
           UUID supervisoryNodeId = roleAssignmentDto.getSupervisoryNodeId();
           if (supervisoryNodeId != null) {
 
@@ -202,7 +202,7 @@ public class UserController {
     Right right = rightRepository.findFirstByName(rightName);
     if (programCode != null) {
 
-      Program program = programRepository.findFirstByCode(programCode);
+      Program program = programRepository.findByCode(programCode);
       if (supervisoryNodeId != null) {
 
         SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
