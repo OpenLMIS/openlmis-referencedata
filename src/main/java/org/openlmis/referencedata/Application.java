@@ -10,8 +10,6 @@ import org.openlmis.referencedata.domain.ProgramProductBuilder;
 import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.web.ProgramProductBuilderDeserializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,8 +22,6 @@ import java.util.Objects;
 
 @SpringBootApplication
 public class Application {
-
-  private Logger logger = LoggerFactory.getLogger(Application.class);
 
   @Autowired
   private ProgramRepository programRepository;
@@ -76,8 +72,8 @@ public class Application {
                                                     BeanDescription beanDesc,
                                                     JsonDeserializer<?> deserializer) {
         Objects.requireNonNull(deserializer, "Jackson passed a null deserializer");
-        Objects.requireNonNull(programRepository, "Spring Boot didn't autowire the " +
-          "Program Repository");
+        Objects.requireNonNull(programRepository, "Spring Boot didn't autowire the "
+            + "Program Repository");
         if (beanDesc.getBeanClass() == ProgramProductBuilder.class) {
           return new ProgramProductBuilderDeserializer(deserializer, programRepository);
         }
@@ -85,7 +81,7 @@ public class Application {
         return deserializer;
       }
     } );
-    
+
     return module;
   }
 }

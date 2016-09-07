@@ -71,11 +71,11 @@ public class ProgramProductBuilder {
    * @param product the product for which we're building this ProgramProduct.
    * @return a new ProgramProduct ready for persisting.
    * @throws NullPointerException if {@link #setProgramRepository(ProgramRepository)} wasn't
-   * called previously with a non-null repository.
+   *      called previously with a non-null repository.
    */
   public ProgramProduct createProgramProduct(OrderableProduct product) {
-    Objects.requireNonNull(programRepository, "Program Repository needed to be injected prior to " +
-      "creating program product");
+    Objects.requireNonNull(programRepository, "Program Repository needed to be injected prior to "
+        + "creating program product");
     Objects.requireNonNull(product, "Product can't be null when building a program product");
 
     Program storedProgram = programRepository.findOne(programId);

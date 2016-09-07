@@ -117,21 +117,4 @@ public abstract class OrderableProduct extends BaseEntity {
   public final int hashCode() {
     return productCode.hashCode();
   }
-
-  public void export(Exporter exp) {
-    exp.addProductCode(this.productCode);
-    exp.addPackSize(this.packSize);
-  }
-
-  public interface Importer {
-    public ProductCode provideProductCode();
-
-    public long providePackSize();
-  }
-
-  public interface Exporter {
-    public void addProductCode(ProductCode productCode);
-
-    public void addPackSize(long packSize);
-  }
 }

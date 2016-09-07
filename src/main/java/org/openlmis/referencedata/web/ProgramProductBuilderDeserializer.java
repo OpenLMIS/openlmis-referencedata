@@ -19,7 +19,7 @@ import java.util.Objects;
  * managed entities.
  */
 public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramProductBuilder>
-  implements ResolvableDeserializer {
+    implements ResolvableDeserializer {
 
   private static final long serialVersionUID = 2923585097168641465L;
   private JsonDeserializer<?> defaultDeserializer;
@@ -49,13 +49,13 @@ public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramPr
 
   @Override
   public ProgramProductBuilder deserialize(JsonParser jsonParser, DeserializationContext ctxt)
-    throws IOException {
+      throws IOException {
     Objects.requireNonNull(programRepository, "Program repository was not successfully injected");
 
     // default bean deserialization
     ProgramProductBuilder ppBuilder = (ProgramProductBuilder) defaultDeserializer.deserialize(
-      jsonParser,
-      ctxt);
+        jsonParser,
+        ctxt);
 
     // inject program repository into builder so that it may lookup entity ids
     ppBuilder.setProgramRepository(programRepository);

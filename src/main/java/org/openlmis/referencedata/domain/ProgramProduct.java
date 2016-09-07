@@ -61,14 +61,15 @@ public class ProgramProduct extends BaseEntity {
 
   /**
    * Create program product.
-   * @param program
-   * @param category
-   * @param product
-   * @param dosesPerMonth
-   * @param active
-   * @param displayOrder
-   * @param maxMonthsStock
-   * @return
+   * @param program The Program this Product will be in.
+   * @param category the category this Product will be in, in this Program.
+   * @param product the Product.
+   * @param dosesPerMonth the number of doses a patient needs of this product in a month.
+   * @param active weather this product is active in this program at this time.
+   * @param displayOrder the display order of this Product in this category of this Program.
+   * @param maxMonthsStock the maximum months of stock this product should be stocked for in this
+   *                       Program.
+   * @return a new ProgramProduct.
    */
   public static final ProgramProduct createNew(Program program,
                                                String category,
@@ -79,8 +80,8 @@ public class ProgramProduct extends BaseEntity {
                                                int displayOrder,
                                                int maxMonthsStock) {
     ProgramProduct programProduct = new ProgramProduct(program,
-      product,
-      category);
+        product,
+        category);
     programProduct.dosesPerMonth = dosesPerMonth;
     programProduct.active = active;
     programProduct.fullSupply = fullSupply;
