@@ -5,12 +5,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
-import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -29,13 +30,17 @@ public abstract class OrderableProduct extends BaseEntity {
   @JsonProperty
   private long packSize;
 
-  @ElementCollection
-  private Set<String> programProducts;
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ProgramProduct> programProducts;
 
   protected OrderableProduct(ProductCode productCode, long packSize) {
     this.productCode = productCode;
     this.packSize = packSize;
     this.programProducts = new LinkedHashSet<>();
+  }
+
+  public boolean hasProgram() {
+    return null != programProducts && 0 < programProducts.size();
   }
 
   /**
@@ -53,7 +58,20 @@ public abstract class OrderableProduct extends BaseEntity {
    * @return true if successful, false otherwise.
    */
   public final boolean addToProgram(ProgramProduct programProduct) {
-    return programProducts.add("todo");
+    return programProducts.add(programProduct);
+  }
+
+  @JsonProperty
+  private final void setPrograms(Set<ProgramProductBuilder> ppBuilders) {
+    for (ProgramProductBuilder ppBuilder : ppBuilders) {
+      ProgramProduct programProduct = ppBuilder.createProgramProduct(this);
+      addToProgram(programProduct);
+    }
+  }
+
+  @JsonProperty
+  private final Set<ProgramProduct> getPrograms() {
+    return programProducts;
   }
 
   @JsonProperty
