@@ -20,10 +20,9 @@ public class ProgramProductRepositoryImpl implements ProgramProductRepositoryCus
   /**
    * Finds ProgramProducts matching all of provided parameters.
    * @param program program of searched ProgramProducts.
-   * @param fullSupply are the looking programProducts fullSupply.
    * @return list of all ProgramProducts matching all of provided parameters.
    */
-  public List<ProgramProduct> searchProgramProducts(Program program, Boolean fullSupply) {
+  public List<ProgramProduct> searchProgramProducts(Program program) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<ProgramProduct> query = builder.createQuery(ProgramProduct.class);
     Root<ProgramProduct> root = query.from(ProgramProduct.class);
@@ -34,12 +33,6 @@ public class ProgramProductRepositoryImpl implements ProgramProductRepositoryCus
               predicate,
               builder.equal(
                       root.get("program"), program));
-    }
-    if (fullSupply != null) {
-      predicate = builder.and(
-              predicate,
-              builder.equal(
-                      root.get("fullSupply"), fullSupply));
     }
     query.where(predicate);
     return entityManager.createQuery(query).getResultList();

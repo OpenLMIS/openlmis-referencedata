@@ -138,15 +138,13 @@ public class ProgramProductController extends BaseController {
   /**
    * Finds ProgramProducts matching all of provided parameters.
    * @param program program of ProgramProducts we want search.
-   * @param fullSupply is the searched ProgramProducts fullSuplly.
    * @return ResponseEntity with list of all ProgramProducts matching
    *         provided parameters and OK httpStatus.
    */
   @RequestMapping(value = "/programProducts/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProgramProducts(
-          @RequestParam(value = "program", required = true) Program program,
-          @RequestParam(value = "fullSupply", required = false) Boolean fullSupply) {
-    List<ProgramProduct> result = programProductService.searchProgramProducts(program, fullSupply);
+          @RequestParam(value = "program", required = true) Program program) {
+    List<ProgramProduct> result = programProductService.searchProgramProducts(program);
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }

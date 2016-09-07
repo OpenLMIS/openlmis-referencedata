@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ProgramProductRepositoryCustom  {
 
-  List<ProgramProduct> searchProgramProducts(Program program, Boolean fullSupply);
+  List<ProgramProduct> searchProgramProducts(Program program);
 }

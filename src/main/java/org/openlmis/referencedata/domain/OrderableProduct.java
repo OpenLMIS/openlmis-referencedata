@@ -5,12 +5,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
-import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -31,13 +32,17 @@ public abstract class OrderableProduct extends BaseEntity {
   @JsonProperty
   private long packSize;
 
-  @ElementCollection
-  private Set<String> programProducts;
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ProgramProduct> programProducts;
 
   protected OrderableProduct(ProductCode productCode, long packSize) {
     this.productCode = productCode;
     this.packSize = packSize;
     this.programProducts = new LinkedHashSet<>();
+  }
+
+  public boolean hasProgram() {
+    return null != programProducts && 0 < programProducts.size();
   }
 
   /**
@@ -55,7 +60,20 @@ public abstract class OrderableProduct extends BaseEntity {
    * @return true if successful, false otherwise.
    */
   public final boolean addToProgram(ProgramProduct programProduct) {
-    return programProducts.add("todo");
+    return programProducts.add(programProduct);
+  }
+
+  @JsonProperty
+  private final void setPrograms(Set<ProgramProductBuilder> ppBuilders) {
+    for (ProgramProductBuilder ppBuilder : ppBuilders) {
+      ProgramProduct programProduct = ppBuilder.createProgramProduct(this);
+      addToProgram(programProduct);
+    }
+  }
+
+  @JsonProperty
+  private final Set<ProgramProduct> getPrograms() {
+    return programProducts;
   }
 
   @JsonProperty
@@ -100,22 +118,5 @@ public abstract class OrderableProduct extends BaseEntity {
   @Override
   public final int hashCode() {
     return productCode.hashCode();
-  }
-
-  public void export(Exporter exp) {
-    exp.addProductCode(this.productCode);
-    exp.addPackSize(this.packSize);
-  }
-
-  public interface Importer {
-    public ProductCode provideProductCode();
-
-    public long providePackSize();
-  }
-
-  public interface Exporter {
-    public void addProductCode(ProductCode productCode);
-
-    public void addPackSize(long packSize);
   }
 }

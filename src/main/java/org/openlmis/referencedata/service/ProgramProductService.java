@@ -17,10 +17,9 @@ public class ProgramProductService {
   /**
    * Finds ProgramProducts matching all of provided parameters.
    * @param program program of searched ProgramProducts.
-   * @param fullSupply are the looking programProducts fullSupply.
    * @return list of all ProgramProducts matching all of provided parameters.
    */
-  public List<ProgramProduct> searchProgramProducts(Program program, Boolean fullSupply) {
-    return programProductRepository.searchProgramProducts(program, fullSupply);
+  public List<ProgramProduct> searchProgramProducts(Program program) {
+    return programProductRepository.searchProgramProducts(program);
   }
 }

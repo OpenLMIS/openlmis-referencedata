@@ -13,7 +13,7 @@ public class RoleAssignmentDto {
 
   @Getter
   @Setter
-  UUID programId;
+  String programCode;
 
   @Getter
   @Setter
@@ -21,6 +21,6 @@ public class RoleAssignmentDto {
 
   @Getter
   @Setter
-  UUID warehouseId;
+  String warehouseCode;
 }
 

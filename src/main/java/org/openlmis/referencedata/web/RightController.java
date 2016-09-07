@@ -41,7 +41,7 @@ public class RightController extends BaseController {
 
   /**
    * Save a right using the provided right DTO. If the right does not exist, will create one. If it
-   * does exist,
+   * does exist, will update it.
    *
    * @param rightDto provided right DTO
    * @return ResponseEntity containing the updated right

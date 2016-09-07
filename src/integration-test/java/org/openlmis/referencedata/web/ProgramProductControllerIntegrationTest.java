@@ -68,7 +68,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldFindProgramProducts() {
     ProgramProduct[] response = restAssured.given()
             .queryParam(PROGRAM, programProducts.get(0).getProgram().getId())
-            .queryParam(FULL_SUPPLY, programProducts.get(0).isFullSupply())
             .queryParam(ACCESS_TOKEN, getToken())
             .when()
             .get(SEARCH_URL)
@@ -82,9 +81,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
       assertEquals(
               programProduct.getProgram().getId(),
               programProducts.get(0).getProgram().getId());
-      assertEquals(
-              programProduct.isFullSupply(),
-              programProducts.get(0).isFullSupply());
     }
   }
 
@@ -128,7 +124,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldUpdateProgramProduct() {
 
     ProgramProduct programProduct = programProducts.get(4);
-    programProduct.setDosesPerMonth(4);
 
     ProgramProduct response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
@@ -141,7 +136,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
           .statusCode(200)
           .extract().as(ProgramProduct.class);
 
-    assertTrue(response.getDosesPerMonth().equals(4));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -187,12 +181,8 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     orderableProductRepository.save(orderableProduct);
     ProgramProduct programProduct = new ProgramProduct();
     programProduct.setProduct(orderableProduct);
-    programProduct.setProductCategory(productCategory);
     Program program = generateProgram();
     programProduct.setProgram(program);
-    programProduct.setFullSupply(true);
-    programProduct.setActive(true);
-    programProduct.setDosesPerMonth(3);
     programProductRepository.save(programProduct);
     return programProduct;
   }

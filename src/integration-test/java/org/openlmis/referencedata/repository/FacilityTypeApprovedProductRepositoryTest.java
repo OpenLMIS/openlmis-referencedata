@@ -84,10 +84,6 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     programProduct.setProgram(program);
     orderableProduct = orderableProductRepository.save(new GlobalProduct());
     programProduct.setProduct(orderableProduct);
-    programProduct.setProductCategory(productCategory);
-    programProduct.setActive(true);
-    programProduct.setDosesPerMonth(1);
-    programProduct.setFullSupply(true);
     programProductRepository.save(programProduct);
   }
 

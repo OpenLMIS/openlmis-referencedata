@@ -87,12 +87,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderableProductRepository.save(orderableProduct);
 
     ProgramProduct programProduct = new ProgramProduct();
-    programProduct.setProductCategory(productCategory);
     programProduct.setProgram(program);
     programProduct.setProduct(orderableProduct);
-    programProduct.setDosesPerMonth(2);
-    programProduct.setActive(true);
-    programProduct.setFullSupply(true);
     programProductRepository.save(programProduct);
 
     FacilityType facilityType = new FacilityType();

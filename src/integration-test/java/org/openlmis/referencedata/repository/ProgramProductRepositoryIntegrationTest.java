@@ -43,11 +43,7 @@ public class ProgramProductRepositoryIntegrationTest
     GlobalProduct globalProduct = orderableProductRepository.save(new GlobalProduct());
     ProgramProduct programProduct = new ProgramProduct();
     programProduct.setProduct(globalProduct);
-    programProduct.setProductCategory(productCategory);
     programProduct.setProgram(program);
-    programProduct.setFullSupply(true);
-    programProduct.setActive(true);
-    programProduct.setDosesPerMonth(3);
     return programProduct;
   }
 
@@ -64,17 +60,13 @@ public class ProgramProductRepositoryIntegrationTest
     ProgramProduct programProduct = cloneProgramProduct(programProducts.get(0));
     List<ProgramProduct> receivedProgramProducts =
             programProductRepository.searchProgramProducts(
-                    programProduct.getProgram(),
-                    programProduct.isFullSupply());
+                    programProduct.getProgram());
 
     Assert.assertEquals(2, receivedProgramProducts.size());
     for (ProgramProduct receivedProgramProduct : receivedProgramProducts) {
       Assert.assertEquals(
               programProduct.getProgram().getId(),
               receivedProgramProduct.getProgram().getId());
-      Assert.assertEquals(
-              programProduct.isFullSupply(),
-              receivedProgramProduct.isFullSupply());
     }
   }
 
@@ -83,8 +75,7 @@ public class ProgramProductRepositoryIntegrationTest
     ProgramProduct programProduct = cloneProgramProduct(programProducts.get(0));
     List<ProgramProduct> receivedProgramProducts =
             programProductRepository.searchProgramProducts(
-                    programProduct.getProgram(),
-                    null);
+                    programProduct.getProgram());
 
     Assert.assertEquals(2, receivedProgramProducts.size());
     for (ProgramProduct receivedProgramProduct : receivedProgramProducts) {
@@ -97,7 +88,7 @@ public class ProgramProductRepositoryIntegrationTest
   @Test
   public void searchProgramProductsByAllParametersNull() {
     List<ProgramProduct> receivedProgramProducts =
-            programProductRepository.searchProgramProducts(null, null);
+            programProductRepository.searchProgramProducts(null);
 
     Assert.assertEquals(programProducts.size(), receivedProgramProducts.size());
   }
@@ -106,10 +97,6 @@ public class ProgramProductRepositoryIntegrationTest
     ProgramProduct clonedProgramProduct = new ProgramProduct();
     clonedProgramProduct.setProgram(programProduct.getProgram());
     clonedProgramProduct.setProduct(programProduct.getProduct());
-    clonedProgramProduct.setProductCategory(programProduct.getProductCategory());
-    clonedProgramProduct.setFullSupply(programProduct.isFullSupply());
-    clonedProgramProduct.setActive(programProduct.isActive());
-    clonedProgramProduct.setDosesPerMonth(programProduct.getDosesPerMonth());
     programProductRepository.save(clonedProgramProduct);
     return clonedProgramProduct;
   }

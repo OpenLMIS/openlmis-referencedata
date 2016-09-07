@@ -2055,21 +2055,3 @@ resourceTypes:
                   body:
                      application/json:
 
-/getAllProcessingPeriods:
-    displayName: Product
-    get:
-          is: [ secured ]
-          description: Retrieving all User objects.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
