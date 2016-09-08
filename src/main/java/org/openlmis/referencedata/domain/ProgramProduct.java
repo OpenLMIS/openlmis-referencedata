@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.IOException;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -28,8 +29,6 @@ public class ProgramProduct extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "productId", nullable = false)
-  @Getter
-  @Setter
   @JsonIgnore
   private OrderableProduct product;
 
@@ -57,6 +56,22 @@ public class ProgramProduct extends BaseEntity {
     this.fullSupply = true;
     this.displayOrder = 0;
     this.maxMonthsStock = 0;
+  }
+
+  /**
+   * Create program product association.
+   * See {@link #createNew(Program, String, OrderableProduct, int, boolean, boolean, int, int)}.
+   * Uses sensible defaults.
+   * @param program see other
+   * @param category see other
+   * @param product see other
+   * @return see other
+   */
+  public static final ProgramProduct createNew(Program program,
+                                               String category,
+                                               OrderableProduct product) {
+    ProgramProduct programProduct = new ProgramProduct(program, product, category);
+    return programProduct;
   }
 
   /**
@@ -91,7 +106,30 @@ public class ProgramProduct extends BaseEntity {
     return programProduct;
   }
 
+  /**
+   * Equal if both represent association between same Program and Product.  e.g. Ibuprofen in the
+   * Essential Meds Program is always the same association regardless of the other properties.
+   * @param other the other ProgramProduct
+   * @return true if for same Program-Product association, false otherwise.
+   */
+  @Override
+  public boolean equals(Object other) {
+    if (Objects.isNull(other) || !(other instanceof ProgramProduct)) {
+      return false;
+    }
 
+    ProgramProduct otherProgProduct = (ProgramProduct) other;
+    return program.equals(otherProgProduct.program) && product.equals(otherProgProduct.product);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(program, product);
+  }
+
+  /**
+   * JSON Serializer for ProgramProducts
+   */
   public static class ProgramProductSerializer extends StdSerializer<ProgramProduct> {
     public ProgramProductSerializer() {
       this(null);

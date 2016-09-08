@@ -1,14 +1,13 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import org.openlmis.referencedata.util.View;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -22,7 +21,8 @@ public class Program extends BaseEntity {
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
   @Setter
-  private String code;
+  @Embedded
+  private Code code;
 
   @Column(columnDefinition = "text")
   @Getter
@@ -52,5 +52,25 @@ public class Program extends BaseEntity {
     if (this.periodsSkippable == null) {
       this.periodsSkippable = false;
     }
+  }
+
+  /**
+   * Equal by a Program's code.
+   * @param other the other Program
+   * @return true if the two Program's {@link Code} are equal.
+   */
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof Program)) {
+      return false;
+    }
+
+    Program otherProgram = (Program) other;
+    return code.equals(otherProgram.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return code.hashCode();
   }
 }

@@ -24,7 +24,7 @@ public final class GlobalProduct extends OrderableProduct {
   @OneToMany(mappedBy = "globalProduct")
   private Set<TradeItem> tradeItems;
 
-  private GlobalProduct(ProductCode productCode, long packSize) {
+  private GlobalProduct(Code productCode, long packSize) {
     super(productCode, packSize);
     tradeItems = new HashSet<>();
   }
@@ -41,7 +41,7 @@ public final class GlobalProduct extends OrderableProduct {
   public static GlobalProduct newGlobalProduct(@JsonProperty("productCode") String productCode,
                                                @JsonProperty("description") String description,
                                                @JsonProperty("packSize") long packSize) {
-    ProductCode code = ProductCode.newProductCode(productCode);
+    Code code = Code.code(productCode);
     GlobalProduct globalProduct = new GlobalProduct(code, packSize);
     globalProduct.description = description;
     return globalProduct;

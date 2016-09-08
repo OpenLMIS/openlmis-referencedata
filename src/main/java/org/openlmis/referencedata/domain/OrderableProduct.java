@@ -25,7 +25,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 public abstract class OrderableProduct extends BaseEntity {
   @Embedded
-  private ProductCode productCode;
+  private Code productCode;
 
   @JsonProperty
   private long packSize;
@@ -33,7 +33,7 @@ public abstract class OrderableProduct extends BaseEntity {
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ProgramProduct> programProducts;
 
-  protected OrderableProduct(ProductCode productCode, long packSize) {
+  protected OrderableProduct(Code productCode, long packSize) {
     this.productCode = productCode;
     this.packSize = packSize;
     this.programProducts = new LinkedHashSet<>();
@@ -48,7 +48,7 @@ public abstract class OrderableProduct extends BaseEntity {
    * @return a copy of this product's unique product code.
    */
   @JsonProperty
-  public final ProductCode getProductCode() {
+  public final Code getProductCode() {
     return productCode;
   }
 
@@ -58,6 +58,10 @@ public abstract class OrderableProduct extends BaseEntity {
    * @return true if successful, false otherwise.
    */
   public final boolean addToProgram(ProgramProduct programProduct) {
+    if (programProducts.contains(programProduct)) {
+      programProducts.remove(programProduct);
+    }
+
     return programProducts.add(programProduct);
   }
 
