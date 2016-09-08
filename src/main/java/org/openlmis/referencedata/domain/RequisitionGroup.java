@@ -71,9 +71,9 @@ public class RequisitionGroup extends BaseEntity {
   }
 
   /**
-   * Create a new requisition group with a specified supervisory node, program schedules and 
+   * Create a new requisition group with a specified supervisory node, program schedules and
    * facilities.
-   * 
+   *
    * @param supervisoryNode specified supervisory node
    * @param programSchedules specified program schedules
    * @param memberFacilities specified facilities

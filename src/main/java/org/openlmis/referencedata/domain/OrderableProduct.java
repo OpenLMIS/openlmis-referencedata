@@ -14,12 +14,14 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Products that are Orderable by Program.  An OrderableProduct represent any medical commodities
  * that may be ordered/requisitioned, typically by a {@link Program}.
  */
 @Entity
+@JsonDeserialize(as = GlobalProduct.class)
 @DiscriminatorColumn(name = "Type")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "orderable_products", schema = "referencedata")

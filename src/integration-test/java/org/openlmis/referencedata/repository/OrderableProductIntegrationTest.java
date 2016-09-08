@@ -8,8 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.UUID;
 
-public class OrderableProductIntegrationTest extends
-    BaseCrudRepositoryIntegrationTest<OrderableProduct> {
+public class OrderableProductIntegrationTest
+    extends BaseCrudRepositoryIntegrationTest<OrderableProduct> {
 
   @Autowired
   private OrderableProductRepository repository;

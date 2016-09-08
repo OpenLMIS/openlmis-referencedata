@@ -132,4 +132,18 @@ public class SupervisoryNode extends BaseEntity {
     requisitionGroup.setSupervisoryNode(this);
     this.requisitionGroup = requisitionGroup;
   }
+
+  /**
+   * Copy values of attributes into new or updated SupervisoryNode.
+   *
+   * @param supervisoryNode SupervisoryNode with new values.
+   */
+  public void updateFrom(SupervisoryNode supervisoryNode) {
+    this.code = supervisoryNode.getCode();
+    this.name = supervisoryNode.getName();
+    this.description = supervisoryNode.getDescription();
+    this.facility = supervisoryNode.getFacility();
+    this.parentNode = supervisoryNode.getParentNode();
+    this.childNodes = supervisoryNode.getChildNodes();
+  }
 }

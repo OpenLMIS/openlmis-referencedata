@@ -119,4 +119,5 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   public int hashCode() {
     return Objects.hash(super.hashCode(), program, supervisoryNode);
   }
+  
 }

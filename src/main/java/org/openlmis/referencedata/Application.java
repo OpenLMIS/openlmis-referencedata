@@ -8,12 +8,15 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.openlmis.referencedata.domain.ProgramProductBuilder;
 import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
+
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.openlmis.referencedata.web.ProgramProductBuilderDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
@@ -21,6 +24,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 @SpringBootApplication
+@ImportResource("applicationContext.xml")
 public class Application {
 
   @Autowired
@@ -55,6 +59,16 @@ public class Application {
     messageSource.setDefaultEncoding("UTF-8");
     messageSource.setUseCodeAsDefaultMessage(true);
     return messageSource;
+  }
+
+  @Bean
+  public ProcessingPeriodValidator beforeCreatePeriodValidator() {
+    return new ProcessingPeriodValidator();
+  }
+
+  @Bean
+  public ProcessingPeriodValidator beforeSavePeriodValidator() {
+    return new ProcessingPeriodValidator();
   }
 
   /**

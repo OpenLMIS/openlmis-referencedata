@@ -1,7 +1,5 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -9,6 +7,9 @@ import org.hibernate.annotations.Type;
 import org.openlmis.referencedata.util.View;
 
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
@@ -22,15 +23,7 @@ public abstract class BaseEntity {
       strategy = "org.openlmis.referencedata.util.ConditionalUuidGenerator")
   @Type(type = "pg-uuid")
   @JsonView(View.BasicInformation.class)
+  @Getter
+  @Setter
   private UUID id;
-
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  public UUID getId() {
-    return id;
-  }
-
-  @JsonIgnore
-  public void setId(UUID id) {
-    this.id = id;
-  }
 }

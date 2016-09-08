@@ -16,6 +16,7 @@ import javax.persistence.Entity;
 @DiscriminatorValue("direct")
 @NoArgsConstructor
 public class DirectRoleAssignment extends RoleAssignment {
+
   public DirectRoleAssignment(Role role) throws RightTypeException {
     super(role);
   }

@@ -6,9 +6,9 @@ import lombok.Setter;
 import java.util.UUID;
 
 public class RoleAssignmentDto {
-  
+
   @Getter
-  @Setter    
+  @Setter
   UUID roleId;
 
   @Getter
@@ -18,8 +18,9 @@ public class RoleAssignmentDto {
   @Getter
   @Setter
   UUID supervisoryNodeId;
-  
+
   @Getter
   @Setter
   String warehouseCode;
 }
+

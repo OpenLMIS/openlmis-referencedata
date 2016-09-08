@@ -92,4 +92,5 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   public int hashCode() {
     return Objects.hash(super.hashCode(), warehouse);
   }
+
 }

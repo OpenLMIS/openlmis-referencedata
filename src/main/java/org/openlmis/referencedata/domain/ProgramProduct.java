@@ -1,6 +1,5 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -24,11 +23,12 @@ public class ProgramProduct extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "programId", nullable = false)
+  @Getter
   private Program program;
 
   @ManyToOne
   @JoinColumn(name = "productId", nullable = false)
-  @JsonIgnore
+  @Getter
   private OrderableProduct product;
 
   private Integer dosesPerMonth;
@@ -45,8 +45,8 @@ public class ProgramProduct extends BaseEntity {
   private int maxMonthsStock;
 
   private ProgramProduct(Program program,
-                        OrderableProduct product,
-                        String productCategory) {
+                         OrderableProduct product,
+                         String productCategory) {
     this.program = program;
     this.product = product;
     this.productCategory = productCategory;
