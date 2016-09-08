@@ -142,7 +142,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-
   @Ignore
   @Test
   public void shouldGetAllProgramProducts() {
@@ -187,6 +186,7 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     ProgramProduct programProduct = new ProgramProduct();
     programProduct.setProduct(orderableProduct);
     Program program = generateProgram();
+    programProduct.setDosesPerMonth(10);
     programProduct.setProgram(program);
     programProductRepository.save(programProduct);
     return programProduct;

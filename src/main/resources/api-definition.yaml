@@ -70,7 +70,7 @@ schemas:
           "properties": {
               "id": { "type": "string", "required": true, "title": "id" },
               "facilityType": { "type": "object", "$ref": "#/schemas/facilityType", "required": true, "title": "facilityType" },
-              "programProduct": { "type": "object", "$ref": "#/schemas/programProduct", "required": true, "title": "programProduct" },
+              "programProduct": { "type": "object", "$ref": "#/schemas/orderableProduct", "required": true, "title": "programProduct" },
               "maxMonthsOfStock": { "type": "number", "required": true, "title": "maxMonthsOfStock" },
               "minMonthsOfStock": { "type": "number", "required": false, "title": "minMonthsOfStock" },
               "emergencyOrderPoint": { "type": "number", "required": false, "title": "emergencyOrderPoint" }
@@ -103,6 +103,20 @@ schemas:
               "catchmentPopulation": { "type": "integer", "required": false, "title": "catchmentPopulation" },
               "latitude": { "type": "number", "required": false, "title": "latitude" },
               "longitude": { "type": "number", "required": false, "title": "longitude" }
+          }
+      }
+
+  - orderableProduct: |
+      {
+          "type": "object",
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "title": "Orderable Product",
+          "description": "A single processingPeriod",
+          "properties": {
+              "id": { "type": "string", "required": true, "title": "id" },
+              "productCode": { "type": "object", "$ref": "#/schemas/productCode", "required": false, "title": "productCode" },
+              "packSize": { "type": "long", "required": false, "title": "packSize" },
+              "programProducts": { "type": "array", "required": false, "title": "programProducts", "items": { "type": "object", "$ref": "#/schemas/orderableProduct" }, "uniqueItems": false  }
           }
       }
 
@@ -155,6 +169,17 @@ schemas:
           }
       }
 
+  - productCode: |
+      {   "type": "object",
+           "$schema": "http://json-schema.org/draft-03/schema",
+           "title": "ProductCode",
+           "description": "A single productCode",
+           "properties": {
+             "id": { "type": "string", "required": true, "title": "id" },
+             "productCode": { "type": "string", "required": false, "title": "productCode" }
+           }
+
+      }
   - program: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",

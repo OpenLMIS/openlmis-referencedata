@@ -1,6 +1,5 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -32,10 +31,12 @@ public class ProgramProduct extends BaseEntity {
   @JoinColumn(name = "productId", nullable = false)
   @Getter
   @Setter
-  @JsonIgnore
   private OrderableProduct product;
 
+  @Getter
+  @Setter
   private Integer dosesPerMonth;
+
   private boolean active;
 
   //@ManyToOne
