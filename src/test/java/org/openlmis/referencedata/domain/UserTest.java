@@ -78,8 +78,8 @@ public class UserTest {
   public void shouldGetHomeFacilityPrograms() throws RightTypeException {
     //given
     Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
-    Program program1 = new Program();
-    Program program2 = new Program();
+    Program program1 = new Program("prog1");
+    Program program2 = new Program("prog2");
 
     RoleAssignment assignment3 = new SupervisionRoleAssignment(role, program1);
     RoleAssignment assignment4 = new SupervisionRoleAssignment(role, program2);
@@ -99,8 +99,8 @@ public class UserTest {
   public void shouldGetSupervisedPrograms() throws RightTypeException {
     //given
     Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
-    Program program1 = new Program();
-    Program program2 = new Program();
+    Program program1 = new Program("prog1");
+    Program program2 = new Program("prog2");
     SupervisoryNode supervisoryNode = new SupervisoryNode();
 
     RoleAssignment assignment3 = new SupervisionRoleAssignment(role, program1, supervisoryNode);
@@ -132,7 +132,7 @@ public class UserTest {
     provinceNode.addChildNode(districtNode);
 
     Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
-    Program program = new Program();
+    Program program = new Program("prog1");
 
     RoleAssignment assignment = new SupervisionRoleAssignment(role, program, provinceNode);
 

@@ -2,7 +2,6 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.openlmis.referencedata.util.View;
 
@@ -14,7 +13,6 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "programs", schema = "referencedata")
-@NoArgsConstructor
 public class Program extends BaseEntity {
 
   @JsonView(View.BasicInformation.class)
@@ -46,6 +44,18 @@ public class Program extends BaseEntity {
   @Getter
   @Setter
   private Boolean showNonFullSupplyTab;
+
+  private Program() {
+    code = null;
+  }
+
+  /**
+   * Creates a new Program with given code.
+   * @param programCode the program code
+   */
+  public Program(String programCode) {
+    this.code = Code.code(programCode);
+  }
 
   @PrePersist
   private void prePersist() {

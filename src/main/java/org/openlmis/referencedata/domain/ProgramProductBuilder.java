@@ -1,6 +1,5 @@
 package org.openlmis.referencedata.domain;
 
-import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.repository.ProgramRepository;
 
 import java.util.Objects;
@@ -12,7 +11,6 @@ import java.util.UUID;
  * called with a {@link ProgramRepository} so that it may lookup a Program's UUID and convert
  * it to {@link Program} in order to build a {@link ProgramProduct}.
  */
-@NoArgsConstructor
 public class ProgramProductBuilder {
   private ProgramRepository programRepository;
 
@@ -23,6 +21,25 @@ public class ProgramProductBuilder {
   private boolean fullSupply;
   private int displayOrder;
   private int maxMonthsOfStock;
+
+  private ProgramProductBuilder() {
+    this.dosesPerMonth = null;
+    this.active = true;
+    this.productCategory = "Other";
+    this.fullSupply = false;
+    this.displayOrder = 0;
+    this.maxMonthsOfStock = 1;
+  }
+
+  /**
+   * Creates a new builder with the given program id.
+   * @param programId a persistent program id that the
+   * {@link #setProgramRepository(ProgramRepository)} will find.
+   */
+  public ProgramProductBuilder(UUID programId) {
+    this();
+    this.programId = Objects.requireNonNull(programId);
+  }
 
   public ProgramProductBuilder setProgramId(UUID programId) {
     this.programId = programId;

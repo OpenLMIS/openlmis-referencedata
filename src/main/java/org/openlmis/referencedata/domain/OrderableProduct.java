@@ -3,6 +3,7 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -66,16 +67,37 @@ public abstract class OrderableProduct extends BaseEntity {
   }
 
   @JsonProperty
-  private final void setPrograms(Set<ProgramProductBuilder> ppBuilders) {
+  protected final void setPrograms(Set<ProgramProductBuilder> ppBuilders) {
+    Set<ProgramProduct> workProgProducts = new HashSet<>();
+
+    // add or modify associations
     for (ProgramProductBuilder ppBuilder : ppBuilders) {
       ProgramProduct programProduct = ppBuilder.createProgramProduct(this);
+      workProgProducts.add(programProduct);
       addToProgram(programProduct);
     }
+    this.programProducts.retainAll(workProgProducts); // remove old associations
   }
 
   @JsonProperty
-  private final Set<ProgramProduct> getPrograms() {
+  protected final Set<ProgramProduct> getPrograms() {
     return programProducts;
+  }
+
+  /**
+   * Get the association to a {@link Program}.
+   * @param program the Program this product is (maybe) in.
+   * @return the asssociation to the given {@link Program}, or null if this product is not in the
+   *        given program.
+   */
+  public ProgramProduct getProgramProduct(Program program) {
+    for (ProgramProduct programProduct : programProducts) {
+      if (programProduct.isForProgram(program)) {
+        return programProduct;
+      }
+    }
+
+    return null;
   }
 
   @JsonProperty

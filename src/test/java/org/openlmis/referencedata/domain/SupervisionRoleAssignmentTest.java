@@ -14,7 +14,7 @@ import java.util.Set;
 public class SupervisionRoleAssignmentTest {
 
   private Right right = new Right("right", SUPERVISION);
-  private Program program = new Program();
+  private Program program = new Program("em");
   private SupervisoryNode node = new SupervisoryNode();
   private Role role = new Role("role", right);
   private SupervisionRoleAssignment homeFacilityRoleAssignment =
@@ -42,7 +42,7 @@ public class SupervisionRoleAssignmentTest {
   public void shouldNotHaveRightWhenProgramDoesNotMatch() throws RightTypeException {
 
     //when
-    RightQuery rightQuery = new RightQuery(right, new Program(), node);
+    RightQuery rightQuery = new RightQuery(right, new Program("test"), node);
     boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then

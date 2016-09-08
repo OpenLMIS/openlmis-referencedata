@@ -1,7 +1,7 @@
 package org.openlmis.referencedata.repository;
 
-import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.OrderableProduct;
 
 import java.util.UUID;
 

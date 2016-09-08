@@ -9,11 +9,8 @@ public class ProgramTest {
 
   @Test
   public void shouldBeEqualByCode() {
-    Program epi = new Program();
-    epi.setCode(Code.code("EPI"));
-
-    Program epiDupe = new Program();
-    epiDupe.setCode(Code.code("epi"));
+    Program epi = new Program("EPI");
+    Program epiDupe = new Program("epi");
 
     assertTrue(epi.equals(epiDupe));
     assertTrue(epiDupe.equals(epi));

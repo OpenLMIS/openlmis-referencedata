@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -37,7 +36,7 @@ public class ProgramProduct extends BaseEntity {
 
   //@ManyToOne
   //@JoinColumn(name = "productCategoryId", nullable = false)
-  //@Getter
+  @Getter
   //@Setter
   private String productCategory;
 
@@ -59,8 +58,17 @@ public class ProgramProduct extends BaseEntity {
   }
 
   /**
+   * Returns true if this association is for given Program.
+   * @param program the {@link Program} to ask about
+   * @return true if this association is for the given Program, false otherwise.
+   */
+  public boolean isForProgram(Program program) {
+    return this.program.equals(program);
+  }
+
+  /**
    * Create program product association.
-   * See {@link #createNew(Program, String, OrderableProduct, int, boolean, boolean, int, int)}.
+   * See {@link #createNew(Program, String, OrderableProduct, Integer, boolean, boolean, int, int)}.
    * Uses sensible defaults.
    * @param program see other
    * @param category see other
@@ -89,7 +97,7 @@ public class ProgramProduct extends BaseEntity {
   public static final ProgramProduct createNew(Program program,
                                                String category,
                                                OrderableProduct product,
-                                               int dosesPerMonth,
+                                               Integer dosesPerMonth,
                                                boolean active,
                                                boolean fullSupply,
                                                int displayOrder,
@@ -128,7 +136,7 @@ public class ProgramProduct extends BaseEntity {
   }
 
   /**
-   * JSON Serializer for ProgramProducts
+   * JSON Serializer for ProgramProducts.
    */
   public static class ProgramProductSerializer extends StdSerializer<ProgramProduct> {
     public ProgramProductSerializer() {
