@@ -40,6 +40,23 @@ public class RightController extends BaseController {
   }
 
   /**
+   * Get specified right in the system.
+   *
+   * @param rightName name of the right to get
+   * @return specified right
+   */
+  @RequestMapping(value = "/rights/{rightName}", method = RequestMethod.GET)
+  public ResponseEntity<?> getRight(@PathVariable("rightName") String rightName) {
+
+    LOGGER.debug("Getting right");
+    Right right = rightRepository.findFirstByName(rightName);
+
+    return ResponseEntity
+        .ok()
+        .body(right);
+  }
+
+  /**
    * Save a right using the provided right DTO. If the right does not exist, will create one. If it
    * does exist, will update it.
    *
