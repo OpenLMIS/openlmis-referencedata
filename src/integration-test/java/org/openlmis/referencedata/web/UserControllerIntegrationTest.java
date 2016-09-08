@@ -8,7 +8,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -72,7 +71,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     }
   }
 
-  @Ignore
   @Test
   public void shouldFindUsers() {
     User[] response = restAssured.given()
@@ -113,7 +111,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     }
   }
 
-  @Ignore
   @Test
   public void shouldDeleteUser() {
 
@@ -132,7 +129,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldGetAllUsers() {
 
@@ -150,7 +146,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldGetChosenUser() {
 
@@ -209,7 +204,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     removeAuthUserByUsername(authUser.getUsername());
   }
 
-  @Ignore
   @Test
   public void shouldUpdateRequisitionAndAuthUsers() {
     User newUser = generateUser();
