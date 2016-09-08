@@ -56,6 +56,24 @@ public class RightController extends BaseController {
         .body(right);
   }
 
+
+
+  /**
+   * Get chosen right.
+   *
+   * @param rightId UUID of right whose we want to get
+   * @return Right.
+   */
+  @RequestMapping(value = "/rights/{id}", method = RequestMethod.GET)
+  public ResponseEntity<?> getRight(@PathVariable("id") UUID rightId) {
+    Right right = rightRepository.findOne(rightId);
+    if (right == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } else {
+      return new ResponseEntity<>(right, HttpStatus.OK);
+    }
+  }
+
   /**
    * Save a right using the provided right DTO. If the right does not exist, will create one. If it
    * does exist, will update it.
@@ -129,22 +147,6 @@ public class RightController extends BaseController {
     }
   }
 
-
-  /**
-   * Get chosen right.
-   *
-   * @param rightId UUID of right whose we want to get
-   * @return Right.
-   */
-  @RequestMapping(value = "/rights/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getRight(@PathVariable("id") UUID rightId) {
-    Right right = rightRepository.findOne(rightId);
-    if (right == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(right, HttpStatus.OK);
-    }
-  }
 
   /**
    * Delete an existing right.

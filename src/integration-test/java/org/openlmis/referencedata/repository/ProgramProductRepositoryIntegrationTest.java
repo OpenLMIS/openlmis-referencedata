@@ -39,7 +39,6 @@ public class ProgramProductRepositoryIntegrationTest
 
   ProgramProduct generateInstance() {
     Program program = generateProgram();
-    ProductCategory productCategory = generateProductCategory();
     GlobalProduct globalProduct = orderableProductRepository.save(new GlobalProduct());
     ProgramProduct programProduct = new ProgramProduct();
     programProduct.setProduct(globalProduct);
