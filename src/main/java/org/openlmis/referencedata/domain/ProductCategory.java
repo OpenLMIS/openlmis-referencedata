@@ -15,7 +15,7 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "program_categories", schema = "referencedata")
+@Table(name = "product_categories", schema = "referencedata")
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductCategory extends BaseEntity {

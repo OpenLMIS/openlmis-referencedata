@@ -4,8 +4,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GlobalProduct;
-import org.openlmis.referencedata.domain.Product;
-import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +18,7 @@ public class ProgramProductRepositoryIntegrationTest
   private ProgramProductRepository programProductRepository;
 
   @Autowired
-  private ProductRepository productRepository;
-
-  @Autowired
   private ProgramRepository programRepository;
-
-  @Autowired
-  private ProductCategoryRepository productCategoryRepository;
 
   @Autowired
   private OrderableProductRepository orderableProductRepository;
@@ -103,33 +95,5 @@ public class ProgramProductRepositoryIntegrationTest
     program.setPeriodsSkippable(false);
     programRepository.save(program);
     return program;
-  }
-
-  private Product generateProduct(ProductCategory productCategory) {
-    Integer instanceNumber = this.getNextInstanceNumber();
-    Product product = new Product();
-    product.setCode("code" + instanceNumber);
-    product.setPrimaryName("product" + instanceNumber);
-    product.setDispensingUnit("unit" + instanceNumber);
-    product.setDosesPerDispensingUnit(10);
-    product.setPackSize(1);
-    product.setPackRoundingThreshold(0);
-    product.setRoundToZero(false);
-    product.setActive(true);
-    product.setFullSupply(true);
-    product.setTracer(false);
-    product.setProductCategory(productCategory);
-    productRepository.save(product);
-    return product;
-  }
-
-  private ProductCategory generateProductCategory() {
-    Integer instanceNumber = this.getNextInstanceNumber();
-    ProductCategory productCategory = new ProductCategory();
-    productCategory.setCode("code" + instanceNumber);
-    productCategory.setName("vaccine" + instanceNumber);
-    productCategory.setDisplayOrder(1);
-    productCategoryRepository.save(productCategory);
-    return productCategory;
   }
 }

@@ -135,27 +135,6 @@ schemas:
           }
       }
 
-  - product: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "Product",
-          "description": "A single product",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "title": "code" },
-              "primaryName": { "type": "string", "required": true, "title": "primaryName" },
-              "dispensingUnit": { "type": "string", "required": true, "title": "dispensingUnit" },
-              "dosesPerDispensingUnit": { "type": "integer", "required": true, "title": "dosesPerDispensingUnit" },
-              "packSize": { "type": "integer", "required": true, "title": "packSize" },
-              "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
-              "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
-              "active": { "type": "boolean", "required": true, "title": "active" },
-              "fullSupply": { "type": "boolean", "required": true, "title": "fullSupply" },
-              "tracer": { "type": "boolean", "required": true, "title": "tracer" },
-              "productCategory": { "type": "object", "$ref": "#/schemas/productCategory", "required": true, "title": "productCategory" }
-          }
-      }
-
   - productCategory: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -1971,44 +1950,6 @@ resourceTypes:
     get:
           is: [ secured ]
           description: Retrieving all Facility objects.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
-
-/getProductById:
-    displayName: Product
-    get:
-          is: [ secured ]
-          description: Retrieving Product object by id.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
-
-/getAllProducts:
-    displayName: Product
-    get:
-          is: [ secured ]
-          description: Retrieving all Product objects.
           responses:
               "200":
                   headers:

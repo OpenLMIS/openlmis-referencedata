@@ -1,31 +1,27 @@
 package org.openlmis.referencedata.web;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
-import org.openlmis.referencedata.domain.Product;
-import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.repository.OrderableProductRepository;
-import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.repository.ProductRepository;
 import org.openlmis.referencedata.repository.ProgramProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -41,12 +37,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
 
   @Autowired
   private ProgramRepository programRepository;
-
-  @Autowired
-  private ProductRepository productRepository;
-
-  @Autowired
-  private ProductCategoryRepository productCategoryRepository;
 
   @Autowired
   private OrderableProductRepository orderableProductRepository;
@@ -203,34 +193,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     program.setPeriodsSkippable(false);
     programRepository.save(program);
     return program;
-  }
-
-  private ProductCategory generateProductCategory() {
-    Integer instanceNumber = generateInstanceNumber();
-    ProductCategory productCategory = new ProductCategory();
-    productCategory.setCode("code" + instanceNumber);
-    productCategory.setName("vaccine" + instanceNumber);
-    productCategory.setDisplayOrder(1);
-    productCategoryRepository.save(productCategory);
-    return productCategory;
-  }
-
-  private Product generateProduct(ProductCategory productCategory) {
-    Integer instanceNumber = generateInstanceNumber();
-    Product product = new Product();
-    product.setCode("code" + instanceNumber);
-    product.setPrimaryName("product" + instanceNumber);
-    product.setDispensingUnit("unit" + instanceNumber);
-    product.setDosesPerDispensingUnit(10);
-    product.setPackSize(1);
-    product.setPackRoundingThreshold(0);
-    product.setRoundToZero(false);
-    product.setActive(true);
-    product.setFullSupply(true);
-    product.setTracer(false);
-    product.setProductCategory(productCategory);
-    productRepository.save(product);
-    return product;
   }
 
   private Integer generateInstanceNumber() {
