@@ -95,6 +95,8 @@ public class ProgramProductBuilder {
         + "creating program product");
     Objects.requireNonNull(product, "Product can't be null when building a program product");
 
+    Objects.requireNonNull(productCategory);
+
     Program storedProgram = programRepository.findOne(programId);
     return ProgramProduct.createNew(storedProgram,
       productCategory,

@@ -153,11 +153,13 @@ public class ProgramProduct extends BaseEntity {
       generator.writeStartObject();
       generator.writeStringField("programId", programProduct.program.getId().toString());
       generator.writeStringField("productCategory", programProduct.productCategory);
-      generator.writeNumberField("dosesPerMonth", programProduct.dosesPerMonth);
       generator.writeBooleanField("active", programProduct.active);
       generator.writeBooleanField("fullSupply", programProduct.fullSupply);
       generator.writeNumberField("displayOrder", programProduct.displayOrder);
       generator.writeNumberField("maxMonthsOfStock", programProduct.maxMonthsStock);
+      if (null != programProduct.dosesPerMonth) {
+        generator.writeNumberField("dosesPerMonth", programProduct.dosesPerMonth);
+      }
       generator.writeEndObject();
     }
   }
