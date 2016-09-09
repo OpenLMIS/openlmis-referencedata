@@ -3,6 +3,7 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -27,7 +28,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @NoArgsConstructor
 public abstract class OrderableProduct extends BaseEntity {
   @Embedded
-  private ProductCode productCode;
+  private Code productCode;
 
   @JsonProperty
   private long packSize;
@@ -35,7 +36,7 @@ public abstract class OrderableProduct extends BaseEntity {
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ProgramProduct> programProducts;
 
-  protected OrderableProduct(ProductCode productCode, long packSize) {
+  protected OrderableProduct(Code productCode, long packSize) {
     this.productCode = productCode;
     this.packSize = packSize;
     this.programProducts = new LinkedHashSet<>();
@@ -50,7 +51,7 @@ public abstract class OrderableProduct extends BaseEntity {
    * @return a copy of this product's unique product code.
    */
   @JsonProperty
-  public final ProductCode getProductCode() {
+  public final Code getProductCode() {
     return productCode;
   }
 
@@ -60,20 +61,45 @@ public abstract class OrderableProduct extends BaseEntity {
    * @return true if successful, false otherwise.
    */
   public final boolean addToProgram(ProgramProduct programProduct) {
+    if (programProducts.contains(programProduct)) {
+      programProducts.remove(programProduct);
+    }
+
     return programProducts.add(programProduct);
   }
 
   @JsonProperty
-  private final void setPrograms(Set<ProgramProductBuilder> ppBuilders) {
+  protected final void setPrograms(Set<ProgramProductBuilder> ppBuilders) {
+    Set<ProgramProduct> workProgProducts = new HashSet<>();
+
+    // add or modify associations
     for (ProgramProductBuilder ppBuilder : ppBuilders) {
       ProgramProduct programProduct = ppBuilder.createProgramProduct(this);
+      workProgProducts.add(programProduct);
       addToProgram(programProduct);
     }
+    this.programProducts.retainAll(workProgProducts); // remove old associations
   }
 
   @JsonProperty
-  private final Set<ProgramProduct> getPrograms() {
+  protected final Set<ProgramProduct> getPrograms() {
     return programProducts;
+  }
+
+  /**
+   * Get the association to a {@link Program}.
+   * @param program the Program this product is (maybe) in.
+   * @return the asssociation to the given {@link Program}, or null if this product is not in the
+   *        given program.
+   */
+  public ProgramProduct getProgramProduct(Program program) {
+    for (ProgramProduct programProduct : programProducts) {
+      if (programProduct.isForProgram(program)) {
+        return programProduct;
+      }
+    }
+
+    return null;
   }
 
   @JsonProperty

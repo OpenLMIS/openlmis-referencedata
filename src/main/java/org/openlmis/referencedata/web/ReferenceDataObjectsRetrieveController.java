@@ -2,11 +2,9 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
-import org.openlmis.referencedata.domain.Product;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.repository.ProductRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,9 +24,6 @@ public class ReferenceDataObjectsRetrieveController extends BaseController {
 
   @Autowired
   FacilityRepository facilityRepository;
-
-  @Autowired
-  ProductRepository productRepository;
 
   @Autowired
   ProcessingPeriodRepository processingPeriodRepository;
@@ -51,18 +46,6 @@ public class ReferenceDataObjectsRetrieveController extends BaseController {
   public ResponseEntity<?> getFacilities() {
     Iterable<Facility> facilities = facilityRepository.findAll();
     return new ResponseEntity<>(facilities, HttpStatus.OK);
-  }
-
-  @RequestMapping(value = "/getProductById", method = RequestMethod.GET)
-  public ResponseEntity<?> getProduct(@RequestParam(value = "id") UUID id) {
-    Product foundProduct = productRepository.findOne(id);
-    return new ResponseEntity<Product>(foundProduct, HttpStatus.OK);
-  }
-
-  @RequestMapping(value = "/getAllProducts", method = RequestMethod.GET)
-  public ResponseEntity<?> getProducts() {
-    Iterable<Product> products = productRepository.findAll();
-    return new ResponseEntity<>(products, HttpStatus.OK);
   }
 
   /**

@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.IOException;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -24,24 +24,19 @@ public class ProgramProduct extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "programId", nullable = false)
   @Getter
-  @Setter
   private Program program;
 
   @ManyToOne
   @JoinColumn(name = "productId", nullable = false)
   @Getter
-  @Setter
   private OrderableProduct product;
 
-  @Getter
-  @Setter
   private Integer dosesPerMonth;
-
   private boolean active;
 
   //@ManyToOne
   //@JoinColumn(name = "productCategoryId", nullable = false)
-  //@Getter
+  @Getter
   //@Setter
   private String productCategory;
 
@@ -63,6 +58,31 @@ public class ProgramProduct extends BaseEntity {
   }
 
   /**
+   * Returns true if this association is for given Program.
+   * @param program the {@link Program} to ask about
+   * @return true if this association is for the given Program, false otherwise.
+   */
+  public boolean isForProgram(Program program) {
+    return this.program.equals(program);
+  }
+
+  /**
+   * Create program product association.
+   * See {@link #createNew(Program, String, OrderableProduct, Integer, boolean, boolean, int, int)}.
+   * Uses sensible defaults.
+   * @param program see other
+   * @param category see other
+   * @param product see other
+   * @return see other
+   */
+  public static final ProgramProduct createNew(Program program,
+                                               String category,
+                                               OrderableProduct product) {
+    ProgramProduct programProduct = new ProgramProduct(program, product, category);
+    return programProduct;
+  }
+
+  /**
    * Create program product.
    * @param program The Program this Product will be in.
    * @param category the category this Product will be in, in this Program.
@@ -77,7 +97,7 @@ public class ProgramProduct extends BaseEntity {
   public static final ProgramProduct createNew(Program program,
                                                String category,
                                                OrderableProduct product,
-                                               int dosesPerMonth,
+                                               Integer dosesPerMonth,
                                                boolean active,
                                                boolean fullSupply,
                                                int displayOrder,
@@ -94,7 +114,30 @@ public class ProgramProduct extends BaseEntity {
     return programProduct;
   }
 
+  /**
+   * Equal if both represent association between same Program and Product.  e.g. Ibuprofen in the
+   * Essential Meds Program is always the same association regardless of the other properties.
+   * @param other the other ProgramProduct
+   * @return true if for same Program-Product association, false otherwise.
+   */
+  @Override
+  public boolean equals(Object other) {
+    if (Objects.isNull(other) || !(other instanceof ProgramProduct)) {
+      return false;
+    }
 
+    ProgramProduct otherProgProduct = (ProgramProduct) other;
+    return program.equals(otherProgProduct.program) && product.equals(otherProgProduct.product);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(program, product);
+  }
+
+  /**
+   * JSON Serializer for ProgramProducts.
+   */
   public static class ProgramProductSerializer extends StdSerializer<ProgramProduct> {
     public ProgramProductSerializer() {
       this(null);

@@ -17,8 +17,7 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
   }
 
   Program generateInstance() {
-    Program program = new Program();
-    program.setCode(String.valueOf(this.getNextInstanceNumber()));
+    Program program = new Program(String.valueOf(this.getNextInstanceNumber()));
     program.setPeriodsSkippable(true);
     return program;
   }

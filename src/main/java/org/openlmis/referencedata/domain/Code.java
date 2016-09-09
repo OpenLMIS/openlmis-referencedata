@@ -2,20 +2,22 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 
 /**
- * Represents a unique product's designation.
+ * Represents a unique designation.
  */
 @Embeddable
-@NoArgsConstructor
-public final class ProductCode {
-  private String productCode;
+public class Code {
+  private final String code;
 
-  private ProductCode(String productCode) {
-    this.productCode = productCode.replaceAll("\\s", "");
+  protected Code() {
+    this.code = "";
+  }
+
+  private Code(String code) {
+    this.code = code.replaceAll("\\s", "");
   }
 
   /**
@@ -29,22 +31,22 @@ public final class ProductCode {
       return false;
     }
 
-    if (!(object instanceof ProductCode)) {
+    if (!(object instanceof Code)) {
       return false;
     }
 
-    return ((ProductCode) object).productCode.equalsIgnoreCase(this.productCode);
+    return this.code.equalsIgnoreCase(((Code) object).code);
   }
 
   @Override
   public final int hashCode() {
-    return productCode.toUpperCase().hashCode();
+    return code.toUpperCase().hashCode();
   }
 
   @Override
   @JsonValue
   public String toString() {
-    return productCode;
+    return code;
   }
 
   /**
@@ -53,8 +55,8 @@ public final class ProductCode {
    * @return a new ProductCode with the given code.  Uses a blank code if given null.
    */
   @JsonCreator
-  public static final ProductCode newProductCode(String productCode) {
+  public static final Code code(String productCode) {
     String workingCode = (null == productCode) ? "" : productCode;
-    return new ProductCode(workingCode);
+    return new Code(workingCode);
   }
 }

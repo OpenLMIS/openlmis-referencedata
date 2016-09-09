@@ -1,16 +1,16 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.repository.custom.ProgramProductRepositoryCustom;
+
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramProduct;
-import org.openlmis.referencedata.repository.custom.ProgramProductRepositoryCustom;
-
-import java.util.List;
 
 public class ProgramProductRepositoryImpl implements ProgramProductRepositoryCustom {
 

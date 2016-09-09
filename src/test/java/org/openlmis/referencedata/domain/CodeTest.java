@@ -6,44 +6,45 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class ProductCodeTest {
+public class CodeTest {
 
-  private ProductCode codeA;
-  private ProductCode codeB;
+  private Code codeA;
+  private Code codeB;
 
   {
-    codeA = ProductCode.newProductCode("codeA");
-    codeB = ProductCode.newProductCode("codeB");
+    codeA = Code.code("codeA");
+    codeB = Code.code("codeB");
   }
 
   @Test
   public void shouldUseBlankProductCodeIfNull() {
-    ProductCode code = ProductCode.newProductCode(null);
-    assertEquals(ProductCode.newProductCode(""), code);
+    Code code = Code.code(null);
+    assertEquals(Code.code(""), code);
   }
 
   @Test
   public void shouldBeEqualByCode() {
-    ProductCode codeADupe = ProductCode.newProductCode("codeA");
+    Code codeADupe = Code.code("codeA");
     assertTrue(codeA.equals(codeADupe));
     assertTrue(codeADupe.equals(codeA));
   }
 
   @Test
   public void shouldBeEqualIgnoreCase() {
-    ProductCode codeADupe = ProductCode.newProductCode("codea");
+    Code codeADupe = Code.code("codea");
     assertEquals(codeA, codeADupe);
   }
 
   @Test
   public void shouldBeEqualIgnoreSpace() {
-    ProductCode codeADupe = ProductCode.newProductCode("code A");
+    Code codeADupe = Code.code("code A");
     assertEquals(codeA, codeADupe);
+    assertEquals(codeADupe, codeA);
   }
 
   @Test
   public void shouldEnforceHashCode() {
-    ProductCode codeADupe = ProductCode.newProductCode("code a");
+    Code codeADupe = Code.code("code a");
     assertEquals(codeA.hashCode(), codeADupe.hashCode());
 
     assertNotEquals(codeA.hashCode(), codeB.hashCode());

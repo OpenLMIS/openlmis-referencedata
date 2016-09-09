@@ -10,7 +10,6 @@ import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.repository.ProductRepository;
 import org.openlmis.referencedata.repository.ProgramProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -28,9 +27,6 @@ public class CleanRepositoryHelper {
 
   public static final UUID INITIAL_USER_ID =
       UUID.fromString("35316636-6264-6331-2d34-3933322d3462");
-
-  @Autowired
-  private ProductRepository productRepository;
 
   @Autowired
   private ProgramProductRepository programProductRepository;
@@ -85,7 +81,6 @@ public class CleanRepositoryHelper {
   public void cleanAll() {
     facilityTypeApprovedProductRepository.deleteAll();
     programProductRepository.deleteAll();
-    productRepository.deleteAll();
     periodRepository.deleteAll();
     programRepository.deleteAll();
     supervisoryNodeRepository.deleteAll();

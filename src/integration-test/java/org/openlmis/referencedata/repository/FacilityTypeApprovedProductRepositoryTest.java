@@ -7,7 +7,6 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
-import org.openlmis.referencedata.domain.Product;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
@@ -29,12 +28,6 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private ProductCategoryRepository productCategoryRepository;
 
   @Autowired
-  private ProductRepository productRepository;
-
-  @Autowired
-  private ProgramProductRepository programProductRepository;
-
-  @Autowired
   private OrderableProductRepository orderableProductRepository;
 
   FacilityTypeApprovedProductRepository getRepository() {
@@ -46,7 +39,6 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private ProgramProduct programProduct;
   private ProductCategory productCategory;
   private Program program;
-  private Product product;
   private OrderableProduct orderableProduct;
 
   private static final double maxMonthsOfStockDelta = 1e-15;
@@ -59,32 +51,19 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     facilityType2 = new FacilityType();
     facilityType2.setCode("newFacilityType");
     facilityTypeRepository.save(facilityType2);
-    program = new Program();
-    program.setCode("programCode");
+    program = new Program("programCode");
     programRepository.save(program);
-    product = new Product();
-    product.setCode("productCode");
-    product.setPrimaryName("productPrimaryName");
-    product.setDispensingUnit("unit");
-    product.setDosesPerDispensingUnit(10);
-    product.setPackSize(1);
-    product.setPackRoundingThreshold(0);
-    product.setRoundToZero(false);
-    product.setActive(true);
-    product.setFullSupply(true);
-    product.setTracer(false);
+
     productCategory = new ProductCategory();
     productCategory.setCode("productCategoryCode");
     productCategory.setName("productCategoryName");
     productCategory.setDisplayOrder(1);
     productCategoryRepository.save(productCategory);
-    product.setProductCategory(productCategory);
-    productRepository.save(product);
-    programProduct = new ProgramProduct();
-    programProduct.setProgram(program);
-    orderableProduct = orderableProductRepository.save(new GlobalProduct());
-    programProduct.setProduct(orderableProduct);
-    programProductRepository.save(programProduct);
+
+    orderableProduct = GlobalProduct.newGlobalProduct("ibuprofen", "testDesc", 10);
+    programProduct = ProgramProduct.createNew(program, "test", orderableProduct);
+    orderableProduct.addToProgram(programProduct);
+    orderableProductRepository.save(orderableProduct);
   }
 
   @Override
