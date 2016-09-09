@@ -21,8 +21,8 @@ public class Code {
   }
 
   /**
-   * ProductCode equality ignores whitespace and case.
-   * @param object the ProductCode to test against.
+   * Code equality ignores whitespace and case.
+   * @param object the Code to test against.
    * @return true if both represent the same code, false otherwise.
    */
   @Override
@@ -50,13 +50,13 @@ public class Code {
   }
 
   /**
-   * Creates a new ProductCode value.
-   * @param productCode the product's code
-   * @return a new ProductCode with the given code.  Uses a blank code if given null.
+   * Creates a new Code value.
+   * @param code the code
+   * @return a new Code with the given code.  Uses a blank code if given null.
    */
   @JsonCreator
-  public static final Code code(String productCode) {
-    String workingCode = (null == productCode) ? "" : productCode;
+  public static final Code code(String code) {
+    String workingCode = (null == code) ? "" : code;
     return new Code(workingCode);
   }
 }
