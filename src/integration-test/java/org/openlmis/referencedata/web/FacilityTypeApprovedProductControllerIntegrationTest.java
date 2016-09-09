@@ -100,6 +100,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     repository.save(facilityTypeAppProd);
   }
 
+  @Ignore
   @Test
   public void shouldDeleteFacilityTypeApprovedProduct() {
 

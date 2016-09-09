@@ -32,9 +32,6 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private ProductRepository productRepository;
 
   @Autowired
-  private ProgramProductRepository programProductRepository;
-
-  @Autowired
   private OrderableProductRepository orderableProductRepository;
 
   FacilityTypeApprovedProductRepository getRepository() {

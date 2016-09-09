@@ -85,6 +85,7 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     }
   }
 
+  @Ignore
   @Test
   public void shouldDeleteProgramProduct() {
 
