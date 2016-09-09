@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.provider.authentication.TokenExtracto
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
+import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -74,9 +75,22 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
         .antMatchers("/**").fullyAuthenticated();
   }
 
+
+
+  /**
+   * AccessTokenConverter bean initializer that utilizes custom UserTokenConverter.
+   * @return token converter
+   */
   @Bean
   public AccessTokenConverter accessTokenConverter() {
-    return new DefaultAccessTokenConverter();
+    DefaultAccessTokenConverter accessTokenConverter = new DefaultAccessTokenConverter();
+    accessTokenConverter.setUserTokenConverter(userAuthenticationConverter());
+    return accessTokenConverter;
+  }
+
+  @Bean
+  public UserAuthenticationConverter userAuthenticationConverter() {
+    return new UserTokenConverter();
   }
 
   /**
