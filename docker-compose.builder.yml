@@ -5,7 +5,6 @@ services:
     links:
       - db
       - log
-      - auth
     volumes:
       - '.:/app'
     command:
@@ -27,9 +26,6 @@ services:
   image:
     build: .
     image: openlmis/referencedata
-  auth:
-    image: openlmis/auth
-    env_file: .env
   db:
     image: openlmis/postgres
     env_file: .env

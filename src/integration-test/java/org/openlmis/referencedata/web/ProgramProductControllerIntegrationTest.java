@@ -23,6 +23,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+@Ignore
 @SuppressWarnings("PMD.TooManyMethods")
 public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationTest {
 

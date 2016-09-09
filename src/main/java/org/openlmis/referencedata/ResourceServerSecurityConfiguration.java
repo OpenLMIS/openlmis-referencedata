@@ -1,9 +1,5 @@
 package org.openlmis.referencedata;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +21,10 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -71,8 +71,7 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
             "/swagger-ui.js",
             "/swagger-ui.min.js",
             "/fonts/*"
-        ).permitAll()
-        .antMatchers("/**").fullyAuthenticated();
+        ).permitAll();
   }
 
 
