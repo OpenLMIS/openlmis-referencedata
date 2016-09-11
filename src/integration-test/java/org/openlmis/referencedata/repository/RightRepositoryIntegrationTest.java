@@ -24,7 +24,7 @@ public class RightRepositoryIntegrationTest
   @Override
   Right generateInstance() {
     int instanceNumber = this.getNextInstanceNumber();
-    return new Right(valueOf(instanceNumber), RightType.GENERAL_ADMIN);
+    return Right.newRight(valueOf(instanceNumber), RightType.GENERAL_ADMIN);
   }
 
   @Test

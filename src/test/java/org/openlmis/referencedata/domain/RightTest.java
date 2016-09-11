@@ -11,13 +11,13 @@ public class RightTest {
   @Test
   public void shouldHaveAttachedRightsOfSameType() {
     //given
-    Right right = new Right("supervisionRight1", RightType.SUPERVISION);
+    Right right = Right.newRight("supervisionRight1", RightType.SUPERVISION);
 
     //when
-    Right attachment = new Right("supervisionRight2", RightType.SUPERVISION);
+    Right attachment = Right.newRight("supervisionRight2", RightType.SUPERVISION);
     right.attach(attachment);
 
-    right.attach(new Right("fulfillmentRight1", RightType.ORDER_FULFILLMENT));
+    right.attach(Right.newRight("fulfillmentRight1", RightType.ORDER_FULFILLMENT));
 
     //then
     Set<Right> attachedRights = right.getAttachments();

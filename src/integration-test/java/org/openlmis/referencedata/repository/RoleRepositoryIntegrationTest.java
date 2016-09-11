@@ -24,7 +24,7 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Override
   Role generateInstance() throws RightTypeException {
     int instanceNumber = this.getNextInstanceNumber();
-    return new Role(valueOf(instanceNumber), new Right(valueOf(instanceNumber),
+    return new Role(valueOf(instanceNumber), Right.newRight(valueOf(instanceNumber),
         RightType.GENERAL_ADMIN));
   }
 }

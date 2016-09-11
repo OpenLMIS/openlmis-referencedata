@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.Set;
 
 public class UserTest {
-  private RightQuery rightQuery = new RightQuery(new Right("supervisionRight1",
+  private RightQuery rightQuery = new RightQuery(Right.newRight("supervisionRight1",
       RightType.SUPERVISION));
 
   private RoleAssignment assignment1 = mock(RoleAssignment.class);
@@ -35,7 +35,7 @@ public class UserTest {
   @Test
   public void shouldBeAbleToAssignRoleToUser() throws RightTypeException {
     //when
-    user.assignRoles(new DirectRoleAssignment(new Role(roleName, new Right("reportRight1",
+    user.assignRoles(new DirectRoleAssignment(new Role(roleName, Right.newRight("reportRight1",
         RightType.REPORTS))));
 
     //then
@@ -77,7 +77,7 @@ public class UserTest {
   @Test
   public void shouldGetHomeFacilityPrograms() throws RightTypeException {
     //given
-    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
+    Role role = new Role(roleName, Right.newRight("right1", RightType.SUPERVISION));
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
 
@@ -98,7 +98,7 @@ public class UserTest {
   @Test
   public void shouldGetSupervisedPrograms() throws RightTypeException {
     //given
-    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
+    Role role = new Role(roleName, Right.newRight("right1", RightType.SUPERVISION));
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility());
@@ -132,7 +132,7 @@ public class UserTest {
 
     districtNode.assignParentNode(provinceNode);
 
-    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
+    Role role = new Role(roleName, Right.newRight("right1", RightType.SUPERVISION));
     Program program = new Program("prog1");
 
     RoleAssignment assignment = new SupervisionRoleAssignment(role, program, provinceNode);

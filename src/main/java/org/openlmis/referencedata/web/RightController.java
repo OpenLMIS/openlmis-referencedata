@@ -184,8 +184,8 @@ public class RightController extends BaseController {
   }
 
   private Right createRightInstance(@RequestBody Right rightDto) {
-    Right right = new Right(rightDto.getName(), rightDto.getType(),
-        rightDto.getDescription());
+    Right right = Right.newRight(rightDto.getName(), rightDto.getType());
+    right.setDescription(rightDto.getDescription());
     Set<Right> attachments = rightDto.getAttachments();
     right.attach(attachments.toArray(new Right[attachments.size()]));
     return right;
