@@ -28,9 +28,10 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   @Autowired
   private RoleRepository roleRepository;
 
-  private Role role = new Role("roleName", Right.newRight("rightName", RightType.GENERAL_ADMIN));
+  private Role role;
 
   public RoleControllerIntegrationTest() throws RightTypeException {
+    role = Role.newRole("roleName", Right.newRight("rightName", RightType.GENERAL_ADMIN));
   }
 
   @Before
