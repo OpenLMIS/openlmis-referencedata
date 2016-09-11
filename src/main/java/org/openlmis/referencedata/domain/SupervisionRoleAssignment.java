@@ -5,6 +5,7 @@ import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
@@ -26,11 +27,13 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "programid")
+  @Getter
   private Program program;
 
   @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "supervisorynodeid")
+  @Getter
   private SupervisoryNode supervisoryNode;
 
   private SupervisionRoleAssignment(Role role) throws RightTypeException {
