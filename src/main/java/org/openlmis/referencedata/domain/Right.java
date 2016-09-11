@@ -32,7 +32,6 @@ public class Right extends BaseEntity {
   @JsonView(View.BasicInformation.class)
   @Column(nullable = false, unique = true, columnDefinition = TEXT)
   @Getter
-  @Setter
   private String name;
 
   @Column(nullable = false, columnDefinition = TEXT)

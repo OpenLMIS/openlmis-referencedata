@@ -30,12 +30,10 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   @Autowired
   private RightRepository rightRepository;
 
-  private Right right = new Right();
+  private Right right = new Right("rightName", RightType.GENERAL_ADMIN);
 
   @Before
   public void setUp() {
-    right.setName("rightName");
-    right.setType(RightType.GENERAL_ADMIN);
     rightRepository.save(right);
   }
 
