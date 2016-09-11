@@ -65,10 +65,6 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   @Override
   SupervisoryNode generateInstance() {
     int instanceNumber = this.getNextInstanceNumber();
-    SupervisoryNode node = new SupervisoryNode();
-    node.setCode("Code #" + instanceNumber);
-    node.setName("SupervisoryNode #" + instanceNumber);
-    node.setFacility(facility);
-    return node;
+    return SupervisoryNode.newSupervisoryNode("Code #" + instanceNumber, facility);
   }
 }

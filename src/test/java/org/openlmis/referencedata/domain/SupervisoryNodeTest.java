@@ -14,17 +14,19 @@ public class SupervisoryNodeTest {
   @Test
   public void shouldGetAllSupervisedFacilities() {
     //given
-    SupervisoryNode supervisoryNode1 = SupervisoryNode.newSupervisoryNode(new Facility());
-    RequisitionGroup requisitionGroup1 = RequisitionGroup.newRequisitionGroup(supervisoryNode1,
-        null, Arrays.asList(new Facility(), new Facility()));
-    supervisoryNode1.assignRequisitionGroup(requisitionGroup1);
+    SupervisoryNode supervisoryNode1 = SupervisoryNode.newSupervisoryNode("SN1", new Facility());
+    RequisitionGroup requisitionGroup1 = RequisitionGroup.newRequisitionGroup("RG1",
+        supervisoryNode1);
+    requisitionGroup1.setMemberFacilities(Arrays.asList(new Facility(), new Facility()));
+    supervisoryNode1.setRequisitionGroup(requisitionGroup1);
 
-    SupervisoryNode supervisoryNode2 = SupervisoryNode.newSupervisoryNode(new Facility());
-    RequisitionGroup requisitionGroup2 = RequisitionGroup.newRequisitionGroup(supervisoryNode2,
-        null, Collections.singletonList(new Facility()));
+    SupervisoryNode supervisoryNode2 = SupervisoryNode.newSupervisoryNode("SN2", new Facility());
+    RequisitionGroup requisitionGroup2 = RequisitionGroup.newRequisitionGroup("RG2",
+        supervisoryNode2);
+    requisitionGroup2.setMemberFacilities(Collections.singletonList(new Facility()));
     supervisoryNode2.setRequisitionGroup(requisitionGroup2);
 
-    supervisoryNode1.addChildNode(supervisoryNode2);
+    supervisoryNode2.assignParentNode(supervisoryNode1);
 
     //when
     Set<Facility> facilities = supervisoryNode1.getAllSupervisedFacilities();

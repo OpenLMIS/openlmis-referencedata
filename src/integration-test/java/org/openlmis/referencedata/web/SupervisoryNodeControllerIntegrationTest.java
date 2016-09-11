@@ -54,7 +54,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
 
-  private SupervisoryNode supervisoryNode = new SupervisoryNode();
+  private SupervisoryNode supervisoryNode;
 
   @Before
   public void setUp() {
@@ -85,8 +85,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     facility.setOperator(facilityOperator);
     facilityRepository.save(facility);
 
-    supervisoryNode.setCode("supervisoryNodeCode");
-    supervisoryNode.setFacility(facility);
+    supervisoryNode = SupervisoryNode.newSupervisoryNode("supervisoryNodeCode", facility);
     repository.save(supervisoryNode);
   }
 

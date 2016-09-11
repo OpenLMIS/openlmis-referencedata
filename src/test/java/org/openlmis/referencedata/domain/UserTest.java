@@ -101,7 +101,7 @@ public class UserTest {
     Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
-    SupervisoryNode supervisoryNode = new SupervisoryNode();
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility());
 
     RoleAssignment assignment3 = new SupervisionRoleAssignment(role, program1, supervisoryNode);
     RoleAssignment assignment4 = new SupervisionRoleAssignment(role, program2, supervisoryNode);
@@ -120,16 +120,17 @@ public class UserTest {
   @Test
   public void shouldGetSupervisedFacilities() throws RightTypeException {
     //given
-    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode(new Facility());
-    RequisitionGroup districtGroup = RequisitionGroup.newRequisitionGroup(districtNode, null,
-        Collections.singletonList(new Facility()));
-    districtNode.assignRequisitionGroup(districtGroup);
+    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("DN", new Facility());
+    RequisitionGroup districtGroup = RequisitionGroup.newRequisitionGroup("DG", districtNode);
+    districtGroup.setMemberFacilities(Collections.singletonList(new Facility()));
+    districtNode.setRequisitionGroup(districtGroup);
 
-    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode(new Facility());
-    RequisitionGroup provinceGroup = RequisitionGroup.newRequisitionGroup(provinceNode, null,
-        Arrays.asList(new Facility(), new Facility()));
-    provinceNode.assignRequisitionGroup(provinceGroup);
-    provinceNode.addChildNode(districtNode);
+    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("PN", new Facility());
+    RequisitionGroup provinceGroup = RequisitionGroup.newRequisitionGroup("PG", provinceNode);
+    provinceGroup.setMemberFacilities(Arrays.asList(new Facility(), new Facility()));
+    provinceNode.setRequisitionGroup(provinceGroup);
+
+    districtNode.assignParentNode(provinceNode);
 
     Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
     Program program = new Program("prog1");

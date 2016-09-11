@@ -30,7 +30,7 @@ public class RequisitionGroup extends BaseEntity {
   @Setter
   private String code;
 
-  @Column(nullable = false, columnDefinition = "text")
+  @Column(columnDefinition = "text")
   @Getter
   @Setter
   private String name;
@@ -63,29 +63,20 @@ public class RequisitionGroup extends BaseEntity {
   @Setter
   private List<Facility> memberFacilities;
 
-  private RequisitionGroup(SupervisoryNode supervisoryNode, List<RequisitionGroupProgramSchedule>
-      programSchedules, List<Facility> memberFacilities) {
+  private RequisitionGroup(String code, SupervisoryNode supervisoryNode) {
+    this.code = code;
     this.supervisoryNode = supervisoryNode;
-    this.requisitionGroupProgramSchedules = programSchedules;
-    this.memberFacilities = memberFacilities;
   }
 
   /**
    * Create a new requisition group with a specified supervisory node, program schedules and
    * facilities.
    *
+   * @param code specified code
    * @param supervisoryNode specified supervisory node
-   * @param programSchedules specified program schedules
-   * @param memberFacilities specified facilities
    * @return the new requisition group
    */
-  public static RequisitionGroup newRequisitionGroup(SupervisoryNode supervisoryNode,
-                                                     List<RequisitionGroupProgramSchedule>
-                                                         programSchedules,
-                                                     List<Facility> memberFacilities) {
-    RequisitionGroup newRequisitionGroup = new RequisitionGroup(supervisoryNode,
-        programSchedules, memberFacilities);
-
-    return newRequisitionGroup;
+  public static RequisitionGroup newRequisitionGroup(String code, SupervisoryNode supervisoryNode) {
+    return new RequisitionGroup(code, supervisoryNode);
   }
 }
