@@ -3,6 +3,7 @@ package org.openlmis.referencedata.web;
 import javax.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
