@@ -25,5 +25,5 @@ public abstract class BaseEntity {
   @JsonView(View.BasicInformation.class)
   @Getter
   @Setter
-  private UUID id;
+  protected UUID id;
 }
