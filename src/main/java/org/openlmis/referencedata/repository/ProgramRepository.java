@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.repository;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 
 import java.util.UUID;
@@ -13,5 +14,5 @@ public interface ProgramRepository extends ReferenceDataRepository<Program, UUID
   @Override
   <S extends Program> Iterable<S> save(Iterable<S> entities);
 
-  <S extends Program> S findByCode(String code);
+  <S extends Program> S findByCode(Code code);
 }
