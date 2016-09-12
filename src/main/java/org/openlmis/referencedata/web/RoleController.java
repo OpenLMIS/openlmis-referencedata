@@ -209,8 +209,9 @@ public class RoleController extends BaseController {
     Set<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository
         .findFirstByName(rightDto.getName())).collect(toSet());
 
-    return new Role(roleDto.getName(),
-        roleDto.getDescription(),
+    Role newRole = Role.newRole(roleDto.getName(),
         rights.toArray(new Right[rights.size()]));
+    newRole.setDescription(roleDto.getDescription());
+    return newRole;
   }
 }

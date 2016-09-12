@@ -4,6 +4,7 @@ import static java.util.Collections.singleton;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
@@ -26,6 +27,7 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "warehouseid")
+  @Getter
   private Facility warehouse;
 
   private FulfillmentRoleAssignment(Role role) throws RightTypeException {

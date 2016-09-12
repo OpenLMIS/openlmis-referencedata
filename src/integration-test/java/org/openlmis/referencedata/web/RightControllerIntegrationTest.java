@@ -18,6 +18,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.UUID;
 
+@Ignore
 public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/rights";
@@ -29,12 +30,10 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   @Autowired
   private RightRepository rightRepository;
 
-  private Right right = new Right();
+  private Right right = Right.newRight("rightName", RightType.GENERAL_ADMIN);
 
   @Before
   public void setUp() {
-    right.setName("rightName");
-    right.setType(RightType.GENERAL_ADMIN);
     rightRepository.save(right);
   }
 

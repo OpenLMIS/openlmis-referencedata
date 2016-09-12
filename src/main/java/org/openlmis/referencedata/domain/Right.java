@@ -32,7 +32,6 @@ public class Right extends BaseEntity {
   @JsonView(View.BasicInformation.class)
   @Column(nullable = false, unique = true, columnDefinition = TEXT)
   @Getter
-  @Setter
   private String name;
 
   @Column(nullable = false, columnDefinition = TEXT)
@@ -59,22 +58,19 @@ public class Right extends BaseEntity {
   )
   private Set<Role> roles;
 
-  public Right(String name, RightType type) {
+  private Right(String name, RightType type) {
     this.name = name;
     this.type = type;
   }
 
   /**
-   * Constructor for name, type, description.
+   * Static factory method for constructing a new right with a name and type.
    *
-   * @param name        right name
-   * @param type        right type
-   * @param description right description
+   * @param name right name
+   * @param type right type
    */
-  public Right(String name, RightType type, String description) {
-    this.name = name;
-    this.type = type;
-    this.description = description;
+  public static Right newRight(String name, RightType type) {
+    return new Right(name, type);
   }
 
   /**

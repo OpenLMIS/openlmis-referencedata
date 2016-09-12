@@ -20,24 +20,25 @@ public class FulfillmentRoleAssignmentTest {
    * Setup constructor.
    */
   public FulfillmentRoleAssignmentTest() throws RightTypeException, RoleAssignmentException {
-    right = new Right("right", ORDER_FULFILLMENT);
+    right = Right.newRight("right", ORDER_FULFILLMENT);
     warehouse = new Facility();
     warehouse.setType(new FacilityType("warehouse"));
     hospital = new Facility();
     hospital.setType(new FacilityType("hospital"));
-    fulfillmentRoleAssignment = new FulfillmentRoleAssignment(new Role(roleName, right), warehouse);
+    fulfillmentRoleAssignment = new FulfillmentRoleAssignment(
+        Role.newRole(roleName, right), warehouse);
   }
 
   @Test
   public void shouldAllowCreationWithWarehouseFacilityType()
       throws RightTypeException, RoleAssignmentException {
-    new FulfillmentRoleAssignment(new Role(roleName, right), warehouse);
+    new FulfillmentRoleAssignment(Role.newRole(roleName, right), warehouse);
   }
 
   @Test(expected = RoleAssignmentException.class)
   public void shouldNotAllowCreationWithNonWarehouseFacilityType()
       throws RightTypeException, RoleAssignmentException {
-    new FulfillmentRoleAssignment(new Role(roleName, right), hospital);
+    new FulfillmentRoleAssignment(Role.newRole(roleName, right), hospital);
   }
 
   @Test

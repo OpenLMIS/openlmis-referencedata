@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.Set;
 
 public class UserTest {
-  private RightQuery rightQuery = new RightQuery(new Right("supervisionRight1",
+  private RightQuery rightQuery = new RightQuery(Right.newRight("supervisionRight1",
       RightType.SUPERVISION));
 
   private RoleAssignment assignment1 = mock(RoleAssignment.class);
@@ -35,7 +35,7 @@ public class UserTest {
   @Test
   public void shouldBeAbleToAssignRoleToUser() throws RightTypeException {
     //when
-    user.assignRoles(new DirectRoleAssignment(new Role(roleName, new Right("reportRight1",
+    user.assignRoles(new DirectRoleAssignment(Role.newRole(roleName, Right.newRight("reportRight1",
         RightType.REPORTS))));
 
     //then
@@ -77,7 +77,7 @@ public class UserTest {
   @Test
   public void shouldGetHomeFacilityPrograms() throws RightTypeException {
     //given
-    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
+    Role role = Role.newRole(roleName, Right.newRight("right1", RightType.SUPERVISION));
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
 
@@ -98,10 +98,10 @@ public class UserTest {
   @Test
   public void shouldGetSupervisedPrograms() throws RightTypeException {
     //given
-    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
+    Role role = Role.newRole(roleName, Right.newRight("right1", RightType.SUPERVISION));
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
-    SupervisoryNode supervisoryNode = new SupervisoryNode();
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility());
 
     RoleAssignment assignment3 = new SupervisionRoleAssignment(role, program1, supervisoryNode);
     RoleAssignment assignment4 = new SupervisionRoleAssignment(role, program2, supervisoryNode);
@@ -120,18 +120,19 @@ public class UserTest {
   @Test
   public void shouldGetSupervisedFacilities() throws RightTypeException {
     //given
-    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode(new Facility());
-    RequisitionGroup districtGroup = RequisitionGroup.newRequisitionGroup(districtNode, null,
-        Collections.singletonList(new Facility()));
-    districtNode.assignRequisitionGroup(districtGroup);
+    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("DN", new Facility());
+    RequisitionGroup districtGroup = RequisitionGroup.newRequisitionGroup("DG", districtNode);
+    districtGroup.setMemberFacilities(Collections.singletonList(new Facility()));
+    districtNode.setRequisitionGroup(districtGroup);
 
-    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode(new Facility());
-    RequisitionGroup provinceGroup = RequisitionGroup.newRequisitionGroup(provinceNode, null,
-        Arrays.asList(new Facility(), new Facility()));
-    provinceNode.assignRequisitionGroup(provinceGroup);
-    provinceNode.addChildNode(districtNode);
+    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("PN", new Facility());
+    RequisitionGroup provinceGroup = RequisitionGroup.newRequisitionGroup("PG", provinceNode);
+    provinceGroup.setMemberFacilities(Arrays.asList(new Facility(), new Facility()));
+    provinceNode.setRequisitionGroup(provinceGroup);
 
-    Role role = new Role(roleName, new Right("right1", RightType.SUPERVISION));
+    districtNode.assignParentNode(provinceNode);
+
+    Role role = Role.newRole(roleName, Right.newRight("right1", RightType.SUPERVISION));
     Program program = new Program("prog1");
 
     RoleAssignment assignment = new SupervisionRoleAssignment(role, program, provinceNode);

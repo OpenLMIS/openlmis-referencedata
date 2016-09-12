@@ -53,30 +53,21 @@ public class Role extends BaseEntity {
   @Getter
   private Set<Right> rights;
 
-  /**
-   * Role constructor with name and rights.
-   *
-   * @param name   the role name
-   * @param rights the rights to group
-   * @throws RightTypeException if the rights do not have the same right type
-   */
-  public Role(String name, Right... rights) throws RightTypeException {
+  private Role(String name, Right... rights) throws RightTypeException {
     this.name = name;
     group(rights);
   }
 
   /**
-   * Role constructor with name, description and rights.
+   * Static factory method for constructing a new role with a name and rights.
    *
-   * @param name        the role name
-   * @param description the role description
-   * @param rights      the rights to group
+   * @param name   the role name
+   * @param rights the rights to group
    * @throws RightTypeException if the rights do not have the same right type
    */
-  public Role(String name, String description, Right... rights) throws RightTypeException {
-    this.name = name;
-    this.description = description;
-    group(rights);
+  public static Role newRole(String name, Right... rights) throws
+      RightTypeException {
+    return new Role(name, rights);
   }
 
   /**

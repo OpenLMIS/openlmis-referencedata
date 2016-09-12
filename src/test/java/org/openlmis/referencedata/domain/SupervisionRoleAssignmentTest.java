@@ -13,10 +13,10 @@ import java.util.Set;
 
 public class SupervisionRoleAssignmentTest {
 
-  private Right right = new Right("right", SUPERVISION);
+  private Right right = Right.newRight("right", SUPERVISION);
   private Program program = new Program("em");
   private SupervisoryNode node = new SupervisoryNode();
-  private Role role = new Role("role", right);
+  private Role role = Role.newRole("role", right);
   private SupervisionRoleAssignment homeFacilityRoleAssignment =
       new SupervisionRoleAssignment(role, program);
   private SupervisionRoleAssignment supervisedRoleAssignment =

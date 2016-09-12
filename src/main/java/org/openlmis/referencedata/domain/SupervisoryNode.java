@@ -22,6 +22,7 @@ import javax.persistence.Table;
 @Table(name = "supervisory_nodes", schema = "referencedata")
 @NoArgsConstructor
 public class SupervisoryNode extends BaseEntity {
+
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
   @Setter
@@ -49,7 +50,6 @@ public class SupervisoryNode extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "parentid")
   @Getter
-  @Setter
   private SupervisoryNode parentNode;
 
   @JsonIdentityInfo(
@@ -57,7 +57,6 @@ public class SupervisoryNode extends BaseEntity {
       property = "childNodesSetId")
   @OneToMany(mappedBy = "parentNode")
   @Getter
-  @Setter
   private Set<SupervisoryNode> childNodes;
 
   @OneToOne(mappedBy = "supervisoryNode")
@@ -65,10 +64,10 @@ public class SupervisoryNode extends BaseEntity {
   @Setter
   private RequisitionGroup requisitionGroup;
 
-  private SupervisoryNode(Facility facility) {
+  private SupervisoryNode(String code, Facility facility) {
+    this.code = code;
     this.facility = facility;
     this.childNodes = new HashSet<>();
-    this.requisitionGroup = new RequisitionGroup();
   }
 
   /**
@@ -77,26 +76,19 @@ public class SupervisoryNode extends BaseEntity {
    * @param facility facility associated with this supervisory node
    * @return a new SupervisoryNode
    */
-  public static SupervisoryNode newSupervisoryNode(Facility facility) {
-    SupervisoryNode newSupervisoryNode = new SupervisoryNode(facility);
-
-    return newSupervisoryNode;
+  public static SupervisoryNode newSupervisoryNode(String code, Facility facility) {
+    return new SupervisoryNode(code, facility);
   }
 
   /**
-   * Add a child supervisory node to this one. Will also set this node as parent to child node.
+   * Assign this node's parent supervisory node. Also add this node to the parent's set of 
+   * child nodes.
    *
-   * @param childNode child supervisory node to add.
-   * @return true if added, false if it's already added or was otherwise unable to add.
+   * @param parentNode parent supervisory node to assign.
    */
-  public boolean addChildNode(SupervisoryNode childNode) {
-    boolean added = childNodes.add(childNode);
-
-    if (added) {
-      childNode.setParentNode(this);
-    }
-
-    return added;
+  public void assignParentNode(SupervisoryNode parentNode) {
+    this.parentNode = parentNode;
+    parentNode.childNodes.add(this);
   }
 
   /**
@@ -120,17 +112,6 @@ public class SupervisoryNode extends BaseEntity {
     }
 
     return supervisedFacilities;
-  }
-
-  /**
-   * Set requisition group for this supervisory node. It also sets this node as the supervisory node
-   * for the requisition group specified.
-   *
-   * @param requisitionGroup specified requisition group
-   */
-  public void assignRequisitionGroup(RequisitionGroup requisitionGroup) {
-    requisitionGroup.setSupervisoryNode(this);
-    this.requisitionGroup = requisitionGroup;
   }
 
   /**

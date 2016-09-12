@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Ignore
 @SuppressWarnings("PMD.TooManyMethods")
 public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 

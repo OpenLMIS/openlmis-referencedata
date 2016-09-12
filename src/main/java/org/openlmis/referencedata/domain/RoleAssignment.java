@@ -2,6 +2,7 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
@@ -31,10 +32,12 @@ public abstract class RoleAssignment extends BaseEntity {
   @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "roleid")
+  @Getter
   protected Role role;
 
   @ManyToOne
   @JoinColumn(name = "userid")
+  @Getter
   protected User user;
 
   /**
