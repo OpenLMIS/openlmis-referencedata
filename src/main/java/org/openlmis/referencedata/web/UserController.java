@@ -15,6 +15,7 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
+import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.ExternalApiException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +96,7 @@ public class UserController extends BaseController {
    * Custom endpoint for creating and updating users.
    */
   @RequestMapping(value = "/users", method = RequestMethod.POST)
-  public ResponseEntity<?> save(@RequestBody @Valid User user, BindingResult bindingResult,
+  public ResponseEntity<?> save(@RequestBody @Valid UserDto userDto, BindingResult bindingResult,
                                 OAuth2Authentication auth) {
     OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
     String token = details.getTokenValue();
@@ -103,8 +105,8 @@ public class UserController extends BaseController {
       return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
     }
     try {
-      userService.save(user, token);
-      return new ResponseEntity<>(user, HttpStatus.OK);
+      userService.save(UserDto.convertUserDtoToUser(userDto), token);
+      return new ResponseEntity<>(userDto, HttpStatus.OK);
     } catch (ExternalApiException ex) {
       ErrorResponse errorResponse =
           new ErrorResponse("An error occurred while saving user", ex.getMessage());
@@ -122,7 +124,11 @@ public class UserController extends BaseController {
   @ResponseBody
   public ResponseEntity<?> getAllUsers() {
     Iterable<User> users = userRepository.findAll();
-    return new ResponseEntity<>(users, HttpStatus.OK);
+    List<UserDto> usersDto = new ArrayList<>();
+    for (User user : users) {
+      usersDto.add(UserDto.convertUserToUserDto(user));
+    }
+    return new ResponseEntity<>(usersDto, HttpStatus.OK);
   }
 
   /**
