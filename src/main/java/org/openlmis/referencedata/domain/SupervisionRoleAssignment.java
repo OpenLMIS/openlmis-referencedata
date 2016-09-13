@@ -3,13 +3,10 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.util.View;
 
 import java.util.Objects;
 import java.util.Set;
@@ -24,13 +21,11 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 public class SupervisionRoleAssignment extends RoleAssignment {
 
-  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "programid")
   @Getter
   private Program program;
 
-  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "supervisorynodeid")
   @Getter

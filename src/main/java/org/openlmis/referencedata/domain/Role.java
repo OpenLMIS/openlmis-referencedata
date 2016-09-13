@@ -4,15 +4,12 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
-import org.openlmis.referencedata.util.View;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -43,7 +40,6 @@ public class Role extends BaseEntity {
   @Setter
   private String description;
 
-  @JsonView(View.BasicInformation.class)
   @ManyToMany(
       cascade = {CascadeType.PERSIST, CascadeType.MERGE}
       )
