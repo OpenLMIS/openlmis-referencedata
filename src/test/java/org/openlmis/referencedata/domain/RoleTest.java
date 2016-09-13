@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class RoleTest {
   private String right2Name = "right2";
 
   @Test
-  public void shouldGroupRightsOfSameType() throws RightTypeException {
+  public void shouldGroupRightsOfSameType() throws RightTypeException, RoleException {
     //given
     Right right1 = Right.newRight(right1Name, RightType.ORDER_FULFILLMENT);
     Right right2 = Right.newRight(right2Name, RightType.ORDER_FULFILLMENT);
@@ -33,7 +34,7 @@ public class RoleTest {
   }
 
   @Test(expected = RightTypeException.class)
-  public void shouldNotGroupRightsOfDifferentTypes() throws RightTypeException {
+  public void shouldNotGroupRightsOfDifferentTypes() throws RightTypeException, RoleException {
     //given
     Right right1 = Right.newRight(right1Name, RightType.ORDER_FULFILLMENT);
     Right right2 = Right.newRight(right2Name, RightType.SUPERVISION);
@@ -43,7 +44,8 @@ public class RoleTest {
   }
 
   @Test
-  public void shouldBeAbleToAddRightsOfSameTypeToExistingRole() throws RightTypeException {
+  public void shouldBeAbleToAddRightsOfSameTypeToExistingRole() throws RightTypeException,
+      RoleException {
     //given
     Role role = Role.newRole(roleName, Right.newRight(right1Name, RightType.SUPERVISION));
 
@@ -58,7 +60,8 @@ public class RoleTest {
   }
 
   @Test(expected = RightTypeException.class)
-  public void shouldNotBeAbleToAddRightsOfDifferentTypeToExistingRole() throws RightTypeException {
+  public void shouldNotBeAbleToAddRightsOfDifferentTypeToExistingRole() throws RightTypeException,
+      RoleException {
     //given
     Role role = Role.newRole(roleName, Right.newRight(right1Name, RightType.SUPERVISION));
 
@@ -68,7 +71,7 @@ public class RoleTest {
   }
 
   @Test
-  public void shouldIndicateIfItContainsARight() throws RightTypeException {
+  public void shouldIndicateIfItContainsARight() throws RightTypeException, RoleException {
     //given
     Right right1 = Right.newRight(right1Name, RightType.SUPERVISION);
     Right right2 = Right.newRight(right2Name, RightType.SUPERVISION);

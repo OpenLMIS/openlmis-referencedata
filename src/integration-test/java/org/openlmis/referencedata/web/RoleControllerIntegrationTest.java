@@ -11,6 +11,7 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,7 +31,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private Role role;
 
-  public RoleControllerIntegrationTest() throws RightTypeException {
+  public RoleControllerIntegrationTest() throws RightTypeException, RoleException {
     role = Role.newRole("roleName", Right.newRight("rightName", RightType.GENERAL_ADMIN));
   }
 

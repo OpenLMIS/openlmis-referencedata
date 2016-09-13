@@ -7,6 +7,7 @@ import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
+import org.openlmis.referencedata.exception.RoleException;
 
 public class FulfillmentRoleAssignmentTest {
 
@@ -19,7 +20,8 @@ public class FulfillmentRoleAssignmentTest {
   /**
    * Setup constructor.
    */
-  public FulfillmentRoleAssignmentTest() throws RightTypeException, RoleAssignmentException {
+  public FulfillmentRoleAssignmentTest() throws RightTypeException, RoleAssignmentException,
+      RoleException {
     right = Right.newRight("right", ORDER_FULFILLMENT);
     warehouse = new Facility();
     warehouse.setType(new FacilityType("warehouse"));
@@ -31,13 +33,13 @@ public class FulfillmentRoleAssignmentTest {
 
   @Test
   public void shouldAllowCreationWithWarehouseFacilityType()
-      throws RightTypeException, RoleAssignmentException {
+      throws RightTypeException, RoleAssignmentException, RoleException {
     new FulfillmentRoleAssignment(Role.newRole(roleName, right), warehouse);
   }
 
   @Test(expected = RoleAssignmentException.class)
   public void shouldNotAllowCreationWithNonWarehouseFacilityType()
-      throws RightTypeException, RoleAssignmentException {
+      throws RightTypeException, RoleAssignmentException, RoleException {
     new FulfillmentRoleAssignment(Role.newRole(roleName, right), hospital);
   }
 

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.util.View;
 
 import java.util.Arrays;
@@ -44,16 +45,16 @@ public class Role extends BaseEntity {
   @JsonView(View.BasicInformation.class)
   @ManyToMany(
       cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-      )
+  )
   @JoinTable(name = "role_rights",
       schema = "referencedata",
       joinColumns = @JoinColumn(name = "roleid", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false)
-      )
+  )
   @Getter
   private Set<Right> rights;
 
-  private Role(String name, Right... rights) throws RightTypeException {
+  private Role(String name, Right... rights) throws RightTypeException, RoleException {
     this.name = name;
     group(rights);
   }
@@ -66,7 +67,7 @@ public class Role extends BaseEntity {
    * @throws RightTypeException if the rights do not have the same right type
    */
   public static Role newRole(String name, Right... rights) throws
-      RightTypeException {
+      RightTypeException, RoleException {
     return new Role(name, rights);
   }
 
@@ -77,8 +78,11 @@ public class Role extends BaseEntity {
    * @param rights the rights to group
    * @throws RightTypeException if the rights do not have the same right type
    */
-  public void group(Right... rights) throws RightTypeException {
+  public void group(Right... rights) throws RightTypeException, RoleException {
     Set<Right> rightsList = new HashSet<>(asList(rights));
+    if (rightsList.size() == 0) {
+      throw new RoleException("referencedata.error.role-must-have-a-right");
+    }
     if (checkRightTypesMatch(rightsList)) {
       this.rights = rightsList;
     } else {
