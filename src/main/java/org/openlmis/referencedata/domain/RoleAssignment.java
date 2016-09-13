@@ -37,7 +37,6 @@ public abstract class RoleAssignment extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "userid")
-  @Getter
   protected User user;
 
   /**

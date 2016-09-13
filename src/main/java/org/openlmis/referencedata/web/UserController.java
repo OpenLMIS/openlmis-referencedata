@@ -1,8 +1,5 @@
 package org.openlmis.referencedata.web;
 
-import javax.validation.Valid;
-import com.fasterxml.jackson.annotation.JsonView;
-
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -27,7 +24,6 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.ErrorResponse;
-import org.openlmis.referencedata.util.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.validation.Valid;
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
 @Controller
@@ -175,14 +173,14 @@ public class UserController extends BaseController {
 
   /**
    * Returns all users with matched parameters
-   * @param username username of user we want to search.
-   * @param firstName firstName of user we want to search.
-   * @param lastName lastName of user we want to search.
+   *
+   * @param username     username of user we want to search.
+   * @param firstName    firstName of user we want to search.
+   * @param lastName     lastName of user we want to search.
    * @param homeFacility homeFacility of user we want to search.
-   * @param active is the user account active.
-   * @param verified is the user account verified.
-   * @return ResponseEntity with list of all Users matching
-   *         provided parameters and OK httpStatus.
+   * @param active       is the user account active.
+   * @param verified     is the user account verified.
+   * @return ResponseEntity with list of all Users matching provided parameters and OK httpStatus.
    */
   @RequestMapping(value = "/users/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchUsers(
@@ -213,7 +211,6 @@ public class UserController extends BaseController {
    *
    * @return all roles associated with the specified user
    */
-  @JsonView(View.BasicInformation.class)
   @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.GET)
   public ResponseEntity<?> getAllUserRoles(@PathVariable(USER_ID) UUID userId) {
 
@@ -239,7 +236,6 @@ public class UserController extends BaseController {
    * @param roleAssignmentDtos role assignment DTOs to associate to the user
    * @return if successful, the updated user; otherwise an HTTP error
    */
-  @JsonView(View.BasicInformation.class)
   @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.POST)
   public ResponseEntity<?> saveUserRoles(@PathVariable(USER_ID) UUID userId,
                                          @RequestBody Set<RoleAssignmentDto> roleAssignmentDtos) {
