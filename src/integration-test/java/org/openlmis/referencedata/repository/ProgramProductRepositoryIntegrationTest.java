@@ -3,7 +3,9 @@ package org.openlmis.referencedata.repository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.GlobalProduct;
+import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class ProgramProductRepositoryIntegrationTest
   private ProgramRepository programRepository;
 
   @Autowired
+  private ProductCategoryRepository productCategoryRepository;
+
+  @Autowired
   private OrderableProductRepository orderableProductRepository;
 
   private List<ProgramProduct> programProducts;
@@ -32,7 +37,11 @@ public class ProgramProductRepositoryIntegrationTest
   ProgramProduct generateInstance() {
     Program program = generateProgram();
     GlobalProduct globalProduct = orderableProductRepository.save(new GlobalProduct());
-    ProgramProduct programProduct = ProgramProduct.createNew(program, "testcat", globalProduct);
+    ProductCategory productCategory = ProductCategory.createNew(Code.code("testcat"));
+    productCategoryRepository.save(productCategory);
+    ProgramProduct programProduct = ProgramProduct.createNew(program,
+        productCategory,
+        globalProduct);
     return programProduct;
   }
 
@@ -84,7 +93,7 @@ public class ProgramProductRepositoryIntegrationTest
 
   private ProgramProduct cloneProgramProduct(ProgramProduct programProduct) {
     ProgramProduct clonedProgramProduct = ProgramProduct.createNew(programProduct.getProgram(),
-        "testClone",
+        programProduct.getProductCategory(),
         programProduct.getProduct());
     programProductRepository.save(clonedProgramProduct);
     return clonedProgramProduct;

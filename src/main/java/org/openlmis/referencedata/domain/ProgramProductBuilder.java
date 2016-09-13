@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.domain;
 
+import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 
 import java.util.Objects;
@@ -12,12 +13,13 @@ import java.util.UUID;
  * it to {@link Program} in order to build a {@link ProgramProduct}.
  */
 public class ProgramProductBuilder {
-  private ProgramRepository programRepository;
+  private ProgramRepository programRepo;
+  private ProductCategoryRepository productCategoryRepo;
 
   private UUID programId;
   private Integer dosesPerMonth;
   private boolean active;
-  private String productCategory;
+  private UUID productCategoryId;
   private boolean fullSupply;
   private int displayOrder;
   private int maxMonthsOfStock;
@@ -25,7 +27,7 @@ public class ProgramProductBuilder {
   private ProgramProductBuilder() {
     this.dosesPerMonth = null;
     this.active = true;
-    this.productCategory = "Other";
+    this.productCategoryId = null;
     this.fullSupply = false;
     this.displayOrder = 0;
     this.maxMonthsOfStock = 1;
@@ -46,6 +48,11 @@ public class ProgramProductBuilder {
     return this;
   }
 
+  public ProgramProductBuilder setProductCategoryId(UUID productCategoryId) {
+    this.productCategoryId = productCategoryId;
+    return this;
+  }
+
   public ProgramProductBuilder setDosesPerMonth(Integer dosesPerMonth) {
     this.dosesPerMonth = dosesPerMonth;
     return this;
@@ -56,8 +63,8 @@ public class ProgramProductBuilder {
     return this;
   }
 
-  public ProgramProductBuilder setProductCategory(String productCategory) {
-    this.productCategory = productCategory;
+  public ProgramProductBuilder setProductId(UUID productCategoryId) {
+    this.productCategoryId = productCategoryId;
     return this;
   }
 
@@ -77,9 +84,12 @@ public class ProgramProductBuilder {
   }
 
   public final void setProgramRepository(ProgramRepository repository) {
-    this.programRepository = repository;
+    this.programRepo = repository;
   }
 
+  public final void setProductCategoryRepository(ProductCategoryRepository repository) {
+    this.productCategoryRepo = repository;
+  }
 
   /**
    * Builds a new (non-persisted) {@link ProgramProduct}.  This will build a program product that
@@ -91,15 +101,16 @@ public class ProgramProductBuilder {
    *      called previously with a non-null repository.
    */
   public ProgramProduct createProgramProduct(OrderableProduct product) {
-    Objects.requireNonNull(programRepository, "Program Repository needed to be injected prior to "
+    Objects.requireNonNull(programRepo, "Program Repository needed to be injected prior to "
         + "creating program product");
+    Objects.requireNonNull(productCategoryRepo, "Product Category Repository needed to be "
+        + "injected prior to creating a program product");
     Objects.requireNonNull(product, "Product can't be null when building a program product");
 
-    Objects.requireNonNull(productCategory);
-
-    Program storedProgram = programRepository.findOne(programId);
+    Program storedProgram = programRepo.findOne(programId);
+    ProductCategory storedProdCategory = productCategoryRepo.findOne(productCategoryId);
     return ProgramProduct.createNew(storedProgram,
-      productCategory,
+      storedProdCategory,
       product,
       dosesPerMonth,
       active,

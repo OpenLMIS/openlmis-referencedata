@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.openlmis.referencedata.domain.ProgramProductBuilder;
+import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramPr
   private static final long serialVersionUID = 2923585097168641465L;
   private JsonDeserializer<?> defaultDeserializer;
   private ProgramRepository programRepository;
+  private ProductCategoryRepository productCategoryRepository;
 
   private ProgramProductBuilderDeserializer() {
     super(ProgramProductBuilder.class);
@@ -38,13 +40,17 @@ public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramPr
    * @throws NullPointerException is either parameter is null.
    */
   public ProgramProductBuilderDeserializer(JsonDeserializer<?> defaultDeserializer,
-                                           ProgramRepository programRepository) {
+                                           ProgramRepository programRepository,
+                                           ProductCategoryRepository productCategoryRepository) {
     super(ProgramProductBuilder.class);
 
     Objects.requireNonNull(defaultDeserializer, "Default deserializer was passed as null");
     Objects.requireNonNull(programRepository, "ProgramRepository was passed as null");
+    Objects.requireNonNull(productCategoryRepository, "ProductCategoryRepository was passed as "
+        + "null");
     this.defaultDeserializer = defaultDeserializer;
     this.programRepository = programRepository;
+    this.productCategoryRepository = productCategoryRepository;
   }
 
   @Override
@@ -57,8 +63,9 @@ public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramPr
         jsonParser,
         ctxt);
 
-    // inject program repository into builder so that it may lookup entity ids
+    // inject repositories into builder so that it may lookup entity ids
     ppBuilder.setProgramRepository(programRepository);
+    ppBuilder.setProductCategoryRepository(productCategoryRepository);
 
     return ppBuilder;
   }

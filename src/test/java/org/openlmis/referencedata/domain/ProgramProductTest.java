@@ -10,18 +10,21 @@ public class ProgramProductTest {
 
   private static OrderableProduct ibuprofen;
   private static Program em;
+  private static ProductCategory testCat;
 
   {
     em = new Program("EM");
+    testCat = ProductCategory.createNew(Code.code("test"));
     ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "NSAID", 20);
   }
 
   @Test
   public void shouldBeEqualByProgramAndProduct() {
-    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, "testcat", ibuprofen);
+    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, testCat, ibuprofen);
 
     Program emDupe = new Program("EM");
-    ProgramProduct ibuprofenInEmDupe = ProgramProduct.createNew(emDupe, "catdupe", ibuprofen);
+    ProductCategory testCatDupe = ProductCategory.createNew(Code.code("catdupe"));
+    ProgramProduct ibuprofenInEmDupe = ProgramProduct.createNew(emDupe, testCatDupe, ibuprofen);
 
     assertEquals(ibuprofenInEm, ibuprofenInEmDupe);
     assertEquals(ibuprofenInEmDupe, ibuprofenInEm);
@@ -30,13 +33,13 @@ public class ProgramProductTest {
 
   @Test
   public void isForProgramShouldBeTrue() {
-    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, "test", ibuprofen);
+    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, testCat, ibuprofen);
     assertTrue(ibuprofenInEm.isForProgram(em));
   }
 
   @Test
   public void isForProgramShouldBeFalse() {
-    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, "test", ibuprofen);
+    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, testCat, ibuprofen);
 
     assertFalse(ibuprofenInEm.isForProgram(null));
     assertFalse(ibuprofenInEm.isForProgram(new Program("fail")));

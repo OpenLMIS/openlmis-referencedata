@@ -34,11 +34,10 @@ public class ProgramProduct extends BaseEntity {
   private Integer dosesPerMonth;
   private boolean active;
 
-  //@ManyToOne
-  //@JoinColumn(name = "productCategoryId", nullable = false)
+  @ManyToOne
+  @JoinColumn(name = "productCategoryId", nullable = false)
   @Getter
-  //@Setter
-  private String productCategory;
+  private ProductCategory productCategory;
 
   private boolean fullSupply;
   private int displayOrder;
@@ -46,7 +45,7 @@ public class ProgramProduct extends BaseEntity {
 
   private ProgramProduct(Program program,
                          OrderableProduct product,
-                         String productCategory) {
+                         ProductCategory productCategory) {
     this.program = program;
     this.product = product;
     this.productCategory = productCategory;
@@ -68,7 +67,14 @@ public class ProgramProduct extends BaseEntity {
 
   /**
    * Create program product association.
-   * See {@link #createNew(Program, String, OrderableProduct, Integer, boolean, boolean, int, int)}.
+   * See {@link #createNew(Program,
+   *  ProductCategory,
+   *  OrderableProduct,
+   *  Integer,
+   *  boolean,
+   *  boolean,
+   *  int,
+   *  int)}.
    * Uses sensible defaults.
    * @param program see other
    * @param category see other
@@ -76,7 +82,7 @@ public class ProgramProduct extends BaseEntity {
    * @return see other
    */
   public static final ProgramProduct createNew(Program program,
-                                               String category,
+                                               ProductCategory category,
                                                OrderableProduct product) {
     ProgramProduct programProduct = new ProgramProduct(program, product, category);
     return programProduct;
@@ -95,7 +101,7 @@ public class ProgramProduct extends BaseEntity {
    * @return a new ProgramProduct.
    */
   public static final ProgramProduct createNew(Program program,
-                                               String category,
+                                               ProductCategory category,
                                                OrderableProduct product,
                                                Integer dosesPerMonth,
                                                boolean active,
@@ -152,7 +158,8 @@ public class ProgramProduct extends BaseEntity {
                           SerializerProvider provider) throws IOException, JsonProcessingException {
       generator.writeStartObject();
       generator.writeStringField("programId", programProduct.program.getId().toString());
-      generator.writeStringField("productCategory", programProduct.productCategory);
+      generator.writeStringField("productCategory",
+          programProduct.getProductCategory().getId() + "");
       generator.writeBooleanField("active", programProduct.active);
       generator.writeBooleanField("fullSupply", programProduct.fullSupply);
       generator.writeNumberField("displayOrder", programProduct.displayOrder);

@@ -62,7 +62,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     productCategoryRepository.save(productCategory);
 
     orderableProduct = GlobalProduct.newGlobalProduct("ibuprofen", "testDesc", 10);
-    programProduct = ProgramProduct.createNew(program, "test", orderableProduct);
+    programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct);
     orderableProduct.addToProgram(programProduct);
     orderableProductRepository.save(orderableProduct);
   }
