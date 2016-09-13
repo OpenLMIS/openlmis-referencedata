@@ -97,8 +97,9 @@ public class ProgramProductBuilder {
    * this builder by resolving them using the provided repository.
    * @param product the product for which we're building this ProgramProduct.
    * @return a new ProgramProduct ready for persisting.
-   * @throws NullPointerException if {@link #setProgramRepository(ProgramRepository)} wasn't
-   *      called previously with a non-null repository.
+   * @throws NullPointerException if {@link #setProgramRepository(ProgramRepository)}
+   *     or {@link #setProductCategoryRepository(ProductCategoryRepository)} wasn't called
+   *     previously with a non-null repository.
    */
   public ProgramProduct createProgramProduct(OrderableProduct product) {
     Objects.requireNonNull(programRepo, "Program Repository needed to be injected prior to "

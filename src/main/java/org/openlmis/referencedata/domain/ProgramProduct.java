@@ -159,7 +159,7 @@ public class ProgramProduct extends BaseEntity {
       generator.writeStartObject();
       generator.writeStringField("programId", programProduct.program.getId().toString());
       generator.writeStringField("productCategory",
-          programProduct.getProductCategory().getId() + "");
+          programProduct.productCategory.getId().toString());
       generator.writeBooleanField("active", programProduct.active);
       generator.writeBooleanField("fullSupply", programProduct.fullSupply);
       generator.writeNumberField("displayOrder", programProduct.displayOrder);
