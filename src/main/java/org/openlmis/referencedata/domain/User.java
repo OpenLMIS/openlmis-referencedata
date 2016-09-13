@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.util.View;
 
 import java.util.Arrays;
@@ -137,7 +136,12 @@ public class User extends BaseEntity {
   public void addSupervisedFacilities(Set<Facility> facilities) {
     supervisedFacilities.addAll(facilities);
   }
-  
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setUsername(username);
