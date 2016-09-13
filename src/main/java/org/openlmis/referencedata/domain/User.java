@@ -150,17 +150,7 @@ public class User extends BaseEntity {
     }
     exporter.setActive(active);
     exporter.setVerified(verified);
-    for (RoleAssignment roleAssignment : roleAssignments) {
-      RoleAssignment.Exporter roleAssignmentExporter = exporter.provideRoleAssignmentExporter();
-      if (roleAssignment instanceof SupervisionRoleAssignment) {
-        ((SupervisionRoleAssignment)roleAssignment).export((RoleAssignmentDto)roleAssignmentExporter);
-      } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
-        ((FulfillmentRoleAssignment)roleAssignment).export((RoleAssignmentDto)roleAssignmentExporter);
-      } else {
-        ((DirectRoleAssignment)roleAssignment).export(roleAssignmentExporter);
-      }
-      exporter.addRoleAssignment(roleAssignmentExporter);
-    }
+    exporter.addRoleAssignments(roleAssignments);
   }
   
   public interface Exporter {
@@ -182,8 +172,6 @@ public class User extends BaseEntity {
 
     void setActive(boolean active);
 
-    RoleAssignment.Exporter provideRoleAssignmentExporter();
-
-    void addRoleAssignment(RoleAssignment.Exporter roleAssignmentExporter);
+    void addRoleAssignments(Set<RoleAssignment> roleAssignments);
   }
 }

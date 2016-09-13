@@ -6,7 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.DirectRoleAssignment;
+import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.RoleAssignment;
+import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.User;
 
 import java.util.HashSet;
@@ -96,12 +99,17 @@ public class UserDto extends BaseEntity implements User.Exporter {
   }
 
   @Override
-  public RoleAssignment.Exporter provideRoleAssignmentExporter() {
-    return new RoleAssignmentDto();
-  }
-
-  @Override
-  public void addRoleAssignment(RoleAssignment.Exporter roleAssignmentExporter) {
-    roleAssignments.add((RoleAssignmentDto)roleAssignmentExporter);
+  public void addRoleAssignments(Set<RoleAssignment> roleAssignments) {
+    for (RoleAssignment roleAssignment : roleAssignments) {
+      RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
+      if (roleAssignment instanceof SupervisionRoleAssignment) {
+        ((SupervisionRoleAssignment)roleAssignment).export(roleAssignmentDto);
+      } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
+        ((FulfillmentRoleAssignment)roleAssignment).export(roleAssignmentDto);
+      } else {
+        ((DirectRoleAssignment)roleAssignment).export(roleAssignmentDto);
+      }
+      this.roleAssignments.add(roleAssignmentDto);
+    }
   }
 }
