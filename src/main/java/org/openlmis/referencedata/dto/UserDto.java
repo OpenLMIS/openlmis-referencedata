@@ -1,18 +1,21 @@
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.BaseEntity;
-import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.domain.User;
-
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.RoleAssignment;
+import org.openlmis.referencedata.domain.User;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto extends BaseEntity {
+public class UserDto extends BaseEntity implements User.Exporter {
 
   @Getter
   @Setter
@@ -39,7 +42,7 @@ public class UserDto extends BaseEntity {
 
   @Getter
   @Setter
-  private UUID homeFacility;
+  private UUID homeFacilityId;
 
   @Getter
   @Setter
@@ -50,13 +53,8 @@ public class UserDto extends BaseEntity {
   private boolean active;
 
   @Getter
-  private UUID roleAssignments;
-
-  public SupervisoryNode getSupervisedNode() {
-    return null;
-  }
-
-
+  private Set<RoleAssignmentDto> roleAssignments = new HashSet<>();
+  
   /**
    * Return converted UserDto from User.
    */
@@ -74,7 +72,7 @@ public class UserDto extends BaseEntity {
       userDto.setTimezone(user.getTimezone());
     }
     if (user.getHomeFacility() != null) {
-      userDto.setHomeFacility(user.getHomeFacility().getId());
+      userDto.setHomeFacilityId(user.getHomeFacility().getId());
     }
     return userDto;
   }
@@ -97,4 +95,13 @@ public class UserDto extends BaseEntity {
     return user;
   }
 
+  @Override
+  public RoleAssignment.Exporter provideRoleAssignmentExporter() {
+    return new RoleAssignmentDto();
+  }
+
+  @Override
+  public void addRoleAssignment(RoleAssignment.Exporter roleAssignmentExporter) {
+    roleAssignments.add((RoleAssignmentDto)roleAssignmentExporter);
+  }
 }

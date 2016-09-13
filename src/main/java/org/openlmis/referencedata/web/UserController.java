@@ -125,11 +125,11 @@ public class UserController extends BaseController {
   @ResponseBody
   public ResponseEntity<?> getAllUsers() {
     Iterable<User> users = userRepository.findAll();
-    List<UserDto> usersDto = new ArrayList<>();
+    List<UserDto> userDtos = new ArrayList<>();
     for (User user : users) {
-      usersDto.add(UserDto.convertUserToUserDto(user));
+      userDtos.add(exportToUserDto(user));
     }
-    return new ResponseEntity<>(usersDto, HttpStatus.OK);
+    return new ResponseEntity<>(userDtos, HttpStatus.OK);
   }
 
   /**
@@ -144,7 +144,7 @@ public class UserController extends BaseController {
     if (user == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
-      return new ResponseEntity<>(user, HttpStatus.OK);
+      return new ResponseEntity<>(exportToUserDto(user), HttpStatus.OK);
     }
   }
 
@@ -438,5 +438,11 @@ public class UserController extends BaseController {
   private Set<RoleAssignmentDto> exportToDtos(Set<RoleAssignment> roleAssignments) {
     return roleAssignments.stream().map(roleAssignment -> exportToDto(roleAssignment))
         .collect(toSet());
+  }
+  
+  private UserDto exportToUserDto(User user) {
+    UserDto userDto = new UserDto();
+    user.export(userDto);
+    return userDto;
   }
 }

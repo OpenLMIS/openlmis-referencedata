@@ -7,11 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.util.View;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -134,5 +136,54 @@ public class User extends BaseEntity {
 
   public void addSupervisedFacilities(Set<Facility> facilities) {
     supervisedFacilities.addAll(facilities);
+  }
+  
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setUsername(username);
+    exporter.setFirstName(firstName);
+    exporter.setLastName(lastName);
+    exporter.setEmail(email);
+    exporter.setTimezone(timezone);
+    if (homeFacility != null) {
+      exporter.setHomeFacilityId(homeFacility.getId());
+    }
+    exporter.setActive(active);
+    exporter.setVerified(verified);
+    for (RoleAssignment roleAssignment : roleAssignments) {
+      RoleAssignment.Exporter roleAssignmentExporter = exporter.provideRoleAssignmentExporter();
+      if (roleAssignment instanceof SupervisionRoleAssignment) {
+        ((SupervisionRoleAssignment)roleAssignment).export((RoleAssignmentDto)roleAssignmentExporter);
+      } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
+        ((FulfillmentRoleAssignment)roleAssignment).export((RoleAssignmentDto)roleAssignmentExporter);
+      } else {
+        ((DirectRoleAssignment)roleAssignment).export(roleAssignmentExporter);
+      }
+      exporter.addRoleAssignment(roleAssignmentExporter);
+    }
+  }
+  
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setUsername(String username);
+
+    void setFirstName(String firstName);
+
+    void setLastName(String lastName);
+
+    void setEmail(String email);
+
+    void setTimezone(String timezone);
+
+    void setHomeFacilityId(UUID homeFacilityId);
+
+    void setVerified(boolean verified);
+
+    void setActive(boolean active);
+
+    RoleAssignment.Exporter provideRoleAssignmentExporter();
+
+    void addRoleAssignment(RoleAssignment.Exporter roleAssignmentExporter);
   }
 }
