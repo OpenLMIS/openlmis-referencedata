@@ -17,6 +17,7 @@ import org.openlmis.referencedata.util.View;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -45,12 +46,12 @@ public class Role extends BaseEntity {
   @JsonView(View.BasicInformation.class)
   @ManyToMany(
       cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-  )
+      )
   @JoinTable(name = "role_rights",
       schema = "referencedata",
       joinColumns = @JoinColumn(name = "roleid", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false)
-  )
+      )
   @Getter
   private Set<Right> rights;
 
@@ -69,6 +70,25 @@ public class Role extends BaseEntity {
   public static Role newRole(String name, Right... rights) throws
       RightTypeException, RoleException {
     return new Role(name, rights);
+  }
+
+  /**
+   * Static factory method for constructing a new role using an importer (DTO).
+   *
+   * @param importer the role importer (DTO)
+   * @throws RightTypeException if the rights do not have the same right type
+   */
+  public static Role newRole(Importer importer) throws RightTypeException, RoleException {
+    Set<Right> importedRights = importer.getRights().stream().map(
+        rightImporter -> Right.newRight(rightImporter))
+        .collect(toSet());
+
+    Role newRole = new Role(importer.getName(),
+        importedRights.toArray(new Right[importedRights.size()]));
+    newRole.id = importer.getId();
+    newRole.description = importer.getDescription();
+
+    return newRole;
   }
 
   /**
@@ -131,5 +151,46 @@ public class Role extends BaseEntity {
     Set<Right> attachments = rights.stream().flatMap(r -> r.getAttachments().stream())
         .collect(toSet());
     return rights.contains(right) || attachments.contains(right);
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setName(name);
+    exporter.setDescription(description);
+
+    Right.Exporter rightExporter = exporter.provideRightExporter();
+    if (rightExporter != null) {
+      for (Right right : rights) {
+        right.export(rightExporter);
+        exporter.addRight(rightExporter);
+      }
+    }
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setName(String name);
+
+    void setDescription(String description);
+
+    Right.Exporter provideRightExporter();
+
+    void addRight(Right.Exporter rightExporter);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    String getName();
+
+    String getDescription();
+
+    Set<Right.Importer> getRights();
   }
 }

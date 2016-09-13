@@ -27,9 +27,10 @@ public class RightDto extends BaseDto implements Right.Exporter, Right.Importer 
 
   @Override
   public void addAttachment(Right.Exporter rightExporter) {
-    attachments.add((RightDto)rightExporter);
+    attachments.add((RightDto) rightExporter);
   }
 
+  @Override
   public Set<Right.Importer> getAttachments() {
     Set<Right.Importer> attachmentDtos = new HashSet<>();
     attachmentDtos.addAll(this.attachments);
