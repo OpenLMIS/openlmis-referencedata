@@ -423,9 +423,15 @@ public class UserController extends BaseController {
         .body(supervisedFacilities);
   }
 
-  private RoleAssignmentDto exportToDto(RoleAssignment roleAssignment) {
+  private <T extends RoleAssignment> RoleAssignmentDto exportToDto(T roleAssignment) {
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignment.export(roleAssignmentDto);
+    if (roleAssignment instanceof SupervisionRoleAssignment) {
+      ((SupervisionRoleAssignment) roleAssignment).export(roleAssignmentDto);
+    } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
+      ((FulfillmentRoleAssignment) roleAssignment).export(roleAssignmentDto);
+    } else {
+      ((DirectRoleAssignment) roleAssignment).export(roleAssignmentDto);
+    }
     return roleAssignmentDto;
   }
 

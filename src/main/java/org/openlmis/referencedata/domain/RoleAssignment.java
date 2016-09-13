@@ -65,8 +65,6 @@ public abstract class RoleAssignment extends BaseEntity {
     this.user = user;
   }
 
-  public abstract void export(Exporter exporter);
-
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {

@@ -100,12 +100,16 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     }
   }
 
-  @Override
-  public void export(RoleAssignment.Exporter exporter) {
+  /**
+   * Export this object's properties for serialization to the exporter provided.
+   * 
+   * @param exporter the exporter provided
+   */
+  public void export(Exporter exporter) {
     exporter.setRoleId(role.getId());
-    ((Exporter)exporter).setProgramCode(program.getCode().toString());
+    exporter.setProgramCode(program.getCode().toString());
     if (supervisoryNode != null) {
-      ((Exporter)exporter).setSupervisoryNodeCode(supervisoryNode.getCode());
+      exporter.setSupervisoryNodeCode(supervisoryNode.getCode());
     }
   }
 

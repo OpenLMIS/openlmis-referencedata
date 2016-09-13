@@ -73,10 +73,14 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
     super.assignTo(user);
   }
 
-  @Override
-  public void export(RoleAssignment.Exporter exporter) {
+  /**
+   * Export this object's properties for serialization to the exporter provided.
+   *
+   * @param exporter the exporter provided
+   */
+  public void export(Exporter exporter) {
     exporter.setRoleId(role.getId());
-    ((Exporter)exporter).setWarehouseCode(warehouse.getCode());
+    exporter.setWarehouseCode(warehouse.getCode());
   }
 
   @Override
