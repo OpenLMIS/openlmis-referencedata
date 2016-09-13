@@ -35,4 +35,9 @@ public class DirectRoleAssignment extends RoleAssignment {
   public void assignTo(User user) {
     super.assignTo(user);
   }
+
+  @Override
+  public void export(Exporter exporter) {
+    exporter.setRoleId(role.getId());
+  }
 }

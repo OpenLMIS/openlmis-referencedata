@@ -30,6 +30,9 @@ public class RoleAssignmentTest {
     public boolean hasRight(RightQuery rightQuery) {
       return false;
     }
+
+    @Override
+    public void export(Exporter exporter) {}
   }
 
   @Test

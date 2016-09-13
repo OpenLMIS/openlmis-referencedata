@@ -101,6 +101,15 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   @Override
+  public void export(RoleAssignment.Exporter exporter) {
+    exporter.setRoleId(role.getId());
+    ((Exporter)exporter).setProgramCode(program.getCode().toString());
+    if (supervisoryNode != null) {
+      ((Exporter)exporter).setSupervisoryNodeCode(supervisoryNode.getCode());
+    }
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
@@ -122,5 +131,10 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   public int hashCode() {
     return Objects.hash(super.hashCode(), program, supervisoryNode);
   }
-  
+
+  public interface Exporter extends RoleAssignment.Exporter {
+    void setProgramCode(String programCode);
+
+    void setSupervisoryNodeCode(String supervisoryNodeCode);
+  }
 }

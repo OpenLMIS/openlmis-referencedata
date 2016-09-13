@@ -10,6 +10,7 @@ import org.openlmis.referencedata.util.View;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -64,6 +65,8 @@ public abstract class RoleAssignment extends BaseEntity {
     this.user = user;
   }
 
+  public abstract void export(Exporter exporter);
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -80,5 +83,9 @@ public abstract class RoleAssignment extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(role, user);
+  }
+
+  public interface Exporter {
+    void setRoleId(UUID roleId);
   }
 }

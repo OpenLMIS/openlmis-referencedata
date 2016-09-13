@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toSet;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -223,11 +225,9 @@ public class UserController extends BaseController {
           .build();
     }
 
-    Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
-
     return ResponseEntity
         .ok()
-        .body(roleAssignments);
+        .body(exportToDtos(user.getRoleAssignments()));
   }
 
   /**
@@ -309,7 +309,7 @@ public class UserController extends BaseController {
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(user.getRoleAssignments());
+        .body(exportToDtos(user.getRoleAssignments()));
   }
 
   /**
@@ -421,5 +421,16 @@ public class UserController extends BaseController {
     return ResponseEntity
         .ok()
         .body(supervisedFacilities);
+  }
+
+  private RoleAssignmentDto exportToDto(RoleAssignment roleAssignment) {
+    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
+    roleAssignment.export(roleAssignmentDto);
+    return roleAssignmentDto;
+  }
+
+  private Set<RoleAssignmentDto> exportToDtos(Set<RoleAssignment> roleAssignments) {
+    return roleAssignments.stream().map(roleAssignment -> exportToDto(roleAssignment))
+        .collect(toSet());
   }
 }

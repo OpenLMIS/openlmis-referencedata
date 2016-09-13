@@ -74,6 +74,12 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   }
 
   @Override
+  public void export(RoleAssignment.Exporter exporter) {
+    exporter.setRoleId(role.getId());
+    ((Exporter)exporter).setWarehouseCode(warehouse.getCode());
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
@@ -95,4 +101,7 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
     return Objects.hash(super.hashCode(), warehouse);
   }
 
+  public interface Exporter extends RoleAssignment.Exporter {
+    void setWarehouseCode(String warehouseCode);
+  }
 }
