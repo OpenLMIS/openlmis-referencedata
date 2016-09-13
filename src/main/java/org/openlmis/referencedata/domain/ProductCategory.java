@@ -1,48 +1,62 @@
 package org.openlmis.referencedata.domain;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import javax.persistence.Column;
+import java.util.Objects;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-/*
- * ProductCategory represents the category for product. Also defines the contract for 
- * creation/upload of ProductCategory like code, name and displayOrder are mandatory.
+/**
+ * Informative category a Product is in when assigned to a {@link Program}.
  */
-
 @Entity
 @Table(name = "product_categories", schema = "referencedata")
-@NoArgsConstructor
-@AllArgsConstructor
 public class ProductCategory extends BaseEntity {
 
-  @Column(nullable = false, unique = true)
+  @Embedded
   @Getter
-  @Setter
-  private String code;
+  private Code code;
 
-  @Column(nullable = false, unique = true)
-  @Getter
-  @Setter
-  private String name;
+  @Embedded
+  @JsonUnwrapped
+  private OrderedDisplayValue orderedDisplayValue;
 
-  @Column(nullable = false)
-  @Getter
-  @Setter
-  private Integer displayOrder;
+  private ProductCategory() {}
 
   /**
-   * Copy values of attributes into new or updated ProductCategory.
-   *
-   * @param productCategory ProductCategory with new values.
+   * Creates a new ProductCategory.
+   * @param code this ProductCategory's unique implementation code.
+   * @param displayValue the display values of this ProductCategory.
+   * @return a new ProductCategory.
+   * @throws NullPointerException if either paramater is null.
+   */
+  protected ProductCategory(Code code, OrderedDisplayValue displayValue) {
+    Objects.requireNonNull(code);
+    Objects.requireNonNull(displayValue);
+    this.code = code;
+    this.orderedDisplayValue = displayValue;
+  }
+
+  /**
+   * Update this from another.  Copies display values from the other ProductCategory into this one.
+   * @param productCategory ProductCategory to update from.
    */
   public void updateFrom(ProductCategory productCategory) {
-    this.code = productCategory.getCode();
-    this.name = productCategory.getName();
-    this.displayOrder = productCategory.getDisplayOrder();
+    this.orderedDisplayValue = productCategory.orderedDisplayValue;
+  }
+
+  /**
+   * Creates a new ProductCategory.
+   * @param productCategoryCode this ProductCategory's unique implementation code.
+   * @param displayValue the display values of this ProductCategory.
+   * @return a new ProductCategory.
+   * @throws NullPointerException if either paramater is null.
+   */
+  public static ProductCategory createNew(Code productCategoryCode, OrderedDisplayValue
+      displayValue) {
+    ProductCategory category = new ProductCategory(productCategoryCode, displayValue);
+    return category;
   }
 }

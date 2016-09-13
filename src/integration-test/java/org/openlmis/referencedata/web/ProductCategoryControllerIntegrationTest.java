@@ -5,15 +5,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,16 +59,16 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertEquals(1, response.length);
     for ( ProductCategory productCategory : response ) {
-      assertEquals(productCategory.getCode(), productCategories.get(0).getCode());
+      assertEquals(productCategory.getCode(),
+          productCategories.get(0).getCode());
     }
   }
 
   private ProductCategory generateProductCategory() {
-    ProductCategory productCategory = new ProductCategory();
     Integer instanceNumber = generateInstanceNumber();
-    productCategory.setName("productCategoryName" + instanceNumber);
-    productCategory.setCode("productCategoryCode" + instanceNumber);
-    productCategory.setDisplayOrder(instanceNumber);
+    ProductCategory productCategory = ProductCategory.createNew(
+        Code.code("productCategoryCode" + instanceNumber),
+        new OrderedDisplayValue("productCategoryName" + instanceNumber, instanceNumber));
     productCategoryRepository.save(productCategory);
     return productCategory;
   }
@@ -116,7 +118,7 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
   public void shouldUpdateProductCategory() {
 
     ProductCategory productCategory = productCategories.get(4);
-    productCategory.setCode("OpenLMIS");
+    //remove this, it's immutable: productCategory.setCode("OpenLMIS");
 
     ProductCategory response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())

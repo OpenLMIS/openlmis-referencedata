@@ -3,6 +3,8 @@ package org.openlmis.referencedata.repository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -24,11 +26,13 @@ public class ProductCategoryRepositoryIntegrationTest extends
   }
 
   ProductCategory generateInstance() {
-    ProductCategory productCategory = new ProductCategory();
     Integer instanceNumber = this.getNextInstanceNumber();
-    productCategory.setName("productCategoryName" + instanceNumber);
-    productCategory.setCode("productCategoryCode" + instanceNumber);
-    productCategory.setDisplayOrder(instanceNumber);
+    OrderedDisplayValue displayValue = new OrderedDisplayValue(
+        "productCategoryName" + instanceNumber,
+        instanceNumber);
+    ProductCategory productCategory = ProductCategory.createNew(
+        Code.code("productCategoryCode" + instanceNumber),
+        displayValue);
     return productCategory;
   }
 
@@ -41,21 +45,17 @@ public class ProductCategoryRepositoryIntegrationTest extends
   }
 
   @Test
-  public void testSearchProductCategoriesByAllParameters() {
-    List<ProductCategory> receivedProductCategories =
-            repository.searchProductCategories(productCategories.get(0).getCode());
+  public void findByCodeShouldFindOne() {
+    ProductCategory search = productCategories.get(0);
+    ProductCategory found = repository.findByCode(search.getCode());
 
-    Assert.assertEquals(1, receivedProductCategories.size());
-    Assert.assertEquals(
-            productCategories.get(0).getCode(),
-            receivedProductCategories.get(0).getCode());
+    Assert.assertEquals(search, found);
   }
 
   @Test
-  public void testSearchProductCategoriesByAllParametersNull() {
-    List<ProductCategory> receivedProductCategories =
-            repository.searchProductCategories(null);
+  public void findByCodeShouldReturnNull() {
+    ProductCategory found = repository.findByCode(null);
 
-    Assert.assertEquals(productCategories.size(), receivedProductCategories.size());
+    Assert.assertNull(found);
   }
 }
