@@ -272,10 +272,10 @@ public class UserController extends BaseController {
         if (programCode != null) {
 
           Program program = programRepository.findByCode(Code.code(programCode));
-          UUID supervisoryNodeId = roleAssignmentDto.getSupervisoryNodeId();
-          if (supervisoryNodeId != null) {
+          String supervisoryNodeCode = roleAssignmentDto.getSupervisoryNodeCode();
+          if (supervisoryNodeCode != null) {
 
-            SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+            SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode(supervisoryNodeCode);
             roleAssignment = new SupervisionRoleAssignment(role, program, supervisoryNode);
 
           } else {

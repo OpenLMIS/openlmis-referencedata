@@ -17,7 +17,7 @@ public class RoleAssignmentDto {
 
   @Getter
   @Setter
-  UUID supervisoryNodeId;
+  String supervisoryNodeCode;
 
   @Getter
   @Setter
