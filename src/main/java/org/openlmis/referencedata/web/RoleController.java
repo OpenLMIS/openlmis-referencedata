@@ -8,6 +8,8 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.AuthException;
+import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
@@ -96,7 +98,7 @@ public class RoleController extends BaseController {
 
       LOGGER.debug("Saving new role");
       newRole = Role.newRole(roleDto);
-      setRightIds(newRole);
+      populateRights(newRole);
       roleRepository.save(newRole);
 
     } catch (AuthException ae) {
@@ -141,7 +143,7 @@ public class RoleController extends BaseController {
       roleToSave = Role.newRole(roleDto);
 
       roleToSave.setId(roleId);
-      setRightIds(roleToSave);
+      populateRights(roleToSave);
 
       roleRepository.save(roleToSave);
 
@@ -208,10 +210,12 @@ public class RoleController extends BaseController {
     return roleDto;
   }
 
-  private void setRightIds(Role role) {
-    for (Right right : role.getRights()) {
+  private void populateRights(Role role) throws RightTypeException, RoleException {
+    Set<Right> rights = role.getRights();
+    for (Right right : rights) {
       Right storedRight = rightRepository.findFirstByName(right.getName());
-      right.setId(storedRight.getId());
+      rights.remove(right);
+      rights.add(storedRight);
     }
   }
 }
