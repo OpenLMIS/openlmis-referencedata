@@ -86,6 +86,22 @@ public class User extends BaseEntity {
   @Transient
   private Set<Facility> supervisedFacilities = new HashSet<>();
 
+  private User(Importer importer) {
+    id = importer.getId();
+    username = importer.getUsername();
+    firstName = importer.getFirstName();
+    lastName = importer.getLastName();
+    email = importer.getEmail();
+    timezone = importer.getTimezone();
+    //homeFacility.setId(importer.getHomeFacilityId()) TODO: set home facility, not ID
+    verified = importer.isVerified();
+    active = importer.isActive();
+  }
+
+  public static User newUser(Importer importer) {
+    return new User(importer);
+  }
+
   @PrePersist
   private void prePersist() {
     if (this.verified == null) {
@@ -154,9 +170,8 @@ public class User extends BaseEntity {
     }
     exporter.setActive(active);
     exporter.setVerified(verified);
-    exporter.addRoleAssignments(roleAssignments);
   }
-  
+
   public interface Exporter {
     void setId(UUID id);
 
@@ -175,7 +190,25 @@ public class User extends BaseEntity {
     void setVerified(boolean verified);
 
     void setActive(boolean active);
+  }
 
-    void addRoleAssignments(Set<RoleAssignment> roleAssignments);
+  public interface Importer {
+    UUID getId();
+
+    String getUsername();
+
+    String getFirstName();
+
+    String getLastName();
+
+    String getEmail();
+
+    String getTimezone();
+
+    UUID getHomeFacilityId();
+
+    boolean isVerified();
+
+    boolean isActive();
   }
 }

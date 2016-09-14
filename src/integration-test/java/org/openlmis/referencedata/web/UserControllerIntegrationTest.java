@@ -212,7 +212,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldUpdateRequisitionAndAuthUsers() {
     User newUser = generateUser();
-    UserDto newUserDto = UserDto.convertUserToUserDto(newUser);
+    UserDto newUserDto = new UserDto();
+    newUser.export(newUserDto);
     UserDto user = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)

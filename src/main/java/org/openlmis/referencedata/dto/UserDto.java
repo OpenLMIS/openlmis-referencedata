@@ -6,19 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.openlmis.referencedata.domain.BaseEntity;
-import org.openlmis.referencedata.domain.DirectRoleAssignment;
-import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
-import org.openlmis.referencedata.domain.RoleAssignment;
-import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.User;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto extends BaseEntity implements User.Exporter {
+public class UserDto extends BaseEntity implements User.Exporter, User.Importer {
 
   @Getter
   @Setter
@@ -36,9 +30,6 @@ public class UserDto extends BaseEntity implements User.Exporter {
   @Setter
   private String email;
 
-  @Setter
-  private UUID supervisedNode;
-
   @Getter
   @Setter
   private String timezone;
@@ -54,62 +45,4 @@ public class UserDto extends BaseEntity implements User.Exporter {
   @Getter
   @Setter
   private boolean active;
-
-  @Getter
-  private Set<RoleAssignmentDto> roleAssignments = new HashSet<>();
-  
-  /**
-   * Return converted UserDto from User.
-   */
-  public static UserDto convertUserToUserDto(User user) {
-    UserDto userDto = new UserDto();
-    userDto.setId(user.getId());
-    userDto.setEmail(user.getEmail());
-    userDto.setActive(user.getActive());
-    userDto.setFirstName(user.getFirstName());
-    userDto.setVerified(user.getVerified());
-    userDto.setUsername(user.getUsername());
-    userDto.setLastName(user.getLastName());
-    userDto.setSupervisedNode(null);
-    if (user.getTimezone() != null) {
-      userDto.setTimezone(user.getTimezone());
-    }
-    if (user.getHomeFacility() != null) {
-      userDto.setHomeFacilityId(user.getHomeFacility().getId());
-    }
-    return userDto;
-  }
-
-  /**
-   * Return converted User from UserDto.
-   */
-  public static User convertUserDtoToUser(UserDto userDto) {
-    User user = new User();
-    user.setId(userDto.getId());
-    user.setEmail(userDto.getEmail());
-    user.setActive(userDto.isActive());
-    user.setFirstName(userDto.getFirstName());
-    user.setVerified(userDto.isVerified());
-    user.setUsername(userDto.getUsername());
-    user.setLastName(userDto.getLastName());
-    if (user.getTimezone() != null) {
-      user.setTimezone(userDto.getTimezone());
-    }
-    return user;
-  }
-
-  @Override
-  public void addRoleAssignments(Set<RoleAssignment> roleAssignments) {
-    for (RoleAssignment roleAssignment : roleAssignments) {
-      RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-      if (roleAssignment instanceof SupervisionRoleAssignment) {
-        ((SupervisionRoleAssignment)roleAssignment).export(roleAssignmentDto);
-      } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
-        ((FulfillmentRoleAssignment)roleAssignment).export(roleAssignmentDto);
-      } else {
-        ((DirectRoleAssignment)roleAssignment).export(roleAssignmentDto);
-      }
-      this.roleAssignments.add(roleAssignmentDto);
-    }
-  }
 }

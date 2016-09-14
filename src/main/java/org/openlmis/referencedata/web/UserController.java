@@ -33,7 +33,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -97,22 +96,33 @@ public class UserController extends BaseController {
    * Custom endpoint for creating and updating users.
    */
   @RequestMapping(value = "/users", method = RequestMethod.POST)
-  public ResponseEntity<?> save(@RequestBody @Valid UserDto userDto, BindingResult bindingResult,
-                                OAuth2Authentication auth) {
-    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
-    String token = details.getTokenValue();
+  public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto,
+                                    BindingResult bindingResult,
+                                    OAuth2Authentication auth) {
+    //OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
+    //String token = details.getTokenValue();
+    //
+    //if (bindingResult.hasErrors()) {
+    //  return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+    //} TODO: reinstate when dependency on auth is proper
 
-    if (bindingResult.hasErrors()) {
-      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
-    }
     try {
-      userService.save(UserDto.convertUserDtoToUser(userDto), token);
-      return new ResponseEntity<>(userDto, HttpStatus.OK);
+
+      User userToSave = User.newUser(userDto);
+      //userService.save(userToSave, token); TODO: reinstate when dependency on auth is proper
+      userRepository.save(userToSave);
+
+      return ResponseEntity
+          .ok(exportToUserDto(userToSave));
+
     } catch (ExternalApiException ex) {
+
       ErrorResponse errorResponse =
           new ErrorResponse("An error occurred while saving user", ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorResponse);
     }
   }
 
@@ -129,7 +139,8 @@ public class UserController extends BaseController {
     for (User user : users) {
       userDtos.add(exportToUserDto(user));
     }
-    return new ResponseEntity<>(userDtos, HttpStatus.OK);
+    return ResponseEntity
+        .ok(userDtos);
   }
 
   /**
@@ -142,9 +153,12 @@ public class UserController extends BaseController {
   public ResponseEntity<?> getUser(@PathVariable("id") UUID userId) {
     User user = userRepository.findOne(userId);
     if (user == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return ResponseEntity
+          .notFound()
+          .build();
     } else {
-      return new ResponseEntity<>(exportToUserDto(user), HttpStatus.OK);
+      return ResponseEntity
+          .ok(exportToUserDto(user));
     }
   }
 
@@ -158,7 +172,9 @@ public class UserController extends BaseController {
   public ResponseEntity<?> deleteUser(@PathVariable("id") UUID userId) {
     User user = userRepository.findOne(userId);
     if (user == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      return ResponseEntity
+          .notFound()
+          .build();
     } else {
       try {
         userRepository.delete(user);
@@ -167,9 +183,13 @@ public class UserController extends BaseController {
             new ErrorResponse("An error occurred while deleting user with id: " + userId,
                 ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .build();
       }
-      return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
+      return ResponseEntity
+          .noContent()
+          .build();
     }
   }
 
@@ -195,7 +215,8 @@ public class UserController extends BaseController {
     List<User> result = userService.searchUsers(username, firstName,
         lastName, homeFacility, active, verified);
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return ResponseEntity
+        .ok(result);
   }
 
   private Map<String, String> getErrors(final BindingResult bindingResult) {
@@ -439,7 +460,7 @@ public class UserController extends BaseController {
     return roleAssignments.stream().map(roleAssignment -> exportToDto(roleAssignment))
         .collect(toSet());
   }
-  
+
   private UserDto exportToUserDto(User user) {
     UserDto userDto = new UserDto();
     user.export(userDto);
