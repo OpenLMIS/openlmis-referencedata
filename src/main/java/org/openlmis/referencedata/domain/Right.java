@@ -81,7 +81,7 @@ public class Right extends BaseEntity {
     newRight.attach(importer.getAttachments().toArray(new Right[importer.getAttachments().size()]));
     return newRight;
   }
-  
+
   /**
    * Attach other rights to this one, to create relationships between rights. The attachment is
    * one-way with this method call. The attached rights must be of the same type; only attachments
@@ -120,7 +120,7 @@ public class Right extends BaseEntity {
     exporter.setDescription(description);
     for (Right attachment : attachments) {
       attachment.export(exporter);
-      exporter.addAttachment((Right.Exporter)attachment);
+      exporter.addAttachment((Right.Exporter) attachment);
     }
   }
 
@@ -143,7 +143,7 @@ public class Right extends BaseEntity {
 
   public interface Exporter {
     void setId(UUID id);
-    
+
     void setName(String name);
 
     void setType(RightType type);
@@ -155,7 +155,7 @@ public class Right extends BaseEntity {
 
   public interface Importer {
     UUID getId();
-    
+
     String getName();
 
     RightType getType();

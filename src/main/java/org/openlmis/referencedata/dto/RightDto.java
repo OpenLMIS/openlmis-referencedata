@@ -7,6 +7,7 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class RightDto extends BaseDto implements Right.Exporter, Right.Importer {
@@ -35,5 +36,22 @@ public class RightDto extends BaseDto implements Right.Exporter, Right.Importer 
     Set<Right.Importer> attachmentDtos = new HashSet<>();
     attachmentDtos.addAll(this.attachments);
     return attachmentDtos;
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof RightDto)) {
+      return false;
+    }
+    RightDto rightDto = (RightDto) obj;
+    return Objects.equals(name, rightDto.name);
   }
 }

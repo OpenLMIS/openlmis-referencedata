@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
 
+import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -11,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Controller
 public class RightController extends BaseController {
 
@@ -29,6 +32,11 @@ public class RightController extends BaseController {
 
   @Autowired
   private RightRepository rightRepository;
+
+  public RightController(RightRepository repository) {
+    super();
+    this.rightRepository = Objects.requireNonNull(repository);
+  }
 
   /**
    * Get all rights in the system.
@@ -42,7 +50,8 @@ public class RightController extends BaseController {
     Set<Right> rights = Sets.newHashSet(rightRepository.findAll());
     Set<RightDto> rightDtos = rights.stream().map(right -> exportToDto(right)).collect(toSet());
 
-    return new ResponseEntity<>(rightDtos, HttpStatus.OK);
+    return ResponseEntity
+        .ok(rightDtos);
   }
 
   /**
@@ -56,9 +65,12 @@ public class RightController extends BaseController {
     Right right = rightRepository.findOne(rightId);
 
     if (right == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return ResponseEntity
+          .notFound()
+          .build();
     } else {
-      return new ResponseEntity<>(exportToDto(right), HttpStatus.OK);
+      return ResponseEntity
+          .ok(exportToDto(right));
     }
   }
 
