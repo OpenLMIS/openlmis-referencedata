@@ -196,7 +196,7 @@ public class UserControllerTest {
 
     //then
     assertThat(httpStatus, is(HttpStatus.CREATED));
-    //verify(repository).save(user1); TODO: until we determine what is a user's "identity"
+    verify(repository).save(user1);
   }
 
   //  @Test

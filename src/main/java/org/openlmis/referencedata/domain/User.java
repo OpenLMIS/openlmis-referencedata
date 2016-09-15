@@ -11,6 +11,7 @@ import org.openlmis.referencedata.util.View;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -200,6 +201,23 @@ public class User extends BaseEntity {
     }
     exporter.setActive(active);
     exporter.setVerified(verified);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof User)) {
+      return false;
+    }
+    User user = (User) obj;
+    return Objects.equals(username, user.username);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(username);
   }
 
   public interface Exporter {
