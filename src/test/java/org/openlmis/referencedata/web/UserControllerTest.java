@@ -2,7 +2,9 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,6 +19,7 @@ import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
@@ -37,6 +40,7 @@ import org.openlmis.referencedata.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -77,11 +81,15 @@ public class UserControllerTest {
   private UUID userId;
   private UUID roleId;
   private Role adminRole1;
+  private String supervisionRight1Name;
+  private Right supervisionRight1;
   private Role supervisionRole1;
   private String programCode;
   private Program program1;
   private String supervisoryNodeCode;
   private SupervisoryNode supervisoryNode1;
+  private String fulfillmentRight1Name;
+  private Right fulfillmentRight1;
   private Role fulfillmentRole1;
   private String warehouseCode;
   private Facility warehouse1;
@@ -110,16 +118,18 @@ public class UserControllerTest {
     roleId = UUID.randomUUID();
     adminRole1 = Role.newRole("adminRole1", Right.newRight("adminRight1", RightType.GENERAL_ADMIN));
     adminRole1.setId(roleId);
-    supervisionRole1 = Role.newRole("supervisionRole1", Right.newRight("supervisionRight1",
-        RightType.SUPERVISION));
+    supervisionRight1Name = "supervisionRight1";
+    supervisionRight1 = Right.newRight(supervisionRight1Name, RightType.SUPERVISION);
+    supervisionRole1 = Role.newRole("supervisionRole1", supervisionRight1);
     supervisionRole1.setId(roleId);
     programCode = "P1";
     program1 = new Program(programCode);
     supervisoryNodeCode = "SN1";
     supervisoryNode1 = new SupervisoryNode();
     supervisoryNode1.setCode(supervisoryNodeCode);
-    fulfillmentRole1 = Role.newRole("fulfillmentRole1", Right.newRight("fulfillmentRight1",
-        RightType.ORDER_FULFILLMENT));
+    fulfillmentRight1Name = "fulfillmentRight1";
+    fulfillmentRight1 = Right.newRight(fulfillmentRight1Name, RightType.ORDER_FULFILLMENT);
+    fulfillmentRole1 = Role.newRole("fulfillmentRole1", fulfillmentRight1);
     fulfillmentRole1.setId(roleId);
     warehouseCode = "W1";
     warehouse1 = new Facility();
@@ -437,5 +447,135 @@ public class UserControllerTest {
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(roleAssignmentDtos, savedRoleAssignmentDtos);
+  }
+
+  @Test
+  public void shouldNotCheckIfUserHasRightForNonExistingUser() {
+    //given
+    when(repository.findOne(userId)).thenReturn(null);
+
+    //when
+    HttpStatus httpStatus = controller.checkIfUserHasRight(userId, "right1", null, null, null)
+        .getStatusCode();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+  }
+  
+  @Test
+  public void shouldReturnTrueIfUserHasRight() throws RightTypeException {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
+    when(repository.findOne(userId)).thenReturn(user1);
+    when(rightRepository.findFirstByName(supervisionRight1Name)).thenReturn(supervisionRight1);
+    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
+    when(supervisoryNodeRepository.findByCode(supervisoryNodeCode)).thenReturn(supervisoryNode1);
+
+    //when
+    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, supervisionRight1Name, 
+        programCode, supervisoryNodeCode, null);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    boolean hasRight = (boolean)responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertTrue(hasRight);
+  }
+  
+  @Test
+  public void shouldReturnFalseIfUserDoesNotHaveRight() throws RightTypeException {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
+    when(repository.findOne(userId)).thenReturn(user1);
+    when(rightRepository.findFirstByName(fulfillmentRight1Name)).thenReturn(fulfillmentRight1);
+    when(facilityRepository.findFirstByCode(warehouseCode)).thenReturn(warehouse1);
+
+    //when
+    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, fulfillmentRight1Name,
+        null, null, warehouseCode);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    boolean hasRight = (boolean)responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertFalse(hasRight);
+  }
+
+  @Test
+  public void shouldNotGetUserProgramsForNonExistingUser() {
+    //given
+    when(repository.findOne(userId)).thenReturn(null);
+
+    //when
+    HttpStatus httpStatus = controller.getUserPrograms(userId, true).getStatusCode();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+  }
+  
+  @Test
+  public void shouldGetUserHomeFacilityPrograms() throws RightTypeException {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    //when
+    ResponseEntity responseEntity = controller.getUserPrograms(userId, true);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    Set<Program> homeFacilityPrograms = (Set<Program>)responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertThat(homeFacilityPrograms.size(), is(1));
+    assertTrue(homeFacilityPrograms.contains(program1));
+  }
+
+  @Test
+  public void shouldGetUserSupervisoryPrograms() throws RightTypeException {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    //when
+    ResponseEntity responseEntity = controller.getUserPrograms(userId, false);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    Set<Program> supervisoryPrograms = (Set<Program>)responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertThat(supervisoryPrograms.size(), is(1));
+    assertTrue(supervisoryPrograms.contains(program1));
+  }
+
+  @Test
+  public void shouldNotGetUserSupervisedFacilitiesForNonExistingUser() {
+    //given
+    when(repository.findOne(userId)).thenReturn(null);
+
+    //when
+    HttpStatus httpStatus = controller.getUserSupervisedFacilities(userId).getStatusCode();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+  }
+
+  @Test
+  public void shouldGetUserSupervisedFacilities() throws RightTypeException {
+    //given
+    RequisitionGroup supervisionGroup1 = RequisitionGroup.newRequisitionGroup("supervisionGroup1", 
+        supervisoryNode1);
+    supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility(), new Facility()));
+    supervisoryNode1.setRequisitionGroup(supervisionGroup1);
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    //when
+    ResponseEntity responseEntity = controller.getUserSupervisedFacilities(userId);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    Set<Facility> supervisedFacilities = (Set<Facility>)responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertThat(supervisedFacilities.size(), is(2));
   }
 }

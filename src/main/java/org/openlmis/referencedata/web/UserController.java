@@ -362,11 +362,11 @@ public class UserController extends BaseController {
   /**
    * Check if user has a right with certain criteria.
    *
-   * @param userId            id of user to check for right
-   * @param rightName         right to check
-   * @param programCode       program to check
-   * @param supervisoryNodeId supervisory node to check
-   * @param warehouseCode     warehouse to check
+   * @param userId              id of user to check for right
+   * @param rightName           right to check
+   * @param programCode         program to check
+   * @param supervisoryNodeCode supervisory node to check
+   * @param warehouseCode       warehouse to check
    * @return if successful, true or false depending on if user has the right
    */
   @RequestMapping(value = "/users/{userId}/hasRight", method = RequestMethod.GET)
@@ -374,8 +374,8 @@ public class UserController extends BaseController {
                                                @RequestParam(value = "rightName") String rightName,
                                                @RequestParam(value = "programCode",
                                                    required = false) String programCode,
-                                               @RequestParam(value = "supervisoryNodeId",
-                                                   required = false) UUID supervisoryNodeId,
+                                               @RequestParam(value = "supervisoryNodeCode",
+                                                   required = false) String supervisoryNodeCode,
                                                @RequestParam(value = "warehouseCode",
                                                    required = false) String warehouseCode) {
 
@@ -392,9 +392,9 @@ public class UserController extends BaseController {
     if (programCode != null) {
 
       Program program = programRepository.findByCode(Code.code(programCode));
-      if (supervisoryNodeId != null) {
+      if (supervisoryNodeCode != null) {
 
-        SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+        SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode(supervisoryNodeCode);
         rightQuery = new RightQuery(right, program, supervisoryNode);
 
       } else {
