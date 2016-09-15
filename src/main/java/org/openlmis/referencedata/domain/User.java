@@ -25,7 +25,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-@SuppressWarnings("PMD.UnusedPrivateField")
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @Entity
 @Table(name = "users", schema = "referencedata")
 @NoArgsConstructor
@@ -87,6 +87,16 @@ public class User extends BaseEntity {
   @Transient
   private Set<Facility> supervisedFacilities = new HashSet<>();
 
+  private User(String username, String firstName, String lastName, String email, boolean active,
+               boolean verified) {
+    this.username = username;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.active = active;
+    this.verified = verified;
+  }
+
   private User(Importer importer) {
     id = importer.getId();
     username = importer.getUsername();
@@ -103,6 +113,11 @@ public class User extends BaseEntity {
     return new User(importer);
   }
 
+  public static User newUser(String username, String firstName, String lastName, String email,
+                             boolean active, boolean verified) {
+    return new User(username, firstName, lastName, email, active, verified);
+  }
+
   @PrePersist
   private void prePersist() {
     if (this.verified == null) {
@@ -112,6 +127,13 @@ public class User extends BaseEntity {
     if (this.active == null) {
       this.active = false;
     }
+  }
+
+  /**
+   * Clear all role assignments from this user. Mainly used as a starting point to re-assign roles.
+   */
+  public void resetRoles() {
+    this.roleAssignments.clear();
   }
 
   /**
@@ -153,14 +175,14 @@ public class User extends BaseEntity {
   public void addSupervisedFacilities(Set<Facility> facilities) {
     supervisedFacilities.addAll(facilities);
   }
-  
+
   @PostLoad
   private void refreshSupervisions() {
     for (RoleAssignment roleAssignment : roleAssignments) {
       roleAssignment.assignTo(this);
     }
   }
-  
+
   /**
    * Export this object to the specified exporter (DTO).
    *

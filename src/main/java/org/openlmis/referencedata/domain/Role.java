@@ -43,13 +43,11 @@ public class Role extends BaseEntity {
   private String description;
 
   @ManyToMany(
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-  )
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "role_rights",
       schema = "referencedata",
       joinColumns = @JoinColumn(name = "roleid", nullable = false),
-      inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false)
-  )
+      inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false))
   @Getter
   private Set<Right> rights;
 

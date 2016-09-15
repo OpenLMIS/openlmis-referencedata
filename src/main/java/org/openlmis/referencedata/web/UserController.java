@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
 
+import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -34,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -56,6 +57,7 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
+@NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
 @Controller
 public class UserController extends BaseController {
@@ -94,12 +96,31 @@ public class UserController extends BaseController {
   }
 
   /**
+   * Constructor for controller unit testing.
+   */
+  public UserController(UserService userService,
+                        UserRepository userRepository,
+                        RoleRepository roleRepository,
+                        RightRepository rightRepository,
+                        ProgramRepository programRepository,
+                        SupervisoryNodeRepository supervisoryNodeRepository,
+                        FacilityRepository facilityRepository) {
+    this.userService = userService;
+    this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
+    this.rightRepository = rightRepository;
+    this.programRepository = programRepository;
+    this.supervisoryNodeRepository = supervisoryNodeRepository;
+    this.facilityRepository = facilityRepository;
+  }
+
+  /**
    * Custom endpoint for creating and updating users.
    */
   @RequestMapping(value = "/users", method = RequestMethod.POST)
-  public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto,
+  public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto/*,
                                     BindingResult bindingResult,
-                                    OAuth2Authentication auth) {
+                                    OAuth2Authentication auth*/) {
     //OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
     //String token = details.getTokenValue();
     //
@@ -114,7 +135,8 @@ public class UserController extends BaseController {
       userRepository.save(userToSave);
 
       return ResponseEntity
-          .ok(exportToUserDto(userToSave));
+          .status(HttpStatus.CREATED)
+          .body(exportToUserDto(userToSave));
 
     } catch (ExternalApiException ex) {
 
@@ -181,7 +203,7 @@ public class UserController extends BaseController {
           .build();
     } else {
       try {
-        userRepository.delete(user);
+        userRepository.delete(userId);
       } catch (DataIntegrityViolationException ex) {
         ErrorResponse errorResponse =
             new ErrorResponse("An error occurred while deleting user with id: " + userId,
@@ -276,6 +298,7 @@ public class UserController extends BaseController {
     try {
 
       LOGGER.debug("Assigning roles to user and saving");
+      user.resetRoles();
       for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
         RoleAssignment roleAssignment;
 
