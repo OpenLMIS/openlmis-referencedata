@@ -558,6 +558,34 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
+    /searchByUUIDAndDate:
+        get:
+            is: [ secured ]
+            description: Find periods with matched parametrs.
+            queryParameters:
+                processingSchedule:
+                        displayName: processingSchedule
+                        type: string
+                        required: true
+                        repeat: false
+                startDate:
+                        displayName: startDate
+                        type: string
+                        required: false
+                        repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
 
         /findFirst1ByOrderByEndDateDesc:
             get:
@@ -1067,6 +1095,38 @@ resourceTypes:
                       X-Content-Type-Options:
                       X-XSS-Protection:
 
+    /searchByUUID:
+        get:
+            is: [ secured ]
+            description: Find Supply Lines with matched parameters.
+            queryParameters:
+                programId:
+                    displayName: programId
+                    description: program ID
+                    type: string
+                    required: true
+                    repeat: false
+                supervisoryNodeId:
+                    displayName: supervisoryNodeId
+                    description: supervisoryNode ID
+                    type: string
+                    required: true
+                    repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "500":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
 
 /users:
     displayName: User
