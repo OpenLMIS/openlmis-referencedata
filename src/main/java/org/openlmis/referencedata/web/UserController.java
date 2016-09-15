@@ -148,8 +148,7 @@ public class UserController extends BaseController {
       userRepository.save(userToSave);
 
       return ResponseEntity
-          .status(HttpStatus.CREATED)
-          .body(exportToUserDto(userToSave));
+          .ok(exportToUserDto(userToSave));
 
     } catch (ExternalApiException ex) {
 
@@ -185,8 +184,8 @@ public class UserController extends BaseController {
    * @param userId UUID of user whose we want to get
    * @return User.
    */
-  @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getUser(@PathVariable("id") UUID userId) {
+  @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
+  public ResponseEntity<?> getUser(@PathVariable("userId") UUID userId) {
 
     LOGGER.debug("Getting user");
     User user = userRepository.findOne(userId);
@@ -207,8 +206,8 @@ public class UserController extends BaseController {
    * @param userId UUID of user whose we want to delete
    * @return ResponseEntity containing the HTTP Status
    */
-  @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteUser(@PathVariable("id") UUID userId) {
+  @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
     User user = userRepository.findOne(userId);
     if (user == null) {
       return ResponseEntity
@@ -223,7 +222,7 @@ public class UserController extends BaseController {
                 ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
         return ResponseEntity
-            .status(HttpStatus.CONFLICT)
+            .badRequest()
             .build();
       }
       return ResponseEntity

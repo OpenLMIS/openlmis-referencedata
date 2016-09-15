@@ -1131,7 +1131,7 @@ resourceTypes:
 /users:
     displayName: User
     get:
-        is: [secured]
+        is: [ secured ]
         description: Get all users.
         responses:
             "200":
@@ -1140,11 +1140,7 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
-            "404":
-                headers:
-                  X-Content-Type-Options:
-                  X-XSS-Protection:
-    post:
+    put:
         is: [ secured ]
         description: Create or update user.
         body:
@@ -1162,10 +1158,16 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
-    /{id}:
+            "500":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+    /{userId}:
         uriParameters:
-            id:
-                displayName: id
+            userId:
+                displayName: User ID
                 type: string
                 required: true
                 repeat: false
@@ -1177,14 +1179,18 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
+                "400":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
                 "404":
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
-                "409":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
+                    body:
+                      application/json:
         get:
             is: [ secured ]
             description: Get chosen user.
@@ -1199,6 +1205,133 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
+                    body:
+                      application/json:
+        /roles:
+            is: [ secured ]
+            displayName: User roles
+            get:
+                is: [ secured ]
+                description: Get all roles for the associated user.
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+            put:
+                is: [ secured ]
+                description: Save roles for the associated user.
+                body:
+                    application/json:
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                    "400":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+        /hasRight:
+            get:
+                is: [ secured ]
+                description: Check if the user has a right with certain criteria.
+                queryParameters:
+                    rightName:
+                        displayName: Right Name
+                        description: The name of the right to check.
+                        type: string
+                        required: true
+                        repeat: false
+                    programCode:
+                        displayName: Program Code
+                        description: The program (code) to check (for supervision rights).
+                        type: string
+                        required: false
+                        repeat: false
+                    supervisoryNodeCode:
+                        displayName: Supervisory Node Code
+                        description: The supervisory node (code) to check (for supervision rights).
+                        type: string
+                        required: false
+                        repeat: false
+                    warehouseCode:
+                        displayName: Warehouse Code
+                        description: The warehouse (code) to check (for fulfillment rights).
+                        type: string
+                        required: false
+                        repeat: false
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+        /programs:
+            is: [ secured ]
+            displayName: User supervised programs
+            get:
+                is: [ secured ]
+                description: Get all programs the associated user supervises (through the home 
+                    facility or through supervisory nodes).
+                queryParameters:
+                    forHomeFacility:
+                        displayName: For Home Facility
+                        description: Flag to get programs for home facility.
+                        type: boolean
+                        required: false
+                        repeat: false
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+        /supervisedFacilities:
+            is: [ secured ]
+            displayName: User supervised facilities
+            get:
+                is: [ secured ]
+                description: Get all facilities the associated user supervises.
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
     /search:
             get:
                 is: [ secured ]

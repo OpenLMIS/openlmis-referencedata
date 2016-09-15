@@ -207,7 +207,7 @@ public class UserControllerTest {
     HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();
 
     //then
-    assertThat(httpStatus, is(HttpStatus.CREATED));
+    assertThat(httpStatus, is(HttpStatus.OK));
     verify(repository).save(user1);
   }
 
