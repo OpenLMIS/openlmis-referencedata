@@ -13,6 +13,7 @@ import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,6 +28,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "roles", schema = "referencedata")
 @NoArgsConstructor
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class Role extends BaseEntity {
   private static final String TEXT = "text";
 
@@ -42,12 +44,12 @@ public class Role extends BaseEntity {
 
   @ManyToMany(
       cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-      )
+  )
   @JoinTable(name = "role_rights",
       schema = "referencedata",
       joinColumns = @JoinColumn(name = "roleid", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false)
-      )
+  )
   @Getter
   private Set<Right> rights;
 
@@ -159,13 +161,29 @@ public class Role extends BaseEntity {
     exporter.setName(name);
     exporter.setDescription(description);
 
-    Right.Exporter rightExporter = exporter.provideRightExporter();
-    if (rightExporter != null) {
-      for (Right right : rights) {
-        right.export(rightExporter);
-        exporter.addRight(rightExporter);
-      }
+    for (Right right : rights) {
+      Right.Exporter rightExporter = Objects.requireNonNull(exporter.provideRightExporter());
+      right.export(rightExporter);
+      exporter.addRight(rightExporter);
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof Role)) {
+      return false;
+    }
+    Role role = (Role) obj;
+    return Objects.equals(name, role.name)
+        && Objects.equals(rights, role.rights);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, rights);
   }
 
   public interface Exporter {
