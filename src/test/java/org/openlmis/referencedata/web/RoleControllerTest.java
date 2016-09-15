@@ -118,6 +118,18 @@ public class RoleControllerTest {
   }
 
   @Test
+  public void shouldNotGetNonExistingRole() {
+    //given
+    when(repository.findOne(roleId)).thenReturn(null);
+
+    //when
+    HttpStatus httpStatus = controller.getRole(roleId).getStatusCode();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+  }
+
+  @Test
   public void shouldCreateNewRoleOnPost() {
     //given
     preparePostOrPut();

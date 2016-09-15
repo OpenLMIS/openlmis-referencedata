@@ -33,6 +33,7 @@ public class RightControllerTest {
   private Right right1;
   private Set<Right> rights;
   private RightDto right1Dto;
+  private UUID rightId;
 
   /**
    * Constructor for test.
@@ -47,6 +48,8 @@ public class RightControllerTest {
 
     right1Dto = new RightDto();
     right1.export(right1Dto);
+
+    rightId = UUID.randomUUID();
   }
 
   @Test
@@ -68,7 +71,6 @@ public class RightControllerTest {
   @Test
   public void shouldGetRight() {
     //given
-    UUID rightId = UUID.randomUUID();
     when(repository.findOne(rightId)).thenReturn(right1);
 
     //when
@@ -82,18 +84,27 @@ public class RightControllerTest {
   }
 
   @Test
+  public void shouldNotGetNonExistingRight() {
+    //given
+    when(repository.findOne(rightId)).thenReturn(null);
+
+    //when
+    HttpStatus httpStatus = controller.getRight(rightId).getStatusCode();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+  }
+
+  @Test
   public void shouldCreateNewRight() {
     //given
     when(repository.findFirstByName(right1Name)).thenReturn(null);
 
     //when
-    ResponseEntity responseEntity = controller.saveRight(right1Dto);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    RightDto rightDto = (RightDto) responseEntity.getBody();
+    HttpStatus httpStatus = controller.saveRight(right1Dto).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(right1Dto, rightDto);
     verify(repository).save(right1);
   }
 
@@ -105,25 +116,20 @@ public class RightControllerTest {
     Right updatedRight1 = Right.newRight(right1Dto);
 
     //when
-    ResponseEntity responseEntity = controller.saveRight(right1Dto);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    RightDto rightDto = (RightDto) responseEntity.getBody();
+    HttpStatus httpStatus = controller.saveRight(right1Dto).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(right1Dto, rightDto);
     verify(repository).save(updatedRight1);
   }
 
   @Test
   public void shouldDeleteExistingRight() {
     //given
-    UUID rightId = UUID.randomUUID();
     when(repository.findOne(rightId)).thenReturn(right1);
 
     //when
-    ResponseEntity responseEntity = controller.deleteRight(rightId);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
+    HttpStatus httpStatus = controller.deleteRight(rightId).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.NO_CONTENT));
@@ -133,12 +139,10 @@ public class RightControllerTest {
   @Test
   public void shouldNotDeleteNonExistingRight() {
     //given
-    UUID rightId = UUID.randomUUID();
     when(repository.findOne(rightId)).thenReturn(null);
 
     //when
-    ResponseEntity responseEntity = controller.deleteRight(rightId);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
+    HttpStatus httpStatus = controller.deleteRight(rightId).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
