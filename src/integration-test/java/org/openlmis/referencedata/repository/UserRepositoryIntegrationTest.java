@@ -8,6 +8,7 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.domain.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -39,16 +40,12 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   User generateInstance() {
     int instanceNumber = this.getNextInstanceNumber();
-    User user = new User();
-    user.setUsername("user" + instanceNumber);
-    user.setEmail(instanceNumber + "@mail.com");
-    user.setTimezone("UTC");
-    user.setFirstName("Test");
-    user.setLastName("User");
-    user.setHomeFacility(generateFacility());
-    user.setActive(true);
-    user.setVerified(true);
-    return user;
+    return new UserBuilder("user" + instanceNumber, "Test", "User", instanceNumber + "@mail.com")
+        .setTimezone("UTC")
+        .setHomeFacility(generateFacility())
+        .setActive(true)
+        .setVerified(true)
+        .createUser();
   }
 
   @Before
@@ -65,32 +62,32 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   public void testSearchUsersByAllParameters() {
     User user = cloneUser(users.get(0));
     List<User> receivedUsers = repository.searchUsers(
-            user.getUsername(),
-            user.getFirstName(),
-            user.getLastName(),
-            user.getHomeFacility(),
-            user.getActive(),
-            user.getVerified());
+        user.getUsername(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getHomeFacility(),
+        user.isActive(),
+        user.isVerified());
 
     Assert.assertEquals(1, receivedUsers.size());
     Assert.assertEquals(
-            user.getUsername(),
-            receivedUsers.get(0).getUsername());
+        user.getUsername(),
+        receivedUsers.get(0).getUsername());
     Assert.assertEquals(
-            user.getFirstName(),
-            receivedUsers.get(0).getFirstName());
+        user.getFirstName(),
+        receivedUsers.get(0).getFirstName());
     Assert.assertEquals(
-            user.getLastName(),
-            receivedUsers.get(0).getLastName());
+        user.getLastName(),
+        receivedUsers.get(0).getLastName());
     Assert.assertEquals(
-            user.getHomeFacility().getId(),
-            receivedUsers.get(0).getHomeFacility().getId());
+        user.getHomeFacility().getId(),
+        receivedUsers.get(0).getHomeFacility().getId());
     Assert.assertEquals(
-            user.getHomeFacility().getActive(),
-            receivedUsers.get(0).getActive());
+        user.isActive(),
+        receivedUsers.get(0).isActive());
     Assert.assertEquals(
-            user.getVerified(),
-            receivedUsers.get(0).getVerified());
+        user.isVerified(),
+        receivedUsers.get(0).isVerified());
   }
 
   @Test
@@ -104,38 +101,36 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   public void testSearchUsersByFirstNameAndLastNameAndHomeFacility() {
     User user = cloneUser(users.get(0));
     List<User> receivedUsers = repository.searchUsers(
-            null,
-            user.getFirstName(),
-            user.getLastName(),
-            user.getHomeFacility(),
-            null,
-            null);
+        null,
+        user.getFirstName(),
+        user.getLastName(),
+        user.getHomeFacility(),
+        null,
+        null);
 
     Assert.assertEquals(2, receivedUsers.size());
     for (User receivedUser : receivedUsers) {
       Assert.assertEquals(
-              user.getFirstName(),
-              receivedUser.getFirstName());
+          user.getFirstName(),
+          receivedUser.getFirstName());
       Assert.assertEquals(
-              user.getLastName(),
-              receivedUser.getLastName());
+          user.getLastName(),
+          receivedUser.getLastName());
       Assert.assertEquals(
-              user.getHomeFacility().getId(),
-              receivedUser.getHomeFacility().getId());
+          user.getHomeFacility().getId(),
+          receivedUser.getHomeFacility().getId());
     }
   }
 
   private User cloneUser(User user) {
     int instanceNumber = this.getNextInstanceNumber();
-    User clonedUser = new User();
-    clonedUser.setUsername(user.getUsername() + instanceNumber);
-    clonedUser.setEmail(instanceNumber + "@mail.com");
-    clonedUser.setTimezone("UTC");
-    clonedUser.setFirstName(user.getFirstName());
-    clonedUser.setLastName(user.getLastName());
-    clonedUser.setHomeFacility(user.getHomeFacility());
-    clonedUser.setActive(user.getActive());
-    clonedUser.setVerified(user.getVerified());
+    User clonedUser = new UserBuilder(user.getUsername() + instanceNumber,
+        user.getFirstName(), user.getLastName(), instanceNumber + "@mail.com")
+        .setTimezone("UTC")
+        .setHomeFacility(user.getHomeFacility())
+        .setActive(user.isActive())
+        .setVerified(user.isVerified())
+        .createUser();
     repository.save(clonedUser);
     return clonedUser;
   }

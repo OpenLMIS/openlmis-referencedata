@@ -22,7 +22,7 @@ public class SupervisionRoleAssignmentTest {
       new SupervisionRoleAssignment(role, program);
   private SupervisionRoleAssignment supervisedRoleAssignment =
       new SupervisionRoleAssignment(role, program, node);
-  private User user = new User();
+  private User user = new UserBuilder("testuser", "Test", "User", "test@test.com").createUser();
 
   public SupervisionRoleAssignmentTest() throws RightTypeException, RoleException {
   }

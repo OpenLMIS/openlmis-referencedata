@@ -2,7 +2,6 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +21,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -30,7 +28,6 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "users", schema = "referencedata")
 @NoArgsConstructor
-@AllArgsConstructor
 public class User extends BaseEntity {
 
   @JsonView(View.BasicInformation.class)
@@ -68,12 +65,12 @@ public class User extends BaseEntity {
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   @Getter
   @Setter
-  private Boolean verified;
+  private boolean verified;
 
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   @Getter
   @Setter
-  private Boolean active;
+  private boolean active;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
   @Getter
@@ -88,17 +85,6 @@ public class User extends BaseEntity {
   @Transient
   private Set<Facility> supervisedFacilities = new HashSet<>();
 
-  private User(String username, String firstName, String lastName, String email,
-               Facility homeFacility, boolean active, boolean verified) {
-    this.username = username;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-    this.homeFacility = homeFacility;
-    this.active = active;
-    this.verified = verified;
-  }
-
   private User(Importer importer) {
     id = importer.getId();
     username = importer.getUsername();
@@ -111,24 +97,21 @@ public class User extends BaseEntity {
     active = importer.isActive();
   }
 
+  User(UUID id, String username, String firstName, String lastName, String email, String timezone,
+       Facility homeFacility, boolean active, boolean verified) {
+    this.id = id;
+    this.username = username;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.timezone = timezone;
+    this.homeFacility = homeFacility;
+    this.active = active;
+    this.verified = verified;
+  }
+
   public static User newUser(Importer importer) {
     return new User(importer);
-  }
-
-  public static User newUser(String username, String firstName, String lastName, String email,
-                             Facility homeFacility, boolean active, boolean verified) {
-    return new User(username, firstName, lastName, email, homeFacility, active, verified);
-  }
-
-  @PrePersist
-  private void prePersist() {
-    if (this.verified == null) {
-      this.verified = false;
-    }
-
-    if (this.active == null) {
-      this.active = false;
-    }
   }
 
   /**

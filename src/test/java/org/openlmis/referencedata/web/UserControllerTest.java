@@ -26,6 +26,7 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.RightTypeException;
@@ -108,10 +109,12 @@ public class UserControllerTest {
     homeFacility = new Facility();
     user1UserName = "user1";
     user2UserName = "user2";
-    user1 = User.newUser(user1UserName, "User", "1", "user1@openlmis.org", homeFacility, true,
-        true);
-    user2 = User.newUser(user2UserName, "User", "2", "user2@openlmis.org", homeFacility, true,
-        true);
+    user1 = new UserBuilder(user1UserName, "User", "1", "user1@openlmis.org")
+        .setHomeFacility(homeFacility)
+        .createUser();
+    user2 = new UserBuilder(user2UserName, "User", "2", "user2@openlmis.org")
+        .setHomeFacility(homeFacility)
+        .createUser();
     users = Sets.newHashSet(user1, user2);
 
     user1Dto = new UserDto();

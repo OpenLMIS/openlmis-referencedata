@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.AuthUserRequest;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -53,17 +54,17 @@ public class UserServiceTest {
   @Test
   public void shouldFindUsersIfMatchedRequiredFields() {
     when(userRepository
-            .searchUsers(
-                    user.getUsername(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getHomeFacility(),
-                    user.getActive(),
-                    user.getVerified()))
-            .thenReturn(Arrays.asList(user));
+        .searchUsers(
+            user.getUsername(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getHomeFacility(),
+            user.isActive(),
+            user.isVerified()))
+        .thenReturn(Arrays.asList(user));
 
     List<User> receivedUsers = userService.searchUsers(user.getUsername(), user.getFirstName(),
-        user.getLastName(), user.getHomeFacility(), user.getActive(), user.getVerified());
+        user.getLastName(), user.getHomeFacility(), user.isActive(), user.isVerified());
 
     assertEquals(1, receivedUsers.size());
     assertEquals(user, receivedUsers.get(0));
@@ -94,16 +95,12 @@ public class UserServiceTest {
   }
 
   private User generateUser() {
-    User user = new User();
-    user.setId(UUID.randomUUID());
-    user.setFirstName("Ala");
-    user.setLastName("ma");
-    user.setUsername("kota");
-    user.setEmail("test@mail.com");
-    user.setTimezone("UTC");
-    user.setHomeFacility(mock(Facility.class));
-    user.setVerified(false);
-    user.setActive(true);
-    return user;
+    return new UserBuilder("kota", "Ala", "ma", "test@mail.com")
+        .setId(UUID.randomUUID())
+        .setTimezone("UTC")
+        .setHomeFacility(mock(Facility.class))
+        .setVerified(false)
+        .setActive(true)
+        .createUser();
   }
 }

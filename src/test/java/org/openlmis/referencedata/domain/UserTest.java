@@ -30,7 +30,7 @@ public class UserTest {
 
   @Before
   public void setUp() {
-    user = new User();
+    user = new UserBuilder("user", "Test", "User", "test@test.com").createUser();
   }
 
   @Test

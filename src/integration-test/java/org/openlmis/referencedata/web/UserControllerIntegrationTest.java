@@ -15,6 +15,7 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
@@ -82,8 +83,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .queryParam(FIRST_NAME, users.get(0).getFirstName())
         .queryParam(LAST_NAME, users.get(0).getLastName())
         .queryParam(HOME_FACILITY, users.get(0).getHomeFacility().getId())
-        .queryParam(ACTIVE, users.get(0).getActive())
-        .queryParam(VERIFIED, users.get(0).getVerified())
+        .queryParam(ACTIVE, users.get(0).isActive())
+        .queryParam(VERIFIED, users.get(0).isVerified())
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(SEARCH_URL)
@@ -107,11 +108,11 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
           user.getHomeFacility().getId(),
           users.get(0).getHomeFacility().getId());
       assertEquals(
-          user.getActive(),
-          users.get(0).getActive());
+          user.isActive(),
+          users.get(0).isActive());
       assertEquals(
-          user.getVerified(),
-          users.get(0).getVerified());
+          user.isVerified(),
+          users.get(0).isVerified());
     }
   }
 
@@ -196,8 +197,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.getLastName(), savedUser.getLastName());
     assertEquals(user.getEmail(), savedUser.getEmail());
     assertEquals(user.getHomeFacility().getId(), savedUser.getHomeFacility().getId());
-    assertEquals(user.getActive(), savedUser.getActive());
-    assertEquals(user.getVerified(), savedUser.getVerified());
+    assertEquals(user.isActive(), savedUser.isActive());
+    assertEquals(user.isVerified(), savedUser.isVerified());
 
     AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
     assertNotNull(authUser);
@@ -260,8 +261,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.getLastName(), savedUser.getLastName());
     assertEquals(user.getEmail(), savedUser.getEmail());
     assertEquals(user.getHomeFacility(), savedUser.getHomeFacility());
-    assertEquals(user.isActive(), savedUser.getActive());
-    assertEquals(user.isVerified(), savedUser.getVerified());
+    assertEquals(user.isActive(), savedUser.isActive());
+    assertEquals(user.isVerified(), savedUser.isVerified());
 
     authUser = getAutUserByUsername(savedUser.getUsername());
     assertNotNull(authUser);
@@ -298,17 +299,16 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private User generateUser() {
-    User user = new User();
     Integer instanceNumber = generateInstanceNumber();
-    user.setFirstName("Ala" + instanceNumber);
-    user.setLastName("ma" + instanceNumber);
-    user.setUsername("kota" + instanceNumber);
-    user.setEmail(instanceNumber + "@mail.com");
-    user.setTimezone("UTC");
-    user.setHomeFacility(generateFacility());
-    user.setVerified(true);
-    user.setActive(true);
-    return user;
+    return new UserBuilder("kota" + instanceNumber,
+        "Ala" + instanceNumber,
+        "ma" + instanceNumber,
+        instanceNumber + "@mail.com")
+        .setTimezone("UTC")
+        .setHomeFacility(generateFacility())
+        .setVerified(true)
+        .setActive(true)
+        .createUser();
   }
 
   private Facility generateFacility() {
