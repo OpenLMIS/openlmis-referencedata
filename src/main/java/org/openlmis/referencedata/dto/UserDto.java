@@ -10,7 +10,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,9 +35,8 @@ public class UserDto extends BaseEntity implements User.Exporter, User.Importer 
   @Setter
   private String timezone;
 
-  @Getter
   @Setter
-  private UUID homeFacilityId;
+  private String homeFacilityCode;
 
   @Getter
   @Setter
@@ -52,6 +50,10 @@ public class UserDto extends BaseEntity implements User.Exporter, User.Importer 
   @Setter
   private boolean active;
 
+  public String fetchHomeFacilityCode() {
+    return homeFacilityCode;
+  }
+  
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {

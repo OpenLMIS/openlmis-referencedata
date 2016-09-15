@@ -72,7 +72,7 @@ public class UserControllerTest {
 
   private UserController controller;
 
-  private UUID homeFacilityId;
+  private String homeFacilityCode;
   private Facility homeFacility;
   private String user1UserName;
   private User user1;
@@ -105,7 +105,7 @@ public class UserControllerTest {
     controller = new UserController(service, repository, roleRepository, rightRepository,
         programRepository, supervisoryNodeRepository, facilityRepository);
 
-    homeFacilityId = UUID.randomUUID();
+    homeFacilityCode = "homeFacilityCode";
     homeFacility = new Facility();
     user1UserName = "user1";
     user2UserName = "user2";
@@ -119,10 +119,10 @@ public class UserControllerTest {
 
     user1Dto = new UserDto();
     user1.export(user1Dto);
-    user1Dto.setHomeFacilityId(homeFacilityId);
+    user1Dto.setHomeFacilityCode(homeFacilityCode);
     user2Dto = new UserDto();
     user2.export(user2Dto);
-    user2Dto.setHomeFacilityId(homeFacilityId);
+    user2Dto.setHomeFacilityCode(homeFacilityCode);
 
     userId = UUID.randomUUID();
 
@@ -196,12 +196,12 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldCreateNewUserOnPost() {
+  public void shouldCreateNewUserOnPut() {
     //given
     preparePostOrPut();
 
     when(repository.findOne(userId)).thenReturn(null);
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
+    when(facilityRepository.findFirstByCode(homeFacilityCode)).thenReturn(homeFacility);
 
     //when
     HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();

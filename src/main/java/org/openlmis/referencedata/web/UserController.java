@@ -117,7 +117,7 @@ public class UserController extends BaseController {
   /**
    * Custom endpoint for creating and updating users.
    */
-  @RequestMapping(value = "/users", method = RequestMethod.POST)
+  @RequestMapping(value = "/users", method = RequestMethod.PUT)
   public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto/*,
                                     BindingResult bindingResult,
                                     OAuth2Authentication auth*/) {
@@ -128,14 +128,17 @@ public class UserController extends BaseController {
     //  return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
     //} TODO: reinstate when dependency on auth is proper
 
-    Facility homeFacility = facilityRepository.findOne(userDto.getHomeFacilityId());
-    if (homeFacility == null) {
-      LOGGER.error("Home facility does not exist");
-      return ResponseEntity
-          .badRequest()
-          .body("Home facility does not exist");
-    } else {
-      userDto.setHomeFacility(homeFacility);
+    String homeFacilityCode = userDto.fetchHomeFacilityCode();
+    if (homeFacilityCode != null) {
+      Facility homeFacility = facilityRepository.findFirstByCode(userDto.fetchHomeFacilityCode());
+      if (homeFacility == null) {
+        LOGGER.error("Home facility does not exist");
+        return ResponseEntity
+            .badRequest()
+            .body("Home facility does not exist");
+      } else {
+        userDto.setHomeFacility(homeFacility);
+      }
     }
 
     try {
