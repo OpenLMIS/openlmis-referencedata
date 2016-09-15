@@ -2287,7 +2287,7 @@ resourceTypes:
     displayName: Right
     put:
           is: [ secured ]
-          description: Create new right.
+          description: Save a right.
           body:
               application/json:
           responses:
@@ -2297,7 +2297,7 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
-              "500":
+              "400":
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
@@ -2313,37 +2313,13 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
-    /{id}:
+    /{rightId}:
           uriParameters:
-            id:
-                displayName: id
+            rightId:
+                displayName: Right ID
                 type: string
                 required: true
                 repeat: false
-          put:
-              is: [ secured ]
-              description: Update existing right.
-              body:
-                  application/json:
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
           get:
               is: [ secured ]
               description: Get chosen right.
@@ -2359,6 +2335,7 @@ resourceTypes:
                         X-Content-Type-Options:
                         X-XSS-Protection:
                       body:
+                          application/json:
           delete:
               is: [ secured ]
               description: Delete chosen right.
@@ -2367,12 +2344,13 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                  "404":
+                  "400":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
                       body:
-                  "409":
+                          application/json:
+                  "404":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
