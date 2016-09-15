@@ -2,6 +2,8 @@ package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toSet;
 
+import com.google.common.collect.Sets;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -46,7 +48,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,11 +135,11 @@ public class UserController extends BaseController {
   @RequestMapping(value = "/users", method = RequestMethod.GET)
   @ResponseBody
   public ResponseEntity<?> getAllUsers() {
-    Iterable<User> users = userRepository.findAll();
-    List<UserDto> userDtos = new ArrayList<>();
-    for (User user : users) {
-      userDtos.add(exportToUserDto(user));
-    }
+
+    LOGGER.debug("Getting all users");
+    Set<User> users = Sets.newHashSet(userRepository.findAll());
+    Set<UserDto> userDtos = users.stream().map(user -> exportToUserDto(user)).collect(toSet());
+
     return ResponseEntity
         .ok(userDtos);
   }
@@ -151,8 +152,11 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
   public ResponseEntity<?> getUser(@PathVariable("id") UUID userId) {
+
+    LOGGER.debug("Getting user");
     User user = userRepository.findOne(userId);
     if (user == null) {
+      LOGGER.error("User to get does not exist");
       return ResponseEntity
           .notFound()
           .build();
@@ -257,7 +261,7 @@ public class UserController extends BaseController {
    * @param roleAssignmentDtos role assignment DTOs to associate to the user
    * @return if successful, the updated user; otherwise an HTTP error
    */
-  @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.POST)
+  @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.PUT)
   public ResponseEntity<?> saveUserRoles(@PathVariable(USER_ID) UUID userId,
                                          @RequestBody Set<RoleAssignmentDto> roleAssignmentDtos) {
 
@@ -329,8 +333,7 @@ public class UserController extends BaseController {
     }
 
     return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(exportToDtos(user.getRoleAssignments()));
+        .ok(exportToDtos(user.getRoleAssignments()));
   }
 
   /**
