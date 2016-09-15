@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import org.openlmis.referencedata.util.View;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;

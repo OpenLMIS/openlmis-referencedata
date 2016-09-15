@@ -170,19 +170,27 @@ public class SupplyLineController extends BaseController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
+  /**
+   * Returns all Supply Lines with matched parameters.
+   * @param programId program of searched Supply Lines.
+   * @param supervisoryNodeId supervisory node of searched Supply Lines.
+   * @return ResponseEntity with list of all Supply Lines matching
+   *         provided parameters and OK httpStatus.
+   */
   @RequestMapping(value = "/supplyLines/searchByUUID", method = RequestMethod.GET)
-  public ResponseEntity<?> searchSupplyLinesByUUID(
+  public ResponseEntity<?> searchSupplyLinesByUuid(
       @RequestParam(value = "programId", required = true) UUID programId,
       @RequestParam(value = "supervisoryNodeId", required = true) UUID supervisoryNodeId) {
-      Program program = programRepository.findOne(programId);
-      SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
-      List<SupplyLine> resultSupplyLine = supplyLineService.searchSupplyLines(program, supervisoryNode);
-      List<SupplyLineDto>  result = new ArrayList<>();
-      for(SupplyLine supplyLine : resultSupplyLine) {
-        SupplyLineDto supplyLineDto = new SupplyLineDto(supplyLine);
-        result.add(supplyLineDto);
-      }
-      return new ResponseEntity<>(result, HttpStatus.OK);
+    Program program = programRepository.findOne(programId);
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+    List<SupplyLine> resultSupplyLine =
+        supplyLineService.searchSupplyLines(program, supervisoryNode);
+    List<SupplyLineDto>  result = new ArrayList<>();
+    for (SupplyLine supplyLine : resultSupplyLine) {
+      SupplyLineDto supplyLineDto = new SupplyLineDto(supplyLine);
+      result.add(supplyLineDto);
+    }
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
 }

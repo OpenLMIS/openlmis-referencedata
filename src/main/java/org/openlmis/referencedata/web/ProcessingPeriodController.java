@@ -206,15 +206,22 @@ public class ProcessingPeriodController extends BaseController {
         LocaleContextHolder.getLocale());
   }
 
+  /**
+   * Returns chosen ProcessingPeriods.
+   * @param processingScheduleId processingSchedule of searched ProcessingPeriods.
+   * @param startDate which day shall ProcessingPeriod start.
+   * @return List of ProcessingPeriods.
+   */
   @RequestMapping(value = "/processingPeriods/searchByUUIDAndDate", method = RequestMethod.GET)
-  public ResponseEntity<?> searchPeriodsByUUIDAndDate(
+  public ResponseEntity<?> searchPeriodsByUuuidAndDate(
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = true) LocalDate startDate) {
 
-    ProcessingSchedule processingSchedule = processingScheduleRepository.findOne(processingScheduleId);
+    ProcessingSchedule processingSchedule =
+        processingScheduleRepository.findOne(processingScheduleId);
     List<ProcessingPeriod> periods = periodService.searchPeriods(processingSchedule, startDate);
     List<ProcessingPeriodDto> result = new ArrayList<>();
-    for(ProcessingPeriod period : periods) {
+    for (ProcessingPeriod period : periods) {
       ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto(period);
       result.add(processingPeriodDto);
     }

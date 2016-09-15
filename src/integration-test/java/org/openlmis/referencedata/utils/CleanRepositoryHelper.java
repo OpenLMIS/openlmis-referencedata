@@ -10,11 +10,16 @@ import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
+import org.openlmis.referencedata.repository.ProductRepository;
 import org.openlmis.referencedata.repository.ProgramProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
+import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.repository.StockRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,6 +32,9 @@ public class CleanRepositoryHelper {
 
   public static final UUID INITIAL_USER_ID =
       UUID.fromString("35316636-6264-6331-2d34-3933322d3462");
+
+  @Autowired
+  private ProductRepository productRepository;
 
   @Autowired
   private ProgramProductRepository programProductRepository;
@@ -61,9 +69,24 @@ public class CleanRepositoryHelper {
   @Autowired
   private ProductCategoryRepository productCategoryRepository;
 
+
+  @Autowired
+  private SupplyLineRepository supplyLineRepository;
+
+  @Autowired
+  private RequisitionGroupRepository requisitionGroupRepository;
+
+  @Autowired
+  private RequisitionGroupProgramScheduleRepository requisitionGroupProgramScheduleRepository;
+
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
+
+  @Autowired
+  private StockRepository stockRepository;
+
   @Autowired
   private UserRepository userRepository;
-
 
   @Autowired
   private RoleRepository roleRepository;
@@ -71,21 +94,24 @@ public class CleanRepositoryHelper {
   @Autowired
   private RightRepository rightRepository;
 
-  @Autowired
-  private SupervisoryNodeRepository supervisoryNodeRepository;
-
   /**
    * Delete all entities from most of repositories.
    */
   @Transactional
   public void cleanAll() {
+    requisitionGroupRepository.deleteAll();
     facilityTypeApprovedProductRepository.deleteAll();
+    stockRepository.deleteAll();
     programProductRepository.deleteAll();
+    requisitionGroupProgramScheduleRepository.deleteAll();
+    supplyLineRepository.deleteAll();
+    productRepository.deleteAll();
     periodRepository.deleteAll();
     programRepository.deleteAll();
     supervisoryNodeRepository.deleteAll();
     deleteAllUsersExceptAdmin();
     productCategoryRepository.deleteAll();
+    stockRepository.deleteAll();
     scheduleRepository.deleteAll();
     facilityRepository.deleteAll();
     facilityTypeRepository.deleteAll();
@@ -94,6 +120,7 @@ public class CleanRepositoryHelper {
     geographicLevelRepository.deleteAll();
     roleRepository.deleteAll();
     rightRepository.deleteAll();
+    facilityTypeRepository.deleteAll();
   }
 
   private void deleteAllUsersExceptAdmin() {

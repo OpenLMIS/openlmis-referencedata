@@ -15,6 +15,10 @@ public class SupplyLineDto {
   private UUID program;
   private UUID supplyingFacility;
 
+  /**
+   * Converts SupplyLine to SupplyLineDto.
+   * @param supplyLine SupplyLine to convert.
+   */
   public SupplyLineDto(SupplyLine supplyLine) {
     id = supplyLine.getId();
     supervisoryNode = supplyLine.getSupervisoryNode().getId();

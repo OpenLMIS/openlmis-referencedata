@@ -135,6 +135,28 @@ schemas:
           }
       }
 
+  - product: |
+        {   "type": "object",
+            "$schema": "http://json-schema.org/draft-03/schema",
+            "title": "Product",
+            "description": "A single product",
+            "properties": {
+                "id": { "type": "string", "required": true, "title": "id" },
+                "code": { "type": "string", "required": true, "title": "code" },
+                "primaryName": { "type": "string", "required": true, "title": "primaryName" },
+                "dispensingUnit": { "type": "string", "required": true, "title": "dispensingUnit" },
+                "dosesPerDispensingUnit": { "type": "integer", "required": true, "title": "dosesPerDispensingUnit" },
+                "packSize": { "type": "integer", "required": true, "title": "packSize" },
+                "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
+                "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
+                "active": { "type": "boolean", "required": true, "title": "active" },
+                "fullSupply": { "type": "boolean", "required": true, "title": "fullSupply" },
+                "tracer": { "type": "boolean", "required": true, "title": "tracer" },
+                "productCategory": { "type": "object", "$ref": "#/schemas/productCategory", "required": true, "title": "productCategory" }
+            }
+        }
+
+
   - productCategory: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -267,6 +289,51 @@ schemas:
               "facility": { "type": "object", "$ref": "#/schemas/facility", "required": true },
               "parentNode": { "type": "object", "$ref": "#/schemas/supervisoryNode", "required": false },
               "childNodes": { "type": "array", "required": false, "title": "childNodes", "items": { "type": "object", "$ref": "#/schemas/supervisoryNode" }, "uniqueItems": false}
+          }
+      }
+
+  - supplyLine: |
+      {   "type": "object",
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "title": "SupplyLine",
+          "description": "A single supplyLine",
+          "properties": {
+              "id": { "type": "string", "required": true, "title": "id" },
+              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNode", "required": true },
+              "description": { "type": "string", "required": false, "title": "description" },
+              "program": { "type": "object", "$ref": "#/schemas/program", "required": true },
+              "supplyingFacility": { "type": "object", "$ref": "#/schemas/facility", "required": true }
+          }
+      }
+
+
+  - requisitionGroup: |
+      {   "type": "object",
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "title": "RequisitionGroup",
+          "description": "A single requisitionGroup",
+          "properties": {
+              "id": { "type": "string", "required": true, "title": "id" },
+              "code": { "type": "string", "required": true, "unique": true, "title": "code" },
+              "name": { "type": "string", "required": true, "title": "name" },
+              "description": { "type": "string", "required": false, "title": "description" },
+              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNode", "required": true },
+              "requisitionGroupProgramScheules": { "type": "array", "required": false, "title": "requisitionGroupProgramSchedules", "items": { "type": "object", "$ref": "#/schemas/requisitionGroupProgramSchedule" }, "uniqueItems": false },
+              "memberFacilities": { "type": "array", "required": false, "title": "memberFacilities", "items": { "type": "object", "$ref": "#/schemas/facility" }, "uniqueItems": false }
+          }
+      }
+
+  - requisitionGroupProgramSchedule: |
+      {   "type": "object",
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "title": "RequisitionGroupProgramSchedule",
+          "description": "A single requisitionGroupProgramSchedule",
+          "properties": {
+              "id": { "type": "string", "required": true, "title": "id" },
+              "program": { "type": "object", "$ref": "#/schemas/program", "required": true },
+              "processingSchedule": { "type": "object", "$ref": "#/schemas/processingSchedule", "required": true },
+              "directDelivery": { "type": "boolean", "required": true, "title": "directDelivery" },
+              "dropOffFacility": { "type": "object", "$ref": "#/schemas/facility", "required": false }
           }
       }
 
@@ -880,6 +947,127 @@ resourceTypes:
                     X-Content-TPype-Options:
                     X-XSS-Protection:
 
+/supplyLines:
+    displayName: Supply Lines
+    get:
+        is: [ secured ]
+        description: Get all supplyLines.
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+            "404":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+    post:
+        is: [ secured ]
+        description: Creates new supplyLine.
+        body:
+            application/json:
+        responses:
+            "201":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+            "400":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+    /{id}:
+        uriParameters:
+            id:
+                displayName: id
+                type: string
+                required: true
+                repeat: false
+        delete:
+            is: [ secured ]
+            description: Delete chosen supplyLine.
+            responses:
+                "204":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "409":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+        get:
+            is: [ secured ]
+            description: Get chosen supplyLine.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+        put:
+            is: [ secured ]
+            description: Update existing supplyLine.
+            body:
+                application/json:
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "400":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+    /search:
+        get:
+            is: [ secured ]
+            description: Find Supply Lines with matched parameters.
+            queryParameters:
+                program:
+                    displayName: program
+                    description: program ID
+                    type: string
+                    required: true
+                    repeat: false
+                supervisoryNode:
+                    displayName: supervisoryNode
+                    description: supervisoryNode ID
+                    type: string
+                    required: true
+                    repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "500":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+
+
 /users:
     displayName: User
     get:
@@ -1157,6 +1345,94 @@ resourceTypes:
                     X-Content-Type-Options:
                     X-XSS-Protection:
 
+/facilityTypes:
+    displayName: Facility Type
+    get:
+        is: [ secured ]
+        description: Get all facilityTypes.
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+            "404":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+    post:
+        is: [ secured ]
+        description: Creates new facilityType.
+        body:
+            application/json:
+        responses:
+            "201":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+            "400":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+    /{id}:
+        uriParameters:
+            id:
+                displayName: id
+                type: string
+                required: true
+                repeat: false
+        delete:
+            is: [ secured ]
+            description: Delete chosen facilityType.
+            responses:
+                "204":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "409":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+        get:
+            is: [ secured ]
+            description: Get chosen facilityType.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+        put:
+            is: [ secured ]
+            description: Update existing facilityType.
+            body:
+                application/json:
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "400":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+
 /programs:
     displayName: Program
     get:
@@ -1261,6 +1537,123 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
+
+/stocks:
+    displayName: Stock
+    get:
+        is: [ secured ]
+        description: Get all stocks.
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+            "404":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+    post:
+        is: [ secured ]
+        description: Creates new stock.
+        body:
+            application/json:
+        responses:
+            "201":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+            "400":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+    /{id}:
+        uriParameters:
+            id:
+                displayName: id
+                type: string
+                required: true
+                repeat: false
+        delete:
+            is: [ secured ]
+            description: Delete chosen stock.
+            responses:
+                "204":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "409":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+        get:
+            is: [ secured ]
+            description: Get chosen stock.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+        put:
+            is: [ secured ]
+            description: Update existing stock.
+            body:
+                application/json:
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "400":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+    /search:
+        get:
+            is: [ secured ]
+            description: Find Stocks with matched parametrs.
+            queryParameters:
+                stockInventory:
+                        displayName: stockInventory
+                        type: string
+                        required: false
+                        repeat: false
+                product:
+                        displayName: product
+                        type: string
+                        required: false
+                        repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+
 
 /facilityOperators:
     displayName: Facility Operators
@@ -1926,11 +2319,29 @@ resourceTypes:
                       body:
                           application/json:
 
-/getFacilityById:
-    displayName: Facility
+/requisitionGroups:
+    displayName: Requisition Group
+    post:
+          is: [ secured ]
+          description: Create new requisitionGroup.
+          body:
+              application/json:
+          responses:
+              "201":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                      application/json:
+              "500":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                      application/json:
     get:
           is: [ secured ]
-          description: Retrieving Facility object by id.
+          description: Get all requisitionGroups.
           responses:
               "200":
                   headers:
@@ -1942,14 +2353,85 @@ resourceTypes:
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
-                  body:
-                     application/json:
+    /{id}:
+          uriParameters:
+            id:
+                displayName: id
+                type: string
+                required: true
+                repeat: false
+          put:
+              is: [ secured ]
+              description: Update existing requisitionGroup.
+              body:
+                  application/json:
+              responses:
+                  "200":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                          application/json:
+                  "404":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                          application/json:
+          get:
+              is: [ secured ]
+              description: Get chosen requisitionGroup.
+              responses:
+                  "200":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                          application/json:
+                  "404":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+          delete:
+              is: [ secured ]
+              description: Delete chosen requisitionGroup.
+              responses:
+                  "204":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                  "404":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                  "409":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
 
-/getAllFacilities:
-    displayName: Facility
+/requisitionGroupProgramSchedules:
+    displayName: Requisition Group Program Schedule
+    post:
+          is: [ secured ]
+          description: Create new requisitionGroupProgramSchedule.
+          body:
+              application/json:
+          responses:
+              "201":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                      application/json:
+              "500":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                      application/json:
     get:
           is: [ secured ]
-          description: Retrieving all Facility objects.
+          description: Get all requisitionGroupProgramSchedules.
           responses:
               "200":
                   headers:
@@ -1961,63 +2443,56 @@ resourceTypes:
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
-                  body:
-                     application/json:
-
-/getProcessingPeriodById:
-    displayName: ProcessingPeriod
-    get:
-          is: [ secured ]
-          description: Retrieving ProcessingPeriod object by id.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
-
-/getAllProcessingPeriods:
-    displayName: ProcessingPeriod
-    get:
-          is: [ secured ]
-          description: Retrieving all ProcessingPeriod objects.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
-
-/getUserById:
-    displayName: User
-    get:
-          is: [ secured ]
-          description: Retrieving User object by id.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
-
+    /{id}:
+          uriParameters:
+            id:
+                displayName: id
+                type: string
+                required: true
+                repeat: false
+          put:
+              is: [ secured ]
+              description: Update existing requisitionGroupProgramSchedule.
+              body:
+                  application/json:
+              responses:
+                  "200":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                          application/json:
+                  "404":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+          get:
+              is: [ secured ]
+              description: Get chosen requisitionGroupProgramSchedule.
+              responses:
+                  "200":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                          application/json:
+                  "404":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+          delete:
+              is: [ secured ]
+              description: Delete chosen requisitionGroupProgramSchedule.
+              responses:
+                  "204":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                  "404":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                  "409":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:

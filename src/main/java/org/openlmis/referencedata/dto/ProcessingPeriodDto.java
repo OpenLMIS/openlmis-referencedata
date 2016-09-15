@@ -17,6 +17,10 @@ public class ProcessingPeriodDto {
   private LocalDate startDate;
   private LocalDate endDate;
 
+  /**
+   * Converts ProcessingPeriod to ProcessingPeriodDto.
+   * @param processingPeriod ProcessingPeriod to convert.
+   */
   public ProcessingPeriodDto(ProcessingPeriod processingPeriod) {
     id = processingPeriod.getId();
     processingSchedule = processingPeriod.getProcessingSchedule().getId();
