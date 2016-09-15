@@ -1,12 +1,8 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.openlmis.referencedata.util.View;
 
 import java.util.List;
 
@@ -24,7 +20,6 @@ public class Facility extends BaseEntity {
 
   public static final String TEXT = "text";
 
-  @JsonView(View.BasicInformation.class)
   @Column(nullable = false, unique = true, columnDefinition = TEXT)
   @Getter
   @Setter

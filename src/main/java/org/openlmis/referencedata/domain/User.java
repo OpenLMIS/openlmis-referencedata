@@ -12,6 +12,7 @@ import org.openlmis.referencedata.util.View;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,11 +20,12 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-@SuppressWarnings("PMD.UnusedPrivateField")
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @Entity
 @Table(name = "users", schema = "referencedata")
 @NoArgsConstructor
@@ -85,6 +87,37 @@ public class User extends BaseEntity {
   @Transient
   private Set<Facility> supervisedFacilities = new HashSet<>();
 
+  private User(String username, String firstName, String lastName, String email, boolean active,
+               boolean verified) {
+    this.username = username;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.active = active;
+    this.verified = verified;
+  }
+
+  private User(Importer importer) {
+    id = importer.getId();
+    username = importer.getUsername();
+    firstName = importer.getFirstName();
+    lastName = importer.getLastName();
+    email = importer.getEmail();
+    timezone = importer.getTimezone();
+    //homeFacility.setId(importer.getHomeFacilityId()) TODO: set home facility, not ID
+    verified = importer.isVerified();
+    active = importer.isActive();
+  }
+
+  public static User newUser(Importer importer) {
+    return new User(importer);
+  }
+
+  public static User newUser(String username, String firstName, String lastName, String email,
+                             boolean active, boolean verified) {
+    return new User(username, firstName, lastName, email, active, verified);
+  }
+
   @PrePersist
   private void prePersist() {
     if (this.verified == null) {
@@ -94,6 +127,13 @@ public class User extends BaseEntity {
     if (this.active == null) {
       this.active = false;
     }
+  }
+
+  /**
+   * Clear all role assignments from this user. Mainly used as a starting point to re-assign roles.
+   */
+  public void resetRoles() {
+    this.roleAssignments.clear();
   }
 
   /**
@@ -134,5 +174,71 @@ public class User extends BaseEntity {
 
   public void addSupervisedFacilities(Set<Facility> facilities) {
     supervisedFacilities.addAll(facilities);
+  }
+
+  @PostLoad
+  private void refreshSupervisions() {
+    for (RoleAssignment roleAssignment : roleAssignments) {
+      roleAssignment.assignTo(this);
+    }
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setUsername(username);
+    exporter.setFirstName(firstName);
+    exporter.setLastName(lastName);
+    exporter.setEmail(email);
+    exporter.setTimezone(timezone);
+    if (homeFacility != null) {
+      exporter.setHomeFacilityId(homeFacility.getId());
+    }
+    exporter.setActive(active);
+    exporter.setVerified(verified);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setUsername(String username);
+
+    void setFirstName(String firstName);
+
+    void setLastName(String lastName);
+
+    void setEmail(String email);
+
+    void setTimezone(String timezone);
+
+    void setHomeFacilityId(UUID homeFacilityId);
+
+    void setVerified(boolean verified);
+
+    void setActive(boolean active);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    String getUsername();
+
+    String getFirstName();
+
+    String getLastName();
+
+    String getEmail();
+
+    String getTimezone();
+
+    UUID getHomeFacilityId();
+
+    boolean isVerified();
+
+    boolean isActive();
   }
 }

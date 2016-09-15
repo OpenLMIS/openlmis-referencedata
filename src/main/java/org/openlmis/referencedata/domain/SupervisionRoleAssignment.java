@@ -3,13 +3,10 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.util.View;
 
 import java.util.Objects;
 import java.util.Set;
@@ -24,13 +21,11 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 public class SupervisionRoleAssignment extends RoleAssignment {
 
-  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "programid")
   @Getter
   private Program program;
 
-  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "supervisorynodeid")
   @Getter
@@ -100,6 +95,19 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     }
   }
 
+  /**
+   * Export this object's properties for serialization to the exporter provided.
+   * 
+   * @param exporter the exporter provided
+   */
+  public void export(Exporter exporter) {
+    exporter.setRoleId(role.getId());
+    exporter.setProgramCode(program.getCode().toString());
+    if (supervisoryNode != null) {
+      exporter.setSupervisoryNodeCode(supervisoryNode.getCode());
+    }
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -122,5 +130,10 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   public int hashCode() {
     return Objects.hash(super.hashCode(), program, supervisoryNode);
   }
-  
+
+  public interface Exporter extends RoleAssignment.Exporter {
+    void setProgramCode(String programCode);
+
+    void setSupervisoryNodeCode(String supervisoryNodeCode);
+  }
 }

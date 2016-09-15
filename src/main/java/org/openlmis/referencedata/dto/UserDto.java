@@ -1,18 +1,19 @@
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.BaseEntity;
-import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.domain.User;
-
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.User;
+
+import java.util.Objects;
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto extends BaseEntity {
+public class UserDto extends BaseEntity implements User.Exporter, User.Importer {
 
   @Getter
   @Setter
@@ -30,16 +31,13 @@ public class UserDto extends BaseEntity {
   @Setter
   private String email;
 
-  @Setter
-  private UUID supervisedNode;
-
   @Getter
   @Setter
   private String timezone;
 
   @Getter
   @Setter
-  private UUID homeFacility;
+  private UUID homeFacilityId;
 
   @Getter
   @Setter
@@ -49,52 +47,20 @@ public class UserDto extends BaseEntity {
   @Setter
   private boolean active;
 
-  @Getter
-  private UUID roleAssignments;
-
-  public SupervisoryNode getSupervisedNode() {
-    return null;
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof UserDto)) {
+      return false;
+    }
+    UserDto userDto = (UserDto) obj;
+    return Objects.equals(username, userDto.username);
   }
 
-
-  /**
-   * Return converted UserDto from User.
-   */
-  public static UserDto convertUserToUserDto(User user) {
-    UserDto userDto = new UserDto();
-    userDto.setId(user.getId());
-    userDto.setEmail(user.getEmail());
-    userDto.setActive(user.getActive());
-    userDto.setFirstName(user.getFirstName());
-    userDto.setVerified(user.getVerified());
-    userDto.setUsername(user.getUsername());
-    userDto.setLastName(user.getLastName());
-    userDto.setSupervisedNode(null);
-    if (user.getTimezone() != null) {
-      userDto.setTimezone(user.getTimezone());
-    }
-    if (user.getHomeFacility() != null) {
-      userDto.setHomeFacility(user.getHomeFacility().getId());
-    }
-    return userDto;
+  @Override
+  public int hashCode() {
+    return Objects.hash(username);
   }
-
-  /**
-   * Return converted User from UserDto.
-   */
-  public static User convertUserDtoToUser(UserDto userDto) {
-    User user = new User();
-    user.setId(userDto.getId());
-    user.setEmail(userDto.getEmail());
-    user.setActive(userDto.isActive());
-    user.setFirstName(userDto.getFirstName());
-    user.setVerified(userDto.isVerified());
-    user.setUsername(userDto.getUsername());
-    user.setLastName(userDto.getLastName());
-    if (user.getTimezone() != null) {
-      user.setTimezone(userDto.getTimezone());
-    }
-    return user;
-  }
-
 }

@@ -1,9 +1,11 @@
 package org.openlmis.referencedata.repository;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,13 +13,16 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
 
   @Autowired
   ProgramRepository repository;
+  
+  String programCode;
 
   ProgramRepository getRepository() {
     return this.repository;
   }
 
   Program generateInstance() {
-    Program program = new Program(String.valueOf(this.getNextInstanceNumber()));
+    programCode = String.valueOf(this.getNextInstanceNumber());
+    Program program = new Program(programCode);
     program.setPeriodsSkippable(true);
     return program;
   }
@@ -34,5 +39,18 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     testProgram = repository.findOne(testProgram.getId());
     assertFalse(testProgram.getPeriodsSkippable());
     repository.deleteAll();
+  }
+  
+  @Test
+  public void shouldFindByCode() {
+    //given
+    Program program = this.generateInstance();
+    repository.save(program);
+
+    //when
+    Program foundProgram = repository.findByCode(Code.code(programCode));
+
+    //then
+    assertEquals(program, foundProgram);
   }
 }

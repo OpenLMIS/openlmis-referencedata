@@ -1,9 +1,7 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
 import lombok.Setter;
-import org.openlmis.referencedata.util.View;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -15,7 +13,6 @@ import javax.persistence.Table;
 @Table(name = "programs", schema = "referencedata")
 public class Program extends BaseEntity {
 
-  @JsonView(View.BasicInformation.class)
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
   @Setter

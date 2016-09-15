@@ -2,14 +2,11 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Collections.singleton;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
-import org.openlmis.referencedata.util.View;
 
 import java.util.Objects;
 import java.util.Set;
@@ -24,7 +21,6 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 public class FulfillmentRoleAssignment extends RoleAssignment {
 
-  @JsonView(View.BasicInformation.class)
   @ManyToOne
   @JoinColumn(name = "warehouseid")
   @Getter
@@ -73,6 +69,16 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
     super.assignTo(user);
   }
 
+  /**
+   * Export this object's properties for serialization to the exporter provided.
+   *
+   * @param exporter the exporter provided
+   */
+  public void export(Exporter exporter) {
+    exporter.setRoleId(role.getId());
+    exporter.setWarehouseCode(warehouse.getCode());
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -95,4 +101,7 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
     return Objects.hash(super.hashCode(), warehouse);
   }
 
+  public interface Exporter extends RoleAssignment.Exporter {
+    void setWarehouseCode(String warehouseCode);
+  }
 }

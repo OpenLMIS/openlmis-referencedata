@@ -4,18 +4,18 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.util.View;
+import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,6 +28,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "roles", schema = "referencedata")
 @NoArgsConstructor
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class Role extends BaseEntity {
   private static final String TEXT = "text";
 
@@ -41,19 +42,16 @@ public class Role extends BaseEntity {
   @Setter
   private String description;
 
-  @JsonView(View.BasicInformation.class)
   @ManyToMany(
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-      )
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "role_rights",
       schema = "referencedata",
       joinColumns = @JoinColumn(name = "roleid", nullable = false),
-      inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false)
-      )
+      inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false))
   @Getter
   private Set<Right> rights;
 
-  private Role(String name, Right... rights) throws RightTypeException {
+  private Role(String name, Right... rights) throws RightTypeException, RoleException {
     this.name = name;
     group(rights);
   }
@@ -66,8 +64,27 @@ public class Role extends BaseEntity {
    * @throws RightTypeException if the rights do not have the same right type
    */
   public static Role newRole(String name, Right... rights) throws
-      RightTypeException {
+      RightTypeException, RoleException {
     return new Role(name, rights);
+  }
+
+  /**
+   * Static factory method for constructing a new role using an importer (DTO).
+   *
+   * @param importer the role importer (DTO)
+   * @throws RightTypeException if the rights do not have the same right type
+   */
+  public static Role newRole(Importer importer) throws RightTypeException, RoleException {
+    Set<Right> importedRights = importer.getRights().stream().map(
+        rightImporter -> Right.newRight(rightImporter))
+        .collect(toSet());
+
+    Role newRole = new Role(importer.getName(),
+        importedRights.toArray(new Right[importedRights.size()]));
+    newRole.id = importer.getId();
+    newRole.description = importer.getDescription();
+
+    return newRole;
   }
 
   /**
@@ -77,8 +94,11 @@ public class Role extends BaseEntity {
    * @param rights the rights to group
    * @throws RightTypeException if the rights do not have the same right type
    */
-  public void group(Right... rights) throws RightTypeException {
+  public void group(Right... rights) throws RightTypeException, RoleException {
     Set<Right> rightsList = new HashSet<>(asList(rights));
+    if (rightsList.size() == 0) {
+      throw new RoleException("referencedata.error.role-must-have-a-right");
+    }
     if (checkRightTypesMatch(rightsList)) {
       this.rights = rightsList;
     } else {
@@ -127,5 +147,62 @@ public class Role extends BaseEntity {
     Set<Right> attachments = rights.stream().flatMap(r -> r.getAttachments().stream())
         .collect(toSet());
     return rights.contains(right) || attachments.contains(right);
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setName(name);
+    exporter.setDescription(description);
+
+    for (Right right : rights) {
+      Right.Exporter rightExporter = Objects.requireNonNull(exporter.provideRightExporter());
+      right.export(rightExporter);
+      exporter.addRight(rightExporter);
+    }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof Role)) {
+      return false;
+    }
+    Role role = (Role) obj;
+    return Objects.equals(name, role.name)
+        && Objects.equals(rights, role.rights);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, rights);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setName(String name);
+
+    void setDescription(String description);
+
+    Right.Exporter provideRightExporter();
+
+    void addRight(Right.Exporter rightExporter);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    String getName();
+
+    String getDescription();
+
+    Set<Right.Importer> getRights();
   }
 }

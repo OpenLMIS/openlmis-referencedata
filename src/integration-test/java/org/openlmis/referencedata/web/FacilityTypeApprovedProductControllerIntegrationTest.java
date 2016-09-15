@@ -4,10 +4,12 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
@@ -54,10 +56,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Before
   public void setUp() {
-    ProductCategory productCategory = new ProductCategory();
-    productCategory.setCode("productCategoryCode");
-    productCategory.setName("productCategoryName");
-    productCategory.setDisplayOrder(1);
+    ProductCategory productCategory = ProductCategory.createNew(Code.code("productCategoryCode"),
+        new OrderedDisplayValue("productCategoryName", 1));
     productCategoryRepository.save(productCategory);
 
     Program program = new Program("programCode");
@@ -68,7 +68,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderableProductRepository.save(orderableProduct);
 
     ProgramProduct programProduct = new ProgramProduct();
-    programProduct.createNew(program, "test", orderableProduct);
+    ProductCategory testCat = ProductCategory.createNew(Code.code("test"));
+    programProduct.createNew(program, testCat, orderableProduct);
     programProductRepository.save(programProduct);
 
     FacilityType facilityType = new FacilityType();

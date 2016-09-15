@@ -8,6 +8,7 @@ import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Set;
 
@@ -23,7 +24,7 @@ public class SupervisionRoleAssignmentTest {
       new SupervisionRoleAssignment(role, program, node);
   private User user = new User();
 
-  public SupervisionRoleAssignmentTest() throws RightTypeException {
+  public SupervisionRoleAssignmentTest() throws RightTypeException, RoleException {
   }
 
   @Test

@@ -2,17 +2,20 @@ package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toSet;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.Sets;
+
+import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.dto.RightDto;
+import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
-import org.openlmis.referencedata.util.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +29,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Controller
 public class RoleController extends BaseController {
 
@@ -44,20 +49,35 @@ public class RoleController extends BaseController {
   private ExposedMessageSource messageSource;
 
   /**
+   * Constructor for controller unit testing.
+   *
+   * @param repository      role repository
+   * @param rightRepository right repository
+   * @param messageSource   message source
+   */
+  public RoleController(RoleRepository repository, RightRepository rightRepository,
+                        ExposedMessageSource messageSource) {
+    super();
+    this.roleRepository = Objects.requireNonNull(repository);
+    this.rightRepository = Objects.requireNonNull(rightRepository);
+    this.messageSource = Objects.requireNonNull(messageSource);
+  }
+
+  /**
    * Get all roles in the system.
    *
    * @return all roles in the system
    */
-  @JsonView(View.BasicInformation.class)
   @RequestMapping(value = "/roles", method = RequestMethod.GET)
   public ResponseEntity<?> getAllRoles() {
 
     LOGGER.debug("Getting all roles");
-    Iterable<Role> roles = roleRepository.findAll();
+    Set<Role> roles = Sets.newHashSet(roleRepository.findAll());
+    Set<RoleDto> roleDtos = roles.stream().map(role -> exportToDto(role)).collect(toSet());
 
     return ResponseEntity
         .ok()
-        .body(roles);
+        .body(roleDtos);
   }
 
   /**
@@ -66,7 +86,6 @@ public class RoleController extends BaseController {
    * @param roleId id of the role to get
    * @return specified role
    */
-  @JsonView(View.BasicInformation.class)
   @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.GET)
   public ResponseEntity<?> getRole(@PathVariable("roleId") UUID roleId) {
 
@@ -81,7 +100,7 @@ public class RoleController extends BaseController {
 
     return ResponseEntity
         .ok()
-        .body(role);
+        .body(exportToDto(role));
   }
 
   /**
@@ -91,14 +110,25 @@ public class RoleController extends BaseController {
    * @return if successful, the new role; otherwise an HTTP error
    */
   @RequestMapping(value = "/roles", method = RequestMethod.POST)
-  public ResponseEntity<?> createRole(@RequestBody Role roleDto) {
+  public ResponseEntity<?> createRole(@RequestBody RoleDto roleDto) {
 
     Role newRole;
+
+    Role storedRole = roleRepository.findFirstByName(roleDto.getName());
+    if (storedRole != null) {
+      LOGGER.error("Role to create already exists");
+      return ResponseEntity
+          .status(HttpStatus.CONFLICT)
+          .body("Role to create already exists");
+    }
 
     try {
 
       LOGGER.debug("Saving new role");
-      newRole = createRoleInstance(roleDto);
+
+      populateRights(roleDto);
+      newRole = Role.newRole(roleDto);
+
       roleRepository.save(newRole);
 
     } catch (AuthException ae) {
@@ -120,7 +150,7 @@ public class RoleController extends BaseController {
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(newRole);
+        .body(exportToDto(newRole));
   }
 
   /**
@@ -133,15 +163,19 @@ public class RoleController extends BaseController {
    */
   @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateRole(@PathVariable("roleId") UUID roleId,
-                                      @RequestBody Role roleDto) {
+                                      @RequestBody RoleDto roleDto) {
 
     Role roleToSave;
 
     try {
 
       LOGGER.debug("Saving role using id: " + roleId);
-      roleToSave = createRoleInstance(roleDto);
+
+      populateRights(roleDto);
+      roleToSave = Role.newRole(roleDto);
+
       roleToSave.setId(roleId);
+
       roleRepository.save(roleToSave);
 
     } catch (AuthException ae) {
@@ -163,7 +197,7 @@ public class RoleController extends BaseController {
 
     return ResponseEntity
         .ok()
-        .body(roleToSave);
+        .body(exportToDto(roleToSave));
   }
 
   /**
@@ -201,17 +235,17 @@ public class RoleController extends BaseController {
         .build();
   }
 
-  private Role createRoleInstance(Role roleDto) throws RightTypeException, RoleException {
-    if (roleDto.getRights().size() == 0) {
-      throw new RoleException("referencedata.error.role-must-have-a-right");
+  private RoleDto exportToDto(Role role) {
+    RoleDto roleDto = new RoleDto();
+    role.export(roleDto);
+    return roleDto;
+  }
+
+  private void populateRights(RoleDto roleDto) throws RightTypeException, RoleException {
+    Set<Right.Importer> rightDtos = roleDto.getRights();
+    for (Right.Importer rightDto : rightDtos) {
+      Right storedRight = rightRepository.findFirstByName(rightDto.getName());
+      storedRight.export((RightDto) rightDto);
     }
-
-    Set<Right> rights = roleDto.getRights().stream().map(rightDto -> rightRepository
-        .findFirstByName(rightDto.getName())).collect(toSet());
-
-    Role newRole = Role.newRole(roleDto.getName(),
-        rights.toArray(new Right[rights.size()]));
-    newRole.setDescription(roleDto.getDescription());
-    return newRole;
   }
 }

@@ -3,10 +3,12 @@ package org.openlmis.referencedata.repository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
@@ -54,14 +56,13 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     program = new Program("programCode");
     programRepository.save(program);
 
-    productCategory = new ProductCategory();
-    productCategory.setCode("productCategoryCode");
-    productCategory.setName("productCategoryName");
-    productCategory.setDisplayOrder(1);
+
+    productCategory = ProductCategory.createNew(Code.code("productCategoryCode"),
+      new OrderedDisplayValue("productCategoryName", 1));
     productCategoryRepository.save(productCategory);
 
     orderableProduct = GlobalProduct.newGlobalProduct("ibuprofen", "testDesc", 10);
-    programProduct = ProgramProduct.createNew(program, "test", orderableProduct);
+    programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct);
     orderableProduct.addToProgram(programProduct);
     orderableProductRepository.save(orderableProduct);
   }

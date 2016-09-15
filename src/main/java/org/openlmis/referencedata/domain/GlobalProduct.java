@@ -71,4 +71,14 @@ public final class GlobalProduct extends OrderableProduct {
 
     return added;
   }
+
+  /**
+   * Sets the associated {@link TradeItem} that may fulfill for this.
+   * @param tradeItems the trade items.
+   */
+  public void setTradeItems(Set<TradeItem> tradeItems) {
+    this.tradeItems.forEach(tradeItem -> tradeItem.assignGlobalProduct(null));
+    this.tradeItems.clear();
+    tradeItems.forEach(tradeItem -> addTradeItem(tradeItem));
+  }
 }

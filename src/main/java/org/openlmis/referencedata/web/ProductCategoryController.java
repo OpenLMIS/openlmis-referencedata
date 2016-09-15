@@ -1,8 +1,8 @@
 package org.openlmis.referencedata.web;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.service.ProductCategoryService;
 import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -27,33 +26,7 @@ public class ProductCategoryController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProductCategoryController.class);
 
   @Autowired
-  private ProductCategoryService productCategoryService;
-
-  @Autowired
   private ProductCategoryRepository productCategoryRepository;
-
-  /**
-   * Allows creating new productCategories.
-   * If the id is specified, it will be ignored.
-   *
-   * @param productCategory A productCategory bound to the request body
-   * @return ResponseEntity containing the created productCategory
-   */
-  @RequestMapping(value = "/productCategories", method = RequestMethod.POST)
-  public ResponseEntity<?> createProductCategory(@RequestBody ProductCategory productCategory) {
-    try {
-      LOGGER.debug("Creating new productCategory");
-      productCategory.setId(null);
-      ProductCategory newProductCategory = productCategoryRepository.save(productCategory);
-      LOGGER.debug("Creating new productCategory with id: " + productCategory.getId());
-      return new ResponseEntity<ProductCategory>(newProductCategory, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating productCategory", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
-  }
 
   /**
    * Get all productCategories.
@@ -68,7 +41,28 @@ public class ProductCategoryController extends BaseController {
   }
 
   /**
-   * Allows updating productCategories.
+   * Create or update a {@link ProductCategory}.
+   *
+   * @param productCategory A productCategory bound to the request body
+   * @return ResponseEntity containing the created productCategory with id.
+   */
+  @RequestMapping(value = "/productCategories", method = RequestMethod.PUT)
+  public ResponseEntity<?> createProductCategory(@RequestBody ProductCategory productCategory) {
+    ProductCategory found = productCategoryRepository.findByCode(productCategory
+        .getCode());
+    if (null != found) {
+      found.updateFrom(productCategory);
+    } else {
+      found = productCategory;
+    }
+
+    ProductCategory newProductCategory = productCategoryRepository.save(found);
+    return new ResponseEntity<>(newProductCategory, HttpStatus.OK);
+  }
+
+  /**
+   * Updates the given {@link ProductCategory}.  Uses the ID given to base it's update and
+   * ignores the code given.
    *
    * @param productCategory A productCategory bound to the request body
    * @param productCategoryId UUID of productCategory which we want to update
@@ -77,28 +71,22 @@ public class ProductCategoryController extends BaseController {
   @RequestMapping(value = "/productCategories/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateProductCategory(@RequestBody ProductCategory productCategory,
                                        @PathVariable("id") UUID productCategoryId) {
-    try {
-      LOGGER.debug("Updating productCategory with id: " + productCategoryId);
+    LOGGER.debug("Updating productCategory with id: " + productCategoryId);
 
-      ProductCategory productCategoryToUpdate =
-            productCategoryRepository.findOne(productCategoryId);
+    ProductCategory productCategoryToUpdate =
+          productCategoryRepository.findOne(productCategoryId);
 
-      if (productCategoryToUpdate == null) {
-        productCategoryToUpdate = new ProductCategory();
-      }
-
-      productCategoryToUpdate.updateFrom(productCategory);
-      productCategoryToUpdate = productCategoryRepository.save(productCategoryToUpdate);
-
-      LOGGER.debug("Updated productCategory with id: " + productCategoryId);
-      return new ResponseEntity<ProductCategory>(productCategoryToUpdate, HttpStatus.OK);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while updating productCategory with id: "
-                  + productCategoryId, ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    if (null == productCategoryToUpdate) {
+      ErrorResponse errorResponse = new ErrorResponse("referencedata.error.id.not-found",
+          "An error occurred while updating productCategory with id: " + productCategoryId);
+      LOGGER.error(errorResponse.getMessage());
+      return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+    productCategoryToUpdate.updateFrom(productCategory);
+    productCategoryToUpdate = productCategoryRepository.save(productCategoryToUpdate);
+
+    LOGGER.debug("Updated productCategory with id: " + productCategoryId);
+    return new ResponseEntity<>(productCategoryToUpdate, HttpStatus.OK);
   }
 
   /**
@@ -144,15 +132,17 @@ public class ProductCategoryController extends BaseController {
 
   /**
    * Finds ProductCategories matching all of provided parameters.
-   * @param code code of productCategory.
+   * @param codeParam code of productCategory.
    * @return ResponseEntity with list of all Product Categories matching
    *         provided parameters and OK httpStatus.
    */
   @RequestMapping(value = "/productCategories/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProductCategories(
-          @RequestParam(value = "code", required = false) String code) {
-    List<ProductCategory> result = productCategoryService.searchProductCategories(code);
-
-    return new ResponseEntity<>(result, HttpStatus.OK);
+          @RequestParam(value = "code", required = false) String codeParam) {
+    ProductCategory found = productCategoryRepository.findByCode(Code.code(codeParam));
+    if (null == found) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(found, HttpStatus.OK);
   }
 }

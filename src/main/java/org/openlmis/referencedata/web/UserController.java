@@ -1,8 +1,12 @@
 package org.openlmis.referencedata.web;
 
-import javax.validation.Valid;
-import com.fasterxml.jackson.annotation.JsonView;
+import static java.util.stream.Collectors.toSet;
 
+import com.google.common.collect.Sets;
+
+import lombok.NoArgsConstructor;
+
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
@@ -26,15 +30,12 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.ErrorResponse;
-import org.openlmis.referencedata.util.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -48,13 +49,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
+@NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
 @Controller
 public class UserController extends BaseController {
@@ -93,25 +96,56 @@ public class UserController extends BaseController {
   }
 
   /**
+   * Constructor for controller unit testing.
+   */
+  public UserController(UserService userService,
+                        UserRepository userRepository,
+                        RoleRepository roleRepository,
+                        RightRepository rightRepository,
+                        ProgramRepository programRepository,
+                        SupervisoryNodeRepository supervisoryNodeRepository,
+                        FacilityRepository facilityRepository) {
+    this.userService = userService;
+    this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
+    this.rightRepository = rightRepository;
+    this.programRepository = programRepository;
+    this.supervisoryNodeRepository = supervisoryNodeRepository;
+    this.facilityRepository = facilityRepository;
+  }
+
+  /**
    * Custom endpoint for creating and updating users.
    */
   @RequestMapping(value = "/users", method = RequestMethod.POST)
-  public ResponseEntity<?> save(@RequestBody @Valid UserDto userDto, BindingResult bindingResult,
-                                OAuth2Authentication auth) {
-    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
-    String token = details.getTokenValue();
+  public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto/*,
+                                    BindingResult bindingResult,
+                                    OAuth2Authentication auth*/) {
+    //OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
+    //String token = details.getTokenValue();
+    //
+    //if (bindingResult.hasErrors()) {
+    //  return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+    //} TODO: reinstate when dependency on auth is proper
 
-    if (bindingResult.hasErrors()) {
-      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
-    }
     try {
-      userService.save(UserDto.convertUserDtoToUser(userDto), token);
-      return new ResponseEntity<>(userDto, HttpStatus.OK);
+
+      User userToSave = User.newUser(userDto);
+      //userService.save(userToSave, token); TODO: reinstate when dependency on auth is proper
+      userRepository.save(userToSave);
+
+      return ResponseEntity
+          .status(HttpStatus.CREATED)
+          .body(exportToUserDto(userToSave));
+
     } catch (ExternalApiException ex) {
+
       ErrorResponse errorResponse =
           new ErrorResponse("An error occurred while saving user", ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorResponse);
     }
   }
 
@@ -123,12 +157,13 @@ public class UserController extends BaseController {
   @RequestMapping(value = "/users", method = RequestMethod.GET)
   @ResponseBody
   public ResponseEntity<?> getAllUsers() {
-    Iterable<User> users = userRepository.findAll();
-    List<UserDto> usersDto = new ArrayList<>();
-    for (User user : users) {
-      usersDto.add(UserDto.convertUserToUserDto(user));
-    }
-    return new ResponseEntity<>(usersDto, HttpStatus.OK);
+
+    LOGGER.debug("Getting all users");
+    Set<User> users = Sets.newHashSet(userRepository.findAll());
+    Set<UserDto> userDtos = users.stream().map(user -> exportToUserDto(user)).collect(toSet());
+
+    return ResponseEntity
+        .ok(userDtos);
   }
 
   /**
@@ -139,11 +174,17 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
   public ResponseEntity<?> getUser(@PathVariable("id") UUID userId) {
+
+    LOGGER.debug("Getting user");
     User user = userRepository.findOne(userId);
     if (user == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      LOGGER.error("User to get does not exist");
+      return ResponseEntity
+          .notFound()
+          .build();
     } else {
-      return new ResponseEntity<>(user, HttpStatus.OK);
+      return ResponseEntity
+          .ok(exportToUserDto(user));
     }
   }
 
@@ -157,31 +198,37 @@ public class UserController extends BaseController {
   public ResponseEntity<?> deleteUser(@PathVariable("id") UUID userId) {
     User user = userRepository.findOne(userId);
     if (user == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      return ResponseEntity
+          .notFound()
+          .build();
     } else {
       try {
-        userRepository.delete(user);
+        userRepository.delete(userId);
       } catch (DataIntegrityViolationException ex) {
         ErrorResponse errorResponse =
             new ErrorResponse("An error occurred while deleting user with id: " + userId,
                 ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .build();
       }
-      return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
+      return ResponseEntity
+          .noContent()
+          .build();
     }
   }
 
   /**
    * Returns all users with matched parameters
-   * @param username username of user we want to search.
-   * @param firstName firstName of user we want to search.
-   * @param lastName lastName of user we want to search.
+   *
+   * @param username     username of user we want to search.
+   * @param firstName    firstName of user we want to search.
+   * @param lastName     lastName of user we want to search.
    * @param homeFacility homeFacility of user we want to search.
-   * @param active is the user account active.
-   * @param verified is the user account verified.
-   * @return ResponseEntity with list of all Users matching
-   *         provided parameters and OK httpStatus.
+   * @param active       is the user account active.
+   * @param verified     is the user account verified.
+   * @return ResponseEntity with list of all Users matching provided parameters and OK httpStatus.
    */
   @RequestMapping(value = "/users/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchUsers(
@@ -194,7 +241,8 @@ public class UserController extends BaseController {
     List<User> result = userService.searchUsers(username, firstName,
         lastName, homeFacility, active, verified);
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return ResponseEntity
+        .ok(result);
   }
 
   private Map<String, String> getErrors(final BindingResult bindingResult) {
@@ -212,7 +260,6 @@ public class UserController extends BaseController {
    *
    * @return all roles associated with the specified user
    */
-  @JsonView(View.BasicInformation.class)
   @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.GET)
   public ResponseEntity<?> getAllUserRoles(@PathVariable(USER_ID) UUID userId) {
 
@@ -225,11 +272,9 @@ public class UserController extends BaseController {
           .build();
     }
 
-    Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
-
     return ResponseEntity
         .ok()
-        .body(roleAssignments);
+        .body(exportToDtos(user.getRoleAssignments()));
   }
 
   /**
@@ -238,8 +283,7 @@ public class UserController extends BaseController {
    * @param roleAssignmentDtos role assignment DTOs to associate to the user
    * @return if successful, the updated user; otherwise an HTTP error
    */
-  @JsonView(View.BasicInformation.class)
-  @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.POST)
+  @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.PUT)
   public ResponseEntity<?> saveUserRoles(@PathVariable(USER_ID) UUID userId,
                                          @RequestBody Set<RoleAssignmentDto> roleAssignmentDtos) {
 
@@ -254,6 +298,7 @@ public class UserController extends BaseController {
     try {
 
       LOGGER.debug("Assigning roles to user and saving");
+      user.resetRoles();
       for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
         RoleAssignment roleAssignment;
 
@@ -270,11 +315,12 @@ public class UserController extends BaseController {
         String warehouseCode = roleAssignmentDto.getWarehouseCode();
         if (programCode != null) {
 
-          Program program = programRepository.findByCode(programCode);
-          UUID supervisoryNodeId = roleAssignmentDto.getSupervisoryNodeId();
-          if (supervisoryNodeId != null) {
+          Program program = programRepository.findByCode(Code.code(programCode));
+          String supervisoryNodeCode = roleAssignmentDto.getSupervisoryNodeCode();
+          if (supervisoryNodeCode != null) {
 
-            SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+            SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode(
+                supervisoryNodeCode);
             roleAssignment = new SupervisionRoleAssignment(role, program, supervisoryNode);
 
           } else {
@@ -310,8 +356,7 @@ public class UserController extends BaseController {
     }
 
     return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(user.getRoleAssignments());
+        .ok(exportToDtos(user.getRoleAssignments()));
   }
 
   /**
@@ -346,7 +391,7 @@ public class UserController extends BaseController {
     Right right = rightRepository.findFirstByName(rightName);
     if (programCode != null) {
 
-      Program program = programRepository.findByCode(programCode);
+      Program program = programRepository.findByCode(Code.code(programCode));
       if (supervisoryNodeId != null) {
 
         SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
@@ -423,5 +468,28 @@ public class UserController extends BaseController {
     return ResponseEntity
         .ok()
         .body(supervisedFacilities);
+  }
+
+  private <T extends RoleAssignment> RoleAssignmentDto exportToDto(T roleAssignment) {
+    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
+    if (roleAssignment instanceof SupervisionRoleAssignment) {
+      ((SupervisionRoleAssignment) roleAssignment).export(roleAssignmentDto);
+    } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
+      ((FulfillmentRoleAssignment) roleAssignment).export(roleAssignmentDto);
+    } else {
+      ((DirectRoleAssignment) roleAssignment).export(roleAssignmentDto);
+    }
+    return roleAssignmentDto;
+  }
+
+  private Set<RoleAssignmentDto> exportToDtos(Set<RoleAssignment> roleAssignments) {
+    return roleAssignments.stream().map(roleAssignment -> exportToDto(roleAssignment))
+        .collect(toSet());
+  }
+
+  private UserDto exportToUserDto(User user) {
+    UserDto userDto = new UserDto();
+    user.export(userDto);
+    return userDto;
   }
 }

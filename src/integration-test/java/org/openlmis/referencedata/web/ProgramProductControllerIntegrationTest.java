@@ -1,11 +1,18 @@
 package org.openlmis.referencedata.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.repository.OrderableProductRepository;
@@ -17,11 +24,6 @@ import org.springframework.http.MediaType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 @Ignore
 @SuppressWarnings("PMD.TooManyMethods")
@@ -176,8 +178,9 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "test", 10);
     orderableProductRepository.save(orderableProduct);
     Program program = generateProgram();
+    ProductCategory testCategory = ProductCategory.createNew(Code.code("testCat"));
     ProgramProduct programProduct = ProgramProduct.createNew(program,
-        "",
+        testCategory,
         orderableProduct,
         10,
         true,

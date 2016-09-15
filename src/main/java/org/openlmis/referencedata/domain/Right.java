@@ -1,16 +1,13 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.openlmis.referencedata.util.View;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,7 +26,6 @@ import javax.persistence.Table;
 public class Right extends BaseEntity {
   private static final String TEXT = "text";
 
-  @JsonView(View.BasicInformation.class)
   @Column(nullable = false, unique = true, columnDefinition = TEXT)
   @Getter
   private String name;
@@ -74,6 +70,19 @@ public class Right extends BaseEntity {
   }
 
   /**
+   * Static factory method for constructing a new right using an importer (DTO).
+   *
+   * @param importer the right importer (DTO)
+   */
+  public static Right newRight(Importer importer) {
+    Right newRight = new Right(importer.getName(), importer.getType());
+    newRight.id = importer.getId();
+    newRight.description = importer.getDescription();
+    newRight.attach(importer.getAttachments().toArray(new Right[importer.getAttachments().size()]));
+    return newRight;
+  }
+
+  /**
    * Attach other rights to this one, to create relationships between rights. The attachment is
    * one-way with this method call. The attached rights must be of the same type; only attachments
    * of the same type are attached.
@@ -99,6 +108,22 @@ public class Right extends BaseEntity {
     this.description = right.getDescription();
   }
 
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setName(name);
+    exporter.setType(type);
+    exporter.setDescription(description);
+    for (Right attachment : attachments) {
+      attachment.export(exporter);
+      exporter.addAttachment((Right.Exporter) attachment);
+    }
+  }
+
   @Override
   public int hashCode() {
     return name.hashCode();
@@ -114,5 +139,29 @@ public class Right extends BaseEntity {
     }
     Right right = (Right) obj;
     return Objects.equals(name, right.name);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setName(String name);
+
+    void setType(RightType type);
+
+    void setDescription(String description);
+
+    void addAttachment(Right.Exporter attachment);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    String getName();
+
+    RightType getType();
+
+    String getDescription();
+
+    Set<Right.Importer> getAttachments();
   }
 }
