@@ -71,6 +71,8 @@ public class UserControllerTest {
 
   private UserController controller;
 
+  private UUID homeFacilityId;
+  private Facility homeFacility;
   private String user1UserName;
   private User user1;
   private UserDto user1Dto;
@@ -102,16 +104,22 @@ public class UserControllerTest {
     controller = new UserController(service, repository, roleRepository, rightRepository,
         programRepository, supervisoryNodeRepository, facilityRepository);
 
+    homeFacilityId = UUID.randomUUID();
+    homeFacility = new Facility();
     user1UserName = "user1";
     user2UserName = "user2";
-    user1 = User.newUser(user1UserName, "User", "1", "user1@openlmis.org", true, true);
-    user2 = User.newUser(user2UserName, "User", "2", "user2@openlmis.org", true, true);
+    user1 = User.newUser(user1UserName, "User", "1", "user1@openlmis.org", homeFacility, true,
+        true);
+    user2 = User.newUser(user2UserName, "User", "2", "user2@openlmis.org", homeFacility, true,
+        true);
     users = Sets.newHashSet(user1, user2);
 
     user1Dto = new UserDto();
     user1.export(user1Dto);
+    user1Dto.setHomeFacilityId(homeFacilityId);
     user2Dto = new UserDto();
     user2.export(user2Dto);
+    user2Dto.setHomeFacilityId(homeFacilityId);
 
     userId = UUID.randomUUID();
 
@@ -190,6 +198,7 @@ public class UserControllerTest {
     preparePostOrPut();
 
     when(repository.findOne(userId)).thenReturn(null);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     //when
     HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();
@@ -198,39 +207,6 @@ public class UserControllerTest {
     assertThat(httpStatus, is(HttpStatus.CREATED));
     verify(repository).save(user1);
   }
-
-  //  @Test
-  //  public void shouldUpdateUserOnPut() {
-  //    //given
-  //    preparePostOrPut();
-  //
-  //    user1Dto.setLastName("Updated");
-  //    User updatedUser1 = User.newUser(user1Dto);
-  //
-  //    //when
-  //    HttpStatus httpStatus = controller.updateUser(userId, user1Dto).getStatusCode();
-  //
-  //    //then
-  //    assertThat(httpStatus, is(HttpStatus.OK));
-  //    verify(repository).save(updatedUser1);
-  //  }
-  //
-  //  @Test
-  //  public void shouldCreateNewUserOnPut() {
-  //    //given
-  //    preparePostOrPut();
-  //
-  //    when(repository.findOne(userId)).thenReturn(null);
-  //    user1Dto.setLastName("Updated");
-  //    User updatedUser1 = User.newUser(user1Dto);
-  //
-  //    //when
-  //    HttpStatus httpStatus = controller.updateUser(userId, user1Dto).getStatusCode();
-  //
-  //    //then
-  //    assertThat(httpStatus, is(HttpStatus.OK));
-  //    verify(repository).save(updatedUser1);
-  //  }
 
   @Test
   public void shouldDeleteExistingUser() {
@@ -461,7 +437,7 @@ public class UserControllerTest {
     //then
     assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
   }
-  
+
   @Test
   public void shouldReturnTrueIfUserHasRight() throws RightTypeException {
     //given
@@ -472,16 +448,16 @@ public class UserControllerTest {
     when(supervisoryNodeRepository.findByCode(supervisoryNodeCode)).thenReturn(supervisoryNode1);
 
     //when
-    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, supervisionRight1Name, 
+    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, supervisionRight1Name,
         programCode, supervisoryNodeCode, null);
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    boolean hasRight = (boolean)responseEntity.getBody();
+    boolean hasRight = (boolean) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertTrue(hasRight);
   }
-  
+
   @Test
   public void shouldReturnFalseIfUserDoesNotHaveRight() throws RightTypeException {
     //given
@@ -494,7 +470,7 @@ public class UserControllerTest {
     ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, fulfillmentRight1Name,
         null, null, warehouseCode);
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    boolean hasRight = (boolean)responseEntity.getBody();
+    boolean hasRight = (boolean) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
@@ -512,7 +488,7 @@ public class UserControllerTest {
     //then
     assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
   }
-  
+
   @Test
   public void shouldGetUserHomeFacilityPrograms() throws RightTypeException {
     //given
@@ -522,7 +498,7 @@ public class UserControllerTest {
     //when
     ResponseEntity responseEntity = controller.getUserPrograms(userId, true);
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<Program> homeFacilityPrograms = (Set<Program>)responseEntity.getBody();
+    Set<Program> homeFacilityPrograms = (Set<Program>) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
@@ -539,7 +515,7 @@ public class UserControllerTest {
     //when
     ResponseEntity responseEntity = controller.getUserPrograms(userId, false);
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<Program> supervisoryPrograms = (Set<Program>)responseEntity.getBody();
+    Set<Program> supervisoryPrograms = (Set<Program>) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
@@ -562,7 +538,7 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserSupervisedFacilities() throws RightTypeException {
     //given
-    RequisitionGroup supervisionGroup1 = RequisitionGroup.newRequisitionGroup("supervisionGroup1", 
+    RequisitionGroup supervisionGroup1 = RequisitionGroup.newRequisitionGroup("supervisionGroup1",
         supervisoryNode1);
     supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility(), new Facility()));
     supervisoryNode1.setRequisitionGroup(supervisionGroup1);
@@ -572,7 +548,7 @@ public class UserControllerTest {
     //when
     ResponseEntity responseEntity = controller.getUserSupervisedFacilities(userId);
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<Facility> supervisedFacilities = (Set<Facility>)responseEntity.getBody();
+    Set<Facility> supervisedFacilities = (Set<Facility>) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));

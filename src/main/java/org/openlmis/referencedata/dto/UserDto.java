@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 
 import java.util.Objects;
@@ -38,6 +39,10 @@ public class UserDto extends BaseEntity implements User.Exporter, User.Importer 
   @Getter
   @Setter
   private UUID homeFacilityId;
+
+  @Getter
+  @Setter
+  private Facility homeFacility;
 
   @Getter
   @Setter

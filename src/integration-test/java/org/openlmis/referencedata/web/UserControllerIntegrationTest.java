@@ -27,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +70,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Before
   public void setUp() {
     users = new ArrayList<>();
-    for ( int userCount = 0; userCount < 5; userCount++ ) {
+    for (int userCount = 0; userCount < 5; userCount++) {
       users.add(createUser());
     }
   }
@@ -77,40 +78,40 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindUsers() {
     User[] response = restAssured.given()
-            .queryParam(USERNAME, users.get(0).getUsername())
-            .queryParam(FIRST_NAME, users.get(0).getFirstName())
-            .queryParam(LAST_NAME, users.get(0).getLastName())
-            .queryParam(HOME_FACILITY, users.get(0).getHomeFacility().getId())
-            .queryParam(ACTIVE, users.get(0).getActive())
-            .queryParam(VERIFIED, users.get(0).getVerified())
-            .queryParam(ACCESS_TOKEN, getToken())
-            .when()
-            .get(SEARCH_URL)
-            .then()
-            .statusCode(200)
-            .extract().as(User[].class);
+        .queryParam(USERNAME, users.get(0).getUsername())
+        .queryParam(FIRST_NAME, users.get(0).getFirstName())
+        .queryParam(LAST_NAME, users.get(0).getLastName())
+        .queryParam(HOME_FACILITY, users.get(0).getHomeFacility().getId())
+        .queryParam(ACTIVE, users.get(0).getActive())
+        .queryParam(VERIFIED, users.get(0).getVerified())
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(User[].class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertEquals(1, response.length);
-    for ( User user : response ) {
+    for (User user : response) {
       assertEquals(
-              user.getUsername(),
-              users.get(0).getUsername());
+          user.getUsername(),
+          users.get(0).getUsername());
       assertEquals(
-              user.getFirstName(),
-              users.get(0).getFirstName());
+          user.getFirstName(),
+          users.get(0).getFirstName());
       assertEquals(
-              user.getLastName(),
-              users.get(0).getLastName());
+          user.getLastName(),
+          users.get(0).getLastName());
       assertEquals(
-              user.getHomeFacility().getId(),
-              users.get(0).getHomeFacility().getId());
+          user.getHomeFacility().getId(),
+          users.get(0).getHomeFacility().getId());
       assertEquals(
-              user.getActive(),
-              users.get(0).getActive());
+          user.getActive(),
+          users.get(0).getActive());
       assertEquals(
-              user.getVerified(),
-              users.get(0).getVerified());
+          user.getVerified(),
+          users.get(0).getVerified());
     }
   }
 
@@ -120,13 +121,13 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     User user = users.get(4);
 
     restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", user.getId())
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(204);
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", user.getId())
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
 
     assertFalse(userRepository.exists(user.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -136,13 +137,13 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetAllUsers() {
 
     UserDto[] response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when()
-          .get(RESOURCE_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(UserDto[].class);
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto[].class);
 
     Iterable<UserDto> users = Arrays.asList(response);
     assertTrue(users.iterator().hasNext());
@@ -155,14 +156,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     User user = users.get(4);
 
     User response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", user.getId())
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(User.class);
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", user.getId())
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(User.class);
 
     assertTrue(userRepository.exists(response.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -258,8 +259,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.getFirstName(), savedUser.getFirstName());
     assertEquals(user.getLastName(), savedUser.getLastName());
     assertEquals(user.getEmail(), savedUser.getEmail());
-    //assertEquals(user.getHomeFacility(), savedUser.getHomeFacility().getId()); TODO: uncomment 
-    // after fixed
+    assertEquals(user.getHomeFacility(), savedUser.getHomeFacility());
     assertEquals(user.isActive(), savedUser.getActive());
     assertEquals(user.isVerified(), savedUser.getVerified());
 
@@ -312,7 +312,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Facility generateFacility() {
-    Integer instanceNumber = + generateInstanceNumber();
+    Integer instanceNumber = +generateInstanceNumber();
     GeographicLevel geographicLevel = generateGeographicLevel();
     GeographicZone geographicZone = generateGeographicZone(geographicLevel);
     FacilityType facilityType = generateFacilityType();

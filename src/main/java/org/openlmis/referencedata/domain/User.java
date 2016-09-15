@@ -88,12 +88,13 @@ public class User extends BaseEntity {
   @Transient
   private Set<Facility> supervisedFacilities = new HashSet<>();
 
-  private User(String username, String firstName, String lastName, String email, boolean active,
-               boolean verified) {
+  private User(String username, String firstName, String lastName, String email,
+               Facility homeFacility, boolean active, boolean verified) {
     this.username = username;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
+    this.homeFacility = homeFacility;
     this.active = active;
     this.verified = verified;
   }
@@ -105,7 +106,7 @@ public class User extends BaseEntity {
     lastName = importer.getLastName();
     email = importer.getEmail();
     timezone = importer.getTimezone();
-    //homeFacility.setId(importer.getHomeFacilityId()) TODO: set home facility, not ID
+    homeFacility = importer.getHomeFacility();
     verified = importer.isVerified();
     active = importer.isActive();
   }
@@ -115,8 +116,8 @@ public class User extends BaseEntity {
   }
 
   public static User newUser(String username, String firstName, String lastName, String email,
-                             boolean active, boolean verified) {
-    return new User(username, firstName, lastName, email, active, verified);
+                             Facility homeFacility, boolean active, boolean verified) {
+    return new User(username, firstName, lastName, email, homeFacility, active, verified);
   }
 
   @PrePersist
@@ -196,9 +197,7 @@ public class User extends BaseEntity {
     exporter.setLastName(lastName);
     exporter.setEmail(email);
     exporter.setTimezone(timezone);
-    if (homeFacility != null) {
-      exporter.setHomeFacilityId(homeFacility.getId());
-    }
+    exporter.setHomeFacility(homeFacility);
     exporter.setActive(active);
     exporter.setVerified(verified);
   }
@@ -233,7 +232,7 @@ public class User extends BaseEntity {
 
     void setTimezone(String timezone);
 
-    void setHomeFacilityId(UUID homeFacilityId);
+    void setHomeFacility(Facility homeFacility);
 
     void setVerified(boolean verified);
 
@@ -253,7 +252,7 @@ public class User extends BaseEntity {
 
     String getTimezone();
 
-    UUID getHomeFacilityId();
+    Facility getHomeFacility();
 
     boolean isVerified();
 

@@ -128,6 +128,16 @@ public class UserController extends BaseController {
     //  return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
     //} TODO: reinstate when dependency on auth is proper
 
+    Facility homeFacility = facilityRepository.findOne(userDto.getHomeFacilityId());
+    if (homeFacility == null) {
+      LOGGER.error("Home facility does not exist");
+      return ResponseEntity
+          .badRequest()
+          .body("Home facility does not exist");
+    } else {
+      userDto.setHomeFacility(homeFacility);
+    }
+
     try {
 
       User userToSave = User.newUser(userDto);
