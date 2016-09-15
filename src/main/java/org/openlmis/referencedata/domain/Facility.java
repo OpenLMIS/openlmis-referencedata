@@ -64,27 +64,7 @@ public class Facility extends BaseEntity {
   @Setter
   private Boolean active;
 
-  @Getter
-  @Setter
-  private Date goLiveDate;
 
-  @Getter
-  @Setter
-  private Date goDownDate;
-
-  @Column(columnDefinition = TEXT)
-  @Getter
-  @Setter
-  private String comment;
-
-  @Column(nullable = false)
-  @Getter
-  @Setter
-  private Boolean enabled;
-
-  @Getter
-  @Setter
-  private Boolean openLmisAccessible;
 
   @OneToMany
   @JoinColumn(name = "programId")

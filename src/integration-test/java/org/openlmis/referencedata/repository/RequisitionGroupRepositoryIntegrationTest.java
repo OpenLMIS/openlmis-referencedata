@@ -5,14 +5,19 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 
-import java.util.UUID;
+/**
+ * Allow testing requisitionGroupRepository.
+ */
+public class RequisitionGroupRepositoryIntegrationTest
+    extends BaseCrudRepositoryIntegrationTest<RequisitionGroup> {
 
-public class SupervisoryNodeRepositoryIntegrationTest extends
-    BaseCrudRepositoryIntegrationTest<SupervisoryNode> {
+  @Autowired
+  RequisitionGroupRepository repository;
+
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
@@ -28,23 +33,31 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
 
-  private GeographicZone geographicZone = new GeographicZone();
-  private GeographicLevel geographicLevel = new GeographicLevel();
-  private Facility facility = new Facility();
+  private SupervisoryNode supervisoryNode;
 
-  @Override
-  CrudRepository<SupervisoryNode, UUID> getRepository() {
-    return supervisoryNodeRepository;
+  RequisitionGroupRepository getRepository() {
+    return this.repository;
+  }
+
+  RequisitionGroup generateInstance() {
+    int instanceNumber = this.getNextInstanceNumber();
+    RequisitionGroup requisitionGroup = new RequisitionGroup();
+    requisitionGroup.setCode("Code # " + instanceNumber);
+    requisitionGroup.setName("ReqGr Name # " + instanceNumber);
+    requisitionGroup.setSupervisoryNode(supervisoryNode);
+    return requisitionGroup;
   }
 
   @Before
   public void setUp() {
-    String code = "code";
+    final String code = "code";
 
+    GeographicLevel geographicLevel = new GeographicLevel();
     geographicLevel.setCode(code);
     geographicLevel.setLevelNumber(1);
     geographicLevelRepository.save(geographicLevel);
 
+    GeographicZone geographicZone = new GeographicZone();
     geographicZone.setCode(code);
     geographicZone.setLevel(geographicLevel);
     geographicZoneRepository.save(geographicZone);
@@ -53,17 +66,16 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     facilityType.setCode(code);
     facilityTypeRepository.save(facilityType);
 
-    facility = new Facility();
+    Facility facility = new Facility();
     facility.setType(facilityType);
     facility.setGeographicZone(geographicZone);
     facility.setCode(code);
     facility.setActive(true);
     facilityRepository.save(facility);
-  }
 
-  @Override
-  SupervisoryNode generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
-    return SupervisoryNode.newSupervisoryNode("Code #" + instanceNumber, facility);
+    supervisoryNode = new SupervisoryNode();
+    supervisoryNode.setCode(code);
+    supervisoryNode.setFacility(facility);
+    supervisoryNodeRepository.save(supervisoryNode);
   }
 }

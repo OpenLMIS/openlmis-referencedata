@@ -79,7 +79,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     Facility facility = new Facility();
     facility.setCode("facilityCode");
     facility.setActive(true);
-    facility.setEnabled(true);
     facility.setGeographicZone(geoZone);
     facility.setType(facilityType);
     facility.setOperator(facilityOperator);

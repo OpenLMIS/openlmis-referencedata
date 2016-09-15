@@ -2,8 +2,10 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
+import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.util.ErrorResponse;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,9 @@ public class ProcessingPeriodController extends BaseController {
 
   @Autowired
   private ProcessingPeriodService periodService;
+
+  @Autowired
+  private ProcessingScheduleRepository processingScheduleRepository;
 
   /**
    * Finds processingPeriods matching all of provided parameters.
@@ -199,4 +205,21 @@ public class ProcessingPeriodController extends BaseController {
     return messageSource.getMessage("referencedata.message.totalPeriod", msgArgs,
         LocaleContextHolder.getLocale());
   }
+
+  @RequestMapping(value = "/processingPeriods/searchByUUIDAndDate", method = RequestMethod.GET)
+  public ResponseEntity<?> searchPeriodsByUUIDAndDate(
+      @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
+      @RequestParam(value = "startDate", required = true) LocalDate startDate) {
+
+    ProcessingSchedule processingSchedule = processingScheduleRepository.findOne(processingScheduleId);
+    List<ProcessingPeriod> periods = periodService.searchPeriods(processingSchedule, startDate);
+    List<ProcessingPeriodDto> result = new ArrayList<>();
+    for(ProcessingPeriod period : periods) {
+      ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto(period);
+      result.add(processingPeriodDto);
+    }
+    return new ResponseEntity<>(result, HttpStatus.OK);
+
+  }
+
 }
