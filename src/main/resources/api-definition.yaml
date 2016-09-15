@@ -2199,7 +2199,13 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
-              "500":
+              "400":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                      application/json:
+              "409":
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
@@ -2215,22 +2221,16 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
-    /{id}:
+    /{roleId}:
           uriParameters:
-            id:
-                displayName: id
+            roleId:
+                displayName: Role ID
                 type: string
                 required: true
                 repeat: false
           put:
               is: [ secured ]
-              description: Update existing role.
+              description: Update existing role (or create new one using role ID).
               body:
                   application/json:
               responses:
@@ -2240,7 +2240,7 @@ resourceTypes:
                         X-XSS-Protection:
                       body:
                           application/json:
-                  "404":
+                  "400":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
@@ -2270,13 +2270,13 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                  "404":
+                  "400":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
                       body:
                           application/json:
-                  "409":
+                  "404":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
