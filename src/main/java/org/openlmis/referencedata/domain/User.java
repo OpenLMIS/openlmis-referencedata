@@ -72,7 +72,7 @@ public class User extends BaseEntity {
   @Setter
   private boolean active;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
 
@@ -109,11 +109,11 @@ public class User extends BaseEntity {
     this.active = active;
     this.verified = verified;
   }
-
+  
   public static User newUser(Importer importer) {
     return new User(importer);
   }
-
+  
   /**
    * Clear all role assignments from this user. Mainly used as a starting point to re-assign roles.
    */

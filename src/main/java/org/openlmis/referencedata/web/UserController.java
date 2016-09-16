@@ -309,8 +309,10 @@ public class UserController extends BaseController {
 
     try {
 
-      LOGGER.debug("Assigning roles to user and saving");
       user.resetRoles();
+      userRepository.save(user);
+
+      LOGGER.debug("Assigning roles to user and saving");
       for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
         RoleAssignment roleAssignment;
 
