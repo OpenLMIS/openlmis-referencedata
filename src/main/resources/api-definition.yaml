@@ -1207,43 +1207,6 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
-        /roles:
-            is: [ secured ]
-            displayName: User roles
-            get:
-                is: [ secured ]
-                description: Get all roles for the associated user.
-                responses:
-                    "200":
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
-                        body:
-                          application/json:
-            put:
-                is: [ secured ]
-                description: Save roles for the associated user.
-                body:
-                    application/json:
-                responses:
-                    "200":
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
-                        body:
-                          application/json:
-                    "400":
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
-                        body:
-                          application/json:
-                    "404":
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
-                        body:
-                          application/json:
         /hasRight:
             get:
                 is: [ secured ]

@@ -30,6 +30,7 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -42,7 +43,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -150,6 +150,7 @@ public class UserControllerTest {
 
   public void preparePostOrPut() {
     when(repository.findOne(userId)).thenReturn(user1);
+    when(facilityRepository.findFirstByCode(homeFacilityCode)).thenReturn(homeFacility);
   }
 
   @Test
@@ -184,6 +185,28 @@ public class UserControllerTest {
   }
 
   @Test
+  public void shouldGetUserWithRoles() throws RightTypeException {
+    //given
+    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole1);
+    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole1,
+        program1);
+    user1.assignRoles(roleAssignment1, roleAssignment2);
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    UserDto expectedUserDto = new UserDto();
+    user1.export(expectedUserDto);
+
+    //when
+    ResponseEntity responseEntity = controller.getUser(userId);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    UserDto userDto = (UserDto) responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertEquals(expectedUserDto, userDto);
+  }
+
+  @Test
   public void shouldNotGetNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
@@ -201,13 +224,173 @@ public class UserControllerTest {
     preparePostOrPut();
 
     when(repository.findOne(userId)).thenReturn(null);
-    when(facilityRepository.findFirstByCode(homeFacilityCode)).thenReturn(homeFacility);
 
     //when
     HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
+    verify(repository).save(user1);
+  }
+
+  @Test
+  public void shouldUpdateExistingUserOnPut() {
+    //given
+    preparePostOrPut();
+
+    //when
+    HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    verify(repository).save(user1);
+  }
+
+  @Test
+  public void shouldNotSaveUserForRoleAssignmentWithoutRole() throws RightTypeException {
+    //given
+    preparePostOrPut();
+
+    user1Dto.setRoleAssignments(Sets.newHashSet(new RoleAssignmentDto()));
+
+    //when
+    HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.BAD_REQUEST));
+  }
+
+  @Test
+  public void shouldSaveUserWithDirectRole() throws RightTypeException {
+    //given
+    preparePostOrPut();
+
+    when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
+    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
+    roleAssignmentDto.setRoleId(roleId);
+    user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+
+    //when
+    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertEquals(user1Dto, savedUserDto);
+    verify(repository).save(user1);
+  }
+
+  @Test
+  public void shouldSaveUserWithHomeFacilityRole() throws RightTypeException {
+    //given
+    preparePostOrPut();
+
+    when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
+    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
+    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
+    roleAssignmentDto.setRoleId(roleId);
+    roleAssignmentDto.setProgramCode(programCode);
+    user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+
+    //when
+    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertEquals(user1Dto, savedUserDto);
+    verify(repository).save(user1);
+  }
+
+  @Test
+  public void shouldSaveUserWithSupervisoryRole() throws RightTypeException {
+    //given
+    preparePostOrPut();
+
+    when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
+    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
+    when(supervisoryNodeRepository.findByCode(supervisoryNodeCode)).thenReturn(supervisoryNode1);
+    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
+    roleAssignmentDto.setRoleId(roleId);
+    roleAssignmentDto.setProgramCode(programCode);
+    roleAssignmentDto.setSupervisoryNodeCode(supervisoryNodeCode);
+    user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+
+    //when
+    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertEquals(user1Dto, savedUserDto);
+    verify(repository).save(user1);
+  }
+
+  @Test
+  public void shouldSaveUserWithFulfillmentRole() throws RightTypeException,
+      RoleAssignmentException {
+    //given
+    preparePostOrPut();
+
+    when(roleRepository.findOne(roleId)).thenReturn(fulfillmentRole1);
+    when(facilityRepository.findFirstByCode(warehouseCode)).thenReturn(warehouse1);
+    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
+    roleAssignmentDto.setRoleId(roleId);
+    roleAssignmentDto.setWarehouseCode(warehouseCode);
+    user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+
+    //when
+    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertEquals(user1Dto, savedUserDto);
+    verify(repository).save(user1);
+  }
+
+  @Test
+  public void shouldReplaceExistingUserRoles() throws RightTypeException {
+    //given
+    preparePostOrPut();
+
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
+
+    when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
+    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
+    roleAssignmentDto.setRoleId(roleId);
+    user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+
+    //when
+    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertEquals(user1Dto, savedUserDto);
+    verify(repository).save(user1);
+  }
+
+  @Test
+  public void shouldDeleteExistingUserRoles() throws RightTypeException {
+    //given
+    preparePostOrPut();
+
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
+
+    //when
+    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    HttpStatus httpStatus = responseEntity.getStatusCode();
+    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+
+    //then
+    assertThat(httpStatus, is(HttpStatus.OK));
+    assertEquals(user1Dto, savedUserDto);
     verify(repository).save(user1);
   }
 
@@ -235,197 +418,6 @@ public class UserControllerTest {
     //then
     assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
     verify(repository, never()).delete(userId);
-  }
-
-  @Test
-  public void shouldGetAllUserRoles() throws RightTypeException {
-    //given
-    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole1);
-    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole1,
-        program1);
-    user1.assignRoles(roleAssignment1, roleAssignment2);
-    when(repository.findOne(userId)).thenReturn(user1);
-
-    RoleAssignmentDto roleAssignment1Dto = new RoleAssignmentDto();
-    RoleAssignmentDto roleAssignment2Dto = new RoleAssignmentDto();
-    roleAssignment1.export(roleAssignment1Dto);
-    roleAssignment2.export(roleAssignment2Dto);
-    Set<RoleAssignmentDto> expectedRoleAssignmentDtos = Sets.newHashSet(roleAssignment1Dto,
-        roleAssignment2Dto);
-
-    //when
-    ResponseEntity responseEntity = controller.getAllUserRoles(userId);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<RoleAssignmentDto> roleAssignmentDtos = (Set<RoleAssignmentDto>) responseEntity.getBody();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(expectedRoleAssignmentDtos, roleAssignmentDtos);
-  }
-
-  @Test
-  public void shouldNotGetAllUserRolesForNonExistingUser() {
-    //given
-    when(repository.findOne(userId)).thenReturn(null);
-
-    //when
-    HttpStatus httpStatus = controller.getAllUserRoles(userId).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
-  }
-
-  @Test
-  public void shouldNotSaveUserRoleForNonExistingUser() {
-    //given
-    when(repository.findOne(userId)).thenReturn(null);
-    Set<RoleAssignmentDto> roleAssignmentDtos = new HashSet<>();
-
-    //when
-    HttpStatus httpStatus = controller.saveUserRoles(userId, roleAssignmentDtos).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
-  }
-
-  @Test
-  public void shouldNotSaveUserRoleForRoleAssignmentWithoutRole() {
-    //given
-    when(repository.findOne(userId)).thenReturn(user1);
-    Set<RoleAssignmentDto> roleAssignmentDtos = Sets.newHashSet(new RoleAssignmentDto());
-
-    //when
-    HttpStatus httpStatus = controller.saveUserRoles(userId, roleAssignmentDtos).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.BAD_REQUEST));
-  }
-
-  @Test
-  public void shouldSaveDirectUserRole() {
-    //given
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
-    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
-    Set<RoleAssignmentDto> roleAssignmentDtos = Sets.newHashSet(roleAssignmentDto);
-
-    //when
-    ResponseEntity responseEntity = controller.saveUserRoles(userId, roleAssignmentDtos);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<RoleAssignmentDto> savedRoleAssignmentDtos = (Set<RoleAssignmentDto>) responseEntity
-        .getBody();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(roleAssignmentDtos, savedRoleAssignmentDtos);
-  }
-
-  @Test
-  public void shouldSaveHomeFacilityUserRole() {
-    //given
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
-    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
-    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
-    roleAssignmentDto.setProgramCode(programCode);
-    Set<RoleAssignmentDto> roleAssignmentDtos = Sets.newHashSet(roleAssignmentDto);
-
-    //when
-    ResponseEntity responseEntity = controller.saveUserRoles(userId, roleAssignmentDtos);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<RoleAssignmentDto> savedRoleAssignmentDtos = (Set<RoleAssignmentDto>) responseEntity
-        .getBody();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(roleAssignmentDtos, savedRoleAssignmentDtos);
-  }
-
-  @Test
-  public void shouldSaveSupervisoryUserRole() {
-    //given
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
-    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
-    when(supervisoryNodeRepository.findByCode(supervisoryNodeCode)).thenReturn(supervisoryNode1);
-    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
-    roleAssignmentDto.setProgramCode(programCode);
-    roleAssignmentDto.setSupervisoryNodeCode(supervisoryNodeCode);
-    Set<RoleAssignmentDto> roleAssignmentDtos = Sets.newHashSet(roleAssignmentDto);
-
-    //when
-    ResponseEntity responseEntity = controller.saveUserRoles(userId, roleAssignmentDtos);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<RoleAssignmentDto> savedRoleAssignmentDtos = (Set<RoleAssignmentDto>) responseEntity
-        .getBody();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(roleAssignmentDtos, savedRoleAssignmentDtos);
-  }
-
-  @Test
-  public void shouldSaveFulfillmentUserRole() {
-    //given
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(roleRepository.findOne(roleId)).thenReturn(fulfillmentRole1);
-    when(facilityRepository.findFirstByCode(warehouseCode)).thenReturn(warehouse1);
-    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
-    roleAssignmentDto.setWarehouseCode(warehouseCode);
-    Set<RoleAssignmentDto> roleAssignmentDtos = Sets.newHashSet(roleAssignmentDto);
-
-    //when
-    ResponseEntity responseEntity = controller.saveUserRoles(userId, roleAssignmentDtos);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<RoleAssignmentDto> savedRoleAssignmentDtos = (Set<RoleAssignmentDto>) responseEntity
-        .getBody();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(roleAssignmentDtos, savedRoleAssignmentDtos);
-  }
-
-  @Test
-  public void shouldReplaceExistingUserRoles() throws RightTypeException {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
-    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
-    Set<RoleAssignmentDto> roleAssignmentDtos = Sets.newHashSet(roleAssignmentDto);
-
-    //when
-    ResponseEntity responseEntity = controller.saveUserRoles(userId, roleAssignmentDtos);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<RoleAssignmentDto> savedRoleAssignmentDtos = (Set<RoleAssignmentDto>) responseEntity
-        .getBody();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(roleAssignmentDtos, savedRoleAssignmentDtos);
-  }
-
-  @Test
-  public void shouldDeleteExistingUserRoles() throws RightTypeException {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
-    when(repository.findOne(userId)).thenReturn(user1);
-    Set<RoleAssignmentDto> roleAssignmentDtos = new HashSet<>();
-
-    //when
-    ResponseEntity responseEntity = controller.saveUserRoles(userId, roleAssignmentDtos);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<RoleAssignmentDto> savedRoleAssignmentDtos = (Set<RoleAssignmentDto>) responseEntity
-        .getBody();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.OK));
-    assertEquals(roleAssignmentDtos, savedRoleAssignmentDtos);
   }
 
   @Test

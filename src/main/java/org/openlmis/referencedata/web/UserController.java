@@ -22,6 +22,8 @@ import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.ExternalApiException;
+import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -144,11 +146,26 @@ public class UserController extends BaseController {
     try {
 
       User userToSave = User.newUser(userDto);
+
+      Set<RoleAssignmentDto> roleAssignmentDtos = userDto.getRoleAssignments();
+      if (roleAssignmentDtos != null) {
+
+        boolean foundNullRoleId = roleAssignmentDtos.stream().anyMatch(
+            roleAssignmentDto -> roleAssignmentDto.getRoleId() == null);
+        if (foundNullRoleId) {
+          return ResponseEntity
+              .badRequest()
+              .body("Role ID is required");
+        }
+
+        assignRolesToUser(roleAssignmentDtos, userToSave);
+      }
+
       //userService.save(userToSave, token); TODO: reinstate when dependency on auth is proper
       userRepository.save(userToSave);
 
       return ResponseEntity
-          .ok(exportToUserDto(userToSave));
+          .ok(exportToDto(userToSave));
 
     } catch (ExternalApiException ex) {
 
@@ -158,6 +175,12 @@ public class UserController extends BaseController {
       return ResponseEntity
           .status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(errorResponse);
+    } catch (AuthException ae) {
+      LOGGER.error("An error occurred while creating role assignment object: "
+          + ae.getMessage());
+      return ResponseEntity
+          .badRequest()
+          .body(ae.getMessage());
     }
   }
 
@@ -172,7 +195,7 @@ public class UserController extends BaseController {
 
     LOGGER.debug("Getting all users");
     Set<User> users = Sets.newHashSet(userRepository.findAll());
-    Set<UserDto> userDtos = users.stream().map(user -> exportToUserDto(user)).collect(toSet());
+    Set<UserDto> userDtos = users.stream().map(user -> exportToDto(user)).collect(toSet());
 
     return ResponseEntity
         .ok(userDtos);
@@ -196,7 +219,7 @@ public class UserController extends BaseController {
           .build();
     } else {
       return ResponseEntity
-          .ok(exportToUserDto(user));
+          .ok(exportToDto(user));
     }
   }
 
@@ -265,112 +288,6 @@ public class UserController extends BaseController {
         }
       }
     };
-  }
-
-  /**
-   * Get all roles associated with the specified user.
-   *
-   * @return all roles associated with the specified user
-   */
-  @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllUserRoles(@PathVariable(USER_ID) UUID userId) {
-
-    LOGGER.debug("Getting all roles associated with userId: " + userId);
-    User user = userRepository.findOne(userId);
-    if (user == null) {
-      LOGGER.error("User not found");
-      return ResponseEntity
-          .notFound()
-          .build();
-    }
-
-    return ResponseEntity
-        .ok()
-        .body(exportToDtos(user.getRoleAssignments()));
-  }
-
-  /**
-   * Assign roles to a user using the provided role assignment DTOs.
-   *
-   * @param roleAssignmentDtos role assignment DTOs to associate to the user
-   * @return if successful, the updated user; otherwise an HTTP error
-   */
-  @RequestMapping(value = "/users/{userId}/roles", method = RequestMethod.PUT)
-  public ResponseEntity<?> saveUserRoles(@PathVariable(USER_ID) UUID userId,
-                                         @RequestBody Set<RoleAssignmentDto> roleAssignmentDtos) {
-
-    User user = userRepository.findOne(userId);
-    if (user == null) {
-      LOGGER.error("User not found");
-      return ResponseEntity
-          .notFound()
-          .build();
-    }
-
-    try {
-
-      user.resetRoles();
-      userRepository.save(user);
-
-      LOGGER.debug("Assigning roles to user and saving");
-      for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
-        RoleAssignment roleAssignment;
-
-        UUID roleId = roleAssignmentDto.getRoleId();
-        if (roleId == null) {
-          LOGGER.error("Role ID is required");
-          return ResponseEntity
-              .badRequest()
-              .body("Role ID is required");
-        }
-        Role role = roleRepository.findOne(roleId);
-
-        String programCode = roleAssignmentDto.getProgramCode();
-        String warehouseCode = roleAssignmentDto.getWarehouseCode();
-        if (programCode != null) {
-
-          Program program = programRepository.findByCode(Code.code(programCode));
-          String supervisoryNodeCode = roleAssignmentDto.getSupervisoryNodeCode();
-          if (supervisoryNodeCode != null) {
-
-            SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode(
-                supervisoryNodeCode);
-            roleAssignment = new SupervisionRoleAssignment(role, program, supervisoryNode);
-
-          } else {
-            roleAssignment = new SupervisionRoleAssignment(role, program);
-          }
-
-        } else if (warehouseCode != null) {
-
-          Facility warehouse = facilityRepository.findFirstByCode(warehouseCode);
-          roleAssignment = new FulfillmentRoleAssignment(role, warehouse);
-
-        } else {
-          roleAssignment = new DirectRoleAssignment(role);
-        }
-
-        user.assignRoles(roleAssignment);
-      }
-
-      userRepository.save(user);
-
-    } catch (DataIntegrityViolationException dive) {
-      LOGGER.error("An error occurred while saving roles to user: "
-          + dive.getRootCause().getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(dive.getRootCause().getMessage());
-    } catch (AuthException ae) {
-      LOGGER.error("An error occurred while creating role assignment object: "
-          + ae.getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(ae.getMessage());
-    }
-
-    return ResponseEntity
-        .ok(exportToDtos(user.getRoleAssignments()));
   }
 
   /**
@@ -484,24 +401,44 @@ public class UserController extends BaseController {
         .body(supervisedFacilities);
   }
 
-  private <T extends RoleAssignment> RoleAssignmentDto exportToDto(T roleAssignment) {
-    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    if (roleAssignment instanceof SupervisionRoleAssignment) {
-      ((SupervisionRoleAssignment) roleAssignment).export(roleAssignmentDto);
-    } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
-      ((FulfillmentRoleAssignment) roleAssignment).export(roleAssignmentDto);
-    } else {
-      ((DirectRoleAssignment) roleAssignment).export(roleAssignmentDto);
+  private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user)
+      throws RightTypeException, RoleAssignmentException {
+    LOGGER.debug("Assigning roles to user and saving");
+    for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
+      RoleAssignment roleAssignment;
+
+      Role role = roleRepository.findOne(roleAssignmentDto.getRoleId());
+
+      String programCode = roleAssignmentDto.getProgramCode();
+      String warehouseCode = roleAssignmentDto.getWarehouseCode();
+      if (programCode != null) {
+
+        Program program = programRepository.findByCode(Code.code(programCode));
+        String supervisoryNodeCode = roleAssignmentDto.getSupervisoryNodeCode();
+        if (supervisoryNodeCode != null) {
+
+          SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode(
+              supervisoryNodeCode);
+          roleAssignment = new SupervisionRoleAssignment(role, program, supervisoryNode);
+
+        } else {
+          roleAssignment = new SupervisionRoleAssignment(role, program);
+        }
+
+      } else if (warehouseCode != null) {
+
+        Facility warehouse = facilityRepository.findFirstByCode(warehouseCode);
+        roleAssignment = new FulfillmentRoleAssignment(role, warehouse);
+
+      } else {
+        roleAssignment = new DirectRoleAssignment(role);
+      }
+
+      user.assignRoles(roleAssignment);
     }
-    return roleAssignmentDto;
   }
 
-  private Set<RoleAssignmentDto> exportToDtos(Set<RoleAssignment> roleAssignments) {
-    return roleAssignments.stream().map(roleAssignment -> exportToDto(roleAssignment))
-        .collect(toSet());
-  }
-
-  private UserDto exportToUserDto(User user) {
+  private UserDto exportToDto(User user) {
     UserDto userDto = new UserDto();
     user.export(userDto);
     return userDto;

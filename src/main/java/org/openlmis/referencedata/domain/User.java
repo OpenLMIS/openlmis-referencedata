@@ -109,11 +109,11 @@ public class User extends BaseEntity {
     this.active = active;
     this.verified = verified;
   }
-  
+
   public static User newUser(Importer importer) {
     return new User(importer);
   }
-  
+
   /**
    * Clear all role assignments from this user. Mainly used as a starting point to re-assign roles.
    */
@@ -183,6 +183,7 @@ public class User extends BaseEntity {
     exporter.setHomeFacility(homeFacility);
     exporter.setActive(active);
     exporter.setVerified(verified);
+    exporter.addRoleAssignments(roleAssignments);
   }
 
   @Override
@@ -220,6 +221,8 @@ public class User extends BaseEntity {
     void setVerified(boolean verified);
 
     void setActive(boolean active);
+
+    void addRoleAssignments(Set<RoleAssignment> roleAssignments);
   }
 
   public interface Importer {
