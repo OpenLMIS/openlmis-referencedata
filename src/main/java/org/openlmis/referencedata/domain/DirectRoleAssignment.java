@@ -1,12 +1,11 @@
 package org.openlmis.referencedata.domain;
 
-import static java.util.Arrays.asList;
+import com.google.common.collect.Sets;
 
 import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
@@ -23,7 +22,7 @@ public class DirectRoleAssignment extends RoleAssignment {
 
   @Override
   protected Set<RightType> getAcceptableRightTypes() {
-    return new HashSet<>(asList(RightType.GENERAL_ADMIN, RightType.REPORTS));
+    return Sets.newHashSet(RightType.GENERAL_ADMIN, RightType.REPORTS);
   }
 
   @Override
@@ -36,6 +35,11 @@ public class DirectRoleAssignment extends RoleAssignment {
     super.assignTo(user);
   }
 
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
   public void export(Exporter exporter) {
     exporter.setRoleId(role.getId());
   }

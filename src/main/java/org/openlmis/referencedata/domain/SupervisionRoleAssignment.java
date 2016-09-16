@@ -69,6 +69,10 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   @Override
+  /**
+   * Check if this role assignment has a right based on specified criteria. For supervision, 
+   * check also that program matches and supervisory node matches (if present).
+   */
   public boolean hasRight(RightQuery rightQuery) {
     boolean roleMatches = role.contains(rightQuery.getRight());
     boolean programMatches = program.equals(rightQuery.getProgram());
@@ -84,6 +88,10 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   @Override
+  /**
+   * Assign this role assignment to the specified user. For supervision, will also add programs 
+   * and supervised facilities to the user.
+   */
   public void assignTo(User user) {
     super.assignTo(user);
     if (supervisoryNode == null) {
@@ -96,9 +104,9 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   /**
-   * Export this object's properties for serialization to the exporter provided.
-   * 
-   * @param exporter the exporter provided
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
     exporter.setRoleId(role.getId());

@@ -117,7 +117,7 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Custom endpoint for creating and updating users.
+   * Custom endpoint for creating and updating users and their roles.
    */
   @RequestMapping(value = "/users", method = RequestMethod.PUT)
   public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto/*,
@@ -185,7 +185,7 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Get all users.
+   * Get all users and their roles.
    *
    * @return Users.
    */
@@ -202,7 +202,7 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Get chosen user.
+   * Get chosen user and role.
    *
    * @param userId UUID of user whose we want to get
    * @return User.

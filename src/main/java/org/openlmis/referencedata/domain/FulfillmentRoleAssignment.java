@@ -57,6 +57,10 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   }
 
   @Override
+  /**
+   * Check if this role assignment has a right based on specified criteria. For fulfillment, check
+   * also that the warehouse matches.
+   */
   public boolean hasRight(RightQuery rightQuery) {
     boolean roleMatches = role.contains(rightQuery.getRight());
     boolean warehouseMatches = warehouse.equals(rightQuery.getWarehouse());
@@ -70,9 +74,9 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   }
 
   /**
-   * Export this object's properties for serialization to the exporter provided.
+   * Export this object to the specified exporter (DTO).
    *
-   * @param exporter the exporter provided
+   * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
     exporter.setRoleId(role.getId());

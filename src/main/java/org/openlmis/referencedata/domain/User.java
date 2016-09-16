@@ -77,12 +77,15 @@ public class User extends BaseEntity {
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
 
   @Transient
+  @Getter
   private Set<Program> homeFacilityPrograms = new HashSet<>();
 
   @Transient
+  @Getter
   private Set<Program> supervisedPrograms = new HashSet<>();
 
   @Transient
+  @Getter
   private Set<Facility> supervisedFacilities = new HashSet<>();
 
   private User(Importer importer) {
@@ -110,15 +113,14 @@ public class User extends BaseEntity {
     this.verified = verified;
   }
 
+  /**
+   * Construct new user based on an importer (DTO).
+   * 
+   * @param importer importer (DTO) to use
+   * @return new user
+   */
   public static User newUser(Importer importer) {
     return new User(importer);
-  }
-
-  /**
-   * Clear all role assignments from this user. Mainly used as a starting point to re-assign roles.
-   */
-  public void resetRoles() {
-    this.roleAssignments.clear();
   }
 
   /**
@@ -133,28 +135,22 @@ public class User extends BaseEntity {
     }
   }
 
+  /**
+   * Check if this user has a right based on specified criteria.
+   * 
+   * @param rightQuery criteria to check
+   * @return true or false, depending on if user has the right
+   */
   public boolean hasRight(RightQuery rightQuery) {
     return roleAssignments.stream().anyMatch(roleAssignment -> roleAssignment.hasRight(rightQuery));
-  }
-
-  public Set<Program> getHomeFacilityPrograms() {
-    return homeFacilityPrograms;
   }
 
   public void addHomeFacilityProgram(Program program) {
     homeFacilityPrograms.add(program);
   }
 
-  public Set<Program> getSupervisedPrograms() {
-    return supervisedPrograms;
-  }
-
   public void addSupervisedProgram(Program program) {
     supervisedPrograms.add(program);
-  }
-
-  public Set<Facility> getSupervisedFacilities() {
-    return supervisedFacilities;
   }
 
   public void addSupervisedFacilities(Set<Facility> facilities) {
@@ -162,6 +158,10 @@ public class User extends BaseEntity {
   }
 
   @PostLoad
+  /**
+   * Refresh transient supervision properties (home facility and supervised programs, supervised 
+   * facilities), after the user object is loaded from the database.
+   */
   private void refreshSupervisions() {
     for (RoleAssignment roleAssignment : roleAssignments) {
       roleAssignment.assignTo(this);
