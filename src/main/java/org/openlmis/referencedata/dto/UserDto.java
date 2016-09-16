@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 
@@ -13,7 +12,7 @@ import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto extends BaseEntity implements User.Exporter, User.Importer {
+public class UserDto extends BaseDto implements User.Exporter, User.Importer {
 
   @Getter
   @Setter
