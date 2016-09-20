@@ -72,6 +72,11 @@ public class User extends BaseEntity {
   @Setter
   private boolean active;
 
+  @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
+  @Getter
+  @Setter
+  private boolean restrictLogin;
+
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();

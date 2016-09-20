@@ -32,12 +32,16 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.referencedata.util.PasswordChangeRequest;
+import org.openlmis.referencedata.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -400,6 +404,61 @@ public class UserController extends BaseController {
         .ok()
         .body(supervisedFacilities);
   }
+
+  /**
+   * Resets a user's password.
+   */
+  @RequestMapping(value = "/users/passwordReset", method = RequestMethod.POST)
+  public ResponseEntity<?> passwordReset(
+      @RequestBody @Valid PasswordResetRequest passwordResetRequest,
+      BindingResult bindingResult, OAuth2Authentication auth) {
+
+    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
+    String token = details.getTokenValue();
+
+    if (bindingResult.hasErrors()) {
+      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      userService.passwordReset(passwordResetRequest, token);
+
+      return new ResponseEntity<>(HttpStatus.OK);
+    } catch (ExternalApiException ex) {
+      ErrorResponse errorResponse =
+          new ErrorResponse("Could not reset user password", ex.getMessage());
+      LOGGER.error(errorResponse.getMessage(), ex);
+      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Changes user's password if valid reset token is provided.
+   */
+  @RequestMapping(value = "/users/changePassword", method = RequestMethod.POST)
+  public ResponseEntity<?> changePassword(
+      @RequestBody @Valid PasswordChangeRequest passwordChangeRequest, BindingResult bindingResult,
+      OAuth2Authentication auth) {
+    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
+    String token = details.getTokenValue();
+
+    if (bindingResult.hasErrors()) {
+      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      userService.changePassword(passwordChangeRequest, token);
+
+      return new ResponseEntity(HttpStatus.OK);
+    } catch (ExternalApiException ex) {
+      ErrorResponse errorResponse =
+          new ErrorResponse("Could not reset user password", ex.getMessage());
+      LOGGER.error(errorResponse.getMessage(), ex);
+      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+
 
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user)
       throws RightTypeException, RoleAssignmentException {

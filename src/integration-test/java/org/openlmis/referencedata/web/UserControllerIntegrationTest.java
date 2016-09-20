@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -23,6 +24,8 @@ import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.AuthUserRequest;
+import org.openlmis.referencedata.util.PasswordChangeRequest;
+import org.openlmis.referencedata.util.PasswordResetRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
@@ -33,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Ignore
 @SuppressWarnings("PMD.TooManyMethods")
@@ -41,6 +45,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/users";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String RESET_PASSWORD_URL = RESOURCE_URL + "/passwordReset";
+  private static final String CHANGE_PASSWORD_URL = RESOURCE_URL + "/changePassword";
   private static final String ACCESS_TOKEN = "access_token";
   private static final String USERNAME = "username";
   private static final String FIRST_NAME = "firstName";
@@ -209,6 +215,111 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     removeAuthUserByUsername(authUser.getUsername());
   }
 
+  //TODO: This test should be updated when example email will be added to notification module
+  @Ignore
+  @Test
+  public void shouldCreateRequisitionAndAuthUsersAndSendResetPasswordEmail() {
+    User user = generateUser();
+
+    User response = restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(user)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(User.class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertNotNull(response);
+
+    User savedUser = userRepository.findOne(response.getId());
+    assertNotNull(savedUser);
+
+    assertEquals(user.getUsername(), savedUser.getUsername());
+    assertEquals(user.getFirstName(), savedUser.getFirstName());
+    assertEquals(user.getLastName(), savedUser.getLastName());
+    assertEquals(user.getEmail(), savedUser.getEmail());
+    assertEquals(user.getHomeFacility().getId(), savedUser.getHomeFacility().getId());
+    assertEquals(user.isActive(), savedUser.isActive());
+    assertEquals(user.isVerified(), savedUser.isVerified());
+
+    AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
+    assertNotNull(authUser);
+
+    assertEquals(savedUser.getEmail(), authUser.getEmail());
+    assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
+
+    removeAuthUserByUsername(authUser.getUsername());
+  }
+
+  @Test
+  public void shouldResetPassword() {
+    User savedUser = createUser();
+    saveAuthUser(savedUser);
+
+    AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
+    assertNotNull(authUser);
+
+    assertNull(authUser.getPassword());
+
+    PasswordResetRequest passwordResetRequest =
+        new PasswordResetRequest(savedUser.getUsername(), "test12345");
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(passwordResetRequest)
+        .when()
+        .post(RESET_PASSWORD_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+
+    authUser = getAutUserByUsername(savedUser.getUsername());
+    assertNotNull(authUser);
+
+    assertNotNull(authUser.getPassword());
+
+    removeAuthUserByUsername(authUser.getUsername());
+  }
+
+  @Test
+  public void shouldChangePasswordIfValidResetTokenIsProvided() {
+    User savedUser = createUser();
+    saveAuthUser(savedUser);
+
+    AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
+    assertNotNull(authUser);
+
+    assertNull(authUser.getPassword());
+
+    UUID tokenId = passwordResetToken(authUser.getReferenceDataUserId());
+    PasswordChangeRequest passwordChangeRequest =
+        new PasswordChangeRequest(tokenId, authUser.getUsername(), "test12345");
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(passwordChangeRequest)
+        .when()
+        .post(CHANGE_PASSWORD_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+
+    authUser = getAutUserByUsername(savedUser.getUsername());
+    assertNotNull(authUser);
+
+    assertNotNull(authUser.getPassword());
+
+    removeAuthUserByUsername(authUser.getUsername());
+  }
+
+
   //need to be ignored atm
   @Ignore
   @Test
@@ -271,6 +382,26 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
 
     removeAuthUserByUsername(authUser.getUsername());
+  }
+
+  private void saveAuthUser(User user) {
+    AuthUserRequest userRequest = new AuthUserRequest();
+    userRequest.setUsername(user.getUsername());
+    userRequest.setEmail(user.getEmail());
+    userRequest.setReferenceDataUserId(user.getId());
+
+    String url = "http://auth:8080/api/users?access_token=" + getToken();
+    RestTemplate restTemplate = new RestTemplate();
+
+    restTemplate.postForObject(url, userRequest, Object.class);
+  }
+
+  private UUID passwordResetToken(UUID referenceDataUserId) {
+    String url = "http://auth:8080/api/users/passwordResetToken?userId=" + referenceDataUserId
+        + "&access_token=" + getToken();
+    RestTemplate restTemplate = new RestTemplate();
+
+    return restTemplate.postForObject(url, null, UUID.class);
   }
 
   private AuthUserRequest getAutUserByUsername(String username) {
