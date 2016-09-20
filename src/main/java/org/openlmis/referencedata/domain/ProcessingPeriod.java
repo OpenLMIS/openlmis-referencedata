@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "periods", schema = "referencedata")
+@Table(name = "processing_periods", schema = "referencedata")
 @NoArgsConstructor
 public class ProcessingPeriod extends BaseEntity {
 

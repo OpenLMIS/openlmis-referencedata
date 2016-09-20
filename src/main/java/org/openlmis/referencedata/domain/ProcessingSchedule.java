@@ -22,7 +22,7 @@ import javax.persistence.Table;
 
 
 @Entity
-@Table(name = "schedules", schema = "referencedata")
+@Table(name = "processing_schedules", schema = "referencedata")
 @NoArgsConstructor
 public class ProcessingSchedule extends BaseEntity {
 
