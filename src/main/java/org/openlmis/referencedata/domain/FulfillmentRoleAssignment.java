@@ -17,7 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-@DiscriminatorValue("fulfillment_role_assignments")
+@DiscriminatorValue("fulfillment")
 @NoArgsConstructor
 public class FulfillmentRoleAssignment extends RoleAssignment {
 
