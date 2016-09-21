@@ -147,6 +147,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     facility.setName("FacilityName" + instanceNumber);
     facility.setDescription("FacilityDescription" + instanceNumber);
     facility.setActive(true);
+    facility.setEnabled(true);
     facilityRepository.save(facility);
     return facility;
   }

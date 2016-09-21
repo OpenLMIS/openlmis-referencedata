@@ -71,6 +71,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     facility.setGeographicZone(geographicZone);
     facility.setCode(code);
     facility.setActive(true);
+    facility.setEnabled(true);
     facilityRepository.save(facility);
 
     supervisoryNode = new SupervisoryNode();

@@ -58,6 +58,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     facility.setGeographicZone(geographicZone);
     facility.setCode(code);
     facility.setActive(true);
+    facility.setEnabled(true);
     facilityRepository.save(facility);
   }
 

@@ -52,6 +52,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     facility.setName("Facility #" + instanceNumber);
     facility.setDescription("Test facility");
     facility.setActive(true);
+    facility.setEnabled(true);
     return facility;
   }
 }
