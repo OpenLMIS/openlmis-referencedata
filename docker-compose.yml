@@ -1,27 +1,20 @@
 version: "2"
 services:
+
   referencedata:
     image: openlmis/referencedata
-    links:
-      - nginx-proxy
-      - db
-      - log
     ports:
       - "8080"
+    links:
+      - db
+      - log
     env_file: .env
+
   db:
     image: openlmis/postgres
-    ports:
-      - "5432"
     env_file: .env
+
   log:
     image: openlmis/rsyslog
     volumes:
       - '../logs/referencedata:/var/log'
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    container_name: nginx-proxy
-    ports:
-      - "80:80"
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
