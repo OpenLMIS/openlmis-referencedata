@@ -2306,7 +2306,7 @@ resourceTypes:
                     X-Content-Type-Options:
                     X-XSS-Protection:
                   body:
-                      application/json:
+                      text/plain:
     get:
           is: [ secured ]
           description: Get all roles.
@@ -2356,8 +2356,6 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                      body:
-                          application/json:
           delete:
               is: [ secured ]
               description: Delete chosen role.
@@ -2376,8 +2374,6 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                      body:
-                          application/json:
 
 /rights:
     displayName: Right

@@ -20,6 +20,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -42,7 +43,7 @@ public class Role extends BaseEntity {
   @Setter
   private String description;
 
-  @ManyToMany(
+  @ManyToMany(fetch = FetchType.EAGER,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "role_rights",
       schema = "referencedata",

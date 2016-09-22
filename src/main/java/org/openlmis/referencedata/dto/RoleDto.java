@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.openlmis.referencedata.domain.Right;
-import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 
 import java.util.HashSet;
@@ -18,7 +17,7 @@ public class RoleDto extends BaseDto implements Role.Exporter, Role.Importer {
   private String name;
 
   @Getter
-  
+
   @Setter
   private String description;
 
@@ -39,10 +38,6 @@ public class RoleDto extends BaseDto implements Role.Exporter, Role.Importer {
     Set<Right.Importer> rightDtos = new HashSet<>();
     rightDtos.addAll(this.rights);
     return rightDtos;
-  }
-
-  public RightType getRightType() {
-    return rights.iterator().next().getType();
   }
 
   @Override
