@@ -2387,7 +2387,7 @@ resourceTypes:
           body:
               application/json:
           responses:
-              "201":
+              "200":
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
@@ -2430,8 +2430,6 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                      body:
-                          application/json:
           delete:
               is: [ secured ]
               description: Delete chosen right.
@@ -2450,8 +2448,6 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                      body:
-                          application/json:
 
 /requisitionGroups:
     displayName: Requisition Group
