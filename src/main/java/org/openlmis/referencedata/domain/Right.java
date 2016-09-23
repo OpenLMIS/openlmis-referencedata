@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -41,7 +42,7 @@ public class Right extends BaseEntity {
   @Setter
   private String description;
 
-  @OneToMany(mappedBy = "parent")
+  @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
   @Getter
   private Set<Right> attachments = new HashSet<>();
 

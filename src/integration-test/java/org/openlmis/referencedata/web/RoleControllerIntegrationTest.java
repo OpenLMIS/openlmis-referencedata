@@ -12,9 +12,11 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
+import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/roles";
@@ -34,15 +37,29 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Autowired
   private RoleRepository roleRepository;
+  
+  @Autowired
+  private RightRepository rightRepository;
 
   private Role role;
   private RoleDto roleDto;
+  
+  private Right right1;
+  private Right right2;
 
   @Before
   public void setUp() throws RightTypeException, RoleException {
-    role = Role.newRole(ROLE_NAME, Right.newRight("right1", RightType.GENERAL_ADMIN));
+    right1 = Right.newRight("right1", RightType.GENERAL_ADMIN);
+
+    right2 = Right.newRight("right2", RightType.GENERAL_ADMIN);
+
+    role = Role.newRole(ROLE_NAME, right1, right2);
+
+    rightRepository.save(right1);
+    rightRepository.save(right2);
     roleRepository.save(role);
-    roleRepository.save(Role.newRole("role2", Right.newRight("right2", RightType.SUPERVISION)));
+
+    roleRepository.save(Role.newRole("role2", right2));
 
     roleDto = new RoleDto();
     role.export(roleDto);
@@ -51,6 +68,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   @After
   public void cleanUp() {
     roleRepository.deleteAll();
+    rightRepository.deleteAll();
   }
 
   @Test
@@ -168,7 +186,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewRoleOnPut() throws RightTypeException, RoleException {
 
     UUID newRoleId = UUID.randomUUID();
-    Role newRole = Role.newRole("role3", Right.newRight("right1", RightType.GENERAL_ADMIN));
+    Role newRole = Role.newRole("role3", right1);
     RoleDto newRoleDto = new RoleDto();
     newRole.export(newRoleDto);
 
@@ -188,6 +206,91 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
     Role storedRole = roleRepository.findOne(newRoleId);
     storedRole.getRights().size();
     assertEquals(newRole, storedRole);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+  
+  @Test
+  public void shouldAddRoleRightsOnPut() throws RightTypeException {
+
+    Right right3 = Right.newRight("right3", RightType.GENERAL_ADMIN);
+    rightRepository.save(right3);
+    
+    RightDto rightDto = new RightDto();
+    right3.export(rightDto);
+    roleDto.addRight(rightDto);
+    
+    RoleDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", role.getId())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(roleDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RoleDto.class);
+
+    assertEquals(roleDto, response);
+    Role storedRole = roleRepository.findOne(role.getId());
+    assertThat(storedRole.getRights().size(), is(3));
+    assertTrue(storedRole.contains(right3));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+  
+  @Test
+  public void shouldUpdateRoleRightsOnPut() throws RightTypeException, RoleException {
+
+    Right right3 = Right.newRight("right3", RightType.GENERAL_ADMIN);
+    rightRepository.save(right3);
+
+    Role updatedRole = Role.newRole(role.getName(), right1, right3);
+    RoleDto updatedRoleDto = new RoleDto();
+    updatedRole.export(updatedRoleDto);
+
+    RoleDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", role.getId())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(updatedRoleDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RoleDto.class);
+
+    assertEquals(updatedRoleDto, response);
+    Role storedRole = roleRepository.findOne(role.getId());
+    assertThat(storedRole.getRights().size(), is(2));
+    assertTrue(storedRole.contains(right3));
+    assertFalse(storedRole.contains(right2));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+  
+  @Test
+  public void shouldRemoveRoleRightsOnPut() throws RightTypeException, RoleException {
+
+    Role updatedRole = Role.newRole(role.getName(), right1);
+    RoleDto updatedRoleDto = new RoleDto();
+    updatedRole.export(updatedRoleDto);
+
+    RoleDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", role.getId())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(updatedRoleDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RoleDto.class);
+
+    assertEquals(updatedRoleDto, response);
+    Role storedRole = roleRepository.findOne(role.getId());
+    assertThat(storedRole.getRights().size(), is(1));
+    assertFalse(storedRole.contains(right2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
