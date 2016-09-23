@@ -451,7 +451,7 @@ public class UserController extends BaseController {
       return new ResponseEntity(HttpStatus.OK);
     } catch (ExternalApiException ex) {
       ErrorResponse errorResponse =
-          new ErrorResponse("Could not reset user password", ex.getMessage());
+          new ErrorResponse("Could not change user password", ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
       return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }

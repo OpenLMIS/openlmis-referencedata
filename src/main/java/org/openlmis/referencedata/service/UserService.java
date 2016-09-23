@@ -108,7 +108,7 @@ public class UserService {
 
       verifyUser(passwordChangeRequest.getUsername());
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not reset auth user password", ex);
+      throw new ExternalApiException("Could not change auth user password", ex);
     }
   }
 
