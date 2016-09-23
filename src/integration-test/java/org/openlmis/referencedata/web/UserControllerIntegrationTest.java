@@ -21,6 +21,7 @@ import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
@@ -38,6 +39,7 @@ import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -62,6 +64,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/users";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
+  private static final String PROGRAMS_URL = ID_URL + "/programs";
+  private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
   private static final String RESET_PASSWORD_URL = RESOURCE_URL + "/passwordReset";
   private static final String CHANGE_PASSWORD_URL = RESOURCE_URL + "/changePassword";
   private static final String ACCESS_TOKEN = "access_token";
@@ -71,6 +76,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String HOME_FACILITY = "homeFacility";
   private static final String ACTIVE = "active";
   private static final String VERIFIED = "verified";
+  private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
+  private static final String PROGRAM1_CODE = "P1";
+  private static final String PROGRAM2_CODE = "P2";
+  private static final String SUPERVISORY_NODE_CODE = "SN1";
 
   @Autowired
   private UserRepository userRepository;
@@ -98,10 +107,15 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
+  
+  @Autowired
+  private RequisitionGroupRepository requisitionGroupRepository;
 
   private User user1;
 
   private static Integer currentInstanceNumber = 0;
+  private Program program1;
+  private Program program2;
 
   @Before
   public void setUp() throws RoleException, RoleAssignmentException, RightTypeException {
@@ -290,7 +304,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldDeleteUser() {
 
-    restAssured.given()
+    restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", user1.getId())
@@ -308,7 +323,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     userRepository.delete(user1);
 
-    restAssured.given()
+    restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .pathParam("id", user1.getId())
         .when()
@@ -320,8 +336,157 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldReturnTrueIfUserHasRight() {
+
+    Boolean response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("rightName", SUPERVISION_RIGHT_NAME)
+        .queryParam("programCode", PROGRAM2_CODE)
+        .queryParam("supervisoryNodeCode", SUPERVISORY_NODE_CODE)
+        .pathParam("id", user1.getId())
+        .when()
+        .get(HAS_RIGHT_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Boolean.class);
+
+    assertTrue(response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnFalseIfUserDoesNotHaveRight() {
+
+    Boolean response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("rightName", SUPERVISION_RIGHT_NAME)
+        .queryParam("programCode", "DOES_NOT_EXIST")
+        .queryParam("supervisoryNodeCode", "DOES_NOT_EXIST")
+        .pathParam("id", user1.getId())
+        .when()
+        .get(HAS_RIGHT_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Boolean.class);
+
+    assertFalse(response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotCheckIfUserHasRightForNonExistingUser() {
+
+    userRepository.delete(user1);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("rightName", SUPERVISION_RIGHT_NAME)
+        .queryParam("programCode", PROGRAM2_CODE)
+        .queryParam("supervisoryNodeCode", SUPERVISORY_NODE_CODE)
+        .pathParam("id", user1.getId())
+        .when()
+        .get(HAS_RIGHT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserHomeFacilityPrograms() throws RightTypeException {
+
+    Program[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", user1.getId())
+        .when()
+        .get(PROGRAMS_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program[].class);
+
+    assertThat(response.length, is(1));
+    assertEquals(program1, response[0]);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserSupervisoryPrograms() throws RightTypeException {
+
+    Program[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("forHomeFacility", false)
+        .pathParam("id", user1.getId())
+        .when()
+        .get(PROGRAMS_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program[].class);
+
+    assertThat(response.length, is(1));
+    assertEquals(program2, response[0]);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotGetUserProgramsForNonExistingUser() {
+
+    userRepository.delete(user1);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", user1.getId())
+        .when()
+        .get(PROGRAMS_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserSupervisedFacilities() throws RightTypeException {
+
+    Facility[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", user1.getId())
+        .when()
+        .get(SUPERVISED_FACILITIES_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    assertThat(response.length, is(2));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotGetUserSupervisedFacilitiesForNonExistingUser() {
+
+    userRepository.delete(user1);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", user1.getId())
+        .when()
+        .get(SUPERVISED_FACILITIES_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldFindUsers() {
-    UserDto[] response = restAssured.given()
+    UserDto[] response = restAssured
+        .given()
         .queryParam(USERNAME, user1.getUsername())
         .queryParam(FIRST_NAME, user1.getFirstName())
         .queryParam(LAST_NAME, user1.getLastName())
@@ -367,7 +532,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateRequisitionAndAuthUsers() {
     User user = generateUser();
 
-    User response = restAssured.given()
+    User response = restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(user)
@@ -406,7 +572,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateRequisitionAndAuthUsersAndSendResetPasswordEmail() {
     User user = generateUser();
 
-    User response = restAssured.given()
+    User response = restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(user)
@@ -453,7 +620,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     PasswordResetRequest passwordResetRequest =
         new PasswordResetRequest(savedUser.getUsername(), "test12345");
 
-    restAssured.given()
+    restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(passwordResetRequest)
@@ -487,7 +655,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     PasswordChangeRequest passwordChangeRequest =
         new PasswordChangeRequest(tokenId, authUser.getUsername(), "test12345");
 
-    restAssured.given()
+    restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(passwordChangeRequest)
@@ -514,7 +683,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     User newUser = generateUser();
     UserDto newUserDto = new UserDto();
     newUser.export(newUserDto);
-    UserDto user = restAssured.given()
+    UserDto user = restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(newUserDto)
@@ -539,7 +709,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(savedUser.getEmail(), authUser.getEmail());
     assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
 
-    User response = restAssured.given()
+    User response = restAssured
+        .given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(user)
         .when()
@@ -682,13 +853,22 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     Role adminRole = Role.newRole("adminRole", adminRight);
     roleRepository.save(adminRole);
 
-    Right supervisionRight = Right.newRight("supervisionRight", RightType.SUPERVISION);
+    Right supervisionRight = Right.newRight(SUPERVISION_RIGHT_NAME, RightType.SUPERVISION);
     rightRepository.save(supervisionRight);
     Role supervisionRole = Role.newRole("supervisionRole", supervisionRight);
     roleRepository.save(supervisionRole);
-    Program program = new Program("P1");
-    programRepository.save(program);
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", generateFacility());
+    program1 = new Program(PROGRAM1_CODE);
+    programRepository.save(program1);
+    program2 = new Program(PROGRAM2_CODE);
+    programRepository.save(program2);
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(SUPERVISORY_NODE_CODE,
+        generateFacility());
+    supervisoryNodeRepository.save(supervisoryNode);
+    RequisitionGroup supervisionGroup = RequisitionGroup.newRequisitionGroup("supervisionGroup",
+        supervisoryNode);
+    supervisionGroup.setMemberFacilities(Arrays.asList(generateFacility(), generateFacility()));
+    requisitionGroupRepository.save(supervisionGroup);
+    supervisoryNode.setRequisitionGroup(supervisionGroup);
     supervisoryNodeRepository.save(supervisoryNode);
 
     Right fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
@@ -707,9 +887,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole);
     SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
-        program);
+        program1);
     SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
-        program, supervisoryNode);
+        program2, supervisoryNode);
     FulfillmentRoleAssignment roleAssignment4 = new FulfillmentRoleAssignment(fulfillmentRole,
         warehouse);
 

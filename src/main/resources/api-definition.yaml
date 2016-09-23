@@ -1243,8 +1243,6 @@ resourceTypes:
                         headers:
                           X-Content-Type-Options:
                           X-XSS-Protection:
-                        body:
-                          application/json:
         /programs:
             is: [ secured ]
             displayName: User supervised programs
@@ -1270,8 +1268,6 @@ resourceTypes:
                         headers:
                           X-Content-Type-Options:
                           X-XSS-Protection:
-                        body:
-                          application/json:
         /supervisedFacilities:
             is: [ secured ]
             displayName: User supervised facilities
@@ -1289,8 +1285,6 @@ resourceTypes:
                         headers:
                           X-Content-Type-Options:
                           X-XSS-Protection:
-                        body:
-                          application/json:
     /search:
             get:
                 is: [ secured ]

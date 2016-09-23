@@ -6,9 +6,9 @@ import lombok.Setter;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -52,13 +52,10 @@ public class RequisitionGroup extends BaseEntity {
   @Setter
   private List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules;
 
-  @ManyToMany(
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-      )
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "requisition_group_members",
       joinColumns = @JoinColumn(name = "requisitiongroupid", nullable = false),
-      inverseJoinColumns = @JoinColumn(name = "facilityid", nullable = false)
-      )
+      inverseJoinColumns = @JoinColumn(name = "facilityid", nullable = false))
   @Getter
   @Setter
   private List<Facility> memberFacilities;
@@ -72,7 +69,7 @@ public class RequisitionGroup extends BaseEntity {
    * Create a new requisition group with a specified supervisory node, program schedules and
    * facilities.
    *
-   * @param code specified code
+   * @param code            specified code
    * @param supervisoryNode specified supervisory node
    * @return the new requisition group
    */
