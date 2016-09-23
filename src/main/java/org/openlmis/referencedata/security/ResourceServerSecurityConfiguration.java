@@ -61,7 +61,6 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
     http.csrf().disable();
 
     http
-        .anonymous().and()
         .authorizeRequests()
         .antMatchers(
             "/",
