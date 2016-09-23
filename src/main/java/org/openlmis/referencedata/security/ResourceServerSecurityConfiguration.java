@@ -1,4 +1,4 @@
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,10 +71,9 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
             "/swagger-ui.js",
             "/swagger-ui.min.js",
             "/fonts/*"
-        ).permitAll();
+        ).permitAll()
+        .antMatchers("/**").fullyAuthenticated();
   }
-
-
 
   /**
    * AccessTokenConverter bean initializer that utilizes custom UserTokenConverter.
