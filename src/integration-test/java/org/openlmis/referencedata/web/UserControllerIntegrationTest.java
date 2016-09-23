@@ -681,7 +681,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     rightRepository.save(adminRight);
     Role adminRole = Role.newRole("adminRole", adminRight);
     roleRepository.save(adminRole);
-    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole);
 
     Right supervisionRight = Right.newRight("supervisionRight", RightType.SUPERVISION);
     rightRepository.save(supervisionRight);
@@ -691,10 +690,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     programRepository.save(program);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", generateFacility());
     supervisoryNodeRepository.save(supervisoryNode);
-    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
-        program);
-    SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
-        program, supervisoryNode);
 
     Right fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
     rightRepository.save(fulfillmentRight);
@@ -709,6 +704,12 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     warehouse.setActive(true);
     warehouse.setEnabled(true);
     facilityRepository.save(warehouse);
+
+    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole);
+    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
+        program);
+    SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
+        program, supervisoryNode);
     FulfillmentRoleAssignment roleAssignment4 = new FulfillmentRoleAssignment(fulfillmentRole,
         warehouse);
 

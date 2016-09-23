@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
@@ -22,7 +21,6 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.List;
 
-@Ignore
 public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/rights";
