@@ -1157,7 +1157,7 @@ resourceTypes:
                   X-Content-Type-Options:
                   X-XSS-Protection:
                 body:
-                  application/json:
+                  text/plain:
             "500":
                 headers:
                   X-Content-Type-Options:
@@ -1189,8 +1189,6 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
-                    body:
-                      application/json:
         get:
             is: [ secured ]
             description: Get chosen user.
@@ -1205,8 +1203,6 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
-                    body:
-                      application/json:
         /hasRight:
             get:
                 is: [ secured ]

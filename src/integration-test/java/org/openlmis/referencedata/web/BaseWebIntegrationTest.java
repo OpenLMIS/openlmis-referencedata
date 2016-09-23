@@ -3,6 +3,7 @@ package org.openlmis.referencedata.web;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
@@ -77,6 +78,16 @@ public abstract class BaseWebIntegrationTest {
         .willReturn(aResponse()
             .withHeader("Content-Type", "application/json")
             .withBody(MOCK_CHECK_RESULT)));
+
+    // This mocks the call to auth to post to an auth user.
+    wireMockRule.stubFor(post(urlPathEqualTo("/api/users"))
+        .willReturn(aResponse()
+            .withStatus(200)));
+
+    // This mocks the call to notification to post a notification.
+    wireMockRule.stubFor(post(urlPathEqualTo("/notification"))
+        .willReturn(aResponse()
+            .withStatus(200)));
   }
 
   @Before

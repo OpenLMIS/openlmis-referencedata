@@ -10,6 +10,7 @@ import org.openlmis.referencedata.util.NotificationRequest;
 import org.openlmis.referencedata.util.PasswordChangeRequest;
 import org.openlmis.referencedata.util.PasswordResetRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,23 +34,30 @@ public class UserService {
   @Autowired
   private ExposedMessageSource messageSource;
 
+  @Value("${virtual.host}")
+  private String virtualHost;
+
+  @Value("${virtual.port}")
+  private String virtualPort;
+
   /**
    * Method returns all users with matched parameters.
-   * @param username username of user.
-   * @param firstName firstName of user.
-   * @param lastName lastName of user.
+   *
+   * @param username     username of user.
+   * @param firstName    firstName of user.
+   * @param lastName     lastName of user.
    * @param homeFacility homeFacility of user.
-   * @param active is the account activated.
-   * @param verified is the account verified.
+   * @param active       is the account activated.
+   * @param verified     is the account verified.
    * @return List of users
    */
   public List<User> searchUsers(
       String username, String firstName, String lastName,
       Facility homeFacility, Boolean active, Boolean verified) {
     return userRepository.searchUsers(
-            username, firstName,
-            lastName, homeFacility,
-            active, verified);
+        username, firstName,
+        lastName, homeFacility,
+        active, verified);
   }
 
   /**
@@ -74,7 +82,7 @@ public class UserService {
     userRequest.setEmail(user.getEmail());
     userRequest.setReferenceDataUserId(user.getId());
 
-    String url = "http://auth:8080/api/users?access_token=" + token;
+    String url = "http://" + virtualHost + ":" + virtualPort + "/api/users?access_token=" + token;
     RestTemplate restTemplate = new RestTemplate();
 
     restTemplate.postForObject(url, userRequest, Object.class);
@@ -85,7 +93,8 @@ public class UserService {
    */
   public void passwordReset(PasswordResetRequest passwordResetRequest, String token) {
     try {
-      String url = "http://auth:8080/api/users/passwordReset?access_token=" + token;
+      String url = "http://" + virtualHost + ":" + virtualPort
+          + "/api/users/passwordReset?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, passwordResetRequest, String.class);
@@ -101,7 +110,8 @@ public class UserService {
    */
   public void changePassword(PasswordChangeRequest passwordChangeRequest, String token) {
     try {
-      String url = "http://auth:8080/api/users/changePassword?access_token=" + token;
+      String url = "http://" + virtualHost + ":" + virtualPort
+          + "/api/users/changePassword?access_token=" + token;
 
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.postForObject(url, passwordChangeRequest, String.class);
@@ -134,8 +144,8 @@ public class UserService {
 
   private UUID createPasswordResetToken(UUID userId, String token) {
     try {
-      String url = "http://auth:8080/api/users/passwordResetToken?userId=" + userId
-          + "&access_token=" + token;
+      String url = "http://" + virtualHost + ":" + virtualPort
+          + "/api/users/passwordResetToken?userId=" + userId + "&access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       return restTemplate.postForObject(url, null, UUID.class);
@@ -148,7 +158,8 @@ public class UserService {
     try {
       NotificationRequest request = new NotificationRequest(from, to, subject, content, null);
 
-      String url = "http://notification:8080/notification?access_token=" + token;
+      String url = "http://" + virtualHost + ":" + virtualPort
+          + "/notification?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, request, Object.class);

@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -8,20 +9,38 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.Sets;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightType;
+import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleAssignmentException;
+import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.AuthUserRequest;
 import org.openlmis.referencedata.util.PasswordChangeRequest;
@@ -32,13 +51,11 @@ import org.springframework.web.client.RestTemplate;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Ignore
 @SuppressWarnings("PMD.TooManyMethods")
 public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -70,115 +87,283 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Autowired
   private FacilityRepository facilityRepository;
 
-  private List<User> users;
+  @Autowired
+  private RoleRepository roleRepository;
+
+  @Autowired
+  private RightRepository rightRepository;
+
+  @Autowired
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
+
+  private User user1;
 
   private static Integer currentInstanceNumber = 0;
 
   @Before
-  public void setUp() {
-    users = new ArrayList<>();
-    for (int userCount = 0; userCount < 5; userCount++) {
-      users.add(createUser());
-    }
-  }
+  public void setUp() throws RoleException, RoleAssignmentException, RightTypeException {
+    user1 = generateUser();
+    assignUserRoles(user1);
+    userRepository.save(user1);
 
-  @Test
-  public void shouldFindUsers() {
-    User[] response = restAssured.given()
-        .queryParam(USERNAME, users.get(0).getUsername())
-        .queryParam(FIRST_NAME, users.get(0).getFirstName())
-        .queryParam(LAST_NAME, users.get(0).getLastName())
-        .queryParam(HOME_FACILITY, users.get(0).getHomeFacility().getId())
-        .queryParam(ACTIVE, users.get(0).isActive())
-        .queryParam(VERIFIED, users.get(0).isVerified())
-        .queryParam(ACCESS_TOKEN, getToken())
-        .when()
-        .get(SEARCH_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(User[].class);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertEquals(1, response.length);
-    for (User user : response) {
-      assertEquals(
-          user.getUsername(),
-          users.get(0).getUsername());
-      assertEquals(
-          user.getFirstName(),
-          users.get(0).getFirstName());
-      assertEquals(
-          user.getLastName(),
-          users.get(0).getLastName());
-      assertEquals(
-          user.getHomeFacility().getId(),
-          users.get(0).getHomeFacility().getId());
-      assertEquals(
-          user.isActive(),
-          users.get(0).isActive());
-      assertEquals(
-          user.isVerified(),
-          users.get(0).isVerified());
-    }
-  }
-
-  @Test
-  public void shouldDeleteUser() {
-
-    User user = users.get(4);
-
-    restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", user.getId())
-        .when()
-        .delete(ID_URL)
-        .then()
-        .statusCode(204);
-
-    assertFalse(userRepository.exists(user.getId()));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    createUser();
   }
 
   @Test
   public void shouldGetAllUsers() {
 
-    UserDto[] response = restAssured.given()
+    UserDto[] response = restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(UserDto[].class);
 
-    Iterable<UserDto> users = Arrays.asList(response);
-    assertTrue(users.iterator().hasNext());
+    List<UserDto> users = Arrays.asList(response);
+    assertThat(users.size(), is(3));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenUser() {
+  public void shouldGetUser() {
 
-    User user = users.get(4);
+    UserDto userDto = new UserDto();
+    user1.export(userDto);
 
-    User response = restAssured.given()
+    UserDto response = restAssured
+        .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", user.getId())
+        .pathParam("id", user1.getId())
         .when()
         .get(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(User.class);
+        .extract().as(UserDto.class);
 
-    assertTrue(userRepository.exists(response.getId()));
+    assertEquals(userDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotGetNonExistingUser() {
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSaveNewUserOnPut() {
+
+    User newUser = generateUser();
+    UserDto newUserDto = new UserDto();
+    newUser.export(newUserDto);
+
+    UserDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(newUserDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto.class);
+
+    assertEquals(newUserDto, response);
+    User storedUser = userRepository.findOneByUsername(newUserDto.getUsername());
+    assertEquals(newUser, storedUser);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSaveExistingUserOnPut() {
+
+    UserDto userDto = new UserDto();
+    user1.export(userDto);
+    userDto.setFirstName("Updated");
+
+    UserDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(userDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto.class);
+
+    assertEquals(userDto, response);
+    User storedUser = userRepository.findOne(user1.getId());
+    assertEquals("Updated", storedUser.getFirstName());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotSaveUserForRoleAssignmentWithoutRole() {
+
+    UserDto userDto = new UserDto();
+    user1.export(userDto);
+    userDto.setRoleAssignments(Sets.newHashSet(new RoleAssignmentDto()));
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(userDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSaveUserWithAddedRoles() throws RightTypeException, RoleException {
+
+    Right adminRight2 = Right.newRight("adminRight2", RightType.GENERAL_ADMIN);
+    rightRepository.save(adminRight2);
+    Role adminRole2 = Role.newRole("adminRole2", adminRight2);
+    roleRepository.save(adminRole2);
+    DirectRoleAssignment addedRoleAssignment = new DirectRoleAssignment(adminRole2);
+    user1.assignRoles(addedRoleAssignment);
+
+    UserDto userDto = new UserDto();
+    user1.export(userDto);
+
+    UserDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(userDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto.class);
+
+    assertEquals(userDto, response);
+    User storedUser = userRepository.findOne(user1.getId());
+    assertTrue(storedUser.getRoleAssignments().contains(addedRoleAssignment));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSaveUserWithRemovedRoles() {
+
+    UserDto userDto = new UserDto();
+    user1.export(userDto);
+
+    userDto.setRoleAssignments(Sets.newHashSet());
+
+    UserDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(userDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto.class);
+
+    assertEquals(userDto, response);
+    User storedUser = userRepository.findOne(user1.getId());
+    assertTrue(storedUser.getRoleAssignments().isEmpty());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldDeleteUser() {
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", user1.getId())
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
+
+    assertFalse(userRepository.exists(user1.getId()));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotDeleteNotExistingUser() {
+
+    userRepository.delete(user1);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", user1.getId())
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindUsers() {
+    UserDto[] response = restAssured.given()
+        .queryParam(USERNAME, user1.getUsername())
+        .queryParam(FIRST_NAME, user1.getFirstName())
+        .queryParam(LAST_NAME, user1.getLastName())
+        .queryParam(HOME_FACILITY, user1.getHomeFacility().getId())
+        .queryParam(ACTIVE, user1.isActive())
+        .queryParam(VERIFIED, user1.isVerified())
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto[].class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertEquals(1, response.length);
+    for (UserDto userDto : response) {
+      assertEquals(
+          userDto.getUsername(),
+          user1.getUsername());
+      assertEquals(
+          userDto.getFirstName(),
+          user1.getFirstName());
+      assertEquals(
+          userDto.getLastName(),
+          user1.getLastName());
+      assertEquals(
+          userDto.getHomeFacility().getId(),
+          user1.getHomeFacility().getId());
+      assertEquals(
+          userDto.isActive(),
+          user1.isActive());
+      assertEquals(
+          userDto.isVerified(),
+          user1.isVerified());
+    }
   }
 
   /**
    * Creating requisition and auth users.
    */
+  @Ignore
+  @Test
   public void shouldCreateRequisitionAndAuthUsers() {
     User user = generateUser();
 
@@ -254,6 +439,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     removeAuthUserByUsername(authUser.getUsername());
   }
 
+  @Ignore
   @Test
   public void shouldResetPassword() {
     User savedUser = createUser();
@@ -286,6 +472,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     removeAuthUserByUsername(authUser.getUsername());
   }
 
+  @Ignore
   @Test
   public void shouldChangePasswordIfValidResetTokenIsProvided() {
     User savedUser = createUser();
@@ -454,6 +641,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     facility.setName("FacilityName" + instanceNumber);
     facility.setDescription("FacilityDescription" + instanceNumber);
     facility.setActive(true);
+    facility.setEnabled(true);
     facilityRepository.save(facility);
     return facility;
   }
@@ -484,5 +672,46 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private Integer generateInstanceNumber() {
     currentInstanceNumber += 1;
     return currentInstanceNumber;
+  }
+
+  private void assignUserRoles(User user) throws RightTypeException, RoleException,
+      RoleAssignmentException {
+
+    Right adminRight = Right.newRight("adminRight", RightType.GENERAL_ADMIN);
+    rightRepository.save(adminRight);
+    Role adminRole = Role.newRole("adminRole", adminRight);
+    roleRepository.save(adminRole);
+    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole);
+
+    Right supervisionRight = Right.newRight("supervisionRight", RightType.SUPERVISION);
+    rightRepository.save(supervisionRight);
+    Role supervisionRole = Role.newRole("supervisionRole", supervisionRight);
+    roleRepository.save(supervisionRole);
+    Program program = new Program("P1");
+    programRepository.save(program);
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", generateFacility());
+    supervisoryNodeRepository.save(supervisoryNode);
+    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
+        program);
+    SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
+        program, supervisoryNode);
+
+    Right fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
+    rightRepository.save(fulfillmentRight);
+    Role fulfillmentRole = Role.newRole("fulfillmentRole", fulfillmentRight);
+    roleRepository.save(fulfillmentRole);
+    FacilityType warehouseType = new FacilityType("warehouse");
+    facilityTypeRepository.save(warehouseType);
+    Facility warehouse = new Facility();
+    warehouse.setCode("W1");
+    warehouse.setType(warehouseType);
+    warehouse.setGeographicZone(generateGeographicZone(generateGeographicLevel()));
+    warehouse.setActive(true);
+    warehouse.setEnabled(true);
+    facilityRepository.save(warehouse);
+    FulfillmentRoleAssignment roleAssignment4 = new FulfillmentRoleAssignment(fulfillmentRole,
+        warehouse);
+
+    user.assignRoles(roleAssignment1, roleAssignment2, roleAssignment3, roleAssignment4);
   }
 }

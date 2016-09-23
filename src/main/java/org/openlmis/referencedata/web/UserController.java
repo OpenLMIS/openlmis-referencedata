@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
@@ -280,7 +281,7 @@ public class UserController extends BaseController {
         lastName, homeFacility, active, verified);
 
     return ResponseEntity
-        .ok(result);
+        .ok(exportToDtos(result));
   }
 
   private Map<String, String> getErrors(final BindingResult bindingResult) {
@@ -458,7 +459,6 @@ public class UserController extends BaseController {
   }
 
 
-
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user)
       throws RightTypeException, RoleAssignmentException {
     LOGGER.debug("Assigning roles to user and saving");
@@ -500,5 +500,9 @@ public class UserController extends BaseController {
     UserDto userDto = new UserDto();
     user.export(userDto);
     return userDto;
+  }
+
+  private List<UserDto> exportToDtos(List<User> users) {
+    return users.stream().map(user -> exportToDto(user)).collect(toList());
   }
 }
