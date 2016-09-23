@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.Arrays;
 import java.util.UUID;
 
-@Ignore
 public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/facilityTypes";
@@ -88,6 +88,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Ignore // TODO: put back in once endpoint is re-enabled
   @Test
   public void shouldUpdateFacilityType() {
 
@@ -108,6 +109,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Ignore // TODO: put back in once endpoint is re-enabled
   @Test
   public void shouldCreateNewFacilityTypeIfDoesNotExist() {
 

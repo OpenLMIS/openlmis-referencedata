@@ -538,7 +538,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(user)
         .when()
-        .post(RESOURCE_URL)
+        .put(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(User.class);
@@ -689,7 +689,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(newUserDto)
         .when()
-        .post(RESOURCE_URL)
+        .put(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(UserDto.class);

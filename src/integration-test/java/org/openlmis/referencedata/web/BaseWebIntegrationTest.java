@@ -9,7 +9,6 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.Application;
@@ -88,10 +87,6 @@ public abstract class BaseWebIntegrationTest {
     wireMockRule.stubFor(post(urlPathEqualTo("/notification"))
         .willReturn(aResponse()
             .withStatus(200)));
-  }
-
-  @Before
-  public void loadRaml() {
   }
 
   @After

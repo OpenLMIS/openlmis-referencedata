@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,6 +19,8 @@ import org.openlmis.referencedata.repository.ProgramProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +58,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     }
   }
 
-  @Ignore
   @Test
   public void shouldFindProgramProducts() {
     ProgramProduct[] response = restAssured.given()
@@ -78,7 +78,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     }
   }
 
-  @Ignore
   @Test
   public void shouldDeleteProgramProduct() {
 
@@ -97,7 +96,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldCreateProgramProduct() {
 
@@ -116,7 +114,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldUpdateProgramProduct() {
 
@@ -136,7 +133,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldGetAllProgramProducts() {
 
@@ -154,7 +150,6 @@ public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationT
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldGetChosenProgramProduct() {
 

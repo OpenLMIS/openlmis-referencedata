@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
@@ -16,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.Arrays;
 import java.util.UUID;
 
-@Ignore
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String ACCESS_TOKEN = "access_token";
@@ -38,7 +37,6 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     programRepository.save(program);
   }
 
-  @Ignore
   @Test
   public void shouldUpdate() {
     ProgramDto programDto = new ProgramDto(program.getId(), Code.code("newCode"), "newName");
@@ -54,7 +52,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(Program.class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertEquals(response.getCode(), "newCode");
+    assertEquals(response.getCode(), Code.code("newCode"));
     assertEquals(response.getName(), "newName");
   }
 

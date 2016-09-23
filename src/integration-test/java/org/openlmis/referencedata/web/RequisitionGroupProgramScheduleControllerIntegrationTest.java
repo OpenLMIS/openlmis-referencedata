@@ -17,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.Arrays;
 import java.util.UUID;
 
-@Ignore
 public class RequisitionGroupProgramScheduleControllerIntegrationTest
       extends BaseWebIntegrationTest {
 
@@ -160,6 +160,7 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Ignore // TODO: put back in once endpoint is re-enabled
   @Test
   public void shouldUpdateRequisitionGroupProgramSchedule() {
 
@@ -180,6 +181,7 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Ignore // TODO: put back in once endpoint is re-enabled
   @Test
   public void shouldCreateNewRequisitionGroupProgramScheduleIfDoesNotExist() {
 

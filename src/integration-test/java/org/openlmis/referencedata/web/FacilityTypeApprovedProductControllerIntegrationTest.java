@@ -1,6 +1,9 @@
 package org.openlmis.referencedata.web;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,12 +25,11 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.Arrays;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
+@Ignore
 public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
@@ -82,7 +84,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     repository.save(facilityTypeAppProd);
   }
 
-  @Ignore
   @Test
   public void shouldDeleteFacilityTypeApprovedProduct() {
 
@@ -99,7 +100,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldCreateFacilityTypeApprovedProduct() {
 
@@ -117,7 +117,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldUpdateFacilityTypeApprovedProduct() {
 
@@ -138,7 +137,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldGetAllFacilityTypeApprovedProducts() {
 
@@ -156,7 +154,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldGetChosenFacilityTypeApprovedProduct() {
 
