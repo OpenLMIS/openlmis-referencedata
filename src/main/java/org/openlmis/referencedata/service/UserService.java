@@ -57,10 +57,14 @@ public class UserService {
    */
   @Transactional
   public void save(User user, String token) {
-    User savedUser = userRepository.save(user);
-    saveAuthUser(savedUser, token);
+    boolean isNewUser = false;
     if (user.getId() == null) {
-      sendResetPasswordEmail(savedUser, token);
+      isNewUser = true;
+    }
+    userRepository.save(user);
+    saveAuthUser(user, token);
+    if (isNewUser) {
+      sendResetPasswordEmail(user, token);
     }
   }
 
@@ -104,7 +108,7 @@ public class UserService {
 
       verifyUser(passwordChangeRequest.getUsername());
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not reset auth user password", ex);
+      throw new ExternalApiException("Could not change auth user password", ex);
     }
   }
 

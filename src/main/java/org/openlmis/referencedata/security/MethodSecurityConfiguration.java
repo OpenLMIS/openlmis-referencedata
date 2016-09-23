@@ -1,4 +1,4 @@
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.security;
 
 
 import org.springframework.context.annotation.Configuration;

@@ -124,15 +124,15 @@ public class UserController extends BaseController {
    * Custom endpoint for creating and updating users and their roles.
    */
   @RequestMapping(value = "/users", method = RequestMethod.PUT)
-  public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto/*,
+  public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto,
                                     BindingResult bindingResult,
-                                    OAuth2Authentication auth*/) {
-    //OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
-    //String token = details.getTokenValue();
-    //
-    //if (bindingResult.hasErrors()) {
-    //  return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
-    //} TODO: reinstate when dependency on auth is proper
+                                    OAuth2Authentication auth) {
+    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
+    String token = details.getTokenValue();
+
+    if (bindingResult.hasErrors()) {
+      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+    }
 
     String homeFacilityCode = userDto.fetchHomeFacilityCode();
     if (homeFacilityCode != null) {
@@ -165,8 +165,7 @@ public class UserController extends BaseController {
         assignRolesToUser(roleAssignmentDtos, userToSave);
       }
 
-      //userService.save(userToSave, token); TODO: reinstate when dependency on auth is proper
-      userRepository.save(userToSave);
+      userService.save(userToSave, token);
 
       return ResponseEntity
           .ok(exportToDto(userToSave));
@@ -452,7 +451,7 @@ public class UserController extends BaseController {
       return new ResponseEntity(HttpStatus.OK);
     } catch (ExternalApiException ex) {
       ErrorResponse errorResponse =
-          new ErrorResponse("Could not reset user password", ex.getMessage());
+          new ErrorResponse("Could not change user password", ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
       return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }

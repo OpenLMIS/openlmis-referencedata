@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,9 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import org.springframework.validation.BindingResult;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -49,6 +53,8 @@ import java.util.UUID;
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class UserControllerTest {
 
+  private static final String ACCESS_TOKEN = "49c1e712-da50-4428-ae39-2d0409bd8059";
+  
   @Mock
   private UserService service;
 
@@ -223,14 +229,21 @@ public class UserControllerTest {
     //given
     preparePostOrPut();
 
+
     when(repository.findOne(userId)).thenReturn(null);
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();
+    HttpStatus httpStatus = controller.saveUser(user1Dto, result, auth).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -238,12 +251,19 @@ public class UserControllerTest {
     //given
     preparePostOrPut();
 
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
+
     //when
-    HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();
+    HttpStatus httpStatus = controller.saveUser(user1Dto, result, auth).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -252,9 +272,15 @@ public class UserControllerTest {
     preparePostOrPut();
 
     user1Dto.setRoleAssignments(Sets.newHashSet(new RoleAssignmentDto()));
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn("49c1e712-da50-4428-ae39-2d0409bd8059");
 
     //when
-    HttpStatus httpStatus = controller.saveUser(user1Dto).getStatusCode();
+    HttpStatus httpStatus = controller.saveUser(user1Dto, result, auth).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.BAD_REQUEST));
@@ -265,20 +291,27 @@ public class UserControllerTest {
     //given
     preparePostOrPut();
 
+
     when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRoleId(roleId);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
     HttpStatus httpStatus = responseEntity.getStatusCode();
     UserDto savedUserDto = (UserDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -286,28 +319,37 @@ public class UserControllerTest {
     //given
     preparePostOrPut();
 
+
     when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
     when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRoleId(roleId);
     roleAssignmentDto.setProgramCode(programCode);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
+
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
     HttpStatus httpStatus = responseEntity.getStatusCode();
     UserDto savedUserDto = (UserDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
   public void shouldSaveUserWithSupervisoryRole() throws RightTypeException {
     //given
     preparePostOrPut();
+
 
     when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
     when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
@@ -317,16 +359,22 @@ public class UserControllerTest {
     roleAssignmentDto.setProgramCode(programCode);
     roleAssignmentDto.setSupervisoryNodeCode(supervisoryNodeCode);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
     HttpStatus httpStatus = responseEntity.getStatusCode();
     UserDto savedUserDto = (UserDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -335,22 +383,29 @@ public class UserControllerTest {
     //given
     preparePostOrPut();
 
+
     when(roleRepository.findOne(roleId)).thenReturn(fulfillmentRole1);
     when(facilityRepository.findFirstByCode(warehouseCode)).thenReturn(warehouse1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRoleId(roleId);
     roleAssignmentDto.setWarehouseCode(warehouseCode);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
     HttpStatus httpStatus = responseEntity.getStatusCode();
     UserDto savedUserDto = (UserDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -360,20 +415,27 @@ public class UserControllerTest {
 
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
 
+
     when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRoleId(roleId);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
     HttpStatus httpStatus = responseEntity.getStatusCode();
     UserDto savedUserDto = (UserDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -381,17 +443,24 @@ public class UserControllerTest {
     //given
     preparePostOrPut();
 
+
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
+    BindingResult result = mock(BindingResult.class);
+    when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto);
+    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
     HttpStatus httpStatus = responseEntity.getStatusCode();
     UserDto savedUserDto = (UserDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test

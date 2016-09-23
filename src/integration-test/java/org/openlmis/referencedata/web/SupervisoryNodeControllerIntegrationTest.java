@@ -26,9 +26,6 @@ import org.springframework.http.MediaType;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 
-/**
- * Created by user on 22.08.16.
- */
 @Ignore
 public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegrationTest {
 

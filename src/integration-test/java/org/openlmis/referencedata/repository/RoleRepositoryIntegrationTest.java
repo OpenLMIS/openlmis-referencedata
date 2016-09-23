@@ -17,6 +17,9 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   @Autowired
   RoleRepository repository;
+  
+  @Autowired
+  RightRepository rightRepository;
 
   RoleRepository getRepository() {
     return this.repository;
@@ -25,7 +28,8 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Override
   Role generateInstance() throws RightTypeException, RoleException {
     int instanceNumber = this.getNextInstanceNumber();
-    return Role.newRole(valueOf(instanceNumber), Right.newRight(valueOf(instanceNumber),
-        RightType.GENERAL_ADMIN));
+    Right right = Right.newRight(valueOf(instanceNumber), RightType.GENERAL_ADMIN);
+    rightRepository.save(right);
+    return Role.newRole(valueOf(instanceNumber), right);
   }
 }
