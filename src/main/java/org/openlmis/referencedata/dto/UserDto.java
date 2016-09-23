@@ -58,6 +58,10 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
 
   @Getter
   @Setter
+  private boolean loginRestricted;
+
+  @Getter
+  @Setter
   private Set<RoleAssignmentDto> roleAssignments;
 
   public String fetchHomeFacilityCode() {

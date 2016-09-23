@@ -14,6 +14,7 @@ public class UserBuilder {
   private Facility homeFacility;
   private boolean active;
   private boolean verified;
+  private boolean loginRestricted;
 
   private UserBuilder() {
     this.homeFacility = null;
@@ -57,8 +58,13 @@ public class UserBuilder {
     return this;
   }
 
+  public UserBuilder setLoginRestricted(boolean loginRestricted) {
+    this.loginRestricted = loginRestricted;
+    return this;
+  }
+
   public User createUser() {
     return new User(id, username, firstName, lastName, email, timezone, homeFacility, active,
-        verified);
+        verified, loginRestricted);
   }
 }

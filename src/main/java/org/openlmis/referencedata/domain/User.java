@@ -75,7 +75,7 @@ public class User extends BaseEntity {
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   @Getter
   @Setter
-  private boolean restrictLogin;
+  private boolean loginRestricted;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @Getter
@@ -103,10 +103,11 @@ public class User extends BaseEntity {
     homeFacility = importer.getHomeFacility();
     verified = importer.isVerified();
     active = importer.isActive();
+    loginRestricted = importer.isLoginRestricted();
   }
 
   User(UUID id, String username, String firstName, String lastName, String email, String timezone,
-       Facility homeFacility, boolean active, boolean verified) {
+       Facility homeFacility, boolean active, boolean verified, boolean loginRestricted) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
@@ -116,6 +117,7 @@ public class User extends BaseEntity {
     this.homeFacility = homeFacility;
     this.active = active;
     this.verified = verified;
+    this.loginRestricted = loginRestricted;
   }
 
   /**
@@ -188,6 +190,7 @@ public class User extends BaseEntity {
     exporter.setHomeFacility(homeFacility);
     exporter.setActive(active);
     exporter.setVerified(verified);
+    exporter.setLoginRestricted(loginRestricted);
     exporter.addRoleAssignments(roleAssignments);
   }
 
@@ -226,6 +229,8 @@ public class User extends BaseEntity {
     void setVerified(boolean verified);
 
     void setActive(boolean active);
+    
+    void setLoginRestricted(boolean loginRestricted);
 
     void addRoleAssignments(Set<RoleAssignment> roleAssignments);
   }
@@ -248,5 +253,7 @@ public class User extends BaseEntity {
     boolean isVerified();
 
     boolean isActive();
+    
+    boolean isLoginRestricted();
   }
 }
