@@ -21,8 +21,8 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class RequisitionGroupProgramScheduleControllerIntegrationTest
-      extends BaseWebIntegrationTest {
+public class RequisitionGroupProgramScheduleControllerComponentTest
+      extends BaseWebComponentTest {
 
   private static final String RESOURCE_URL = "/api/requisitionGroupProgramSchedules";
   private static final String ID_URL = RESOURCE_URL + "/{id}";

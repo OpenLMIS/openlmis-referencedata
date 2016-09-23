@@ -32,7 +32,7 @@ import java.util.UUID;
 
 @Ignore
 @SuppressWarnings("PMD.TooManyMethods")
-public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest {
+public class SupplyLineControllerComponentTest extends BaseWebComponentTest {
 
   private static final String RESOURCE_URL = "/api/supplyLines";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";

@@ -19,7 +19,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrationTest {
+public class ProcessingScheduleControllerComponentTest extends BaseWebComponentTest {
 
   private static final String RESOURCE_URL = "/api/processingSchedules";
   private static final String ID_URL = RESOURCE_URL + "/{id}";

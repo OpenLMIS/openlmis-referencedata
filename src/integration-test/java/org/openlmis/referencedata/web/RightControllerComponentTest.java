@@ -21,7 +21,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.List;
 
-public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
+public class RightControllerComponentTest extends BaseWebComponentTest {
 
   private static final String RESOURCE_URL = "/api/rights";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -38,7 +38,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   /**
    * Constructor for test class.
    */
-  public RightControllerIntegrationTest() {
+  public RightControllerComponentTest() {
     right = Right.newRight(RIGHT_NAME, RightType.GENERAL_ADMIN);
     rightDto = new RightDto();
     right.export(rightDto);

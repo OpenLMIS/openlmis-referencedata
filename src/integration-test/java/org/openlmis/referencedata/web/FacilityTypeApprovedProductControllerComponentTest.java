@@ -30,7 +30,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 
 @Ignore
-public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWebIntegrationTest {
+public class FacilityTypeApprovedProductControllerComponentTest extends BaseWebComponentTest {
 
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
   private static final String ID_URL = RESOURCE_URL + "/{id}";

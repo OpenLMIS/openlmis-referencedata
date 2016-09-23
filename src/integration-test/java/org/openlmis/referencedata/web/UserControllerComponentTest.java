@@ -59,7 +59,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
-public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
+public class UserControllerComponentTest extends BaseWebComponentTest {
 
   private static final String RESOURCE_URL = "/api/users";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";

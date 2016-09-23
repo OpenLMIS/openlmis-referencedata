@@ -19,7 +19,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
+public class ProgramControllerComponentTest extends BaseWebComponentTest {
 
   private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/programs";

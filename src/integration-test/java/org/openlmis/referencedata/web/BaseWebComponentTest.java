@@ -25,7 +25,7 @@ import guru.nidi.ramltester.restassured.RestAssuredClient;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest("server.port:8080")
-public abstract class BaseWebIntegrationTest {
+public abstract class BaseWebComponentTest {
 
   protected static final String RAML_ASSERT_MESSAGE =
       "HTTP request/response should match RAML definition.";
@@ -68,7 +68,7 @@ public abstract class BaseWebIntegrationTest {
   /**
    * Constructor for test.
    */
-  public BaseWebIntegrationTest() {
+  public BaseWebComponentTest() {
     RestAssured.baseURI = BASE_URL;
     restAssured = ramlDefinition.createRestAssured();
 

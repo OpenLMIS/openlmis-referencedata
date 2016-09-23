@@ -28,7 +28,7 @@ import java.util.List;
 
 @Ignore
 @SuppressWarnings("PMD.TooManyMethods")
-public class ProgramProductControllerIntegrationTest extends BaseWebIntegrationTest {
+public class ProgramProductControllerComponentTest extends BaseWebComponentTest {
 
   private static final String RESOURCE_URL = "/api/programProducts";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
