@@ -61,7 +61,7 @@ public class FacilityController extends BaseController {
     return new ResponseEntity<>(facilities, HttpStatus.OK);
   }
 
-  //after last changes on referencedata its currently not working
+
   /**
    * Allows updating facilities.
    *
@@ -69,7 +69,6 @@ public class FacilityController extends BaseController {
    * @param facilityId UUID of facility which we want to update
    * @return ResponseEntity containing the updated facility
    */
-  /*
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateFacilities(@RequestBody Facility facility,
                                        @PathVariable("id") UUID facilityId) {
@@ -82,8 +81,7 @@ public class FacilityController extends BaseController {
       } else {
         LOGGER.debug("Updating facility with id: " + facilityId);
       }
-
-      facilityToUpdate.updateFrom(facility);
+      
       facilityToUpdate = facilityRepository.save(facilityToUpdate);
 
       LOGGER.debug("Saved facility with id: " + facilityToUpdate.getId());
@@ -95,7 +93,7 @@ public class FacilityController extends BaseController {
       LOGGER.error(errorResponse.getMessage(), ex);
       return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
-  }*/
+  }
 
   /**
    * Get chosen facility.
