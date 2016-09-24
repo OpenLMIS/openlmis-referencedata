@@ -21,6 +21,6 @@ public class OrderableProductIntegrationTest
 
   @Override
   OrderableProduct generateInstance() {
-    return GlobalProduct.newGlobalProduct("abcd", "test", 10);
+    return GlobalProduct.newGlobalProduct("abcd", "Abcd", "test", 10);
   }
 }

@@ -29,8 +29,8 @@ public final class TradeItem extends OrderableProduct {
   @ManyToOne
   private GlobalProduct globalProduct;
 
-  private TradeItem(Code productCode, long packSize) {
-    super(productCode, packSize);
+  private TradeItem(Code productCode, String name, long packSize) {
+    super(productCode, name, packSize);
   }
 
   @Override
@@ -57,9 +57,10 @@ public final class TradeItem extends OrderableProduct {
    */
   @JsonCreator
   public static TradeItem newTradeItem(@JsonProperty("productCode") String productCode,
+                                       @JsonProperty("name") String name,
                                        @JsonProperty("packSize") long packSize) {
     Code code = Code.code(productCode);
-    TradeItem tradeItem = new TradeItem(code, packSize);
+    TradeItem tradeItem = new TradeItem(code, name, packSize);
 
     return tradeItem;
   }

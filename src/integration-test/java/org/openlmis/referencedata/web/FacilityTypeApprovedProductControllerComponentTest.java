@@ -66,7 +66,7 @@ public class FacilityTypeApprovedProductControllerComponentTest extends BaseWebC
     program.setPeriodsSkippable(true);
     programRepository.save(program);
 
-    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "test", 10);
+    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "Abcd", "test", 10);
     orderableProductRepository.save(orderableProduct);
 
     ProgramProduct programProduct = new ProgramProduct();

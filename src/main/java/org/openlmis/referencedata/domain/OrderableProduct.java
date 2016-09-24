@@ -28,14 +28,17 @@ public abstract class OrderableProduct extends BaseEntity {
   @Embedded
   private Code productCode;
 
+  private String name;
+
   @JsonProperty
   private long packSize;
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ProgramProduct> programProducts;
 
-  protected OrderableProduct(Code productCode, long packSize) {
+  protected OrderableProduct(Code productCode, String name, long packSize) {
     this.productCode = productCode;
+    this.name = name;
     this.packSize = packSize;
     this.programProducts = new LinkedHashSet<>();
   }
@@ -51,6 +54,15 @@ public abstract class OrderableProduct extends BaseEntity {
   @JsonProperty
   public final Code getProductCode() {
     return productCode;
+  }
+
+  /**
+   * Return this orderable product's name.
+   * @return this product's name.
+   */
+  @JsonProperty
+  public final String getName() {
+    return name;
   }
 
   /**

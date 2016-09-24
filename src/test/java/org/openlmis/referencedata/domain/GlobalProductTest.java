@@ -12,9 +12,9 @@ public class GlobalProductTest {
   private static TradeItem motrin;
 
   {
-    ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "test desc", 10);
-    advil = TradeItem.newTradeItem("advil", 12);
-    motrin = TradeItem.newTradeItem("motrin", 12);
+    ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "Ibuprofen", "test desc", 10);
+    advil = TradeItem.newTradeItem("advil", "Advil", 12);
+    motrin = TradeItem.newTradeItem("motrin", "Motrin", 12);
     ibuprofen.addTradeItem(advil);
     ibuprofen.addTradeItem(motrin);
   }
@@ -39,7 +39,8 @@ public class GlobalProductTest {
   public void testEqualsAndHashCode() {
     assertTrue(ibuprofen.equals(ibuprofen));
 
-    GlobalProduct ibuprofenDupe = GlobalProduct.newGlobalProduct("ibuprofen", "dupe", 20);
+    GlobalProduct ibuprofenDupe =
+        GlobalProduct.newGlobalProduct("ibuprofen", "Ibuprofen", "dupe", 20);
     assertEquals(ibuprofen.hashCode(), ibuprofenDupe.hashCode());
   }
 }

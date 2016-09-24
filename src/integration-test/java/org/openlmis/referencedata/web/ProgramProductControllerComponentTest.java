@@ -170,7 +170,7 @@ public class ProgramProductControllerComponentTest extends BaseWebComponentTest 
   }
 
   private ProgramProduct generateProgramProduct() {
-    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "test", 10);
+    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "Abcd", "test", 10);
     orderableProductRepository.save(orderableProduct);
     Program program = generateProgram();
     ProductCategory testCategory = ProductCategory.createNew(Code.code("testCat"));
