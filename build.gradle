@@ -131,6 +131,11 @@ task generateMigration << {
     migrationFile.createNewFile()
 }
 
+task demoDataSeed(type:Exec) {
+    executable "./demo-data/demo_seed.sh"
+    args "./demo-data", "node ./demo-data/seed_generator.js"
+}
+
 task checkApiIsRaml(type:Exec) {
     executable "raml-cop"
     args "src/main/resources/api-definition.yaml"
