@@ -28,9 +28,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
 
-  private GeographicZone geographicZone = new GeographicZone();
-  private GeographicLevel geographicLevel = new GeographicLevel();
-  private Facility facility = new Facility();
+  private Facility facility;
 
   @Override
   CrudRepository<SupervisoryNode, UUID> getRepository() {
@@ -41,10 +39,12 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   public void setUp() {
     String code = "code";
 
+    GeographicLevel geographicLevel = new GeographicLevel();
     geographicLevel.setCode(code);
     geographicLevel.setLevelNumber(1);
     geographicLevelRepository.save(geographicLevel);
 
+    GeographicZone geographicZone = new GeographicZone();
     geographicZone.setCode(code);
     geographicZone.setLevel(geographicLevel);
     geographicZoneRepository.save(geographicZone);
@@ -53,10 +53,9 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     facilityType.setCode(code);
     facilityTypeRepository.save(facilityType);
 
-    facility = new Facility();
+    facility = new Facility(code);
     facility.setType(facilityType);
     facility.setGeographicZone(geographicZone);
-    facility.setCode(code);
     facility.setActive(true);
     facility.setEnabled(true);
     facilityRepository.save(facility);

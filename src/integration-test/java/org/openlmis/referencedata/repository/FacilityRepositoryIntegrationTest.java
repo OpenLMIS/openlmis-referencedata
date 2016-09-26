@@ -45,10 +45,9 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   Facility generateInstance() {
     int instanceNumber = this.getNextInstanceNumber();
-    Facility facility = new Facility();
+    Facility facility = new Facility("F" + instanceNumber);
     facility.setType(this.facilityType);
     facility.setGeographicZone(this.geographicZone);
-    facility.setCode("F" + instanceNumber);
     facility.setName("Facility #" + instanceNumber);
     facility.setDescription("Test facility");
     facility.setActive(true);

@@ -112,7 +112,7 @@ public class UserControllerTest {
         programRepository, supervisoryNodeRepository, facilityRepository);
 
     homeFacilityCode = "homeFacilityCode";
-    homeFacility = new Facility();
+    homeFacility = new Facility("C1");
     user1UserName = "user1";
     user2UserName = "user2";
     user1 = new UserBuilder(user1UserName, "User", "1", "user1@openlmis.org")
@@ -149,7 +149,7 @@ public class UserControllerTest {
     fulfillmentRole1 = Role.newRole("fulfillmentRole1", fulfillmentRight1);
     fulfillmentRole1.setId(roleId);
     warehouseCode = "W1";
-    warehouse1 = new Facility();
+    warehouse1 = new Facility("C2");
     warehouse1.setCode(warehouseCode);
     warehouse1.setType(new FacilityType("warehouse"));
   }
@@ -604,7 +604,7 @@ public class UserControllerTest {
     //given
     RequisitionGroup supervisionGroup1 = RequisitionGroup.newRequisitionGroup("supervisionGroup1",
         supervisoryNode1);
-    supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility(), new Facility()));
+    supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility("C1"), new Facility("C2")));
     supervisoryNode1.setRequisitionGroup(supervisionGroup1);
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);

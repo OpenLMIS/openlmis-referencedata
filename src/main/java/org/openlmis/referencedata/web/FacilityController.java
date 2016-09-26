@@ -86,12 +86,12 @@ public class FacilityController extends BaseController {
     Facility facilityToUpdate = facilityRepository.findOne(facilityId);
     try {
       if (facilityToUpdate == null) {
-        facilityToUpdate = new Facility();
+        facilityToUpdate = facility;
         LOGGER.info("Creating new facility");
       } else {
         LOGGER.debug("Updating facility with id: " + facilityId);
       }
-      
+
       facilityToUpdate = facilityRepository.save(facilityToUpdate);
 
       LOGGER.debug("Saved facility with id: " + facilityToUpdate.getId());

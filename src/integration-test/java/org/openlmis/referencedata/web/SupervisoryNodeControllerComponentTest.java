@@ -74,8 +74,7 @@ public class SupervisoryNodeControllerComponentTest extends BaseWebComponentTest
     geoZone.setLevel(geoLevel);
     geographicZoneRepository.save(geoZone);
 
-    Facility facility = new Facility();
-    facility.setCode("facilityCode");
+    Facility facility = new Facility("facilityCode");
     facility.setActive(true);
     facility.setGeographicZone(geoZone);
     facility.setType(facilityType);

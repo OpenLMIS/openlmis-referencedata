@@ -130,10 +130,9 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
     GeographicLevel geographicLevel = generateGeographicLevel();
     GeographicZone geographicZone = generateGeographicZone(geographicLevel);
     FacilityType facilityType = generateFacilityType();
-    Facility facility = new Facility();
+    Facility facility = new Facility("FacilityCode " + instanceNumber);
     facility.setType(facilityType);
     facility.setGeographicZone(geographicZone);
-    facility.setCode("FacilityCode " + instanceNumber);
     facility.setName("FacilityName " + instanceNumber);
     facility.setDescription("FacilityDescription " + instanceNumber);
     facility.setEnabled(true);

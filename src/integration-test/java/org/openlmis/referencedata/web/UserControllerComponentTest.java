@@ -805,7 +805,7 @@ public class UserControllerComponentTest extends BaseWebComponentTest {
     GeographicLevel geographicLevel = generateGeographicLevel();
     GeographicZone geographicZone = generateGeographicZone(geographicLevel);
     FacilityType facilityType = generateFacilityType();
-    Facility facility = new Facility();
+    Facility facility = new Facility("W2");
     facility.setType(facilityType);
     facility.setGeographicZone(geographicZone);
     facility.setCode("FacilityCode" + instanceNumber);
@@ -877,8 +877,7 @@ public class UserControllerComponentTest extends BaseWebComponentTest {
     roleRepository.save(fulfillmentRole);
     FacilityType warehouseType = new FacilityType("warehouse");
     facilityTypeRepository.save(warehouseType);
-    Facility warehouse = new Facility();
-    warehouse.setCode("W1");
+    Facility warehouse = new Facility("W1");
     warehouse.setType(warehouseType);
     warehouse.setGeographicZone(generateGeographicZone(generateGeographicLevel()));
     warehouse.setActive(true);
