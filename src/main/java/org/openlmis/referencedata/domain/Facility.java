@@ -86,4 +86,19 @@ public class Facility extends BaseEntity {
   @Getter
   @Setter
   private List<Program> supportedPrograms;
+
+  /**
+   * Equal by a Facility's code.
+   * @param other the other Facility
+   * @return true if the two Facilities' {@link Code} are equal.
+   */
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof Facility)) {
+      return false;
+    }
+
+    Facility facility = (Facility)other;
+    return code.equals(facility.getCode());
+  }
 }

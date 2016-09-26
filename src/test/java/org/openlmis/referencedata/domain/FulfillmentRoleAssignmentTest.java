@@ -24,6 +24,7 @@ public class FulfillmentRoleAssignmentTest {
       RoleException {
     right = Right.newRight("right", ORDER_FULFILLMENT);
     warehouse = new Facility();
+    warehouse.setCode("code");
     warehouse.setType(new FacilityType("warehouse"));
     hospital = new Facility();
     hospital.setType(new FacilityType("hospital"));

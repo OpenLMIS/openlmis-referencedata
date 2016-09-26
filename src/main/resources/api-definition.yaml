@@ -1490,6 +1490,40 @@ resourceTypes:
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
+    /supplying:
+        get:
+            is: [ secured ]
+            description: Returns a list of facilities.
+            queryParameters:
+                program:
+                    displayName: program
+                    type: string
+                    required: true
+                    repeat: false
+                supervisoryNode:
+                    displayName: supervisoryNode
+                    type: string
+                    required: true
+                    repeat: false
+            responses:
+              200:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+              400:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+              404:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+              500:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
 
 /facilityTypes:
     displayName: Facility Type
