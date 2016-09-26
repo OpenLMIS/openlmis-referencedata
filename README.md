@@ -5,7 +5,7 @@ This service contains all of the reference data for OpenLMIS 3.x.
 * Docker 1.11+
 * Docker Compose 1.6+
 
-## Quick Start
+## <a name="quickstart">Quick Start</a>
 1. Fork/clone this repository from GitHub.
 
  ```shell
@@ -176,3 +176,13 @@ $ gradle bootRun --debug-jvm
 This will enable debugging for the application, listening on port 5005, which the container has 
 exposed. Note that the process starts suspended, so the application will not start up until the 
 debugger has connected.
+
+### Demo Data
+You can use a standard data set for demonstration purposes. To do so, first follow the Quick Start
+until step 3 is done: https://github.com/OpenLMIS/openlmis-referencedata/blob/master/README.md#quickstart.
+Then, before `gradle bootRun`, use `gradle demoDataSeed`. This will generate a sql input file under
+`./demo-data` directory.
+
+To insert this data into the database, finish the Quick Start steps,
+and then outside of container's interactive shell, run:
+`docker exec -i openlmisreferencedata_db_1 psql -Upostgres open_lmis < demo-data/input.sql`
