@@ -2,7 +2,7 @@
 ---
 title: OpenLMIS Requisition API
 version: "1.0.0"
-baseUri: "@baseUrl@/api"
+baseUri: "http://@virtualHost@:8080/api"
 
 documentation:
     - title: Getting Started
