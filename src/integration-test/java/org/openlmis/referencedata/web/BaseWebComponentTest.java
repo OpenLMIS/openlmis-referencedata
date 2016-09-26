@@ -22,9 +22,12 @@ import guru.nidi.ramltester.RamlDefinition;
 import guru.nidi.ramltester.RamlLoaders;
 import guru.nidi.ramltester.restassured.RestAssuredClient;
 
+import java.util.Optional;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest("server.port:8080")
+@SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public abstract class BaseWebComponentTest {
 
   protected static final String RAML_ASSERT_MESSAGE =
@@ -34,8 +37,6 @@ public abstract class BaseWebComponentTest {
 
   private static final RamlDefinition ramlDefinition =
       RamlLoaders.fromClasspath().load("api-definition-raml.yaml");
-
-  private static final String BASE_URL = System.getenv("BASE_URL");
 
   private static final String MOCK_CHECK_RESULT = "{\n"
       + "  \"aud\": [\n"
@@ -69,11 +70,12 @@ public abstract class BaseWebComponentTest {
    * Constructor for test.
    */
   public BaseWebComponentTest() {
-    RestAssured.baseURI = BASE_URL;
+    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
+    RestAssured.baseURI = "http://" + virtualHost + ":8080";
     restAssured = ramlDefinition.createRestAssured();
 
     // This mocks the auth check to always return valid admin credentials.
-    wireMockRule.stubFor(post(urlEqualTo("/oauth/check_token"))
+    wireMockRule.stubFor(post(urlEqualTo("/auth/oauth/check_token"))
         .willReturn(aResponse()
             .withHeader("Content-Type", "application/json")
             .withBody(MOCK_CHECK_RESULT)));

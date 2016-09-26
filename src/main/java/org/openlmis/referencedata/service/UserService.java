@@ -10,7 +10,6 @@ import org.openlmis.referencedata.util.NotificationRequest;
 import org.openlmis.referencedata.util.PasswordChangeRequest;
 import org.openlmis.referencedata.util.PasswordResetRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -25,28 +25,21 @@ import javax.annotation.PostConstruct;
 @Service
 public class UserService {
 
-  private static final String BASE_URL = System.getenv("BASE_URL");
-  
-  //TODO: This address needs to be changed when reset password page will be done
-  private static final String RESET_PASSWORD_PATH = BASE_URL + "/reset-password.html";
-
   @Autowired
   private UserRepository userRepository;
 
   @Autowired
   private ExposedMessageSource messageSource;
 
-  @Value("${virtual.host}")
-  private String virtualHost;
-
-  @Value("${virtual.port}")
-  private String virtualPort;
-
   private String virtualHostBaseUrl;
 
+  /**
+   * Initialize service object.
+   */
   @PostConstruct
   public void init() {
-    virtualHostBaseUrl = "http://" + virtualHost + ":" + virtualPort;
+    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
+    virtualHostBaseUrl = "http://" + virtualHost;
   }
   
   /**
@@ -138,9 +131,10 @@ public class UserService {
   private void sendResetPasswordEmail(User user, String authToken) {
     UUID token = createPasswordResetToken(user.getId(), authToken);
 
+    //TODO: This address needs to be changed when reset password page will be done
     String[] msgArgs = {user.getFirstName(), user.getLastName(),
-        user.getUsername(), RESET_PASSWORD_PATH + "/username/" + user.getUsername()
-        + "/token/" + token};
+        user.getUsername(), virtualHostBaseUrl + "reset-password.html" + "/username/"
+        + user.getUsername() + "/token/" + token};
     String mailBody = messageSource.getMessage("password.reset.email.body",
         msgArgs, LocaleContextHolder.getLocale());
     String mailSubject = messageSource.getMessage("account.created.email.subject",
