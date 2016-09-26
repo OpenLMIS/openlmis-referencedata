@@ -26,7 +26,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest("server.port:8080")
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-public abstract class BaseWebComponentTest {
+public abstract class BaseWebIntegrationTest {
 
   protected static final String RAML_ASSERT_MESSAGE =
       "HTTP request/response should match RAML definition.";
@@ -67,7 +67,7 @@ public abstract class BaseWebComponentTest {
   /**
    * Constructor for test.
    */
-  public BaseWebComponentTest() {
+  public BaseWebIntegrationTest() {
     String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
     RestAssured.baseURI = "http://" + virtualHost + ":8080";
     restAssured = ramlDefinition.createRestAssured();

@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Ignore
-public class ProductCategoryControllerComponentTest extends BaseWebComponentTest {
+public class ProductCategoryControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/productCategories";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";

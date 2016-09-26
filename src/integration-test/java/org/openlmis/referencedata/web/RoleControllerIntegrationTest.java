@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
-public class RoleControllerComponentTest extends BaseWebComponentTest {
+public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/roles";
   private static final String ID_URL = RESOURCE_URL + "/{id}";

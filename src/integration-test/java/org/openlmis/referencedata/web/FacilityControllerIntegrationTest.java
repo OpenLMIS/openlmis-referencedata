@@ -1,6 +1,10 @@
 package org.openlmis.referencedata.web;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -19,16 +23,13 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-public class FacilityControllerComponentTest extends BaseWebComponentTest {
+public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";

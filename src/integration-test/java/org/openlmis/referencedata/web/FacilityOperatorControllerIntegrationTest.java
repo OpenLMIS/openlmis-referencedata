@@ -17,7 +17,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FacilityOperatorControllerComponentTest extends BaseWebComponentTest {
+public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/facilityOperators";

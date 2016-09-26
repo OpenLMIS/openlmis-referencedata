@@ -20,7 +20,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-public class ProcessingPeriodControllerComponentTest extends BaseWebComponentTest {
+public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/processingPeriods";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";

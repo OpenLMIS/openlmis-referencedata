@@ -13,12 +13,14 @@ import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,16 +28,22 @@ import org.springframework.http.MediaType;
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @Ignore
-public class SupervisoryNodeControllerComponentTest extends BaseWebComponentTest {
+public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  private static final String RESOURCE_URL = "/api/supervisoryNodes";
+  private static final String RESOURCE_URL = "/api/requisitionGroups";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
+  private static final UUID ID = UUID.fromString("1752b457-0a4b-4de0-bf94-5a6a8002427e");
+  private static final String DESCRIPTION = "OpenLMIS";
 
   @Autowired
-  private SupervisoryNodeRepository repository;
+  private RequisitionGroupRepository repository;
+
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -52,7 +60,7 @@ public class SupervisoryNodeControllerComponentTest extends BaseWebComponentTest
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
 
-  private SupervisoryNode supervisoryNode;
+  private RequisitionGroup requisitionGroup = new RequisitionGroup();
 
   @Before
   public void setUp() {
@@ -81,35 +89,59 @@ public class SupervisoryNodeControllerComponentTest extends BaseWebComponentTest
     facility.setOperator(facilityOperator);
     facilityRepository.save(facility);
 
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("supervisoryNodeCode", facility);
-    repository.save(supervisoryNode);
+    SupervisoryNode supervisoryNode = new SupervisoryNode();
+    supervisoryNode.setCode("supervisoryNodeCode");
+    supervisoryNode.setFacility(facility);
+    supervisoryNodeRepository.save(supervisoryNode);
+
+    requisitionGroup.setCode("code");
+    requisitionGroup.setName("name");
+    requisitionGroup.setSupervisoryNode(supervisoryNode);
+    repository.save(requisitionGroup);
   }
 
   @Test
-  public void shouldDeleteSupervisoryNode() {
+  public void shouldDeleteRequisitionGroup() {
 
     restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supervisoryNode.getId())
+          .pathParam("id", requisitionGroup.getId())
           .when()
           .delete(ID_URL)
           .then()
           .statusCode(204);
 
-    assertFalse(repository.exists(supervisoryNode.getId()));
+    assertFalse(repository.exists(requisitionGroup.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldCreateSupervisoryNode() {
+  public void shouldNotDeleteNonexistentRequisitionGroup() {
 
-    repository.delete(supervisoryNode);
+    repository.delete(requisitionGroup);
 
     restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(supervisoryNode)
+          .pathParam("id", requisitionGroup.getId())
+          .when()
+          .delete(ID_URL)
+          .then()
+          .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldCreateRequisitionGroup() {
+
+    repository.delete(requisitionGroup);
+
+    restAssured.given()
+          .queryParam(ACCESS_TOKEN, getToken())
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .body(requisitionGroup)
           .when()
           .post(RESOURCE_URL)
           .then()
@@ -119,56 +151,94 @@ public class SupervisoryNodeControllerComponentTest extends BaseWebComponentTest
   }
 
   @Test
-  public void shouldUpdateSupervisoryNode() {
+  public void shouldGetAllRequisitionGroups() {
 
-    supervisoryNode.setCode("OpenLMIS");
-
-    SupervisoryNode response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supervisoryNode.getId())
-          .body(supervisoryNode)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(SupervisoryNode.class);
-
-    assertEquals(response.getCode(), "OpenLMIS");
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetAllSupervisoryNodes() {
-
-    SupervisoryNode[] response = restAssured.given()
+    RequisitionGroup[] response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when()
           .get(RESOURCE_URL)
           .then()
           .statusCode(200)
-          .extract().as(SupervisoryNode[].class);
+          .extract().as(RequisitionGroup[].class);
 
-    Iterable<SupervisoryNode> supervisoryNodes = Arrays.asList(response);
-    assertTrue(supervisoryNodes.iterator().hasNext());
+    Iterable<RequisitionGroup> requisitionGroups = Arrays.asList(response);
+    assertTrue(requisitionGroups.iterator().hasNext());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenSupervisoryNode() {
+  public void shouldGetChosenRequisitionGroup() {
 
-    SupervisoryNode response = restAssured.given()
+    RequisitionGroup response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supervisoryNode.getId())
+          .pathParam("id", requisitionGroup.getId())
           .when()
           .get(ID_URL)
           .then()
           .statusCode(200)
-          .extract().as(SupervisoryNode.class);
+          .extract().as(RequisitionGroup.class);
 
     assertTrue(repository.exists(response.getId()));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotGetNonexistentRequisitionGroup() {
+
+    repository.delete(requisitionGroup);
+
+    restAssured.given()
+          .queryParam(ACCESS_TOKEN, getToken())
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .pathParam("id", requisitionGroup.getId())
+          .when()
+          .get(ID_URL)
+          .then()
+          .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldUpdateRequisitionGroup() {
+
+    requisitionGroup.setDescription(DESCRIPTION);
+
+    RequisitionGroup response = restAssured.given()
+          .queryParam(ACCESS_TOKEN, getToken())
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .pathParam("id", requisitionGroup.getId())
+          .body(requisitionGroup)
+          .when()
+          .put(ID_URL)
+          .then()
+          .statusCode(200)
+          .extract().as(RequisitionGroup.class);
+
+    assertEquals(response.getDescription(), DESCRIPTION);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldCreateNewRequisitionGroupIfDoesNotExist() {
+
+    repository.delete(requisitionGroup);
+    requisitionGroup.setDescription(DESCRIPTION);
+
+    RequisitionGroup response = restAssured.given()
+          .queryParam(ACCESS_TOKEN, getToken())
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .pathParam("id", ID)
+          .body(requisitionGroup)
+          .when()
+          .put(ID_URL)
+          .then()
+          .statusCode(200)
+          .extract().as(RequisitionGroup.class);
+
+    assertEquals(response.getDescription(), DESCRIPTION);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }
