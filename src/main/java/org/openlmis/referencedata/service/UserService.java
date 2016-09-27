@@ -37,7 +37,7 @@ public class UserService {
    */
   @PostConstruct
   public void init() {
-    String virtualHost = Optional.ofNullable(System.getenv("AUTH_HOST")).orElse("localhost");
+    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
     virtualHostBaseUrl = "http://" + virtualHost;
   }
   
