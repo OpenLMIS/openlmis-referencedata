@@ -15,6 +15,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Optional;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -66,7 +68,8 @@ public abstract class BaseWebComponentTest {
    * Constructor for test.
    */
   public BaseWebComponentTest() {
-    RestAssured.baseURI = "http://localhost:8080";
+    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
+    RestAssured.baseURI = "http://" + virtualHost + ":8080";
     restAssured = ramlDefinition.createRestAssured();
 
     // This mocks the auth check to always return valid admin credentials.
