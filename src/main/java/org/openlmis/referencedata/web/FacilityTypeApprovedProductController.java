@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 
 import java.util.UUID;
@@ -58,7 +57,6 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @return FacilityTypeApprovedProduct.
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllFacilityTypeApprovedProducts() {
     Iterable<FacilityTypeApprovedProduct> facilityTypeApprovedProducts = repository.findAll();
     if (facilityTypeApprovedProducts == null) {

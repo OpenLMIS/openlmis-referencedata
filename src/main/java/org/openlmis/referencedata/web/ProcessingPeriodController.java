@@ -110,7 +110,6 @@ public class ProcessingPeriodController extends BaseController {
    * @return ProcessingPeriods.
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllProcessingPeriods() {
     Iterable<ProcessingPeriod> periods = periodRepository.findAll();
     if (periods == null) {

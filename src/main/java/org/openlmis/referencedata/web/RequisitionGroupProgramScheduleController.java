@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.UUID;
 
@@ -59,7 +58,6 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
    * @return RequisitionGroupProgramSchedules.
    */
   @RequestMapping(value = "/requisitionGroupProgramSchedules", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllRequisitionGroupProgramSchedule() {
     Iterable<RequisitionGroupProgramSchedule> requisitions = repository.findAll();
     return new ResponseEntity<>(requisitions, HttpStatus.OK);

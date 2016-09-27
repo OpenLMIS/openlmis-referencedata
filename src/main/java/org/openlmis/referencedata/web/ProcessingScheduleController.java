@@ -93,7 +93,6 @@ public class ProcessingScheduleController extends BaseController {
    * @return ProcessingSchedules.
    */
   @RequestMapping(value = "/processingSchedules", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllProcessingSchedules() {
     Iterable<ProcessingSchedule> schedules = scheduleRepository.findAll();
     if (schedules == null) {
