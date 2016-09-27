@@ -16,11 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.annotation.PostConstruct;
 
 @Service
 public class UserService {
@@ -38,7 +37,7 @@ public class UserService {
    */
   @PostConstruct
   public void init() {
-    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
+    String virtualHost = Optional.ofNullable(System.getenv("AUTH_HOST")).orElse("localhost");
     virtualHostBaseUrl = "http://" + virtualHost;
   }
   
