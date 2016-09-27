@@ -15,10 +15,8 @@ import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.openlmis.referencedata.web.ProgramProductBuilderDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
@@ -26,9 +24,7 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import java.util.Locale;
 import java.util.Objects;
 
-@Configuration
-@EnableAutoConfiguration
-@ComponentScan(basePackages = "org.openlmis")
+@SpringBootApplication(scanBasePackages = "org.openlmis")
 @ImportResource("applicationContext.xml")
 public class Application {
 

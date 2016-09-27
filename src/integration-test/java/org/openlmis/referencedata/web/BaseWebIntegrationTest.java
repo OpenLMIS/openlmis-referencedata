@@ -1,30 +1,29 @@
 package org.openlmis.referencedata.web;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.jayway.restassured.RestAssured;
-import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.RamlLoaders;
-import guru.nidi.ramltester.restassured.RestAssuredClient;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
-import org.openlmis.referencedata.Application;
-import org.openlmis.referencedata.utils.CleanRepositoryHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.Optional;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(Application.class)
-@WebIntegrationTest("server.port:8080")
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.jayway.restassured.RestAssured;
+
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.runner.RunWith;
+import org.openlmis.referencedata.utils.CleanRepositoryHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlLoaders;
+import guru.nidi.ramltester.restassured.RestAssuredClient;
+
+import java.util.Optional;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public abstract class BaseWebIntegrationTest {
 
