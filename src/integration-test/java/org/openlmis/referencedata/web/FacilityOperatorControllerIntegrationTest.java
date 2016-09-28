@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
@@ -17,6 +18,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
 import java.util.List;
 
+@Ignore
 public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String ACCESS_TOKEN = "access_token";

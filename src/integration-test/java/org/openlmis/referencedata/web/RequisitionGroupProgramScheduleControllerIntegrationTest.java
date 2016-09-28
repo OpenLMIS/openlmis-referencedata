@@ -21,6 +21,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.UUID;
 
+@Ignore
 public class RequisitionGroupProgramScheduleControllerIntegrationTest
       extends BaseWebIntegrationTest {
 

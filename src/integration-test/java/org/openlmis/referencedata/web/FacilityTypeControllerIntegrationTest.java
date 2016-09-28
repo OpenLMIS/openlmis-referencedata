@@ -19,6 +19,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.UUID;
 
+@Ignore
 public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/facilityTypes";
