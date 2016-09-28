@@ -1,18 +1,6 @@
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import com.google.common.collect.Sets;
-
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
@@ -49,6 +37,17 @@ import org.springframework.validation.BindingResult;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class UserControllerTest {
@@ -603,7 +602,7 @@ public class UserControllerTest {
   public void shouldGetUserSupervisedFacilities() throws RightTypeException {
     //given
     RequisitionGroup supervisionGroup1 = RequisitionGroup.newRequisitionGroup("supervisionGroup1",
-        supervisoryNode1);
+            "supervisionGroupName1", supervisoryNode1);
     supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility("C1"), new Facility("C2")));
     supervisoryNode1.setRequisitionGroup(supervisionGroup1);
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));

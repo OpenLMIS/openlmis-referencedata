@@ -3,13 +3,16 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +26,10 @@ public class RequisitionGroupController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(RequisitionGroupController.class);
 
   @Autowired
+  @Qualifier("requisitionGroupValidator")
+  private RequisitionGroupValidator validator;
+
+  @Autowired
   private RequisitionGroupRepository requisitionGroupRepository;
 
   /**
@@ -33,19 +40,26 @@ public class RequisitionGroupController extends BaseController {
    * @return ResponseEntity containing the created requisitionGroup
    */
   @RequestMapping(value = "/requisitionGroups", method = RequestMethod.POST)
-  public ResponseEntity<?> createRequisitionGroup(@RequestBody RequisitionGroup requisitionGroup) {
-    try {
-      LOGGER.debug("Creating new requisitionGroup");
-      requisitionGroup.setId(null);
-      RequisitionGroup newRequisitionGroup = requisitionGroupRepository.save(requisitionGroup);
-      LOGGER.debug("Created new requisitionGroup with id: " + requisitionGroup.getId());
-      return new ResponseEntity<RequisitionGroup>(newRequisitionGroup, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating requisitionGroup",
-                  ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+  public ResponseEntity<?> createRequisitionGroup(@RequestBody RequisitionGroup requisitionGroup,
+                                                  BindingResult bindingResult) {
+    LOGGER.debug("Creating new requisitionGroup");
+    validator.validate(requisitionGroup, bindingResult);
+
+    if (bindingResult.getErrorCount() == 0) {
+      try {
+        requisitionGroup.setId(null);
+        RequisitionGroup newRequisitionGroup = requisitionGroupRepository.save(requisitionGroup);
+        LOGGER.debug("Created new requisitionGroup with id: " + requisitionGroup.getId());
+        return new ResponseEntity<>(newRequisitionGroup, HttpStatus.CREATED);
+      } catch (DataIntegrityViolationException ex) {
+        ErrorResponse errorResponse =
+                new ErrorResponse("An error accurred while creating requisitionGroup",
+                        ex.getMessage());
+        LOGGER.error(errorResponse.getMessage(), ex);
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+      }
+    } else {
+      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
     }
   }
 
