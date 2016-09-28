@@ -17,4 +17,4 @@ services:
   log:
     image: openlmis/rsyslog
     volumes:
-      - '../logs/auth:/var/log'
+      - '../logs/referencedata:/var/log'
