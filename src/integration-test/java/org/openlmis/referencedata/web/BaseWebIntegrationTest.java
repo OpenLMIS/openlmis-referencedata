@@ -1,26 +1,23 @@
 package org.openlmis.referencedata.web;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
-
+import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlLoaders;
+import guru.nidi.ramltester.restassured.RestAssuredClient;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.RamlLoaders;
-import guru.nidi.ramltester.restassured.RestAssuredClient;
-
-import java.util.Optional;
-
 import javax.annotation.PostConstruct;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -57,6 +54,9 @@ public abstract class BaseWebIntegrationTest {
       + "  \"client_id\": \"trusted-client\"\n"
       + "}";
 
+  @Value("${auth.server.baseUrl}")
+  protected String baseUri;
+
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(80);
 
@@ -92,8 +92,8 @@ public abstract class BaseWebIntegrationTest {
   @PostConstruct
   public void init() {
 
-    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
-    RestAssured.baseURI = "http://" + virtualHost + ":" + Integer.toString(randomPort);
+    RestAssured.baseURI = baseUri;
+    RestAssured.port = randomPort;
     restAssured = ramlDefinition.createRestAssured();
   } 
   

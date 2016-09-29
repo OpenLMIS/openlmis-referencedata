@@ -83,6 +83,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM2_CODE = "P2";
   private static final String SUPERVISORY_NODE_CODE = "SN1";
   private static final String WAREHOUSE_CODE = "W1";
+  private static final String USER_API_STRING = "/auth/api/users";
 
   @MockBean
   private UserRepository userRepository;
@@ -569,22 +570,22 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     userRequest.setEmail(user.getEmail());
     userRequest.setReferenceDataUserId(user.getId());
 
-    String url = "http://auth:8080/api/users?access_token=" + getToken();
+    final String url = baseUri + "?access_token=" + getToken();
     RestTemplate restTemplate = new RestTemplate();
 
     restTemplate.postForObject(url, userRequest, Object.class);
   }
 
   private UUID passwordResetToken(UUID referenceDataUserId) {
-    String url = "http://auth:8080/api/users/passwordResetToken?userId=" + referenceDataUserId
-        + "&access_token=" + getToken();
+    final String url = baseUri + USER_API_STRING + "/passwordResetToken?userId="
+        + referenceDataUserId + "&access_token=" + getToken();
     RestTemplate restTemplate = new RestTemplate();
 
     return restTemplate.postForObject(url, null, UUID.class);
   }
 
   private AuthUserRequest getAutUserByUsername(String username) {
-    String url = "http://auth:8080/api/users/search/findOneByUsername?username=" + username
+    final String url = baseUri + USER_API_STRING + "/search/findOneByUsername?username=" + username
         + "&access_token=" + getToken();
 
     RestTemplate restTemplate = new RestTemplate();
@@ -592,7 +593,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private void removeAuthUserByUsername(String username) {
-    String url = "http://auth:8080/api/users/search/findOneByUsername?username=" + username
+    String url = baseUri + USER_API_STRING + "/search/findOneByUsername?username=" + username
         + "&access_token=" + getToken();
 
     RestTemplate restTemplate = new RestTemplate();
@@ -600,7 +601,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     String href = ((String) ((Map) ((Map) map.get("_links")).get("self")).get("href"));
     String id = href.split("users/")[1];
 
-    url = "http://auth:8080/api/users/" + id + "?access_token=" + getToken();
+    url = baseUri + USER_API_STRING + id + "?access_token=" + getToken();
     restTemplate.delete(url);
   }
 
