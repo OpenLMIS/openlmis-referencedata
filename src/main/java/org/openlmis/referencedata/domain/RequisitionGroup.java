@@ -1,8 +1,6 @@
 package org.openlmis.referencedata.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +11,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.util.List;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * RequisitionGroup represents a group of facilities which follow a particular schedule for a
@@ -69,13 +70,28 @@ public class RequisitionGroup extends BaseEntity {
    * Create a new requisition group with a specified supervisory node, program schedules and
    * facilities.
    *
-   * @param code      specified code
-   * @param name      specified name
+   * @param code            specified code
+   * @param name            specified name
    * @param supervisoryNode specified supervisory node
    * @return the new requisition group
    */
   public static RequisitionGroup newRequisitionGroup(String code, String name,
                                                      SupervisoryNode supervisoryNode) {
     return new RequisitionGroup(code, name, supervisoryNode);
+  }
+
+  /**
+   * Copy properties from the given instance.
+   *
+   * @param requisitionGroup an instance from which properties will be used to update current
+   *                         instance
+   */
+  public void updateFrom(RequisitionGroup requisitionGroup) {
+    code = requisitionGroup.getCode();
+    name = requisitionGroup.getName();
+    description = requisitionGroup.getDescription();
+    supervisoryNode = requisitionGroup.getSupervisoryNode();
+    requisitionGroupProgramSchedules = requisitionGroup.getRequisitionGroupProgramSchedules();
+    memberFacilities = requisitionGroup.getMemberFacilities();
   }
 }
