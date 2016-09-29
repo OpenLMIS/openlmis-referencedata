@@ -2,33 +2,30 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import com.google.common.collect.Sets;
+
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
-import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-@Ignore
 @SuppressWarnings("PMD.TooManyMethods")
 public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -37,44 +34,39 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ACCESS_TOKEN = "access_token";
   private static final String ROLE_NAME = "role1";
 
-  @Autowired
+  @MockBean
   private RoleRepository roleRepository;
   
-  @Autowired
+  @MockBean
   private RightRepository rightRepository;
 
   private Role role;
   private RoleDto roleDto;
+  private UUID roleId;
   
   private Right right1;
   private Right right2;
+  private static final String RIGHT1_NAME = "right1";
+  private static final String RIGHT2_NAME = "right2";
 
-  @Before
-  public void setUp() throws RightTypeException, RoleException {
-    right1 = Right.newRight("right1", RightType.GENERAL_ADMIN);
-
-    right2 = Right.newRight("right2", RightType.GENERAL_ADMIN);
-
+  /**
+   * Constructor for test class.
+   */
+  public RoleControllerIntegrationTest() throws RightTypeException, RoleException {
+    right1 = Right.newRight(RIGHT1_NAME, RightType.GENERAL_ADMIN);
+    right2 = Right.newRight(RIGHT2_NAME, RightType.GENERAL_ADMIN);
     role = Role.newRole(ROLE_NAME, right1, right2);
-
-    rightRepository.save(right1);
-    rightRepository.save(right2);
-    roleRepository.save(role);
-
-    roleRepository.save(Role.newRole("role2", right2));
-
     roleDto = new RoleDto();
     role.export(roleDto);
-  }
-
-  @After
-  public void cleanUp() {
-    roleRepository.deleteAll();
-    rightRepository.deleteAll();
+    roleId = UUID.randomUUID();
   }
 
   @Test
-  public void shouldGetAllRoles() {
+  public void shouldGetAllRoles() throws RightTypeException, RoleException {
+
+    Set<Role> storedRoles = Sets.newHashSet(role,
+        Role.newRole("role2", right1));
+    given(roleRepository.findAll()).willReturn(storedRoles);
 
     RoleDto[] response = restAssured
         .given()
@@ -93,10 +85,12 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetRole() {
 
+    given(roleRepository.findOne(roleId)).willReturn(role);
+
     RoleDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", role.getId())
+        .pathParam("id", roleId)
         .when()
         .get(ID_URL)
         .then()
@@ -108,26 +102,11 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldNotGetNonExistingRole() {
+  public void shouldPostRole() {
 
-    roleRepository.delete(role);
-
-    restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", role.getId())
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldCreateNewRoleOnPost() {
-
-    roleRepository.delete(role);
+    given(roleRepository.findFirstByName(ROLE_NAME)).willReturn(null);
+    given(rightRepository.findFirstByName(RIGHT1_NAME)).willReturn(right1);
+    given(rightRepository.findFirstByName(RIGHT2_NAME)).willReturn(right2);
 
     RoleDto response = restAssured
         .given()
@@ -140,36 +119,21 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(201)
         .extract().as(RoleDto.class);
 
-    assertTrue(roleRepository.exists(role.getId()));
     assertEquals(roleDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldNotCreateExistingRoleOnPost() {
+  public void shouldPutRole() {
 
-    restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(role)
-        .when()
-        .post(RESOURCE_URL)
-        .then()
-        .statusCode(409);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldUpdateExistingRoleOnPut() {
-
-    roleDto.setDescription("Updated");
+    given(roleRepository.findOne(roleId)).willReturn(role);
+    given(rightRepository.findFirstByName(RIGHT1_NAME)).willReturn(right1);
+    given(rightRepository.findFirstByName(RIGHT2_NAME)).willReturn(right2);
 
     RoleDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", role.getId())
+        .pathParam("id", roleId)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(roleDto)
         .when()
@@ -179,152 +143,22 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(RoleDto.class);
 
     assertEquals(roleDto, response);
-    Role storedRole = roleRepository.findOne(role.getId());
-    assertEquals("Updated", storedRole.getDescription());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldCreateNewRoleOnPut() throws RightTypeException, RoleException {
-
-    UUID newRoleId = UUID.randomUUID();
-    Role newRole = Role.newRole("role3", right1);
-    RoleDto newRoleDto = new RoleDto();
-    newRole.export(newRoleDto);
-
-    RoleDto response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", newRoleId)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(newRoleDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(RoleDto.class);
-
-    assertEquals(newRoleDto, response);
-    Role storedRole = roleRepository.findOne(newRoleId);
-    storedRole.getRights().size();
-    assertEquals(newRole, storedRole);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-  
-  @Test
-  public void shouldAddRoleRightsOnPut() throws RightTypeException {
-
-    Right right3 = Right.newRight("right3", RightType.GENERAL_ADMIN);
-    rightRepository.save(right3);
-    
-    RightDto rightDto = new RightDto();
-    right3.export(rightDto);
-    roleDto.addRight(rightDto);
-    
-    RoleDto response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", role.getId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(roleDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(RoleDto.class);
-
-    assertEquals(roleDto, response);
-    Role storedRole = roleRepository.findOne(role.getId());
-    assertThat(storedRole.getRights().size(), is(3));
-    assertTrue(storedRole.contains(right3));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-  
-  @Test
-  public void shouldUpdateRoleRightsOnPut() throws RightTypeException, RoleException {
-
-    Right right3 = Right.newRight("right3", RightType.GENERAL_ADMIN);
-    rightRepository.save(right3);
-
-    Role updatedRole = Role.newRole(role.getName(), right1, right3);
-    RoleDto updatedRoleDto = new RoleDto();
-    updatedRole.export(updatedRoleDto);
-
-    RoleDto response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", role.getId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(updatedRoleDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(RoleDto.class);
-
-    assertEquals(updatedRoleDto, response);
-    Role storedRole = roleRepository.findOne(role.getId());
-    assertThat(storedRole.getRights().size(), is(2));
-    assertTrue(storedRole.contains(right3));
-    assertFalse(storedRole.contains(right2));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-  
-  @Test
-  public void shouldRemoveRoleRightsOnPut() throws RightTypeException, RoleException {
-
-    Role updatedRole = Role.newRole(role.getName(), right1);
-    RoleDto updatedRoleDto = new RoleDto();
-    updatedRole.export(updatedRoleDto);
-
-    RoleDto response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", role.getId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(updatedRoleDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(RoleDto.class);
-
-    assertEquals(updatedRoleDto, response);
-    Role storedRole = roleRepository.findOne(role.getId());
-    assertThat(storedRole.getRights().size(), is(1));
-    assertFalse(storedRole.contains(right2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldDeleteRole() {
 
+    given(roleRepository.findOne(roleId)).willReturn(role);
+
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", role.getId())
+        .pathParam("id", roleId)
         .when()
         .delete(ID_URL)
         .then()
         .statusCode(204);
-
-    assertFalse(roleRepository.exists(role.getId()));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldNotDeleteNonExistingRole() {
-
-    roleRepository.delete(role);
-
-    restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", role.getId())
-        .when()
-        .delete(ID_URL)
-        .then()
-        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

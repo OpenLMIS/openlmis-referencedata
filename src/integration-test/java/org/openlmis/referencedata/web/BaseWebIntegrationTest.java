@@ -8,11 +8,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
-import org.openlmis.referencedata.utils.CleanRepositoryHelper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -22,8 +20,10 @@ import guru.nidi.ramltester.restassured.RestAssuredClient;
 
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public abstract class BaseWebIntegrationTest {
 
@@ -57,19 +57,16 @@ public abstract class BaseWebIntegrationTest {
       + "  \"client_id\": \"trusted-client\"\n"
       + "}";
 
-  @Autowired
-  private CleanRepositoryHelper cleanRepositoryHelper;
-
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(80);
 
+  @LocalServerPort
+  private int randomPort;
+  
   /**
    * Constructor for test.
    */
   public BaseWebIntegrationTest() {
-    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
-    RestAssured.baseURI = "http://" + virtualHost + ":8080";
-    restAssured = ramlDefinition.createRestAssured();
 
     // This mocks the auth check to always return valid admin credentials.
     wireMockRule.stubFor(post(urlEqualTo("/auth/oauth/check_token"))
@@ -88,11 +85,18 @@ public abstract class BaseWebIntegrationTest {
             .withStatus(200)));
   }
 
-  @After
-  public void cleanRepositories() {
-    cleanRepositoryHelper.cleanAll();
-  }
+  /**
+   * Initialize the REST Assured client. Done here and not in the constructor, so that randomPort
+   * is available.
+   */
+  @PostConstruct
+  public void init() {
 
+    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
+    RestAssured.baseURI = "http://" + virtualHost + ":" + Integer.toString(randomPort);
+    restAssured = ramlDefinition.createRestAssured();
+  } 
+  
   /**
    * Get an access token. An arbitrary UUID string is returned and the tests assume it is a valid
    * one.
