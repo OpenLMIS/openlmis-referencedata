@@ -1,6 +1,8 @@
 package org.openlmis.referencedata.validate;
 
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class RequisitionGroupValidator implements Validator {
 
   @Autowired
   private RequisitionGroupRepository requisitionGroups;
+
+  @Autowired
+  private FacilityRepository facilities;
 
   /**
    * Checks if the given class definition is supported.
@@ -54,9 +59,20 @@ public class RequisitionGroupValidator implements Validator {
    */
   @Override
   public void validate(Object target, Errors errors) {
+    verifyArguments(target, errors);
+    verifyProperties(errors);
+
+    if (!errors.hasErrors()) {
+      verifyData((RequisitionGroup) target, errors);
+    }
+  }
+
+  private void verifyArguments(Object target, Errors errors) {
     checkNotNull(target, "The Requisition Group cannot be null");
     checkNotNull(errors, "The contextual state about the validation process cannot be null");
+  }
 
+  private void verifyProperties(Errors errors) {
     // the Requisition Group Code is required
     ValidationUtils.rejectIfEmptyOrWhitespace(
         errors, "code", "code.empty", "The Requisition Group Code is required"
@@ -71,22 +87,46 @@ public class RequisitionGroupValidator implements Validator {
     ValidationUtils.rejectIfEmpty(
         errors, "supervisoryNode", "supervisoryNode.empty", "The Supervisory Node is required"
     );
+  }
 
-    if (!errors.hasErrors()) {
-      RequisitionGroup group = (RequisitionGroup) target;
+  private void verifyData(RequisitionGroup target, Errors errors) {
+    // requisition group code cannot be duplicated
+    if (null != requisitionGroups.findByCode(target.getCode())) {
+      errors.rejectValue(
+          "code", "code.duplicate", "The Requisition Group Code cannot be duplicated"
+      );
+    }
 
-      // requisition group code cannot be duplicated
-      if (null != requisitionGroups.findByCode(group.getCode())) {
+    // supervisory node matches a defined supervisory node
+    if (null == supervisoryNodes.findByCode(target.getSupervisoryNode().getCode())) {
+      errors.rejectValue(
+          "supervisoryNode", "supervisoryNode.not.exist",
+          "The Supervisory Node should match a defined supervisory node"
+      );
+    }
+
+    // facilities must already exist in the system (cannot add new facilities from this point)
+    for (int i = 0, size = target.getMemberFacilities().size(); i < size; ++i) {
+      Facility facility = target.getMemberFacilities().get(i);
+      String field = "memberFacilities[" + i + "]";
+
+      if (null == facility) {
         errors.rejectValue(
-            "code", "code.duplicate", "The Requisition Group Code cannot be duplicated"
+            field, "facility.is.null", "The facility can not be null"
         );
+        continue;
       }
 
-      // supervisory node matches a defined supervisory node
-      if (null == supervisoryNodes.findByCode(group.getSupervisoryNode().getCode())) {
+      if (null == facility.getId()) {
         errors.rejectValue(
-            "supervisoryNode", "supervisoryNode.not.exist",
-            "The Supervisory Node should match a defined supervisory node"
+            field, "facility.missing.id", "The facility must have ID"
+        );
+        continue;
+      }
+
+      if (null == facilities.findOne(facility.getId())) {
+        errors.rejectValue(
+            field, "facility.not.exist", "The facility should match a defined facility"
         );
       }
     }

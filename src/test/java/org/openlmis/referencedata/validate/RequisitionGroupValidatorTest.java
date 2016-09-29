@@ -1,22 +1,27 @@
 package org.openlmis.referencedata.validate;
 
+import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -31,6 +36,9 @@ public class RequisitionGroupValidatorTest {
   @Mock
   private RequisitionGroupRepository requisitionGroups;
 
+  @Mock
+  private FacilityRepository facilities;
+
   @InjectMocks
   private Validator validator = new RequisitionGroupValidator();
 
@@ -39,6 +47,9 @@ public class RequisitionGroupValidatorTest {
 
   @Before
   public void setUp() throws Exception {
+    Facility facility = new Facility("TestFacilityCode");
+    facility.setId(UUID.randomUUID());
+
     SupervisoryNode supervisoryNode = new SupervisoryNode();
     supervisoryNode.setCode("TestSupervisoryNodeCode");
 
@@ -47,17 +58,23 @@ public class RequisitionGroupValidatorTest {
     requisitionGroup.setName("TestRequisitionGroupName");
     requisitionGroup.setDescription("TestRequisitionGroupDescription");
     requisitionGroup.setSupervisoryNode(supervisoryNode);
+    requisitionGroup.setMemberFacilities(Lists.newArrayList(facility));
 
     errors = new BeanPropertyBindingResult(requisitionGroup, "requisitionGroup");
-  }
 
-  @Test
-  public void shouldNotFindErrors() throws Exception {
     doReturn(mock(SupervisoryNode.class))
         .when(supervisoryNodes)
         .findByCode("TestSupervisoryNodeCode");
 
+    doReturn(mock(Facility.class))
+        .when(facilities)
+        .findOne(facility.getId());
+  }
+
+  @Test
+  public void shouldNotFindErrors() throws Exception {
     validator.validate(requisitionGroup, errors);
+
     assertThat(errors.getErrorCount(), is(equalTo(0)));
   }
 
@@ -65,13 +82,12 @@ public class RequisitionGroupValidatorTest {
   public void shouldRejectIfCodeIsEmpty() throws Exception {
     String[] strings = new String[]{null, "", "  "};
 
-    for (int i = 0, length = strings.length; i < length; ++i) {
-      String code = strings[i];
+    for (String code : strings) {
       requisitionGroup.setCode(code);
 
       validator.validate(requisitionGroup, errors);
-      assertThat(errors.getErrorCount(), is(equalTo(i + 1)));
-      assertThat(errors.getFieldError("code"), is(notNullValue()));
+
+      assertErrorMessage("code", "The Requisition Group Code is required");
     }
   }
 
@@ -84,8 +100,8 @@ public class RequisitionGroupValidatorTest {
       requisitionGroup.setName(name);
 
       validator.validate(requisitionGroup, errors);
-      assertThat(errors.getErrorCount(), is(equalTo(i + 1)));
-      assertThat(errors.getFieldError("name"), is(notNullValue()));
+
+      assertErrorMessage("name", "The requisition Group Name is required");
     }
   }
 
@@ -94,8 +110,8 @@ public class RequisitionGroupValidatorTest {
     requisitionGroup.setSupervisoryNode(null);
 
     validator.validate(requisitionGroup, errors);
-    assertThat(errors.getErrorCount(), is(equalTo(1)));
-    assertThat(errors.getFieldError("supervisoryNode"), is(notNullValue()));
+
+    assertErrorMessage("supervisoryNode", "The Supervisory Node is required");
   }
 
   @Test
@@ -104,13 +120,9 @@ public class RequisitionGroupValidatorTest {
         .when(requisitionGroups)
         .findByCode(requisitionGroup.getCode());
 
-    doReturn(mock(SupervisoryNode.class))
-        .when(supervisoryNodes)
-        .findByCode("TestSupervisoryNodeCode");
-
     validator.validate(requisitionGroup, errors);
-    assertThat(errors.getErrorCount(), is(equalTo(1)));
-    assertThat(errors.getFieldError("code"), is(notNullValue()));
+
+    assertErrorMessage("code", "The Requisition Group Code cannot be duplicated");
   }
 
   @Test
@@ -120,7 +132,49 @@ public class RequisitionGroupValidatorTest {
         .findByCode(anyString());
 
     validator.validate(requisitionGroup, errors);
-    assertThat(errors.getErrorCount(), is(equalTo(1)));
-    assertThat(errors.getFieldError("supervisoryNode"), is(notNullValue()));
+
+    assertErrorMessage(
+        "supervisoryNode", "The Supervisory Node should match a defined supervisory node"
+    );
+  }
+
+  @Test
+  public void shouldRejectIfFacilityIsNull() throws Exception {
+    requisitionGroup.getMemberFacilities().add(null);
+
+    validator.validate(requisitionGroup, errors);
+
+    assertErrorMessage("memberFacilities[1]", "The facility can not be null");
+  }
+
+  @Test
+  public void shouldRejectIfFacilityHasNoId() throws Exception {
+    requisitionGroup.getMemberFacilities().add(new Facility("TestFacilityCode2"));
+
+    validator.validate(requisitionGroup, errors);
+
+    assertErrorMessage("memberFacilities[1]", "The facility must have ID");
+  }
+
+  @Test
+  public void shouldRejectIfFacilityCanNotBeFound() throws Exception {
+    Facility facility = new Facility("TestFacilityCode2");
+    facility.setId(UUID.randomUUID());
+
+    requisitionGroup.getMemberFacilities().add(facility);
+
+    validator.validate(requisitionGroup, errors);
+
+    assertErrorMessage("memberFacilities[1]", "The facility should match a defined facility");
+  }
+
+  private void assertErrorMessage(String field, String expectedMessage) {
+    assertThat("There is no errors for field: " + field, errors.hasFieldErrors(field), is(true));
+
+    boolean match = errors.getFieldErrors(field)
+        .stream()
+        .anyMatch(e -> e.getField().equals(field) && e.getDefaultMessage().equals(expectedMessage));
+
+    assertThat("There is no error with default message: " + expectedMessage, match, is(true));
   }
 }
