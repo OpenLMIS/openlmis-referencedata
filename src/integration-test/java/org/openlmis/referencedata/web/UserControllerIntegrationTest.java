@@ -12,7 +12,6 @@ import static org.mockito.BDDMockito.given;
 
 import com.google.common.collect.Sets;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -136,8 +135,11 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID fulfillmentRoleId;
   private Facility warehouse;
 
-  @Before
-  public void setUp() throws RoleException, RoleAssignmentException, RightTypeException {
+  /**
+   * Constructor for test class.
+   */
+  public UserControllerIntegrationTest() throws RoleException, RoleAssignmentException,
+      RightTypeException {
     user1 = generateUser();
     assignUserRoles(user1);
     userId = UUID.randomUUID();
@@ -642,7 +644,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     GeographicLevel geographicLevel = new GeographicLevel();
     geographicLevel.setCode("GeographicLevel" + generateInstanceNumber());
     geographicLevel.setLevelNumber(1);
-    geographicLevelRepository.save(geographicLevel);
     return geographicLevel;
   }
 
@@ -650,14 +651,12 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     GeographicZone geographicZone = new GeographicZone();
     geographicZone.setCode("GeographicZone" + generateInstanceNumber());
     geographicZone.setLevel(geographicLevel);
-    geographicZoneRepository.save(geographicZone);
     return geographicZone;
   }
 
   private FacilityType generateFacilityType() {
     FacilityType facilityType = new FacilityType();
     facilityType.setCode("FacilityType" + generateInstanceNumber());
-    facilityTypeRepository.save(facilityType);
     return facilityType;
   }
 
