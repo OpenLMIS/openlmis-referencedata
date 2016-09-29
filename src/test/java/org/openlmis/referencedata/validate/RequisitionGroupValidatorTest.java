@@ -28,7 +28,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RequisitionGroupValidatorTest {
+public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
   @Mock
   private SupervisoryNodeRepository supervisoryNodes;
@@ -87,7 +87,7 @@ public class RequisitionGroupValidatorTest {
 
       validator.validate(requisitionGroup, errors);
 
-      assertErrorMessage("code", "The Requisition Group Code is required");
+      assertErrorMessage(errors, "code", "The Requisition Group Code is required");
     }
   }
 
@@ -95,13 +95,12 @@ public class RequisitionGroupValidatorTest {
   public void shouldRejectIfNameIsEmpty() throws Exception {
     String[] strings = new String[]{null, "", "  "};
 
-    for (int i = 0, length = strings.length; i < length; ++i) {
-      String name = strings[i];
+    for (String name : strings) {
       requisitionGroup.setName(name);
 
       validator.validate(requisitionGroup, errors);
 
-      assertErrorMessage("name", "The requisition Group Name is required");
+      assertErrorMessage(errors, "name", "The requisition Group Name is required");
     }
   }
 
@@ -111,7 +110,7 @@ public class RequisitionGroupValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage("supervisoryNode", "The Supervisory Node is required");
+    assertErrorMessage(errors, "supervisoryNode", "The Supervisory Node is required");
   }
 
   @Test
@@ -122,7 +121,7 @@ public class RequisitionGroupValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage("code", "The Requisition Group Code cannot be duplicated");
+    assertErrorMessage(errors, "code", "The Requisition Group Code cannot be duplicated");
   }
 
   @Test
@@ -134,7 +133,7 @@ public class RequisitionGroupValidatorTest {
     validator.validate(requisitionGroup, errors);
 
     assertErrorMessage(
-        "supervisoryNode", "The Supervisory Node should match a defined supervisory node"
+        errors, "supervisoryNode", "The Supervisory Node should match a defined supervisory node"
     );
   }
 
@@ -144,7 +143,7 @@ public class RequisitionGroupValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage("memberFacilities[1]", "The facility can not be null");
+    assertErrorMessage(errors, "memberFacilities[1]", "The facility can not be null");
   }
 
   @Test
@@ -153,7 +152,7 @@ public class RequisitionGroupValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage("memberFacilities[1]", "The facility must have ID");
+    assertErrorMessage(errors, "memberFacilities[1]", "The facility must have ID");
   }
 
   @Test
@@ -165,16 +164,9 @@ public class RequisitionGroupValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage("memberFacilities[1]", "The facility should match a defined facility");
+    assertErrorMessage(
+        errors, "memberFacilities[1]", "The facility should match a defined facility"
+    );
   }
 
-  private void assertErrorMessage(String field, String expectedMessage) {
-    assertThat("There is no errors for field: " + field, errors.hasFieldErrors(field), is(true));
-
-    boolean match = errors.getFieldErrors(field)
-        .stream()
-        .anyMatch(e -> e.getField().equals(field) && e.getDefaultMessage().equals(expectedMessage));
-
-    assertThat("There is no error with default message: " + expectedMessage, match, is(true));
-  }
 }
