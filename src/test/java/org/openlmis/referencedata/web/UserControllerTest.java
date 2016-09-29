@@ -601,8 +601,9 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserSupervisedFacilities() throws RightTypeException {
     //given
-    RequisitionGroup supervisionGroup1 = RequisitionGroup.newRequisitionGroup("supervisionGroup1",
-            "supervisionGroupName1", supervisoryNode1);
+    RequisitionGroup supervisionGroup1 = new RequisitionGroup(
+        "supervisionGroup1", "supervisionGroupName1", supervisoryNode1
+    );
     supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility("C1"), new Facility("C2")));
     supervisoryNode1.setRequisitionGroup(supervisionGroup1);
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));

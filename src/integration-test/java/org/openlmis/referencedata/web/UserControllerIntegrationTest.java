@@ -682,9 +682,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     program2 = new Program(PROGRAM2_CODE);
     supervisoryNode = SupervisoryNode.newSupervisoryNode(SUPERVISORY_NODE_CODE,
         generateFacility());
-    RequisitionGroup supervisionGroup = RequisitionGroup.newRequisitionGroup(
-        "SGC", "SGN", supervisoryNode
-    );
+    RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);
     supervisionGroup.setMemberFacilities(Arrays.asList(generateFacility(), generateFacility()));
     supervisoryNode.setRequisitionGroup(supervisionGroup);
 

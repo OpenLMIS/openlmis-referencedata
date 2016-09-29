@@ -123,14 +123,12 @@ public class UserTest {
   public void shouldGetSupervisedFacilities() throws RightTypeException, RoleException {
     //given
     SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("DN", new Facility("C1"));
-    RequisitionGroup districtGroup = RequisitionGroup.newRequisitionGroup("DG", "DGN",
-            districtNode);
+    RequisitionGroup districtGroup = new RequisitionGroup("DG", "DGN", districtNode);
     districtGroup.setMemberFacilities(Collections.singletonList(new Facility("C2")));
     districtNode.setRequisitionGroup(districtGroup);
 
     SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("PN", new Facility("C3"));
-    RequisitionGroup provinceGroup = RequisitionGroup.newRequisitionGroup("PG", "PGN",
-            provinceNode);
+    RequisitionGroup provinceGroup = new RequisitionGroup("PG", "PGN", provinceNode);
     provinceGroup.setMemberFacilities(Arrays.asList(new Facility("C4"), new Facility("C5")));
     provinceNode.setRequisitionGroup(provinceGroup);
 

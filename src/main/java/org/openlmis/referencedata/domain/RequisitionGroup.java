@@ -60,12 +60,6 @@ public class RequisitionGroup extends BaseEntity {
   @Setter
   private List<Facility> memberFacilities;
 
-  private RequisitionGroup(String code, String name, SupervisoryNode supervisoryNode) {
-    this.code = code;
-    this.name = name;
-    this.supervisoryNode = supervisoryNode;
-  }
-
   /**
    * Create a new requisition group with a specified supervisory node, program schedules and
    * facilities.
@@ -73,11 +67,11 @@ public class RequisitionGroup extends BaseEntity {
    * @param code            specified code
    * @param name            specified name
    * @param supervisoryNode specified supervisory node
-   * @return the new requisition group
    */
-  public static RequisitionGroup newRequisitionGroup(String code, String name,
-                                                     SupervisoryNode supervisoryNode) {
-    return new RequisitionGroup(code, name, supervisoryNode);
+  public RequisitionGroup(String code, String name, SupervisoryNode supervisoryNode) {
+    this.code = code;
+    this.name = name;
+    this.supervisoryNode = supervisoryNode;
   }
 
   /**
