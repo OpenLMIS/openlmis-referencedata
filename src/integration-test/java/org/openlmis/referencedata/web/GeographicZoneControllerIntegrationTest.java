@@ -6,9 +6,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -16,15 +19,20 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
 
-public class GeographicLevelControllerComponentTest extends BaseWebComponentTest {
+@Ignore
+public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  private static final String RESOURCE_URL = "/api/geographicLevels";
+  private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
 
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
 
+  @Autowired
+  private GeographicZoneRepository geographicZoneRepository;
+
+  private GeographicZone geoZone = new GeographicZone();
   private GeographicLevel geoLevel = new GeographicLevel();
 
   @Before
@@ -32,33 +40,36 @@ public class GeographicLevelControllerComponentTest extends BaseWebComponentTest
     geoLevel.setCode("geoLevelCode");
     geoLevel.setLevelNumber(1);
     geographicLevelRepository.save(geoLevel);
+    geoZone.setCode("geoZoneCode");
+    geoZone.setLevel(geoLevel);
+    geographicZoneRepository.save(geoZone);
   }
 
   @Test
-  public void shouldDeleteGeographicLevel() {
+  public void shouldDeleteGeographicZone() {
 
     restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", geoLevel.getId())
+          .pathParam("id", geoZone.getId())
           .when()
           .delete(ID_URL)
           .then()
           .statusCode(204);
 
-    assertFalse(geographicLevelRepository.exists(geoLevel.getId()));
+    assertFalse(geographicZoneRepository.exists(geoZone.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldCreateGeographicLevel() {
+  public void shouldCreateGeographicZone() {
 
-    geographicLevelRepository.delete(geoLevel);
+    geographicZoneRepository.delete(geoZone);
 
     restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(geoLevel)
+          .body(geoZone)
           .when()
           .post(RESOURCE_URL)
           .then()
@@ -68,56 +79,56 @@ public class GeographicLevelControllerComponentTest extends BaseWebComponentTest
   }
 
   @Test
-  public void shouldUpdateGeographicLevel() {
+  public void shouldUpdateGeographicZone() {
 
-    geoLevel.setCode("OpenLMIS");
+    geoZone.setCode("OpenLMIS");
 
-    GeographicLevel response = restAssured.given()
+    GeographicZone response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", geoLevel.getId())
-          .body(geoLevel)
+          .pathParam("id", geoZone.getId())
+          .body(geoZone)
           .when()
           .put(ID_URL)
           .then()
           .statusCode(200)
-          .extract().as(GeographicLevel.class);
+          .extract().as(GeographicZone.class);
 
     assertEquals(response.getCode(), "OpenLMIS");
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetAllGeographicLevels() {
+  public void shouldGetAllGeographicZones() {
 
-    GeographicLevel[] response = restAssured.given()
+    GeographicZone[] response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .when()
           .get(RESOURCE_URL)
           .then()
           .statusCode(200)
-          .extract().as(GeographicLevel[].class);
+          .extract().as(GeographicZone[].class);
 
-    Iterable<GeographicLevel> geographicLevels = Arrays.asList(response);
-    assertTrue(geographicLevels.iterator().hasNext());
+    Iterable<GeographicZone> geographicZones = Arrays.asList(response);
+    assertTrue(geographicZones.iterator().hasNext());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenGeographicLevel() {
+  public void shouldGetChosenGeographicZone() {
 
-    GeographicLevel response = restAssured.given()
+    GeographicZone response = restAssured.given()
           .queryParam(ACCESS_TOKEN, getToken())
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", geoLevel.getId())
+          .pathParam("id", geoZone.getId())
           .when()
           .get(ID_URL)
           .then()
           .statusCode(200)
-          .extract().as(GeographicLevel.class);
+          .extract().as(GeographicZone.class);
 
-    assertTrue(geographicLevelRepository.exists(response.getId()));
+    assertTrue(geographicZoneRepository.exists(response.getId()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

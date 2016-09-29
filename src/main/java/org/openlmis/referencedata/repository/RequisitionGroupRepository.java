@@ -7,4 +7,7 @@ import java.util.UUID;
 
 public interface RequisitionGroupRepository
     extends PagingAndSortingRepository<RequisitionGroup, UUID> {
+
+  <S extends RequisitionGroup> S findByCode(String code);
+
 }

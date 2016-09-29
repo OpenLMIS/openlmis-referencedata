@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.UUID;
 
@@ -34,7 +33,6 @@ public class ProductCategoryController extends BaseController {
    * @return ProductCategories.
    */
   @RequestMapping(value = "/productCategories", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllProductCategories() {
     Iterable<ProductCategory> productCategories = productCategoryRepository.findAll();
     return new ResponseEntity<>(productCategories, HttpStatus.OK);

@@ -20,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,9 +30,7 @@ import org.springframework.web.client.RestClientException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -90,18 +87,8 @@ public class ProcessingPeriodController extends BaseController {
       ProcessingPeriod newPeriod = periodRepository.save(period);
       return new ResponseEntity<ProcessingPeriod>(newPeriod, HttpStatus.CREATED);
     } else {
-      return new ResponseEntity(getPeriodErrors(bindingResult), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
     }
-  }
-
-  private Map<String, String> getPeriodErrors(final BindingResult bindingResult) {
-    return new HashMap<String, String>() {
-      {
-        for (FieldError error : bindingResult.getFieldErrors()) {
-          put(error.getField(), error.getDefaultMessage());
-        }
-      }
-    };
   }
 
   /**
@@ -110,7 +97,6 @@ public class ProcessingPeriodController extends BaseController {
    * @return ProcessingPeriods.
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllProcessingPeriods() {
     Iterable<ProcessingPeriod> periods = periodRepository.findAll();
     if (periods == null) {

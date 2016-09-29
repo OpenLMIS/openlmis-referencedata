@@ -23,9 +23,9 @@ public class FulfillmentRoleAssignmentTest {
   public FulfillmentRoleAssignmentTest() throws RightTypeException, RoleAssignmentException,
       RoleException {
     right = Right.newRight("right", ORDER_FULFILLMENT);
-    warehouse = new Facility();
+    warehouse = new Facility("C1");
     warehouse.setType(new FacilityType("warehouse"));
-    hospital = new Facility();
+    hospital = new Facility("C2");
     hospital.setType(new FacilityType("hospital"));
     fulfillmentRoleAssignment = new FulfillmentRoleAssignment(
         Role.newRole(roleName, right), warehouse);

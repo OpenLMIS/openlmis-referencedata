@@ -28,7 +28,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 
 @Ignore
-public class SupervisoryNodeControllerComponentTest extends BaseWebComponentTest {
+public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -74,8 +74,7 @@ public class SupervisoryNodeControllerComponentTest extends BaseWebComponentTest
     geoZone.setLevel(geoLevel);
     geographicZoneRepository.save(geoZone);
 
-    Facility facility = new Facility();
-    facility.setCode("facilityCode");
+    Facility facility = new Facility("facilityCode");
     facility.setActive(true);
     facility.setGeographicZone(geoZone);
     facility.setType(facilityType);

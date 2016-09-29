@@ -32,7 +32,7 @@ import java.util.UUID;
 
 @Ignore
 @SuppressWarnings("PMD.TooManyMethods")
-public class SupplyLineControllerComponentTest extends BaseWebComponentTest {
+public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/supplyLines";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
@@ -269,10 +269,9 @@ public class SupplyLineControllerComponentTest extends BaseWebComponentTest {
     GeographicLevel geographicLevel = generateGeographicLevel();
     GeographicZone geographicZone = generateGeographicZone(geographicLevel);
     FacilityType facilityType = generateFacilityType();
-    Facility facility = new Facility();
+    Facility facility = new Facility("FacilityCode" + instanceNumber);
     facility.setType(facilityType);
     facility.setGeographicZone(geographicZone);
-    facility.setCode("FacilityCode" + instanceNumber);
     facility.setName("FacilityName" + instanceNumber);
     facility.setDescription("FacilityDescription" + instanceNumber);
     facility.setActive(true);

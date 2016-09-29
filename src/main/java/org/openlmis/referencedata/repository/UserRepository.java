@@ -2,12 +2,13 @@ package org.openlmis.referencedata.repository;
 
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
 public interface UserRepository extends
-    ReferenceDataRepository<User, UUID>,
+    PagingAndSortingRepository<User, UUID>,
     UserRepositoryCustom {
 
   @Override

@@ -1,18 +1,6 @@
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import com.google.common.collect.Sets;
-
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
@@ -49,6 +37,17 @@ import org.springframework.validation.BindingResult;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class UserControllerTest {
@@ -112,7 +111,7 @@ public class UserControllerTest {
         programRepository, supervisoryNodeRepository, facilityRepository);
 
     homeFacilityCode = "homeFacilityCode";
-    homeFacility = new Facility();
+    homeFacility = new Facility("C1");
     user1UserName = "user1";
     user2UserName = "user2";
     user1 = new UserBuilder(user1UserName, "User", "1", "user1@openlmis.org")
@@ -149,7 +148,7 @@ public class UserControllerTest {
     fulfillmentRole1 = Role.newRole("fulfillmentRole1", fulfillmentRight1);
     fulfillmentRole1.setId(roleId);
     warehouseCode = "W1";
-    warehouse1 = new Facility();
+    warehouse1 = new Facility("C2");
     warehouse1.setCode(warehouseCode);
     warehouse1.setType(new FacilityType("warehouse"));
   }
@@ -602,9 +601,10 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserSupervisedFacilities() throws RightTypeException {
     //given
-    RequisitionGroup supervisionGroup1 = RequisitionGroup.newRequisitionGroup("supervisionGroup1",
-        supervisoryNode1);
-    supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility(), new Facility()));
+    RequisitionGroup supervisionGroup1 = new RequisitionGroup(
+        "supervisionGroup1", "supervisionGroupName1", supervisoryNode1
+    );
+    supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility("C1"), new Facility("C2")));
     supervisoryNode1.setRequisitionGroup(supervisionGroup1);
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);

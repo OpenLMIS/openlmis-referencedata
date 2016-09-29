@@ -1,11 +1,7 @@
 package org.openlmis.referencedata.domain;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,10 +9,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "facilities", schema = "referencedata")
-@NoArgsConstructor
 public class Facility extends BaseEntity {
 
   public static final String TEXT = "text";
@@ -86,4 +83,32 @@ public class Facility extends BaseEntity {
   @Getter
   @Setter
   private List<Program> supportedPrograms;
+
+  private Facility() {
+
+  }
+
+  public Facility(String code) {
+    this.code = code;
+  }
+
+  /**
+   * Equal by a Facility's code.
+   * @param other the other Facility
+   * @return true if the two Facilities' {@link Code} are equal.
+   */
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof Facility)) {
+      return false;
+    }
+
+    Facility facility = (Facility)other;
+    return code.equals(facility.getCode());
+  }
+
+  @Override
+  public int hashCode() {
+    return code.hashCode();
+  }
 }

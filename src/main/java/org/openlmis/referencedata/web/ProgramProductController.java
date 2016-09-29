@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 
 import java.util.List;
@@ -62,7 +61,6 @@ public class ProgramProductController extends BaseController {
    * @return ProgramProduct.
    */
   @RequestMapping(value = "/programProducts", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllProgramProducts() {
     Iterable<ProgramProduct> programProducts = programProductRepository.findAll();
     if (programProducts == null) {

@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 @Ignore
-public class RequisitionGroupControllerComponentTest extends BaseWebComponentTest {
+public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/requisitionGroups";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -82,8 +82,7 @@ public class RequisitionGroupControllerComponentTest extends BaseWebComponentTes
     geoZone.setLevel(geoLevel);
     geographicZoneRepository.save(geoZone);
 
-    Facility facility = new Facility();
-    facility.setCode("facilityCode");
+    Facility facility = new Facility("facilityCode");
     facility.setActive(true);
     facility.setGeographicZone(geoZone);
     facility.setType(facilityType);

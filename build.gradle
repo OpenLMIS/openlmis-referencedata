@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.3.3.RELEASE"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.4.1.RELEASE"
     }
 }
 
@@ -108,6 +108,7 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     testLogging {
         events "passed", "skipped", "failed"
+        exceptionFormat = 'full'
     }
 }
 check.dependsOn integrationTest
@@ -149,6 +150,7 @@ configure(checkApiIsRaml) {
 test {
     testLogging {
         events 'started', 'passed'
+        exceptionFormat = 'full'
     }
 }
 

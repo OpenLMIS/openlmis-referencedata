@@ -16,11 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.annotation.PostConstruct;
 
 @Service
 public class UserService {
@@ -84,7 +83,7 @@ public class UserService {
     userRequest.setEmail(user.getEmail());
     userRequest.setReferenceDataUserId(user.getId());
 
-    String url = virtualHostBaseUrl + "/api/users?access_token=" + token;
+    String url = virtualHostBaseUrl + "/auth/api/users?access_token=" + token;
     RestTemplate restTemplate = new RestTemplate();
 
     restTemplate.postForObject(url, userRequest, Object.class);
@@ -95,7 +94,7 @@ public class UserService {
    */
   public void passwordReset(PasswordResetRequest passwordResetRequest, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/passwordReset?access_token=" + token;
+      String url = virtualHostBaseUrl + "/auth/api/users/passwordReset?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, passwordResetRequest, String.class);
@@ -111,7 +110,7 @@ public class UserService {
    */
   public void changePassword(PasswordChangeRequest passwordChangeRequest, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/changePassword?access_token=" + token;
+      String url = virtualHostBaseUrl + "/auth/api/users/changePassword?access_token=" + token;
 
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.postForObject(url, passwordChangeRequest, String.class);
@@ -145,7 +144,7 @@ public class UserService {
 
   private UUID createPasswordResetToken(UUID userId, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/passwordResetToken?userId=" + userId
+      String url = virtualHostBaseUrl + "/auth/api/users/passwordResetToken?userId=" + userId
           + "&access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 

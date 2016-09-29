@@ -66,10 +66,9 @@ public class RequisitionGroupRepositoryIntegrationTest
     facilityType.setCode(code);
     facilityTypeRepository.save(facilityType);
 
-    Facility facility = new Facility();
+    Facility facility = new Facility(code);
     facility.setType(facilityType);
     facility.setGeographicZone(geographicZone);
-    facility.setCode(code);
     facility.setActive(true);
     facility.setEnabled(true);
     facilityRepository.save(facility);

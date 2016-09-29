@@ -1,12 +1,5 @@
 package org.openlmis.referencedata.domain;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
@@ -15,6 +8,13 @@ import org.openlmis.referencedata.exception.RoleException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UserTest {
   private RightQuery rightQuery = new RightQuery(Right.newRight("supervisionRight1",
@@ -102,7 +102,8 @@ public class UserTest {
     Role role = Role.newRole(roleName, Right.newRight("right1", RightType.SUPERVISION));
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility());
+    SupervisoryNode supervisoryNode =
+        SupervisoryNode.newSupervisoryNode("SN1", new Facility("C1"));
 
     RoleAssignment assignment3 = new SupervisionRoleAssignment(role, program1, supervisoryNode);
     RoleAssignment assignment4 = new SupervisionRoleAssignment(role, program2, supervisoryNode);
@@ -121,14 +122,14 @@ public class UserTest {
   @Test
   public void shouldGetSupervisedFacilities() throws RightTypeException, RoleException {
     //given
-    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("DN", new Facility());
-    RequisitionGroup districtGroup = RequisitionGroup.newRequisitionGroup("DG", districtNode);
-    districtGroup.setMemberFacilities(Collections.singletonList(new Facility()));
+    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("DN", new Facility("C1"));
+    RequisitionGroup districtGroup = new RequisitionGroup("DG", "DGN", districtNode);
+    districtGroup.setMemberFacilities(Collections.singletonList(new Facility("C2")));
     districtNode.setRequisitionGroup(districtGroup);
 
-    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("PN", new Facility());
-    RequisitionGroup provinceGroup = RequisitionGroup.newRequisitionGroup("PG", provinceNode);
-    provinceGroup.setMemberFacilities(Arrays.asList(new Facility(), new Facility()));
+    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("PN", new Facility("C3"));
+    RequisitionGroup provinceGroup = new RequisitionGroup("PG", "PGN", provinceNode);
+    provinceGroup.setMemberFacilities(Arrays.asList(new Facility("C4"), new Facility("C5")));
     provinceNode.setRequisitionGroup(provinceGroup);
 
     districtNode.assignParentNode(provinceNode);

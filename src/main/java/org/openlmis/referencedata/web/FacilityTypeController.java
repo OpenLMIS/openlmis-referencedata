@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.UUID;
 
@@ -55,7 +54,6 @@ public class FacilityTypeController extends BaseController {
    * @return FacilityTypes.
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllFacilityTypes() {
     Iterable<FacilityType> facilityTypes = facilityTypeRepository.findAll();
     return new ResponseEntity<>(facilityTypes, HttpStatus.OK);

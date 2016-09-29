@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.UUID;
 
@@ -55,7 +54,6 @@ public class SupervisoryNodeController extends BaseController {
    * @return SupervisoryNodes.
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.GET)
-  @ResponseBody
   public ResponseEntity<?> getAllSupervisoryNodes() {
     Iterable<SupervisoryNode> supervisoryNodes = supervisoryNodeRepository.findAll();
     return new ResponseEntity<>(supervisoryNodes, HttpStatus.OK);
