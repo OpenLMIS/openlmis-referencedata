@@ -5,6 +5,8 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
@@ -31,6 +33,12 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private FacilityRepository facilityRepository;
+  
+  @Autowired
+  private ProgramRepository programRepository;
+  
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
   private SupplyLineService supplyLineService;
@@ -147,15 +155,18 @@ public class FacilityController extends BaseController {
   /**
    * Retrieves all available supplying facilities for program and supervisory node.
    *
-   * @param program program to filter facilities
-   * @param supervisoryNode supervisoryNode to filter facilities
+   * @param programId program to filter facilities
+   * @param supervisoryNodeId supervisoryNode to filter facilities
    * @return ResponseEntity containing matched facilities
    */
   @RequestMapping(value = "/facilities/supplying", method = RequestMethod.GET)
   public ResponseEntity<?> getSupplyingDepots(
-      @RequestParam(value = "program") Program program,
-      @RequestParam(value = "supervisoryNode") SupervisoryNode supervisoryNode) {
-    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, supervisoryNode);
+      @RequestParam(value = "programId") UUID programId,
+      @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
+    Program program = programRepository.findOne(programId);
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, 
+        supervisoryNode);
     List<Facility> facilities = supplyLines.stream()
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
     return new ResponseEntity<>(facilities, HttpStatus.OK);

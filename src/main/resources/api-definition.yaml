@@ -1495,13 +1495,13 @@ resourceTypes:
             is: [ secured ]
             description: Returns a list of facilities.
             queryParameters:
-                program:
-                    displayName: program
+                programId:
+                    displayName: programId
                     type: string
                     required: true
                     repeat: false
-                supervisoryNode:
-                    displayName: supervisoryNode
+                supervisoryNodeId:
+                    displayName: supervisoryNodeId
                     type: string
                     required: true
                     repeat: false
