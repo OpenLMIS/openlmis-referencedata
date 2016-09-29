@@ -46,18 +46,11 @@ public class RequisitionGroupController extends BaseController {
     validator.validate(requisitionGroup, bindingResult);
 
     if (bindingResult.getErrorCount() == 0) {
-      try {
-        requisitionGroup.setId(null);
-        RequisitionGroup newRequisitionGroup = requisitionGroupRepository.save(requisitionGroup);
-        LOGGER.debug("Created new requisitionGroup with id: " + requisitionGroup.getId());
-        return new ResponseEntity<>(newRequisitionGroup, HttpStatus.CREATED);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating requisitionGroup",
-                ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
-      }
+      requisitionGroup.setId(null);
+      RequisitionGroup newRequisitionGroup = requisitionGroupRepository.save(requisitionGroup);
+
+      LOGGER.debug("Created new requisitionGroup with id: " + requisitionGroup.getId());
+      return new ResponseEntity<>(newRequisitionGroup, HttpStatus.CREATED);
     } else {
       return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
     }
