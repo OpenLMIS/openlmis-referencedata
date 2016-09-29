@@ -36,14 +36,14 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private RoleRepository roleRepository;
-  
+
   @MockBean
   private RightRepository rightRepository;
 
   private Role role;
   private RoleDto roleDto;
   private UUID roleId;
-  
+
   private Right right1;
   private Right right2;
   private static final String RIGHT1_NAME = "right1";
