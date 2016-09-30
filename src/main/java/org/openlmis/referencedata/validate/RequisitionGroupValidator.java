@@ -2,6 +2,7 @@ package org.openlmis.referencedata.validate;
 
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,10 +34,10 @@ public class RequisitionGroupValidator implements Validator {
   /**
    * Checks if the given class definition is supported.
    *
-   * @param clazz the {@link Class} that this {@link Validator} is
-   *        being asked if it can {@link #validate(Object, Errors) validate}
-   * @return true if {@code clazz} is equal to {@link RequisitionGroup} class
-   *         definition. Otherwise false.
+   * @param clazz the {@link Class} that this {@link Validator} is being asked if it can {@link
+   *              #validate(Object, Errors) validate}
+   * @return true if {@code clazz} is equal to {@link RequisitionGroup} class definition. Otherwise
+   *         false.
    */
   @Override
   public boolean supports(Class<?> clazz) {
@@ -63,7 +66,11 @@ public class RequisitionGroupValidator implements Validator {
     verifyProperties(errors);
 
     if (!errors.hasErrors()) {
-      verifyData((RequisitionGroup) target, errors);
+      RequisitionGroup group = (RequisitionGroup) target;
+
+      verifyCode(group.getCode(), errors);
+      verifySupervisoryNode(group.getSupervisoryNode(), errors);
+      verifyFacilities(group.getMemberFacilities(), errors);
     }
   }
 
@@ -89,42 +96,45 @@ public class RequisitionGroupValidator implements Validator {
     );
   }
 
-  private void verifyData(RequisitionGroup target, Errors errors) {
+  private void verifyCode(String code, Errors errors) {
     // requisition group code cannot be duplicated
-    if (null != requisitionGroups.findByCode(target.getCode())) {
+    if (null != requisitionGroups.findByCode(code)) {
       errors.rejectValue(
           "code", "code.duplicate", "The Requisition Group Code cannot be duplicated"
       );
     }
+  }
 
+  private void verifySupervisoryNode(SupervisoryNode supervisoryNode, Errors errors) {
     // supervisory node matches a defined supervisory node
-    if (null == supervisoryNodes.findByCode(target.getSupervisoryNode().getCode())) {
+    if (null == supervisoryNode.getId()) {
+      errors.rejectValue(
+          "supervisoryNode", "supervisoryNode.missing.id",
+          "The Supervisory Node must have ID"
+      );
+    } else if (null == supervisoryNodes.findOne(supervisoryNode.getId())) {
       errors.rejectValue(
           "supervisoryNode", "supervisoryNode.not.exist",
           "The Supervisory Node should match a defined supervisory node"
       );
     }
+  }
 
+  private void verifyFacilities(List<Facility> memberFacilities, Errors errors) {
     // facilities must already exist in the system (cannot add new facilities from this point)
-    for (int i = 0, size = target.getMemberFacilities().size(); i < size; ++i) {
-      Facility facility = target.getMemberFacilities().get(i);
+    for (int i = 0, size = memberFacilities.size(); i < size; ++i) {
+      Facility facility = memberFacilities.get(i);
       String field = "memberFacilities[" + i + "]";
 
       if (null == facility) {
         errors.rejectValue(
             field, "facility.is.null", "The facility can not be null"
         );
-        continue;
-      }
-
-      if (null == facility.getId()) {
+      } else if (null == facility.getId()) {
         errors.rejectValue(
             field, "facility.missing.id", "The facility must have ID"
         );
-        continue;
-      }
-
-      if (null == facilities.findOne(facility.getId())) {
+      } else if (null == facilities.findOne(facility.getId())) {
         errors.rejectValue(
             field, "facility.not.exist", "The facility should match a defined facility"
         );

@@ -23,7 +23,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -51,7 +51,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     facility.setId(UUID.randomUUID());
 
     SupervisoryNode supervisoryNode = new SupervisoryNode();
-    supervisoryNode.setCode("TestSupervisoryNodeCode");
+    supervisoryNode.setId(UUID.randomUUID());
 
     requisitionGroup = new RequisitionGroup();
     requisitionGroup.setCode("TestRequisitionGroupCode");
@@ -64,7 +64,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     doReturn(mock(SupervisoryNode.class))
         .when(supervisoryNodes)
-        .findByCode("TestSupervisoryNodeCode");
+        .findOne(supervisoryNode.getId());
 
     doReturn(mock(Facility.class))
         .when(facilities)
@@ -76,32 +76,6 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     validator.validate(requisitionGroup, errors);
 
     assertThat(errors.getErrorCount(), is(equalTo(0)));
-  }
-
-  @Test
-  public void shouldRejectIfCodeIsEmpty() throws Exception {
-    String[] strings = new String[]{null, "", "  "};
-
-    for (String code : strings) {
-      requisitionGroup.setCode(code);
-
-      validator.validate(requisitionGroup, errors);
-
-      assertErrorMessage(errors, "code", "The Requisition Group Code is required");
-    }
-  }
-
-  @Test
-  public void shouldRejectIfNameIsEmpty() throws Exception {
-    String[] strings = new String[]{null, "", "  "};
-
-    for (String name : strings) {
-      requisitionGroup.setName(name);
-
-      validator.validate(requisitionGroup, errors);
-
-      assertErrorMessage(errors, "name", "The requisition Group Name is required");
-    }
   }
 
   @Test
@@ -125,10 +99,21 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
   }
 
   @Test
+  public void shouldRejectIfSupervisoryHasNoId() throws Exception {
+    requisitionGroup.getSupervisoryNode().setId(null);
+
+    validator.validate(requisitionGroup, errors);
+
+    assertErrorMessage(
+        errors, "supervisoryNode", "The Supervisory Node must have ID"
+    );
+  }
+
+  @Test
   public void shouldRejectIfSupervisoryNodeCanNotBeFound() throws Exception {
     doReturn(null)
         .when(supervisoryNodes)
-        .findByCode(anyString());
+        .findOne(any(UUID.class));
 
     validator.validate(requisitionGroup, errors);
 
