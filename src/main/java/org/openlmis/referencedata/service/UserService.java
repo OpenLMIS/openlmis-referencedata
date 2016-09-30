@@ -158,7 +158,7 @@ public class UserService {
     try {
       NotificationRequest request = new NotificationRequest(from, to, subject, content, null);
 
-      String url = virtualHostBaseUrl + "/notification?access_token=" + token;
+      String url = virtualHostBaseUrl + "/notification/notification?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, request, Object.class);
