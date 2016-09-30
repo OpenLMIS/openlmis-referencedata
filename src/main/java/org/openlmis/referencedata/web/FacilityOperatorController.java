@@ -34,8 +34,8 @@ public class FacilityOperatorController extends BaseController {
     LOGGER.debug("Creating new facility operator");
     // Ignore provided id
     facilityOperator.setId(null);
-    FacilityOperator newFacilityOperator = facilityOperatorRepository.save(facilityOperator);
-    return new ResponseEntity<>(newFacilityOperator, HttpStatus.CREATED);
+    facilityOperatorRepository.save(facilityOperator);
+    return new ResponseEntity<>(facilityOperator, HttpStatus.CREATED);
   }
 
   /**
@@ -44,7 +44,7 @@ public class FacilityOperatorController extends BaseController {
    * @return facilityOperators.
    */
   @RequestMapping(value = "/facilityOperators", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllfacilityOperators() {
+  public ResponseEntity<?> getAllFacilityOperators() {
     Iterable<FacilityOperator> facilityOperators = facilityOperatorRepository.findAll();
     if (facilityOperators == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -56,16 +56,16 @@ public class FacilityOperatorController extends BaseController {
   /**
    * Allows updating facilityOperator.
    *
-   * @param facilityOperator A facilityOperator bound to the request body
+   * @param facilityOperator   A facilityOperator bound to the request body
    * @param facilityOperatorId UUID of facilityOperator which we want to update
    * @return ResponseEntity containing the updated facilityOperator
    */
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateFacilityOperators(@RequestBody FacilityOperator facilityOperator,
-                                       @PathVariable("id") UUID facilityOperatorId) {
+  public ResponseEntity<?> updateFacilityOperator(@RequestBody FacilityOperator facilityOperator,
+                                                  @PathVariable("id") UUID facilityOperatorId) {
     LOGGER.debug("Updating facility operator");
-    FacilityOperator updatedFacilityOperator = facilityOperatorRepository.save(facilityOperator);
-    return new ResponseEntity<>(updatedFacilityOperator, HttpStatus.OK);
+    facilityOperatorRepository.save(facilityOperator);
+    return new ResponseEntity<>(facilityOperator, HttpStatus.OK);
   }
 
   /**
