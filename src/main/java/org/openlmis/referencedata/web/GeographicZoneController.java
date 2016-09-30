@@ -34,8 +34,8 @@ public class GeographicZoneController extends BaseController {
     LOGGER.debug("Creating new geographicZone");
     // Ignore provided id
     geographicZone.setId(null);
-    GeographicZone newGeographicZone = geographicZoneRepository.save(geographicZone);
-    return new ResponseEntity<>(newGeographicZone, HttpStatus.CREATED);
+    geographicZoneRepository.save(geographicZone);
+    return new ResponseEntity<>(geographicZone, HttpStatus.CREATED);
   }
 
   /**
@@ -56,16 +56,16 @@ public class GeographicZoneController extends BaseController {
   /**
    * Allows updating geographicZones.
    *
-   * @param geographicZone A geographicZone bound to the request body
+   * @param geographicZone   A geographicZone bound to the request body
    * @param geographicZoneId UUID of geographicZone which we want to update
    * @return ResponseEntity containing the updated geographicZone
    */
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateGeographicZone(@RequestBody GeographicZone geographicZone,
-                                                 @PathVariable("id") UUID geographicZoneId) {
+                                                @PathVariable("id") UUID geographicZoneId) {
     LOGGER.debug("Updating geographicZone");
-    GeographicZone updatedGeographicZone = geographicZoneRepository.save(geographicZone);
-    return new ResponseEntity<GeographicZone>(updatedGeographicZone, HttpStatus.OK);
+    geographicZoneRepository.save(geographicZone);
+    return new ResponseEntity<GeographicZone>(geographicZone, HttpStatus.OK);
   }
 
   /**
