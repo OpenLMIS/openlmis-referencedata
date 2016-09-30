@@ -1,11 +1,7 @@
 package org.openlmis.referencedata.web;
 
-import static java.util.stream.Collectors.toSet;
-
 import com.google.common.collect.Sets;
-
 import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RightDto;
@@ -20,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toSet;
 
 @NoArgsConstructor
 @Controller
@@ -57,7 +54,6 @@ public class RoleController extends BaseController {
    */
   public RoleController(RoleRepository repository, RightRepository rightRepository,
                         ExposedMessageSource messageSource) {
-    super();
     this.roleRepository = Objects.requireNonNull(repository);
     this.rightRepository = Objects.requireNonNull(rightRepository);
     this.messageSource = Objects.requireNonNull(messageSource);
@@ -73,7 +69,7 @@ public class RoleController extends BaseController {
 
     LOGGER.debug("Getting all roles");
     Set<Role> roles = Sets.newHashSet(roleRepository.findAll());
-    Set<RoleDto> roleDtos = roles.stream().map(role -> exportToDto(role)).collect(toSet());
+    Set<RoleDto> roleDtos = roles.stream().map(this::exportToDto).collect(toSet());
 
     return ResponseEntity
         .ok()
@@ -138,12 +134,6 @@ public class RoleController extends BaseController {
       return ResponseEntity
           .badRequest()
           .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-    } catch (DataIntegrityViolationException dive) {
-
-      LOGGER.error("An error occurred while saving new role: " + dive.getRootCause().getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(dive.getRootCause().getMessage());
     }
 
     LOGGER.debug("Saved new role with id: " + newRole.getId());
@@ -185,12 +175,6 @@ public class RoleController extends BaseController {
       return ResponseEntity
           .badRequest()
           .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-    } catch (DataIntegrityViolationException dive) {
-
-      LOGGER.error("An error occurred while saving role: " + dive.getRootCause().getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(dive.getRootCause().getMessage());
     }
 
     LOGGER.debug("Saved role with id: " + roleToSave.getId());
@@ -217,18 +201,10 @@ public class RoleController extends BaseController {
           .build();
     }
 
-    try {
 
-      LOGGER.debug("Deleting role");
-      roleRepository.delete(roleId);
+    LOGGER.debug("Deleting role");
+    roleRepository.delete(roleId);
 
-    } catch (DataIntegrityViolationException dive) {
-
-      LOGGER.error("An error occurred while deleting role: " + dive.getRootCause().getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(dive.getRootCause().getMessage());
-    }
 
     return ResponseEntity
         .noContent()

@@ -2,13 +2,11 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -107,19 +105,11 @@ public class RequisitionGroupController extends BaseController {
         LOGGER.debug("Updating requisitionGroup with id: " + requisitionGroupId);
       }
 
-      try {
-        requisitionGroupToUpdate.updateFrom(requisitionGroup);
-        requisitionGroupToUpdate = requisitionGroupRepository.save(requisitionGroupToUpdate);
+      requisitionGroupToUpdate.updateFrom(requisitionGroup);
+      requisitionGroupToUpdate = requisitionGroupRepository.save(requisitionGroupToUpdate);
 
-        LOGGER.debug("Saved requisitionGroup with id: " + requisitionGroupToUpdate.getId());
-        return new ResponseEntity<>(requisitionGroupToUpdate, HttpStatus.OK);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while saving requisitionGroup with id: "
-                + requisitionGroupToUpdate.getId(), ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-      }
+      LOGGER.debug("Saved requisitionGroup with id: " + requisitionGroupToUpdate.getId());
+      return new ResponseEntity<>(requisitionGroupToUpdate, HttpStatus.OK);
     } else {
       return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
     }
@@ -137,15 +127,7 @@ public class RequisitionGroupController extends BaseController {
     if (requisitionGroup == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        requisitionGroupRepository.delete(requisitionGroup);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while deleting requisitionGroup with id: "
-                + requisitionGroupId, ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      requisitionGroupRepository.delete(requisitionGroup);
       return new ResponseEntity<RequisitionGroup>(HttpStatus.NO_CONTENT);
     }
   }

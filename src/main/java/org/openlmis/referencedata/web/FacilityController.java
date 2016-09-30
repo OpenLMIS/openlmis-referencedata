@@ -8,11 +8,9 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -52,18 +50,11 @@ public class FacilityController extends BaseController {
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
   public ResponseEntity<?> createFacility(@RequestBody Facility facility) {
-    try {
-      LOGGER.debug("Creating new facility");
-      facility.setId(null);
-      Facility newFacility = facilityRepository.save(facility);
-      LOGGER.debug("Created new facility with id: " + facility.getId());
-      return new ResponseEntity<Facility>(newFacility, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating facility", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new facility");
+    facility.setId(null);
+    Facility newFacility = facilityRepository.save(facility);
+    LOGGER.debug("Created new facility with id: " + facility.getId());
+    return new ResponseEntity<Facility>(newFacility, HttpStatus.CREATED);
   }
 
   /**
@@ -90,25 +81,17 @@ public class FacilityController extends BaseController {
                                        @PathVariable("id") UUID facilityId) {
 
     Facility facilityToUpdate = facilityRepository.findOne(facilityId);
-    try {
-      if (facilityToUpdate == null) {
-        facilityToUpdate = facility;
-        LOGGER.info("Creating new facility");
-      } else {
-        LOGGER.debug("Updating facility with id: " + facilityId);
-      }
-
-      facilityToUpdate = facilityRepository.save(facilityToUpdate);
-
-      LOGGER.debug("Saved facility with id: " + facilityToUpdate.getId());
-      return new ResponseEntity<Facility>(facilityToUpdate, HttpStatus.OK);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while saving facility with id: "
-                  + facilityToUpdate.getId(), ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    if (facilityToUpdate == null) {
+      facilityToUpdate = facility;
+      LOGGER.debug("Creating new facility");
+    } else {
+      LOGGER.debug("Updating facility with id: " + facilityId);
     }
+
+    facilityToUpdate = facilityRepository.save(facilityToUpdate);
+
+    LOGGER.debug("Saved facility with id: " + facilityToUpdate.getId());
+    return new ResponseEntity<>(facilityToUpdate, HttpStatus.OK);
   }
 
   /**
@@ -139,15 +122,7 @@ public class FacilityController extends BaseController {
     if (facility == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        facilityRepository.delete(facility);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("An error accurred while deleting facility with id: "
-                    + facilityId, ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      facilityRepository.delete(facility);
       return new ResponseEntity<Facility>(HttpStatus.NO_CONTENT);
     }
   }

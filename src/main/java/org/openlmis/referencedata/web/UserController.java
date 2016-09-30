@@ -33,14 +33,12 @@ import org.openlmis.referencedata.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -51,9 +49,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -236,17 +232,7 @@ public class UserController extends BaseController {
           .notFound()
           .build();
     } else {
-      try {
-        userRepository.delete(userId);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-            new ErrorResponse("An error occurred while deleting user with id: " + userId,
-                ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return ResponseEntity
-            .badRequest()
-            .build();
-      }
+      userRepository.delete(userId);
       return ResponseEntity
           .noContent()
           .build();
@@ -277,16 +263,6 @@ public class UserController extends BaseController {
 
     return ResponseEntity
         .ok(exportToDtos(result));
-  }
-
-  private Map<String, String> getErrors(final BindingResult bindingResult) {
-    return new HashMap<String, String>() {
-      {
-        for (FieldError error : bindingResult.getFieldErrors()) {
-          put(error.getField(), error.getDefaultMessage());
-        }
-      }
-    };
   }
 
   /**
@@ -498,6 +474,6 @@ public class UserController extends BaseController {
   }
 
   private List<UserDto> exportToDtos(List<User> users) {
-    return users.stream().map(user -> exportToDto(user)).collect(toList());
+    return users.stream().map(this::exportToDto).collect(toList());
   }
 }

@@ -2,11 +2,9 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestClientException;
 
 import java.util.UUID;
 
@@ -26,7 +23,6 @@ public class FacilityOperatorController extends BaseController {
   @Autowired
   FacilityOperatorRepository facilityOperatorRepository;
 
-
   /**
    * Allows creating new facilityOperators.
    *
@@ -35,19 +31,11 @@ public class FacilityOperatorController extends BaseController {
    */
   @RequestMapping(value = "/facilityOperators", method = RequestMethod.POST)
   public ResponseEntity<?> createFacilityOperator(@RequestBody FacilityOperator facilityOperator) {
-    try {
-      LOGGER.debug("Creating new facility operator");
-      // Ignore provided id
-      facilityOperator.setId(null);
-      FacilityOperator newFacilityOperator = facilityOperatorRepository.save(facilityOperator);
-      return new ResponseEntity<FacilityOperator>(newFacilityOperator, HttpStatus.CREATED);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating facilityOperator",
-                  ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new facility operator");
+    // Ignore provided id
+    facilityOperator.setId(null);
+    FacilityOperator newFacilityOperator = facilityOperatorRepository.save(facilityOperator);
+    return new ResponseEntity<>(newFacilityOperator, HttpStatus.CREATED);
   }
 
   /**
@@ -75,17 +63,9 @@ public class FacilityOperatorController extends BaseController {
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateFacilityOperators(@RequestBody FacilityOperator facilityOperator,
                                        @PathVariable("id") UUID facilityOperatorId) {
-    try {
-      LOGGER.debug("Updating facility operator");
-      FacilityOperator updatedFacilityOperator = facilityOperatorRepository.save(facilityOperator);
-      return new ResponseEntity<FacilityOperator>(updatedFacilityOperator, HttpStatus.OK);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while updating facilityOperator",
-                  ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Updating facility operator");
+    FacilityOperator updatedFacilityOperator = facilityOperatorRepository.save(facilityOperator);
+    return new ResponseEntity<>(updatedFacilityOperator, HttpStatus.OK);
   }
 
   /**
@@ -116,15 +96,7 @@ public class FacilityOperatorController extends BaseController {
     if (facilityOperator == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        facilityOperatorRepository.delete(facilityOperator);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("FacilityOperator cannot be deleted"
-                    + "because of existing dependencies", ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      facilityOperatorRepository.delete(facilityOperator);
       return new ResponseEntity<FacilityOperator>(HttpStatus.NO_CONTENT);
     }
   }

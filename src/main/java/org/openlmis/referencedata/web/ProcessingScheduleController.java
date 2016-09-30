@@ -6,12 +6,10 @@ import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestClientException;
 
 import java.util.UUID;
 
@@ -49,19 +46,11 @@ public class ProcessingScheduleController extends BaseController {
    */
   @RequestMapping(value = "/processingSchedules", method = RequestMethod.POST)
   public ResponseEntity<?> createProcessingSchedule(@RequestBody ProcessingSchedule schedule) {
-    try {
-      LOGGER.debug("Creating new processingSchedule");
-      // Ignore provided id
-      schedule.setId(null);
-      ProcessingSchedule newSchedule = scheduleRepository.save(schedule);
-      return new ResponseEntity<ProcessingSchedule>(newSchedule, HttpStatus.CREATED);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating processingSchedule",
-                  ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new processingSchedule");
+    // Ignore provided id
+    schedule.setId(null);
+    ProcessingSchedule newSchedule = scheduleRepository.save(schedule);
+    return new ResponseEntity<ProcessingSchedule>(newSchedule, HttpStatus.CREATED);
   }
 
   /**
@@ -74,17 +63,9 @@ public class ProcessingScheduleController extends BaseController {
   @RequestMapping(value = "/processingSchedules/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateProcessingSchedule(@RequestBody ProcessingSchedule schedule,
                                        @PathVariable("id") UUID scheduleId) {
-    try {
-      LOGGER.debug("Updating processingSchedule");
-      ProcessingSchedule updatedSchedule = scheduleRepository.save(schedule);
-      return new ResponseEntity<ProcessingSchedule>(updatedSchedule, HttpStatus.OK);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while updating processingSchedule",
-                  ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Updating processingSchedule");
+    ProcessingSchedule updatedSchedule = scheduleRepository.save(schedule);
+    return new ResponseEntity<>(updatedSchedule, HttpStatus.OK);
   }
 
   /**
@@ -130,15 +111,7 @@ public class ProcessingScheduleController extends BaseController {
     if (schedule == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        scheduleRepository.delete(schedule);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("ProcessingSchedule cannot be deleted"
-                    + " because of existing dependencies", ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      scheduleRepository.delete(schedule);
       return new ResponseEntity<ProcessingSchedule>(HttpStatus.NO_CONTENT);
     }
   }
@@ -157,7 +130,7 @@ public class ProcessingScheduleController extends BaseController {
     ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
 
     Iterable<ProcessingPeriod> allPeriods = periodService.searchPeriods(schedule, null);
-    if (!allPeriods.equals(null)) {
+    if (allPeriods.iterator().hasNext()) {
       ProcessingPeriod firstPeriod = allPeriods.iterator().next();
       ProcessingPeriod lastPeriod = periodRepository.findFirst1ByOrderByEndDateDesc();
       java.time.Period total = java.time.Period.between(firstPeriod.getStartDate(),

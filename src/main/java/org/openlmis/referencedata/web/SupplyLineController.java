@@ -8,11 +8,9 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -52,18 +50,11 @@ public class SupplyLineController extends BaseController {
    */
   @RequestMapping(value = "/supplyLines", method = RequestMethod.POST)
   public ResponseEntity<?> createSupplyLine(@RequestBody SupplyLine supplyLine) {
-    try {
-      LOGGER.debug("Creating new supplyLine");
-      supplyLine.setId(null);
-      SupplyLine newSupplyLine = supplyLineRepository.save(supplyLine);
-      LOGGER.debug("Created new supplyLine with id: " + supplyLine.getId());
-      return new ResponseEntity<SupplyLine>(newSupplyLine, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating supplyLine", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new supplyLine");
+    supplyLine.setId(null);
+    SupplyLine newSupplyLine = supplyLineRepository.save(supplyLine);
+    LOGGER.debug("Created new supplyLine with id: " + supplyLine.getId());
+    return new ResponseEntity<>(newSupplyLine, HttpStatus.CREATED);
   }
 
   /**
@@ -89,26 +80,18 @@ public class SupplyLineController extends BaseController {
                                        @PathVariable("id") UUID supplyLineId) {
 
     SupplyLine supplyLineToUpdate = supplyLineRepository.findOne(supplyLineId);
-    try {
-      if (supplyLineToUpdate == null) {
-        supplyLineToUpdate = new SupplyLine();
-        LOGGER.info("Creating new supplyLine");
-      } else {
-        LOGGER.debug("Updating supplyLine with id: " + supplyLineId);
-      }
-
-      supplyLineToUpdate.updateFrom(supplyLine);
-      supplyLineToUpdate = supplyLineRepository.save(supplyLineToUpdate);
-
-      LOGGER.debug("Saved supplyLine with id: " + supplyLineToUpdate.getId());
-      return new ResponseEntity<SupplyLine>(supplyLineToUpdate, HttpStatus.OK);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while saving supplyLine with id: "
-                  + supplyLineToUpdate.getId(), ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    if (supplyLineToUpdate == null) {
+      supplyLineToUpdate = new SupplyLine();
+      LOGGER.debug("Creating new supplyLine");
+    } else {
+      LOGGER.debug("Updating supplyLine with id: " + supplyLineId);
     }
+
+    supplyLineToUpdate.updateFrom(supplyLine);
+    supplyLineToUpdate = supplyLineRepository.save(supplyLineToUpdate);
+
+    LOGGER.debug("Saved supplyLine with id: " + supplyLineToUpdate.getId());
+    return new ResponseEntity<>(supplyLineToUpdate, HttpStatus.OK);
   }
 
   /**
@@ -139,15 +122,7 @@ public class SupplyLineController extends BaseController {
     if (supplyLine == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        supplyLineRepository.delete(supplyLine);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("An error accurred while deleting supplyLine with id: "
-                    + supplyLineId, ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      supplyLineRepository.delete(supplyLine);
       return new ResponseEntity<SupplyLine>(HttpStatus.NO_CONTENT);
     }
   }

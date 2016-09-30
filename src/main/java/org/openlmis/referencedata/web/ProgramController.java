@@ -3,11 +3,9 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestClientException;
 
 import java.util.UUID;
 
@@ -35,18 +32,11 @@ public class ProgramController extends BaseController {
    */
   @RequestMapping(value = "/programs", method = RequestMethod.POST)
   public ResponseEntity<?> createProgram(@RequestBody Program program) {
-    try {
-      LOGGER.debug("Creating new program");
-      // Ignore provided id
-      program.setId(null);
-      Program newProgram = programRepository.save(program);
-      return new ResponseEntity<Program>(newProgram, HttpStatus.CREATED);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating program", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new program");
+    // Ignore provided id
+    program.setId(null);
+    Program newProgram = programRepository.save(program);
+    return new ResponseEntity<>(newProgram, HttpStatus.CREATED);
   }
 
   /**
@@ -92,15 +82,7 @@ public class ProgramController extends BaseController {
     if (program == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        programRepository.delete(program);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("Program cannot be deleted because of existing dependencies",
-                    ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      programRepository.delete(program);
       return new ResponseEntity<Program>(HttpStatus.NO_CONTENT);
     }
   }
@@ -118,7 +100,7 @@ public class ProgramController extends BaseController {
 
     Program program = programRepository.findOne(programDto.getId());
     if (program == null) {
-      LOGGER.debug("Update failed - program with id: {} not found", programDto.getId());
+      LOGGER.warn("Update failed - program with id: {} not found", programDto.getId());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 

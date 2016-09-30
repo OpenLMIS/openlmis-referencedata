@@ -7,14 +7,12 @@ import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestClientException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -116,17 +113,9 @@ public class ProcessingPeriodController extends BaseController {
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateProcessingPeriod(@RequestBody ProcessingPeriod period,
                                        @PathVariable("id") UUID periodId) {
-    try {
-      LOGGER.debug("Updating processingPeriod");
-      ProcessingPeriod updatedProcessingPeriod = periodRepository.save(period);
-      return new ResponseEntity<ProcessingPeriod>(updatedProcessingPeriod, HttpStatus.OK);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while updating processingPeriod",
-                  ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Updating processingPeriod");
+    ProcessingPeriod updatedProcessingPeriod = periodRepository.save(period);
+    return new ResponseEntity<>(updatedProcessingPeriod, HttpStatus.OK);
   }
 
   /**
@@ -157,15 +146,7 @@ public class ProcessingPeriodController extends BaseController {
     if (period == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        periodRepository.delete(period);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("ProcessingPeriod cannot be deleted"
-                    + "because of existing dependencies", ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      periodRepository.delete(period);
       return new ResponseEntity<ProcessingPeriod>(HttpStatus.NO_CONTENT);
     }
   }

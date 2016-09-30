@@ -40,7 +40,7 @@ public class GlobalProductController {
   public GlobalProduct createOrUpdate(@RequestBody GlobalProduct globalProduct) {
     // if it already exists, update or fail if not already a GlobalProduct
     OrderableProduct storedProduct = repository.findByProductCode(globalProduct.getProductCode());
-    if ( null != storedProduct ) {
+    if (null != storedProduct) {
       globalProduct.setId(storedProduct.getId());
     }
 

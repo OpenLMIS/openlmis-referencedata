@@ -2,11 +2,9 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestClientException;
 
 import java.util.UUID;
 
@@ -34,18 +31,11 @@ public class GeographicZoneController extends BaseController {
    */
   @RequestMapping(value = "/geographicZones", method = RequestMethod.POST)
   public ResponseEntity<?> createGeographicZone(@RequestBody GeographicZone geographicZone) {
-    try {
-      LOGGER.debug("Creating new geographicZone");
-      // Ignore provided id
-      geographicZone.setId(null);
-      GeographicZone newGeographicZone = geographicZoneRepository.save(geographicZone);
-      return new ResponseEntity<GeographicZone>(newGeographicZone, HttpStatus.CREATED);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating geographicZone", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new geographicZone");
+    // Ignore provided id
+    geographicZone.setId(null);
+    GeographicZone newGeographicZone = geographicZoneRepository.save(geographicZone);
+    return new ResponseEntity<>(newGeographicZone, HttpStatus.CREATED);
   }
 
   /**
@@ -73,16 +63,9 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateGeographicZone(@RequestBody GeographicZone geographicZone,
                                                  @PathVariable("id") UUID geographicZoneId) {
-    try {
-      LOGGER.debug("Updating geographicZone");
-      GeographicZone updatedGeographicZone = geographicZoneRepository.save(geographicZone);
-      return new ResponseEntity<GeographicZone>(updatedGeographicZone, HttpStatus.OK);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while updating geographicZone", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Updating geographicZone");
+    GeographicZone updatedGeographicZone = geographicZoneRepository.save(geographicZone);
+    return new ResponseEntity<GeographicZone>(updatedGeographicZone, HttpStatus.OK);
   }
 
   /**
@@ -113,15 +96,7 @@ public class GeographicZoneController extends BaseController {
     if (geographicZone == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        geographicZoneRepository.delete(geographicZone);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("GeographicZone cannot be deleted"
-                    + "because of existing dependencies", ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      geographicZoneRepository.delete(geographicZone);
       return new ResponseEntity<GeographicZone>(HttpStatus.NO_CONTENT);
     }
   }

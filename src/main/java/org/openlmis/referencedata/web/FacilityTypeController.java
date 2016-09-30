@@ -34,18 +34,11 @@ public class FacilityTypeController extends BaseController {
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.POST)
   public ResponseEntity<?> createFacilityType(@RequestBody FacilityType facilityType) {
-    try {
-      LOGGER.debug("Creating new facilityType");
-      facilityType.setId(null);
-      FacilityType newFacilityType = facilityTypeRepository.save(facilityType);
-      LOGGER.debug("Created new facilityType with id: " + facilityType.getId());
-      return new ResponseEntity<FacilityType>(newFacilityType, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating facilityType", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new facilityType");
+    facilityType.setId(null);
+    FacilityType newFacilityType = facilityTypeRepository.save(facilityType);
+    LOGGER.debug("Created new facilityType with id: " + facilityType.getId());
+    return new ResponseEntity<>(newFacilityType, HttpStatus.CREATED);
   }
 
   /**

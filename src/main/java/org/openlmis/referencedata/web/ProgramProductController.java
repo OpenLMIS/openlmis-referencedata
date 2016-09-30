@@ -4,11 +4,9 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.repository.ProgramProductRepository;
 import org.openlmis.referencedata.service.ProgramProductService;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 import java.util.UUID;
@@ -41,18 +38,11 @@ public class ProgramProductController extends BaseController {
    */
   @RequestMapping(value = "/programProducts", method = RequestMethod.POST)
   public ResponseEntity<?> createProgramProduct(@RequestBody ProgramProduct programProduct) {
-    try {
-      LOGGER.debug("Creating new programProduct");
-      // Ignore provided id
-      programProduct.setId(null);
-      ProgramProduct newProgramProduct = programProductRepository.save(programProduct);
-      return new ResponseEntity<ProgramProduct>(newProgramProduct, HttpStatus.CREATED);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating programProduct", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new programProduct");
+    // Ignore provided id
+    programProduct.setId(null);
+    ProgramProduct newProgramProduct = programProductRepository.save(programProduct);
+    return new ResponseEntity<>(newProgramProduct, HttpStatus.CREATED);
   }
 
   /**
@@ -80,16 +70,9 @@ public class ProgramProductController extends BaseController {
   @RequestMapping(value = "/programProducts/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateProgramProduct(@RequestBody ProgramProduct programProduct,
                                                  @PathVariable("id") UUID programProductId) {
-    try {
-      LOGGER.debug("Updating programProduct");
-      ProgramProduct updatedProgramProduct = programProductRepository.save(programProduct);
-      return new ResponseEntity<ProgramProduct>(updatedProgramProduct, HttpStatus.OK);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while updating programProduct", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Updating programProduct");
+    ProgramProduct updatedProgramProduct = programProductRepository.save(programProduct);
+    return new ResponseEntity<>(updatedProgramProduct, HttpStatus.OK);
   }
 
   /**
@@ -120,15 +103,7 @@ public class ProgramProductController extends BaseController {
     if (programProduct == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        programProductRepository.delete(programProduct);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("ProgramProduct cannot be deleted because of existing dependencies",
-                    ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      programProductRepository.delete(programProduct);
       return new ResponseEntity<ProgramProduct>(HttpStatus.NO_CONTENT);
     }
   }

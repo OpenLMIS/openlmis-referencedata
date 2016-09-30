@@ -2,11 +2,9 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -36,20 +34,11 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
   @RequestMapping(value = "/requisitionGroupProgramSchedules", method = RequestMethod.POST)
   public ResponseEntity<?> createRequisitionGroupProgramSchedule(
         @RequestBody RequisitionGroupProgramSchedule requisition) {
-    try {
-      LOGGER.debug("Creating new requisitionGroupProgramSchedule");
-      requisition.setId(null);
-      RequisitionGroupProgramSchedule newRequisition = repository.save(requisition);
-      LOGGER.debug("Created new requisitionGroupProgramSchedule with id: " + requisition.getId());
-      return new ResponseEntity<RequisitionGroupProgramSchedule>(
-            newRequisition, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating"
-                  + "requisitionGroupProgramSchedule", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new requisitionGroupProgramSchedule");
+    requisition.setId(null);
+    RequisitionGroupProgramSchedule newRequisition = repository.save(requisition);
+    LOGGER.debug("Created new requisitionGroupProgramSchedule with id: " + requisition.getId());
+    return new ResponseEntity<>(newRequisition, HttpStatus.CREATED);
   }
 
   /**
@@ -135,15 +124,7 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
     if (requisition == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        repository.delete(requisition);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("An error accurred while deleting requisitionGroupProgramSchedule"
-                    + " with id: " + requisitionId, ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      repository.delete(requisition);
       return new ResponseEntity<RequisitionGroupProgramSchedule>(HttpStatus.NO_CONTENT);
     }
   }
