@@ -1,12 +1,7 @@
 package org.openlmis.referencedata.web;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
 import com.google.common.collect.Sets;
-
 import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -55,20 +50,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.validation.Valid;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
 @Controller
 public class UserController extends BaseController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RightController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
   private static final String USER_ID = "userId";
 
   @Autowired
