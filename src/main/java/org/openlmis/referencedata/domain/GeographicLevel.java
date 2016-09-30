@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -27,4 +29,26 @@ public class GeographicLevel extends BaseEntity {
   @Getter
   @Setter
   private Integer levelNumber;
+
+  public GeographicLevel(String code, int levelNumber) {
+    this.code = code;
+    this.levelNumber = levelNumber;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof GeographicLevel)) {
+      return false;
+    }
+    GeographicLevel that = (GeographicLevel) obj;
+    return Objects.equals(code, that.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
+  }
 }

@@ -34,8 +34,8 @@ public class GeographicLevelController extends BaseController {
     LOGGER.debug("Creating new geographicLevel");
     // Ignore provided id
     geographicLevel.setId(null);
-    GeographicLevel newGeographicLevel = geographicLevelRepository.save(geographicLevel);
-    return new ResponseEntity<>(newGeographicLevel, HttpStatus.CREATED);
+    geographicLevelRepository.save(geographicLevel);
+    return new ResponseEntity<>(geographicLevel, HttpStatus.CREATED);
   }
 
   /**
@@ -56,16 +56,16 @@ public class GeographicLevelController extends BaseController {
   /**
    * Allows updating geographicLevels.
    *
-   * @param geographicLevel A geographicLevel bound to the request body
+   * @param geographicLevel   A geographicLevel bound to the request body
    * @param geographicLevelId UUID of geographicLevel which we want to update
    * @return ResponseEntity containing the updated geographicLevel
    */
   @RequestMapping(value = "/geographicLevels/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateGeographicLevel(@RequestBody GeographicLevel geographicLevel,
-                                            @PathVariable("id") UUID geographicLevelId) {
+                                                 @PathVariable("id") UUID geographicLevelId) {
     LOGGER.debug("Updating geographicLevel");
-    GeographicLevel updatedGeographicLevel = geographicLevelRepository.save(geographicLevel);
-    return new ResponseEntity<>(updatedGeographicLevel, HttpStatus.OK);
+    geographicLevelRepository.save(geographicLevel);
+    return new ResponseEntity<>(geographicLevel, HttpStatus.OK);
   }
 
   /**
