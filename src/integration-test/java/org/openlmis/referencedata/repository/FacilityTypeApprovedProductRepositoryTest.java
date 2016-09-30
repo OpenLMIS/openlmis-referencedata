@@ -4,8 +4,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
@@ -13,6 +16,13 @@ import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collection;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 public class FacilityTypeApprovedProductRepositoryTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
@@ -31,6 +41,15 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Autowired
   private OrderableProductRepository orderableProductRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
+
+  @Autowired
+  private GeographicLevelRepository geographicLevelRepository;
+
+  @Autowired
+  private GeographicZoneRepository geographicZoneRepository;
 
   FacilityTypeApprovedProductRepository getRepository() {
     return this.ftapRepository;
@@ -86,5 +105,44 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ftapRepository.save(ftap);
     Assert.assertEquals("newFacilityType", ftap.getFacilityType().getCode());
     Assert.assertEquals(10.00, ftap.getMaxMonthsOfStock(), maxMonthsOfStockDelta);
+  }
+
+  @Test
+  public void shouldGetFullSupply() throws Exception {
+    GeographicLevel level = new GeographicLevel();
+    level.setCode("FacilityRepositoryIntegrationTest");
+    level.setLevelNumber(1);
+    geographicLevelRepository.save(level);
+
+    GeographicZone geographicZone = new GeographicZone();
+    geographicZone.setCode("FacilityRepositoryIntegrationTest");
+    geographicZone.setLevel(level);
+    geographicZoneRepository.save(geographicZone);
+
+    int instanceNumber = this.getNextInstanceNumber();
+    Facility facility = new Facility("TF" + instanceNumber);
+    facility.setType(facilityType);
+    facility.setGeographicZone(geographicZone);
+    facility.setName("Facility #" + instanceNumber);
+    facility.setDescription("Test facility");
+    facility.setActive(true);
+    facility.setEnabled(true);
+
+    facilityRepository.save(facility);
+    ftapRepository.save(this.generateInstance());
+
+    Collection<FacilityTypeApprovedProduct> list = ftapRepository
+        .searchFullSupply(facility.getId(), program.getId());
+
+    assertThat(list, hasSize(1));
+
+    FacilityTypeApprovedProduct ftap = list.iterator().next();
+
+    assertThat(ftap.getFacilityType().getId(), is(equalTo(facilityType.getId())));
+    assertThat(ftap.getFacilityType().getId(), is(equalTo(facility.getType().getId())));
+    assertThat(ftap.getProgramProduct().getProgram().getId(), is(equalTo(program.getId())));
+    assertThat(ftap.getProgramProduct().isFullSupply(), is(true));
+    assertThat(ftap.getProgramProduct().isActive(), is(true));
+
   }
 }
