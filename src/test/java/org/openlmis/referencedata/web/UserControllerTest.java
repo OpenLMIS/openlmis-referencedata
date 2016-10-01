@@ -7,6 +7,7 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.Right;
@@ -617,5 +618,27 @@ public class UserControllerTest {
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertThat(supervisedFacilities.size(), is(2));
+  }
+
+  @Test
+  public void shouldGetUserFulfillmentFacilities()
+      throws RightTypeException, RoleAssignmentException {
+    //given
+    FulfillmentRoleAssignment assignment1 =
+        new FulfillmentRoleAssignment(fulfillmentRole1, warehouse1);
+
+    SupervisionRoleAssignment assignment2
+        = new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1);
+
+    user1.assignRoles(assignment1);
+    user1.assignRoles(assignment2);
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    //when
+    ResponseEntity responseEntity = controller.getUserFulfillmentFacilities(userId);
+    Set<Facility> facilities = (Set<Facility>) responseEntity.getBody();
+
+    //then
+    assertThat(facilities.size(), is(1));
   }
 }

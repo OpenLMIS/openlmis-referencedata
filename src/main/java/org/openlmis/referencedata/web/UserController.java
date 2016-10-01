@@ -377,6 +377,29 @@ public class UserController extends BaseController {
   }
 
   /**
+   * Get all the facilities that the user has fulfillment rights for.
+   *
+   * @param userId id of user to get fulfillment facilities
+   * @return set of fulfillment facilities
+   */
+  @RequestMapping(value = "/users/{userId}/fulfillmentFacilities", method = RequestMethod.GET)
+  public ResponseEntity<?> getUserFulfillmentFacilities(@PathVariable(USER_ID) UUID userId) {
+    User user = userRepository.findOne(userId);
+    if (user == null) {
+      LOGGER.error("User not found");
+      return ResponseEntity
+          .notFound()
+          .build();
+    }
+
+    Set<Facility> facilities = user.getFulfillmentFacilities();
+
+    return ResponseEntity
+        .ok()
+        .body(facilities);
+  }
+
+  /**
    * Resets a user's password.
    */
   @RequestMapping(value = "/users/passwordReset", method = RequestMethod.POST)

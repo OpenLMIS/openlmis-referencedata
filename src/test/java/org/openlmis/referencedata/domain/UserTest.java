@@ -147,4 +147,20 @@ public class UserTest {
     //then
     assertThat(facilities.size(), is(3));
   }
+
+  @Test
+  public void shouldGetFulfillmentFacilities() {
+    //given
+    FulfillmentRoleAssignment fulfillmentRoleAssignment = mock(FulfillmentRoleAssignment.class);
+
+    user.assignRoles(fulfillmentRoleAssignment);
+    user.assignRoles(assignment1);
+    user.assignRoles(assignment2);
+
+    //when
+    Set<Facility> facilities = user.getFulfillmentFacilities();
+
+    //then
+    assertThat(facilities.size(), is(1));
+  }
 }
