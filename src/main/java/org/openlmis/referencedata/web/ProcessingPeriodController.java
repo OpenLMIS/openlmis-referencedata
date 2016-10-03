@@ -3,6 +3,7 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.exception.InvalidIdException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
@@ -62,7 +63,11 @@ public class ProcessingPeriodController extends BaseController {
           @RequestParam(value = "processingSchedule", required = true)
               ProcessingSchedule processingSchedule,
           @RequestParam(value = "toDate", required = false)
-          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+          @DateTimeFormat(
+              iso = DateTimeFormat.ISO.DATE) LocalDate toDate) throws InvalidIdException {
+    if (processingSchedule == null) {
+      throw new InvalidIdException("ProcessingSchedule with provided id does not exist.");
+    }
     List<ProcessingPeriod> result = periodService.searchPeriods(processingSchedule, toDate);
 
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -183,8 +188,11 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> searchPeriodsByUuuidAndDate(
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
-
+      @DateTimeFormat(
+          iso = DateTimeFormat.ISO.DATE) LocalDate startDate) throws InvalidIdException {
+    if (processingScheduleId == null) {
+      throw new InvalidIdException("ProcessingSchedule with provided id does not exist.");
+    }
     ProcessingSchedule processingSchedule =
         processingScheduleRepository.findOne(processingScheduleId);
     List<ProcessingPeriod> periods = periodService.searchPeriods(processingSchedule, startDate);

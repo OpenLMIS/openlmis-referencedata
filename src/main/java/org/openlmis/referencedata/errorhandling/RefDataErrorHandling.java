@@ -2,6 +2,7 @@ package org.openlmis.referencedata.errorhandling;
 
 import org.openlmis.referencedata.exception.CsvInputNotValidException;
 import org.openlmis.referencedata.exception.ExceptionDetail;
+import org.openlmis.referencedata.exception.InvalidIdException;
 import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +33,15 @@ public class RefDataErrorHandling {
   }
 
   /**
-   * Handle CSV Input exception and returns proper response.
+   * Handles exceptions and returns proper response.
    *
    * @param ex Exception to handle.
    * @return ResponseEntity with exception details
    */
-  @ExceptionHandler(CsvInputNotValidException.class)
+  @ExceptionHandler({CsvInputNotValidException.class, InvalidIdException.class})
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
-  public ExceptionDetail csvInputNotValidExceptionHandler(
-          CsvInputNotValidException ex) {
+  public ExceptionDetail exceptionHandler(Exception ex) {
     String title = "Resource Property Validation Failure";
     LOGGER.error(title, ex);
     return getExceptionDetail(ex, HttpStatus.BAD_REQUEST, title);
