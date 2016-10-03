@@ -53,23 +53,31 @@ public class ProcessingPeriodController extends BaseController {
 
   /**
    * Finds processingPeriods matching all of provided parameters.
-   * @param processingSchedule processingSchedule of searched ProcessingPeriods.
-   * @param toDate to which day shall ProcessingPeriod start.
+   * @param processingScheduleId processingSchedule of searched ProcessingPeriods.
+   * @param toDate to which day shall Period start.
    * @return ResponseEntity with list of all ProcessingPeriods matching
    *         provided parameters and OK httpStatus.
    */
   @RequestMapping(value = "/processingPeriods/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProcessingPeriods(
-          @RequestParam(value = "processingSchedule", required = true)
-              ProcessingSchedule processingSchedule,
-          @RequestParam(value = "toDate", required = false)
-          @DateTimeFormat(
+          @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
+          @RequestParam(value = "toDate", required = false) @DateTimeFormat(
               iso = DateTimeFormat.ISO.DATE) LocalDate toDate) throws InvalidIdException {
-    if (processingSchedule == null) {
-      throw new InvalidIdException("ProcessingSchedule with provided id does not exist.");
+    if (processingScheduleId == null) {
+      throw new InvalidIdException("Processing schedule id must be provided.");
     }
-    List<ProcessingPeriod> result = periodService.searchPeriods(processingSchedule, toDate);
+    ProcessingSchedule processingSchedule =
+        processingScheduleRepository.findOne(processingScheduleId);
+    List<ProcessingPeriodDto> result = new ArrayList<>();
 
+    if (processingSchedule != null) {
+      List<ProcessingPeriod> periods = periodService.searchPeriods(processingSchedule, toDate);
+
+      for (ProcessingPeriod period : periods) {
+        ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto(period);
+        result.add(processingPeriodDto);
+      }
+    }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -176,33 +184,6 @@ public class ProcessingPeriodController extends BaseController {
 
     return messageSource.getMessage("referencedata.message.totalPeriod", msgArgs,
         LocaleContextHolder.getLocale());
-  }
-
-  /**
-   * Returns chosen ProcessingPeriods.
-   * @param processingScheduleId processingSchedule of searched ProcessingPeriods.
-   * @param startDate which day shall ProcessingPeriod start.
-   * @return List of ProcessingPeriods.
-   */
-  @RequestMapping(value = "/processingPeriods/searchByUUIDAndDate", method = RequestMethod.GET)
-  public ResponseEntity<?> searchPeriodsByUuuidAndDate(
-      @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
-      @RequestParam(value = "startDate", required = false)
-      @DateTimeFormat(
-          iso = DateTimeFormat.ISO.DATE) LocalDate startDate) throws InvalidIdException {
-    if (processingScheduleId == null) {
-      throw new InvalidIdException("ProcessingSchedule with provided id does not exist.");
-    }
-    ProcessingSchedule processingSchedule =
-        processingScheduleRepository.findOne(processingScheduleId);
-    List<ProcessingPeriod> periods = periodService.searchPeriods(processingSchedule, startDate);
-    List<ProcessingPeriodDto> result = new ArrayList<>();
-    for (ProcessingPeriod period : periods) {
-      ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto(period);
-      result.add(processingPeriodDto);
-    }
-    return new ResponseEntity<>(result, HttpStatus.OK);
-
   }
 
 }

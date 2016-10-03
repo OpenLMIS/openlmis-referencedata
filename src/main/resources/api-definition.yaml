@@ -558,34 +558,6 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
-    /searchByUUIDAndDate:
-        get:
-            is: [ secured ]
-            description: Find periods with matched parametrs.
-            queryParameters:
-                processingSchedule:
-                        displayName: processingSchedule
-                        type: string
-                        required: true
-                        repeat: false
-                startDate:
-                        displayName: startDate
-                        type: string
-                        required: false
-                        repeat: false
-            responses:
-                "200":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                      application/json:
-                "404":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                      application/json:
 
         /findFirst1ByOrderByEndDateDesc:
             get:
