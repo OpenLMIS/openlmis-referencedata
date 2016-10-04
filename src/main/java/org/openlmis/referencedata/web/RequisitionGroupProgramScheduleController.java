@@ -1,7 +1,13 @@
 package org.openlmis.referencedata.web;
 
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.dto.RequisitionGroupProgramScheduleDto;
+import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
+import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
@@ -22,7 +29,16 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
         LoggerFactory.getLogger(RequisitionGroupProgramScheduleController.class);
 
   @Autowired
+  private RequisitionGroupProgramScheduleService service;
+
+  @Autowired
   private RequisitionGroupProgramScheduleRepository repository;
+
+  @Autowired
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
 
   /**
    * Allows creating new requisitionGroupProgramSchedule.
@@ -127,5 +143,32 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
       repository.delete(requisition);
       return new ResponseEntity<RequisitionGroupProgramSchedule>(HttpStatus.NO_CONTENT);
     }
+  }
+
+  /**
+   * Returns chosen RequisitionGroupProgramSchedule.
+   * @param programId program of searched RequisitionGroupProgramSchedule.
+   * @param facilityId facility of searched RequisitionGroupProgramSchedule.
+   * @return RequisitionGroupProgramSchedule.
+   */
+  @RequestMapping(value = "/requisitionGroupProgramSchedules/search",
+        method = RequestMethod.GET)
+  public ResponseEntity<?> searchByProgramAndFacility(
+        @RequestParam(value = "programId", required = true) UUID programId,
+        @RequestParam(value = "facilityId", required = true) UUID facilityId) {
+
+    Program program = programRepository.findOne(programId);
+    Facility facility = facilityRepository.findOne(facilityId);
+    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
+          service.searchRequisitionGroupProgramSchedule(program, facility);
+
+    return ResponseEntity.ok(exportToDto(requisitionGroupProgramSchedule));
+  }
+
+  private RequisitionGroupProgramScheduleDto exportToDto(
+        RequisitionGroupProgramSchedule requisitionGroupProgramSchedule) {
+    RequisitionGroupProgramScheduleDto dto = new RequisitionGroupProgramScheduleDto();
+    requisitionGroupProgramSchedule.export(dto);
+    return dto;
   }
 }

@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.util.UUID;
 
 /**
  * RequisitionGroupProgramSchedule represents the schedule to be mapped for a given program and
@@ -43,4 +44,71 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
   @Getter
   @Setter
   private Facility dropOffFacility;
+
+  private RequisitionGroupProgramSchedule(Program program, ProcessingSchedule schedule,
+                                          Boolean directDelivery) {
+    this.program = program;
+    this.processingSchedule = schedule;
+    this.directDelivery = directDelivery;
+  }
+
+  public static RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule(
+        Program program, ProcessingSchedule schedule, boolean directDelivery) {
+    return new RequisitionGroupProgramSchedule(program, schedule, directDelivery);
+  }
+
+  /**
+   * Construct new RequisitionGroupProgramSchedule based on an importer (DTO).
+   *
+   * @param importer importer (DTO) to use
+   * @return new RequisitionGroupProgramSchedule
+   */
+  public static RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule(
+        RequisitionGroupProgramSchedule.Importer importer) {
+    RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule
+          = new RequisitionGroupProgramSchedule(
+          importer.getProgram(),
+          importer.getProcessingSchedule(),
+          importer.getDirectDelivery());
+    newRequisitionGroupProgramSchedule.id = importer.getId();
+    newRequisitionGroupProgramSchedule.dropOffFacility = importer.getDropOffFacility();
+    return newRequisitionGroupProgramSchedule;
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(RequisitionGroupProgramSchedule.Exporter exporter) {
+    exporter.setId(id);
+    exporter.setProcessingSchedule(processingSchedule);
+    exporter.setProgram(program);
+    exporter.setDropOffFacility(dropOffFacility);
+    exporter.setDirectDelivery(directDelivery);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setProgram(Program program);
+
+    void setProcessingSchedule(ProcessingSchedule schedule);
+
+    void setDirectDelivery(Boolean directDelivery);
+
+    void setDropOffFacility(Facility facility);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    Program getProgram();
+
+    ProcessingSchedule getProcessingSchedule();
+
+    Boolean getDirectDelivery();
+
+    Facility getDropOffFacility();
+  }
 }

@@ -1,32 +1,66 @@
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.ProcessingPeriod;
-
-import java.time.LocalDate;
-import java.util.UUID;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.openlmis.referencedata.domain.ProcessingPeriod;
+import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
 
-@Getter
-@Setter
-public class ProcessingPeriodDto {
-  private UUID id;
-  private UUID processingSchedule;
+import javax.persistence.Convert;
+import java.time.LocalDate;
+import java.util.Objects;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProcessingPeriodDto extends BaseDto implements
+      ProcessingPeriod.Exporter, ProcessingPeriod.Importer {
+
+  @Getter
+  @Setter
+  private ProcessingSchedule processingSchedule;
+
+  @Getter
+  @Setter
   private String name;
-  private String descritpion;
+
+  @Getter
+  @Setter
+  private String description;
+
+  @JsonSerialize(using = LocalDateSerializer.class)
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+  @Convert(converter = LocalDatePersistenceConverter.class)
+  @Getter
+  @Setter
   private LocalDate startDate;
+
+  @JsonSerialize(using = LocalDateSerializer.class)
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+  @Convert(converter = LocalDatePersistenceConverter.class)
+  @Getter
+  @Setter
   private LocalDate endDate;
 
-  /**
-   * Converts ProcessingPeriod to ProcessingPeriodDto.
-   * @param processingPeriod ProcessingPeriod to convert.
-   */
-  public ProcessingPeriodDto(ProcessingPeriod processingPeriod) {
-    id = processingPeriod.getId();
-    processingSchedule = processingPeriod.getProcessingSchedule().getId();
-    name = processingPeriod.getName();
-    descritpion = processingPeriod.getDescription();
-    startDate = processingPeriod.getStartDate();
-    endDate = processingPeriod.getEndDate();
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof ProcessingPeriodDto)) {
+      return false;
+    }
+    ProcessingPeriodDto periodDto = (ProcessingPeriodDto) obj;
+    return Objects.equals(name, periodDto.name);
   }
 }

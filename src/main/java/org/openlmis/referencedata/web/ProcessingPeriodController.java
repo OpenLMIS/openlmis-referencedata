@@ -1,12 +1,17 @@
 package org.openlmis.referencedata.web;
 
+import com.google.common.collect.Sets;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.exception.InvalidIdException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.slf4j.Logger;
@@ -27,9 +32,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Controller
 public class ProcessingPeriodController extends BaseController {
@@ -51,53 +59,60 @@ public class ProcessingPeriodController extends BaseController {
   @Autowired
   private ProcessingScheduleRepository processingScheduleRepository;
 
+  @Autowired
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
+
   /**
    * Finds processingPeriods matching all of provided parameters.
-   * @param processingScheduleId processingSchedule of searched ProcessingPeriods.
-   * @param toDate to which day shall Period start.
+   * @param programId program of searched ProcessingPeriods.
+   * @param facilityId facility of searched ProcessingPeriods.
    * @return ResponseEntity with list of all ProcessingPeriods matching
    *         provided parameters and OK httpStatus.
    */
   @RequestMapping(value = "/processingPeriods/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProcessingPeriods(
-          @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
-          @RequestParam(value = "toDate", required = false) @DateTimeFormat(
-              iso = DateTimeFormat.ISO.DATE) LocalDate toDate) throws InvalidIdException {
-    if (processingScheduleId == null) {
-      throw new InvalidIdException("Processing schedule id must be provided.");
-    }
-    ProcessingSchedule processingSchedule =
-        processingScheduleRepository.findOne(processingScheduleId);
-    List<ProcessingPeriodDto> result = new ArrayList<>();
+        @RequestParam(value = "programId", required = true) UUID programId,
+        @RequestParam(value = "facilityId", required = true) UUID facilityId)
+        throws InvalidIdException {
 
-    if (processingSchedule != null) {
-      List<ProcessingPeriod> periods = periodService.searchPeriods(processingSchedule, toDate);
-
-      for (ProcessingPeriod period : periods) {
-        ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto(period);
-        result.add(processingPeriodDto);
-      }
+    if (programId == null) {
+      throw new InvalidIdException("Program id must be provided.");
     }
-    return new ResponseEntity<>(result, HttpStatus.OK);
+
+    if (facilityId == null) {
+      throw new InvalidIdException("Facility id must be provided.");
+    }
+
+    Program program = programRepository.findOne(programId);
+    Facility facility = facilityRepository.findOne(facilityId);
+
+    List<ProcessingPeriod> periods = periodService.filterPeriods(program, facility);
+
+    return ResponseEntity.ok(exportToDtos(periods));
   }
 
   /**
-   * Creates given processingPeriod if possible.
+   * Create a new processing period using the provided processing period DTO.
    *
-   * @param period ProcessingPeriod object to be created.
+   * @param periodDto processing period DTO with which to create the processing period
    * @param bindingResult Object used for validation.
-   * @return ResponseEntity with created ProcessingPeriod, BAD_REQUEST otherwise.
+   * @return if successful, the new processing period; otherwise an HTTP error
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.POST)
-  public ResponseEntity<?> createProcessingPeriod(@RequestBody ProcessingPeriod period,
+  public ResponseEntity<?> createProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
                                         BindingResult bindingResult) {
+    ProcessingPeriod newPeriod = ProcessingPeriod.newPeriod(periodDto);
     LOGGER.debug("Creating new processingPeriod");
-    validator.validate(period, bindingResult);
+    validator.validate(newPeriod, bindingResult);
     if (bindingResult.getErrorCount() == 0) {
-      ProcessingPeriod newPeriod = periodRepository.save(period);
-      return new ResponseEntity<ProcessingPeriod>(newPeriod, HttpStatus.CREATED);
+      periodRepository.save(newPeriod);
+
+      return ResponseEntity.status(HttpStatus.CREATED).body(exportToDto(newPeriod));
     } else {
-      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+      return ResponseEntity.badRequest().body(getErrors(bindingResult));
     }
   }
 
@@ -108,27 +123,30 @@ public class ProcessingPeriodController extends BaseController {
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.GET)
   public ResponseEntity<?> getAllProcessingPeriods() {
-    Iterable<ProcessingPeriod> periods = periodRepository.findAll();
-    if (periods == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(periods, HttpStatus.OK);
-    }
+    Set<ProcessingPeriod> processingPeriods = Sets.newHashSet(periodRepository.findAll());
+    Set<ProcessingPeriodDto> periodDtos = processingPeriods.stream().map(
+        period -> exportToDto(period)).collect(toSet());
+
+    return ResponseEntity.ok(periodDtos);
   }
 
   /**
-   * Allows updating processingPeriods.
+   * Update an existing processingPeriod using the provided processingPeriod DTO.
+   * Note, if the role does not exist, will create one.
    *
-   * @param period A processingPeriod bound to the request body
-   * @param periodId UUID of processingPeriod which we want to update
-   * @return ResponseEntity containing the updated processingPeriod
+   * @param periodId  id of the processingPeriod to update
+   * @param periodDto provided processingPeriod DTO
+   * @return if successful, the updated role; otherwise an HTTP error
    */
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateProcessingPeriod(@RequestBody ProcessingPeriod period,
+  public ResponseEntity<?> updateProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
                                        @PathVariable("id") UUID periodId) {
     LOGGER.debug("Updating processingPeriod");
-    ProcessingPeriod updatedProcessingPeriod = periodRepository.save(period);
-    return new ResponseEntity<>(updatedProcessingPeriod, HttpStatus.OK);
+    ProcessingPeriod updatedProcessingPeriod = ProcessingPeriod.newPeriod(periodDto);
+    updatedProcessingPeriod.setId(periodId);
+    periodRepository.save(updatedProcessingPeriod);
+    return ResponseEntity
+          .ok(exportToDto(updatedProcessingPeriod));
   }
 
   /**
@@ -141,9 +159,9 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> getProcessingPeriod(@PathVariable("id") UUID periodId) {
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return ResponseEntity.notFound().build();
     } else {
-      return new ResponseEntity<>(period, HttpStatus.OK);
+      return ResponseEntity.ok(exportToDto(period));
     }
   }
 
@@ -157,10 +175,10 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> deleteProcessingPeriod(@PathVariable("id") UUID periodId) {
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      return ResponseEntity.notFound().build();
     } else {
       periodRepository.delete(period);
-      return new ResponseEntity<ProcessingPeriod>(HttpStatus.NO_CONTENT);
+      return ResponseEntity.noContent().build();
     }
   }
 
@@ -186,4 +204,32 @@ public class ProcessingPeriodController extends BaseController {
         LocaleContextHolder.getLocale());
   }
 
+  /**
+   * Returns chosen ProcessingPeriods.
+   * @param processingScheduleId processingSchedule of searched ProcessingPeriods.
+   * @param startDate which day shall ProcessingPeriod start.
+   * @return List of ProcessingPeriods.
+   */
+  @RequestMapping(value = "/processingPeriods/searchByUUIDAndDate", method = RequestMethod.GET)
+  public ResponseEntity<?> searchPeriodsByUuuidAndDate(
+      @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
+      @RequestParam(value = "startDate", required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
+
+    ProcessingSchedule processingSchedule =
+        processingScheduleRepository.findOne(processingScheduleId);
+    List<ProcessingPeriod> periods = periodService.searchPeriods(processingSchedule, startDate);
+
+    return ResponseEntity.ok(exportToDtos(periods));
+  }
+
+  private ProcessingPeriodDto exportToDto(ProcessingPeriod period) {
+    ProcessingPeriodDto periodDto = new ProcessingPeriodDto();
+    period.export(periodDto);
+    return periodDto;
+  }
+
+  private List<ProcessingPeriodDto> exportToDtos(List<ProcessingPeriod> periods) {
+    return periods.stream().map(this::exportToDto).collect(toList());
+  }
 }

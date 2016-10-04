@@ -535,13 +535,41 @@ resourceTypes:
             is: [ secured ]
             description: Find periods with matched parametrs.
             queryParameters:
-                processingSchedule:
+                programId:
+                        displayName: program
+                        type: string
+                        required: true
+                        repeat: false
+                facilityId:
+                        displayName: facility
+                        type: string
+                        required: true
+                        repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+    /searchByUUIDAndDate:
+        get:
+            is: [ secured ]
+            description: Find periods with matched parametrs.
+            queryParameters:
+                processingScheduleId:
                         displayName: processingSchedule
                         type: string
                         required: true
                         repeat: false
-                toDate:
-                        displayName: toDate
+                startDate:
+                        displayName: startDate
                         type: string
                         required: false
                         repeat: false
@@ -558,22 +586,21 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
-
-        /findFirst1ByOrderByEndDateDesc:
-            get:
-                is: [ secured ]
-                description: Get last processingPeriod.
-                responses:
-                    "200":
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
-                        body:
-                          application/json:
-                    "404":
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
+    /findFirst1ByOrderByEndDateDesc:
+        get:
+            is: [ secured ]
+            description: Get last processingPeriod.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
 
 /productCategories:
     displayName: Product Categories
@@ -2529,3 +2556,31 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
+    /search:
+        get:
+            is: [ secured ]
+            description: Find requisitionGroupProgramSchedule with matched parametrs.
+            queryParameters:
+                programId:
+                        displayName: program
+                        type: string
+                        required: true
+                        repeat: false
+                facilityId:
+                        displayName: facility
+                        type: string
+                        required: true
+                        repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
