@@ -1,7 +1,6 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +34,8 @@ public class ProgramController extends BaseController {
     LOGGER.debug("Creating new program");
     // Ignore provided id
     program.setId(null);
-    Program newProgram = programRepository.save(program);
-    return new ResponseEntity<>(newProgram, HttpStatus.CREATED);
+    programRepository.save(program);
+    return new ResponseEntity<>(program, HttpStatus.CREATED);
   }
 
   /**
@@ -88,26 +87,25 @@ public class ProgramController extends BaseController {
   }
 
   /**
-   * Updating Program code and name.
-   * @param programDto DTO class used to update program's code and name
+   * Updating Program.
+   *
+   * @param program DTO class used to update program's code and name
    */
-  @RequestMapping(value = "/programs/update", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateProgramCodeAndName(@RequestBody ProgramDto programDto) {
-    if (programDto == null || programDto.getId() == null) {
+  @RequestMapping(value = "/programs/{id}", method = RequestMethod.PUT)
+  public ResponseEntity<?> updateProgram(@PathVariable("id") UUID programId,
+                                         @RequestBody Program program) {
+    if (program == null || programId == null) {
       LOGGER.debug("Update failed - program id not specified");
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    Program program = programRepository.findOne(programDto.getId());
-    if (program == null) {
-      LOGGER.warn("Update failed - program with id: {} not found", programDto.getId());
+    Program storedProgram = programRepository.findOne(programId);
+    if (storedProgram == null) {
+      LOGGER.warn("Update failed - program with id: {} not found", programId);
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    program.setCode(programDto.getCode());
-    program.setName(programDto.getName());
-
-    program = programRepository.save(program);
+    programRepository.save(program);
 
     return new ResponseEntity<>(program, HttpStatus.OK);
   }
