@@ -604,13 +604,13 @@ resourceTypes:
 
 /productCategories:
     displayName: Product Categories
-    post:
+    put:
           is: [ secured ]
           description: Create new productCategory.
           body:
               application/json:
           responses:
-              "201":
+              "200":
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
