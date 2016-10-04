@@ -3,24 +3,21 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
-import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
-import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
-@Ignore
 public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/processingSchedules";
@@ -28,36 +25,24 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   private static final String DIFFERENCE_URL = RESOURCE_URL + "/{id}/difference";
   private static final String ACCESS_TOKEN = "access_token";
 
-  @Autowired
+  @MockBean
   private ProcessingScheduleRepository scheduleRepository;
 
-  @Autowired
-  private ProcessingPeriodRepository periodRepository;
-
   private ProcessingSchedule schedule;
-  private ProcessingPeriod period;
+  private UUID processingScheduleId;
 
-  @Before
-  public void setUp() {
-    schedule = new ProcessingSchedule();
-    schedule.setCode("code");
-    schedule.setName("schedule");
-    schedule.setDescription("Test schedule");
-    scheduleRepository.save(schedule);
-
-    period = new ProcessingPeriod();
-    period.setName("period");
-    period.setProcessingSchedule(schedule);
-    period.setDescription("Test period");
-    period.setStartDate(LocalDate.of(2016, 1, 1));
-    period.setEndDate(LocalDate.of(2016, 2, 1));
-    periodRepository.save(period);
+  public ProcessingScheduleControllerIntegrationTest() {
+    schedule = new ProcessingSchedule("PS1", "Schedule1");
+    processingScheduleId = UUID.randomUUID();
   }
 
+  @Ignore
   @Test
   public void shouldDisplayTotalDifference() {
-    String response = restAssured.given()
-        .pathParam("id", schedule.getId())
+
+    String response = restAssured
+        .given()
+        .pathParam("id", processingScheduleId)
         .queryParam("access_token", getToken())
         .when()
         .get(DIFFERENCE_URL)
@@ -72,90 +57,100 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void shouldDeleteSchedule() {
 
-    periodRepository.delete(period);
+    given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", schedule.getId())
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(204);
-
-    Assert.assertFalse(scheduleRepository.exists(schedule.getId()));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldCreateSchedule() {
-
-    periodRepository.delete(period);
-    scheduleRepository.delete(schedule);
-
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(schedule)
-          .when()
-          .post(RESOURCE_URL)
-          .then()
-          .statusCode(201);
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", processingScheduleId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldUpdateSchedule() {
+  public void shouldPostProcessingSchedule() {
+
+    ProcessingSchedule response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(schedule)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(201)
+        .extract().as(ProcessingSchedule.class);
+
+    assertEquals(schedule, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldPutProcessingSchedule() {
 
     schedule.setDescription("OpenLMIS");
+    given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
 
-    ProcessingSchedule response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", schedule.getId())
-          .body(schedule)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(ProcessingSchedule.class);
+    ProcessingSchedule response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", processingScheduleId)
+        .body(schedule)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProcessingSchedule.class);
 
-    assertEquals(response.getDescription(), "OpenLMIS");
+    assertEquals(schedule, response);
+    assertEquals("OpenLMIS", response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetAllSchedules() {
+  public void shouldGetAllProcessingSchedules() {
 
-    ProcessingSchedule[] response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when()
-          .get(RESOURCE_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(ProcessingSchedule[].class);
+    List<ProcessingSchedule> storedProcessingSchedules = Arrays.asList(schedule,
+        new ProcessingSchedule("PS2", "Schedule2"));
+    given(scheduleRepository.findAll()).willReturn(storedProcessingSchedules);
 
-    Iterable<ProcessingSchedule> schedules = Arrays.asList(response);
-    assertTrue(schedules.iterator().hasNext());
+    ProcessingSchedule[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProcessingSchedule[].class);
+
+    assertEquals(storedProcessingSchedules.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenSchedule() {
+  public void shouldGetProcessingSchedule() {
 
-    ProcessingSchedule response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", schedule.getId())
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(ProcessingSchedule.class);
+    given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
 
-    assertTrue(scheduleRepository.exists(response.getId()));
+    ProcessingSchedule response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", processingScheduleId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProcessingSchedule.class);
+
+    assertEquals(schedule, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }
