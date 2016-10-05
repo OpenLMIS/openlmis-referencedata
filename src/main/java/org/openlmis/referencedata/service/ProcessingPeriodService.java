@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -60,8 +59,6 @@ public class ProcessingPeriodService {
       RequisitionGroupProgramSchedule rgps = requisitionGroupProgramSchedules.get(0);
       List<ProcessingPeriod> periods
             = periodRepository.searchPeriods(rgps.getProcessingSchedule(), null);
-
-      Collections.sort(periods, (p1, p2) -> p1.getStartDate().compareTo(p2.getStartDate()));
 
       return periods;
     }

@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
@@ -18,38 +17,27 @@ import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class ProcessingPeriodDto extends BaseDto implements
       ProcessingPeriod.Exporter, ProcessingPeriod.Importer {
 
-  @Getter
-  @Setter
   private ProcessingSchedule processingSchedule;
-
-  @Getter
-  @Setter
   private String name;
-
-  @Getter
-  @Setter
   private String description;
 
   @JsonSerialize(using = LocalDateSerializer.class)
   @JsonDeserialize(using = LocalDateDeserializer.class)
   @Convert(converter = LocalDatePersistenceConverter.class)
-  @Getter
-  @Setter
   private LocalDate startDate;
 
   @JsonSerialize(using = LocalDateSerializer.class)
   @JsonDeserialize(using = LocalDateDeserializer.class)
   @Convert(converter = LocalDatePersistenceConverter.class)
-  @Getter
-  @Setter
   private LocalDate endDate;
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return Objects.hash();
   }
 
   @Override
@@ -61,6 +49,6 @@ public class ProcessingPeriodDto extends BaseDto implements
       return false;
     }
     ProcessingPeriodDto periodDto = (ProcessingPeriodDto) obj;
-    return Objects.equals(name, periodDto.name);
+    return Objects.equals(id, periodDto.id);
   }
 }

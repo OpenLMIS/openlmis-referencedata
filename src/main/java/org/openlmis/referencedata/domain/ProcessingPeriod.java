@@ -102,7 +102,7 @@ public class ProcessingPeriod extends BaseEntity {
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return Objects.hash();
   }
 
   @Override
@@ -114,7 +114,7 @@ public class ProcessingPeriod extends BaseEntity {
       return false;
     }
     ProcessingPeriod period = (ProcessingPeriod) obj;
-    return Objects.equals(name, period.name);
+    return Objects.equals(id, period.id);
   }
 
   public interface Exporter {

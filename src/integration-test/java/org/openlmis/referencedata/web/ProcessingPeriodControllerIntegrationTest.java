@@ -2,6 +2,7 @@ package org.openlmis.referencedata.web;
 
 import com.google.common.collect.Sets;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -20,7 +21,6 @@ import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
-import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -41,7 +41,7 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 
 
-@SuppressWarnings({"PMD.TooManyMethods","PMD.UnusedPrivateField"})
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/processingPeriods";
@@ -68,9 +68,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   private ProcessingScheduleRepository scheduleRepository;
 
   @MockBean
-  private RequisitionGroupProgramScheduleService service;
-
-  @MockBean
   private ProcessingPeriodService periodService;
 
   @MockBean(name = "beforeSavePeriodValidator")
@@ -88,10 +85,8 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   private static Integer currentInstanceNumber = 0;
 
-  /**
-   * Constructor for test class.
-   */
-  public ProcessingPeriodControllerIntegrationTest() {
+  @Before
+  public void setUp() {
     schedule = generateSchedule();
     firstPeriod = ProcessingPeriod.newPeriod("P1", schedule,
           LocalDate.of(2016, 1, 1), LocalDate.of(2016, 2, 1));
