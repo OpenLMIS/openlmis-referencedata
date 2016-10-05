@@ -4,6 +4,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.dto.RequisitionGroupProgramScheduleDto;
+import org.openlmis.referencedata.exception.InvalidIdException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
@@ -155,20 +156,37 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
         method = RequestMethod.GET)
   public ResponseEntity<?> searchByProgramAndFacility(
         @RequestParam(value = "programId", required = true) UUID programId,
-        @RequestParam(value = "facilityId", required = true) UUID facilityId) {
+        @RequestParam(value = "facilityId", required = true) UUID facilityId)
+        throws InvalidIdException {
+
+    if (programId == null) {
+      throw new InvalidIdException("Program id must be provided.");
+    }
+
+    if (facilityId == null) {
+      throw new InvalidIdException("Facility id must be provided.");
+    }
 
     Program program = programRepository.findOne(programId);
     Facility facility = facilityRepository.findOne(facilityId);
-    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
-          service.searchRequisitionGroupProgramSchedule(program, facility);
+
+    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule = null;
+
+    if (program != null && facility != null) {
+      requisitionGroupProgramSchedule =
+            service.searchRequisitionGroupProgramSchedule(program, facility);
+    }
 
     return ResponseEntity.ok(exportToDto(requisitionGroupProgramSchedule));
   }
 
   private RequisitionGroupProgramScheduleDto exportToDto(
         RequisitionGroupProgramSchedule requisitionGroupProgramSchedule) {
-    RequisitionGroupProgramScheduleDto dto = new RequisitionGroupProgramScheduleDto();
-    requisitionGroupProgramSchedule.export(dto);
+    RequisitionGroupProgramScheduleDto dto = null;
+    if (requisitionGroupProgramSchedule != null) {
+      dto = new RequisitionGroupProgramScheduleDto();
+      requisitionGroupProgramSchedule.export(dto);
+    }
     return dto;
   }
 }
