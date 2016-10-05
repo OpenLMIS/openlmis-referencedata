@@ -604,13 +604,13 @@ resourceTypes:
 
 /productCategories:
     displayName: Product Categories
-    post:
+    put:
           is: [ secured ]
           description: Create new productCategory.
           body:
               application/json:
           responses:
-              "201":
+              "200":
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
@@ -1646,23 +1646,6 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
-    /update:
-        put:
-            is: [ secured ]
-            description: Update program code and name.
-            body:
-                application/json:
-            responses:
-                "200":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                      application/json:
-                "400":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
     /{id}:
         uriParameters:
             id:

@@ -19,6 +19,10 @@ import java.util.Collection;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_IS_REQUIRED;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME_IS_REQUIRED;
 
 @RunWith(Parameterized.class)
 public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest {
@@ -78,7 +82,7 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(errors, "code", "The Requisition Group Code is required");
+    assertErrorMessage(errors, CODE, CODE_IS_REQUIRED);
   }
 
   @Test
@@ -87,7 +91,7 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(errors, "name", "The requisition Group Name is required");
+    assertErrorMessage(errors, NAME, NAME_IS_REQUIRED);
   }
 
 }

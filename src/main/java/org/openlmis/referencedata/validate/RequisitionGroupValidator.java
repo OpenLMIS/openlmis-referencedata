@@ -12,7 +12,9 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -21,6 +23,40 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Component
 public class RequisitionGroupValidator implements Validator {
+
+  // prefix
+  private static final String ERROR_CODE_PREFIX = "referencedata.requisitiongroup";
+
+  // suffixes
+  private static final String EMPTY = "empty";
+  private static final String DUPLICATE = "duplicate";
+  private static final String MISSING_ID = "missing.id";
+  private static final String NOT_EXIST = "not.exist";
+  private static final String IS_NULL = "is.null";
+
+  // RequisitionGroup fields
+  static final String CODE = "code";
+  static final String NAME = "name";
+  static final String SUPERVISORY_NODE = "supervisoryNode";
+  static final String MEMBER_FACILITIES = "memberFacilities";
+
+  // code error messages
+  static final String CODE_IS_REQUIRED = "The Requisition Group Code is required";
+  static final String CODE_CANNOT_BE_DUPLICATED = "The Requisition Group Code cannot be duplicated";
+
+  // name error messages
+  static final String NAME_IS_REQUIRED = "The requisition Group Name is required";
+
+  // supervisory node error messages
+  static final String SUPERVISORY_NODE_IS_REQUIRED = "The Supervisory Node is required";
+  static final String SUPERVISORY_NODE_MUST_HAVE_ID = "The Supervisory Node must have ID";
+  static final String SUPERVISORY_NODE_MUST_EXIST =
+      "The Supervisory Node should match a defined supervisory node";
+
+  // facility error messages
+  static final String FACILITY_CAN_NOT_BE_NULL = "The facility can not be null";
+  static final String FACILITY_MUST_HAVE_ID = "The facility must have ID";
+  static final String FACILITY_MUST_EXIST = "The facility should match a defined facility";
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodes;
@@ -81,65 +117,68 @@ public class RequisitionGroupValidator implements Validator {
 
   private void verifyProperties(Errors errors) {
     // the Requisition Group Code is required
-    ValidationUtils.rejectIfEmptyOrWhitespace(
-        errors, "code", "code.empty", "The Requisition Group Code is required"
-    );
+    rejectIfEmptyOrWhitespace(errors, CODE, EMPTY, CODE_IS_REQUIRED);
 
     // the requisition group name is required
-    ValidationUtils.rejectIfEmptyOrWhitespace(
-        errors, "name", "name.empty", "The requisition Group Name is required"
-    );
+    rejectIfEmptyOrWhitespace(errors, NAME, EMPTY, NAME_IS_REQUIRED);
 
     // the supervisory node is required
-    ValidationUtils.rejectIfEmpty(
-        errors, "supervisoryNode", "supervisoryNode.empty", "The Supervisory Node is required"
-    );
+    rejectIfEmpty(errors, SUPERVISORY_NODE, EMPTY, SUPERVISORY_NODE_IS_REQUIRED);
   }
 
   private void verifyCode(String code, Errors errors) {
     // requisition group code cannot be duplicated
     if (null != requisitionGroups.findByCode(code)) {
-      errors.rejectValue(
-          "code", "code.duplicate", "The Requisition Group Code cannot be duplicated"
-      );
+      rejectValue(errors, CODE, DUPLICATE, CODE_CANNOT_BE_DUPLICATED);
     }
   }
 
   private void verifySupervisoryNode(SupervisoryNode supervisoryNode, Errors errors) {
     // supervisory node matches a defined supervisory node
     if (null == supervisoryNode.getId()) {
-      errors.rejectValue(
-          "supervisoryNode", "supervisoryNode.missing.id",
-          "The Supervisory Node must have ID"
-      );
+      rejectValue(errors, SUPERVISORY_NODE, MISSING_ID, SUPERVISORY_NODE_MUST_HAVE_ID);
     } else if (null == supervisoryNodes.findOne(supervisoryNode.getId())) {
-      errors.rejectValue(
-          "supervisoryNode", "supervisoryNode.not.exist",
-          "The Supervisory Node should match a defined supervisory node"
-      );
+      rejectValue(errors, SUPERVISORY_NODE, NOT_EXIST, SUPERVISORY_NODE_MUST_EXIST);
     }
   }
 
   private void verifyFacilities(List<Facility> memberFacilities, Errors errors) {
-    // facilities must already exist in the system (cannot add new facilities from this point)
-    for (int i = 0, size = memberFacilities.size(); i < size; ++i) {
-      Facility facility = memberFacilities.get(i);
-      String field = "memberFacilities[" + i + "]";
+    List<Facility> facilities = Optional
+        .ofNullable(memberFacilities)
+        .orElse(Collections.emptyList());
 
+    // facilities must already exist in the system (cannot add new facilities from this point)
+    for (Facility facility : facilities) {
       if (null == facility) {
-        errors.rejectValue(
-            field, "facility.is.null", "The facility can not be null"
-        );
+        rejectValue(errors, MEMBER_FACILITIES, IS_NULL, FACILITY_CAN_NOT_BE_NULL);
       } else if (null == facility.getId()) {
-        errors.rejectValue(
-            field, "facility.missing.id", "The facility must have ID"
-        );
-      } else if (null == facilities.findOne(facility.getId())) {
-        errors.rejectValue(
-            field, "facility.not.exist", "The facility should match a defined facility"
-        );
+        rejectValue(errors, MEMBER_FACILITIES, MISSING_ID, FACILITY_MUST_HAVE_ID);
+      } else if (null == this.facilities.findOne(facility.getId())) {
+        rejectValue(errors, MEMBER_FACILITIES, NOT_EXIST, FACILITY_MUST_EXIST);
       }
     }
+  }
+
+  private void rejectIfEmpty(Errors errors, String field,
+                             String suffix, String message) {
+    ValidationUtils.rejectIfEmpty(
+        errors, field, getErrorCode(field, suffix), message
+    );
+  }
+
+  private void rejectIfEmptyOrWhitespace(Errors errors, String field,
+                                         String suffix, String message) {
+    ValidationUtils.rejectIfEmptyOrWhitespace(
+        errors, field, getErrorCode(field, suffix), message
+    );
+  }
+
+  private void rejectValue(Errors errors, String field, String suffix, String message) {
+    errors.rejectValue(field, getErrorCode(field, suffix), message);
+  }
+
+  private String getErrorCode(String field, String suffix) {
+    return ERROR_CODE_PREFIX + '.' + field + '.' + suffix;
   }
 
 }

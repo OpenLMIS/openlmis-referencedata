@@ -49,23 +49,23 @@ public class ProcessingScheduleController extends BaseController {
     LOGGER.debug("Creating new processingSchedule");
     // Ignore provided id
     schedule.setId(null);
-    ProcessingSchedule newSchedule = scheduleRepository.save(schedule);
-    return new ResponseEntity<ProcessingSchedule>(newSchedule, HttpStatus.CREATED);
+    scheduleRepository.save(schedule);
+    return new ResponseEntity<ProcessingSchedule>(schedule, HttpStatus.CREATED);
   }
 
   /**
    * Allows updating processingSchedules.
    *
-   * @param schedule A processingSchedule bound to the request body
+   * @param schedule   A processingSchedule bound to the request body
    * @param scheduleId UUID of processingSchedule which we want to update
    * @return ResponseEntity containing the updated processingSchedule
    */
   @RequestMapping(value = "/processingSchedules/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateProcessingSchedule(@RequestBody ProcessingSchedule schedule,
-                                       @PathVariable("id") UUID scheduleId) {
+                                                    @PathVariable("id") UUID scheduleId) {
     LOGGER.debug("Updating processingSchedule");
-    ProcessingSchedule updatedSchedule = scheduleRepository.save(schedule);
-    return new ResponseEntity<>(updatedSchedule, HttpStatus.OK);
+    scheduleRepository.save(schedule);
+    return new ResponseEntity<>(schedule, HttpStatus.OK);
   }
 
   /**
@@ -117,12 +117,10 @@ public class ProcessingScheduleController extends BaseController {
   }
 
   /**
-   * Calculates total difference in days and months
-   *      between processingSchedule beginning and end.
+   * Calculates total difference in days and months between processingSchedule beginning and end.
    *
    * @param scheduleId UUID of given processingSchedule.
-   * @return String which contains information about total difference
-   *      between processingSchedule beginning and end.
+   * @return String about total difference between processingSchedule beginning and end.
    */
   @RequestMapping(value = "/processingSchedules/{id}/difference", method = RequestMethod.GET)
   @ResponseBody
@@ -134,7 +132,7 @@ public class ProcessingScheduleController extends BaseController {
       ProcessingPeriod firstPeriod = allPeriods.iterator().next();
       ProcessingPeriod lastPeriod = periodRepository.findFirst1ByOrderByEndDateDesc();
       java.time.Period total = java.time.Period.between(firstPeriod.getStartDate(),
-              lastPeriod.getEndDate());
+          lastPeriod.getEndDate());
       String months = Integer.toString(total.getMonths());
       String days = Integer.toString(total.getDays());
 
@@ -142,11 +140,11 @@ public class ProcessingScheduleController extends BaseController {
       LOGGER.debug("Returning total days and months of schedule processingPeriods");
 
       return messageSource.getMessage("referencedata.message.totalPeriod", msgArgs,
-              LocaleContextHolder.getLocale());
+          LocaleContextHolder.getLocale());
     } else {
-      String[] messageArgs = {"0","0"};
+      String[] messageArgs = {"0", "0"};
       return messageSource.getMessage("referencedata.message.totalPeriod", messageArgs,
-              LocaleContextHolder.getLocale());
+          LocaleContextHolder.getLocale());
     }
   }
 }
