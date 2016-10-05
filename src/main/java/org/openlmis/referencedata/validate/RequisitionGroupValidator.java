@@ -33,19 +33,27 @@ public class RequisitionGroupValidator implements Validator {
   private static final String MISSING_ID = "missing.id";
   private static final String NOT_EXIST = "not.exist";
   private static final String IS_NULL = "is.null";
+  private static final String IS_TOO_LONG = "is.too.long";
 
   // RequisitionGroup fields
   static final String CODE = "code";
   static final String NAME = "name";
+  static final String DESCRIPTION = "description";
   static final String SUPERVISORY_NODE = "supervisoryNode";
   static final String MEMBER_FACILITIES = "memberFacilities";
 
   // code error messages
   static final String CODE_IS_REQUIRED = "The Requisition Group Code is required";
   static final String CODE_CANNOT_BE_DUPLICATED = "The Requisition Group Code cannot be duplicated";
+  static final String CODE_IS_TOO_LONG = "The Requisition Group Code can have max 50 characters";
 
   // name error messages
   static final String NAME_IS_REQUIRED = "The requisition Group Name is required";
+  static final String NAME_IS_TOO_LONG = "The Requisition Group Name can have max 50 characters";
+
+  // description error messages
+  static final String DESCRIPTION_IS_TOO_LONG =
+      "The Requisition Group Description can have max 250 characters";
 
   // supervisory node error messages
   static final String SUPERVISORY_NODE_IS_REQUIRED = "The Supervisory Node is required";
@@ -99,11 +107,12 @@ public class RequisitionGroupValidator implements Validator {
   @Override
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors);
-    verifyProperties(errors);
+
+    RequisitionGroup group = (RequisitionGroup) target;
+
+    verifyProperties(group, errors);
 
     if (!errors.hasErrors()) {
-      RequisitionGroup group = (RequisitionGroup) target;
-
       verifyCode(group.getCode(), errors);
       verifySupervisoryNode(group.getSupervisoryNode(), errors);
       verifyFacilities(group.getMemberFacilities(), errors);
@@ -115,15 +124,32 @@ public class RequisitionGroupValidator implements Validator {
     checkNotNull(errors, "The contextual state about the validation process cannot be null");
   }
 
-  private void verifyProperties(Errors errors) {
-    // the Requisition Group Code is required
+  private void verifyProperties(RequisitionGroup group, Errors errors) {
+    // the Requisition Group Code is required, length 50 characters
     rejectIfEmptyOrWhitespace(errors, CODE, EMPTY, CODE_IS_REQUIRED);
 
-    // the requisition group name is required
+    // the requisition group name is required, length 50 characters
     rejectIfEmptyOrWhitespace(errors, NAME, EMPTY, NAME_IS_REQUIRED);
 
     // the supervisory node is required
     rejectIfEmpty(errors, SUPERVISORY_NODE, EMPTY, SUPERVISORY_NODE_IS_REQUIRED);
+
+    if (!errors.hasErrors()) {
+      // the Requisition Group Code max length 50 characters
+      if (group.getCode().length() > 50) {
+        rejectValue(errors, CODE, IS_TOO_LONG, CODE_IS_TOO_LONG);
+      }
+
+      // the requisition group name max length 50 characters
+      if (group.getName().length() > 50) {
+        rejectValue(errors, NAME, IS_TOO_LONG, NAME_IS_TOO_LONG);
+      }
+
+      // description max length 250 characters,
+      if (null != group.getDescription() && group.getDescription().length() > 250) {
+        rejectValue(errors, DESCRIPTION, IS_TOO_LONG, DESCRIPTION_IS_TOO_LONG);
+      }
+    }
   }
 
   private void verifyCode(String code, Errors errors) {
