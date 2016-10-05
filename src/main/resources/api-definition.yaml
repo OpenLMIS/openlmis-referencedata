@@ -222,10 +222,11 @@ schemas:
           "title": "Right",
           "description": "A single right",
           "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
+              "id": { "type": "string", "required": false, "title": "id" },
               "name": { "type": "string", "required": true, "title": "name" },
-              "type": { "type": { "enum":["ORDER_FULFILLMENT", "SUPERVISION", "GENERAL_ADMIN", "REPORTS"] }, "required": true, "title": "type" },
-              "description": { "type": "string", "required": false, "title": "description" }
+              "type": { "enum":["ORDER_FULFILLMENT", "SUPERVISION", "GENERAL_ADMIN", "REPORTS"], "required": true, "title": "type" },
+              "description": { "type": "string", "required": false, "title": "description" },
+              "attachments": { "type": "array", "required": false, "title": "attachments", "items": { "type": "object", "$ref": "#/schemas/right" }, "uniqueItems": false }
           }
       }
 
@@ -2299,6 +2300,7 @@ resourceTypes:
           description: Save a right.
           body:
               application/json:
+                  schema: right
           responses:
               "200":
                   headers:
@@ -2306,6 +2308,7 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
+                          schema: right
               "400":
                   headers:
                     X-Content-Type-Options:
@@ -2322,6 +2325,7 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
+                          schema: right
     /{rightId}:
           uriParameters:
             rightId:
@@ -2339,6 +2343,7 @@ resourceTypes:
                         X-XSS-Protection:
                       body:
                           application/json:
+                              schema: right
                   "404":
                       headers:
                         X-Content-Type-Options:
