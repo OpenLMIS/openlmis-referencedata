@@ -120,8 +120,7 @@ public class ProcessingScheduleController extends BaseController {
    * Calculates total difference in days and months between processingSchedule beginning and end.
    *
    * @param scheduleId UUID of given processingSchedule.
-   * @return String which contains information about total difference between processingSchedule
-   * beginning and end.
+   * @return String about total difference between processingSchedule beginning and end.
    */
   @RequestMapping(value = "/processingSchedules/{id}/difference", method = RequestMethod.GET)
   @ResponseBody

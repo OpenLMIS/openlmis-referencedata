@@ -132,8 +132,7 @@ public class ProductCategoryController extends BaseController {
    * Finds ProductCategories matching all of provided parameters.
    *
    * @param codeParam code of productCategory.
-   * @return ResponseEntity with list of all Product Categories matching provided parameters and OK
-   * httpStatus.
+   * @return ResponseEntity with list of all Product Categories matching provided parameters
    */
   @RequestMapping(value = "/productCategories/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProductCategories(
