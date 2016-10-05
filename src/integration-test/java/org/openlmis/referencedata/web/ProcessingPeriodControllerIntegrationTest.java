@@ -14,6 +14,7 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
@@ -181,7 +182,8 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldFindPeriodsByProgramAndFacility() {
+  public void shouldFindPeriodsByProgramAndFacility()
+        throws RequisitionGroupProgramScheduleException {
 
     given(programRepository.findOne(programId))
           .willReturn(requisitionGroupProgramSchedule.getProgram());

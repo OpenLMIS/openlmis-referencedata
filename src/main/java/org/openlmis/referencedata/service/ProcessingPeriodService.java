@@ -4,6 +4,8 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +45,25 @@ public class ProcessingPeriodService {
    * @return Collection of Processing Periods.
    */
   public List<ProcessingPeriod> filterPeriods(
-        Program program, Facility facility) {
-    List<ProcessingPeriod> periods = periodRepository.searchPeriods(
-          repository.searchRequisitionGroupProgramSchedule(program, facility)
-                .getProcessingSchedule(), null);
+        Program program, Facility facility) throws RequisitionGroupProgramScheduleException {
 
-    Collections.sort(periods, (p1, p2) -> p1.getStartDate().compareTo(p2.getStartDate()));
+    List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules
+          = repository.searchRequisitionGroupProgramSchedule(program, facility);
 
-    return periods;
+    if (requisitionGroupProgramSchedules == null || requisitionGroupProgramSchedules.isEmpty()) {
+      return null;
+    } else if (requisitionGroupProgramSchedules.size() != 1) {
+      throw new RequisitionGroupProgramScheduleException(
+            "There cannot exists more than one requisition group program schedule"
+                  + " for program and facility");
+    } else {
+      RequisitionGroupProgramSchedule rgps = requisitionGroupProgramSchedules.get(0);
+      List<ProcessingPeriod> periods
+            = periodRepository.searchPeriods(rgps.getProcessingSchedule(), null);
+
+      Collections.sort(periods, (p1, p2) -> p1.getStartDate().compareTo(p2.getStartDate()));
+
+      return periods;
+    }
   }
 }

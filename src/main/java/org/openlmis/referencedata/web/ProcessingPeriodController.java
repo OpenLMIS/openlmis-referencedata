@@ -7,6 +7,7 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.exception.InvalidIdException;
+import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
@@ -77,7 +78,7 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> searchProcessingPeriods(
         @RequestParam(value = "programId", required = true) UUID programId,
         @RequestParam(value = "facilityId", required = true) UUID facilityId)
-        throws InvalidIdException {
+        throws InvalidIdException, RequisitionGroupProgramScheduleException {
 
     if (programId == null) {
       throw new InvalidIdException("Program id must be provided.");

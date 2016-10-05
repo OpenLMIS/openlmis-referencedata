@@ -21,7 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
 
 @Controller
 public class RequisitionGroupProgramScheduleController extends BaseController {
@@ -170,14 +174,15 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
     Program program = programRepository.findOne(programId);
     Facility facility = facilityRepository.findOne(facilityId);
 
-    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule = null;
+    List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedule
+          = new ArrayList<>();
 
     if (program != null && facility != null) {
       requisitionGroupProgramSchedule =
             service.searchRequisitionGroupProgramSchedule(program, facility);
     }
 
-    return ResponseEntity.ok(exportToDto(requisitionGroupProgramSchedule));
+    return ResponseEntity.ok(exportToDtos(requisitionGroupProgramSchedule));
   }
 
   private RequisitionGroupProgramScheduleDto exportToDto(
@@ -188,5 +193,10 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
       requisitionGroupProgramSchedule.export(dto);
     }
     return dto;
+  }
+
+  private List<RequisitionGroupProgramScheduleDto> exportToDtos(
+        List<RequisitionGroupProgramSchedule> list) {
+    return list.stream().map(this::exportToDto).collect(toList());
   }
 }

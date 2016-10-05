@@ -11,6 +11,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.List;
 
 
 public class RequisitionGroupProgramScheduleRepositoryImpl implements
@@ -26,7 +27,7 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
    * @param facility Facility of searched RequisitionGroupProgramSchedule
    * @return Requisition Group Program Schedule matching search criteria
    */
-  public RequisitionGroupProgramSchedule searchRequisitionGroupProgramSchedule(
+  public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedule(
         Program program, Facility facility) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<RequisitionGroupProgramSchedule> query =
@@ -46,6 +47,6 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
                   root.get("dropOffFacility"), facility));
     }
     query.where(predicate);
-    return entityManager.createQuery(query).getSingleResult();
+    return entityManager.createQuery(query).getResultList();
   }
 }
