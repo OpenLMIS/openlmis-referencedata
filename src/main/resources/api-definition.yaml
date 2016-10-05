@@ -2325,7 +2325,6 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
-                          schema: right
     /{rightId}:
           uriParameters:
             rightId:
