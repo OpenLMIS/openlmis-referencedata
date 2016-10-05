@@ -26,6 +26,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_CANNOT_BE_DUPLICATED;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_CAN_NOT_BE_NULL;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_MUST_EXIST;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_MUST_HAVE_ID;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.MEMBER_FACILITIES;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_IS_REQUIRED;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_MUST_EXIST;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_MUST_HAVE_ID;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RequisitionGroupValidatorTest extends BaseValidatorTest {
@@ -84,7 +94,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(errors, "supervisoryNode", "The Supervisory Node is required");
+    assertErrorMessage(errors, SUPERVISORY_NODE, SUPERVISORY_NODE_IS_REQUIRED);
   }
 
   @Test
@@ -95,7 +105,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(errors, "code", "The Requisition Group Code cannot be duplicated");
+    assertErrorMessage(errors, CODE, CODE_CANNOT_BE_DUPLICATED);
   }
 
   @Test
@@ -104,9 +114,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(
-        errors, "supervisoryNode", "The Supervisory Node must have ID"
-    );
+    assertErrorMessage(errors, SUPERVISORY_NODE, SUPERVISORY_NODE_MUST_HAVE_ID);
   }
 
   @Test
@@ -117,9 +125,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(
-        errors, "supervisoryNode", "The Supervisory Node should match a defined supervisory node"
-    );
+    assertErrorMessage(errors, SUPERVISORY_NODE, SUPERVISORY_NODE_MUST_EXIST);
   }
 
   @Test
@@ -128,7 +134,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(errors, "memberFacilities[1]", "The facility can not be null");
+    assertErrorMessage(errors, MEMBER_FACILITIES, FACILITY_CAN_NOT_BE_NULL);
   }
 
   @Test
@@ -137,7 +143,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(errors, "memberFacilities[1]", "The facility must have ID");
+    assertErrorMessage(errors, MEMBER_FACILITIES, FACILITY_MUST_HAVE_ID);
   }
 
   @Test
@@ -149,9 +155,15 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroup, errors);
 
-    assertErrorMessage(
-        errors, "memberFacilities[1]", "The facility should match a defined facility"
-    );
+    assertErrorMessage(errors, MEMBER_FACILITIES, FACILITY_MUST_EXIST);
+  }
+
+  @Test
+  public void shouldNotThrowExceptionIfMemberFacilitiesIsNullOrEmpty() throws Exception {
+    requisitionGroup.setMemberFacilities(null);
+
+    validator.validate(requisitionGroup, errors);
+    assertThat(errors.hasFieldErrors(MEMBER_FACILITIES), is(false));
   }
 
 }
