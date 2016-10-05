@@ -1,5 +1,8 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.List;
 
 import javax.persistence.Column;
@@ -23,6 +26,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "requisition_groups", schema = "referencedata")
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class RequisitionGroup extends BaseEntity {
 
   @Column(unique = true, nullable = false, columnDefinition = "text")
