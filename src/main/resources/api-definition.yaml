@@ -1,6 +1,6 @@
 #%RAML 0.8
 ---
-title: OpenLMIS Requisition API
+title: OpenLMIS Reference Data API
 version: "1.0.0"
 baseUri: "http://@virtualHost@:8080/api"
 
