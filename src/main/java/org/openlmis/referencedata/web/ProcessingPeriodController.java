@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -89,7 +90,11 @@ public class ProcessingPeriodController extends BaseController {
     Program program = programRepository.findOne(programId);
     Facility facility = facilityRepository.findOne(facilityId);
 
-    List<ProcessingPeriod> periods = periodService.filterPeriods(program, facility);
+    List<ProcessingPeriod> periods = new ArrayList<>();
+
+    if (program != null && facility != null) {
+      periods = periodService.filterPeriods(program, facility);
+    }
 
     return ResponseEntity.ok(exportToDtos(periods));
   }
@@ -214,11 +219,20 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> searchPeriodsByUuuidAndDate(
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate)
+        throws InvalidIdException {
+    if (processingScheduleId == null) {
+      throw new InvalidIdException("Processing Schedule id must be provided");
+    }
 
     ProcessingSchedule processingSchedule =
         processingScheduleRepository.findOne(processingScheduleId);
-    List<ProcessingPeriod> periods = periodService.searchPeriods(processingSchedule, startDate);
+
+    List<ProcessingPeriod> periods = new ArrayList<>();
+
+    if (processingSchedule != null) {
+      periods = periodService.searchPeriods(processingSchedule, startDate);
+    }
 
     return ResponseEntity.ok(exportToDtos(periods));
   }
