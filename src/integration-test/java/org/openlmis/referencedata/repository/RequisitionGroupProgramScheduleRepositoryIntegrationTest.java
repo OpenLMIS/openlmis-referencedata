@@ -103,7 +103,7 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldReturnEmptyListIfRequisitionGroupProgramScheduleIsNotFound()
+  public void shouldReturnNullIfRequisitionGroupProgramScheduleIsNotFound()
         throws RequisitionGroupProgramScheduleException {
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
           repository.searchRequisitionGroupProgramSchedule(program, facility);
