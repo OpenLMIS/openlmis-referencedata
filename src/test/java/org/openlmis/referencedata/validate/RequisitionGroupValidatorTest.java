@@ -59,6 +59,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
   @InjectMocks
   private Validator validator = new RequisitionGroupValidator();
 
+  private SupervisoryNode supervisoryNode;
   private RequisitionGroup requisitionGroup;
   private Errors errors;
 
@@ -67,10 +68,11 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     Facility facility = new Facility("TestFacilityCode");
     facility.setId(UUID.randomUUID());
 
-    SupervisoryNode supervisoryNode = new SupervisoryNode();
+    supervisoryNode = new SupervisoryNode();
     supervisoryNode.setId(UUID.randomUUID());
 
     requisitionGroup = new RequisitionGroup();
+    requisitionGroup.setId(UUID.randomUUID());
     requisitionGroup.setCode(RandomStringUtils.randomAlphanumeric(50));
     requisitionGroup.setName(RandomStringUtils.randomAlphanumeric(50));
     requisitionGroup.setDescription(RandomStringUtils.randomAlphanumeric(250));
@@ -197,4 +199,37 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     assertErrorMessage(errors, DESCRIPTION, DESCRIPTION_IS_TOO_LONG);
   }
 
+  @Test
+  public void shouldNotRejectIfCodeIsDuplicatedAndIdsAreSame() throws Exception {
+    RequisitionGroup old = new RequisitionGroup();
+    old.setId(requisitionGroup.getId());
+    old.setCode(requisitionGroup.getCode());
+    old.setName(RandomStringUtils.randomAlphanumeric(50));
+    old.setDescription(RandomStringUtils.randomAlphanumeric(250));
+    old.setSupervisoryNode(supervisoryNode);
+
+    doReturn(old)
+        .when(requisitionGroups)
+        .findByCode(requisitionGroup.getCode());
+
+    validator.validate(requisitionGroup, errors);
+    assertThat(errors.hasFieldErrors(CODE), is(false));
+  }
+
+  @Test
+  public void shouldRejectIfCodeIsDuplicatedAndIdsAreDifferent() throws Exception {
+    RequisitionGroup old = new RequisitionGroup();
+    old.setId(UUID.randomUUID());
+    old.setCode(requisitionGroup.getCode());
+    old.setName(RandomStringUtils.randomAlphanumeric(50));
+    old.setDescription(RandomStringUtils.randomAlphanumeric(250));
+    old.setSupervisoryNode(supervisoryNode);
+
+    doReturn(old)
+        .when(requisitionGroups)
+        .findByCode(requisitionGroup.getCode());
+
+    validator.validate(requisitionGroup, errors);
+    assertErrorMessage(errors, CODE, CODE_CANNOT_BE_DUPLICATED);
+  }
 }
