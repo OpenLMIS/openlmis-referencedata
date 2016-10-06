@@ -15,6 +15,7 @@ import org.springframework.validation.Validator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -113,7 +114,7 @@ public class RequisitionGroupValidator implements Validator {
     verifyProperties(group, errors);
 
     if (!errors.hasErrors()) {
-      verifyCode(group.getCode(), errors);
+      verifyCode(group.getId(), group.getCode(), errors);
       verifySupervisoryNode(group.getSupervisoryNode(), errors);
       verifyFacilities(group.getMemberFacilities(), errors);
     }
@@ -152,9 +153,11 @@ public class RequisitionGroupValidator implements Validator {
     }
   }
 
-  private void verifyCode(String code, Errors errors) {
+  private void verifyCode(UUID id, String code, Errors errors) {
     // requisition group code cannot be duplicated
-    if (null != requisitionGroups.findByCode(code)) {
+    RequisitionGroup db = requisitionGroups.findByCode(code);
+
+    if (null != db && (null == id || !id.equals(db.getId()))) {
       rejectValue(errors, CODE, DUPLICATE, CODE_CANNOT_BE_DUPLICATED);
     }
   }
