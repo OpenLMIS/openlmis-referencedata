@@ -37,7 +37,7 @@ public class ProcessingPeriodDto extends BaseDto implements
 
   @Override
   public int hashCode() {
-    return Objects.hash();
+    return Objects.hash(name, processingSchedule);
   }
 
   @Override
@@ -49,6 +49,7 @@ public class ProcessingPeriodDto extends BaseDto implements
       return false;
     }
     ProcessingPeriodDto periodDto = (ProcessingPeriodDto) obj;
-    return Objects.equals(id, periodDto.id);
+    return Objects.equals(name, periodDto.name)
+          && Objects.equals(processingSchedule, periodDto.processingSchedule);
   }
 }

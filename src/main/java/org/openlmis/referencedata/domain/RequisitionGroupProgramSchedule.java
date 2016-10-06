@@ -1,6 +1,5 @@
 package org.openlmis.referencedata.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -18,7 +18,6 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "requisition_group_program_schedules")
-@AllArgsConstructor
 @NoArgsConstructor
 public class RequisitionGroupProgramSchedule extends BaseEntity {
 
@@ -86,6 +85,24 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
     exporter.setProgram(program);
     exporter.setDropOffFacility(dropOffFacility);
     exporter.setDirectDelivery(directDelivery);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(program, dropOffFacility);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof RequisitionGroupProgramSchedule)) {
+      return false;
+    }
+    RequisitionGroupProgramSchedule object = (RequisitionGroupProgramSchedule) obj;
+    return Objects.equals(program, object.program)
+          && Objects.equals(dropOffFacility, object.dropOffFacility);
   }
 
   public interface Exporter {
