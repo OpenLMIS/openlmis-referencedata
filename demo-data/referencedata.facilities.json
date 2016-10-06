@@ -5,7 +5,7 @@
     "name": "Facility Active Enabled",
     "geographicZone": { "id": "00000000-0000-0000-0000-000000000001" },
     "type": { "id": "00000000-0000-0000-0000-000000000001" },
-    "operator": { "id": "00000000-0000-0000-0000-000000000001" },
+    "operatedby": { "id": "00000000-0000-0000-0000-000000000001" },
     "active": "true",
     "enabled": "true",
     "openLmisAccessible": "true"
@@ -16,7 +16,7 @@
   "name": "Facility Active Disabled",
   "geographicZone": { "id": "00000000-0000-0000-0000-000000000001" },
   "type": { "id": "00000000-0000-0000-0000-000000000001" },
-  "operator": { "id": "00000000-0000-0000-0000-000000000001" },
+  "operatedby": { "id": "00000000-0000-0000-0000-000000000001" },
   "active": "true",
   "enabled": "false",
   "openLmisAccessible": "false"
@@ -27,7 +27,7 @@
   "name": "Facility Inactive Enabled",
   "geographicZone": { "id": "00000000-0000-0000-0000-000000000002" },
   "type": { "id": "00000000-0000-0000-0000-000000000002" },
-  "operator": { "id": "00000000-0000-0000-0000-000000000002" },
+  "operatedby": { "id": "00000000-0000-0000-0000-000000000002" },
   "active": "false",
   "enabled": "true",
   "openLmisAccessible": "false"
@@ -38,7 +38,7 @@
   "name": "Facility Inactive Disabled",
   "geographicZone": { "id": "00000000-0000-0000-0000-000000000002" },
   "type": { "id": "00000000-0000-0000-0000-000000000002" },
-  "operator": { "id": "00000000-0000-0000-0000-000000000002" },
+  "operatedby": { "id": "00000000-0000-0000-0000-000000000002" },
   "active": "false",
   "enabled": "false",
   "openLmisAccessible": "true"
