@@ -9,7 +9,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
-    "homeFacility": { "id": "00000000-0000-0000-0000-000000000001" },
+    "facilityid": { "id": "00000000-0000-0000-0000-000000000001" },
     "timeZone": "CET"
   }
 ]
