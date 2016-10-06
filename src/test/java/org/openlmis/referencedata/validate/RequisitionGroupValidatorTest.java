@@ -2,6 +2,7 @@ package org.openlmis.referencedata.validate;
 
 import com.google.common.collect.Lists;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,16 +29,22 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_CANNOT_BE_DUPLICATED;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_IS_TOO_LONG;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.DESCRIPTION;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.DESCRIPTION_IS_TOO_LONG;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_CAN_NOT_BE_NULL;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_MUST_EXIST;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_MUST_HAVE_ID;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.MEMBER_FACILITIES;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME_IS_TOO_LONG;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_IS_REQUIRED;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_MUST_EXIST;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_MUST_HAVE_ID;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
   @Mock
@@ -64,9 +71,9 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     supervisoryNode.setId(UUID.randomUUID());
 
     requisitionGroup = new RequisitionGroup();
-    requisitionGroup.setCode("TestRequisitionGroupCode");
-    requisitionGroup.setName("TestRequisitionGroupName");
-    requisitionGroup.setDescription("TestRequisitionGroupDescription");
+    requisitionGroup.setCode(RandomStringUtils.randomAlphanumeric(50));
+    requisitionGroup.setName(RandomStringUtils.randomAlphanumeric(50));
+    requisitionGroup.setDescription(RandomStringUtils.randomAlphanumeric(250));
     requisitionGroup.setSupervisoryNode(supervisoryNode);
     requisitionGroup.setMemberFacilities(Lists.newArrayList(facility));
 
@@ -164,6 +171,30 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroup, errors);
     assertThat(errors.hasFieldErrors(MEMBER_FACILITIES), is(false));
+  }
+
+  @Test
+  public void shouldRejectIfCodeIsTooLong() throws Exception {
+    requisitionGroup.setCode(RandomStringUtils.randomAlphanumeric(51));
+
+    validator.validate(requisitionGroup, errors);
+    assertErrorMessage(errors, CODE, CODE_IS_TOO_LONG);
+  }
+
+  @Test
+  public void shouldRejectIfNameIsTooLong() throws Exception {
+    requisitionGroup.setName(RandomStringUtils.randomAlphanumeric(51));
+
+    validator.validate(requisitionGroup, errors);
+    assertErrorMessage(errors, NAME, NAME_IS_TOO_LONG);
+  }
+
+  @Test
+  public void shouldRejectIfDescriptionIsTooLong() throws Exception {
+    requisitionGroup.setDescription(RandomStringUtils.randomAlphanumeric(251));
+
+    validator.validate(requisitionGroup, errors);
+    assertErrorMessage(errors, DESCRIPTION, DESCRIPTION_IS_TOO_LONG);
   }
 
 }
