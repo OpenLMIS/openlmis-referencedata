@@ -49,18 +49,10 @@ public class ProcessingPeriodService {
     List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules
           = repository.searchRequisitionGroupProgramSchedule(program, facility);
 
-    if (requisitionGroupProgramSchedules == null || requisitionGroupProgramSchedules.isEmpty()) {
-      return null;
-    } else if (requisitionGroupProgramSchedules.size() != 1) {
-      throw new RequisitionGroupProgramScheduleException(
-            "There cannot exists more than one requisition group program schedule"
-                  + " for program and facility");
-    } else {
-      RequisitionGroupProgramSchedule rgps = requisitionGroupProgramSchedules.get(0);
-      List<ProcessingPeriod> periods
-            = periodRepository.searchPeriods(rgps.getProcessingSchedule(), null);
+    RequisitionGroupProgramSchedule rgps = requisitionGroupProgramSchedules.get(0);
+    List<ProcessingPeriod> periods
+          = periodRepository.searchPeriods(rgps.getProcessingSchedule(), null);
 
-      return periods;
-    }
+    return periods;
   }
 }

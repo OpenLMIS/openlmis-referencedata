@@ -3,6 +3,7 @@ package org.openlmis.referencedata.repository.custom.impl;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.repository.custom.RequisitionGroupProgramScheduleRepositoryCustom;
 
 import javax.persistence.EntityManager;
@@ -28,7 +29,7 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
    * @return Requisition Group Program Schedule matching search criteria
    */
   public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedule(
-        Program program, Facility facility) {
+        Program program, Facility facility) throws RequisitionGroupProgramScheduleException {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<RequisitionGroupProgramSchedule> query =
           builder.createQuery(RequisitionGroupProgramSchedule.class);
@@ -47,6 +48,17 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
                   root.get("dropOffFacility"), facility));
     }
     query.where(predicate);
-    return entityManager.createQuery(query).getResultList();
+
+    List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules
+          = entityManager.createQuery(query).getResultList();
+    if (requisitionGroupProgramSchedules == null || requisitionGroupProgramSchedules.isEmpty()) {
+      return null;
+    } else if (requisitionGroupProgramSchedules.size() != 1) {
+      throw new RequisitionGroupProgramScheduleException(
+            "There cannot exists more than one requisition group program schedule"
+                  + " for program and facility");
+    } else {
+      return entityManager.createQuery(query).getResultList();
+    }
   }
 }

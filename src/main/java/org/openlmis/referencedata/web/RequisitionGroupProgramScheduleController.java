@@ -5,6 +5,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.dto.RequisitionGroupProgramScheduleDto;
 import org.openlmis.referencedata.exception.InvalidIdException;
+import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
@@ -161,7 +162,7 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
   public ResponseEntity<?> searchByProgramAndFacility(
         @RequestParam(value = "programId", required = true) UUID programId,
         @RequestParam(value = "facilityId", required = true) UUID facilityId)
-        throws InvalidIdException {
+        throws InvalidIdException, RequisitionGroupProgramScheduleException {
 
     if (programId == null) {
       throw new InvalidIdException("Program id must be provided.");
