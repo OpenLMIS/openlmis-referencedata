@@ -22,5 +22,13 @@
     "maxMonthsOfStock": "18",
     "minMonthsOfStock": "12",
     "emergencyOrderPoint": "24"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000004",
+    "facilityType": { "id": "00000000-0000-0000-0000-000000000001" },
+    "programProduct": { "id": "00000000-0000-0000-0000-000000000004" },
+    "maxMonthsOfStock": "18",
+    "minMonthsOfStock": "12",
+    "emergencyOrderPoint": "24"
   }
 ]
