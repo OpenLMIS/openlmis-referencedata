@@ -56,7 +56,7 @@ public class ProcessingPeriodServiceTest {
   @Test
   public void shouldFindPeriodsByProgramAndFacility()
         throws RequisitionGroupProgramScheduleException {
-    doReturn(Arrays.asList(requisitionGroupProgramSchedule)).when(repository)
+    doReturn(requisitionGroupProgramSchedule).when(repository)
           .searchRequisitionGroupProgramSchedule(program, facility);
     doReturn(Arrays.asList(period)).when(periodRepository).searchPeriods(schedule, null);
 

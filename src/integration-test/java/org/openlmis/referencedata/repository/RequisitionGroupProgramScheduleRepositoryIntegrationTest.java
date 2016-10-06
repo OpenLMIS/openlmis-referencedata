@@ -12,8 +12,6 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -100,18 +98,16 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
         throws RequisitionGroupProgramScheduleException {
     repository.save(generateInstance());
     repository.save(generateInstance());
-    List<RequisitionGroupProgramSchedule> list =
-          repository.searchRequisitionGroupProgramSchedule(program, facility);
 
-    assertEquals(list.size(), 2);
+    repository.searchRequisitionGroupProgramSchedule(program, facility);
   }
 
   @Test
-  public void shouldReturnNullIfRequisitionGroupProgramScheduleForProgramAndFacilityIsNotFound()
+  public void shouldReturnEmptyListIfRequisitionGroupProgramScheduleIsNotFound()
         throws RequisitionGroupProgramScheduleException {
-    List<RequisitionGroupProgramSchedule> list =
+    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
           repository.searchRequisitionGroupProgramSchedule(program, facility);
 
-    assertEquals(list, null);
+    assertEquals(requisitionGroupProgramSchedule, null);
   }
 }

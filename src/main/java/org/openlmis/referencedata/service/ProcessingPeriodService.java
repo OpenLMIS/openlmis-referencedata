@@ -46,12 +46,11 @@ public class ProcessingPeriodService {
   public List<ProcessingPeriod> filterPeriods(
         Program program, Facility facility) throws RequisitionGroupProgramScheduleException {
 
-    List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules
+    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule
           = repository.searchRequisitionGroupProgramSchedule(program, facility);
 
-    RequisitionGroupProgramSchedule rgps = requisitionGroupProgramSchedules.get(0);
-    List<ProcessingPeriod> periods
-          = periodRepository.searchPeriods(rgps.getProcessingSchedule(), null);
+    List<ProcessingPeriod> periods = periodRepository.searchPeriods(
+          requisitionGroupProgramSchedule.getProcessingSchedule(), null);
 
     return periods;
   }

@@ -28,7 +28,7 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
    * @param facility Facility of searched RequisitionGroupProgramSchedule
    * @return Requisition Group Program Schedule matching search criteria
    */
-  public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedule(
+  public RequisitionGroupProgramSchedule searchRequisitionGroupProgramSchedule(
         Program program, Facility facility) throws RequisitionGroupProgramScheduleException {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<RequisitionGroupProgramSchedule> query =
@@ -58,7 +58,7 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
             "There cannot exists more than one requisition group program schedule"
                   + " for program and facility");
     } else {
-      return entityManager.createQuery(query).getResultList();
+      return entityManager.createQuery(query).getSingleResult();
     }
   }
 }

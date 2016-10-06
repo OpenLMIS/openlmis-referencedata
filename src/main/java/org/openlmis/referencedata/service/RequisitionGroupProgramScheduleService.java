@@ -8,15 +8,13 @@ import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepo
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class RequisitionGroupProgramScheduleService {
 
   @Autowired
   private RequisitionGroupProgramScheduleRepository repository;
 
-  public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedule(
+  public RequisitionGroupProgramSchedule searchRequisitionGroupProgramSchedule(
         Program program, Facility facility) throws RequisitionGroupProgramScheduleException {
     return repository.searchRequisitionGroupProgramSchedule(program, facility);
   }
