@@ -33,6 +33,13 @@ schemas:
           }
       }
 
+  - facilityArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref":"#/schemas/facility" }
+
+      }
+
   - facilityOperator: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -181,6 +188,7 @@ schemas:
            }
 
       }
+
   - program: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -195,6 +203,12 @@ schemas:
               "periodsSkippable": { "type": "boolean", "required": true, "title": "periodsSkippable" },
               "showNonFullSupplyTab": { "type": "boolean", "required": false, "title": "showNonFullSupplyTab" }
           }
+      }
+
+  - programArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref":"#/schemas/program" }
       }
 
   - programProduct: |
@@ -1338,6 +1352,7 @@ resourceTypes:
                           X-XSS-Protection:
                         body:
                           application/json:
+                              schema: programArray
                     500:
                         headers:
                           X-Content-Type-Options:
@@ -1547,6 +1562,7 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                     application/json:
+                        schema: facilityArray
               404:
                   headers:
                     X-Content-Type-Options:
