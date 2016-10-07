@@ -39,8 +39,8 @@ public class FacilityTypeApprovedProductController extends BaseController {
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
     // Ignore provided id
     facilityTypeApprovedProduct.setId(null);
-    FacilityTypeApprovedProduct newFacility = repository.save(facilityTypeApprovedProduct);
-    return new ResponseEntity<>(newFacility, HttpStatus.CREATED);
+    repository.save(facilityTypeApprovedProduct);
+    return new ResponseEntity<>(facilityTypeApprovedProduct, HttpStatus.CREATED);
   }
 
   /**
@@ -95,8 +95,8 @@ public class FacilityTypeApprovedProductController extends BaseController {
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     LOGGER.debug("Updating facilityTypeApprovedProduct");
-    FacilityTypeApprovedProduct updatedFacility = repository.save(facilityTypeApprovedProduct);
-    return new ResponseEntity<>(updatedFacility, HttpStatus.OK);
+    repository.save(facilityTypeApprovedProduct);
+    return new ResponseEntity<>(facilityTypeApprovedProduct, HttpStatus.OK);
   }
 
   /**
