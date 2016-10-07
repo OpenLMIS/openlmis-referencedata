@@ -104,6 +104,49 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingSupervisorNode() {
+
+    Program searchedProgram = generateProgram();
+    supervisoryNodeId = UUID.randomUUID();
+
+    given(programRepository.findOne(programId)).willReturn(searchedProgram);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(null);
+
+
+    restAssured.given()
+        .queryParam("programId", programId)
+        .queryParam("supervisoryNodeId", supervisoryNodeId)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SUPPLYING_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingProgram() {
+
+    SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
+    programId = UUID.randomUUID();
+
+    given(programRepository.findOne(programId)).willReturn(null);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
+
+    restAssured.given()
+        .queryParam("programId", programId)
+        .queryParam("supervisoryNodeId", supervisoryNodeId)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SUPPLYING_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldFindFacilitiesWithSimilarCode() {
     Facility generatedFacility = generateFacility();
     String similarCode = "Facility";

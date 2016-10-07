@@ -8,6 +8,7 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
+import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,6 +141,22 @@ public class FacilityController extends BaseController {
       @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
     Program program = programRepository.findOne(programId);
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+
+    if (program == null) {
+      final String errorMessage = "Given Program does not exist";
+      final String errorDescription = "programId: " + programId;
+
+      ErrorResponse errorResponse = new ErrorResponse(errorMessage, errorDescription);
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    if (supervisoryNode == null) {
+      final String errorMessage = "Given SupervisorNode does not exist";
+      final String errorDescription = "supervisorNodeId: " + supervisoryNodeId;
+
+      ErrorResponse errorResponse = new ErrorResponse(errorMessage, errorDescription);
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    
     List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, 
         supervisoryNode);
     List<Facility> facilities = supplyLines.stream()
