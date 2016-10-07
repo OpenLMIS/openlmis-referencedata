@@ -3,7 +3,12 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -13,10 +18,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "supervisory_nodes", schema = "referencedata")
@@ -76,8 +77,8 @@ public class SupervisoryNode extends BaseEntity {
   }
 
   /**
-   * Assign this node's parent supervisory node. Also add this node to the parent's set of 
-   * child nodes.
+   * Assign this node's parent supervisory node. Also add this node to the parent's set of child
+   * nodes.
    *
    * @param parentNode parent supervisory node to assign.
    */
@@ -121,5 +122,22 @@ public class SupervisoryNode extends BaseEntity {
     this.facility = supervisoryNode.getFacility();
     this.parentNode = supervisoryNode.getParentNode();
     this.childNodes = supervisoryNode.getChildNodes();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof SupervisoryNode)) {
+      return false;
+    }
+    SupervisoryNode that = (SupervisoryNode) obj;
+    return Objects.equals(code, that.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
   }
 }

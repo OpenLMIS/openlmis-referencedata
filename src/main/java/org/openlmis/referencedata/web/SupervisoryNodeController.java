@@ -24,8 +24,7 @@ public class SupervisoryNodeController extends BaseController {
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
   /**
-   * Allows creating new supervisoryNode.
-   * If the id is specified, it will be ignored.
+   * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
    *
    * @param supervisoryNode A supervisoryNode bound to the request body
    * @return ResponseEntity containing the created supervisoryNode
@@ -34,9 +33,9 @@ public class SupervisoryNodeController extends BaseController {
   public ResponseEntity<?> createSupervisoryNode(@RequestBody SupervisoryNode supervisoryNode) {
     LOGGER.debug("Creating new supervisoryNode");
     supervisoryNode.setId(null);
-    SupervisoryNode newSupervisoryNode = supervisoryNodeRepository.save(supervisoryNode);
+    supervisoryNodeRepository.save(supervisoryNode);
     LOGGER.debug("Created new supervisoryNode with id: " + supervisoryNode.getId());
-    return new ResponseEntity<SupervisoryNode>(newSupervisoryNode, HttpStatus.CREATED);
+    return new ResponseEntity<SupervisoryNode>(supervisoryNode, HttpStatus.CREATED);
   }
 
   /**
@@ -69,24 +68,24 @@ public class SupervisoryNodeController extends BaseController {
   /**
    * Allows updating supervisoryNode.
    *
-   * @param supervisoryNode A supervisoryNode bound to the request body
+   * @param supervisoryNode   A supervisoryNode bound to the request body
    * @param supervisoryNodeId UUID of supervisoryNode which we want to update
    * @return ResponseEntity containing the updated supervisoryNode
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateSupervisoryNode(@RequestBody SupervisoryNode supervisoryNode,
-                                       @PathVariable("id") UUID supervisoryNodeId) {
+                                                 @PathVariable("id") UUID supervisoryNodeId) {
     LOGGER.debug("Updating supervisoryNode with id: " + supervisoryNodeId);
 
     SupervisoryNode supervisoryNodeToUpdate =
-          supervisoryNodeRepository.findOne(supervisoryNodeId);
+        supervisoryNodeRepository.findOne(supervisoryNodeId);
 
     if (supervisoryNodeToUpdate == null) {
       supervisoryNodeToUpdate = new SupervisoryNode();
     }
 
     supervisoryNodeToUpdate.updateFrom(supervisoryNode);
-    supervisoryNodeToUpdate = supervisoryNodeRepository.save(supervisoryNodeToUpdate);
+    supervisoryNodeRepository.save(supervisoryNodeToUpdate);
 
     LOGGER.debug("Updated supervisoryNode with id: " + supervisoryNodeId);
     return new ResponseEntity<>(supervisoryNodeToUpdate, HttpStatus.OK);
