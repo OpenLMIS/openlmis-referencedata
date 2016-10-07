@@ -1,11 +1,16 @@
 package org.openlmis.referencedata.repository;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
+import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
 
@@ -54,4 +59,53 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     facility.setEnabled(true);
     return facility;
   }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarCode() {
+    Facility facility = generateInstance();
+    repository.save(facility);
+    Facility facility1 = generateInstance();
+    repository.save(facility1);
+
+    List<Facility> foundFacilties = repository.findFacilitiesWithSimilarCodeOrName(facility.getCode(), null);
+
+    assertEquals(1, foundFacilties.size());
+    assertEquals(facility.getCode(), foundFacilties.get(0).getCode());
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarName() {
+    Facility facility = generateInstance();
+    repository.save(facility);
+
+    List<Facility> foundFacilties = repository.findFacilitiesWithSimilarCodeOrName(null, "Facil");
+
+    assertEquals(1, foundFacilties.size());
+    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarCodeOrName() {
+    Facility facility = generateInstance();
+    repository.save(facility);
+    Facility facility1 = generateInstance();
+    repository.save(facility1);
+
+    List<Facility> foundFacilties = repository.findFacilitiesWithSimilarCodeOrName(facility.getCode(), "Facil");
+
+    assertEquals(2, foundFacilties.size());
+    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+  }
+
+  @Test
+  public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
+    Facility facility = generateInstance();
+    repository.save(facility);
+
+    List<Facility> foundFacilties = repository.findFacilitiesWithSimilarCodeOrName("Ogorek", "Pomidor");
+
+    assertEquals(0, foundFacilties.size());
+  }
+
+
 }

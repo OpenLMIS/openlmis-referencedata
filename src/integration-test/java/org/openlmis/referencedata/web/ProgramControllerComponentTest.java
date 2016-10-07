@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class ProgramControllerComponentTest extends BaseWebComponentTest {
@@ -25,6 +26,7 @@ public class ProgramControllerComponentTest extends BaseWebComponentTest {
   private static final String RESOURCE_URL = "/api/programs";
   private static final String UPDATE_URL = RESOURCE_URL + "/update";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/findProgramsWithSimilarName";
 
   @Autowired
   private ProgramRepository programRepository;
@@ -33,7 +35,7 @@ public class ProgramControllerComponentTest extends BaseWebComponentTest {
 
   @Before
   public void setUp() {
-    program.setName("name");
+    program.setName("Program name");
     programRepository.save(program);
   }
 
@@ -148,6 +150,45 @@ public class ProgramControllerComponentTest extends BaseWebComponentTest {
           .extract().as(Program.class);
 
     assertTrue(programRepository.exists(response.getId()));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindProgramsByName() {
+    String similarProgramName = "Program";
+
+    Program[] response = restAssured.given()
+        .queryParam("name", similarProgramName)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(FIND_BY_NAME_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program[].class);
+
+    List<Program> foundProgram = Arrays.asList(response);
+    assertEquals(1, foundProgram.size());
+    assertEquals("Program name", foundProgram.get(0).getName());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotFindProgramsByIncorrectName() {
+    String incorrectProgramName = "Incorrect";
+
+    Program[] response = restAssured.given()
+        .queryParam("name", incorrectProgramName)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(FIND_BY_NAME_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program[].class);
+
+    List<Program> foundProgram = Arrays.asList(response);
+    assertEquals(0, foundProgram.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

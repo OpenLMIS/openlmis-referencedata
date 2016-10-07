@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.web;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -160,4 +161,16 @@ public class FacilityController extends BaseController {
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
     return new ResponseEntity<>(facilities, HttpStatus.OK);
   }
+
+  @RequestMapping(value = "/facilities/findFacilitiesWithSimilarCodeOrName", method = RequestMethod.GET)
+  public ResponseEntity<?> findFacilitiesWithSimilarCodeOrName(
+      @RequestParam(value = "code", required = false) String code,
+      @RequestParam(value = "name", required = false) String name) {
+    if (code == null && name == null) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    List<Facility> foundFacilities = facilityRepository.findFacilitiesWithSimilarCodeOrName(code, name);
+    return new ResponseEntity<>(foundFacilities, HttpStatus.OK);
+  }
+
 }

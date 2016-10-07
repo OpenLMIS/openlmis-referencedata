@@ -1525,6 +1525,33 @@ resourceTypes:
                     X-Content-Type-Options:
                     X-XSS-Protection:
 
+    /findFacilitiesWithSimilarCodeOrName:
+        get:
+            is: [ secured ]
+            description: Returns a list of facilities.
+            queryParameters:
+                code:
+                    displayName: code
+                    type: string
+                    required: false
+                    repeat: false
+                name:
+                    displayName: name
+                    type: string
+                    required: false
+                    repeat: false
+            responses:
+              200:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+              404:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+
 /facilityTypes:
     displayName: Facility Type
     get:
@@ -1714,6 +1741,28 @@ resourceTypes:
                     body:
                       application/json:
                 "400":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+    /findProgramsWithSimilarName:
+
+        get:
+            is: [ secured ]
+            description: Get chosen program.
+            queryParameters:
+                name:
+                    displayName: name
+                    type: string
+                    required: true
+                    repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:

@@ -20,7 +20,9 @@ import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -32,6 +34,8 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
   private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
+  private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
+      RESOURCE_URL + "/findFacilitiesWithSimilarCodeOrName";
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -91,6 +95,8 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
         .extract().as(Facility[].class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+
+
     assertEquals(searchedFacilitiesAmt, response.length);
 
     Collection<Facility> searchedFacilities = searchedSupplyLines
@@ -100,6 +106,63 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
       assertNotEquals(facility, additionalSupplyLine.getSupplyingFacility());
     }
   }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarCode() {
+    Facility generatedFacility = generateFacility();
+    String similarCode = "Facility";
+
+    Facility[] response = restAssured.given()
+        .queryParam("code", similarCode)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    List<Facility> facilities = Arrays.asList(response);
+    assertEquals(1, facilities.size());
+    assertEquals(generatedFacility.getCode(), facilities.get(0).getCode());
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarName() {
+    Facility generatedFacility = generateFacility();
+    String similarName = "Facility";
+
+    Facility[] response = restAssured.given()
+        .queryParam("name", similarName)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    List<Facility> facilities = Arrays.asList(response);
+    assertEquals(1, facilities.size());
+    assertEquals(generatedFacility.getName(), facilities.get(0).getName());
+  }
+
+  @Test
+  public void shouldNotFindFacilitiesWithIncorrectCodeAndName() {
+    generateFacility();
+
+    Facility[] response = restAssured.given()
+        .queryParam("code", "IncorrectCode")
+        .queryParam("name", "NotSimilarName")
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    List<Facility> facilities = Arrays.asList(response);
+    assertEquals(0, facilities.size());
+  }
+
 
   private SupplyLine generateSupplyLine() {
     SupplyLine supplyLine = new SupplyLine();
