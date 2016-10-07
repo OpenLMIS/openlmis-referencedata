@@ -22,6 +22,7 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.exception.RoleException;
+import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -74,6 +75,9 @@ public class UserControllerTest {
   private FacilityRepository facilityRepository;
 
   @Mock
+  private ExposedMessageSource messageSource;
+
+  @Mock
   private RightRepository rightRepository;
 
   private UserController controller;
@@ -109,7 +113,7 @@ public class UserControllerTest {
   public UserControllerTest() throws RightTypeException, RoleException {
     initMocks(this);
     controller = new UserController(service, repository, roleRepository, rightRepository,
-        programRepository, supervisoryNodeRepository, facilityRepository);
+        programRepository, supervisoryNodeRepository, facilityRepository, messageSource);
 
     homeFacilityCode = "homeFacilityCode";
     homeFacility = new Facility("C1");
