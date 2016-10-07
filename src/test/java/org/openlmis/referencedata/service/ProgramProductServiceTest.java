@@ -1,4 +1,4 @@
-package org.openlmis.referencedata.domain;
+package org.openlmis.referencedata.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.repository.ProgramProductRepository;
 import org.openlmis.referencedata.service.ProgramProductService;
 
