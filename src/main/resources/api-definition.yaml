@@ -6,7 +6,7 @@ baseUri: "http://@virtualHost@:8080/api"
 
 documentation:
     - title: Getting Started
-      content: Welcome to the OpenLMIS rereferencedata-service documentation.
+      content: Welcome to the OpenLMIS referencedata service documentation.
 
 schemas:
   - errorResponse: |
@@ -129,7 +129,7 @@ schemas:
           "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
           "title": "Orderable Product",
-          "description": "A single processingPeriod",
+          "description": "A single orderableProduct",
           "properties": {
               "id": { "type": "string", "required": true, "title": "id" },
               "productCode": { "type": "object", "$ref": "#/schemas/productCode", "required": false, "title": "productCode" },
