@@ -11,11 +11,16 @@ import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
 
 import java.util.List;
 
-public class ProgramRepositoryImpl implements ProgramRepositoryCustom{
+public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
 
   @PersistenceContext
   private EntityManager entityManager;
 
+  /**
+   *
+   * @param name Part of wanted program name.
+   * @return List of Programs with wanted name.
+   */
   public List<Program> findProgramsWithSimilarName(String name) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Program> query = builder.createQuery(Program.class);

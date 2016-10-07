@@ -1,18 +1,10 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import org.openlmis.referencedata.util.View;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -23,6 +15,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @Entity
@@ -164,11 +162,22 @@ public class User extends BaseEntity {
     supervisedFacilities.addAll(facilities);
   }
 
-  @PostLoad
+  /**
+   * Get facilities that user has fulfillment rights for.
+   * @return set of facilities
+   */
+  public Set<Facility> getFulfillmentFacilities() {
+    return roleAssignments.stream()
+        .filter(assignment -> assignment instanceof FulfillmentRoleAssignment)
+        .map(assignment -> ((FulfillmentRoleAssignment) assignment).getWarehouse())
+        .collect(Collectors.toSet());
+  }
+
   /**
    * Refresh transient supervision properties (home facility and supervised programs, supervised 
    * facilities), after the user object is loaded from the database.
    */
+  @PostLoad
   private void refreshSupervisions() {
     for (RoleAssignment roleAssignment : roleAssignments) {
       roleAssignment.assignTo(this);

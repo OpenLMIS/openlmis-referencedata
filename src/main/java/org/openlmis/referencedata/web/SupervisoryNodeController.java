@@ -2,11 +2,9 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,26 +24,18 @@ public class SupervisoryNodeController extends BaseController {
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
   /**
-   * Allows creating new supervisoryNode.
-   * If the id is specified, it will be ignored.
+   * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
    *
    * @param supervisoryNode A supervisoryNode bound to the request body
    * @return ResponseEntity containing the created supervisoryNode
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.POST)
   public ResponseEntity<?> createSupervisoryNode(@RequestBody SupervisoryNode supervisoryNode) {
-    try {
-      LOGGER.debug("Creating new supervisoryNode");
-      supervisoryNode.setId(null);
-      SupervisoryNode newSupervisoryNode = supervisoryNodeRepository.save(supervisoryNode);
-      LOGGER.debug("Created new supervisoryNode with id: " + supervisoryNode.getId());
-      return new ResponseEntity<SupervisoryNode>(newSupervisoryNode, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error occurred while saving supervisoryNode", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new supervisoryNode");
+    supervisoryNode.setId(null);
+    supervisoryNodeRepository.save(supervisoryNode);
+    LOGGER.debug("Created new supervisoryNode with id: " + supervisoryNode.getId());
+    return new ResponseEntity<SupervisoryNode>(supervisoryNode, HttpStatus.CREATED);
   }
 
   /**
@@ -78,35 +68,27 @@ public class SupervisoryNodeController extends BaseController {
   /**
    * Allows updating supervisoryNode.
    *
-   * @param supervisoryNode A supervisoryNode bound to the request body
+   * @param supervisoryNode   A supervisoryNode bound to the request body
    * @param supervisoryNodeId UUID of supervisoryNode which we want to update
    * @return ResponseEntity containing the updated supervisoryNode
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateSupervisoryNode(@RequestBody SupervisoryNode supervisoryNode,
-                                       @PathVariable("id") UUID supervisoryNodeId) {
-    try {
-      LOGGER.debug("Updating supervisoryNode with id: " + supervisoryNodeId);
+                                                 @PathVariable("id") UUID supervisoryNodeId) {
+    LOGGER.debug("Updating supervisoryNode with id: " + supervisoryNodeId);
 
-      SupervisoryNode supervisoryNodeToUpdate =
-            supervisoryNodeRepository.findOne(supervisoryNodeId);
+    SupervisoryNode supervisoryNodeToUpdate =
+        supervisoryNodeRepository.findOne(supervisoryNodeId);
 
-      if (supervisoryNodeToUpdate == null) {
-        supervisoryNodeToUpdate = new SupervisoryNode();
-      }
-
-      supervisoryNodeToUpdate.updateFrom(supervisoryNode);
-      supervisoryNodeToUpdate = supervisoryNodeRepository.save(supervisoryNodeToUpdate);
-
-      LOGGER.debug("Updated supervisoryNode with id: " + supervisoryNodeId);
-      return new ResponseEntity<SupervisoryNode>(supervisoryNodeToUpdate, HttpStatus.OK);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error occurred while updating supervisoryNode with id: "
-                  + supervisoryNodeId, ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    if (supervisoryNodeToUpdate == null) {
+      supervisoryNodeToUpdate = new SupervisoryNode();
     }
+
+    supervisoryNodeToUpdate.updateFrom(supervisoryNode);
+    supervisoryNodeRepository.save(supervisoryNodeToUpdate);
+
+    LOGGER.debug("Updated supervisoryNode with id: " + supervisoryNodeId);
+    return new ResponseEntity<>(supervisoryNodeToUpdate, HttpStatus.OK);
   }
 
   /**
@@ -121,15 +103,7 @@ public class SupervisoryNodeController extends BaseController {
     if (supervisoryNode == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        supervisoryNodeRepository.delete(supervisoryNode);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("An error occurred while deleting supervisoryNode with id: "
-                    + supervisoryNodeId, ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      supervisoryNodeRepository.delete(supervisoryNode);
       return new ResponseEntity<SupervisoryNode>(HttpStatus.NO_CONTENT);
     }
   }

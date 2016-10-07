@@ -5,15 +5,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "program_products", schema = "referencedata")
@@ -32,6 +34,7 @@ public class ProgramProduct extends BaseEntity {
   private OrderableProduct product;
 
   private Integer dosesPerMonth;
+  @Getter
   private boolean active;
 
   @ManyToOne
@@ -39,6 +42,7 @@ public class ProgramProduct extends BaseEntity {
   @Getter
   private ProductCategory productCategory;
 
+  @Getter
   private boolean fullSupply;
   private int displayOrder;
   private int maxMonthsStock;

@@ -26,26 +26,18 @@ public class FacilityTypeController extends BaseController {
   private FacilityTypeRepository facilityTypeRepository;
 
   /**
-   * Allows creating new facilityType.
-   * If the id is specified, it will be ignored.
+   * Allows creating new facilityType. If the id is specified, it will be ignored.
    *
    * @param facilityType A facilityType bound to the request body
    * @return ResponseEntity containing the created facilityType
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.POST)
   public ResponseEntity<?> createFacilityType(@RequestBody FacilityType facilityType) {
-    try {
-      LOGGER.debug("Creating new facilityType");
-      facilityType.setId(null);
-      FacilityType newFacilityType = facilityTypeRepository.save(facilityType);
-      LOGGER.debug("Created new facilityType with id: " + facilityType.getId());
-      return new ResponseEntity<FacilityType>(newFacilityType, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating facilityType", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new facilityType");
+    facilityType.setId(null);
+    facilityTypeRepository.save(facilityType);
+    LOGGER.debug("Created new facilityType with id: " + facilityType.getId());
+    return new ResponseEntity<>(facilityType, HttpStatus.CREATED);
   }
 
   /**
@@ -59,18 +51,16 @@ public class FacilityTypeController extends BaseController {
     return new ResponseEntity<>(facilityTypes, HttpStatus.OK);
   }
 
-  //after last changes on referencedata its currently not working
   /**
    * Allows updating facilityTypes.
    *
-   * @param facilityType A facilityType bound to the request body
+   * @param facilityType   A facilityType bound to the request body
    * @param facilityTypeId UUID of facilityType which we want to update
    * @return ResponseEntity containing the updated facilityType
    */
-  /*
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateFacilityType(@RequestBody FacilityType facilityType,
-                                            @PathVariable("id") UUID facilityTypeId) {
+                                              @PathVariable("id") UUID facilityTypeId) {
 
     FacilityType facilityTypeToUpdate = facilityTypeRepository.findOne(facilityTypeId);
     try {
@@ -82,18 +72,18 @@ public class FacilityTypeController extends BaseController {
       }
 
       facilityTypeToUpdate.updateFrom(facilityType);
-      facilityTypeToUpdate = facilityTypeRepository.save(facilityTypeToUpdate);
+      facilityTypeRepository.save(facilityTypeToUpdate);
 
       LOGGER.debug("Saved facility with id: " + facilityTypeToUpdate.getId());
       return new ResponseEntity<FacilityType>(facilityTypeToUpdate, HttpStatus.OK);
     } catch (DataIntegrityViolationException ex) {
       ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while saving facilityType with id: "
-                  + facilityTypeToUpdate.getId(), ex.getMessage());
+          new ErrorResponse("An error accurred while saving facilityType with id: "
+              + facilityTypeToUpdate.getId(), ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
       return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
-  }*/
+  }
 
   /**
    * Get chosen facilityType.
@@ -127,8 +117,8 @@ public class FacilityTypeController extends BaseController {
         facilityTypeRepository.delete(facilityType);
       } catch (DataIntegrityViolationException ex) {
         ErrorResponse errorResponse =
-              new ErrorResponse("An error accurred while deleting facilityType with id: "
-                    + facilityTypeId, ex.getMessage());
+            new ErrorResponse("An error accurred while deleting facilityType with id: "
+                + facilityTypeId, ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
         return new ResponseEntity(HttpStatus.CONFLICT);
       }

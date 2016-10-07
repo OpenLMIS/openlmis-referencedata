@@ -2,20 +2,20 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestClientException;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collection;
 import java.util.UUID;
 
 @Controller
@@ -36,19 +36,11 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.POST)
   public ResponseEntity<?> createFacility(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct) {
-    try {
-      LOGGER.debug("Creating new facilityTypeApprovedProduct");
-      // Ignore provided id
-      facilityTypeApprovedProduct.setId(null);
-      FacilityTypeApprovedProduct newFacility = repository.save(facilityTypeApprovedProduct);
-      return new ResponseEntity<FacilityTypeApprovedProduct>(newFacility, HttpStatus.CREATED);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating facilityTypeApprovedProduct",
-                  ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new facilityTypeApprovedProduct");
+    // Ignore provided id
+    facilityTypeApprovedProduct.setId(null);
+    FacilityTypeApprovedProduct newFacility = repository.save(facilityTypeApprovedProduct);
+    return new ResponseEntity<>(newFacility, HttpStatus.CREATED);
   }
 
   /**
@@ -67,6 +59,30 @@ public class FacilityTypeApprovedProductController extends BaseController {
   }
 
   /**
+   * Get list of full supply FacilityTypeApprovedProduct.
+   *
+   * @param facility facility id
+   * @param program  program id
+   * @return list of full supply FacilityTypeApprovedProduct
+   */
+  @RequestMapping(
+      value = "/facilityTypeApprovedProducts/search",
+      method = RequestMethod.GET
+  )
+  public ResponseEntity<?> getFullSupply(@RequestParam(value = "facility") UUID facility,
+                                         @RequestParam(value = "program") UUID program) {
+    Collection<FacilityTypeApprovedProduct> facilityTypeApprovedProducts =
+        repository.searchFullSupply(facility, program);
+
+    if (CollectionUtils.isEmpty(facilityTypeApprovedProducts)) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } else {
+      return new ResponseEntity<>(facilityTypeApprovedProducts, HttpStatus.OK);
+    }
+  }
+
+
+  /**
    * Allows updating facilityTypeApprovedProduct.
    *
    * @param facilityTypeApprovedProduct A facilityTypeApprovedProduct bound to the request body
@@ -78,17 +94,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
   public ResponseEntity<?> updateFacilityTypeApprovedProduct(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
-    try {
-      LOGGER.debug("Updating facilityTypeApprovedProduct");
-      FacilityTypeApprovedProduct updatedFacility = repository.save(facilityTypeApprovedProduct);
-      return new ResponseEntity<FacilityTypeApprovedProduct>(updatedFacility, HttpStatus.OK);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while updating facilityTypeApprovedProduct",
-                  ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Updating facilityTypeApprovedProduct");
+    FacilityTypeApprovedProduct updatedFacility = repository.save(facilityTypeApprovedProduct);
+    return new ResponseEntity<>(updatedFacility, HttpStatus.OK);
   }
 
   /**
@@ -124,15 +132,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
     if (facilityTypeApprovedProduct == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        repository.delete(facilityTypeApprovedProduct);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("FacilityTypeApprovedProduct cannot be deleted"
-                    + " because of existing dependencies", ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      repository.delete(facilityTypeApprovedProduct);
       return new ResponseEntity<FacilityTypeApprovedProduct>(HttpStatus.NO_CONTENT);
     }
   }

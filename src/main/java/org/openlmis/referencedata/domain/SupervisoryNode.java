@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -21,6 +22,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "supervisory_nodes", schema = "referencedata")
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SupervisoryNode extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
@@ -44,17 +46,11 @@ public class SupervisoryNode extends BaseEntity {
   @Setter
   private Facility facility;
 
-  @JsonIdentityInfo(
-      generator = ObjectIdGenerators.IntSequenceGenerator.class,
-      property = "parentId")
   @ManyToOne
   @JoinColumn(name = "parentid")
   @Getter
   private SupervisoryNode parentNode;
 
-  @JsonIdentityInfo(
-      generator = ObjectIdGenerators.IntSequenceGenerator.class,
-      property = "childNodesSetId")
   @OneToMany(mappedBy = "parentNode")
   @Getter
   private Set<SupervisoryNode> childNodes;
@@ -81,8 +77,8 @@ public class SupervisoryNode extends BaseEntity {
   }
 
   /**
-   * Assign this node's parent supervisory node. Also add this node to the parent's set of 
-   * child nodes.
+   * Assign this node's parent supervisory node. Also add this node to the parent's set of child
+   * nodes.
    *
    * @param parentNode parent supervisory node to assign.
    */
@@ -126,5 +122,22 @@ public class SupervisoryNode extends BaseEntity {
     this.facility = supervisoryNode.getFacility();
     this.parentNode = supervisoryNode.getParentNode();
     this.childNodes = supervisoryNode.getChildNodes();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof SupervisoryNode)) {
+      return false;
+    }
+    SupervisoryNode that = (SupervisoryNode) obj;
+    return Objects.equals(code, that.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
   }
 }

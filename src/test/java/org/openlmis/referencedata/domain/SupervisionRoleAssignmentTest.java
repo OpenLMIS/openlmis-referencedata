@@ -16,7 +16,7 @@ public class SupervisionRoleAssignmentTest {
 
   private Right right = Right.newRight("right", SUPERVISION);
   private Program program = new Program("em");
-  private SupervisoryNode node = new SupervisoryNode();
+  private SupervisoryNode node = SupervisoryNode.newSupervisoryNode("SN1", new Facility("F1"));
   private Role role = Role.newRole("role", right);
   private SupervisionRoleAssignment homeFacilityRoleAssignment =
       new SupervisionRoleAssignment(role, program);

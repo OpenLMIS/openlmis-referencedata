@@ -1,7 +1,15 @@
 package org.openlmis.referencedata.web;
 
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.dto.RequisitionGroupProgramScheduleDto;
+import org.openlmis.referencedata.exception.InvalidIdException;
+import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
+import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
+import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
@@ -24,7 +33,16 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
         LoggerFactory.getLogger(RequisitionGroupProgramScheduleController.class);
 
   @Autowired
+  private RequisitionGroupProgramScheduleService service;
+
+  @Autowired
   private RequisitionGroupProgramScheduleRepository repository;
+
+  @Autowired
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
 
   /**
    * Allows creating new requisitionGroupProgramSchedule.
@@ -36,20 +54,11 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
   @RequestMapping(value = "/requisitionGroupProgramSchedules", method = RequestMethod.POST)
   public ResponseEntity<?> createRequisitionGroupProgramSchedule(
         @RequestBody RequisitionGroupProgramSchedule requisition) {
-    try {
-      LOGGER.debug("Creating new requisitionGroupProgramSchedule");
-      requisition.setId(null);
-      RequisitionGroupProgramSchedule newRequisition = repository.save(requisition);
-      LOGGER.debug("Created new requisitionGroupProgramSchedule with id: " + requisition.getId());
-      return new ResponseEntity<RequisitionGroupProgramSchedule>(
-            newRequisition, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating"
-                  + "requisitionGroupProgramSchedule", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new requisitionGroupProgramSchedule");
+    requisition.setId(null);
+    repository.save(requisition);
+    LOGGER.debug("Created new requisitionGroupProgramSchedule with id: " + requisition.getId());
+    return new ResponseEntity<>(requisition, HttpStatus.CREATED);
   }
 
   /**
@@ -80,7 +89,6 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
     }
   }
 
-  //after last changes on referencedata its currently not working
   /**
    * Allows updating requisitionGroupProgramSchedule.
    *
@@ -90,24 +98,21 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
    *                                          which we want to update
    * @return ResponseEntity containing the updated requisitionGroup
    */
-  /*
   @RequestMapping(value = "/requisitionGroupProgramSchedules/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateRequisitionGroupProgramSchedule(
-        @RequestBody RequisitionGroupProgramSchedule reqGroupProgSchedule,
+        @RequestBody RequisitionGroupProgramScheduleDto reqGroupProgSchedule,
         @PathVariable("id") UUID requisitionId) {
 
-    RequisitionGroupProgramSchedule reqGroupProgScheduleToUpdate =
-          repository.findOne(requisitionId);
-    try {
-      if (reqGroupProgScheduleToUpdate == null) {
-        reqGroupProgScheduleToUpdate = new RequisitionGroupProgramSchedule();
-        LOGGER.info("Creating new requisitionGroupProgramSchedule");
-      } else {
-        LOGGER.debug("Updating requisitionGPS with id: " + requisitionId);
-      }
+    RequisitionGroupProgramSchedule reqGroupProgScheduleToUpdate;
 
-      reqGroupProgScheduleToUpdate.updateFrom(reqGroupProgSchedule);
-      reqGroupProgScheduleToUpdate = repository.save(reqGroupProgScheduleToUpdate);
+    try {
+
+      reqGroupProgScheduleToUpdate = RequisitionGroupProgramSchedule
+          .newRequisitionGroupProgramSchedule(reqGroupProgSchedule);
+
+      reqGroupProgScheduleToUpdate.setId(requisitionId);
+
+      repository.save(reqGroupProgScheduleToUpdate);
 
       LOGGER.debug("Saved requisitionGroupProgramSchedule with id: "
             + reqGroupProgScheduleToUpdate.getId());
@@ -115,12 +120,12 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
             reqGroupProgScheduleToUpdate, HttpStatus.OK);
     } catch (DataIntegrityViolationException ex) {
       ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while saving requisitionGroupProgramSchedule"
-                  + " with id: " + reqGroupProgScheduleToUpdate.getId(), ex.getMessage());
+            new ErrorResponse("An error occurred while saving requisitionGroupProgramSchedule"
+                  + " with id: " + requisitionId, ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
       return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
-  }*/
+  }
 
   /**
    * Allows deleting requisitionGroupProgramSchedule.
@@ -135,16 +140,52 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
     if (requisition == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        repository.delete(requisition);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("An error accurred while deleting requisitionGroupProgramSchedule"
-                    + " with id: " + requisitionId, ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      repository.delete(requisition);
       return new ResponseEntity<RequisitionGroupProgramSchedule>(HttpStatus.NO_CONTENT);
     }
+  }
+
+  /**
+   * Returns chosen RequisitionGroupProgramSchedule.
+   * @param programId program of searched RequisitionGroupProgramSchedule.
+   * @param facilityId facility of searched RequisitionGroupProgramSchedule.
+   * @return RequisitionGroupProgramSchedule.
+   */
+  @RequestMapping(value = "/requisitionGroupProgramSchedules/search",
+        method = RequestMethod.GET)
+  public ResponseEntity<?> searchByProgramAndFacility(
+        @RequestParam(value = "programId", required = true) UUID programId,
+        @RequestParam(value = "facilityId", required = true) UUID facilityId)
+        throws InvalidIdException, RequisitionGroupProgramScheduleException {
+
+    if (programId == null) {
+      throw new InvalidIdException("Program id must be provided.");
+    }
+
+    if (facilityId == null) {
+      throw new InvalidIdException("Facility id must be provided.");
+    }
+
+    Program program = programRepository.findOne(programId);
+    Facility facility = facilityRepository.findOne(facilityId);
+
+    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule = null;
+
+    if (program != null && facility != null) {
+      requisitionGroupProgramSchedule =
+            service.searchRequisitionGroupProgramSchedule(program, facility);
+    }
+
+    return ResponseEntity.ok(exportToDto(requisitionGroupProgramSchedule));
+  }
+
+  private RequisitionGroupProgramScheduleDto exportToDto(
+        RequisitionGroupProgramSchedule requisitionGroupProgramSchedule) {
+    RequisitionGroupProgramScheduleDto dto = null;
+    if (requisitionGroupProgramSchedule != null) {
+      dto = new RequisitionGroupProgramScheduleDto();
+      requisitionGroupProgramSchedule.export(dto);
+    }
+    return dto;
   }
 }

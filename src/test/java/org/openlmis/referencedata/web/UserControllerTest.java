@@ -1,24 +1,13 @@
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import com.google.common.collect.Sets;
-
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.Right;
@@ -49,6 +38,17 @@ import org.springframework.validation.BindingResult;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class UserControllerTest {
@@ -602,8 +602,9 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserSupervisedFacilities() throws RightTypeException {
     //given
-    RequisitionGroup supervisionGroup1 = RequisitionGroup.newRequisitionGroup("supervisionGroup1",
-        supervisoryNode1);
+    RequisitionGroup supervisionGroup1 = new RequisitionGroup(
+        "supervisionGroup1", "supervisionGroupName1", supervisoryNode1
+    );
     supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility("C1"), new Facility("C2")));
     supervisoryNode1.setRequisitionGroup(supervisionGroup1);
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
@@ -617,5 +618,27 @@ public class UserControllerTest {
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
     assertThat(supervisedFacilities.size(), is(2));
+  }
+
+  @Test
+  public void shouldGetUserFulfillmentFacilities()
+      throws RightTypeException, RoleAssignmentException {
+    //given
+    FulfillmentRoleAssignment assignment1 =
+        new FulfillmentRoleAssignment(fulfillmentRole1, warehouse1);
+
+    SupervisionRoleAssignment assignment2
+        = new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1);
+
+    user1.assignRoles(assignment1);
+    user1.assignRoles(assignment2);
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    //when
+    ResponseEntity responseEntity = controller.getUserFulfillmentFacilities(userId);
+    Set<Facility> facilities = (Set<Facility>) responseEntity.getBody();
+
+    //then
+    assertThat(facilities.size(), is(1));
   }
 }

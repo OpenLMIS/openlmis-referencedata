@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.openlmis.referencedata.util.LocalDateTimePersistenceConverter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -48,10 +49,32 @@ public class ProcessingSchedule extends BaseEntity {
   @Setter
   private String name;
 
+  public ProcessingSchedule(String code, String name) {
+    this.code = code;
+    this.name = name;
+  }
+
   @PrePersist
   @PreUpdate
+
   private void setModifiedDate() {
     this.modifiedDate = LocalDateTime.now();
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof ProcessingSchedule)) {
+      return false;
+    }
+    ProcessingSchedule that = (ProcessingSchedule) obj;
+    return Objects.equals(code, that.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
+  }
 }

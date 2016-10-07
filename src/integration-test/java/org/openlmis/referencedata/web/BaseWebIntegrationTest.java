@@ -5,26 +5,24 @@ import com.jayway.restassured.RestAssured;
 import guru.nidi.ramltester.RamlDefinition;
 import guru.nidi.ramltester.RamlLoaders;
 import guru.nidi.ramltester.restassured.RestAssuredClient;
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
-import org.openlmis.referencedata.Application;
-import org.openlmis.referencedata.utils.CleanRepositoryHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.embedded.LocalServerPort;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import javax.annotation.PostConstruct;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(Application.class)
-@WebIntegrationTest("server.port:8080")
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-public abstract class BaseWebComponentTest {
+public abstract class BaseWebIntegrationTest {
 
   protected static final String RAML_ASSERT_MESSAGE =
       "HTTP request/response should match RAML definition.";
@@ -56,18 +54,19 @@ public abstract class BaseWebComponentTest {
       + "  \"client_id\": \"trusted-client\"\n"
       + "}";
 
-  @Autowired
-  private CleanRepositoryHelper cleanRepositoryHelper;
+  @Value("${auth.server.baseUrl}")
+  protected String baseUri;
 
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(80);
 
+  @LocalServerPort
+  private int randomPort;
+  
   /**
    * Constructor for test.
    */
-  public BaseWebComponentTest() {
-    RestAssured.baseURI = "http://localhost:8080";
-    restAssured = ramlDefinition.createRestAssured();
+  public BaseWebIntegrationTest() {
 
     // This mocks the auth check to always return valid admin credentials.
     wireMockRule.stubFor(post(urlEqualTo("/auth/oauth/check_token"))
@@ -76,7 +75,7 @@ public abstract class BaseWebComponentTest {
             .withBody(MOCK_CHECK_RESULT)));
 
     // This mocks the call to auth to post to an auth user.
-    wireMockRule.stubFor(post(urlPathEqualTo("/api/users"))
+    wireMockRule.stubFor(post(urlPathEqualTo("/auth/api/users"))
         .willReturn(aResponse()
             .withStatus(200)));
 
@@ -86,11 +85,18 @@ public abstract class BaseWebComponentTest {
             .withStatus(200)));
   }
 
-  @After
-  public void cleanRepositories() {
-    cleanRepositoryHelper.cleanAll();
-  }
+  /**
+   * Initialize the REST Assured client. Done here and not in the constructor, so that randomPort
+   * is available.
+   */
+  @PostConstruct
+  public void init() {
 
+    RestAssured.baseURI = baseUri;
+    RestAssured.port = randomPort;
+    restAssured = ramlDefinition.createRestAssured();
+  } 
+  
   /**
    * Get an access token. An arbitrary UUID string is returned and the tests assume it is a valid
    * one.

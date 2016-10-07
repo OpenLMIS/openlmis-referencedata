@@ -1,18 +1,13 @@
 package org.openlmis.referencedata.web;
 
-import static java.util.stream.Collectors.toSet;
-
 import com.google.common.collect.Sets;
-
 import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +19,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.util.stream.Collectors.toSet;
+
 @NoArgsConstructor
 @Controller
 public class RightController extends BaseController {
@@ -34,7 +31,6 @@ public class RightController extends BaseController {
   private RightRepository rightRepository;
 
   public RightController(RightRepository repository) {
-    super();
     this.rightRepository = Objects.requireNonNull(repository);
   }
 
@@ -48,7 +44,7 @@ public class RightController extends BaseController {
 
     LOGGER.debug("Getting all rights");
     Set<Right> rights = Sets.newHashSet(rightRepository.findAll());
-    Set<RightDto> rightDtos = rights.stream().map(right -> exportToDto(right)).collect(toSet());
+    Set<RightDto> rightDtos = rights.stream().map(this::exportToDto).collect(toSet());
 
     return ResponseEntity
         .ok(rightDtos);
@@ -92,18 +88,10 @@ public class RightController extends BaseController {
       rightToSave.setId(storedRight.getId());
     }
 
-    try {
 
-      LOGGER.debug("Saving right");
-      rightRepository.save(rightToSave);
+    LOGGER.debug("Saving right");
+    rightRepository.save(rightToSave);
 
-    } catch (DataIntegrityViolationException dive) {
-
-      LOGGER.error("An error occurred while saving right: " + dive.getRootCause().getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(dive.getRootCause().getMessage());
-    }
 
     LOGGER.debug("Saved right with id: " + rightToSave.getId());
 
@@ -129,18 +117,10 @@ public class RightController extends BaseController {
           .build();
     }
 
-    try {
 
-      LOGGER.debug("Deleting right");
-      rightRepository.delete(rightId);
+    LOGGER.debug("Deleting right");
+    rightRepository.delete(rightId);
 
-    } catch (DataIntegrityViolationException dive) {
-
-      LOGGER.error("An error occurred while deleting right: " + dive.getRootCause().getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(dive.getRootCause().getMessage());
-    }
 
     return ResponseEntity
         .noContent()

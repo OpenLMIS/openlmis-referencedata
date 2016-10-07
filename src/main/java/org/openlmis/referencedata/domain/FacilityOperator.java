@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table(name = "facility_operators", schema = "referencedata")
@@ -31,4 +32,21 @@ public class FacilityOperator extends BaseEntity {
   @Getter
   @Setter
   private Integer displayOrder;
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof FacilityOperator)) {
+      return false;
+    }
+    FacilityOperator that = (FacilityOperator) obj;
+    return Objects.equals(code, that.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
+  }
 }

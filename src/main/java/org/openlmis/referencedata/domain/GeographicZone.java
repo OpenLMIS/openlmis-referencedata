@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -31,7 +33,7 @@ public class GeographicZone extends BaseEntity {
   @Setter
   private GeographicLevel level;
 
-  //@ManyToOne
+  //@ManyToOne TODO: re-enable this at some point, similar to SupervisoryNode
   //@JoinColumn(name = "parentid")
   //@Getter
   //@Setter
@@ -50,4 +52,26 @@ public class GeographicZone extends BaseEntity {
   @Getter
   @Setter
   private Double longitude;
+
+  public GeographicZone(String code, GeographicLevel level) {
+    this.code = code;
+    this.level = level;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof GeographicZone)) {
+      return false;
+    }
+    GeographicZone that = (GeographicZone) obj;
+    return Objects.equals(code, that.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
+  }
 }

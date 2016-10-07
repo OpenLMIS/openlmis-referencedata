@@ -12,17 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class ProcessingPeriodRepositoryIntegrationTest
       extends BaseCrudRepositoryIntegrationTest<ProcessingPeriod> {
+
+  private static final String PERIOD_NAME = "name";
+  private static final String PERIOD_DESCRIPTION = "description";
+  private static final int PERIOD_LENGTH_IN_DAYS = 30;
 
   @Autowired
   private ProcessingPeriodRepository periodRepository;
 
   @Autowired
   private ProcessingScheduleRepository scheduleRepository;
-
-  private static final String PERIOD_NAME = "name";
-  private static final String PERIOD_DESCRIPTION = "description";
 
   private ProcessingSchedule testSchedule;
 
@@ -81,32 +85,40 @@ public class ProcessingPeriodRepositoryIntegrationTest
     periodFromRepo.setStartDate(LocalDate.of(2016, 2, 2));
     periodFromRepo.setEndDate(LocalDate.of(2016, 3, 2));
     periodRepository.save(periodFromRepo);
-    Assert.assertEquals(description, periodFromRepo.getDescription());
+    assertEquals(description, periodFromRepo.getDescription());
   }
 
   @Test
-  public void testSearchPeriodsByAllParameters() {
+  public void shouldReturnOrderedPeriodsWhenSearchingByAllParameters() {
     List<ProcessingPeriod> periods = new ArrayList<>();
     for (int periodsCount = 0; periodsCount < 5; periodsCount++) {
       periods.add(generatePeriodInstance(
               PERIOD_NAME + periodsCount,
               testSchedule,
               PERIOD_DESCRIPTION + periodsCount,
-              LocalDate.now().minusDays(periodsCount),
-              LocalDate.now().plusDays(periodsCount)));
+              LocalDate.of(2016, 5, 1).plusDays(
+                      periodsCount * PERIOD_LENGTH_IN_DAYS + 1),
+              LocalDate.of(2016, 5, 1).plusDays(
+                      periodsCount * PERIOD_LENGTH_IN_DAYS + PERIOD_LENGTH_IN_DAYS)));
       periodRepository.save(periods.get(periodsCount));
     }
     List<ProcessingPeriod> receivedPeriods =
-            periodRepository.searchPeriods(testSchedule, periods.get(1).getStartDate());
+            periodRepository.searchPeriods(testSchedule, periods.get(3).getStartDate());
 
-    Assert.assertEquals(4, receivedPeriods.size());
+    assertEquals(4, receivedPeriods.size());
     for (ProcessingPeriod period : receivedPeriods) {
-      Assert.assertEquals(
-              testSchedule.getId(),
-              period.getProcessingSchedule().getId());
-      Assert.assertTrue(
-              period.getStartDate().isBefore(periods.get(0).getStartDate()));
+      assertEquals(testSchedule.getId(), period.getProcessingSchedule().getId());
+      assertTrue(period.getStartDate().isBefore(periods.get(4).getStartDate()));
     }
+
+    LocalDate period1StartDate = receivedPeriods.get(0).getStartDate();
+    LocalDate period2StartDate = receivedPeriods.get(1).getStartDate();
+    LocalDate period3StartDate = receivedPeriods.get(2).getStartDate();
+    LocalDate period4StartDate = receivedPeriods.get(3).getStartDate();
+
+    assertTrue(period1StartDate.isBefore(period2StartDate));
+    assertTrue(period2StartDate.isBefore(period3StartDate));
+    assertTrue(period3StartDate.isBefore(period4StartDate));
   }
 
   @Test
@@ -124,9 +136,9 @@ public class ProcessingPeriodRepositoryIntegrationTest
     List<ProcessingPeriod> receivedPeriods =
             periodRepository.searchPeriods(null, periods.get(1).getStartDate());
 
-    Assert.assertEquals(4, receivedPeriods.size());
+    assertEquals(4, receivedPeriods.size());
     for (ProcessingPeriod period : receivedPeriods) {
-      Assert.assertTrue(
+      assertTrue(
               period.getStartDate().isBefore(periods.get(0).getStartDate()));
     }
   }
@@ -146,6 +158,6 @@ public class ProcessingPeriodRepositoryIntegrationTest
     List<ProcessingPeriod> receivedPeriods =
             periodRepository.searchPeriods(null, null);
 
-    Assert.assertEquals(periods.size(), receivedPeriods.size());
+    assertEquals(periods.size(), receivedPeriods.size());
   }
 }

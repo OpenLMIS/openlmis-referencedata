@@ -67,7 +67,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility1 = generateInstance();
     repository.save(facility1);
 
-    List<Facility> foundFacilties = repository.findFacilitiesWithSimilarCodeOrName(facility.getCode(), null);
+    List<Facility> foundFacilties =
+        repository.findFacilitiesWithSimilarCodeOrName(facility.getCode(), null);
 
     assertEquals(1, foundFacilties.size());
     assertEquals(facility.getCode(), foundFacilties.get(0).getCode());
@@ -91,7 +92,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility1 = generateInstance();
     repository.save(facility1);
 
-    List<Facility> foundFacilties = repository.findFacilitiesWithSimilarCodeOrName(facility.getCode(), "Facil");
+    List<Facility> foundFacilties =
+        repository.findFacilitiesWithSimilarCodeOrName(facility.getCode(), "Facil");
 
     assertEquals(2, foundFacilties.size());
     assertEquals(facility.getName(), foundFacilties.get(0).getName());
@@ -102,7 +104,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility = generateInstance();
     repository.save(facility);
 
-    List<Facility> foundFacilties = repository.findFacilitiesWithSimilarCodeOrName("Ogorek", "Pomidor");
+    List<Facility> foundFacilties =
+        repository.findFacilitiesWithSimilarCodeOrName("Ogorek", "Pomidor");
 
     assertEquals(0, foundFacilties.size());
   }

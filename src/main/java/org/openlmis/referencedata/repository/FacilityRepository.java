@@ -6,7 +6,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.UUID;
 
-public interface FacilityRepository extends PagingAndSortingRepository<Facility, UUID>, FacilityRepositoryCustom {
+public interface FacilityRepository
+    extends PagingAndSortingRepository<Facility, UUID>, FacilityRepositoryCustom {
 
   @Override
   <S extends Facility> S save(S entity);

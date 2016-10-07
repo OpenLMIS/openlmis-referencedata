@@ -1,10 +1,14 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,6 +27,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "requisition_groups", schema = "referencedata")
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class RequisitionGroup extends BaseEntity {
 
   @Column(unique = true, nullable = false, columnDefinition = "text")
@@ -30,7 +35,7 @@ public class RequisitionGroup extends BaseEntity {
   @Setter
   private String code;
 
-  @Column(columnDefinition = "text")
+  @Column(nullable = false, columnDefinition = "text")
   @Getter
   @Setter
   private String name;
@@ -60,20 +65,49 @@ public class RequisitionGroup extends BaseEntity {
   @Setter
   private List<Facility> memberFacilities;
 
-  private RequisitionGroup(String code, SupervisoryNode supervisoryNode) {
-    this.code = code;
-    this.supervisoryNode = supervisoryNode;
-  }
-
   /**
    * Create a new requisition group with a specified supervisory node, program schedules and
    * facilities.
    *
    * @param code            specified code
+   * @param name            specified name
    * @param supervisoryNode specified supervisory node
-   * @return the new requisition group
    */
-  public static RequisitionGroup newRequisitionGroup(String code, SupervisoryNode supervisoryNode) {
-    return new RequisitionGroup(code, supervisoryNode);
+  public RequisitionGroup(String code, String name, SupervisoryNode supervisoryNode) {
+    this.code = code;
+    this.name = name;
+    this.supervisoryNode = supervisoryNode;
+  }
+
+  /**
+   * Copy properties from the given instance.
+   *
+   * @param requisitionGroup an instance from which properties will be used to update current
+   *                         instance
+   */
+  public void updateFrom(RequisitionGroup requisitionGroup) {
+    code = requisitionGroup.getCode();
+    name = requisitionGroup.getName();
+    description = requisitionGroup.getDescription();
+    supervisoryNode = requisitionGroup.getSupervisoryNode();
+    requisitionGroupProgramSchedules = requisitionGroup.getRequisitionGroupProgramSchedules();
+    memberFacilities = requisitionGroup.getMemberFacilities();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof RequisitionGroup)) {
+      return false;
+    }
+    RequisitionGroup that = (RequisitionGroup) obj;
+    return Objects.equals(code, that.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
   }
 }

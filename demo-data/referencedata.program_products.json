@@ -31,5 +31,16 @@
     "fullSupply": "false",
     "maxMonthsStock": 30,
     "displayOrder": 3
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000004",
+    "program": { "id": "00000000-0000-0000-0000-000000000002" },
+    "product": { "id": "00000000-0000-0000-0000-000000000004" },
+    "productCategory": { "id": "00000000-0000-0000-0000-000000000002" },
+    "dosesPerMonth": 1,
+    "active": "true",
+    "fullSupply": "true",
+    "maxMonthsStock": 30,
+    "displayOrder": 3
   }
 ]

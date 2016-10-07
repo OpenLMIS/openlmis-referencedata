@@ -1,6 +1,11 @@
 package org.openlmis.referencedata.web;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -11,54 +16,43 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
-import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.repository.SupplyLineRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openlmis.referencedata.service.SupplyLineService;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-public class FacilityControllerComponentTest extends BaseWebComponentTest {
+@SuppressWarnings({"PMD.TooManyMethods"})
+public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
       RESOURCE_URL + "/findFacilitiesWithSimilarCodeOrName";
 
-  @Autowired
+  @MockBean
   private FacilityRepository facilityRepository;
 
-  @Autowired
-  private FacilityTypeRepository facilityTypeRepository;
+  @MockBean
+  private SupplyLineService supplyLineService;
 
-  @Autowired
-  private GeographicLevelRepository geographicLevelRepository;
-
-  @Autowired
-  private GeographicZoneRepository geographicZoneRepository;
-
-  @Autowired
-  private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Autowired
-  private SupplyLineRepository supplyLineRepository;
-
-  @Autowired
+  @MockBean
   private ProgramRepository programRepository;
 
+  @MockBean
+  private SupervisoryNodeRepository supervisoryNodeRepository;
+
   private Integer currentInstanceNumber;
+  private UUID programId;
+  private UUID supervisoryNodeId;
 
   @Before
   public void setUp() {
@@ -72,21 +66,23 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
     Program searchedProgram = generateProgram();
     SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
 
-    Collection<SupplyLine> searchedSupplyLines = new ArrayList<>();
-    SupplyLine additionalSupplyLine = generateSupplyLine();
-
+    List<SupplyLine> searchedSupplyLines = new ArrayList<>();
     for (int i = 0; i < searchedFacilitiesAmt; i++) {
       SupplyLine supplyLine = generateSupplyLine();
       supplyLine.setProgram(searchedProgram);
       supplyLine.setSupervisoryNode(searchedSupervisoryNode);
-      supplyLineRepository.save(supplyLine);
 
       searchedSupplyLines.add(supplyLine);
     }
+    
+    given(programRepository.findOne(programId)).willReturn(searchedProgram);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
+    given(supplyLineService.searchSupplyLines(searchedProgram, searchedSupervisoryNode))
+        .willReturn(searchedSupplyLines);
 
     Facility[] response = restAssured.given()
-        .queryParam("program", searchedProgram.getId())
-        .queryParam("supervisoryNode", searchedSupervisoryNode.getId())
+        .queryParam("programId", programId)
+        .queryParam("supervisoryNodeId", supervisoryNodeId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(SUPPLYING_URL)
@@ -96,9 +92,9 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
 
-
     assertEquals(searchedFacilitiesAmt, response.length);
 
+    SupplyLine additionalSupplyLine = generateSupplyLine();
     Collection<Facility> searchedFacilities = searchedSupplyLines
         .stream().map(SupplyLine::getSupplyingFacility).collect(Collectors.toList());
     for (Facility facility : response) {
@@ -111,6 +107,10 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
   public void shouldFindFacilitiesWithSimilarCode() {
     Facility generatedFacility = generateFacility();
     String similarCode = "Facility";
+    List<Facility> listToReturn = new ArrayList<>();
+    listToReturn.add(generatedFacility);
+    given(facilityRepository.findFacilitiesWithSimilarCodeOrName(similarCode,null))
+        .willReturn(listToReturn);
 
     Facility[] response = restAssured.given()
         .queryParam("code", similarCode)
@@ -130,6 +130,10 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
   public void shouldFindFacilitiesWithSimilarName() {
     Facility generatedFacility = generateFacility();
     String similarName = "Facility";
+    List<Facility> listToReturn = new ArrayList<>();
+    listToReturn.add(generatedFacility);
+    given(facilityRepository.findFacilitiesWithSimilarCodeOrName(null,similarName))
+        .willReturn(listToReturn);
 
     Facility[] response = restAssured.given()
         .queryParam("name", similarName)
@@ -169,22 +173,23 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
     supplyLine.setProgram(generateProgram());
     supplyLine.setSupervisoryNode(generateSupervisoryNode());
     supplyLine.setSupplyingFacility(generateFacility());
-    supplyLineRepository.save(supplyLine);
     return supplyLine;
   }
 
   private SupervisoryNode generateSupervisoryNode() {
     SupervisoryNode supervisoryNode = new SupervisoryNode();
+    supervisoryNodeId = UUID.randomUUID();
+    supervisoryNode.setId(supervisoryNodeId);
     supervisoryNode.setCode("SupervisoryNode " + generateInstanceNumber());
     supervisoryNode.setFacility(generateFacility());
-    supervisoryNodeRepository.save(supervisoryNode);
     return supervisoryNode;
   }
 
   private Program generateProgram() {
     Program program = new Program("Program " + generateInstanceNumber());
+    programId = UUID.randomUUID();
+    program.setId(programId);
     program.setPeriodsSkippable(false);
-    programRepository.save(program);
     return program;
   }
 
@@ -200,7 +205,6 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
     facility.setDescription("FacilityDescription " + instanceNumber);
     facility.setEnabled(true);
     facility.setActive(true);
-    facilityRepository.save(facility);
     return facility;
   }
 
@@ -208,7 +212,6 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
     GeographicLevel geographicLevel = new GeographicLevel();
     geographicLevel.setCode("GeographicLevel " + generateInstanceNumber());
     geographicLevel.setLevelNumber(1);
-    geographicLevelRepository.save(geographicLevel);
     return geographicLevel;
   }
 
@@ -216,14 +219,12 @@ public class FacilityControllerComponentTest extends BaseWebComponentTest {
     GeographicZone geographicZone = new GeographicZone();
     geographicZone.setCode("GeographicZone " + generateInstanceNumber());
     geographicZone.setLevel(geographicLevel);
-    geographicZoneRepository.save(geographicZone);
     return geographicZone;
   }
 
   private FacilityType generateFacilityType() {
     FacilityType facilityType = new FacilityType();
     facilityType.setCode("FacilityType " + generateInstanceNumber());
-    facilityTypeRepository.save(facilityType);
     return facilityType;
   }
 

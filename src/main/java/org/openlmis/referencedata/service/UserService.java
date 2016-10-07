@@ -37,7 +37,7 @@ public class UserService {
    */
   @PostConstruct
   public void init() {
-    String virtualHost = Optional.ofNullable(System.getenv("AUTH_HOST")).orElse("localhost");
+    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
     virtualHostBaseUrl = "http://" + virtualHost;
   }
   
@@ -83,7 +83,7 @@ public class UserService {
     userRequest.setEmail(user.getEmail());
     userRequest.setReferenceDataUserId(user.getId());
 
-    String url = virtualHostBaseUrl + "/api/users?access_token=" + token;
+    String url = virtualHostBaseUrl + "/auth/api/users?access_token=" + token;
     RestTemplate restTemplate = new RestTemplate();
 
     restTemplate.postForObject(url, userRequest, Object.class);
@@ -94,7 +94,7 @@ public class UserService {
    */
   public void passwordReset(PasswordResetRequest passwordResetRequest, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/passwordReset?access_token=" + token;
+      String url = virtualHostBaseUrl + "/auth/api/users/passwordReset?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, passwordResetRequest, String.class);
@@ -110,7 +110,7 @@ public class UserService {
    */
   public void changePassword(PasswordChangeRequest passwordChangeRequest, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/changePassword?access_token=" + token;
+      String url = virtualHostBaseUrl + "/auth/api/users/changePassword?access_token=" + token;
 
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.postForObject(url, passwordChangeRequest, String.class);
@@ -144,7 +144,7 @@ public class UserService {
 
   private UUID createPasswordResetToken(UUID userId, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/passwordResetToken?userId=" + userId
+      String url = virtualHostBaseUrl + "/auth/api/users/passwordResetToken?userId=" + userId
           + "&access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
@@ -158,7 +158,7 @@ public class UserService {
     try {
       NotificationRequest request = new NotificationRequest(from, to, subject, content, null);
 
-      String url = virtualHostBaseUrl + "/notification?access_token=" + token;
+      String url = virtualHostBaseUrl + "/notification/notification?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, request, Object.class);

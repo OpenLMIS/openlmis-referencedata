@@ -2,11 +2,9 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestClientException;
 
 import java.util.UUID;
 
@@ -34,18 +31,11 @@ public class GeographicLevelController extends BaseController {
    */
   @RequestMapping(value = "/geographicLevels", method = RequestMethod.POST)
   public ResponseEntity<?> createGeographicLevel(@RequestBody GeographicLevel geographicLevel) {
-    try {
-      LOGGER.debug("Creating new geographicLevel");
-      // Ignore provided id
-      geographicLevel.setId(null);
-      GeographicLevel newGeographicLevel = geographicLevelRepository.save(geographicLevel);
-      return new ResponseEntity<GeographicLevel>(newGeographicLevel, HttpStatus.CREATED);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating geographicLevel", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new geographicLevel");
+    // Ignore provided id
+    geographicLevel.setId(null);
+    geographicLevelRepository.save(geographicLevel);
+    return new ResponseEntity<>(geographicLevel, HttpStatus.CREATED);
   }
 
   /**
@@ -66,23 +56,16 @@ public class GeographicLevelController extends BaseController {
   /**
    * Allows updating geographicLevels.
    *
-   * @param geographicLevel A geographicLevel bound to the request body
+   * @param geographicLevel   A geographicLevel bound to the request body
    * @param geographicLevelId UUID of geographicLevel which we want to update
    * @return ResponseEntity containing the updated geographicLevel
    */
   @RequestMapping(value = "/geographicLevels/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateGeographicLevel(@RequestBody GeographicLevel geographicLevel,
-                                            @PathVariable("id") UUID geographicLevelId) {
-    try {
-      LOGGER.debug("Updating geographicLevel");
-      GeographicLevel updatedGeographicLevel = geographicLevelRepository.save(geographicLevel);
-      return new ResponseEntity<GeographicLevel>(updatedGeographicLevel, HttpStatus.OK);
-    } catch (RestClientException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while updating geographicLevel", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+                                                 @PathVariable("id") UUID geographicLevelId) {
+    LOGGER.debug("Updating geographicLevel");
+    geographicLevelRepository.save(geographicLevel);
+    return new ResponseEntity<>(geographicLevel, HttpStatus.OK);
   }
 
   /**
@@ -113,15 +96,7 @@ public class GeographicLevelController extends BaseController {
     if (geographicLevel == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        geographicLevelRepository.delete(geographicLevel);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("GeographicLevel cannot be deleted"
-                    + "because of existing dependencies", ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      geographicLevelRepository.delete(geographicLevel);
       return new ResponseEntity<GeographicLevel>(HttpStatus.NO_CONTENT);
     }
   }

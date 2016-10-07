@@ -54,25 +54,25 @@ public class ProductCategoryController extends BaseController {
       found = productCategory;
     }
 
-    ProductCategory newProductCategory = productCategoryRepository.save(found);
-    return new ResponseEntity<>(newProductCategory, HttpStatus.OK);
+    productCategoryRepository.save(found);
+    return new ResponseEntity<>(found, HttpStatus.OK);
   }
 
   /**
-   * Updates the given {@link ProductCategory}.  Uses the ID given to base it's update and
-   * ignores the code given.
+   * Updates the given {@link ProductCategory}.  Uses the ID given to base it's update and ignores
+   * the code given.
    *
-   * @param productCategory A productCategory bound to the request body
+   * @param productCategory   A productCategory bound to the request body
    * @param productCategoryId UUID of productCategory which we want to update
    * @return ResponseEntity containing the updated productCategory
    */
   @RequestMapping(value = "/productCategories/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateProductCategory(@RequestBody ProductCategory productCategory,
-                                       @PathVariable("id") UUID productCategoryId) {
+                                                 @PathVariable("id") UUID productCategoryId) {
     LOGGER.debug("Updating productCategory with id: " + productCategoryId);
 
     ProductCategory productCategoryToUpdate =
-          productCategoryRepository.findOne(productCategoryId);
+        productCategoryRepository.findOne(productCategoryId);
 
     if (null == productCategoryToUpdate) {
       ErrorResponse errorResponse = new ErrorResponse("referencedata.error.id.not-found",
@@ -81,7 +81,7 @@ public class ProductCategoryController extends BaseController {
       return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
     productCategoryToUpdate.updateFrom(productCategory);
-    productCategoryToUpdate = productCategoryRepository.save(productCategoryToUpdate);
+    productCategoryRepository.save(productCategoryToUpdate);
 
     LOGGER.debug("Updated productCategory with id: " + productCategoryId);
     return new ResponseEntity<>(productCategoryToUpdate, HttpStatus.OK);
@@ -119,8 +119,8 @@ public class ProductCategoryController extends BaseController {
         productCategoryRepository.delete(productCategory);
       } catch (DataIntegrityViolationException ex) {
         ErrorResponse errorResponse =
-              new ErrorResponse("An error accurred while deleting productCategory with id: "
-                    + productCategoryId, ex.getMessage());
+            new ErrorResponse("An error accurred while deleting productCategory with id: "
+                + productCategoryId, ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
         return new ResponseEntity(HttpStatus.CONFLICT);
       }
@@ -130,13 +130,13 @@ public class ProductCategoryController extends BaseController {
 
   /**
    * Finds ProductCategories matching all of provided parameters.
+   *
    * @param codeParam code of productCategory.
-   * @return ResponseEntity with list of all Product Categories matching
-   *         provided parameters and OK httpStatus.
+   * @return ResponseEntity with list of all Product Categories matching provided parameters
    */
   @RequestMapping(value = "/productCategories/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProductCategories(
-          @RequestParam(value = "code", required = false) String codeParam) {
+      @RequestParam(value = "code", required = false) String codeParam) {
     ProductCategory found = productCategoryRepository.findByCode(Code.code(codeParam));
     if (null == found) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -1,17 +1,16 @@
 package org.openlmis.referencedata.web;
 
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
-import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,6 +31,12 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private FacilityRepository facilityRepository;
+  
+  @Autowired
+  private ProgramRepository programRepository;
+  
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
   private SupplyLineService supplyLineService;
@@ -45,18 +50,11 @@ public class FacilityController extends BaseController {
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
   public ResponseEntity<?> createFacility(@RequestBody Facility facility) {
-    try {
-      LOGGER.debug("Creating new facility");
-      facility.setId(null);
-      Facility newFacility = facilityRepository.save(facility);
-      LOGGER.debug("Created new facility with id: " + facility.getId());
-      return new ResponseEntity<Facility>(newFacility, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while creating facility", ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
-    }
+    LOGGER.debug("Creating new facility");
+    facility.setId(null);
+    Facility newFacility = facilityRepository.save(facility);
+    LOGGER.debug("Created new facility with id: " + facility.getId());
+    return new ResponseEntity<Facility>(newFacility, HttpStatus.CREATED);
   }
 
   /**
@@ -83,25 +81,17 @@ public class FacilityController extends BaseController {
                                        @PathVariable("id") UUID facilityId) {
 
     Facility facilityToUpdate = facilityRepository.findOne(facilityId);
-    try {
-      if (facilityToUpdate == null) {
-        facilityToUpdate = facility;
-        LOGGER.info("Creating new facility");
-      } else {
-        LOGGER.debug("Updating facility with id: " + facilityId);
-      }
-
-      facilityToUpdate = facilityRepository.save(facilityToUpdate);
-
-      LOGGER.debug("Saved facility with id: " + facilityToUpdate.getId());
-      return new ResponseEntity<Facility>(facilityToUpdate, HttpStatus.OK);
-    } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while saving facility with id: "
-                  + facilityToUpdate.getId(), ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    if (facilityToUpdate == null) {
+      facilityToUpdate = facility;
+      LOGGER.debug("Creating new facility");
+    } else {
+      LOGGER.debug("Updating facility with id: " + facilityId);
     }
+
+    facilityToUpdate = facilityRepository.save(facilityToUpdate);
+
+    LOGGER.debug("Saved facility with id: " + facilityToUpdate.getId());
+    return new ResponseEntity<>(facilityToUpdate, HttpStatus.OK);
   }
 
   /**
@@ -132,15 +122,7 @@ public class FacilityController extends BaseController {
     if (facility == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
-      try {
-        facilityRepository.delete(facility);
-      } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-              new ErrorResponse("An error accurred while deleting facility with id: "
-                    + facilityId, ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
-      }
+      facilityRepository.delete(facility);
       return new ResponseEntity<Facility>(HttpStatus.NO_CONTENT);
     }
   }
@@ -148,28 +130,39 @@ public class FacilityController extends BaseController {
   /**
    * Retrieves all available supplying facilities for program and supervisory node.
    *
-   * @param program program to filter facilities
-   * @param supervisoryNode supervisoryNode to filter facilities
+   * @param programId program to filter facilities
+   * @param supervisoryNodeId supervisoryNode to filter facilities
    * @return ResponseEntity containing matched facilities
    */
   @RequestMapping(value = "/facilities/supplying", method = RequestMethod.GET)
   public ResponseEntity<?> getSupplyingDepots(
-      @RequestParam(value = "program") Program program,
-      @RequestParam(value = "supervisoryNode") SupervisoryNode supervisoryNode) {
-    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, supervisoryNode);
+      @RequestParam(value = "programId") UUID programId,
+      @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
+    Program program = programRepository.findOne(programId);
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, 
+        supervisoryNode);
     List<Facility> facilities = supplyLines.stream()
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
     return new ResponseEntity<>(facilities, HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/facilities/findFacilitiesWithSimilarCodeOrName", method = RequestMethod.GET)
+  /**
+   *
+   * @param code Part of wanted facility code.
+   * @param name Part of wanted facility name.
+   * @return List with wanted facility code or name.
+   */
+  @RequestMapping(value = "/facilities/findFacilitiesWithSimilarCodeOrName",
+      method = RequestMethod.GET)
   public ResponseEntity<?> findFacilitiesWithSimilarCodeOrName(
       @RequestParam(value = "code", required = false) String code,
       @RequestParam(value = "name", required = false) String name) {
     if (code == null && name == null) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    List<Facility> foundFacilities = facilityRepository.findFacilitiesWithSimilarCodeOrName(code, name);
+    List<Facility> foundFacilities =
+        facilityRepository.findFacilitiesWithSimilarCodeOrName(code, name);
     return new ResponseEntity<>(foundFacilities, HttpStatus.OK);
   }
 

@@ -1,6 +1,6 @@
 #%RAML 0.8
 ---
-title: OpenLMIS Requisition API
+title: OpenLMIS Reference Data API
 version: "1.0.0"
 baseUri: "http://@virtualHost@:8080/api"
 
@@ -222,10 +222,11 @@ schemas:
           "title": "Right",
           "description": "A single right",
           "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
+              "id": { "type": "string", "required": false, "title": "id" },
               "name": { "type": "string", "required": true, "title": "name" },
-              "type": { "type": { "enum":["ORDER_FULFILLMENT", "SUPERVISION", "GENERAL_ADMIN", "REPORTS"] }, "required": true, "title": "type" },
-              "description": { "type": "string", "required": false, "title": "description" }
+              "type": { "enum":["ORDER_FULFILLMENT", "SUPERVISION", "GENERAL_ADMIN", "REPORTS"], "required": true, "title": "type" },
+              "description": { "type": "string", "required": false, "title": "description" },
+              "attachments": { "type": "array", "required": false, "title": "attachments", "items": { "type": "object", "$ref": "#/schemas/right" }, "uniqueItems": false }
           }
       }
 
@@ -535,15 +536,15 @@ resourceTypes:
             is: [ secured ]
             description: Find periods with matched parametrs.
             queryParameters:
-                processingSchedule:
-                        displayName: processingSchedule
+                programId:
+                        displayName: program
                         type: string
                         required: true
                         repeat: false
-                toDate:
-                        displayName: toDate
+                facilityId:
+                        displayName: facility
                         type: string
-                        required: false
+                        required: true
                         repeat: false
             responses:
                 "200":
@@ -563,7 +564,7 @@ resourceTypes:
             is: [ secured ]
             description: Find periods with matched parametrs.
             queryParameters:
-                processingSchedule:
+                processingScheduleId:
                         displayName: processingSchedule
                         type: string
                         required: true
@@ -586,32 +587,31 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
-
-        /findFirst1ByOrderByEndDateDesc:
-            get:
-                is: [ secured ]
-                description: Get last processingPeriod.
-                responses:
-                    "200":
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
-                        body:
-                          application/json:
-                    "404":
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
+    /findFirst1ByOrderByEndDateDesc:
+        get:
+            is: [ secured ]
+            description: Get last processingPeriod.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
 
 /productCategories:
     displayName: Product Categories
-    post:
+    put:
           is: [ secured ]
           description: Create new productCategory.
           body:
               application/json:
           responses:
-              "201":
+              "200":
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
@@ -1495,13 +1495,13 @@ resourceTypes:
             is: [ secured ]
             description: Returns a list of facilities.
             queryParameters:
-                program:
-                    displayName: program
+                programId:
+                    displayName: programId
                     type: string
                     required: true
                     repeat: false
-                supervisoryNode:
-                    displayName: supervisoryNode
+                supervisoryNodeId:
+                    displayName: supervisoryNodeId
                     type: string
                     required: true
                     repeat: false
@@ -1674,23 +1674,6 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
-    /update:
-        put:
-            is: [ secured ]
-            description: Update program code and name.
-            body:
-                application/json:
-            responses:
-                "200":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                      application/json:
-                "400":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
     /{id}:
         uriParameters:
             id:
@@ -2077,6 +2060,34 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                      application/json:
+    /search:
+          get:
+            is: [ secured ]
+            description: Get list of full supply FacilityTypeApprovedProduct.
+            queryParameters:
+                facility:
+                        displayName: facility
+                        type: string
+                        required: true
+                        repeat: false
+                program:
+                        displayName: program
+                        type: string
+                        required: true
+                        repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
     /{id}:
           uriParameters:
             id:
@@ -2338,6 +2349,7 @@ resourceTypes:
           description: Save a right.
           body:
               application/json:
+                  schema: right
           responses:
               "200":
                   headers:
@@ -2345,6 +2357,7 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
+                          schema: right
               "400":
                   headers:
                     X-Content-Type-Options:
@@ -2378,6 +2391,7 @@ resourceTypes:
                         X-XSS-Protection:
                       body:
                           application/json:
+                              schema: right
                   "404":
                       headers:
                         X-Content-Type-Options:
@@ -2578,3 +2592,31 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
+    /search:
+        get:
+            is: [ secured ]
+            description: Find requisitionGroupProgramSchedule with matched parametrs.
+            queryParameters:
+                programId:
+                        displayName: program
+                        type: string
+                        required: true
+                        repeat: false
+                facilityId:
+                        displayName: facility
+                        type: string
+                        required: true
+                        repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
