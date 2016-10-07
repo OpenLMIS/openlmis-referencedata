@@ -1,11 +1,9 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -15,22 +13,16 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
-import org.openlmis.referencedata.repository.GeographicZoneRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
-@Ignore
 @SuppressWarnings("PMD.TooManyMethods")
 public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -41,39 +33,28 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   private static final UUID ID = UUID.fromString("1752b457-0a4b-4de0-bf94-5a6a8002427e");
   private static final String DESCRIPTION = "OpenLMIS";
 
-  @Autowired
+  @MockBean
   private SupplyLineRepository supplyLineRepository;
 
-  @Autowired
-  private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Autowired
-  private GeographicLevelRepository geographicLevelRepository;
-
-  @Autowired
-  private GeographicZoneRepository geographicZoneRepository;
-
-  @Autowired
-  private FacilityTypeRepository facilityTypeRepository;
-
-  @Autowired
-  private FacilityRepository facilityRepository;
-
-  @Autowired
-  private ProgramRepository programRepository;
-
   private SupplyLine supplyLine;
+  private UUID supplyLineId;
   private Integer currentInstanceNumber;
 
-  @Before
-  public void setUp() {
+  /**
+   * Constructor for tests.
+   */
+  public SupplyLineControllerIntegrationTest() {
     currentInstanceNumber = 0;
     supplyLine = generateSupplyLine();
+    supplyLineId = UUID.randomUUID();
   }
 
+  @Ignore
   @Test
   public void shouldFindSupplyLines() {
-    SupplyLine[] response = restAssured.given()
+
+    SupplyLine[] response = restAssured
+        .given()
         .queryParam("program", supplyLine.getProgram().getId())
         .queryParam("supervisoryNode", supplyLine.getSupervisoryNode().getId())
         .queryParam(ACCESS_TOKEN, getToken())
@@ -85,7 +66,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertEquals(1, response.length);
-    for ( SupplyLine responseSupplyLine : response ) {
+    for (SupplyLine responseSupplyLine : response) {
       assertEquals(
           supplyLine.getProgram().getId(),
           responseSupplyLine.getProgram().getId());
@@ -101,141 +82,158 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   @Test
   public void shouldDeleteSupplyLine() {
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supplyLine.getId())
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(204);
+    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
 
-    assertFalse(supplyLineRepository.exists(supplyLine.getId()));
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supplyLineId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldNotDeleteNonexistentSupplyLine() {
 
-    supplyLineRepository.delete(supplyLine);
+    given(supplyLineRepository.findOne(supplyLineId)).willReturn(null);
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supplyLine.getId())
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldCreateSupplyLine() {
-
-    supplyLineRepository.delete(supplyLine);
-
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(supplyLine)
-          .when()
-          .post(RESOURCE_URL)
-          .then()
-          .statusCode(201);
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supplyLineId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldUpdateSupplyLine() {
+  public void shouldPostSupplyLine() {
+
+    SupplyLine response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(supplyLine)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(201)
+        .extract().as(SupplyLine.class);
+
+    assertEquals(supplyLine, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldPutSupplyLine() {
 
     supplyLine.setDescription(DESCRIPTION);
+    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
 
-    SupplyLine response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supplyLine.getId())
-          .body(supplyLine)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(SupplyLine.class);
+    SupplyLine response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supplyLineId)
+        .body(supplyLine)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(SupplyLine.class);
 
-    assertEquals(response.getDescription(), DESCRIPTION);
+    assertEquals(supplyLine, response);
+    assertEquals(DESCRIPTION, response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldCreateNewSupplyLineIfDoesNotExist() {
 
-    supplyLineRepository.delete(supplyLine);
     supplyLine.setDescription(DESCRIPTION);
+    given(supplyLineRepository.findOne(supplyLineId)).willReturn(null);
 
-    SupplyLine response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", ID)
-          .body(supplyLine)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(SupplyLine.class);
+    SupplyLine response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", ID)
+        .body(supplyLine)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(SupplyLine.class);
 
-    assertEquals(response.getDescription(), DESCRIPTION);
+    assertEquals(supplyLine, response);
+    assertEquals(DESCRIPTION, response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldGetAllSupplyLines() {
 
-    SupplyLine[] response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when()
-          .get(RESOURCE_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(SupplyLine[].class);
+    SupplyLine newSupplyLine = generateSupplyLine();
+    List<SupplyLine> storedSupplyLines = Arrays.asList(supplyLine, newSupplyLine);
+    given(supplyLineRepository.findAll()).willReturn(storedSupplyLines);
 
-    Iterable<SupplyLine> supplyLines = Arrays.asList(response);
-    assertTrue(supplyLines.iterator().hasNext());
+    SupplyLine[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(SupplyLine[].class);
+
+    assertEquals(storedSupplyLines.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenSupplyLine() {
+  public void shouldGetSupplyLine() {
 
-    SupplyLine response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supplyLine.getId())
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(SupplyLine.class);
+    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
 
-    assertTrue(supplyLineRepository.exists(response.getId()));
+    SupplyLine response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supplyLineId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(SupplyLine.class);
+
+    assertEquals(supplyLine, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldNotGetNonexistentSupplyLine() {
 
-    supplyLineRepository.delete(supplyLine);
+    given(supplyLineRepository.findOne(supplyLineId)).willReturn(null);
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supplyLine.getId())
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(404);
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supplyLineId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -245,7 +243,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     supplyLine.setProgram(generateProgram());
     supplyLine.setSupervisoryNode(generateSupervisoryNode());
     supplyLine.setSupplyingFacility(generateFacility());
-    supplyLineRepository.save(supplyLine);
     return supplyLine;
   }
 
@@ -253,19 +250,17 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     SupervisoryNode supervisoryNode = new SupervisoryNode();
     supervisoryNode.setCode("234");
     supervisoryNode.setFacility(generateFacility());
-    supervisoryNodeRepository.save(supervisoryNode);
     return supervisoryNode;
   }
 
   private Program generateProgram() {
     Program program = new Program("890");
     program.setPeriodsSkippable(false);
-    programRepository.save(program);
     return program;
   }
 
   private Facility generateFacility() {
-    Integer instanceNumber = + generateInstanceNumber();
+    Integer instanceNumber = +generateInstanceNumber();
     GeographicLevel geographicLevel = generateGeographicLevel();
     GeographicZone geographicZone = generateGeographicZone(geographicLevel);
     FacilityType facilityType = generateFacilityType();
@@ -275,7 +270,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     facility.setName("FacilityName" + instanceNumber);
     facility.setDescription("FacilityDescription" + instanceNumber);
     facility.setActive(true);
-    facilityRepository.save(facility);
     return facility;
   }
 
@@ -283,7 +277,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     GeographicLevel geographicLevel = new GeographicLevel();
     geographicLevel.setCode("GeographicLevel" + generateInstanceNumber());
     geographicLevel.setLevelNumber(1);
-    geographicLevelRepository.save(geographicLevel);
     return geographicLevel;
   }
 
@@ -291,14 +284,12 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     GeographicZone geographicZone = new GeographicZone();
     geographicZone.setCode("GeographicZone" + generateInstanceNumber());
     geographicZone.setLevel(geographicLevel);
-    geographicZoneRepository.save(geographicZone);
     return geographicZone;
   }
 
   private FacilityType generateFacilityType() {
     FacilityType facilityType = new FacilityType();
     facilityType.setCode("FacilityType" + generateInstanceNumber());
-    facilityTypeRepository.save(facilityType);
     return facilityType;
   }
 

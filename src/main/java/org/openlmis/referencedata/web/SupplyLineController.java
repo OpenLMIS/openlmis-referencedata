@@ -42,8 +42,7 @@ public class SupplyLineController extends BaseController {
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
   /**
-   * Allows creating new supplyLines.
-   * If the id is specified, it will be ignored.
+   * Allows creating new supplyLines. If the id is specified, it will be ignored.
    *
    * @param supplyLine A supplyLine bound to the request body
    * @return ResponseEntity containing the created supplyLine
@@ -52,9 +51,9 @@ public class SupplyLineController extends BaseController {
   public ResponseEntity<?> createSupplyLine(@RequestBody SupplyLine supplyLine) {
     LOGGER.debug("Creating new supplyLine");
     supplyLine.setId(null);
-    SupplyLine newSupplyLine = supplyLineRepository.save(supplyLine);
+    supplyLineRepository.save(supplyLine);
     LOGGER.debug("Created new supplyLine with id: " + supplyLine.getId());
-    return new ResponseEntity<>(newSupplyLine, HttpStatus.CREATED);
+    return new ResponseEntity<>(supplyLine, HttpStatus.CREATED);
   }
 
   /**
@@ -71,13 +70,13 @@ public class SupplyLineController extends BaseController {
   /**
    * Allows updating supplyLines.
    *
-   * @param supplyLine A supplyLine bound to the request body
+   * @param supplyLine   A supplyLine bound to the request body
    * @param supplyLineId UUID of supplyLine which we want to update
    * @return ResponseEntity containing the updated supplyLine
    */
   @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateSupplyLine(@RequestBody SupplyLine supplyLine,
-                                       @PathVariable("id") UUID supplyLineId) {
+                                            @PathVariable("id") UUID supplyLineId) {
 
     SupplyLine supplyLineToUpdate = supplyLineRepository.findOne(supplyLineId);
     if (supplyLineToUpdate == null) {
@@ -88,7 +87,7 @@ public class SupplyLineController extends BaseController {
     }
 
     supplyLineToUpdate.updateFrom(supplyLine);
-    supplyLineToUpdate = supplyLineRepository.save(supplyLineToUpdate);
+    supplyLineRepository.save(supplyLineToUpdate);
 
     LOGGER.debug("Saved supplyLine with id: " + supplyLineToUpdate.getId());
     return new ResponseEntity<>(supplyLineToUpdate, HttpStatus.OK);
@@ -129,10 +128,10 @@ public class SupplyLineController extends BaseController {
 
   /**
    * Returns all Supply Lines with matched parameters.
-   * @param program program of searched Supply Lines.
+   *
+   * @param program         program of searched Supply Lines.
    * @param supervisoryNode supervisory node of searched Supply Lines.
-   * @return ResponseEntity with list of all Supply Lines matching
-   *         provided parameters and OK httpStatus.
+   * @return ResponseEntity with list of all Supply Lines matching provided parameters.
    */
   @RequestMapping(value = "/supplyLines/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchSupplyLines(
@@ -145,10 +144,10 @@ public class SupplyLineController extends BaseController {
 
   /**
    * Returns all Supply Lines with matched parameters.
-   * @param programId program of searched Supply Lines.
+   *
+   * @param programId         program of searched Supply Lines.
    * @param supervisoryNodeId supervisory node of searched Supply Lines.
-   * @return ResponseEntity with list of all Supply Lines matching
-   *         provided parameters and OK httpStatus.
+   * @return ResponseEntity with list of all Supply Lines matching provided parameters.
    */
   @RequestMapping(value = "/supplyLines/searchByUUID", method = RequestMethod.GET)
   public ResponseEntity<?> searchSupplyLinesByUuid(
@@ -158,7 +157,7 @@ public class SupplyLineController extends BaseController {
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     List<SupplyLine> resultSupplyLine =
         supplyLineService.searchSupplyLines(program, supervisoryNode);
-    List<SupplyLineDto>  result = new ArrayList<>();
+    List<SupplyLineDto> result = new ArrayList<>();
     for (SupplyLine supplyLine : resultSupplyLine) {
       SupplyLineDto supplyLineDto = new SupplyLineDto(supplyLine);
       result.add(supplyLineDto);
