@@ -10,9 +10,11 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -54,9 +56,9 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
         @RequestBody RequisitionGroupProgramSchedule requisition) {
     LOGGER.debug("Creating new requisitionGroupProgramSchedule");
     requisition.setId(null);
-    RequisitionGroupProgramSchedule newRequisition = repository.save(requisition);
+    repository.save(requisition);
     LOGGER.debug("Created new requisitionGroupProgramSchedule with id: " + requisition.getId());
-    return new ResponseEntity<>(newRequisition, HttpStatus.CREATED);
+    return new ResponseEntity<>(requisition, HttpStatus.CREATED);
   }
 
   /**
@@ -87,7 +89,6 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
     }
   }
 
-  //after last changes on referencedata its currently not working
   /**
    * Allows updating requisitionGroupProgramSchedule.
    *
@@ -97,24 +98,21 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
    *                                          which we want to update
    * @return ResponseEntity containing the updated requisitionGroup
    */
-  /*
   @RequestMapping(value = "/requisitionGroupProgramSchedules/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateRequisitionGroupProgramSchedule(
-        @RequestBody RequisitionGroupProgramSchedule reqGroupProgSchedule,
+        @RequestBody RequisitionGroupProgramScheduleDto reqGroupProgSchedule,
         @PathVariable("id") UUID requisitionId) {
 
-    RequisitionGroupProgramSchedule reqGroupProgScheduleToUpdate =
-          repository.findOne(requisitionId);
-    try {
-      if (reqGroupProgScheduleToUpdate == null) {
-        reqGroupProgScheduleToUpdate = new RequisitionGroupProgramSchedule();
-        LOGGER.info("Creating new requisitionGroupProgramSchedule");
-      } else {
-        LOGGER.debug("Updating requisitionGPS with id: " + requisitionId);
-      }
+    RequisitionGroupProgramSchedule reqGroupProgScheduleToUpdate;
 
-      reqGroupProgScheduleToUpdate.updateFrom(reqGroupProgSchedule);
-      reqGroupProgScheduleToUpdate = repository.save(reqGroupProgScheduleToUpdate);
+    try {
+
+      reqGroupProgScheduleToUpdate = RequisitionGroupProgramSchedule
+          .newRequisitionGroupProgramSchedule(reqGroupProgSchedule);
+
+      reqGroupProgScheduleToUpdate.setId(requisitionId);
+
+      repository.save(reqGroupProgScheduleToUpdate);
 
       LOGGER.debug("Saved requisitionGroupProgramSchedule with id: "
             + reqGroupProgScheduleToUpdate.getId());
@@ -122,12 +120,12 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
             reqGroupProgScheduleToUpdate, HttpStatus.OK);
     } catch (DataIntegrityViolationException ex) {
       ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while saving requisitionGroupProgramSchedule"
-                  + " with id: " + reqGroupProgScheduleToUpdate.getId(), ex.getMessage());
+            new ErrorResponse("An error occurred while saving requisitionGroupProgramSchedule"
+                  + " with id: " + requisitionId, ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
       return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
-  }*/
+  }
 
   /**
    * Allows deleting requisitionGroupProgramSchedule.

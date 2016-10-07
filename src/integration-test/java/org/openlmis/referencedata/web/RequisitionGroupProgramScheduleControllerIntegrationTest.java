@@ -1,205 +1,220 @@
 package org.openlmis.referencedata.web;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
-@Ignore
 public class RequisitionGroupProgramScheduleControllerIntegrationTest
-      extends BaseWebIntegrationTest {
+    extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/requisitionGroupProgramSchedules";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
   private static final UUID ID = UUID.fromString("1752b457-0a4b-4de0-bf94-5a6a8002427e");
 
-  @Autowired
+  @MockBean
   private RequisitionGroupProgramScheduleRepository repository;
+  
+  private RequisitionGroup requisitionGroup;
+  private ProcessingSchedule schedule;
+  private Program program;
+  
+  private RequisitionGroupProgramSchedule reqGroupProgSchedule;
+  private UUID requisitionGroupProgramScheduleId;
 
-  @Autowired
-  private ProcessingScheduleRepository scheduleRepository;
+  /**
+   * Constructor for tests.
+   */
+  public RequisitionGroupProgramScheduleControllerIntegrationTest() {
 
-  @Autowired
-  private ProgramRepository programRepository;
+    requisitionGroup = new RequisitionGroup("RG1", "Requisition Group 1",
+        SupervisoryNode.newSupervisoryNode("SN1", new Facility("F1")));
 
-  private RequisitionGroupProgramSchedule reqGroupProgSchedule =
-        new RequisitionGroupProgramSchedule();
+    schedule = new ProcessingSchedule("scheduleCode", "scheduleName");
 
-  @Before
-  public void setUp() {
-    ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode("scheduleCode");
-    schedule.setName("scheduleName");
-    scheduleRepository.save(schedule);
-
-    Program program = new Program("programCode");
+    program = new Program("programCode");
     program.setPeriodsSkippable(true);
-    programRepository.save(program);
 
-    reqGroupProgSchedule.setDirectDelivery(false);
-    reqGroupProgSchedule.setProcessingSchedule(schedule);
-    reqGroupProgSchedule.setProgram(program);
-    repository.save(reqGroupProgSchedule);
+    reqGroupProgSchedule = RequisitionGroupProgramSchedule
+        .newRequisitionGroupProgramSchedule(requisitionGroup, program, schedule, false);
+    
+    requisitionGroupProgramScheduleId = UUID.randomUUID();
   }
 
   @Test
   public void shouldDeleteRequisitionGroupProgramSchedule() {
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", reqGroupProgSchedule.getId())
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(204);
+    given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(reqGroupProgSchedule);
 
-    assertFalse(repository.exists(reqGroupProgSchedule.getId()));
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupProgramScheduleId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldNotDeleteNonexistentRequisitionGroupProgramSchedule() {
 
-    repository.delete(reqGroupProgSchedule);
+    given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(null);
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", reqGroupProgSchedule.getId())
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldCreateRequisitionGroupProgramSchedule() {
-
-    repository.delete(reqGroupProgSchedule);
-
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(reqGroupProgSchedule)
-          .when()
-          .post(RESOURCE_URL)
-          .then()
-          .statusCode(201);
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupProgramScheduleId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetAllRequisitionGroupsProgramSchedule() {
+  public void shouldPostRequisitionGroupProgramSchedule() {
 
-    RequisitionGroupProgramSchedule[] response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when()
-          .get(RESOURCE_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(RequisitionGroupProgramSchedule[].class);
+    RequisitionGroupProgramSchedule response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(reqGroupProgSchedule)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(201)
+        .extract().as(RequisitionGroupProgramSchedule.class);
 
-    Iterable<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules =
-          Arrays.asList(response);
-    assertTrue(requisitionGroupProgramSchedules.iterator().hasNext());
+    assertEquals(reqGroupProgSchedule, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenRequisitionGroupProgramSchedule() {
+  public void shouldGetAllRequisitionGroupProgramSchedules() {
 
-    RequisitionGroupProgramSchedule response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", reqGroupProgSchedule.getId())
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(RequisitionGroupProgramSchedule.class);
+    List<RequisitionGroupProgramSchedule> storedRequisitionGroupProgramSchedules = Arrays.asList(
+        reqGroupProgSchedule, RequisitionGroupProgramSchedule
+            .newRequisitionGroupProgramSchedule(requisitionGroup, program, schedule, true));
+    given(repository.findAll()).willReturn(storedRequisitionGroupProgramSchedules);
 
-    assertTrue(repository.exists(response.getId()));
+    RequisitionGroupProgramSchedule[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RequisitionGroupProgramSchedule[].class);
+
+    assertEquals(storedRequisitionGroupProgramSchedules.size(), response.length);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetRequisitionGroupProgramSchedule() {
+
+    given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(reqGroupProgSchedule);
+
+    RequisitionGroupProgramSchedule response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupProgramScheduleId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RequisitionGroupProgramSchedule.class);
+
+    assertEquals(reqGroupProgSchedule, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldNotGetNonexistentRequisitionGroupProgramSchedule() {
 
-    repository.delete(reqGroupProgSchedule);
+    given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(null);
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", reqGroupProgSchedule.getId())
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(404);
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupProgramScheduleId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore // TODO: put back in once endpoint is re-enabled
   @Test
-  public void shouldUpdateRequisitionGroupProgramSchedule() {
+  public void shouldPutRequisitionGroupProgramSchedule() {
 
     reqGroupProgSchedule.setDirectDelivery(true);
+    given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(reqGroupProgSchedule);
 
-    RequisitionGroupProgramSchedule response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", reqGroupProgSchedule.getId())
-          .body(reqGroupProgSchedule)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(RequisitionGroupProgramSchedule.class);
+    RequisitionGroupProgramSchedule response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupProgramScheduleId)
+        .body(reqGroupProgSchedule)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RequisitionGroupProgramSchedule.class);
 
+    assertEquals(reqGroupProgSchedule, response);
     assertTrue(response.isDirectDelivery());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore // TODO: put back in once endpoint is re-enabled
   @Test
   public void shouldCreateNewRequisitionGroupProgramScheduleIfDoesNotExist() {
 
-    repository.delete(reqGroupProgSchedule);
     reqGroupProgSchedule.setDirectDelivery(true);
+    given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(null);
 
-    RequisitionGroupProgramSchedule response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", ID)
-          .body(reqGroupProgSchedule)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(RequisitionGroupProgramSchedule.class);
+    RequisitionGroupProgramSchedule response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", ID)
+        .body(reqGroupProgSchedule)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RequisitionGroupProgramSchedule.class);
 
+    assertEquals(reqGroupProgSchedule, response);
     assertTrue(response.isDirectDelivery());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
