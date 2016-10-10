@@ -2,14 +2,13 @@
   {
     "id": "00000000-0000-0000-0000-000000000001",
     "username": "administrator",
-    "password": "password",
     "email": "administrator@openlmis.org",
     "firstName": "Admin",
-    "lastName": "Strator",
+    "lastName": "Admin",
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
-    "facilityid": { "id": "00000000-0000-0000-0000-000000000001" },
+    "facilityId": { "id": "00000000-0000-0000-0000-000000000001" },
     "timeZone": "CET"
   }
 ]
