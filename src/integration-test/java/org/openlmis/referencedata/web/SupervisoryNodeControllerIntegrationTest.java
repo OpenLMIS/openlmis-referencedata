@@ -1,12 +1,9 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
@@ -14,161 +11,148 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.repository.FacilityOperatorRepository;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
-import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
-@Ignore
 public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
 
-  @Autowired
+  @MockBean
   private SupervisoryNodeRepository repository;
 
-  @Autowired
-  private FacilityRepository facilityRepository;
-
-  @Autowired
-  private FacilityTypeRepository facilityTypeRepository;
-
-  @Autowired
-  private FacilityOperatorRepository facilityOperatorRepository;
-
-  @Autowired
-  private GeographicZoneRepository geographicZoneRepository;
-
-  @Autowired
-  private GeographicLevelRepository geographicLevelRepository;
-
   private SupervisoryNode supervisoryNode;
+  private UUID supervisoryNodeId;
 
-  @Before
-  public void setUp() {
+  /**
+   * Constructor for tests.
+   */
+  public SupervisoryNodeControllerIntegrationTest() {
     FacilityOperator facilityOperator = new FacilityOperator();
     facilityOperator.setCode("facilityOperator");
-    facilityOperatorRepository.save(facilityOperator);
 
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode("facilityTypeCode");
-    facilityTypeRepository.save(facilityType);
+    FacilityType facilityType = new FacilityType("facilityTypeCode");
 
-    GeographicLevel geoLevel = new GeographicLevel();
-    geoLevel.setCode("geoCode");
-    geoLevel.setLevelNumber(1);
-    geographicLevelRepository.save(geoLevel);
+    GeographicLevel geoLevel = new GeographicLevel("geoCode", 1);
 
-    GeographicZone geoZone = new GeographicZone();
-    geoZone.setCode("geoZoneCode");
-    geoZone.setLevel(geoLevel);
-    geographicZoneRepository.save(geoZone);
+    GeographicZone geoZone = new GeographicZone("geoZoneCode", geoLevel);
 
     Facility facility = new Facility("facilityCode");
     facility.setActive(true);
     facility.setGeographicZone(geoZone);
     facility.setType(facilityType);
     facility.setOperator(facilityOperator);
-    facilityRepository.save(facility);
 
     supervisoryNode = SupervisoryNode.newSupervisoryNode("supervisoryNodeCode", facility);
-    repository.save(supervisoryNode);
+    supervisoryNodeId = UUID.randomUUID();
   }
 
   @Test
   public void shouldDeleteSupervisoryNode() {
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supervisoryNode.getId())
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(204);
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
-    assertFalse(repository.exists(supervisoryNode.getId()));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldCreateSupervisoryNode() {
-
-    repository.delete(supervisoryNode);
-
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(supervisoryNode)
-          .when()
-          .post(RESOURCE_URL)
-          .then()
-          .statusCode(201);
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldUpdateSupervisoryNode() {
+  public void shouldPostSupervisoryNode() {
 
-    supervisoryNode.setCode("OpenLMIS");
+    SupervisoryNode response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(supervisoryNode)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(201)
+        .extract().as(SupervisoryNode.class);
 
-    SupervisoryNode response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supervisoryNode.getId())
-          .body(supervisoryNode)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(SupervisoryNode.class);
+    assertEquals(supervisoryNode, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
 
-    assertEquals(response.getCode(), "OpenLMIS");
+  @Test
+  public void shouldPutSupervisoryNode() {
+
+    supervisoryNode.setDescription("OpenLMIS");
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+
+    SupervisoryNode response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .body(supervisoryNode)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(SupervisoryNode.class);
+
+    assertEquals(supervisoryNode, response);
+    assertEquals("OpenLMIS", response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldGetAllSupervisoryNodes() {
 
-    SupervisoryNode[] response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when()
-          .get(RESOURCE_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(SupervisoryNode[].class);
+    List<SupervisoryNode> storedSupervisoryNodes = Arrays.asList(supervisoryNode,
+        SupervisoryNode.newSupervisoryNode("SN2", new Facility("F2")));
+    given(repository.findAll()).willReturn(storedSupervisoryNodes);
 
-    Iterable<SupervisoryNode> supervisoryNodes = Arrays.asList(response);
-    assertTrue(supervisoryNodes.iterator().hasNext());
+    SupervisoryNode[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(SupervisoryNode[].class);
+
+    assertEquals(storedSupervisoryNodes.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenSupervisoryNode() {
+  public void shouldGetSupervisoryNode() {
 
-    SupervisoryNode response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", supervisoryNode.getId())
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(SupervisoryNode.class);
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
-    assertTrue(repository.exists(response.getId()));
+    SupervisoryNode response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(SupervisoryNode.class);
+
+    assertEquals(supervisoryNode, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

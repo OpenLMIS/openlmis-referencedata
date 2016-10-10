@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +46,7 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldFindProductCategories() {
+  public void shouldFindProductCategoriesByCode() {
 
     given(productCategoryRepository.findByCode(any(Code.class))).willReturn(productCategory);
 
@@ -60,6 +61,25 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
         .extract().as(ProductCategory.class);
 
     assertEquals(productCategory, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindAllProductCategories() {
+
+    Iterable<ProductCategory> searchResult = Collections.singletonList(productCategory);
+    given(productCategoryRepository.findAll()).willReturn(searchResult);
+
+    ProductCategory[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProductCategory[].class);
+
+    assertEquals(1, response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

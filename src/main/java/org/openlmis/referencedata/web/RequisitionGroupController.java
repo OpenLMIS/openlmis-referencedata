@@ -31,8 +31,7 @@ public class RequisitionGroupController extends BaseController {
   private RequisitionGroupRepository requisitionGroupRepository;
 
   /**
-   * Allows creating new requisitionGroup.
-   * If the id is specified, it will be ignored.
+   * Allows creating new requisitionGroup. If the id is specified, it will be ignored.
    *
    * @param requisitionGroup A requisitionGroup bound to the request body
    * @return ResponseEntity containing the created requisitionGroup
@@ -45,10 +44,10 @@ public class RequisitionGroupController extends BaseController {
 
     if (bindingResult.getErrorCount() == 0) {
       requisitionGroup.setId(null);
-      RequisitionGroup newRequisitionGroup = requisitionGroupRepository.save(requisitionGroup);
+      requisitionGroupRepository.save(requisitionGroup);
 
       LOGGER.debug("Created new requisitionGroup with id: " + requisitionGroup.getId());
-      return new ResponseEntity<>(newRequisitionGroup, HttpStatus.CREATED);
+      return new ResponseEntity<>(requisitionGroup, HttpStatus.CREATED);
     } else {
       return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
     }
@@ -106,7 +105,7 @@ public class RequisitionGroupController extends BaseController {
       }
 
       requisitionGroupToUpdate.updateFrom(requisitionGroup);
-      requisitionGroupToUpdate = requisitionGroupRepository.save(requisitionGroupToUpdate);
+      requisitionGroupRepository.save(requisitionGroupToUpdate);
 
       LOGGER.debug("Saved requisitionGroup with id: " + requisitionGroupToUpdate.getId());
       return new ResponseEntity<>(requisitionGroupToUpdate, HttpStatus.OK);

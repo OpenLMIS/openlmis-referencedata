@@ -111,6 +111,7 @@ public class ProductCategoryController extends BaseController {
    */
   @RequestMapping(value = "/productCategories/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteProductCategory(@PathVariable("id") UUID productCategoryId) {
+
     ProductCategory productCategory = productCategoryRepository.findOne(productCategoryId);
     if (productCategory == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -137,10 +138,17 @@ public class ProductCategoryController extends BaseController {
   @RequestMapping(value = "/productCategories/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProductCategories(
       @RequestParam(value = "code", required = false) String codeParam) {
-    ProductCategory found = productCategoryRepository.findByCode(Code.code(codeParam));
-    if (null == found) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    if (codeParam != null) {
+      ProductCategory productCategory = productCategoryRepository
+          .findByCode(Code.code(codeParam));
+      if (null == productCategory) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+      return new ResponseEntity<>(productCategory, HttpStatus.OK);
+    } else {
+      Iterable<ProductCategory> productCategories = productCategoryRepository.findAll();
+      return new ResponseEntity<>(productCategories, HttpStatus.OK);
     }
-    return new ResponseEntity<>(found, HttpStatus.OK);
   }
 }

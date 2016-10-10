@@ -20,6 +20,7 @@ import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.ExternalApiException;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
+import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -33,6 +34,7 @@ import org.openlmis.referencedata.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -57,7 +59,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @NoArgsConstructor
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 @Controller
 public class UserController extends BaseController {
 
@@ -67,24 +69,26 @@ public class UserController extends BaseController {
   @Autowired
   private UserService userService;
 
+  @Autowired
+  private UserRepository userRepository;
 
   @Autowired
-  UserRepository userRepository;
+  private RoleRepository roleRepository;
 
   @Autowired
-  RoleRepository roleRepository;
+  private ProgramRepository programRepository;
 
   @Autowired
-  ProgramRepository programRepository;
+  private ExposedMessageSource messageSource;
 
   @Autowired
-  SupervisoryNodeRepository supervisoryNodeRepository;
+  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
-  FacilityRepository facilityRepository;
+  private FacilityRepository facilityRepository;
 
   @Autowired
-  RightRepository rightRepository;
+  private RightRepository rightRepository;
 
   @Autowired
   private Validator validator;
@@ -103,7 +107,8 @@ public class UserController extends BaseController {
                         RightRepository rightRepository,
                         ProgramRepository programRepository,
                         SupervisoryNodeRepository supervisoryNodeRepository,
-                        FacilityRepository facilityRepository) {
+                        FacilityRepository facilityRepository,
+                        ExposedMessageSource messageSource) {
     this.userService = userService;
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
@@ -111,6 +116,7 @@ public class UserController extends BaseController {
     this.programRepository = programRepository;
     this.supervisoryNodeRepository = supervisoryNodeRepository;
     this.facilityRepository = facilityRepository;
+    this.messageSource = messageSource;
   }
 
   /**
@@ -285,9 +291,10 @@ public class UserController extends BaseController {
                                                @RequestParam(value = "warehouseCode",
                                                    required = false) String warehouseCode) {
 
-    User user = userRepository.findOne(userId);
-    if (user == null) {
-      LOGGER.error("User not found");
+    User user;
+    try {
+      user = validateUser(userId);
+    } catch (AuthException err) {
       return ResponseEntity
           .notFound()
           .build();
@@ -335,21 +342,19 @@ public class UserController extends BaseController {
                                            @RequestParam(value = "forHomeFacility",
                                                required = false, defaultValue = "true")
                                                boolean forHomeFacility) {
+    try {
+      User user = validateUser(userId);
+      Set<Program> programs = forHomeFacility
+          ? user.getHomeFacilityPrograms() : user.getSupervisedPrograms();
 
-    User user = userRepository.findOne(userId);
-    if (user == null) {
-      LOGGER.error("User not found");
+      return ResponseEntity
+          .ok()
+          .body(programs);
+    } catch (AuthException err) {
       return ResponseEntity
           .notFound()
           .build();
     }
-
-    Set<Program> programs = forHomeFacility
-        ? user.getHomeFacilityPrograms() : user.getSupervisedPrograms();
-
-    return ResponseEntity
-        .ok()
-        .body(programs);
   }
 
   /**
@@ -360,20 +365,18 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{userId}/supervisedFacilities", method = RequestMethod.GET)
   public ResponseEntity<?> getUserSupervisedFacilities(@PathVariable(USER_ID) UUID userId) {
+    try {
+      User user = validateUser(userId);
+      Set<Facility> supervisedFacilities = user.getSupervisedFacilities();
 
-    User user = userRepository.findOne(userId);
-    if (user == null) {
-      LOGGER.error("User not found");
+      return ResponseEntity
+          .ok()
+          .body(supervisedFacilities);
+    } catch (AuthException err) {
       return ResponseEntity
           .notFound()
           .build();
     }
-
-    Set<Facility> supervisedFacilities = user.getSupervisedFacilities();
-
-    return ResponseEntity
-        .ok()
-        .body(supervisedFacilities);
   }
 
   /**
@@ -384,19 +387,18 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{userId}/fulfillmentFacilities", method = RequestMethod.GET)
   public ResponseEntity<?> getUserFulfillmentFacilities(@PathVariable(USER_ID) UUID userId) {
-    User user = userRepository.findOne(userId);
-    if (user == null) {
-      LOGGER.error("User not found");
+    try {
+      User user = validateUser(userId);
+      Set<Facility> facilities = user.getFulfillmentFacilities();
+
+      return ResponseEntity
+          .ok()
+          .body(facilities);
+    } catch (AuthException err) {
       return ResponseEntity
           .notFound()
           .build();
     }
-
-    Set<Facility> facilities = user.getFulfillmentFacilities();
-
-    return ResponseEntity
-        .ok()
-        .body(facilities);
   }
 
   /**
@@ -452,6 +454,19 @@ public class UserController extends BaseController {
     }
   }
 
+  private User validateUser(UUID userId) throws AuthException {
+    User user = userRepository.findOne(userId);
+    if (user == null) {
+      Object[] args = { userId };
+      String message = messageSource.getMessage(
+          "referencedata.error.id.not-found", args, LocaleContextHolder.getLocale());
+
+      LOGGER.error(message);
+      throw new AuthException(message);
+    }
+
+    return user;
+  }
 
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user)
       throws RightTypeException, RoleAssignmentException {

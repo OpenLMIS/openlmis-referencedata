@@ -3,7 +3,12 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,10 +19,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * RequisitionGroup represents a group of facilities which follow a particular schedule for a
@@ -91,5 +92,22 @@ public class RequisitionGroup extends BaseEntity {
     supervisoryNode = requisitionGroup.getSupervisoryNode();
     requisitionGroupProgramSchedules = requisitionGroup.getRequisitionGroupProgramSchedules();
     memberFacilities = requisitionGroup.getMemberFacilities();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof RequisitionGroup)) {
+      return false;
+    }
+    RequisitionGroup that = (RequisitionGroup) obj;
+    return Objects.equals(code, that.code);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
   }
 }

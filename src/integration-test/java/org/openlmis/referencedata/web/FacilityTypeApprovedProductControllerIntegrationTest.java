@@ -1,10 +1,9 @@
 package org.openlmis.referencedata.web;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -17,17 +16,14 @@ import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
-import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.OrderableProductRepository;
-import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.repository.ProgramProductRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @Ignore
 public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -36,138 +32,148 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
 
-  @Autowired
+  @MockBean
   private FacilityTypeApprovedProductRepository repository;
 
-  @Autowired
-  private FacilityTypeRepository facilityTypeRepository;
+  private Program program;
+  private OrderableProduct orderableProduct;
+  private FacilityType facilityType1;
+  private FacilityType facilityType2;
+  private ProgramProduct programProduct;
+  private FacilityTypeApprovedProduct facilityTypeAppProd;
+  private UUID facilityTypeAppProdId;
 
-  @Autowired
-  private ProgramProductRepository programProductRepository;
+  /**
+   * Constructor for tests.
+   */
+  public FacilityTypeApprovedProductControllerIntegrationTest() {
 
-  @Autowired
-  private ProductCategoryRepository productCategoryRepository;
+    program = new Program("programCode");
+    program.setPeriodsSkippable(true);
+    program.setId(UUID.randomUUID());
 
-  @Autowired
-  private ProgramRepository programRepository;
-
-  @Autowired
-  private OrderableProductRepository orderableProductRepository;
-
-  private FacilityTypeApprovedProduct facilityTypeAppProd = new FacilityTypeApprovedProduct();
-
-  @Before
-  public void setUp() {
     ProductCategory productCategory = ProductCategory.createNew(Code.code("productCategoryCode"),
         new OrderedDisplayValue("productCategoryName", 1));
-    productCategoryRepository.save(productCategory);
+    productCategory.setId(UUID.randomUUID());
 
-    Program program = new Program("programCode");
-    program.setPeriodsSkippable(true);
-    programRepository.save(program);
+    orderableProduct = GlobalProduct.newGlobalProduct("abcd", "Abcd", "test", 10);
 
-    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct("abcd", "Abcd", "test", 10);
-    orderableProductRepository.save(orderableProduct);
+    programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct);
 
-    ProgramProduct programProduct = new ProgramProduct();
-    ProductCategory testCat = ProductCategory.createNew(Code.code("test"));
-    programProduct.createNew(program, testCat, orderableProduct);
-    programProductRepository.save(programProduct);
+    facilityType1 = new FacilityType("facilityType1");
 
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode("facilityType");
-    facilityTypeRepository.save(facilityType);
+    facilityType2 = new FacilityType("facilityType2");
 
-    facilityTypeAppProd.setFacilityType(facilityType);
+    facilityTypeAppProd = new FacilityTypeApprovedProduct();
+    facilityTypeAppProd.setId(facilityTypeAppProdId);
+    facilityTypeAppProd.setFacilityType(facilityType1);
     facilityTypeAppProd.setProgramProduct(programProduct);
     facilityTypeAppProd.setMaxMonthsOfStock(6.00);
-    repository.save(facilityTypeAppProd);
+    facilityTypeAppProdId = UUID.randomUUID();
   }
 
   @Test
   public void shouldDeleteFacilityTypeApprovedProduct() {
 
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", facilityTypeAppProd.getId())
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(204);
+    given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
 
-    assertFalse(repository.exists(facilityTypeAppProd.getId()));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldCreateFacilityTypeApprovedProduct() {
-
-    repository.delete(facilityTypeAppProd);
-
-    restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .body(facilityTypeAppProd)
-          .when()
-          .post(RESOURCE_URL)
-          .then()
-          .statusCode(201);
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldUpdateFacilityTypeApprovedProduct() {
+  public void shouldPostFacilityTypeApprovedProduct() {
+
+    FacilityTypeApprovedProduct response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(facilityTypeAppProd)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(201)
+        .extract().as(FacilityTypeApprovedProduct.class);
+
+    assertEquals(facilityTypeAppProd, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldPutFacilityTypeApprovedProduct() {
 
     facilityTypeAppProd.setMaxMonthsOfStock(9.00);
+    given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
 
-    FacilityTypeApprovedProduct response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", facilityTypeAppProd.getId())
-          .body(facilityTypeAppProd)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(FacilityTypeApprovedProduct.class);
+    FacilityTypeApprovedProduct response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .body(facilityTypeAppProd)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(FacilityTypeApprovedProduct.class);
 
-    assertTrue(response.getMaxMonthsOfStock().equals(9.00));
+    assertEquals(facilityTypeAppProd, response);
+    assertEquals(9.00, response.getMaxMonthsOfStock(), 0.00);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldGetAllFacilityTypeApprovedProducts() {
 
-    FacilityTypeApprovedProduct[] response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when()
-          .get(RESOURCE_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(FacilityTypeApprovedProduct[].class);
+    FacilityTypeApprovedProduct another = new FacilityTypeApprovedProduct();
+    another.setFacilityType(facilityType2);
+    another.setProgramProduct(programProduct);
+    another.setMaxMonthsOfStock(3.0);
+    List<FacilityTypeApprovedProduct> storedFacilityTypeApprovedProducts = Arrays.asList(
+        facilityTypeAppProd, another);
 
-    Iterable<FacilityTypeApprovedProduct> facilityTypeApprovedProducts = Arrays.asList(response);
-    assertTrue(facilityTypeApprovedProducts.iterator().hasNext());
+    given(repository.findAll()).willReturn(storedFacilityTypeApprovedProducts);
+
+    Object[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Object[].class);
+
+    assertEquals(storedFacilityTypeApprovedProducts.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldGetChosenFacilityTypeApprovedProduct() {
+  public void shouldGetFacilityTypeApprovedProduct() {
 
-    FacilityTypeApprovedProduct response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", facilityTypeAppProd.getId())
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(FacilityTypeApprovedProduct.class);
+    given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
 
-    assertTrue(repository.exists(response.getId()));
+    FacilityTypeApprovedProduct response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(FacilityTypeApprovedProduct.class);
+
+    assertEquals(facilityTypeAppProd, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

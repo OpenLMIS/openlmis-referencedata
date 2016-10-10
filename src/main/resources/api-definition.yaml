@@ -6,9 +6,20 @@ baseUri: "http://@virtualHost@:8080/api"
 
 documentation:
     - title: Getting Started
-      content: Welcome to the OpenLMIS rereferencedata-service documentation.
+      content: Welcome to the OpenLMIS referencedata service documentation.
 
 schemas:
+  - errorResponse: |
+      {   "type": "object",
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "title": "ErrorResponse",
+          "description": "Error response",
+          "properties": {
+              "message": { "type": "string", "required": true, "title": "message" },
+              "description": { "type": "string", "required": false, "title": "description" }
+          }
+      }
+
   - facility: |
       {
           "type": "object",
@@ -31,6 +42,13 @@ schemas:
               "openLmisAccessible": { "type": "boolean", "required": false, "title": "openLmisAccessible" },
               "supportedPrograms": { "type": "array", "required": false, "title": "supportedPrograms", "items": { "type": "object", "$ref":"#/schemas/program" }, "uniqueItems": false }
           }
+      }
+
+  - facilityArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref":"#/schemas/facility" }
+
       }
 
   - facilityOperator: |
@@ -111,7 +129,7 @@ schemas:
           "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
           "title": "Orderable Product",
-          "description": "A single processingPeriod",
+          "description": "A single orderableProduct",
           "properties": {
               "id": { "type": "string", "required": true, "title": "id" },
               "productCode": { "type": "object", "$ref": "#/schemas/productCode", "required": false, "title": "productCode" },
@@ -181,6 +199,7 @@ schemas:
            }
 
       }
+
   - program: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -195,6 +214,12 @@ schemas:
               "periodsSkippable": { "type": "boolean", "required": true, "title": "periodsSkippable" },
               "showNonFullSupplyTab": { "type": "boolean", "required": false, "title": "showNonFullSupplyTab" }
           }
+      }
+
+  - programArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref":"#/schemas/program" }
       }
 
   - programProduct: |
@@ -1338,6 +1363,7 @@ resourceTypes:
                           X-XSS-Protection:
                         body:
                           application/json:
+                              schema: programArray
                     500:
                         headers:
                           X-Content-Type-Options:
@@ -1516,11 +1542,42 @@ resourceTypes:
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
+                  body:
+                    application/json:
+                      schema: errorResponse
               404:
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
               500:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+
+    /findFacilitiesWithSimilarCodeOrName:
+        get:
+            is: [ secured ]
+            description: Returns a list of facilities.
+            queryParameters:
+                code:
+                    displayName: code
+                    type: string
+                    required: false
+                    repeat: false
+                name:
+                    displayName: name
+                    type: string
+                    required: false
+                    repeat: false
+            responses:
+              200:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+                        schema: facilityArray
+              404:
                   headers:
                     X-Content-Type-Options:
                     X-XSS-Protection:
@@ -1697,6 +1754,28 @@ resourceTypes:
                     body:
                       application/json:
                 "400":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+    /findProgramsWithSimilarName:
+
+        get:
+            is: [ secured ]
+            description: Get chosen program.
+            queryParameters:
+                name:
+                    displayName: name
+                    type: string
+                    required: true
+                    repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:

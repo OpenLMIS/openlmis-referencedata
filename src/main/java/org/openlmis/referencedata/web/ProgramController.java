@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -108,5 +110,11 @@ public class ProgramController extends BaseController {
     programRepository.save(program);
 
     return new ResponseEntity<>(program, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/programs/findProgramsWithSimilarName", method = RequestMethod.GET)
+  public ResponseEntity<?> findProgramsByName(@RequestParam("name") String programName) {
+    List<Program> foundPrograms = programRepository.findProgramsWithSimilarName(programName);
+    return new ResponseEntity<>(foundPrograms, HttpStatus.OK);
   }
 }
