@@ -52,6 +52,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -457,12 +458,12 @@ public class UserController extends BaseController {
   private User validateUser(UUID userId) throws AuthException {
     User user = userRepository.findOne(userId);
     if (user == null) {
+      String messageCode = "referencedata.error.id.not-found";
       Object[] args = { userId };
-      String message = messageSource.getMessage(
-          "referencedata.error.id.not-found", args, LocaleContextHolder.getLocale());
 
-      LOGGER.error(message);
-      throw new AuthException(message);
+      LOGGER.error(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
+      throw new AuthException(
+          messageSource.getMessage(messageCode, args, LocaleContextHolder.getLocale()));
     }
 
     return user;
