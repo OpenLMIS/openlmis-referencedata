@@ -55,7 +55,7 @@ public class User extends BaseEntity {
   private String timezone;
 
   @ManyToOne
-  @JoinColumn(name = "facilityid")
+  @JoinColumn(name = "homefacilityid")
   @Getter
   @Setter
   private Facility homeFacility;
