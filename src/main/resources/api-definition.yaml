@@ -124,6 +124,20 @@ schemas:
           }
       }
 
+  - globalProduct: |
+        {   "type": "object",
+            "$schema": "http://json-schema.org/draft-03/schema",
+            "title": "Global Product",
+            "description": "A single globalProduct",
+            "properties": {
+                "id": { "type": "string", "required": false, "title": "id" },
+                "productCode": { "type": "string", "required": true, "title": "productCode" },
+                "name": { "type": "string", "required": false, "title": "name" },
+                "description": { "type": "string", "required": false, "title": "description" },
+                "packSize": { "type": "integer", "required": false, "title": "packSize" }
+            }
+        }
+
   - orderableProduct: |
       {
           "type": "object",
@@ -131,10 +145,11 @@ schemas:
           "title": "Orderable Product",
           "description": "A single orderableProduct",
           "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "productCode": { "type": "object", "$ref": "#/schemas/productCode", "required": false, "title": "productCode" },
+              "id": { "type": "string", "required": false, "title": "id" },
+              "productCode": { "type": "string", "required": true, "title": "productCode" },
+              "name": { "type": "string", "required": false, "title": "name" },
               "packSize": { "type": "long", "required": false, "title": "packSize" },
-              "programProducts": { "type": "array", "required": false, "title": "programProducts", "items": { "type": "object", "$ref": "#/schemas/orderableProduct" }, "uniqueItems": false  }
+              "programProducts": { "type": "array", "required": false, "title": "programProducts", "items": { "type": "object", "$ref": "#/schemas/programProduct" }, "uniqueItems": false }
           }
       }
 
@@ -153,28 +168,6 @@ schemas:
           }
       }
 
-  - product: |
-        {   "type": "object",
-            "$schema": "http://json-schema.org/draft-03/schema",
-            "title": "Product",
-            "description": "A single product",
-            "properties": {
-                "id": { "type": "string", "required": true, "title": "id" },
-                "code": { "type": "string", "required": true, "title": "code" },
-                "primaryName": { "type": "string", "required": true, "title": "primaryName" },
-                "dispensingUnit": { "type": "string", "required": true, "title": "dispensingUnit" },
-                "dosesPerDispensingUnit": { "type": "integer", "required": true, "title": "dosesPerDispensingUnit" },
-                "packSize": { "type": "integer", "required": true, "title": "packSize" },
-                "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
-                "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
-                "active": { "type": "boolean", "required": true, "title": "active" },
-                "fullSupply": { "type": "boolean", "required": true, "title": "fullSupply" },
-                "tracer": { "type": "boolean", "required": true, "title": "tracer" },
-                "productCategory": { "type": "object", "$ref": "#/schemas/productCategory", "required": true, "title": "productCategory" }
-            }
-        }
-
-
   - productCategory: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -186,18 +179,6 @@ schemas:
               "name": { "type": "string", "required": true, "title": "name" },
               "displayOrder": { "type": "integer", "required": true, "title": "displayOrder" }
           }
-      }
-
-  - productCode: |
-      {   "type": "object",
-           "$schema": "http://json-schema.org/draft-03/schema",
-           "title": "ProductCode",
-           "description": "A single productCode",
-           "properties": {
-             "id": { "type": "string", "required": true, "title": "id" },
-             "productCode": { "type": "string", "required": false, "title": "productCode" }
-           }
-
       }
 
   - program: |
@@ -282,6 +263,20 @@ schemas:
           }
       }
 
+  - tradeItem: |
+        {   "type": "object",
+            "$schema": "http://json-schema.org/draft-03/schema",
+            "title": "Trade Item",
+            "description": "A single tradeItem",
+            "properties": {
+                "id": { "type": "string", "required": false, "title": "id" },
+                "productCode": { "type": "string", "required": true, "title": "productCode" },
+                "name": { "type": "string", "required": false, "title": "name" },
+                "packSize": { "type": "integer", "required": false, "title": "packSize" },
+                "manufacturer": { "type": "string", "required": false, "title": "manufacturer" }
+            }
+        }
+
   - user: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -360,18 +355,6 @@ schemas:
               "processingSchedule": { "type": "object", "$ref": "#/schemas/processingSchedule", "required": true },
               "directDelivery": { "type": "boolean", "required": true, "title": "directDelivery" },
               "dropOffFacility": { "type": "object", "$ref": "#/schemas/facility", "required": false }
-          }
-      }
-
-  - programDto: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "ProgramDto",
-          "description": "A single programDto",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "title": "code" },
-              "name": { "type": "string", "required": false, "title": "name" }
           }
       }
 
@@ -748,139 +731,106 @@ resourceTypes:
                      X-Content-Type-Options:
                      X-XSS-Protection:
 
-/programProducts:
-    displayName: Program Products
-    post:
-          is: [ secured ]
-          description: Create new programProduct.
-          body:
-              application/json:
-          responses:
-              "201":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "500":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
+/orderableProducts:
+    displayName: Orderable Product
     get:
-          is: [ secured ]
-          description: Get all programProducts.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                     application/json:
+        is: [ secured ]
+        description: Get all Orderable Products.
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+                      schema: orderableProduct
     /{id}:
-          uriParameters:
+        uriParameters:
             id:
                 displayName: id
                 type: string
                 required: true
                 repeat: false
-          put:
-              is: [ secured ]
-              description: Update existing programProduct.
-              body:
+        get:
+            is: [ secured ]
+            description: Get chosen orderable product.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                          schema: orderableProduct
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+
+/tradeItems:
+    displayName: Trade Item
+    put:
+        is: [ secured ]
+        description: Create or update a Trade Item.
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
                   application/json:
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-          get:
-              is: [ secured ]
-              description: Get chosen programProduct.
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-          delete:
-              is: [ secured ]
-              description: Delete chosen programProduct.
-              responses:
-                  "204":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "409":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-    /search:
-            get:
-                is: [ secured ]
-                description: Find program products with matched parameters.
-                queryParameters:
-                    program:
-                        displayName: program
-                        description: program ID
-                        type: string
-                        required: true
-                        repeat: false
-                    fullSupply:
-                        displayName: fullSupply
-                        description: Full supply
-                        type: boolean
-                        required: false
-                        repeat: false
-                responses:
-                   "200":
-                       headers:
-                         X-Content-Type-Options:
-                         X-XSS-Protection:
-                       body:
-                         application/json:
-                   "404":
-                       headers:
-                         X-Content-Type-Options:
-                         X-XSS-Protection:
-                       body:
-                         application/json:
-                   "500":
-                       headers:
-                         X-Content-Type-Options:
-                         X-XSS-Protection:
-                       body:
-                         application/json:
+                      schema: tradeItem
+
+/globalProducts:
+    displayName: Global Product
+    put:
+        is: [ secured ]
+        description: Create or update a Global Product.
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+                      schema: globalProduct
+    /{id}/tradeItems:
+        uriParameters:
+            id:
+                displayName: id
+                type: string
+                required: true
+                repeat: false
+        get:
+            is: [ secured ]
+            description: Get a list of Trade Item UUIDs that may fulfill for the given Orderable Product.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+        put:
+            is: [ secured ]
+            description: Update the list of Trade Item UUIDs that may fulfill for the given Orderable Product.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "400":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
 
 /processingSchedules:
     displayName: Processing Schedule
