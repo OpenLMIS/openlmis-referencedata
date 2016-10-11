@@ -23,7 +23,7 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
    * @param name Part of wanted program name.
    * @return List of Programs with wanted name.
    */
-  public List<Program> findProgramsWithSimilarName(String name) {
+  public List<Program> findProgramsByName(String name) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Program> query = builder.createQuery(Program.class);
     Root<Program> root = query.from(Program.class);

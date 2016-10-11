@@ -152,7 +152,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     String similarCode = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(generatedFacility);
-    given(facilityRepository.findFacilitiesWithSimilarCodeOrName(similarCode,null))
+    given(facilityRepository.findFacilitiesByCodeOrName(similarCode,null))
         .willReturn(listToReturn);
 
     Facility[] response = restAssured.given()
@@ -175,7 +175,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     String similarName = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(generatedFacility);
-    given(facilityRepository.findFacilitiesWithSimilarCodeOrName(null,similarName))
+    given(facilityRepository.findFacilitiesByCodeOrName(null,similarName))
         .willReturn(listToReturn);
 
     Facility[] response = restAssured.given()

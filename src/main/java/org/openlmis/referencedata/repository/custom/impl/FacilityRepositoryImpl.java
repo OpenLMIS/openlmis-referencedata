@@ -26,7 +26,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * @param name Part of wanted name.
    * @return List of Facilities with wanted code or name.
    */
-  public List<Facility> findFacilitiesWithSimilarCodeOrName(String code, String name) {
+  public List<Facility> findFacilitiesByCodeOrName(String code, String name) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Facility> query = builder.createQuery(Facility.class);
     Root<Facility> root = query.from(Facility.class);

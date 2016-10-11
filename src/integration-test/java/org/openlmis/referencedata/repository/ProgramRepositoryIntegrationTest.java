@@ -64,7 +64,7 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     Program program = this.generateInstance();
     repository.save(program);
 
-    List<Program> foundPrograms = repository.findProgramsWithSimilarName("Program");
+    List<Program> foundPrograms = repository.findProgramsByName("Program");
 
     assertEquals(1, foundPrograms.size());
     assertEquals(program, foundPrograms.get(0));
@@ -75,7 +75,7 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     Program program = this.generateInstance();
     repository.save(program);
 
-    List<Program> foundPrograms = repository.findProgramsWithSimilarName("Incorrect Name");
+    List<Program> foundPrograms = repository.findProgramsByName("Incorrect Name");
 
     assertEquals(0, foundPrograms.size());
   }

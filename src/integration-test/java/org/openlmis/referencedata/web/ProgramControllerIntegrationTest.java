@@ -143,7 +143,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     String similarProgramName = "Program";
     List<Program> listToReturn = new ArrayList<>();
     listToReturn.add(program);
-    given(programRepository.findProgramsWithSimilarName(similarProgramName))
+    given(programRepository.findProgramsByName(similarProgramName))
         .willReturn(listToReturn);
     Program[] response = restAssured.given()
         .queryParam("name", similarProgramName)
@@ -164,7 +164,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldNotFindProgramsByIncorrectName() {
     String incorrectProgramName = "Incorrect";
-    given(programRepository.findProgramsWithSimilarName(incorrectProgramName))
+    given(programRepository.findProgramsByName(incorrectProgramName))
         .willReturn(new ArrayList<Program>());
     Program[] response = restAssured.given()
         .queryParam("name", incorrectProgramName)

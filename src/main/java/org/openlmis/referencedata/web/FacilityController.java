@@ -181,7 +181,7 @@ public class FacilityController extends BaseController {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     List<Facility> foundFacilities =
-        facilityRepository.findFacilitiesWithSimilarCodeOrName(code, name);
+        facilityRepository.findFacilitiesByCodeOrName(code, name);
     return new ResponseEntity<>(foundFacilities, HttpStatus.OK);
   }
 

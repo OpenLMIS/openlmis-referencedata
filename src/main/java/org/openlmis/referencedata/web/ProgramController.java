@@ -121,7 +121,7 @@ public class ProgramController extends BaseController {
    */
   @RequestMapping(value = "/programs/search", method = RequestMethod.GET)
   public ResponseEntity<?> findProgramsByName(@RequestParam("name") String programName) {
-    List<Program> foundPrograms = programRepository.findProgramsWithSimilarName(programName);
+    List<Program> foundPrograms = programRepository.findProgramsByName(programName);
     return new ResponseEntity<>(foundPrograms, HttpStatus.OK);
   }
 }
