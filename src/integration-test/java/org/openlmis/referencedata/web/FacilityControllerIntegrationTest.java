@@ -36,7 +36,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
-      RESOURCE_URL + "/findFacilitiesWithSimilarCodeOrName";
+      RESOURCE_URL + "/search";
 
   @MockBean
   private FacilityRepository facilityRepository;

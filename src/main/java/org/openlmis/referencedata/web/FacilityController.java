@@ -165,12 +165,14 @@ public class FacilityController extends BaseController {
   }
 
   /**
+   * Retrieves all Facilities with facilitCode similar to code parameter or facilityName similar
+   * to name parameter.
    *
    * @param code Part of wanted facility code.
    * @param name Part of wanted facility name.
-   * @return List with wanted facility code or name.
+   * @return List of wanted Facilities.
    */
-  @RequestMapping(value = "/facilities/findFacilitiesWithSimilarCodeOrName",
+  @RequestMapping(value = "/facilities/search",
       method = RequestMethod.GET)
   public ResponseEntity<?> findFacilitiesWithSimilarCodeOrName(
       @RequestParam(value = "code", required = false) String code,

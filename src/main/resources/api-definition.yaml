@@ -1554,7 +1554,7 @@ resourceTypes:
                     X-Content-Type-Options:
                     X-XSS-Protection:
 
-    /findFacilitiesWithSimilarCodeOrName:
+    /search:
         get:
             is: [ secured ]
             description: Returns a list of facilities.
@@ -1757,8 +1757,7 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
-    /findProgramsWithSimilarName:
-
+    /search:
         get:
             is: [ secured ]
             description: Get chosen program.

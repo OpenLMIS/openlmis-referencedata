@@ -17,6 +17,8 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
   private EntityManager entityManager;
 
   /**
+   * This method is supposed to retrieve all Programs with programName similar to name parameter.
+   * To find all wanted Programs we use criteria query and like operator.
    *
    * @param name Part of wanted program name.
    * @return List of Programs with wanted name.

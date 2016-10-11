@@ -112,7 +112,14 @@ public class ProgramController extends BaseController {
     return new ResponseEntity<>(program, HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/programs/findProgramsWithSimilarName", method = RequestMethod.GET)
+
+  /**
+   * Retrieves all Programs with programName similar to name parameter.
+   *
+   * @param programName Part of wanted programName.
+   * @return List of wanted Programs.
+   */
+  @RequestMapping(value = "/programs/search", method = RequestMethod.GET)
   public ResponseEntity<?> findProgramsByName(@RequestParam("name") String programName) {
     List<Program> foundPrograms = programRepository.findProgramsWithSimilarName(programName);
     return new ResponseEntity<>(foundPrograms, HttpStatus.OK);
