@@ -44,10 +44,10 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
   private GeographicZoneRepository geographicZoneRepository;
 
   @Autowired
-  SupervisoryNodeRepository supervisoryNodeRepository;
+  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
-  RequisitionGroupRepository requisitionGroupRepository;
+  private RequisitionGroupRepository requisitionGroupRepository;
 
   private RequisitionGroup requisitionGroup;
   private Program program;

@@ -56,7 +56,6 @@ public class ProcessingSchedule extends BaseEntity {
 
   @PrePersist
   @PreUpdate
-
   private void setModifiedDate() {
     this.modifiedDate = LocalDateTime.now();
   }
