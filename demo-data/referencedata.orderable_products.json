@@ -4,7 +4,7 @@
     "code": "C1",
     "name": "Acetylsalicylic Acid",
     "packSize": 16,
-    "type": "TestType",
+    "type": "TRADE_ITEM",
     "programProducts": [
       {
         "id": "00000000-0000-0000-0000-000000000001"
@@ -16,7 +16,7 @@
     "code": "C2",
     "name": "Glibenclamide",
     "packSize": 40,
-    "type": "TestType",
+    "type": "TRADE_ITEM",
     "programProducts": [
       {
         "id": "00000000-0000-0000-0000-000000000001"
@@ -28,7 +28,7 @@
     "code": "C3",
     "name": "Streptococcus Pneumoniae Vaccine",
     "packSize": 5,
-    "type": "TestType",
+    "type": "TRADE_ITEM",
     "programProducts": [
       {
         "id": "00000000-0000-0000-0000-000000000001"
