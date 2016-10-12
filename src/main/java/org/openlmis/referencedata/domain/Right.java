@@ -79,7 +79,10 @@ public class Right extends BaseEntity {
     Right newRight = new Right(importer.getName(), importer.getType());
     newRight.id = importer.getId();
     newRight.description = importer.getDescription();
-    newRight.attach(importer.getAttachments().toArray(new Right[importer.getAttachments().size()]));
+    for (Right.Importer attachmentImporter : importer.getAttachments()) {
+      Right newAttachment = newRight(attachmentImporter);
+      newRight.attach(newAttachment);
+    }
     return newRight;
   }
 
@@ -119,10 +122,7 @@ public class Right extends BaseEntity {
     exporter.setName(name);
     exporter.setType(type);
     exporter.setDescription(description);
-    for (Right attachment : attachments) {
-      attachment.export(exporter);
-      exporter.addAttachment((Right.Exporter) attachment);
-    }
+    exporter.setAttachments(attachments);
   }
 
   @Override
@@ -151,7 +151,7 @@ public class Right extends BaseEntity {
 
     void setDescription(String description);
 
-    void addAttachment(Right.Exporter attachment);
+    void setAttachments(Set<Right> attachments);
   }
 
   public interface Importer {

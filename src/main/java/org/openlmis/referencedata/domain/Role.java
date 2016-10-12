@@ -157,12 +157,7 @@ public class Role extends BaseEntity {
     exporter.setId(id);
     exporter.setName(name);
     exporter.setDescription(description);
-
-    for (Right right : rights) {
-      Right.Exporter rightExporter = Objects.requireNonNull(exporter.provideRightExporter());
-      right.export(rightExporter);
-      exporter.addRight(rightExporter);
-    }
+    exporter.setRights(rights);
   }
 
   @Override
@@ -190,9 +185,7 @@ public class Role extends BaseEntity {
 
     void setDescription(String description);
 
-    Right.Exporter provideRightExporter();
-
-    void addRight(Right.Exporter rightExporter);
+    void setRights(Set<Right> rights);
   }
 
   public interface Importer {

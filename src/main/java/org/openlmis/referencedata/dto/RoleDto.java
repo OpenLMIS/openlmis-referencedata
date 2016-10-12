@@ -17,27 +17,25 @@ public class RoleDto extends BaseDto implements Role.Exporter, Role.Importer {
   private String name;
 
   @Getter
-
   @Setter
   private String description;
 
   private Set<RightDto> rights = new HashSet<>();
 
   @Override
-  public Right.Exporter provideRightExporter() {
-    return new RightDto();
-  }
-
-  @Override
-  public void addRight(Right.Exporter rightExporter) {
-    rights.add((RightDto) rightExporter);
+  public void setRights(Set<Right> rights) {
+    for (Right right : rights) {
+      RightDto rightDto = new RightDto();
+      right.export(rightDto);
+      this.rights.add(rightDto);
+    }
   }
 
   @Override
   public Set<Right.Importer> getRights() {
-    Set<Right.Importer> rightDtos = new HashSet<>();
-    rightDtos.addAll(this.rights);
-    return rightDtos;
+    Set<Right.Importer> rights = new HashSet<>();
+    rights.addAll(this.rights);
+    return rights;
   }
 
   @Override
