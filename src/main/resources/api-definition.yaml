@@ -132,9 +132,9 @@ schemas:
             "properties": {
                 "id": { "type": "string", "required": false, "title": "id" },
                 "productCode": { "type": "string", "required": true, "title": "productCode" },
-                "name": { "type": "string", "required": false, "title": "name" },
-                "description": { "type": "string", "required": false, "title": "description" },
-                "packSize": { "type": "integer", "required": false, "title": "packSize" }
+                "name": { "type": "string", "required": true, "title": "name" },
+                "description": { "type": "string", "required": true, "title": "description" },
+                "packSize": { "type": "integer", "required": true, "title": "packSize" }
             }
         }
 
@@ -145,12 +145,19 @@ schemas:
           "title": "Orderable Product",
           "description": "A single orderableProduct",
           "properties": {
-              "id": { "type": "string", "required": false, "title": "id" },
+              "id": { "type": "string", "required": true, "title": "id" },
               "productCode": { "type": "string", "required": true, "title": "productCode" },
               "name": { "type": "string", "required": false, "title": "name" },
               "packSize": { "type": "long", "required": false, "title": "packSize" },
-              "programProducts": { "type": "array", "required": false, "title": "programProducts", "items": { "type": "object", "$ref": "#/schemas/programProduct" }, "uniqueItems": false }
+              "programProducts": { "type": "array", "required": false, "title": "programProducts", "items": { "type": "object", "$ref": "#/schemas/programProduct" }, "uniqueItems": true }
           }
+      }
+
+  - orderableProductArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref":"#/schemas/orderableProduct" }
+
       }
 
   - processingPeriod: |
@@ -356,6 +363,12 @@ schemas:
               "directDelivery": { "type": "boolean", "required": true, "title": "directDelivery" },
               "dropOffFacility": { "type": "object", "$ref": "#/schemas/facility", "required": false }
           }
+      }
+
+  - uuidArray: |
+      {
+          "type": "array",
+          "items": { "type": "string", "required": true, "title": "id" }
       }
 
 traits:
@@ -743,7 +756,7 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
-                      schema: orderableProduct
+                      schema: orderableProductArray
     /{id}:
         uriParameters:
             id:
@@ -811,6 +824,7 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
+                        schema: uuidArray
                 "404":
                     headers:
                       X-Content-Type-Options:
@@ -818,6 +832,9 @@ resourceTypes:
         put:
             is: [ secured ]
             description: Update the list of Trade Item UUIDs that may fulfill for the given Orderable Product.
+            body:
+                application/json:
+                    schema: uuidArray
             responses:
                 "200":
                     headers:
