@@ -10,6 +10,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
@@ -33,7 +34,8 @@ public abstract class OrderableProduct extends BaseEntity {
   @JsonProperty
   private long packSize;
 
-  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
+      fetch = FetchType.EAGER)
   private Set<ProgramProduct> programProducts;
 
   protected OrderableProduct(Code productCode, String name, long packSize) {
