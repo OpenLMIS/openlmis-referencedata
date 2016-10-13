@@ -1,31 +1,28 @@
 [
   {
     "id": "00000000-0000-0000-0000-000000000001",
-    "code": "CND",
-    "name": "Canada",
+    "code": "Mal",
+    "name": "Malawi",
     "levelid": { "id": "00000000-0000-0000-0000-000000000001" }
   },
   {
     "id": "00000000-0000-0000-0000-000000000002",
-    "code": "CND-ONT",
-    "name": "Ontario",
+    "code": "Mal-So",
+    "name": "Southern Region",
     "levelid": { "id": "00000000-0000-0000-0000-000000000002" }
   },
   {
     "id": "00000000-0000-0000-0000-000000000003",
-    "code": "CND-ONT-TOR",
-    "name": "Toronto",
+    "code": "M-So-Bal",
+    "name": "Balaka District",
     "levelid": { "id": "00000000-0000-0000-0000-000000000003" },
-    "latitude": 43.41,
-    "longitude": 79.28,
-    "catchmentPopulation": 2600000
   },
-  {
+   {
     "id": "00000000-0000-0000-0000-000000000004",
-    "code": "CND-ONT-TOR-ETO",
-    "name": "Etobicoke",
+    "code": "M-So-Bal-Bal",
+    "name": "Balaka",
     "levelid": { "id": "00000000-0000-0000-0000-000000000004" },
-    "latitude": 43.48,
-    "longitude": 79.31
+    "latitude": -14.99,
+    "longitude": 34.92,
   }
 ]
