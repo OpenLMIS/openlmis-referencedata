@@ -217,6 +217,7 @@ apply from: "documentation.gradle"
 integrationTest.dependsOn copyRamlToBuild
 
 check {
-    dependsOn checkApiIsRaml
+    dependsOn ramlToHtml
+    dependsOn copyRamlHtmlToBuild
     dependsOn integrationTest
 }
