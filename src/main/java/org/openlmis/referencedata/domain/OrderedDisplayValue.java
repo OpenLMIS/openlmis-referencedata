@@ -3,6 +3,8 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
 
+import lombok.Getter;
+
 import java.util.Objects;
 import javax.persistence.Embeddable;
 
@@ -13,8 +15,10 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class OrderedDisplayValue {
   @JsonProperty
+  @Getter
   private String displayName;
   @JsonProperty
+  @Getter
   private int displayOrder;
 
   private OrderedDisplayValue() {}

@@ -2,31 +2,31 @@
   {
     "id": "00000000-0000-0000-0000-000000000001",
     "code": "C1",
-    "name": "Antibiotics",
+    "displayName": "Antibiotics",
     "displayOrder": 1
   },
   {
     "id": "00000000-0000-0000-0000-000000000002",
     "code": "C2",
-    "name": "Anaesthetics",
+    "displayName": "Anaesthetics",
     "displayOrder": 2
   },
   {
     "id": "00000000-0000-0000-0000-000000000003",
     "code": "C3",
-    "name": "Anti-fungal",
+    "displayName": "Anti-fungal",
     "displayOrder": 3
   },
   {
     "id": "00000000-0000-0000-0000-000000000004",
     "code": "C4",
-    "name": "Analgesics",
+    "displayName": "Analgesics",
     "displayOrder": 4
   },
   {
     "id": "00000000-0000-0000-0000-000000000005",
     "code": "C5",
-    "name": "Vaccines",
+    "displayName": "Vaccines",
     "displayOrder": 5
   }
 ]

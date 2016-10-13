@@ -162,8 +162,12 @@ public class ProgramProduct extends BaseEntity {
                           SerializerProvider provider) throws IOException, JsonProcessingException {
       generator.writeStartObject();
       generator.writeStringField("programId", programProduct.program.getId().toString());
-      generator.writeStringField("productCategoryId",
-          programProduct.productCategory.getId().toString());
+      generator.writeStringField("productCategoryId", programProduct.productCategory.getId()
+          .toString());
+      generator.writeStringField("productCategoryDisplayName",
+          programProduct.productCategory.getOrderedDisplayValue().getDisplayName());
+      generator.writeNumberField("productCategoryDisplayOrder",
+          programProduct.productCategory.getOrderedDisplayValue().getDisplayOrder());
       generator.writeBooleanField("active", programProduct.active);
       generator.writeBooleanField("fullSupply", programProduct.fullSupply);
       generator.writeNumberField("displayOrder", programProduct.displayOrder);

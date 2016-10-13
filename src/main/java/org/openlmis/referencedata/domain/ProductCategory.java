@@ -23,6 +23,7 @@ public class ProductCategory extends BaseEntity {
 
   @Embedded
   @JsonUnwrapped
+  @Getter
   private OrderedDisplayValue orderedDisplayValue;
 
   private ProductCategory() {
