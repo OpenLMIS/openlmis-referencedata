@@ -2,15 +2,22 @@
   {
     "id": "00000000-0000-0000-0000-000000000001",
     "code": "FT001",
-    "name": "Facility Type Active",
+    "name": "HealthCenter",
     "active": "true",
     "displayOrder": 1
   },
   {
     "id": "00000000-0000-0000-0000-000000000002",
     "code": "FT002",
-    "name": "Facility Type Inactive",
-    "active": "false",
+    "name": "Distict Hospital",
+    "active": "true",
     "displayOrder": 2
-  }
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000003",
+    "code": "FT003",
+    "name": "Warehouse",
+    "active": "true",
+    "displayOrder": 3
+  },
 ]
