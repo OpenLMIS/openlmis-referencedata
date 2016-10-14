@@ -1,21 +1,21 @@
 [
   {
     "id": "00000000-0000-0000-0000-000000000001",
-    "code": "FT001",
-    "name": "HealthCenter",
+    "code": "HC",
+    "name": "Health Center",
     "active": "true",
     "displayOrder": 1
   },
   {
     "id": "00000000-0000-0000-0000-000000000002",
-    "code": "FT002",
+    "code": "DH",
     "name": "Distict Hospital",
     "active": "true",
     "displayOrder": 2
   },
   {
     "id": "00000000-0000-0000-0000-000000000003",
-    "code": "FT003",
+    "code": "WH",
     "name": "Warehouse",
     "active": "true",
     "displayOrder": 3
