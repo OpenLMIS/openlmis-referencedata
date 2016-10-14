@@ -218,6 +218,7 @@ integrationTest.dependsOn copyRamlToBuild
 
 check {
     dependsOn ramlToHtml
+    dependsOn ramlToSwagger
     dependsOn copyRamlHtmlToBuild
     dependsOn integrationTest
 }

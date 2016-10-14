@@ -67,9 +67,13 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
             "/lib/*",
             "/images/*",
             "/css/*",
+            "/fonts/*",
+            "/lang/*",
+            "/index.html",
+            "/o2c.html",
+            "/generated/api-definition.json",
             "/swagger-ui.js",
-            "/swagger-ui.min.js",
-            "/fonts/*"
+            "/swagger-ui.min.js"
         ).permitAll()
         .antMatchers("/**").fullyAuthenticated();
   }
