@@ -30,5 +30,53 @@
     "maxMonthsOfStock": "18",
     "minMonthsOfStock": "12",
     "emergencyOrderPoint": "24"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000005",
+    "facilityTypeId": { "id": "00000000-0000-0000-0000-000000000001" },
+    "programProductId": { "id": "00000000-0000-0000-0000-000000000005" },
+    "maxMonthsOfStock": "1000",
+    "minMonthsOfStock": "100",
+    "emergencyOrderPoint": "75"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000006",
+    "facilityTypeId": { "id": "00000000-0000-0000-0000-000000000001" },
+    "programProductId": { "id": "00000000-0000-0000-0000-000000000006" },
+    "maxMonthsOfStock": "1000",
+    "minMonthsOfStock": "100",
+    "emergencyOrderPoint": "75"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000007",
+    "facilityTypeId": { "id": "00000000-0000-0000-0000-000000000001" },
+    "programProductId": { "id": "00000000-0000-0000-0000-000000000007" },
+    "maxMonthsOfStock": "500",
+    "minMonthsOfStock": "50",
+    "emergencyOrderPoint": "25"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000008",
+    "facilityTypeId": { "id": "00000000-0000-0000-0000-000000000001" },
+    "programProductId": { "id": "00000000-0000-0000-0000-000000000008" },
+    "maxMonthsOfStock": "500",
+    "minMonthsOfStock": "50",
+    "emergencyOrderPoint": "25"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000009",
+    "facilityTypeId": { "id": "00000000-0000-0000-0000-000000000001" },
+    "programProductId": { "id": "00000000-0000-0000-0000-000000000009" },
+    "maxMonthsOfStock": "500",
+    "minMonthsOfStock": "50",
+    "emergencyOrderPoint": "25"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000010",
+    "facilityTypeId": { "id": "00000000-0000-0000-0000-000000000001" },
+    "programProductId": { "id": "00000000-0000-0000-0000-000000000010" },
+    "maxMonthsOfStock": "500",
+    "minMonthsOfStock": "50",
+    "emergencyOrderPoint": "25"
   }
 ]
