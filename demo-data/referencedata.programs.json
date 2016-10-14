@@ -10,7 +10,7 @@
     "id": "00000000-0000-0000-0000-000000000002",
     "code": "PRG002",
     "name": "Essential Meds",
-    "active": "false",
+    "active": "true",
     "periodsSkippable": "false"
   }
 ]
