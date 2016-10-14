@@ -4,13 +4,13 @@
     "code": "PRG001",
     "name": "Family Planing",
     "active": "true",
-    "periodsSkippable": "true",
+    "periodsSkippable": "true"
   },
   {
     "id": "00000000-0000-0000-0000-000000000002",
     "code": "PRG002",
     "name": "Essential Meds",
     "active": "false",
-    "periodsSkippable": "false",
+    "periodsSkippable": "false"
   }
 ]
