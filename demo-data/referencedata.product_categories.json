@@ -28,5 +28,29 @@
     "code": "C5",
     "displayName": "Vaccines",
     "displayOrder": 5
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000006",
+    "code": "oc",
+    "displayName": "Oral Contraceptive",
+    "displayOrder": 6
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000007",
+    "code": "bm",
+    "displayName": "Barrier Method",
+    "displayOrder": 7
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000008",
+    "code": "imp",
+    "displayName": "Implantable Contraceptive",
+    "displayOrder": 8
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000009",
+    "code": "inj",
+    "displayName": "Injectable Hormonal Contraceptive",
+    "displayOrder": 9
   }
 ]

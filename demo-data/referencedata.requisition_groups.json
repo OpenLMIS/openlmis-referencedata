@@ -1,8 +1,8 @@
 [
   {
     "id": "00000000-0000-0000-0000-000000000001",
-    "code": "REQGRP001",
-    "name": "Requisition Group 1",
+    "code": "RGFP",
+    "name": "RG Family Planning",
     "supervisoryNodeId": { "id": "00000000-0000-0000-0000-000000000001" },
     "memberFacilities": [
       {
@@ -12,34 +12,12 @@
   },
   {
     "id": "00000000-0000-0000-0000-000000000002",
-    "code": "REQGRP002",
-    "name": "Requisition Group 2",
+    "code": "RGES",
+    "name": "RG Essential Meds",
     "supervisoryNodeId": { "id": "00000000-0000-0000-0000-000000000002" },
     "memberFacilities": [
       {
         "id": "00000000-0000-0000-0000-000000000002"
-      }
-    ]
-  },
-  {
-    "id": "00000000-0000-0000-0000-000000000003",
-    "code": "REQGRP003",
-    "name": "Requisition Group 3",
-    "supervisoryNodeId": { "id": "00000000-0000-0000-0000-000000000003" },
-    "memberFacilities": [
-      {
-        "id": "00000000-0000-0000-0000-000000000003"
-      }
-    ]
-  },
-  {
-    "id": "00000000-0000-0000-0000-000000000004",
-    "code": "REQGRP004",
-    "name": "Requisition Group 4",
-    "supervisoryNodeId": { "id": "00000000-0000-0000-0000-000000000004" },
-    "memberFacilities": [
-      {
-        "id": "00000000-0000-0000-0000-000000000004"
       }
     ]
   }
