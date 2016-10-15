@@ -1,5 +1,12 @@
 package org.openlmis.referencedata.validate;
 
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_IS_REQUIRED;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME_IS_REQUIRED;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
@@ -16,13 +24,6 @@ import org.springframework.validation.Validator;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_IS_REQUIRED;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME_IS_REQUIRED;
 
 @RunWith(Parameterized.class)
 public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest {
@@ -34,7 +35,7 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
   private Validator validator = new RequisitionGroupValidator();
 
   private String expectedValue;
-  private RequisitionGroup requisitionGroup;
+  private RequisitionGroupDto requisitionGroupDto;
   private Errors errors;
 
   /**
@@ -45,11 +46,14 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
   public RequisitionGroupValidatorParametrizedTest(String value) {
     expectedValue = value;
 
-    requisitionGroup = new RequisitionGroup();
+    RequisitionGroup requisitionGroup = new RequisitionGroup();
     requisitionGroup.setCode("TestRequisitionGroupCode");
     requisitionGroup.setName("TestRequisitionGroupName");
 
-    errors = new BeanPropertyBindingResult(requisitionGroup, "requisitionGroup");
+    requisitionGroupDto = new RequisitionGroupDto();
+    requisitionGroup.export(requisitionGroupDto);
+
+    errors = new BeanPropertyBindingResult(requisitionGroupDto, "requisitionGroup");
   }
 
   /**
@@ -78,18 +82,18 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
 
   @Test
   public void shouldRejectIfCodeIsEmpty() throws Exception {
-    requisitionGroup.setCode(expectedValue);
+    requisitionGroupDto.setCode(expectedValue);
 
-    validator.validate(requisitionGroup, errors);
+    validator.validate(requisitionGroupDto, errors);
 
     assertErrorMessage(errors, CODE, CODE_IS_REQUIRED);
   }
 
   @Test
   public void shouldRejectIfNameIsEmpty() throws Exception {
-    requisitionGroup.setName(expectedValue);
+    requisitionGroupDto.setName(expectedValue);
 
-    validator.validate(requisitionGroup, errors);
+    validator.validate(requisitionGroupDto, errors);
 
     assertErrorMessage(errors, NAME, NAME_IS_REQUIRED);
   }

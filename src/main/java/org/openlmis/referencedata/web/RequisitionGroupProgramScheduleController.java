@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -48,35 +50,42 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
    * Allows creating new requisitionGroupProgramSchedule.
    * If the id is specified, it will be ignored.
    *
-   * @param requisition A requisitionGroupProgramSchedule bound to the request body
+   * @param scheduleDto A requisitionGroupProgramSchedule bound to the request body
    * @return ResponseEntity containing the created requisitionGroupProgramSchedule
    */
   @RequestMapping(value = "/requisitionGroupProgramSchedules", method = RequestMethod.POST)
   public ResponseEntity<?> createRequisitionGroupProgramSchedule(
-        @RequestBody RequisitionGroupProgramSchedule requisition) {
+        @RequestBody RequisitionGroupProgramScheduleDto scheduleDto) {
+    scheduleDto.setId(null);
+    RequisitionGroupProgramSchedule reqGroupProgScheduleToCreate =
+        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(scheduleDto);
     LOGGER.debug("Creating new requisitionGroupProgramSchedule");
-    requisition.setId(null);
-    repository.save(requisition);
-    LOGGER.debug("Created new requisitionGroupProgramSchedule with id: " + requisition.getId());
-    return new ResponseEntity<>(requisition, HttpStatus.CREATED);
+    repository.save(reqGroupProgScheduleToCreate);
+    LOGGER.debug("Created new requisitionGroupProgramSchedule with id: "
+        + reqGroupProgScheduleToCreate.getId());
+    return new ResponseEntity<>(exportToDto(reqGroupProgScheduleToCreate), HttpStatus.CREATED);
   }
 
   /**
    * Get all requisitionGroupProgramSchedules.
    *
-   * @return RequisitionGroupProgramSchedules.
+   * @return RequisitionGroupProgramScheduleDtos.
    */
   @RequestMapping(value = "/requisitionGroupProgramSchedules", method = RequestMethod.GET)
   public ResponseEntity<?> getAllRequisitionGroupProgramSchedule() {
     Iterable<RequisitionGroupProgramSchedule> requisitions = repository.findAll();
-    return new ResponseEntity<>(requisitions, HttpStatus.OK);
+    List<RequisitionGroupProgramScheduleDto> requisitionDtos = new ArrayList<>();
+    for (RequisitionGroupProgramSchedule requisition : requisitions) {
+      requisitionDtos.add(exportToDto(requisition));
+    }
+    return new ResponseEntity<>(requisitionDtos, HttpStatus.OK);
   }
 
   /**
    * Get chosen requisitionGroupProgramSchedule.
    *
    * @param requisitionId UUID of requisitionGroupProgramSchedule whose we want to get
-   * @return RequisitionGroupProgramSchedule.
+   * @return RequisitionGroupProgramScheduleDto.
    */
   @RequestMapping(value = "/requisitionGroupProgramSchedules/{id}", method = RequestMethod.GET)
   public ResponseEntity<?> getRequisitionGroupProgramSchedule(
@@ -85,22 +94,22 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
     if (requisition == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
-      return new ResponseEntity<>(requisition, HttpStatus.OK);
+      return new ResponseEntity<>(exportToDto(requisition), HttpStatus.OK);
     }
   }
 
   /**
    * Allows updating requisitionGroupProgramSchedule.
    *
-   * @param reqGroupProgSchedule A requisitionGroupProgramSchedule
+   * @param reqGroupProgScheduleDto A requisitionGroupProgramScheduleDto
    *                                        bound to the request body
    * @param requisitionId UUID of requisitionGroupProgramSchedule
    *                                          which we want to update
-   * @return ResponseEntity containing the updated requisitionGroup
+   * @return ResponseEntity containing the updated requisitionGroupProgramSchedule
    */
   @RequestMapping(value = "/requisitionGroupProgramSchedules/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateRequisitionGroupProgramSchedule(
-        @RequestBody RequisitionGroupProgramScheduleDto reqGroupProgSchedule,
+        @RequestBody RequisitionGroupProgramScheduleDto reqGroupProgScheduleDto,
         @PathVariable("id") UUID requisitionId) {
 
     RequisitionGroupProgramSchedule reqGroupProgScheduleToUpdate;
@@ -108,7 +117,7 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
     try {
 
       reqGroupProgScheduleToUpdate = RequisitionGroupProgramSchedule
-          .newRequisitionGroupProgramSchedule(reqGroupProgSchedule);
+          .newRequisitionGroupProgramSchedule(reqGroupProgScheduleDto);
 
       reqGroupProgScheduleToUpdate.setId(requisitionId);
 
@@ -116,8 +125,7 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
 
       LOGGER.debug("Saved requisitionGroupProgramSchedule with id: "
             + reqGroupProgScheduleToUpdate.getId());
-      return new ResponseEntity<RequisitionGroupProgramSchedule>(
-            reqGroupProgScheduleToUpdate, HttpStatus.OK);
+      return new ResponseEntity<>(exportToDto(reqGroupProgScheduleToUpdate), HttpStatus.OK);
     } catch (DataIntegrityViolationException ex) {
       ErrorResponse errorResponse =
             new ErrorResponse("An error occurred while saving requisitionGroupProgramSchedule"
@@ -141,7 +149,7 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
       repository.delete(requisition);
-      return new ResponseEntity<RequisitionGroupProgramSchedule>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
 
@@ -149,7 +157,7 @@ public class RequisitionGroupProgramScheduleController extends BaseController {
    * Returns chosen RequisitionGroupProgramSchedule.
    * @param programId program of searched RequisitionGroupProgramSchedule.
    * @param facilityId facility of searched RequisitionGroupProgramSchedule.
-   * @return RequisitionGroupProgramSchedule.
+   * @return RequisitionGroupProgramScheduleDto.
    */
   @RequestMapping(value = "/requisitionGroupProgramSchedules/search",
         method = RequestMethod.GET)

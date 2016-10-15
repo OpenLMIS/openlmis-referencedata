@@ -11,6 +11,7 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -31,6 +32,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private SupervisoryNodeRepository repository;
 
   private SupervisoryNode supervisoryNode;
+  private SupervisoryNodeDto supervisoryNodeDto;
   private UUID supervisoryNodeId;
 
   /**
@@ -53,6 +55,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     facility.setOperator(facilityOperator);
 
     supervisoryNode = SupervisoryNode.newSupervisoryNode("supervisoryNodeCode", facility);
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    supervisoryNode.export(supervisoryNodeDto);
     supervisoryNodeId = UUID.randomUUID();
   }
 
@@ -77,18 +81,18 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldPostSupervisoryNode() {
 
-    SupervisoryNode response = restAssured
+    SupervisoryNodeDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(supervisoryNode)
+        .body(supervisoryNodeDto)
         .when()
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .extract().as(SupervisoryNode.class);
+        .extract().as(SupervisoryNodeDto.class);
 
-    assertEquals(supervisoryNode, response);
+    assertEquals(supervisoryNodeDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -98,19 +102,22 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     supervisoryNode.setDescription("OpenLMIS");
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
-    SupervisoryNode response = restAssured
+    SupervisoryNodeDto supervisoryNodeDto = new SupervisoryNodeDto();
+    supervisoryNode.export(supervisoryNodeDto);
+
+    SupervisoryNodeDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
-        .body(supervisoryNode)
+        .body(supervisoryNodeDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(SupervisoryNode.class);
+        .extract().as(SupervisoryNodeDto.class);
 
-    assertEquals(supervisoryNode, response);
+    assertEquals(supervisoryNodeDto, response);
     assertEquals("OpenLMIS", response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -122,7 +129,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         SupervisoryNode.newSupervisoryNode("SN2", new Facility("F2")));
     given(repository.findAll()).willReturn(storedSupervisoryNodes);
 
-    SupervisoryNode[] response = restAssured
+    SupervisoryNodeDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -130,7 +137,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(SupervisoryNode[].class);
+        .extract().as(SupervisoryNodeDto[].class);
 
     assertEquals(storedSupervisoryNodes.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -141,7 +148,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
-    SupervisoryNode response = restAssured
+    SupervisoryNodeDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -150,9 +157,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .get(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(SupervisoryNode.class);
+        .extract().as(SupervisoryNodeDto.class);
 
-    assertEquals(supervisoryNode, response);
+    assertEquals(supervisoryNodeDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

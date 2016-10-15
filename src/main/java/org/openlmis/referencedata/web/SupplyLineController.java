@@ -3,7 +3,9 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.SupplyLineDto;
+import org.openlmis.referencedata.dto.SupplyLineSimpleDto;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
@@ -44,38 +46,45 @@ public class SupplyLineController extends BaseController {
   /**
    * Allows creating new supplyLines. If the id is specified, it will be ignored.
    *
-   * @param supplyLine A supplyLine bound to the request body
+   * @param supplyLineDto A supplyLine bound to the request body
    * @return ResponseEntity containing the created supplyLine
    */
   @RequestMapping(value = "/supplyLines", method = RequestMethod.POST)
-  public ResponseEntity<?> createSupplyLine(@RequestBody SupplyLine supplyLine) {
+  public ResponseEntity<?> createSupplyLine(@RequestBody SupplyLineDto supplyLineDto) {
     LOGGER.debug("Creating new supplyLine");
-    supplyLine.setId(null);
+    supplyLineDto.setId(null);
+    SupplyLine supplyLine = SupplyLine.newSupplyLine(supplyLineDto);
     supplyLineRepository.save(supplyLine);
     LOGGER.debug("Created new supplyLine with id: " + supplyLine.getId());
-    return new ResponseEntity<>(supplyLine, HttpStatus.CREATED);
+    return new ResponseEntity<>(exportToDto(supplyLine), HttpStatus.CREATED);
   }
 
   /**
    * Get all supplyLines.
    *
-   * @return SupplyLines.
+   * @return SupplyLineDtos.
    */
   @RequestMapping(value = "/supplyLines", method = RequestMethod.GET)
   public ResponseEntity<?> getAllSupplyLines() {
     Iterable<SupplyLine> supplyLines = supplyLineRepository.findAll();
-    return new ResponseEntity<>(supplyLines, HttpStatus.OK);
+    List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
+
+    for (SupplyLine supplyLine : supplyLines) {
+      supplyLineDtos.add(exportToDto(supplyLine));
+    }
+
+    return new ResponseEntity<>(supplyLineDtos, HttpStatus.OK);
   }
 
   /**
    * Allows updating supplyLines.
    *
-   * @param supplyLine   A supplyLine bound to the request body
+   * @param supplyLineDto A supplyLineDto bound to the request body
    * @param supplyLineId UUID of supplyLine which we want to update
    * @return ResponseEntity containing the updated supplyLine
    */
   @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateSupplyLine(@RequestBody SupplyLine supplyLine,
+  public ResponseEntity<?> updateSupplyLine(@RequestBody SupplyLineDto supplyLineDto,
                                             @PathVariable("id") UUID supplyLineId) {
 
     SupplyLine supplyLineToUpdate = supplyLineRepository.findOne(supplyLineId);
@@ -86,11 +95,11 @@ public class SupplyLineController extends BaseController {
       LOGGER.debug("Updating supplyLine with id: " + supplyLineId);
     }
 
-    supplyLineToUpdate.updateFrom(supplyLine);
+    supplyLineToUpdate.updateFrom(SupplyLine.newSupplyLine(supplyLineDto));
     supplyLineRepository.save(supplyLineToUpdate);
 
     LOGGER.debug("Saved supplyLine with id: " + supplyLineToUpdate.getId());
-    return new ResponseEntity<>(supplyLineToUpdate, HttpStatus.OK);
+    return new ResponseEntity<>(exportToDto(supplyLineToUpdate), HttpStatus.OK);
   }
 
   /**
@@ -105,7 +114,7 @@ public class SupplyLineController extends BaseController {
     if (supplyLine == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
-      return new ResponseEntity<>(supplyLine, HttpStatus.OK);
+      return new ResponseEntity<>(exportToDto(supplyLine), HttpStatus.OK);
     }
   }
 
@@ -122,7 +131,7 @@ public class SupplyLineController extends BaseController {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
       supplyLineRepository.delete(supplyLine);
-      return new ResponseEntity<SupplyLine>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
 
@@ -130,16 +139,23 @@ public class SupplyLineController extends BaseController {
    * Returns all Supply Lines with matched parameters.
    *
    * @param program         program of searched Supply Lines.
-   * @param supervisoryNode supervisory node of searched Supply Lines.
+   * @param supervisoryNodeDto supervisory node of searched Supply Lines.
    * @return ResponseEntity with list of all Supply Lines matching provided parameters.
    */
   @RequestMapping(value = "/supplyLines/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchSupplyLines(
-      @RequestParam(value = "program", required = true) Program program,
-      @RequestParam(value = "supervisoryNode", required = true) SupervisoryNode supervisoryNode) {
+      @RequestParam(value = "program") Program program,
+      @RequestParam(value = "supervisoryNode") SupervisoryNodeDto supervisoryNodeDto) {
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
     List<SupplyLine> result = supplyLineService.searchSupplyLines(program, supervisoryNode);
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
+
+    for (SupplyLine supplyLine : result) {
+      supplyLineDtos.add(exportToDto(supplyLine));
+    }
+
+    return new ResponseEntity<>(supplyLineDtos, HttpStatus.OK);
   }
 
   /**
@@ -157,12 +173,22 @@ public class SupplyLineController extends BaseController {
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     List<SupplyLine> resultSupplyLine =
         supplyLineService.searchSupplyLines(program, supervisoryNode);
-    List<SupplyLineDto> result = new ArrayList<>();
+    List<SupplyLineSimpleDto> result = new ArrayList<>();
     for (SupplyLine supplyLine : resultSupplyLine) {
-      SupplyLineDto supplyLineDto = new SupplyLineDto(supplyLine);
-      result.add(supplyLineDto);
+      SupplyLineSimpleDto supplyLineSimpleDto = new SupplyLineSimpleDto(supplyLine);
+      result.add(supplyLineSimpleDto);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
+  private SupplyLineDto exportToDto(SupplyLine supplyLine) {
+    SupplyLineDto supplyLineDto = null;
+
+    if (supplyLine != null) {
+      supplyLineDto = new SupplyLineDto();
+      supplyLine.export(supplyLineDto);
+    }
+
+    return supplyLineDto;
+  }
 }

@@ -73,14 +73,21 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
    */
   public static RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule(
         RequisitionGroupProgramSchedule.Importer importer) {
+    RequisitionGroup requisitionGroup = null;
+
+    if (importer.getRequisitionGroup() != null) {
+      requisitionGroup = RequisitionGroup.newRequisitionGroup(importer.getRequisitionGroup());
+    }
+
     RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule
           = new RequisitionGroupProgramSchedule(
-          importer.getRequisitionGroup(),
+          requisitionGroup,
           importer.getProgram(),
           importer.getProcessingSchedule(),
           importer.getDirectDelivery());
     newRequisitionGroupProgramSchedule.id = importer.getId();
     newRequisitionGroupProgramSchedule.dropOffFacility = importer.getDropOffFacility();
+
     return newRequisitionGroupProgramSchedule;
   }
 
@@ -133,8 +140,8 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
 
   public interface Importer {
     UUID getId();
-    
-    RequisitionGroup getRequisitionGroup();
+
+    RequisitionGroup.Importer getRequisitionGroup();
 
     Program getProgram();
 

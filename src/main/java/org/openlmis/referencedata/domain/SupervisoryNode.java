@@ -1,8 +1,5 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +7,7 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,7 +20,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "supervisory_nodes", schema = "referencedata")
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SupervisoryNode extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
@@ -77,6 +74,40 @@ public class SupervisoryNode extends BaseEntity {
   }
 
   /**
+   * Static factory method for constructing a new supervisory node using an importer (DTO).
+   *
+   * @param importer the supervisory node importer (DTO)
+   */
+  public static SupervisoryNode newSupervisoryNode(Importer importer) {
+    SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getCode(),
+        importer.getFacility());
+    newSupervisoryNode.id = importer.getId();
+    newSupervisoryNode.name = importer.getName();
+    newSupervisoryNode.description = importer.getDescription();
+
+    if (importer.getParentNode() != null) {
+      newSupervisoryNode.parentNode = SupervisoryNode.newSupervisoryNode(importer.getParentNode());
+    }
+
+    if (importer.getRequisitionGroup() != null) {
+      newSupervisoryNode.requisitionGroup =
+          RequisitionGroup.newRequisitionGroup(importer.getRequisitionGroup());
+    }
+
+    if (importer.getChildNodes() != null) {
+      Set<SupervisoryNode> childNodes = new HashSet<>();
+
+      for (Importer childNodeImporter : importer.getChildNodes()) {
+        childNodes.add(SupervisoryNode.newSupervisoryNode(childNodeImporter));
+      }
+
+      newSupervisoryNode.childNodes = childNodes;
+    }
+
+    return newSupervisoryNode;
+  }
+
+  /**
    * Assign this node's parent supervisory node. Also add this node to the parent's set of child
    * nodes.
    *
@@ -124,6 +155,22 @@ public class SupervisoryNode extends BaseEntity {
     this.childNodes = supervisoryNode.getChildNodes();
   }
 
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setCode(code);
+    exporter.setName(name);
+    exporter.setDescription(description);
+    exporter.setFacility(facility);
+    exporter.setParentNode(parentNode);
+    exporter.setChildNodes(childNodes);
+    exporter.setRequisitionGroup(requisitionGroup);
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -139,5 +186,41 @@ public class SupervisoryNode extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(code);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setCode(String code);
+
+    void setName(String name);
+
+    void setDescription(String description);
+
+    void setFacility(Facility facility);
+
+    void setParentNode(SupervisoryNode parentNode);
+
+    void setChildNodes(Set<SupervisoryNode> childNodes);
+
+    void setRequisitionGroup(RequisitionGroup requisitionGroup);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    String getCode();
+
+    String getName();
+
+    String getDescription();
+
+    Facility getFacility();
+
+    SupervisoryNode.Importer getParentNode();
+
+    Set<SupervisoryNode.Importer> getChildNodes();
+
+    RequisitionGroup.Importer getRequisitionGroup();
   }
 }

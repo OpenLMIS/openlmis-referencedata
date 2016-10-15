@@ -12,6 +12,7 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,7 +30,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   private static final String RESOURCE_URL = "/api/requisitionGroups";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
-  private static final UUID ID = UUID.fromString("1752b457-0a4b-4de0-bf94-5a6a8002427e");
   private static final String DESCRIPTION = "OpenLMIS";
 
   @MockBean
@@ -39,6 +39,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   private RequisitionGroupValidator requisitionGroupValidator;
 
   private RequisitionGroup requisitionGroup;
+  private RequisitionGroupDto requisitionGroupDto;
   private UUID requisitionGroupId;
 
   private SupervisoryNode supervisoryNode;
@@ -66,7 +67,11 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     supervisoryNode.setId(UUID.randomUUID());
 
     requisitionGroup = new RequisitionGroup("RG1", "Requisition Group 1", supervisoryNode);
+    supervisoryNode.setRequisitionGroup(requisitionGroup);
+
     requisitionGroupId = UUID.randomUUID();
+    requisitionGroupDto = new RequisitionGroupDto();
+    requisitionGroup.export(requisitionGroupDto);
   }
 
   @Test
@@ -108,18 +113,18 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldPostRequisitionGroup() {
 
-    RequisitionGroup response = restAssured
+    RequisitionGroupDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(requisitionGroup)
+        .body(requisitionGroupDto)
         .when()
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .extract().as(RequisitionGroup.class);
+        .extract().as(RequisitionGroupDto.class);
 
-    assertEquals(requisitionGroup, response);
+    assertEquals(requisitionGroupDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -130,7 +135,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
         new RequisitionGroup("RG2", "Requisition Group 2", supervisoryNode));
     given(requisitionGroupRepository.findAll()).willReturn(storedRequisitionGroups);
 
-    RequisitionGroup[] response = restAssured
+    RequisitionGroupDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -138,7 +143,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(RequisitionGroup[].class);
+        .extract().as(RequisitionGroupDto[].class);
 
     assertEquals(storedRequisitionGroups.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -149,7 +154,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
 
-    RequisitionGroup response = restAssured
+    RequisitionGroupDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -158,9 +163,9 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
         .get(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(RequisitionGroup.class);
+        .extract().as(RequisitionGroupDto.class);
 
-    assertEquals(requisitionGroup, response);
+    assertEquals(requisitionGroupDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -188,19 +193,22 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     requisitionGroup.setDescription(DESCRIPTION);
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
 
-    RequisitionGroup response = restAssured
+    RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
+    requisitionGroup.export(requisitionGroupDto);
+
+    RequisitionGroupDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
-        .body(requisitionGroup)
+        .body(requisitionGroupDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(RequisitionGroup.class);
+        .extract().as(RequisitionGroupDto.class);
 
-    assertEquals(requisitionGroup, response);
+    assertEquals(requisitionGroupDto, response);
     assertEquals(DESCRIPTION, response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -211,19 +219,22 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     requisitionGroup.setDescription(DESCRIPTION);
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);
 
-    RequisitionGroup response = restAssured
+    RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
+    requisitionGroup.export(requisitionGroupDto);
+
+    RequisitionGroupDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", ID)
-        .body(requisitionGroup)
+        .pathParam("id", requisitionGroupId)
+        .body(requisitionGroupDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(RequisitionGroup.class);
+        .extract().as(RequisitionGroupDto.class);
 
-    assertEquals(requisitionGroup, response);
+    assertEquals(requisitionGroupDto, response);
     assertEquals(DESCRIPTION, response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

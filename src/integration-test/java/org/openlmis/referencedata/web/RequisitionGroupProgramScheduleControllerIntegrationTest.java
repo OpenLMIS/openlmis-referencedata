@@ -12,6 +12,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.dto.RequisitionGroupProgramScheduleDto;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -28,7 +29,6 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
   private static final String RESOURCE_URL = "/api/requisitionGroupProgramSchedules";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
-  private static final UUID ID = UUID.fromString("1752b457-0a4b-4de0-bf94-5a6a8002427e");
 
   @MockBean
   private RequisitionGroupProgramScheduleRepository repository;
@@ -38,6 +38,7 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
   private Program program;
   
   private RequisitionGroupProgramSchedule reqGroupProgSchedule;
+  private RequisitionGroupProgramScheduleDto reqGroupProgScheduleDto;
   private UUID requisitionGroupProgramScheduleId;
 
   /**
@@ -47,6 +48,7 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
 
     requisitionGroup = new RequisitionGroup("RG1", "Requisition Group 1",
         SupervisoryNode.newSupervisoryNode("SN1", new Facility("F1")));
+    requisitionGroup.setId(UUID.randomUUID());
 
     schedule = new ProcessingSchedule("scheduleCode", "scheduleName");
 
@@ -55,7 +57,10 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
 
     reqGroupProgSchedule = RequisitionGroupProgramSchedule
         .newRequisitionGroupProgramSchedule(requisitionGroup, program, schedule, false);
-    
+
+    reqGroupProgScheduleDto = new RequisitionGroupProgramScheduleDto();
+    reqGroupProgSchedule.export(reqGroupProgScheduleDto);
+
     requisitionGroupProgramScheduleId = UUID.randomUUID();
   }
 
@@ -98,18 +103,18 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
   @Test
   public void shouldPostRequisitionGroupProgramSchedule() {
 
-    RequisitionGroupProgramSchedule response = restAssured
+    RequisitionGroupProgramScheduleDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(reqGroupProgSchedule)
+        .body(reqGroupProgScheduleDto)
         .when()
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .extract().as(RequisitionGroupProgramSchedule.class);
+        .extract().as(RequisitionGroupProgramScheduleDto.class);
 
-    assertEquals(reqGroupProgSchedule, response);
+    assertEquals(reqGroupProgScheduleDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -121,7 +126,7 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
             .newRequisitionGroupProgramSchedule(requisitionGroup, program, schedule, true));
     given(repository.findAll()).willReturn(storedRequisitionGroupProgramSchedules);
 
-    RequisitionGroupProgramSchedule[] response = restAssured
+    RequisitionGroupProgramScheduleDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -129,7 +134,7 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(RequisitionGroupProgramSchedule[].class);
+        .extract().as(RequisitionGroupProgramScheduleDto[].class);
 
     assertEquals(storedRequisitionGroupProgramSchedules.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -140,7 +145,7 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
 
     given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(reqGroupProgSchedule);
 
-    RequisitionGroupProgramSchedule response = restAssured
+    RequisitionGroupProgramScheduleDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -149,9 +154,9 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
         .get(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(RequisitionGroupProgramSchedule.class);
+        .extract().as(RequisitionGroupProgramScheduleDto.class);
 
-    assertEquals(reqGroupProgSchedule, response);
+    assertEquals(reqGroupProgScheduleDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -179,20 +184,25 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
     reqGroupProgSchedule.setDirectDelivery(true);
     given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(reqGroupProgSchedule);
 
-    RequisitionGroupProgramSchedule response = restAssured
+    RequisitionGroupProgramScheduleDto requisitionGroupProgramScheduleDto =
+        new RequisitionGroupProgramScheduleDto();
+    reqGroupProgSchedule.export(requisitionGroupProgramScheduleDto);
+    requisitionGroupProgramScheduleDto.setId(requisitionGroupProgramScheduleId);
+
+    RequisitionGroupProgramScheduleDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupProgramScheduleId)
-        .body(reqGroupProgSchedule)
+        .body(requisitionGroupProgramScheduleDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(RequisitionGroupProgramSchedule.class);
+        .extract().as(RequisitionGroupProgramScheduleDto.class);
 
-    assertEquals(reqGroupProgSchedule, response);
-    assertTrue(response.isDirectDelivery());
+    assertEquals(requisitionGroupProgramScheduleDto, response);
+    assertTrue(response.getDirectDelivery());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -202,20 +212,25 @@ public class RequisitionGroupProgramScheduleControllerIntegrationTest
     reqGroupProgSchedule.setDirectDelivery(true);
     given(repository.findOne(requisitionGroupProgramScheduleId)).willReturn(null);
 
-    RequisitionGroupProgramSchedule response = restAssured
+    RequisitionGroupProgramScheduleDto requisitionGroupProgramScheduleDto =
+        new RequisitionGroupProgramScheduleDto();
+    reqGroupProgSchedule.export(requisitionGroupProgramScheduleDto);
+    requisitionGroupProgramScheduleDto.setId(requisitionGroupProgramScheduleId);
+
+    RequisitionGroupProgramScheduleDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", ID)
-        .body(reqGroupProgSchedule)
+        .pathParam("id", requisitionGroupProgramScheduleId)
+        .body(requisitionGroupProgramScheduleDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(RequisitionGroupProgramSchedule.class);
+        .extract().as(RequisitionGroupProgramScheduleDto.class);
 
-    assertEquals(reqGroupProgSchedule, response);
-    assertTrue(response.isDirectDelivery());
+    assertEquals(requisitionGroupProgramScheduleDto, response);
+    assertTrue(response.getDirectDelivery());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

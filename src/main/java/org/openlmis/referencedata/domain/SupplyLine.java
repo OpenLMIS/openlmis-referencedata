@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,6 +51,23 @@ public class SupplyLine extends BaseEntity {
   }
 
   /**
+   * Static factory method for constructing a new supply line using an importer (DTO).
+   *
+   * @param importer the supply line importer (DTO)
+   */
+  public static SupplyLine newSupplyLine(Importer importer) {
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(
+        importer.getSupervisoryNode());
+
+    SupplyLine supplyLine = new SupplyLine(supervisoryNode, importer.getProgram(),
+        importer.getSupplyingFacility());
+    supplyLine.setId(importer.getId());
+    supplyLine.setDescription(importer.getDescription());
+
+    return supplyLine;
+  }
+
+  /**
    * Copy values of attributes into new or updated SupplyLine.
    *
    * @param supplyLine SupplyLine with new values.
@@ -59,6 +77,19 @@ public class SupplyLine extends BaseEntity {
     this.description = supplyLine.getDescription();
     this.program = supplyLine.getProgram();
     this.supplyingFacility = supplyLine.getSupplyingFacility();
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setSupervisoryNode(supervisoryNode);
+    exporter.setDescription(description);
+    exporter.setProgram(program);
+    exporter.setSupplyingFacility(supplyingFacility);
   }
 
   @Override
@@ -78,5 +109,29 @@ public class SupplyLine extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(supervisoryNode, program, supplyingFacility);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setSupervisoryNode(SupervisoryNode supervisoryNode);
+
+    void setDescription(String description);
+
+    void setProgram(Program program);
+
+    void setSupplyingFacility(Facility supplyingFacility);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    SupervisoryNode.Importer getSupervisoryNode();
+
+    String getDescription();
+
+    Program getProgram();
+
+    Facility getSupplyingFacility();
   }
 }

@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -26,27 +29,35 @@ public class SupervisoryNodeController extends BaseController {
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
    *
-   * @param supervisoryNode A supervisoryNode bound to the request body
+   * @param supervisoryNodeDto A supervisoryNodeDto bound to the request body
    * @return ResponseEntity containing the created supervisoryNode
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.POST)
-  public ResponseEntity<?> createSupervisoryNode(@RequestBody SupervisoryNode supervisoryNode) {
+  public ResponseEntity<?> createSupervisoryNode(
+      @RequestBody SupervisoryNodeDto supervisoryNodeDto) {
     LOGGER.debug("Creating new supervisoryNode");
-    supervisoryNode.setId(null);
+    supervisoryNodeDto.setId(null);
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
     supervisoryNodeRepository.save(supervisoryNode);
     LOGGER.debug("Created new supervisoryNode with id: " + supervisoryNode.getId());
-    return new ResponseEntity<SupervisoryNode>(supervisoryNode, HttpStatus.CREATED);
+    return new ResponseEntity<>(exportToDto(supervisoryNode), HttpStatus.CREATED);
   }
 
   /**
    * Get all supervisoryNodes.
    *
-   * @return SupervisoryNodes.
+   * @return SupervisoryNodeDtos.
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.GET)
   public ResponseEntity<?> getAllSupervisoryNodes() {
     Iterable<SupervisoryNode> supervisoryNodes = supervisoryNodeRepository.findAll();
-    return new ResponseEntity<>(supervisoryNodes, HttpStatus.OK);
+    List<SupervisoryNodeDto> supervisoryNodeDtos = new ArrayList<>();
+
+    for (SupervisoryNode supervisoryNode : supervisoryNodes) {
+      supervisoryNodeDtos.add(exportToDto(supervisoryNode));
+    }
+
+    return new ResponseEntity<>(supervisoryNodeDtos, HttpStatus.OK);
   }
 
   /**
@@ -61,19 +72,19 @@ public class SupervisoryNodeController extends BaseController {
     if (supervisoryNode == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
-      return new ResponseEntity<>(supervisoryNode, HttpStatus.OK);
+      return new ResponseEntity<>(exportToDto(supervisoryNode), HttpStatus.OK);
     }
   }
 
   /**
    * Allows updating supervisoryNode.
    *
-   * @param supervisoryNode   A supervisoryNode bound to the request body
+   * @param supervisoryNodeDto A supervisoryNodeDto bound to the request body
    * @param supervisoryNodeId UUID of supervisoryNode which we want to update
    * @return ResponseEntity containing the updated supervisoryNode
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateSupervisoryNode(@RequestBody SupervisoryNode supervisoryNode,
+  public ResponseEntity<?> updateSupervisoryNode(@RequestBody SupervisoryNodeDto supervisoryNodeDto,
                                                  @PathVariable("id") UUID supervisoryNodeId) {
     LOGGER.debug("Updating supervisoryNode with id: " + supervisoryNodeId);
 
@@ -84,11 +95,11 @@ public class SupervisoryNodeController extends BaseController {
       supervisoryNodeToUpdate = new SupervisoryNode();
     }
 
-    supervisoryNodeToUpdate.updateFrom(supervisoryNode);
+    supervisoryNodeToUpdate.updateFrom(SupervisoryNode.newSupervisoryNode(supervisoryNodeDto));
     supervisoryNodeRepository.save(supervisoryNodeToUpdate);
 
     LOGGER.debug("Updated supervisoryNode with id: " + supervisoryNodeId);
-    return new ResponseEntity<>(supervisoryNodeToUpdate, HttpStatus.OK);
+    return new ResponseEntity<>(exportToDto(supervisoryNodeToUpdate), HttpStatus.OK);
   }
 
   /**
@@ -106,5 +117,16 @@ public class SupervisoryNodeController extends BaseController {
       supervisoryNodeRepository.delete(supervisoryNode);
       return new ResponseEntity<SupervisoryNode>(HttpStatus.NO_CONTENT);
     }
+  }
+
+  private SupervisoryNodeDto exportToDto(SupervisoryNode supervisoryNode) {
+    SupervisoryNodeDto supervisoryNodeDto = null;
+
+    if (supervisoryNode != null) {
+      supervisoryNodeDto = new SupervisoryNodeDto();
+      supervisoryNode.export(supervisoryNodeDto);
+    }
+
+    return supervisoryNodeDto;
   }
 }

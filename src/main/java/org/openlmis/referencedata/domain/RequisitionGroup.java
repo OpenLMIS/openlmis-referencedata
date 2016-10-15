@@ -1,14 +1,13 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,7 +26,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "requisition_groups", schema = "referencedata")
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class RequisitionGroup extends BaseEntity {
 
   @Column(unique = true, nullable = false, columnDefinition = "text")
@@ -80,6 +78,39 @@ public class RequisitionGroup extends BaseEntity {
   }
 
   /**
+   * Static factory method for constructing a new requisition group using an importer (DTO).
+   *
+   * @param importer the requisition group importer (DTO)
+   */
+  public static RequisitionGroup newRequisitionGroup(Importer importer) {
+    SupervisoryNode supervisoryNode = null;
+
+    if (importer.getSupervisoryNode() != null) {
+      supervisoryNode = SupervisoryNode.newSupervisoryNode(importer.getSupervisoryNode());
+    }
+
+    RequisitionGroup newRequisitionGroup = new RequisitionGroup(importer.getCode(),
+        importer.getName(), supervisoryNode);
+    newRequisitionGroup.id = importer.getId();
+    newRequisitionGroup.description = importer.getDescription();
+    newRequisitionGroup.memberFacilities = importer.getMemberFacilities();
+
+    if (importer.getRequisitionGroupProgramSchedules() != null) {
+      List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules = new ArrayList<>();
+
+      for (RequisitionGroupProgramSchedule.Importer scheduleImporter :
+          importer.getRequisitionGroupProgramSchedules()) {
+        requisitionGroupProgramSchedules.add(
+            RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(scheduleImporter));
+      }
+
+      newRequisitionGroup.requisitionGroupProgramSchedules = requisitionGroupProgramSchedules;
+    }
+
+    return newRequisitionGroup;
+  }
+
+  /**
    * Copy properties from the given instance.
    *
    * @param requisitionGroup an instance from which properties will be used to update current
@@ -92,6 +123,21 @@ public class RequisitionGroup extends BaseEntity {
     supervisoryNode = requisitionGroup.getSupervisoryNode();
     requisitionGroupProgramSchedules = requisitionGroup.getRequisitionGroupProgramSchedules();
     memberFacilities = requisitionGroup.getMemberFacilities();
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setCode(code);
+    exporter.setName(name);
+    exporter.setDescription(description);
+    exporter.setSupervisoryNode(supervisoryNode);
+    exporter.setRequisitionGroupProgramSchedules(requisitionGroupProgramSchedules);
+    exporter.setMemberFacilities(memberFacilities);
   }
 
   @Override
@@ -109,5 +155,37 @@ public class RequisitionGroup extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(code);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setCode(String code);
+
+    void setName(String name);
+
+    void setDescription(String description);
+
+    void setSupervisoryNode(SupervisoryNode supervisoryNode);
+
+    void setRequisitionGroupProgramSchedules(List<RequisitionGroupProgramSchedule> schedules);
+
+    void setMemberFacilities(List<Facility> memberFacilities);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    String getCode();
+
+    String getName();
+
+    String getDescription();
+
+    SupervisoryNode.Importer getSupervisoryNode();
+
+    List<RequisitionGroupProgramSchedule.Importer> getRequisitionGroupProgramSchedules();
+
+    List<Facility> getMemberFacilities();
   }
 }

@@ -13,6 +13,7 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.dto.SupplyLineDto;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -30,13 +31,13 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ACCESS_TOKEN = "access_token";
-  private static final UUID ID = UUID.fromString("1752b457-0a4b-4de0-bf94-5a6a8002427e");
   private static final String DESCRIPTION = "OpenLMIS";
 
   @MockBean
   private SupplyLineRepository supplyLineRepository;
 
   private SupplyLine supplyLine;
+  private SupplyLineDto supplyLineDto;
   private UUID supplyLineId;
   private Integer currentInstanceNumber;
 
@@ -46,6 +47,8 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public SupplyLineControllerIntegrationTest() {
     currentInstanceNumber = 0;
     supplyLine = generateSupplyLine();
+    supplyLineDto = new SupplyLineDto();
+    supplyLine.export(supplyLineDto);
     supplyLineId = UUID.randomUUID();
   }
 
@@ -53,7 +56,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   @Test
   public void shouldFindSupplyLines() {
 
-    SupplyLine[] response = restAssured
+    SupplyLineDto[] response = restAssured
         .given()
         .queryParam("program", supplyLine.getProgram().getId())
         .queryParam("supervisoryNode", supplyLine.getSupervisoryNode().getId())
@@ -62,20 +65,20 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .get(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(SupplyLine[].class);
+        .extract().as(SupplyLineDto[].class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertEquals(1, response.length);
-    for (SupplyLine responseSupplyLine : response) {
+    for (SupplyLineDto responseSupplyLineDto : response) {
       assertEquals(
           supplyLine.getProgram().getId(),
-          responseSupplyLine.getProgram().getId());
+          responseSupplyLineDto.getProgram().getId());
       assertEquals(
           supplyLine.getSupervisoryNode().getId(),
-          responseSupplyLine.getSupervisoryNode().getId());
+          responseSupplyLineDto.getSupervisoryNode().getId());
       assertEquals(
           supplyLine.getId(),
-          responseSupplyLine.getId());
+          responseSupplyLineDto.getId());
     }
   }
 
@@ -118,18 +121,18 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   @Test
   public void shouldPostSupplyLine() {
 
-    SupplyLine response = restAssured
+    SupplyLineDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(supplyLine)
+        .body(supplyLineDto)
         .when()
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .extract().as(SupplyLine.class);
+        .extract().as(SupplyLineDto.class);
 
-    assertEquals(supplyLine, response);
+    assertEquals(supplyLineDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -139,19 +142,22 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     supplyLine.setDescription(DESCRIPTION);
     given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
 
-    SupplyLine response = restAssured
+    SupplyLineDto supplyLineDto = new SupplyLineDto();
+    supplyLine.export(supplyLineDto);
+
+    SupplyLineDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
-        .body(supplyLine)
+        .body(supplyLineDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(SupplyLine.class);
+        .extract().as(SupplyLineDto.class);
 
-    assertEquals(supplyLine, response);
+    assertEquals(supplyLineDto, response);
     assertEquals(DESCRIPTION, response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -162,19 +168,22 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     supplyLine.setDescription(DESCRIPTION);
     given(supplyLineRepository.findOne(supplyLineId)).willReturn(null);
 
-    SupplyLine response = restAssured
+    SupplyLineDto supplyLineDto = new SupplyLineDto();
+    supplyLine.export(supplyLineDto);
+
+    SupplyLineDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", ID)
-        .body(supplyLine)
+        .pathParam("id", supplyLineId)
+        .body(supplyLineDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(SupplyLine.class);
+        .extract().as(SupplyLineDto.class);
 
-    assertEquals(supplyLine, response);
+    assertEquals(supplyLineDto, response);
     assertEquals(DESCRIPTION, response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -186,7 +195,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     List<SupplyLine> storedSupplyLines = Arrays.asList(supplyLine, newSupplyLine);
     given(supplyLineRepository.findAll()).willReturn(storedSupplyLines);
 
-    SupplyLine[] response = restAssured
+    SupplyLineDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -194,7 +203,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(SupplyLine[].class);
+        .extract().as(SupplyLineDto[].class);
 
     assertEquals(storedSupplyLines.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -205,7 +214,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
 
-    SupplyLine response = restAssured
+    SupplyLineDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -214,9 +223,9 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .get(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(SupplyLine.class);
+        .extract().as(SupplyLineDto.class);
 
-    assertEquals(supplyLine, response);
+    assertEquals(supplyLineDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

@@ -1,8 +1,11 @@
 package org.openlmis.referencedata.validate;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
-import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.dto.RequisitionGroupDto;
+import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -16,8 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A validator for {@link RequisitionGroup} object.
@@ -109,7 +110,7 @@ public class RequisitionGroupValidator implements Validator {
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors);
 
-    RequisitionGroup group = (RequisitionGroup) target;
+    RequisitionGroupDto group = (RequisitionGroupDto) target;
 
     verifyProperties(group, errors);
 
@@ -125,7 +126,7 @@ public class RequisitionGroupValidator implements Validator {
     checkNotNull(errors, "The contextual state about the validation process cannot be null");
   }
 
-  private void verifyProperties(RequisitionGroup group, Errors errors) {
+  private void verifyProperties(RequisitionGroupDto group, Errors errors) {
     // the Requisition Group Code is required, length 50 characters
     rejectIfEmptyOrWhitespace(errors, CODE, EMPTY, CODE_IS_REQUIRED);
 
@@ -162,7 +163,7 @@ public class RequisitionGroupValidator implements Validator {
     }
   }
 
-  private void verifySupervisoryNode(SupervisoryNode supervisoryNode, Errors errors) {
+  private void verifySupervisoryNode(SupervisoryNodeBaseDto supervisoryNode, Errors errors) {
     // supervisory node matches a defined supervisory node
     if (null == supervisoryNode.getId()) {
       rejectValue(errors, SUPERVISORY_NODE, MISSING_ID, SUPERVISORY_NODE_MUST_HAVE_ID);

@@ -1,29 +1,64 @@
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 
-import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class SupplyLineDto {
-  private UUID id;
-  private UUID supervisoryNode;
-  private String description;
-  private UUID program;
-  private UUID supplyingFacility;
+import java.util.Objects;
 
-  /**
-   * Converts SupplyLine to SupplyLineDto.
-   * @param supplyLine SupplyLine to convert.
-   */
-  public SupplyLineDto(SupplyLine supplyLine) {
-    id = supplyLine.getId();
-    supervisoryNode = supplyLine.getSupervisoryNode().getId();
-    description = supplyLine.getDescription();
-    program = supplyLine.getProgram().getId();
-    supplyingFacility = supplyLine.getSupplyingFacility().getId();
+public class SupplyLineDto extends BaseDto implements SupplyLine.Exporter, SupplyLine.Importer {
+
+  @JsonProperty
+  @Getter
+  private SupervisoryNodeBaseDto supervisoryNode;
+
+  @Getter
+  @Setter
+  private String description;
+
+  @Getter
+  @Setter
+  private Program program;
+
+  @Getter
+  @Setter
+  private Facility supplyingFacility;
+
+  @JsonIgnore
+  @Override
+  public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
+    if (supervisoryNode != null) {
+      SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeBaseDto();
+      supervisoryNode.export(supervisoryNodeBaseDto);
+      this.supervisoryNode = supervisoryNodeBaseDto;
+    } else {
+      this.supervisoryNode = null;
+    }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof SupplyLineDto)) {
+      return false;
+    }
+    SupplyLineDto that = (SupplyLineDto) obj;
+    return Objects.equals(id, that.id) && Objects.equals(supervisoryNode, that.supervisoryNode)
+        && Objects.equals(program, that.program)
+        && Objects.equals(supplyingFacility, that.supplyingFacility);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, supervisoryNode, program, supplyingFacility);
   }
 }
