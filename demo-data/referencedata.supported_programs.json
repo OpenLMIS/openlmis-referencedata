@@ -1,0 +1,22 @@
+[
+  {
+    "id": "29172001-809d-45bd-bbae-3a53b544709a",
+    "facility": { "id" : "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" }
+  },
+  {
+    "id": "a3da399c-547e-4dbe-9b94-8361f626b334",
+    "facility": { "id" : "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" }
+  },
+  {
+    "id": "56615552-9f08-4b2c-8553-562774fd4c94",
+    "facility": { "id" : "13037147-1769-4735-90a7-b9b310d128b8" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" }
+  },
+  {
+    "id": "0f19e23e-207b-41f2-8519-200585197bb9",
+    "facility": { "id" : "13037147-1769-4735-90a7-b9b310d128b8" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" }
+  }
+]
