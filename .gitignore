@@ -9,3 +9,4 @@ out/
 .env
 .tx/
 demo-data/*.sql
+node_modules
