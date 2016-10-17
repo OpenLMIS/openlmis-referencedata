@@ -1,6 +1,6 @@
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.FacilityOperator;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +11,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ProgramDto extends BaseDto implements Program.Exporter, Program.Importer {
+public class FacilityOperatorDto extends BaseDto
+    implements FacilityOperator.Exporter, FacilityOperator.Importer {
   private String code;
   private String name;
   private String description;
-  private Boolean active;
-  private Boolean periodsSkippable;
-  private Boolean showNonFullSupplyTab;
+  private Integer displayOrder;
 }

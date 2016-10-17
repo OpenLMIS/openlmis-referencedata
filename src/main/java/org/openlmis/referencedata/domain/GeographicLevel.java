@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,5 +51,40 @@ public class GeographicLevel extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(code);
+  }
+
+  /**
+   * Exports current state of geographic level object.
+   *
+   * @param exporter instance of {@link GeographicLevel.Exporter}
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setCode(code);
+    exporter.setName(name);
+    exporter.setLevelNumber(levelNumber);
+  }
+
+  public interface Exporter {
+
+    void setId(UUID id);
+
+    void setCode(String code);
+
+    void setName(String name);
+
+    void setLevelNumber(Integer levelNumber);
+  }
+
+  public interface Importer {
+
+    UUID getId();
+
+    String getCode();
+
+    String getName();
+
+    Integer getLevelNumber();
+
   }
 }

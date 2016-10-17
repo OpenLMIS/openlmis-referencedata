@@ -1,19 +1,33 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import org.openlmis.referencedata.dto.FacilityOperatorDto;
+import org.openlmis.referencedata.dto.FacilityTypeDto;
+import org.openlmis.referencedata.dto.GeographicZoneDto;
+import org.openlmis.referencedata.dto.ProgramDto;
+
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "facilities", schema = "referencedata")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Facility extends BaseEntity {
 
   public static final String TEXT = "text";
@@ -78,11 +92,11 @@ public class Facility extends BaseEntity {
   @Setter
   private Boolean openLmisAccessible;
 
-  @OneToMany
-  @JoinColumn(name = "programId")
+  @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true,
+      fetch = FetchType.EAGER)
   @Getter
   @Setter
-  private List<Program> supportedPrograms;
+  private Set<SupportedProgram> supportedPrograms;
 
   private Facility() {
 
@@ -94,6 +108,7 @@ public class Facility extends BaseEntity {
 
   /**
    * Equal by a Facility's code.
+   *
    * @param other the other Facility
    * @return true if the two Facilities' {@link Code} are equal.
    */
@@ -103,12 +118,131 @@ public class Facility extends BaseEntity {
       return false;
     }
 
-    Facility facility = (Facility)other;
+    Facility facility = (Facility) other;
     return code.equals(facility.getCode());
   }
 
   @Override
   public int hashCode() {
     return code.hashCode();
+  }
+
+  /**
+   * Exports current state of facility object.
+   *
+   * @param exporter instance of {@link Facility.Exporter}
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setCode(code);
+    exporter.setName(name);
+    exporter.setDescription(description);
+
+    if (null != geographicZone) {
+      GeographicZoneDto geographicZoneDto = new GeographicZoneDto();
+      geographicZone.export(geographicZoneDto);
+
+      exporter.setGeographicZone(geographicZoneDto);
+    }
+
+    if (null != type) {
+      FacilityTypeDto typeDto = new FacilityTypeDto();
+      type.export(typeDto);
+
+      exporter.setType(typeDto);
+    }
+
+    if (null != operator) {
+      FacilityOperatorDto operatorDto = new FacilityOperatorDto();
+      operator.export(operatorDto);
+
+      exporter.setOperator(operatorDto);
+    }
+
+    exporter.setActive(active);
+    exporter.setGoLiveDate(goLiveDate);
+    exporter.setGoDownDate(goDownDate);
+    exporter.setComment(comment);
+    exporter.setEnabled(enabled);
+    exporter.setOpenLmisAccessible(openLmisAccessible);
+
+    if (null != supportedPrograms) {
+      Set<ProgramDto> supportedProgramsDto = supportedPrograms
+          .stream()
+          .map(SupportedProgram::getProgram)
+          .map(program -> {
+            ProgramDto programDto = new ProgramDto();
+            program.export(programDto);
+
+            return programDto;
+          })
+          .collect(Collectors.toSet());
+
+      exporter.setSupportedPrograms(supportedProgramsDto);
+    }
+  }
+
+  public interface Exporter {
+
+    void setId(UUID id);
+
+    void setCode(String code);
+
+    void setName(String name);
+
+    void setDescription(String description);
+
+    void setGeographicZone(GeographicZoneDto geographicZone);
+
+    void setType(FacilityTypeDto type);
+
+    void setOperator(FacilityOperatorDto operator);
+
+    void setActive(Boolean active);
+
+    void setGoLiveDate(Date goLiveDate);
+
+    void setGoDownDate(Date goDownDate);
+
+    void setComment(String comment);
+
+    void setEnabled(Boolean enabled);
+
+    void setOpenLmisAccessible(Boolean openLmisAccessible);
+
+    void setSupportedPrograms(Set<ProgramDto> supportedPrograms);
+
+  }
+
+  public interface Importer {
+
+    UUID getId();
+
+    String getCode();
+
+    String getName();
+
+    String getDescription();
+
+    GeographicZoneDto getGeographicZone();
+
+    FacilityTypeDto getType();
+
+    FacilityOperatorDto getOperator();
+
+    Boolean getActive();
+
+    Date getGoLiveDate();
+
+    Date getGoDownDate();
+
+    String getComment();
+
+    Boolean getEnabled();
+
+    Boolean getOpenLmisAccessible();
+
+    Set<ProgramDto> getSupportedPrograms();
+
   }
 }

@@ -3,6 +3,8 @@ package org.openlmis.referencedata.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -79,5 +81,55 @@ public class Program extends BaseEntity {
   @Override
   public int hashCode() {
     return code.hashCode();
+  }
+
+  /**
+   * Exports current state of program object.
+   *
+   * @param exporter instance of {@link Program.Exporter}
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setCode(code.toString());
+    exporter.setName(name);
+    exporter.setDescription(description);
+    exporter.setActive(active);
+    exporter.setPeriodsSkippable(periodsSkippable);
+    exporter.setShowNonFullSupplyTab(showNonFullSupplyTab);
+  }
+
+  public interface Exporter {
+
+    void setId(UUID id);
+
+    void setCode(String code);
+
+    void setName(String name);
+
+    void setDescription(String description);
+
+    void setActive(Boolean active);
+
+    void setPeriodsSkippable(Boolean periodsSkippable);
+
+    void setShowNonFullSupplyTab(Boolean showNonFullSupplyTab);
+  }
+
+  public interface Importer {
+
+    UUID getId();
+
+    String getCode();
+
+    String getName();
+
+    String getDescription();
+
+    Boolean getActive();
+
+    Boolean getPeriodsSkippable();
+
+    Boolean getShowNonFullSupplyTab();
+
   }
 }

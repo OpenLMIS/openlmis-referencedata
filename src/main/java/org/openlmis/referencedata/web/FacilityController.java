@@ -4,6 +4,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Controller
 public class FacilityController extends BaseController {
@@ -55,7 +57,7 @@ public class FacilityController extends BaseController {
     facility.setId(null);
     Facility newFacility = facilityRepository.save(facility);
     LOGGER.debug("Created new facility with id: " + facility.getId());
-    return new ResponseEntity<Facility>(newFacility, HttpStatus.CREATED);
+    return ok(newFacility);
   }
 
   /**
@@ -66,7 +68,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities", method = RequestMethod.GET)
   public ResponseEntity<?> getAllFacilities() {
     Iterable<Facility> facilities = facilityRepository.findAll();
-    return new ResponseEntity<>(facilities, HttpStatus.OK);
+    return ok(facilities);
   }
 
 
@@ -92,7 +94,7 @@ public class FacilityController extends BaseController {
     facilityToUpdate = facilityRepository.save(facilityToUpdate);
 
     LOGGER.debug("Saved facility with id: " + facilityToUpdate.getId());
-    return new ResponseEntity<>(facilityToUpdate, HttpStatus.OK);
+    return ok(facilityToUpdate);
   }
 
   /**
@@ -107,7 +109,7 @@ public class FacilityController extends BaseController {
     if (facility == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
-      return new ResponseEntity<>(facility, HttpStatus.OK);
+      return ok(facility);
     }
   }
 
@@ -161,7 +163,7 @@ public class FacilityController extends BaseController {
         supervisoryNode);
     List<Facility> facilities = supplyLines.stream()
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
-    return new ResponseEntity<>(facilities, HttpStatus.OK);
+    return ok(facilities);
   }
 
   /**
@@ -182,7 +184,29 @@ public class FacilityController extends BaseController {
     }
     List<Facility> foundFacilities =
         facilityRepository.findFacilitiesByCodeOrName(code, name);
-    return new ResponseEntity<>(foundFacilities, HttpStatus.OK);
+    return ok(foundFacilities);
+  }
+
+  private ResponseEntity<FacilityDto> ok(Facility facility) {
+    return new ResponseEntity<>(toDto(facility), HttpStatus.OK);
+  }
+
+  private ResponseEntity<List<FacilityDto>> ok(Iterable<Facility> facilities) {
+    return new ResponseEntity<>(toDto(facilities), HttpStatus.OK);
+  }
+
+  private FacilityDto toDto(Facility facility) {
+    FacilityDto dto = new FacilityDto();
+    facility.export(dto);
+
+    return dto;
+  }
+
+  private List<FacilityDto> toDto(Iterable<Facility> facilities) {
+    return StreamSupport
+        .stream(facilities.spliterator(), false)
+        .map(this::toDto)
+        .collect(Collectors.toList());
   }
 
 }

@@ -1,10 +1,13 @@
 package org.openlmis.referencedata.domain;
 
+import org.openlmis.referencedata.dto.GeographicLevelDto;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -73,5 +76,63 @@ public class GeographicZone extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(code);
+  }
+
+  /**
+   * Exports current state of geographic zone object.
+   *
+   * @param exporter instance of {@link GeographicZone.Exporter}
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setCode(code);
+    exporter.setName(name);
+
+    if (null != level) {
+      GeographicLevelDto levelDto = new GeographicLevelDto();
+      level.export(levelDto);
+
+      exporter.setLevel(levelDto);
+    }
+
+    exporter.setCatchmentPopulation(catchmentPopulation);
+    exporter.setLatitude(latitude);
+    exporter.setLongitude(longitude);
+  }
+
+  public interface Exporter {
+
+    void setId(UUID id);
+
+    void setCode(String code);
+
+    void setName(String name);
+
+    void setLevel(GeographicLevelDto level);
+
+    void setCatchmentPopulation(Integer catchmentPopulation);
+
+    void setLatitude(Double latitude);
+
+    void setLongitude(Double longitude);
+
+  }
+
+  public interface Importer {
+
+    UUID getId();
+
+    String getCode();
+
+    String getName();
+
+    GeographicLevelDto getLevel();
+
+    Integer getCatchmentPopulation();
+
+    Double getLatitude();
+
+    Double getLongitude();
+
   }
 }

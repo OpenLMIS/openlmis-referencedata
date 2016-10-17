@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.Objects;
 
 @Entity
 @Table(name = "facility_operators", schema = "referencedata")
@@ -48,5 +50,46 @@ public class FacilityOperator extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(code);
+  }
+
+  /**
+   * Exports current state of facility operator object.
+   *
+   * @param exporter instance of {@link FacilityOperator.Exporter}
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setCode(code);
+    exporter.setName(name);
+    exporter.setDescription(description);
+    exporter.setDisplayOrder(displayOrder);
+  }
+
+  public interface Exporter {
+
+    void setId(UUID id);
+
+    void setCode(String code);
+
+    void setName(String name);
+
+    void setDescription(String description);
+
+    void setDisplayOrder(Integer displayOrder);
+
+  }
+
+  public interface Importer {
+
+    UUID getId();
+
+    String getCode();
+
+    String getName();
+
+    String getDescription();
+
+    Integer getDisplayOrder();
+
   }
 }
