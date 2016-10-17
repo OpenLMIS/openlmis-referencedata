@@ -1,54 +1,54 @@
 [
   {
-    "id": "00000000-0000-0000-0000-000000000001",
+    "id": "6805dd74-ec00-4697-9a5d-5b78414fcaf6",
     "code": "C1",
     "displayName": "Antibiotics",
     "displayOrder": 1
   },
   {
-    "id": "00000000-0000-0000-0000-000000000002",
+    "id": "814c51b6-91e3-45c3-af39-25e94b608d96",
     "code": "C2",
     "displayName": "Anaesthetics",
     "displayOrder": 2
   },
   {
-    "id": "00000000-0000-0000-0000-000000000003",
+    "id": "baeb2434-574d-4804-9640-992abbe826ef",
     "code": "C3",
     "displayName": "Anti-fungal",
     "displayOrder": 3
   },
   {
-    "id": "00000000-0000-0000-0000-000000000004",
+    "id": "6c7768ef-6ccc-4150-a589-043a17f6cf95",
     "code": "C4",
     "displayName": "Analgesics",
     "displayOrder": 4
   },
   {
-    "id": "00000000-0000-0000-0000-000000000005",
+    "id": "16173fd0-f439-4222-931e-91c413a495c3",
     "code": "C5",
     "displayName": "Vaccines",
     "displayOrder": 5
   },
   {
-    "id": "00000000-0000-0000-0000-000000000006",
+    "id": "15b8ef1f-a5d6-42dd-95bf-bb68a4504e82",
     "code": "oc",
     "displayName": "Oral Contraceptive",
     "displayOrder": 6
   },
   {
-    "id": "00000000-0000-0000-0000-000000000007",
+    "id": "3bfe0282-732b-4ce8-b4f9-aa7ffb297758",
     "code": "bm",
     "displayName": "Barrier Method",
     "displayOrder": 7
   },
   {
-    "id": "00000000-0000-0000-0000-000000000008",
+    "id": "06606981-67cc-42d1-87ed-21f22fb0ea58",
     "code": "imp",
     "displayName": "Implantable Contraceptive",
     "displayOrder": 8
   },
   {
-    "id": "00000000-0000-0000-0000-000000000009",
+    "id": "74f39ab7-b5ce-4087-a6ea-65799a35e79b",
     "code": "inj",
     "displayName": "Injectable Hormonal Contraceptive",
     "displayOrder": 9

@@ -1,6 +1,6 @@
 [
   {
-    "id": "00000000-0000-0000-0000-000000000001",
+    "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb",
     "username": "administrator",
     "email": "administrator@openlmis.org",
     "firstName": "Admin",
@@ -8,7 +8,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
-    "homefacilityid": { "id": "00000000-0000-0000-0000-000000000001" },
+    "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "timeZone": "CET"
   }
 ]

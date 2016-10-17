@@ -1,20 +1,20 @@
 [
   {
-    "id": "00000000-0000-0000-0000-000000000001",
+    "id": "ac1d268b-ce10-455f-bf87-9c667da8f060",
     "code": "HC",
     "name": "Health Center",
     "active": "true",
     "displayOrder": 1
   },
   {
-    "id": "00000000-0000-0000-0000-000000000002",
+    "id": "ac1d268b-ce10-455f-bf87-9c667da8f060",
     "code": "DH",
     "name": "Distict Hospital",
     "active": "true",
     "displayOrder": 2
   },
   {
-    "id": "00000000-0000-0000-0000-000000000003",
+    "id": "e2faaa9e-4b2d-4212-bb60-fd62970b2113",
     "code": "WH",
     "name": "Warehouse",
     "active": "true",

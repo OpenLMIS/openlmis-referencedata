@@ -1,16 +1,16 @@
 [
   {
-    "id": "00000000-0000-0000-0000-000000000001",
+    "id": "4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22",
     "name": "MANAGE_GEOGRAPHIC_ZONE",
     "type": "ADMIN"
   },
   {
-    "id": "00000000-0000-0000-0000-000000000002",
+    "id": "5c4b3b9b-713e-4b9a-8c58-7efcd2954512",
     "name": "MANAGE_SUPERVISORY_NODE",
     "type": "ADMIN"
   },
   {
-    "id": "00000000-0000-0000-0000-000000000003",
+    "id": "fb6a0053-6254-4b41-8028-bf91421f90dd",
     "name": "MANAGE_PRODUCT",
     "type": "ADMIN"
   }
