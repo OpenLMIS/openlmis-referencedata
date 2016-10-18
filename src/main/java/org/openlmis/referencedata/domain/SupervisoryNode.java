@@ -79,8 +79,13 @@ public class SupervisoryNode extends BaseEntity {
    * @param importer the supervisory node importer (DTO)
    */
   public static SupervisoryNode newSupervisoryNode(Importer importer) {
-    SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getCode(),
-        importer.getFacility());
+    Facility facility = null;
+
+    if (importer.getFacility() != null) {
+      facility = Facility.newFacility(importer.getFacility());
+    }
+
+    SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getCode(), facility);
     newSupervisoryNode.id = importer.getId();
     newSupervisoryNode.name = importer.getName();
     newSupervisoryNode.description = importer.getDescription();
@@ -215,7 +220,7 @@ public class SupervisoryNode extends BaseEntity {
 
     String getDescription();
 
-    Facility getFacility();
+    Facility.Importer getFacility();
 
     SupervisoryNode.Importer getParentNode();
 

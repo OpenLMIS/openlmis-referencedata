@@ -93,7 +93,6 @@ public class RequisitionGroup extends BaseEntity {
         importer.getName(), supervisoryNode);
     newRequisitionGroup.id = importer.getId();
     newRequisitionGroup.description = importer.getDescription();
-    newRequisitionGroup.memberFacilities = importer.getMemberFacilities();
 
     if (importer.getRequisitionGroupProgramSchedules() != null) {
       List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules = new ArrayList<>();
@@ -105,6 +104,16 @@ public class RequisitionGroup extends BaseEntity {
       }
 
       newRequisitionGroup.requisitionGroupProgramSchedules = requisitionGroupProgramSchedules;
+    }
+
+    if (importer.getMemberFacilities() != null) {
+      List<Facility> memberFacilities = new ArrayList<>();
+
+      for (Facility.Importer facilityImporter : importer.getMemberFacilities()) {
+        memberFacilities.add(Facility.newFacility(facilityImporter));
+      }
+
+      newRequisitionGroup.memberFacilities = memberFacilities;
     }
 
     return newRequisitionGroup;
@@ -186,6 +195,6 @@ public class RequisitionGroup extends BaseEntity {
 
     List<RequisitionGroupProgramSchedule.Importer> getRequisitionGroupProgramSchedules();
 
-    List<Facility> getMemberFacilities();
+    List<Facility.Importer> getMemberFacilities();
   }
 }

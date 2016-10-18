@@ -34,6 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -43,6 +44,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -144,7 +146,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
   @Test
   public void shouldRejectIfFacilityIsNull() throws Exception {
-    requisitionGroupDto.getMemberFacilities().add(null);
+    requisitionGroupDto.setMemberFacilityDtos(Collections.singletonList(null));
 
     validator.validate(requisitionGroupDto, errors);
 
@@ -153,7 +155,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
   @Test
   public void shouldRejectIfFacilityHasNoId() throws Exception {
-    requisitionGroupDto.getMemberFacilities().add(new Facility("TestFacilityCode2"));
+    requisitionGroupDto.setMemberFacilityDtos(Collections.singletonList(new FacilityDto()));
 
     validator.validate(requisitionGroupDto, errors);
 
@@ -162,10 +164,8 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
   @Test
   public void shouldRejectIfFacilityCanNotBeFound() throws Exception {
-    Facility facility = new Facility("TestFacilityCode2");
-    facility.setId(UUID.randomUUID());
-
-    requisitionGroupDto.getMemberFacilities().add(facility);
+    requisitionGroupDto.setMemberFacilityDtos(
+        Collections.singletonList(new FacilityDto(UUID.randomUUID())));
 
     validator.validate(requisitionGroupDto, errors);
 

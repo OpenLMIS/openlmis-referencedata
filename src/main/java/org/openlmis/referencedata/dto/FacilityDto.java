@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
@@ -70,6 +71,10 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
   private Boolean openLmisAccessible;
 
   private Set<ProgramDto> supportedPrograms;
+
+  public FacilityDto(UUID id) {
+    setId(id);
+  }
 
   @Override
   public void setGeographicZone(GeographicZone geographicZone) {

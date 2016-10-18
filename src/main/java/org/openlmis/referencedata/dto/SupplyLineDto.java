@@ -23,13 +23,13 @@ public class SupplyLineDto extends BaseDto implements SupplyLine.Exporter, Suppl
   @Setter
   private String description;
 
+  @JsonProperty
   @Getter
-  @Setter
-  private Program program;
+  private ProgramDto program;
 
+  @JsonProperty
   @Getter
-  @Setter
-  private Facility supplyingFacility;
+  private FacilityDto supplyingFacility;
 
   @JsonIgnore
   @Override
@@ -40,6 +40,30 @@ public class SupplyLineDto extends BaseDto implements SupplyLine.Exporter, Suppl
       this.supervisoryNode = supervisoryNodeBaseDto;
     } else {
       this.supervisoryNode = null;
+    }
+  }
+
+  @JsonIgnore
+  @Override
+  public void setProgram(Program program) {
+    if (program != null) {
+      ProgramDto programDto = new ProgramDto();
+      program.export(programDto);
+      this.program = programDto;
+    } else {
+      this.program = null;
+    }
+  }
+
+  @JsonIgnore
+  @Override
+  public void setSupplyingFacility(Facility supplyingFacility) {
+    if (supplyingFacility != null) {
+      FacilityDto facilityDto = new FacilityDto();
+      supplyingFacility.export(facilityDto);
+      this.supplyingFacility = facilityDto;
+    } else {
+      this.supplyingFacility = null;
     }
   }
 

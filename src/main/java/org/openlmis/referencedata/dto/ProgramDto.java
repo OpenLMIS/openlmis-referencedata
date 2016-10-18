@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -18,4 +20,8 @@ public class ProgramDto extends BaseDto implements Program.Exporter, Program.Imp
   private Boolean active;
   private Boolean periodsSkippable;
   private Boolean showNonFullSupplyTab;
+
+  public ProgramDto(UUID id) {
+    setId(id);
+  }
 }

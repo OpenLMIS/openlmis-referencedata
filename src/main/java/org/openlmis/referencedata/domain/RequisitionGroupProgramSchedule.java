@@ -79,14 +79,22 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
       requisitionGroup = RequisitionGroup.newRequisitionGroup(importer.getRequisitionGroup());
     }
 
-    RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule
-          = new RequisitionGroupProgramSchedule(
-          requisitionGroup,
-          importer.getProgram(),
-          importer.getProcessingSchedule(),
-          importer.getDirectDelivery());
+    Program program = null;
+
+    if (importer.getProgram() != null) {
+      program = Program.newProgram(importer.getProgram());
+    }
+
+    RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule =
+        new RequisitionGroupProgramSchedule(requisitionGroup, program,
+          importer.getProcessingSchedule(), importer.getDirectDelivery());
+
     newRequisitionGroupProgramSchedule.id = importer.getId();
-    newRequisitionGroupProgramSchedule.dropOffFacility = importer.getDropOffFacility();
+
+    if (importer.getDropOffFacility() != null) {
+      newRequisitionGroupProgramSchedule.dropOffFacility =
+          Facility.newFacility(importer.getDropOffFacility());
+    }
 
     return newRequisitionGroupProgramSchedule;
   }
@@ -143,12 +151,12 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
 
     RequisitionGroup.Importer getRequisitionGroup();
 
-    Program getProgram();
+    Program.Importer getProgram();
 
     ProcessingSchedule getProcessingSchedule();
 
     Boolean getDirectDelivery();
 
-    Facility getDropOffFacility();
+    Facility.Importer getDropOffFacility();
   }
 }

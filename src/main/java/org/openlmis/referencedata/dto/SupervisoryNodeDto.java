@@ -2,6 +2,7 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 
@@ -9,6 +10,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
+
+  @JsonIgnore
+  @Override
+  public void setFacility(Facility facility) {
+    if (facility != null) {
+      FacilityDto facilityDto = new FacilityDto();
+      facility.export(facilityDto);
+      setFacility(facilityDto);
+    } else {
+      setFacility((FacilityDto) null);
+    }
+  }
 
   @JsonIgnore
   @Override

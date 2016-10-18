@@ -26,9 +26,9 @@ public class RequisitionGroupProgramScheduleBaseDto extends BaseDto implements
   @Getter
   private RequisitionGroupBaseDto requisitionGroup;
 
+  @JsonProperty
   @Getter
-  @Setter
-  private Program program;
+  private ProgramDto program;
 
   @Getter
   @Setter
@@ -38,9 +38,9 @@ public class RequisitionGroupProgramScheduleBaseDto extends BaseDto implements
   @Setter
   private Boolean directDelivery;
 
+  @JsonProperty
   @Getter
-  @Setter
-  private Facility dropOffFacility;
+  private FacilityDto dropOffFacility;
 
   public RequisitionGroupProgramScheduleBaseDto(UUID id) {
     setId(id);
@@ -58,6 +58,34 @@ public class RequisitionGroupProgramScheduleBaseDto extends BaseDto implements
 
   public void setRequisitionGroup(RequisitionGroupBaseDto requisitionGroup) {
     this.requisitionGroup = requisitionGroup;
+  }
+
+  @JsonIgnore
+  @Override
+  public void setProgram(Program program) {
+    if (program != null) {
+      this.program = new ProgramDto(program.getId());
+    } else {
+      this.program = null;
+    }
+  }
+
+  public void setProgram(ProgramDto program) {
+    this.program = program;
+  }
+
+  @JsonIgnore
+  @Override
+  public void setDropOffFacility(Facility dropOffFacility) {
+    if (dropOffFacility != null) {
+      this.dropOffFacility = new FacilityDto(dropOffFacility.getId());
+    } else {
+      this.dropOffFacility = null;
+    }
+  }
+
+  public void setDropOffFacility(FacilityDto dropOffFacility) {
+    this.dropOffFacility = dropOffFacility;
   }
 
   @Override

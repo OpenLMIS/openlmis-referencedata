@@ -41,9 +41,8 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   private List<RequisitionGroupProgramScheduleBaseDto> requisitionGroupProgramSchedules =
       new ArrayList<>();
 
-  @Getter
-  @Setter
-  private List<Facility> memberFacilities;
+  @JsonProperty
+  private List<FacilityDto> memberFacilities = new ArrayList<>();
 
   public RequisitionGroupBaseDto(UUID id) {
     setId(id);
@@ -90,6 +89,33 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   public void setRequisitionGroupProgramScheduleDtos(
       List<RequisitionGroupProgramScheduleBaseDto> schedules) {
     this.requisitionGroupProgramSchedules = schedules;
+  }
+
+  @Override
+  public List<Facility.Importer> getMemberFacilities() {
+    if (memberFacilities == null) {
+      return null;
+    }
+
+    List<Facility.Importer> facilities = new ArrayList<>();
+    facilities.addAll(memberFacilities);
+    return facilities;
+  }
+
+  @JsonIgnore
+  @Override
+  public void setMemberFacilities(List<Facility> memberFacilities) {
+    if (memberFacilities != null) {
+      for (Facility facility : memberFacilities) {
+        this.memberFacilities.add(new FacilityDto(facility.getId()));
+      }
+    } else {
+      this.memberFacilities = null;
+    }
+  }
+
+  public void setMemberFacilityDtos(List<FacilityDto> memberFacilities) {
+    this.memberFacilities = memberFacilities;
   }
 
   @Override

@@ -172,13 +172,13 @@ public class RequisitionGroupValidator implements Validator {
     }
   }
 
-  private void verifyFacilities(List<Facility> memberFacilities, Errors errors) {
-    List<Facility> facilities = Optional
+  private void verifyFacilities(List<Facility.Importer> memberFacilities, Errors errors) {
+    List<Facility.Importer> facilities = Optional
         .ofNullable(memberFacilities)
         .orElse(Collections.emptyList());
 
     // facilities must already exist in the system (cannot add new facilities from this point)
-    for (Facility facility : facilities) {
+    for (Facility.Importer facility : facilities) {
       if (null == facility) {
         rejectValue(errors, MEMBER_FACILITIES, IS_NULL, FACILITY_CAN_NOT_BE_NULL);
       } else if (null == facility.getId()) {

@@ -32,9 +32,9 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   @Setter
   private String description;
 
+  @JsonProperty
   @Getter
-  @Setter
-  private Facility facility;
+  private FacilityDto facility;
 
   @JsonProperty
   @Getter
@@ -49,6 +49,20 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
 
   public SupervisoryNodeBaseDto(UUID id) {
     setId(id);
+  }
+
+  @JsonIgnore
+  @Override
+  public void setFacility(Facility facility) {
+    if (facility != null) {
+      this.facility = new FacilityDto(facility.getId());
+    } else {
+      this.facility = null;
+    }
+  }
+
+  public void setFacility(FacilityDto facility) {
+    this.facility = facility;
   }
 
   @JsonIgnore

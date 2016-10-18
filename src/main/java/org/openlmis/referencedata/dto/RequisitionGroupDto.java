@@ -2,6 +2,7 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 
@@ -38,6 +39,24 @@ public class RequisitionGroupDto extends RequisitionGroupBaseDto {
       setRequisitionGroupProgramScheduleDtos(scheduleBaseDtos);
     } else {
       setRequisitionGroupProgramScheduleDtos(null);
+    }
+  }
+
+  @JsonIgnore
+  @Override
+  public void setMemberFacilities(List<Facility> memberFacilities) {
+    if (memberFacilities != null) {
+      List<FacilityDto> facilityDtos = new ArrayList<>();
+
+      for (Facility facility : memberFacilities) {
+        FacilityDto facilityDto = new FacilityDto();
+        facility.export(facilityDto);
+        facilityDtos.add(facilityDto);
+      }
+
+      setMemberFacilityDtos(facilityDtos);
+    } else {
+      setMemberFacilityDtos(null);
     }
   }
 }

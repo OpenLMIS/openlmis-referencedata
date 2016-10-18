@@ -58,9 +58,19 @@ public class SupplyLine extends BaseEntity {
   public static SupplyLine newSupplyLine(Importer importer) {
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(
         importer.getSupervisoryNode());
+    Program program = null;
 
-    SupplyLine supplyLine = new SupplyLine(supervisoryNode, importer.getProgram(),
-        importer.getSupplyingFacility());
+    if (importer.getProgram() != null) {
+      program = Program.newProgram(importer.getProgram());
+    }
+
+    Facility supplyingFacility = null;
+
+    if (importer.getSupplyingFacility() != null) {
+      supplyingFacility = Facility.newFacility(importer.getSupplyingFacility());
+    }
+
+    SupplyLine supplyLine = new SupplyLine(supervisoryNode, program, supplyingFacility);
     supplyLine.setId(importer.getId());
     supplyLine.setDescription(importer.getDescription());
 
@@ -130,8 +140,8 @@ public class SupplyLine extends BaseEntity {
 
     String getDescription();
 
-    Program getProgram();
+    Program.Importer getProgram();
 
-    Facility getSupplyingFacility();
+    Facility.Importer getSupplyingFacility();
   }
 }
