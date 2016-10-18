@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 buildscript {
     repositories {
         mavenCentral()
@@ -22,18 +20,18 @@ apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 apply plugin: 'pmd'
 
-jar {
-    baseName = 'openlmis-referencedata'
-    version  = '0.0.1'
-}
+
+group = serviceGroup
+version = serviceVersion
+archivesBaseName = rootProject.name
+project.ext.buildTime = java.time.Instant.now().toString() // for versioning
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
     jcenter()
 }
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
@@ -141,6 +139,13 @@ task checkApiIsRaml(type:Exec) {
     args "src/main/resources/api-definition.yaml"
 }
 
+processResources {
+    // update version information in build
+    filesMatching('**/version.properties') {
+        expand(project.properties)
+    }
+}
+
 configure(checkApiIsRaml) {
     group = JavaBasePlugin.VERIFICATION_GROUP
     description = 'Verify that the api-specification is valid RAML'
@@ -174,6 +179,7 @@ sonarqube {
     properties {
         property "sonar.projectName", "OpenLMIS Reference Data Service"
         property "sonar.projectKey", "org.sonarqube:openlmis-referencedata"
+        property "sonar.projectVersion", version
         property "sonar.host.url", "http://sonar.openlmis.org"
         property "sonar.java.coveragePlugin", "jacoco"
         //Tells SonarQube where the unit tests execution reports are
@@ -186,9 +192,10 @@ sonarqube {
     }
 }
 
-build.dependsOn jacocoTestReport
-// Makes sure checkstyle is run before build completes
-build.dependsOn check
+build {
+    dependsOn check
+    dependsOn jacocoTestReport
+}
 
 pmd {
     toolVersion = '5.4.0'
@@ -203,14 +210,6 @@ tasks.withType(Pmd){
         xml.enabled true
         html.enabled true
     }
-}
-
-def time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-time.setTimeZone(TimeZone.getTimeZone("GMT"))
-
-def versionToCopy = copySpec {
-    from 'src/main/resources'
-    include 'version_template'
 }
 
 apply from: "documentation.gradle"
