@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -13,9 +16,6 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "program_products", schema = "referencedata")
@@ -162,6 +162,7 @@ public class ProgramProduct extends BaseEntity {
                           SerializerProvider provider) throws IOException, JsonProcessingException {
       generator.writeStartObject();
       generator.writeStringField("programId", programProduct.program.getId().toString());
+      generator.writeStringField("productId", programProduct.product.getId().toString());
       generator.writeStringField("productCategoryId", programProduct.productCategory.getId()
           .toString());
       generator.writeStringField("productCategoryDisplayName",
