@@ -4,6 +4,7 @@
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "processingScheduleId": { "id": "9c15bd6e-3f6b-4b91-b53a-36c199d35eac" },
     "directDelivery": "true",
+    "dropOffFacilityId": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "requisitionGroupId": { "id": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05" }
   },
   {
