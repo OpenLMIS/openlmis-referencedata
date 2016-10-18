@@ -3,6 +3,7 @@ package org.openlmis.referencedata.dto;
 import static java.util.stream.Collectors.toSet;
 
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
@@ -44,7 +45,6 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
   private String homeFacilityCode;
 
   @Getter
-  @Setter
   private FacilityDto homeFacility;
 
   @Getter
@@ -65,6 +65,12 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
 
   public String fetchHomeFacilityCode() {
     return homeFacilityCode;
+  }
+
+  @Override
+  public void setHomeFacility(Facility homeFacility) {
+    this.homeFacility = new FacilityDto();
+    homeFacility.export(this.homeFacility);
   }
 
   /**

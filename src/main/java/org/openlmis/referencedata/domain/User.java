@@ -2,7 +2,6 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.util.View;
 
 import lombok.Getter;
@@ -206,10 +205,7 @@ public class User extends BaseEntity {
     exporter.setTimezone(timezone);
 
     if (null != homeFacility) {
-      FacilityDto facilityDto = new FacilityDto();
-      homeFacility.export(facilityDto);
-
-      exporter.setHomeFacility(facilityDto);
+      exporter.setHomeFacility(homeFacility);
     }
 
     exporter.setActive(active);
@@ -248,7 +244,7 @@ public class User extends BaseEntity {
 
     void setTimezone(String timezone);
 
-    void setHomeFacility(FacilityDto homeFacility);
+    void setHomeFacility(Facility homeFacility);
 
     void setVerified(boolean verified);
 
@@ -272,7 +268,7 @@ public class User extends BaseEntity {
 
     String getTimezone();
 
-    FacilityDto getHomeFacility();
+    Facility.Importer getHomeFacility();
 
     boolean isVerified();
 

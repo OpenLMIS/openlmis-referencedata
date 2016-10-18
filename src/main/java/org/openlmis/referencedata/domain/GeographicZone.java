@@ -1,7 +1,5 @@
 package org.openlmis.referencedata.domain;
 
-import org.openlmis.referencedata.dto.GeographicLevelDto;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -112,10 +110,7 @@ public class GeographicZone extends BaseEntity {
     exporter.setName(name);
 
     if (null != level) {
-      GeographicLevelDto levelDto = new GeographicLevelDto();
-      level.export(levelDto);
-
-      exporter.setLevel(levelDto);
+      exporter.setLevel(level);
     }
 
     exporter.setCatchmentPopulation(catchmentPopulation);
@@ -131,7 +126,7 @@ public class GeographicZone extends BaseEntity {
 
     void setName(String name);
 
-    void setLevel(GeographicLevelDto level);
+    void setLevel(GeographicLevel level);
 
     void setCatchmentPopulation(Integer catchmentPopulation);
 
@@ -149,7 +144,7 @@ public class GeographicZone extends BaseEntity {
 
     String getName();
 
-    GeographicLevelDto getLevel();
+    GeographicLevel.Importer getLevel();
 
     Integer getCatchmentPopulation();
 

@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.dto;
 
+import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 
 import lombok.AllArgsConstructor;
@@ -19,4 +20,10 @@ public class GeographicZoneDto extends BaseDto implements
   private Integer catchmentPopulation;
   private Double latitude;
   private Double longitude;
+
+  @Override
+  public void setLevel(GeographicLevel level) {
+    this.level = new GeographicLevelDto();
+    level.export(this.level);
+  }
 }

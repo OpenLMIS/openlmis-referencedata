@@ -3,11 +3,6 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import org.openlmis.referencedata.dto.FacilityOperatorDto;
-import org.openlmis.referencedata.dto.FacilityTypeDto;
-import org.openlmis.referencedata.dto.GeographicZoneDto;
-import org.openlmis.referencedata.dto.ProgramDto;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -190,24 +185,15 @@ public class Facility extends BaseEntity {
     exporter.setDescription(description);
 
     if (null != geographicZone) {
-      GeographicZoneDto geographicZoneDto = new GeographicZoneDto();
-      geographicZone.export(geographicZoneDto);
-
-      exporter.setGeographicZone(geographicZoneDto);
+      exporter.setGeographicZone(geographicZone);
     }
 
     if (null != type) {
-      FacilityTypeDto typeDto = new FacilityTypeDto();
-      type.export(typeDto);
-
-      exporter.setType(typeDto);
+      exporter.setType(type);
     }
 
     if (null != operator) {
-      FacilityOperatorDto operatorDto = new FacilityOperatorDto();
-      operator.export(operatorDto);
-
-      exporter.setOperator(operatorDto);
+      exporter.setOperator(operator);
     }
 
     exporter.setActive(active);
@@ -218,18 +204,7 @@ public class Facility extends BaseEntity {
     exporter.setOpenLmisAccessible(openLmisAccessible);
 
     if (null != supportedPrograms) {
-      Set<ProgramDto> supportedProgramsDto = supportedPrograms
-          .stream()
-          .map(SupportedProgram::getProgram)
-          .map(program -> {
-            ProgramDto programDto = new ProgramDto();
-            program.export(programDto);
-
-            return programDto;
-          })
-          .collect(Collectors.toSet());
-
-      exporter.setSupportedPrograms(supportedProgramsDto);
+      exporter.setSupportedPrograms(supportedPrograms);
     }
   }
 
@@ -243,11 +218,11 @@ public class Facility extends BaseEntity {
 
     void setDescription(String description);
 
-    void setGeographicZone(GeographicZoneDto geographicZone);
+    void setGeographicZone(GeographicZone geographicZone);
 
-    void setType(FacilityTypeDto type);
+    void setType(FacilityType type);
 
-    void setOperator(FacilityOperatorDto operator);
+    void setOperator(FacilityOperator operator);
 
     void setActive(Boolean active);
 
@@ -261,7 +236,7 @@ public class Facility extends BaseEntity {
 
     void setOpenLmisAccessible(Boolean openLmisAccessible);
 
-    void setSupportedPrograms(Set<ProgramDto> supportedPrograms);
+    void setSupportedPrograms(Set<SupportedProgram> supportedPrograms);
 
   }
 
@@ -275,11 +250,11 @@ public class Facility extends BaseEntity {
 
     String getDescription();
 
-    GeographicZoneDto getGeographicZone();
+    GeographicZone.Importer getGeographicZone();
 
-    FacilityTypeDto getType();
+    FacilityType.Importer getType();
 
-    FacilityOperatorDto getOperator();
+    FacilityOperator.Importer getOperator();
 
     Boolean getActive();
 
@@ -293,7 +268,7 @@ public class Facility extends BaseEntity {
 
     Boolean getOpenLmisAccessible();
 
-    Set<ProgramDto> getSupportedPrograms();
+    Set<Program.Importer> getSupportedPrograms();
 
   }
 }

@@ -17,7 +17,6 @@ import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.AuthException;
@@ -147,10 +146,7 @@ public class UserController extends BaseController {
             .badRequest()
             .body("Home facility does not exist");
       } else {
-        FacilityDto facilityDto = new FacilityDto();
-        homeFacility.export(facilityDto);
-
-        userDto.setHomeFacility(facilityDto);
+        userDto.setHomeFacility(homeFacility);
       }
     }
 
