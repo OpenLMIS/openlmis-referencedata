@@ -1,7 +1,10 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import com.google.common.collect.Sets;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -14,6 +17,7 @@ import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.AuthException;
@@ -50,14 +54,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.Valid;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import javax.validation.Valid;
 
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
@@ -143,7 +147,10 @@ public class UserController extends BaseController {
             .badRequest()
             .body("Home facility does not exist");
       } else {
-        userDto.setHomeFacility(homeFacility);
+        FacilityDto facilityDto = new FacilityDto();
+        homeFacility.export(facilityDto);
+
+        userDto.setHomeFacility(facilityDto);
       }
     }
 

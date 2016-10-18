@@ -2,17 +2,16 @@ package org.openlmis.referencedata.dto;
 
 import static java.util.stream.Collectors.toSet;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.User;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Objects;
 import java.util.Set;
@@ -46,7 +45,7 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
 
   @Getter
   @Setter
-  private Facility homeFacility;
+  private FacilityDto homeFacility;
 
   @Getter
   @Setter

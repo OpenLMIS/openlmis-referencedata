@@ -1,10 +1,20 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
+
+import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.util.View;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.util.View;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,12 +25,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @Entity
@@ -98,7 +102,11 @@ public class User extends BaseEntity {
     lastName = importer.getLastName();
     email = importer.getEmail();
     timezone = importer.getTimezone();
-    homeFacility = importer.getHomeFacility();
+
+    if (null != importer.getHomeFacility()) {
+      homeFacility = Facility.newFacility(importer.getHomeFacility());
+    }
+
     verified = importer.isVerified();
     active = importer.isActive();
     loginRestricted = importer.isLoginRestricted();
@@ -196,7 +204,14 @@ public class User extends BaseEntity {
     exporter.setLastName(lastName);
     exporter.setEmail(email);
     exporter.setTimezone(timezone);
-    exporter.setHomeFacility(homeFacility);
+
+    if (null != homeFacility) {
+      FacilityDto facilityDto = new FacilityDto();
+      homeFacility.export(facilityDto);
+
+      exporter.setHomeFacility(facilityDto);
+    }
+
     exporter.setActive(active);
     exporter.setVerified(verified);
     exporter.setLoginRestricted(loginRestricted);
@@ -233,7 +248,7 @@ public class User extends BaseEntity {
 
     void setTimezone(String timezone);
 
-    void setHomeFacility(Facility homeFacility);
+    void setHomeFacility(FacilityDto homeFacility);
 
     void setVerified(boolean verified);
 
@@ -257,7 +272,7 @@ public class User extends BaseEntity {
 
     String getTimezone();
 
-    Facility getHomeFacility();
+    FacilityDto getHomeFacility();
 
     boolean isVerified();
 
