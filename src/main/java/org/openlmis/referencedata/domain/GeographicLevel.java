@@ -54,9 +54,25 @@ public class GeographicLevel extends BaseEntity {
   }
 
   /**
+   * Creates new geographic level object based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of geographic level.
+   */
+  public static GeographicLevel newGeographicLevel(Importer importer) {
+    GeographicLevel geographicLevel = new GeographicLevel();
+    geographicLevel.setId(importer.getId());
+    geographicLevel.setCode(importer.getCode());
+    geographicLevel.setName(importer.getName());
+    geographicLevel.setLevelNumber(importer.getLevelNumber());
+
+    return geographicLevel;
+  }
+
+  /**
    * Exports current state of geographic level object.
    *
-   * @param exporter instance of {@link GeographicLevel.Exporter}
+   * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
     exporter.setId(id);

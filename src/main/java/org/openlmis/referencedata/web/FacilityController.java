@@ -52,10 +52,10 @@ public class FacilityController extends BaseController {
    * @return ResponseEntity containing the created facility
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
-  public ResponseEntity<?> createFacility(@RequestBody Facility facility) {
+  public ResponseEntity<?> createFacility(@RequestBody FacilityDto facility) {
     LOGGER.debug("Creating new facility");
     facility.setId(null);
-    Facility newFacility = facilityRepository.save(facility);
+    Facility newFacility = facilityRepository.save(Facility.newFacility(facility));
     LOGGER.debug("Created new facility with id: " + facility.getId());
     return ok(newFacility);
   }
@@ -80,12 +80,12 @@ public class FacilityController extends BaseController {
    * @return ResponseEntity containing the updated facility
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateFacilities(@RequestBody Facility facility,
+  public ResponseEntity<?> updateFacilities(@RequestBody FacilityDto facility,
                                        @PathVariable("id") UUID facilityId) {
 
     Facility facilityToUpdate = facilityRepository.findOne(facilityId);
     if (facilityToUpdate == null) {
-      facilityToUpdate = facility;
+      facilityToUpdate = Facility.newFacility(facility);
       LOGGER.debug("Creating new facility");
     } else {
       LOGGER.debug("Updating facility with id: " + facilityId);

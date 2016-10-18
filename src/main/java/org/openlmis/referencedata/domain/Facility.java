@@ -128,9 +128,60 @@ public class Facility extends BaseEntity {
   }
 
   /**
+   * Creates new facility object based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of facility.
+   */
+  public static Facility newFacility(Importer importer) {
+    Facility facility = new Facility();
+    facility.setId(importer.getId());
+    facility.setCode(importer.getCode());
+    facility.setName(importer.getName());
+    facility.setDescription(importer.getDescription());
+
+    if (null != importer.getGeographicZone()) {
+      facility.setGeographicZone(GeographicZone.newGeographicZone(importer.getGeographicZone()));
+    }
+
+    if (null != importer.getType()) {
+      facility.setType(FacilityType.newFacilityType(importer.getType()));
+    }
+
+    if (null != importer.getOperator()) {
+      facility.setOperator(FacilityOperator.newFacilityOperator(importer.getOperator()));
+    }
+
+    facility.setActive(importer.getActive());
+    facility.setGoLiveDate(importer.getGoLiveDate());
+    facility.setGoDownDate(importer.getGoDownDate());
+    facility.setComment(importer.getComment());
+    facility.setEnabled(importer.getEnabled());
+    facility.setOpenLmisAccessible(importer.getOpenLmisAccessible());
+
+    if (null != importer.getSupportedPrograms()) {
+      Set<SupportedProgram> supportedPrograms = importer.getSupportedPrograms()
+          .stream()
+          .map(Program::newProgram)
+          .map(program -> {
+            SupportedProgram supportedProgram = new SupportedProgram();
+            supportedProgram.setFacility(facility);
+            supportedProgram.setProgram(program);
+
+            return supportedProgram;
+          })
+          .collect(Collectors.toSet());
+
+      facility.setSupportedPrograms(supportedPrograms);
+    }
+
+    return facility;
+  }
+
+  /**
    * Exports current state of facility object.
    *
-   * @param exporter instance of {@link Facility.Exporter}
+   * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
     exporter.setId(id);

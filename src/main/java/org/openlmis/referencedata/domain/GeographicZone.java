@@ -79,9 +79,32 @@ public class GeographicZone extends BaseEntity {
   }
 
   /**
+   * Creates new geographic zone object based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of geographic zone.
+   */
+  public static GeographicZone newGeographicZone(Importer importer) {
+    GeographicZone geographicZone = new GeographicZone();
+    geographicZone.setId(importer.getId());
+    geographicZone.setCode(importer.getCode());
+    geographicZone.setName(importer.getName());
+
+    if (null != importer.getLevel()) {
+      geographicZone.setLevel(GeographicLevel.newGeographicLevel(importer.getLevel()));
+    }
+
+    geographicZone.setCatchmentPopulation(importer.getCatchmentPopulation());
+    geographicZone.setLatitude(importer.getLatitude());
+    geographicZone.setLongitude(importer.getLongitude());
+
+    return geographicZone;
+  }
+
+  /**
    * Exports current state of geographic zone object.
    *
-   * @param exporter instance of {@link GeographicZone.Exporter}
+   * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
     exporter.setId(id);

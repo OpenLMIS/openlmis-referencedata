@@ -73,9 +73,27 @@ public class FacilityType extends BaseEntity {
   }
 
   /**
+   * Creates new facility type object based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of facility type.
+   */
+  public static FacilityType newFacilityType(Importer importer) {
+    FacilityType facilityType = new FacilityType();
+    facilityType.setId(importer.getId());
+    facilityType.setCode(importer.getCode());
+    facilityType.setName(importer.getName());
+    facilityType.setDescription(importer.getDescription());
+    facilityType.setDisplayOrder(importer.getDisplayOrder());
+    facilityType.setActive(importer.getActive());
+
+    return facilityType;
+  }
+
+  /**
    * Exports current state of facility type object.
    *
-   * @param exporter instance of {@link FacilityType.Exporter}
+   * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
     exporter.setId(id);

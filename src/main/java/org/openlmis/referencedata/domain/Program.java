@@ -50,6 +50,7 @@ public class Program extends BaseEntity {
 
   /**
    * Creates a new Program with given code.
+   *
    * @param programCode the program code
    */
   public Program(String programCode) {
@@ -65,6 +66,7 @@ public class Program extends BaseEntity {
 
   /**
    * Equal by a Program's code.
+   *
    * @param other the other Program
    * @return true if the two Program's {@link Code} are equal.
    */
@@ -84,9 +86,28 @@ public class Program extends BaseEntity {
   }
 
   /**
+   * Creates new program object based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of program.
+   */
+  public static Program newProgram(Importer importer) {
+    Program program = new Program();
+    program.setId(importer.getId());
+    program.setCode(Code.code(importer.getCode()));
+    program.setName(importer.getName());
+    program.setDescription(importer.getDescription());
+    program.setActive(importer.getActive());
+    program.setPeriodsSkippable(importer.getPeriodsSkippable());
+    program.setShowNonFullSupplyTab(importer.getShowNonFullSupplyTab());
+
+    return program;
+  }
+
+  /**
    * Exports current state of program object.
    *
-   * @param exporter instance of {@link Program.Exporter}
+   * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
     exporter.setId(id);

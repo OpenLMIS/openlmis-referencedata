@@ -53,9 +53,26 @@ public class FacilityOperator extends BaseEntity {
   }
 
   /**
+   * Creates new facility operator object based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of facility operator.
+   */
+  public static FacilityOperator newFacilityOperator(Importer importer) {
+    FacilityOperator facilityOperator = new FacilityOperator();
+    facilityOperator.setId(importer.getId());
+    facilityOperator.setCode(importer.getCode());
+    facilityOperator.setName(importer.getName());
+    facilityOperator.setDescription(importer.getDescription());
+    facilityOperator.setDisplayOrder(importer.getDisplayOrder());
+
+    return facilityOperator;
+  }
+
+  /**
    * Exports current state of facility operator object.
    *
-   * @param exporter instance of {@link FacilityOperator.Exporter}
+   * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
