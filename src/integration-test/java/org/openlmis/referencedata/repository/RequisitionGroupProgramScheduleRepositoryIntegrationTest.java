@@ -15,6 +15,11 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolationException;
 
 /**
  * Allow testing requisitionGroupProgramScheduleRepository.
@@ -48,6 +53,9 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
 
   @Autowired
   private RequisitionGroupRepository requisitionGroupRepository;
+
+  @Autowired
+  private EntityManager entityManager;
 
   private RequisitionGroup requisitionGroup;
   private Program program;
@@ -106,13 +114,12 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     requisitionGroupRepository.save(requisitionGroup);
   }
 
-  @Test(expected = RequisitionGroupProgramScheduleException.class)
-  public void shouldThrowExceptionWhenFindMoreThenOneRequisitionGroupProgramSchedule()
+  @Test(expected = PersistenceException.class)
+  public void shouldThrowExceptionWhenSavingTheSameRequisitionGroupProgramSchedule()
         throws RequisitionGroupProgramScheduleException {
     repository.save(generateInstance());
     repository.save(generateInstance());
-
-    repository.searchRequisitionGroupProgramSchedule(program, facility);
+    entityManager.flush();
   }
 
   @Test

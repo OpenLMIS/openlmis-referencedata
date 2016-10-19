@@ -53,12 +53,8 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
           = entityManager.createQuery(query).getResultList();
     if (requisitionGroupProgramSchedules == null || requisitionGroupProgramSchedules.isEmpty()) {
       return null;
-    } else if (requisitionGroupProgramSchedules.size() != 1) {
-      throw new RequisitionGroupProgramScheduleException(
-            "There cannot exists more than one requisition group program schedule"
-                  + " for program and facility");
     } else {
-      return entityManager.createQuery(query).getSingleResult();
+      return requisitionGroupProgramSchedules.get(0);
     }
   }
 }

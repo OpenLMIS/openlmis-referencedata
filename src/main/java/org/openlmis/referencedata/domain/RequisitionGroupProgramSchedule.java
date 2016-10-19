@@ -12,13 +12,16 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * RequisitionGroupProgramSchedule represents the schedule to be mapped for a given program and
  * requisition group.
  */
 @Entity
-@Table(name = "requisition_group_program_schedules")
+@Table(name = "requisition_group_program_schedules", uniqueConstraints =
+    @UniqueConstraint(name = "requisition_group_program_facility",
+      columnNames = { "dropOffFacilityId",  "programId"}))
 @NoArgsConstructor
 public class RequisitionGroupProgramSchedule extends BaseEntity {
 
