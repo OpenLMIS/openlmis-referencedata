@@ -1,6 +1,10 @@
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -127,5 +131,20 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
           repository.searchRequisitionGroupProgramSchedule(program, facility);
 
     assertEquals(requisitionGroupProgramSchedule, null);
+  }
+
+  @Test
+  public void shouldReturnCorrectInstance() throws RequisitionGroupProgramScheduleException {
+    RequisitionGroupProgramSchedule entity = generateInstance();
+    repository.save(entity);
+
+    requisitionGroup.setRequisitionGroupProgramSchedules(Lists.newArrayList(entity));
+    requisitionGroup.setMemberFacilities(Lists.newArrayList(facility));
+    requisitionGroupRepository.save(requisitionGroup);
+
+    RequisitionGroupProgramSchedule found = repository
+        .searchRequisitionGroupProgramSchedule(program, facility);
+
+    assertThat(found, is(entity));
   }
 }
