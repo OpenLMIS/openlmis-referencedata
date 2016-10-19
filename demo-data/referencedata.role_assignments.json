@@ -6,5 +6,12 @@
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
     "role": {"id": "d30a2fbb-51d9-49ad-90fe-fb405470a439"}
+  },
+  {
+    "id": "4b3c6622-48cb-4c1b-9a79-f37243c37063",
+    "type": "fulfillment",
+    "warehouse": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": {"id": "185db8f7-ee35-44d0-8b40-6de12489ae77"}
   }
 ]
