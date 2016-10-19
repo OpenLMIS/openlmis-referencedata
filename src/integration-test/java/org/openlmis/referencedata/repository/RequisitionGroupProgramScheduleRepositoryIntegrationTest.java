@@ -15,11 +15,9 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
-import javax.validation.ConstraintViolationException;
 
 /**
  * Allow testing requisitionGroupProgramScheduleRepository.
