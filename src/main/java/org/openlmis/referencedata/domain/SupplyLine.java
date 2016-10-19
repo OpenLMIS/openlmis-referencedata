@@ -56,8 +56,12 @@ public class SupplyLine extends BaseEntity {
    * @param importer the supply line importer (DTO)
    */
   public static SupplyLine newSupplyLine(Importer importer) {
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(
-        importer.getSupervisoryNode());
+    SupervisoryNode supervisoryNode = null;
+
+    if (importer.getSupervisoryNode() != null) {
+      supervisoryNode = SupervisoryNode.newSupervisoryNode(importer.getSupervisoryNode());
+    }
+
     Program program = null;
 
     if (importer.getProgram() != null) {
@@ -71,8 +75,8 @@ public class SupplyLine extends BaseEntity {
     }
 
     SupplyLine supplyLine = new SupplyLine(supervisoryNode, program, supplyingFacility);
-    supplyLine.setId(importer.getId());
-    supplyLine.setDescription(importer.getDescription());
+    supplyLine.id = importer.getId();
+    supplyLine.description = importer.getDescription();
 
     return supplyLine;
   }
