@@ -147,7 +147,7 @@ public class RequisitionGroupValidator implements Validator {
         rejectValue(errors, NAME, IS_TOO_LONG, NAME_IS_TOO_LONG);
       }
 
-      // description max length 250 characters,
+      // description max length 250 characters
       if (null != group.getDescription() && group.getDescription().length() > 250) {
         rejectValue(errors, DESCRIPTION, IS_TOO_LONG, DESCRIPTION_IS_TOO_LONG);
       }

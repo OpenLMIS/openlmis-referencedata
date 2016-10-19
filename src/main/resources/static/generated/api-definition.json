@@ -716,6 +716,40 @@
       "title": "Role",
       "type": "object"
     },
+    "stockAdjustmentReason": {
+      "description": "A single stockAdjustmentReason",
+      "properties": {
+        "additive": {
+          "title": "additive",
+          "type": "boolean"
+        },
+        "description": {
+          "title": "description",
+          "type": "string"
+        },
+        "displayOrder": {
+          "title": "displayOrder",
+          "type": "integer"
+        },
+        "name": {
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "Stock Adjustment Reason",
+      "type": "object"
+    },
+    "stockAdjustmentReasonArray": {
+      "items": {
+        "$ref": "#/definitions/stockAdjustmentReason",
+        "type": "object"
+      },
+      "type": "array"
+    },
     "supervisoryNode": {
       "description": "A single supervisoryNode",
       "properties": {
@@ -2791,6 +2825,74 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/programs/{id}/stockAdjustmentReasons": {
+      "get": {
+        "description": "Get stock adjustment reasons by program.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "OAuth2 access token",
+            "in": "query",
+            "name": "access_token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/stockAdjustmentReasonArray"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "description": "Save stock adjustment reasons for a program.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "OAuth2 access token",
+            "in": "query",
+            "name": "access_token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/stockAdjustmentReasonArray"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/stockAdjustmentReasonArray"
+            }
           },
           "400": {
             "description": "Bad Request"

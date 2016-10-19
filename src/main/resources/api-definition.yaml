@@ -365,6 +365,25 @@ schemas:
           }
       }
 
+  - stockAdjustmentReason: |
+      {   "type": "object",
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "title": "Stock Adjustment Reason",
+          "description": "A single stockAdjustmentReason",
+          "properties": {
+              "name": { "type": "string", "required": true, "title": "name" },
+              "description": { "type": "string", "required": true, "title": "description" },
+              "additive": { "type": "boolean", "required": false, "title": "additive" },
+              "displayOrder": { "type": "integer", "required": false, "title": "displayOrder" }
+          }
+      }
+
+  - stockAdjustmentReasonArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref":"#/schemas/stockAdjustmentReason" }
+      }
+
   - uuidArray: |
       {
           "type": "array",
@@ -1742,6 +1761,46 @@ resourceTypes:
                     body:
                       application/json:
                 "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+    /{id}/stockAdjustmentReasons:
+        uriParameters:
+            id:
+                displayName: id
+                type: string
+                required: true
+                repeat: false
+        get:
+            is: [ secured ]
+            description: Get stock adjustment reasons by program.
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                        schema: stockAdjustmentReasonArray
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+        put:
+            is: [ secured ]
+            description: Save stock adjustment reasons for a program.
+            body:
+                application/json:
+                  schema: stockAdjustmentReasonArray
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                        schema: stockAdjustmentReasonArray
+                "400":
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:

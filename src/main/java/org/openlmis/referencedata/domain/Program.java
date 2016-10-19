@@ -3,11 +3,15 @@ package org.openlmis.referencedata.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
@@ -43,6 +47,15 @@ public class Program extends BaseEntity {
   @Getter
   @Setter
   private Boolean showNonFullSupplyTab;
+
+  @OneToMany(
+      mappedBy = "program",
+      cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE},
+      fetch = FetchType.EAGER,
+      orphanRemoval = true)
+  @Getter
+  @Setter
+  private Set<StockAdjustmentReason> stockAdjustmentReasons;
 
   private Program() {
     code = null;

@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.StockAdjustmentReason;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -123,5 +125,46 @@ public class ProgramController extends BaseController {
   public ResponseEntity<?> findProgramsByName(@RequestParam("name") String programName) {
     List<Program> foundPrograms = programRepository.findProgramsByName(programName);
     return new ResponseEntity<>(foundPrograms, HttpStatus.OK);
+  }
+
+  /**
+   * Get stock adjustment reasons by program.
+   *
+   * @param programId UUID of the program.
+   * @return List of stock adjustment reasons.
+   */
+  @RequestMapping(value = "/programs/{id}/stockAdjustmentReasons", method = RequestMethod.GET)
+  public ResponseEntity<?> getStockAdjustmentReasons(@PathVariable("id") UUID programId) {
+    Program program = programRepository.findOne(programId);
+    if (program == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } else {
+      return new ResponseEntity<>(program.getStockAdjustmentReasons(), HttpStatus.OK);
+    }
+  }
+
+  /**
+   * Saving stock adjustment reasons by program.
+   *
+   * @param stockAdjustmentReasons List of reasons bound to the request body.
+   * @return ResponseEntity containing the saved reasons.
+   */
+  @RequestMapping(value = "/programs/{id}/stockAdjustmentReasons", method = RequestMethod.PUT)
+  public ResponseEntity<?> saveStockAdjustmentReasons(
+      @PathVariable("id") UUID programId,
+      @RequestBody Set<StockAdjustmentReason> stockAdjustmentReasons) {
+    if (programId == null) {
+      LOGGER.debug("Stock adjustment reasons update failed - program id not specified");
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    Program program = programRepository.findOne(programId);
+    if (program == null) {
+      LOGGER.warn("Stock adjustment reasons update failed - program with id: {} not found",
+          programId);
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    program.setStockAdjustmentReasons(stockAdjustmentReasons);
+    programRepository.save(program);
+    return new ResponseEntity<>(program.getStockAdjustmentReasons(), HttpStatus.OK);
   }
 }
