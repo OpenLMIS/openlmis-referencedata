@@ -8,14 +8,6 @@
     "requisitionGroupId": { "id": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05" }
   },
   {
-    "id": "e789532a-209e-4c0a-8207-f1ffba0461e2",
-    "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "processingScheduleId": { "id": "9c15bd6e-3f6b-4b91-b53a-36c199d35eac" },
-    "directDelivery": "true",
-    "dropOffFacilityId": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
-    "requisitionGroupId": { "id": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05" }
-  },
-  {
     "id": "56b50f88-13e2-4dd1-8210-fead7025b106",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" },
