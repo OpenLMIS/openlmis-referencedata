@@ -41,7 +41,7 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   private SupervisoryNodeBaseDto parentNode;
 
   @JsonProperty
-  private Set<SupervisoryNodeBaseDto> childNodes = new HashSet<>();
+  private Set<SupervisoryNodeBaseDto> childNodes;
 
   @JsonProperty
   @Getter
@@ -94,6 +94,8 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   @Override
   public void setChildNodes(Set<SupervisoryNode> childNodes) {
     if (childNodes != null) {
+      this.childNodes  = new HashSet<>();
+
       for (SupervisoryNode node : childNodes) {
         this.childNodes.add(new SupervisoryNodeBaseDto(node.getId()));
       }

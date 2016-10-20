@@ -2,9 +2,9 @@ package org.openlmis.referencedata.validate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
-import org.openlmis.referencedata.dto.RequisitionGroupDto;
+import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
@@ -19,9 +19,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
- * A validator for {@link RequisitionGroup} object.
+ * A validator for {@link RequisitionGroupBaseDto} object.
  */
 @Component
 public class RequisitionGroupValidator implements Validator {
@@ -82,17 +83,17 @@ public class RequisitionGroupValidator implements Validator {
    *
    * @param clazz the {@link Class} that this {@link Validator} is being asked if it can {@link
    *              #validate(Object, Errors) validate}
-   * @return true if {@code clazz} is equal to {@link RequisitionGroup} class definition. Otherwise
-   *         false.
+   * @return true if {@code clazz} is equal to {@link RequisitionGroupBaseDto} class definition.
+   *     Otherwise false.
    */
   @Override
   public boolean supports(Class<?> clazz) {
-    return RequisitionGroup.class.equals(clazz);
+    return RequisitionGroupBaseDto.class.equals(clazz);
   }
 
   /**
-   * Validates the {@code target} object, which must be an instance of {@link RequisitionGroup}
-   * class.
+   * Validates the {@code target} object, which must be an instance of
+   * {@link RequisitionGroupBaseDto} class.
    * <p>Firstly, the method checks if the target object has a value in {@code code} and {@code name}
    * properties. For those two properties the value cannot be {@code null}, empty or
    * contains only whitespaces.</p>
@@ -110,14 +111,16 @@ public class RequisitionGroupValidator implements Validator {
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors);
 
-    RequisitionGroupDto group = (RequisitionGroupDto) target;
+    RequisitionGroupBaseDto group = (RequisitionGroupBaseDto) target;
 
     verifyProperties(group, errors);
 
     if (!errors.hasErrors()) {
       verifyCode(group.getId(), group.getCode(), errors);
       verifySupervisoryNode(group.getSupervisoryNode(), errors);
-      verifyFacilities(group.getMemberFacilities(), errors);
+      verifyFacilities(Optional.ofNullable(group.getMemberFacilities())
+          .orElse(Collections.emptyList()).stream().map(facility -> (FacilityDto) facility)
+          .collect(Collectors.toList()), errors);
     }
   }
 
@@ -126,7 +129,7 @@ public class RequisitionGroupValidator implements Validator {
     checkNotNull(errors, "The contextual state about the validation process cannot be null");
   }
 
-  private void verifyProperties(RequisitionGroupDto group, Errors errors) {
+  private void verifyProperties(RequisitionGroupBaseDto group, Errors errors) {
     // the Requisition Group Code is required, length 50 characters
     rejectIfEmptyOrWhitespace(errors, CODE, EMPTY, CODE_IS_REQUIRED);
 
@@ -172,13 +175,9 @@ public class RequisitionGroupValidator implements Validator {
     }
   }
 
-  private void verifyFacilities(List<Facility.Importer> memberFacilities, Errors errors) {
-    List<Facility.Importer> facilities = Optional
-        .ofNullable(memberFacilities)
-        .orElse(Collections.emptyList());
-
+  private void verifyFacilities(List<FacilityDto> memberFacilities, Errors errors) {
     // facilities must already exist in the system (cannot add new facilities from this point)
-    for (Facility.Importer facility : facilities) {
+    for (FacilityDto facility : memberFacilities) {
       if (null == facility) {
         rejectValue(errors, MEMBER_FACILITIES, IS_NULL, FACILITY_CAN_NOT_BE_NULL);
       } else if (null == facility.getId()) {

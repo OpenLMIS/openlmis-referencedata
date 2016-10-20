@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
@@ -41,7 +42,7 @@ public class RequisitionGroupController extends BaseController {
    */
   @RequestMapping(value = "/requisitionGroups", method = RequestMethod.POST)
   public ResponseEntity<?> createRequisitionGroup(
-      @RequestBody RequisitionGroupDto requisitionGroupDto, BindingResult bindingResult) {
+      @RequestBody RequisitionGroupBaseDto requisitionGroupDto, BindingResult bindingResult) {
     LOGGER.debug("Creating new requisitionGroup");
     validator.validate(requisitionGroupDto, bindingResult);
 
@@ -63,7 +64,7 @@ public class RequisitionGroupController extends BaseController {
    * @return RequisitionGroupDtos.
    */
   @RequestMapping(value = "/requisitionGroups", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllRequisitionGroup() {
+  public ResponseEntity<?> getAllRequisitionGroups() {
     Iterable<RequisitionGroup> requisitionGroups = requisitionGroupRepository.findAll();
     List<RequisitionGroupDto> requisitionGroupDtos = new ArrayList<>();
     for (RequisitionGroup requisitionGroup : requisitionGroups) {
@@ -97,7 +98,7 @@ public class RequisitionGroupController extends BaseController {
    */
   @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateRequisitionGroup(
-      @RequestBody RequisitionGroupDto requisitionGroupDto,
+      @RequestBody RequisitionGroupBaseDto requisitionGroupDto,
       @PathVariable("id") UUID requisitionGroupId,
       BindingResult bindingResult) {
     validator.validate(requisitionGroupDto, bindingResult);

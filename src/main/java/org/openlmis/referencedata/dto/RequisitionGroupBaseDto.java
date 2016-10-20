@@ -38,11 +38,10 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   private SupervisoryNodeBaseDto supervisoryNode;
 
   @JsonProperty
-  private List<RequisitionGroupProgramScheduleBaseDto> requisitionGroupProgramSchedules =
-      new ArrayList<>();
+  private List<RequisitionGroupProgramScheduleBaseDto> requisitionGroupProgramSchedules;
 
   @JsonProperty
-  private List<FacilityDto> memberFacilities = new ArrayList<>();
+  private List<FacilityDto> memberFacilities;
 
   public RequisitionGroupBaseDto(UUID id) {
     setId(id);
@@ -77,6 +76,8 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   @Override
   public void setRequisitionGroupProgramSchedules(List<RequisitionGroupProgramSchedule> schedules) {
     if (schedules != null) {
+      this.requisitionGroupProgramSchedules = new ArrayList<>();
+
       for (RequisitionGroupProgramSchedule schedule : schedules) {
         this.requisitionGroupProgramSchedules.add(
             new RequisitionGroupProgramScheduleBaseDto(schedule.getId()));
@@ -106,6 +107,8 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   @Override
   public void setMemberFacilities(List<Facility> memberFacilities) {
     if (memberFacilities != null) {
+      this.memberFacilities = new ArrayList<>();
+
       for (Facility facility : memberFacilities) {
         this.memberFacilities.add(new FacilityDto(facility.getId()));
       }

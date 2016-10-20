@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest {
+public class RequisitionGroupValidatorParameterizedTest extends BaseValidatorTest {
 
   @Mock
   private SupervisoryNodeRepository supervisoryNodes;
@@ -34,7 +34,7 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
   @InjectMocks
   private Validator validator = new RequisitionGroupValidator();
 
-  private String expectedValue;
+  private String emptyValue;
   private RequisitionGroupDto requisitionGroupDto;
   private Errors errors;
 
@@ -43,8 +43,8 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
    *
    * @param value expected value for code or name property of {@link RequisitionGroup}
    */
-  public RequisitionGroupValidatorParametrizedTest(String value) {
-    expectedValue = value;
+  public RequisitionGroupValidatorParameterizedTest(String value) {
+    emptyValue = value;
 
     RequisitionGroup requisitionGroup = new RequisitionGroup();
     requisitionGroup.setCode("TestRequisitionGroupCode");
@@ -82,7 +82,7 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
 
   @Test
   public void shouldRejectIfCodeIsEmpty() throws Exception {
-    requisitionGroupDto.setCode(expectedValue);
+    requisitionGroupDto.setCode(emptyValue);
 
     validator.validate(requisitionGroupDto, errors);
 
@@ -91,7 +91,7 @@ public class RequisitionGroupValidatorParametrizedTest extends BaseValidatorTest
 
   @Test
   public void shouldRejectIfNameIsEmpty() throws Exception {
-    requisitionGroupDto.setName(expectedValue);
+    requisitionGroupDto.setName(emptyValue);
 
     validator.validate(requisitionGroupDto, errors);
 

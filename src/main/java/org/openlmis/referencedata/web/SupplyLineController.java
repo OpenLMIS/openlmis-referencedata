@@ -3,6 +3,7 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.SupplyLineDto;
 import org.openlmis.referencedata.dto.SupplyLineSimpleDto;
@@ -138,14 +139,15 @@ public class SupplyLineController extends BaseController {
   /**
    * Returns all Supply Lines with matched parameters.
    *
-   * @param program         program of searched Supply Lines.
+   * @param programDto         program of searched Supply Lines.
    * @param supervisoryNodeDto supervisory node of searched Supply Lines.
    * @return ResponseEntity with list of all Supply Lines matching provided parameters.
    */
   @RequestMapping(value = "/supplyLines/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchSupplyLines(
-      @RequestParam(value = "program") Program program,
+      @RequestParam(value = "program") ProgramDto programDto,
       @RequestParam(value = "supervisoryNode") SupervisoryNodeDto supervisoryNodeDto) {
+    Program program = Program.newProgram(programDto);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
     List<SupplyLine> result = supplyLineService.searchSupplyLines(program, supervisoryNode);
 
@@ -173,11 +175,14 @@ public class SupplyLineController extends BaseController {
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     List<SupplyLine> resultSupplyLine =
         supplyLineService.searchSupplyLines(program, supervisoryNode);
+
     List<SupplyLineSimpleDto> result = new ArrayList<>();
     for (SupplyLine supplyLine : resultSupplyLine) {
-      SupplyLineSimpleDto supplyLineSimpleDto = new SupplyLineSimpleDto(supplyLine);
+      SupplyLineSimpleDto supplyLineSimpleDto = new SupplyLineSimpleDto();
+      supplyLine.export(supplyLineSimpleDto);
       result.add(supplyLineSimpleDto);
     }
+
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
