@@ -6,7 +6,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
-import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.repository.custom.RequisitionGroupProgramScheduleRepositoryCustom;
 
 import javax.persistence.EntityManager;
@@ -33,8 +32,8 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
    * @param facility Facility of searched RequisitionGroupProgramSchedule
    * @return Requisition Group Program Schedule matching search criteria
    */
-  public RequisitionGroupProgramSchedule searchRequisitionGroupProgramSchedule(
-      Program program, Facility facility) throws RequisitionGroupProgramScheduleException {
+  public RequisitionGroupProgramSchedule searchRequisitionGroupProgramSchedule(Program program,
+                                                                               Facility facility) {
     checkNotNull(program);
     checkNotNull(facility);
 

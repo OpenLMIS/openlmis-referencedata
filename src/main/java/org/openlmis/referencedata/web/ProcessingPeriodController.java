@@ -1,13 +1,16 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import com.google.common.collect.Sets;
+
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.exception.InvalidIdException;
-import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
@@ -37,9 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 @Controller
 public class ProcessingPeriodController extends BaseController {
@@ -78,7 +78,7 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> searchProcessingPeriods(
         @RequestParam(value = "programId", required = true) UUID programId,
         @RequestParam(value = "facilityId", required = true) UUID facilityId)
-        throws InvalidIdException, RequisitionGroupProgramScheduleException {
+        throws InvalidIdException {
 
     if (programId == null) {
       throw new InvalidIdException("Program id must be provided.");
