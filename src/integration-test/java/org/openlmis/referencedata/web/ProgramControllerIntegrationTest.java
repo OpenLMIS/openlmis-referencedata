@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
@@ -218,20 +219,23 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     StockAdjustmentReason reason = new StockAdjustmentReason();
     reason.setName("Stock Adjustment Reason");
     reasons.add(reason);
+    program.setStockAdjustmentReasons(reasons);
 
-    StockAdjustmentReason[] response = restAssured
+    Program response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", programId)
-        .body(reasons)
+        .body(program)
         .when()
-        .put(STOCK_ADJUSTMENT_REASONS_URL)
+        .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(StockAdjustmentReason[].class);
+        .extract().as(Program.class);
 
-    assertEquals(1, response.length);
-    assertEquals(reason.getName(), response[0].getName());
+    reasons = response.getStockAdjustmentReasons();
+    assertNotNull(reasons);
+    assertEquals(1, reasons.size());
+    assertEquals(reason.getName(), reasons.iterator().next().getName());
   }
 }
