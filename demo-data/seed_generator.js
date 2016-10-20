@@ -29,7 +29,8 @@ var filesOrdered = [
     "referencedata.role_assignments",
     "referencedata.requisition_groups",
     "referencedata.requisition_group_program_schedules",
-    "referencedata.supported_programs.json"
+    "referencedata.supported_programs.json",
+    "referencedata.requisition_group_members.json"
 ]
 
 // Detects if the given key/value pair represents a foreign key.

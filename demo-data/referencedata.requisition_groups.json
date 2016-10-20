@@ -3,22 +3,12 @@
     "id": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05",
     "code": "RGFP",
     "name": "RG Family Planning",
-    "supervisoryNodeId": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
-    "memberFacilities": [
-      {
-        "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce"
-      }
-    ]
+    "supervisoryNodeId": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" }
   },
   {
     "id": "84b33e28-f537-4a76-8895-9d4d564a623a",
     "code": "RGES",
     "name": "RG Essential Meds",
-    "supervisoryNodeId": { "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79" },
-    "memberFacilities": [
-      {
-        "id": "13037147-1769-4735-90a7-b9b310d128b8"
-      }
-    ]
+    "supervisoryNodeId": { "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79" }
   }
 ]
