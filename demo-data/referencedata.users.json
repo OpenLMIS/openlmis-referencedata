@@ -13,8 +13,8 @@
   },
   {
     "id": "56a50e9a-9668-437d-a09c-7e709ce22222",
-    "username": "dvadmin",
-    "email": "dvadmin@openlmis.org",
+    "username": "devadmin",
+    "email": "devadmin@openlmis.org",
     "firstName": "Admin",
     "lastName": "Admin",
     "verified": "true",
