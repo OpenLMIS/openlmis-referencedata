@@ -12,5 +12,12 @@
     "name": "Essential Meds",
     "active": "true",
     "periodsSkippable": "false"
+  },
+  {
+    "id": "66032ea8-b69b-4102-a1eb-844e57143187",
+    "code": "PRG003",
+    "name": "New program",
+    "active": "true",
+    "periodsSkippable": "false"
   }
 ]

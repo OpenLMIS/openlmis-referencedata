@@ -10,5 +10,17 @@
     "loginRestricted": "false",
     "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "timeZone": "CET"
+  },
+  {
+    "id": "56a50e9a-9668-437d-a09c-7e709ce22222",
+    "username": "dvadmin",
+    "email": "dvadmin@openlmis.org",
+    "firstName": "Admin",
+    "lastName": "Admin",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "homefacilityid": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "timeZone": "CET"
   }
 ]

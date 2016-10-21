@@ -78,5 +78,13 @@
     "maxMonthsOfStock": "500",
     "minMonthsOfStock": "50",
     "emergencyOrderPoint": "25"
+  },
+  {
+    "id": "ab0d91d4-0251-483e-ac98-ed7d1369dd27",
+    "facilityTypeId": { "id": "ac1d268b-ce10-455f-bf87-9c667da8f060" },
+    "programProductId": { "id": "99b2a62a-f96d-45ad-ba91-7dcc6cda7ce3" },
+    "maxMonthsOfStock": "500",
+    "minMonthsOfStock": "50",
+    "emergencyOrderPoint": "25"
   }
 ]

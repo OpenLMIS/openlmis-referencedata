@@ -108,5 +108,16 @@
     "fullSupply": "true",
     "maxMonthsStock": 20,
     "displayOrder": 5
+  },
+  {
+    "id": "99b2a62a-f96d-45ad-ba91-7dcc6cda7ce3",
+    "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
+    "productId": { "id": "7f7b83db-580d-4269-88d2-7f9c80a591a9" },
+    "productCategoryId": { "id": "74f39ab7-b5ce-4087-a6ea-65799a35e79b" },
+    "dosesPerMonth": 1,
+    "active": "true",
+    "fullSupply": "true",
+    "maxMonthsStock": 20,
+    "displayOrder": 6
   }
 ]
