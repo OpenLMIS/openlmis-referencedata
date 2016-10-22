@@ -49,8 +49,7 @@ public class RequisitionGroup extends BaseEntity {
   @Setter
   private SupervisoryNode supervisoryNode;
 
-  @OneToMany
-  @JoinColumn(name = "requisitionGroupProgramSchedulesId")
+  @OneToMany(mappedBy = "requisitionGroup")
   @Getter
   @Setter
   private List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules;
