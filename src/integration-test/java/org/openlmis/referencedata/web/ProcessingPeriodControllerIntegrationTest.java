@@ -1,7 +1,15 @@
 package org.openlmis.referencedata.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doAnswer;
+
 import com.google.common.collect.Sets;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -26,19 +34,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.doAnswer;
 
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -46,7 +48,8 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   private static final String RESOURCE_URL = "/api/processingPeriods";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
-  private static final String SEARCH_BY_UUID_AND_DATE_URL = RESOURCE_URL + "/searchByUUIDAndDate";
+  private static final String SEARCH_BY_UUID_AND_DATE_URL =
+      RESOURCE_URL + "/searchByScheduleAndDate";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String DIFFERENCE_URL = RESOURCE_URL + "/{id}/difference";
   private static final String PROGRAM = "programId";

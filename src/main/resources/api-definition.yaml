@@ -599,7 +599,7 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
-    /searchByUUIDAndDate:
+    /searchByScheduleAndDate:
         get:
             is: [ secured ]
             description: Find periods with matched parameters.

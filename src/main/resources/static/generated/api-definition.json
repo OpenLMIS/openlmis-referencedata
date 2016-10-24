@@ -933,7 +933,7 @@
   "host": "localhost:8080",
   "info": {
     "title": "OpenLMIS Reference Data API",
-    "version": "1.0.0"
+    "version": "3.0.0-beta-SNAPSHOT"
   },
   "paths": {
     "/facilities": {
@@ -2120,31 +2120,9 @@
         }
       }
     },
-    "/processingPeriods/findFirst1ByOrderByEndDateDesc": {
-      "get": {
-        "description": "Get last processingPeriod.",
-        "parameters": [
-          {
-            "description": "OAuth2 access token",
-            "in": "query",
-            "name": "access_token",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
     "/processingPeriods/search": {
       "get": {
-        "description": "Find periods with matched parametrs.",
+        "description": "Find periods with matched parameters.",
         "parameters": [
           {
             "description": "OAuth2 access token",
@@ -2176,9 +2154,9 @@
         }
       }
     },
-    "/processingPeriods/searchByUUIDAndDate": {
+    "/processingPeriods/searchByScheduleAndDate": {
       "get": {
-        "description": "Find periods with matched parametrs.",
+        "description": "Find periods with matched parameters.",
         "parameters": [
           {
             "description": "OAuth2 access token",
@@ -2949,7 +2927,7 @@
     },
     "/requisitionGroupProgramSchedules/search": {
       "get": {
-        "description": "Find requisitionGroupProgramSchedule with matched parametrs.",
+        "description": "Find requisitionGroupProgramSchedule with matched parameters.",
         "parameters": [
           {
             "description": "OAuth2 access token",

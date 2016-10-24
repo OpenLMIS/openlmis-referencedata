@@ -216,7 +216,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param startDate which day shall ProcessingPeriod start.
    * @return List of ProcessingPeriods.
    */
-  @RequestMapping(value = "/processingPeriods/searchByUUIDAndDate", method = RequestMethod.GET)
+  @RequestMapping(value = "/processingPeriods/searchByScheduleAndDate", method = RequestMethod.GET)
   public ResponseEntity<?> searchPeriodsByUuuidAndDate(
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
