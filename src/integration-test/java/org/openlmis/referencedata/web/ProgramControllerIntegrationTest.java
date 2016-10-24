@@ -1,13 +1,11 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.StockAdjustmentReason;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -16,9 +14,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -26,7 +22,6 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/programs";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String STOCK_ADJUSTMENT_REASONS_URL = ID_URL + "/stockAdjustmentReasons";
   private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/search";
 
   @MockBean
@@ -184,58 +179,5 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     List<Program> foundProgram = Arrays.asList(response);
     assertEquals(0, foundProgram.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetStockAdjustmentReasonsByProgram() {
-    given(programRepository.findOne(programId)).willReturn(program);
-
-    Set<StockAdjustmentReason> reasons = new HashSet<>();
-    StockAdjustmentReason reason = new StockAdjustmentReason();
-    reason.setName("Stock Adjustment Reason");
-    reasons.add(reason);
-    program.setStockAdjustmentReasons(reasons);
-
-    StockAdjustmentReason[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", programId)
-        .when()
-        .get(STOCK_ADJUSTMENT_REASONS_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(StockAdjustmentReason[].class);
-
-    assertEquals(1, response.length);
-    assertEquals(reason.getName(), response[0].getName());
-  }
-
-  @Test
-  public void shouldSaveStockAdjustmentReasonsByProgram() {
-    given(programRepository.findOne(programId)).willReturn(program);
-
-    Set<StockAdjustmentReason> reasons = new HashSet<>();
-    StockAdjustmentReason reason = new StockAdjustmentReason();
-    reason.setName("Stock Adjustment Reason");
-    reasons.add(reason);
-    program.setStockAdjustmentReasons(reasons);
-
-    Program response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", programId)
-        .body(program)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(Program.class);
-
-    reasons = response.getStockAdjustmentReasons();
-    assertNotNull(reasons);
-    assertEquals(1, reasons.size());
-    assertEquals(reason.getName(), reasons.iterator().next().getName());
   }
 }

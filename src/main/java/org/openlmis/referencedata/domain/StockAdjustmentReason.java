@@ -8,7 +8,6 @@ import lombok.Setter;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -20,7 +19,6 @@ import javax.persistence.Table;
 public class StockAdjustmentReason extends BaseEntity {
 
   @ManyToOne(cascade = CascadeType.REFRESH)
-  @JoinColumn(name = "programId")
   @Getter
   @Setter
   private Program program;

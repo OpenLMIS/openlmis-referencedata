@@ -124,20 +124,4 @@ public class ProgramController extends BaseController {
     List<Program> foundPrograms = programRepository.findProgramsByName(programName);
     return new ResponseEntity<>(foundPrograms, HttpStatus.OK);
   }
-
-  /**
-   * Get stock adjustment reasons by program.
-   *
-   * @param programId UUID of the program.
-   * @return List of stock adjustment reasons.
-   */
-  @RequestMapping(value = "/programs/{id}/stockAdjustmentReasons", method = RequestMethod.GET)
-  public ResponseEntity<?> getStockAdjustmentReasons(@PathVariable("id") UUID programId) {
-    Program program = programRepository.findOne(programId);
-    if (program == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(program.getStockAdjustmentReasons(), HttpStatus.OK);
-    }
-  }
 }
