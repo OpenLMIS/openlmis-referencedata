@@ -119,7 +119,7 @@ public class RequisitionGroupValidator implements Validator {
       verifyCode(group.getId(), group.getCode(), errors);
       verifySupervisoryNode(group.getSupervisoryNode(), errors);
       verifyFacilities(Optional.ofNullable(group.getMemberFacilities())
-          .orElse(Collections.emptyList()).stream().map(facility -> (FacilityDto) facility)
+          .orElse(Collections.emptySet()).stream().map(facility -> (FacilityDto) facility)
           .collect(Collectors.toList()), errors);
     }
   }

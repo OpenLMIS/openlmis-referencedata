@@ -683,7 +683,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     supervisoryNode = SupervisoryNode.newSupervisoryNode(SUPERVISORY_NODE_CODE,
         generateFacility());
     RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);
-    supervisionGroup.setMemberFacilities(Arrays.asList(generateFacility(), generateFacility()));
+    supervisionGroup.setMemberFacilities(Sets.newHashSet(generateFacility(), generateFacility()));
     supervisoryNode.setRequisitionGroup(supervisionGroup);
 
     Right fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);

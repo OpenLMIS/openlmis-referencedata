@@ -1,6 +1,18 @@
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import com.google.common.collect.Sets;
+
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
@@ -36,20 +48,8 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.validation.BindingResult;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class UserControllerTest {
@@ -609,7 +609,7 @@ public class UserControllerTest {
     RequisitionGroup supervisionGroup1 = new RequisitionGroup(
         "supervisionGroup1", "supervisionGroupName1", supervisoryNode1
     );
-    supervisionGroup1.setMemberFacilities(Arrays.asList(new Facility("C1"), new Facility("C2")));
+    supervisionGroup1.setMemberFacilities(Sets.newHashSet(new Facility("C1"), new Facility("C2")));
     supervisoryNode1.setRequisitionGroup(supervisionGroup1);
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);

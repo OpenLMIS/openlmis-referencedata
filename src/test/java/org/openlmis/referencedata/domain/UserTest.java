@@ -1,20 +1,20 @@
 package org.openlmis.referencedata.domain;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleException;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.google.common.collect.Sets;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.openlmis.referencedata.exception.RightTypeException;
+import org.openlmis.referencedata.exception.RoleException;
+
+import java.util.Set;
 
 public class UserTest {
   private RightQuery rightQuery = new RightQuery(Right.newRight("supervisionRight1",
@@ -124,12 +124,12 @@ public class UserTest {
     //given
     SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("DN", new Facility("C1"));
     RequisitionGroup districtGroup = new RequisitionGroup("DG", "DGN", districtNode);
-    districtGroup.setMemberFacilities(Collections.singletonList(new Facility("C2")));
+    districtGroup.setMemberFacilities(Sets.newHashSet(new Facility("C2")));
     districtNode.setRequisitionGroup(districtGroup);
 
     SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("PN", new Facility("C3"));
     RequisitionGroup provinceGroup = new RequisitionGroup("PG", "PGN", provinceNode);
-    provinceGroup.setMemberFacilities(Arrays.asList(new Facility("C4"), new Facility("C5")));
+    provinceGroup.setMemberFacilities(Sets.newHashSet(new Facility("C4"), new Facility("C5")));
     provinceNode.setRequisitionGroup(provinceGroup);
 
     districtNode.assignParentNode(provinceNode);

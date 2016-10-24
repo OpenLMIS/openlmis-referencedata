@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -41,7 +43,7 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   private List<RequisitionGroupProgramScheduleBaseDto> requisitionGroupProgramSchedules;
 
   @JsonProperty
-  private List<FacilityDto> memberFacilities;
+  private Set<FacilityDto> memberFacilities;
 
   public RequisitionGroupBaseDto(UUID id) {
     setId(id);
@@ -93,21 +95,21 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   }
 
   @Override
-  public List<Facility.Importer> getMemberFacilities() {
+  public Set<Facility.Importer> getMemberFacilities() {
     if (memberFacilities == null) {
       return null;
     }
 
-    List<Facility.Importer> facilities = new ArrayList<>();
+    Set<Facility.Importer> facilities = new HashSet<>();
     facilities.addAll(memberFacilities);
     return facilities;
   }
 
   @JsonIgnore
   @Override
-  public void setMemberFacilities(List<Facility> memberFacilities) {
+  public void setMemberFacilities(Set<Facility> memberFacilities) {
     if (memberFacilities != null) {
-      this.memberFacilities = new ArrayList<>();
+      this.memberFacilities = new HashSet<>();
 
       for (Facility facility : memberFacilities) {
         this.memberFacilities.add(new FacilityDto(facility.getId()));
@@ -117,7 +119,7 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
     }
   }
 
-  public void setMemberFacilityDtos(List<FacilityDto> memberFacilities) {
+  public void setMemberFacilityDtos(Set<FacilityDto> memberFacilities) {
     this.memberFacilities = memberFacilities;
   }
 

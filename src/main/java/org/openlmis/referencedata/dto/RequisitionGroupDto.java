@@ -7,7 +7,9 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RequisitionGroupDto extends RequisitionGroupBaseDto {
 
@@ -44,9 +46,9 @@ public class RequisitionGroupDto extends RequisitionGroupBaseDto {
 
   @JsonIgnore
   @Override
-  public void setMemberFacilities(List<Facility> memberFacilities) {
+  public void setMemberFacilities(Set<Facility> memberFacilities) {
     if (memberFacilities != null) {
-      List<FacilityDto> facilityDtos = new ArrayList<>();
+      Set<FacilityDto> facilityDtos = new HashSet<>();
 
       for (Facility facility : memberFacilities) {
         FacilityDto facilityDto = new FacilityDto();

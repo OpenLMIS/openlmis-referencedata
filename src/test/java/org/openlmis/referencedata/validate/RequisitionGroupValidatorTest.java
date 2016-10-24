@@ -22,7 +22,7 @@ import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPE
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_MUST_EXIST;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_MUST_HAVE_ID;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
@@ -81,7 +81,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     requisitionGroup.setName(RandomStringUtils.randomAlphanumeric(50));
     requisitionGroup.setDescription(RandomStringUtils.randomAlphanumeric(250));
     requisitionGroup.setSupervisoryNode(supervisoryNode);
-    requisitionGroup.setMemberFacilities(Lists.newArrayList(facility));
+    requisitionGroup.setMemberFacilities(Sets.newHashSet(facility));
 
     requisitionGroupDto = new RequisitionGroupDto();
     requisitionGroup.export(requisitionGroupDto);
@@ -146,7 +146,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
   @Test
   public void shouldRejectIfFacilityIsNull() throws Exception {
-    requisitionGroupDto.setMemberFacilityDtos(Collections.singletonList(null));
+    requisitionGroupDto.setMemberFacilityDtos(Collections.singleton(null));
 
     validator.validate(requisitionGroupDto, errors);
 
@@ -155,7 +155,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
   @Test
   public void shouldRejectIfFacilityHasNoId() throws Exception {
-    requisitionGroupDto.setMemberFacilityDtos(Collections.singletonList(new FacilityDto()));
+    requisitionGroupDto.setMemberFacilityDtos(Collections.singleton(new FacilityDto()));
 
     validator.validate(requisitionGroupDto, errors);
 
@@ -165,7 +165,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
   @Test
   public void shouldRejectIfFacilityCanNotBeFound() throws Exception {
     requisitionGroupDto.setMemberFacilityDtos(
-        Collections.singletonList(new FacilityDto(UUID.randomUUID())));
+        Collections.singleton(new FacilityDto(UUID.randomUUID())));
 
     validator.validate(requisitionGroupDto, errors);
 

@@ -5,8 +5,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -60,7 +62,7 @@ public class RequisitionGroup extends BaseEntity {
       inverseJoinColumns = @JoinColumn(name = "facilityid", nullable = false))
   @Getter
   @Setter
-  private List<Facility> memberFacilities;
+  private Set<Facility> memberFacilities;
 
   /**
    * Create a new requisition group with a specified supervisory node, program schedules and
@@ -106,7 +108,7 @@ public class RequisitionGroup extends BaseEntity {
     }
 
     if (importer.getMemberFacilities() != null) {
-      List<Facility> memberFacilities = new ArrayList<>();
+      Set<Facility> memberFacilities = new HashSet<>();
 
       for (Facility.Importer facilityImporter : importer.getMemberFacilities()) {
         memberFacilities.add(Facility.newFacility(facilityImporter));
@@ -178,7 +180,7 @@ public class RequisitionGroup extends BaseEntity {
 
     void setRequisitionGroupProgramSchedules(List<RequisitionGroupProgramSchedule> schedules);
 
-    void setMemberFacilities(List<Facility> memberFacilities);
+    void setMemberFacilities(Set<Facility> memberFacilities);
   }
 
   public interface Importer {
@@ -194,6 +196,6 @@ public class RequisitionGroup extends BaseEntity {
 
     List<RequisitionGroupProgramSchedule.Importer> getRequisitionGroupProgramSchedules();
 
-    List<Facility.Importer> getMemberFacilities();
+    Set<Facility.Importer> getMemberFacilities();
   }
 }
