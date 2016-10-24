@@ -574,7 +574,7 @@ resourceTypes:
     /search:
         get:
             is: [ secured ]
-            description: Find periods with matched parametrs.
+            description: Find periods with matched parameters.
             queryParameters:
                 programId:
                         displayName: program
@@ -602,7 +602,7 @@ resourceTypes:
     /searchByUUIDAndDate:
         get:
             is: [ secured ]
-            description: Find periods with matched parametrs.
+            description: Find periods with matched parameters.
             queryParameters:
                 processingScheduleId:
                         displayName: processingSchedule
@@ -627,21 +627,6 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
-    /findFirst1ByOrderByEndDateDesc:
-        get:
-            is: [ secured ]
-            description: Get last processingPeriod.
-            responses:
-                "200":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                      application/json:
-                "404":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
 
 /productCategories:
     displayName: Product Categories
@@ -2650,7 +2635,7 @@ resourceTypes:
     /search:
         get:
             is: [ secured ]
-            description: Find requisitionGroupProgramSchedule with matched parametrs.
+            description: Find requisitionGroupProgramSchedule with matched parameters.
             queryParameters:
                 programId:
                         displayName: program
