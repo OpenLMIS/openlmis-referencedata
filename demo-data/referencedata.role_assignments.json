@@ -8,6 +8,14 @@
     "role": {"id": "d30a2fbb-51d9-49ad-90fe-fb405470a439"}
   },
   {
+    "id": "6745e82c-99df-11e6-9f33-a24fc0d9649c",
+    "type": "supervision",
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": {"id": "d30a2fbb-51d9-49ad-90fe-fb405470a439"}
+  },
+  {
     "id": "4b3c6622-48cb-4c1b-9a79-f37243c37063",
     "type": "fulfillment",
     "warehouse": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
