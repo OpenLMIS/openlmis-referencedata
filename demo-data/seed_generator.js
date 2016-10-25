@@ -22,6 +22,7 @@ var filesOrdered = [
     "referencedata.orderable_products",
     "referencedata.programs",
     "referencedata.program_products",
+    "referencedata.stock_adjustment_reasons",
     "referencedata.supply_lines",
     "referencedata.users",
     "referencedata.roles",
