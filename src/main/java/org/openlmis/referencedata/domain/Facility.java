@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -114,12 +115,12 @@ public class Facility extends BaseEntity {
     }
 
     Facility facility = (Facility) other;
-    return code.equals(facility.getCode());
+    return Objects.equals(code, facility.getCode());
   }
 
   @Override
   public int hashCode() {
-    return code.hashCode();
+    return Objects.hash(code);
   }
 
   /**
