@@ -114,7 +114,8 @@ public class StockAdjustmentReasonController extends BaseController {
     if (storedStockAdjustmentReason == null) {
       LOGGER.warn("Update failed - stockAdjustmentReason with id: {} not found",
               stockAdjustmentReasonId);
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>("Stock Adjustment Reason with id: " + stockAdjustmentReasonId
+          + " not found", HttpStatus.BAD_REQUEST);
     }
 
     stockAdjustmentReasonRepository.save(stockAdjustmentReason);
