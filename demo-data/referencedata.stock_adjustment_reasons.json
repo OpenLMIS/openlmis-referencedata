@@ -2,7 +2,7 @@
   {
     "id": "9e25fd93-d8a0-4d1d-8188-55dd3c408d24",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "TRANSFER_IN",
+    "name": "Transfer In",
     "description": "Transfer In",
     "additive": true,
     "displayOrder": 1
@@ -10,7 +10,7 @@
   {
     "id": "236c97a5-1829-4304-b5b4-f40b3d11a136",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "TRANSFER_OUT",
+    "name": "Transfer Out",
     "description": "Transfer Out",
     "additive": false,
     "displayOrder": 2
@@ -18,7 +18,7 @@
   {
     "id": "71ee1dc3-5444-4a40-8b17-5676152e2ee1",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "DAMAGED",
+    "name": "Damaged",
     "description": "Damaged",
     "additive": false,
     "displayOrder": 3
@@ -26,7 +26,7 @@
   {
     "id": "3f671afa-9c28-4de0-b94e-6475e7ae15d4",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "LOST",
+    "name": "Lost",
     "description": "Lost",
     "additive": false,
     "displayOrder": 4
@@ -34,7 +34,7 @@
   {
     "id": "85a6f1eb-853c-4283-921c-7125ef65b089",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "STOLEN",
+    "name": "Stolen",
     "description": "Stolen",
     "additive": false,
     "displayOrder": 5
@@ -42,7 +42,7 @@
   {
     "id": "faf5b4c4-817c-4c2a-b9fb-ea3ac6094a17",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "EXPIRED",
+    "name": "Expired",
     "description": "Expired",
     "additive": false,
     "displayOrder": 6
@@ -50,7 +50,7 @@
   {
     "id": "212a775a-1632-4cf4-9701-99c568094b10",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "PASSED_OPEN_VIAL_TIME_LIMIT",
+    "name": "Passed Open-Vial Time Limit",
     "description": "Passed Open-Vial Time Limit",
     "additive": false,
     "displayOrder": 7
@@ -58,7 +58,7 @@
   {
     "id": "9beb151f-1162-4695-87e6-812552858336",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "COLD_CHAIN_FAILURE",
+    "name": "Cold Chain Failure",
     "description": "Cold Chain Failure",
     "additive": false,
     "displayOrder": 8
@@ -66,7 +66,7 @@
   {
     "id": "bbc1d3fc-bd9d-4623-a10c-7f253bdc6199",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "name": "CLINIC_RETURN",
+    "name": "Clinic Return",
     "description": "Clinic Return",
     "additive": true,
     "displayOrder": 9
@@ -74,7 +74,7 @@
   {
     "id": "f1b833e0-3cad-4dc1-a13d-7d8b293c3b09",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "name": "TRANSFER_IN",
+    "name": "Transfer In",
     "description": "Transfer In",
     "additive": true,
     "displayOrder": 1
@@ -82,7 +82,7 @@
   {
     "id": "b047c538-78a1-490a-86ec-9fe5256943b1",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "name": "TRANSFER_OUT",
+    "name": "Transfer Out",
     "description": "Transfer Out",
     "additive": false,
     "displayOrder": 2
@@ -90,7 +90,7 @@
   {
     "id": "28fa945c-ff9c-4121-affb-5c9ac572e8e4",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "name": "DAMAGED",
+    "name": "Damaged",
     "description": "Damaged",
     "additive": false,
     "displayOrder": 3
@@ -98,7 +98,7 @@
   {
     "id": "cdbce4e1-70c1-4762-9d61-9e1577c7414c",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "name": "LOST",
+    "name": "Lost",
     "description": "Lost",
     "additive": false,
     "displayOrder": 4
@@ -106,7 +106,7 @@
   {
     "id": "ed73fe63-2151-4dcb-83bc-461140b8e5a5",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "name": "STOLEN",
+    "name": "Stolen",
     "description": "Stolen",
     "additive": false,
     "displayOrder": 5
@@ -114,7 +114,7 @@
   {
     "id": "038a6ede-8506-4438-9d4a-d012bbc74f36",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "name": "EXPIRED",
+    "name": "Expired",
     "description": "Expired",
     "additive": false,
     "displayOrder": 6
@@ -122,7 +122,7 @@
   {
     "id": "881a5fff-b4cd-4d7f-9aac-e76bef6dbbf9",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "name": "CLINIC_RETURN",
+    "name": "Clinic Return",
     "description": "Clinic Return",
     "additive": true,
     "displayOrder": 9
@@ -130,7 +130,7 @@
   {
     "id": "18e3b832-671c-493e-8359-c2133be5288c",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "name": "TRANSFER_IN",
+    "name": "Transfer In",
     "description": "Transfer In",
     "additive": true,
     "displayOrder": 1
@@ -138,7 +138,7 @@
   {
     "id": "530c5c76-cdf0-4d6e-b3a4-f599f73f47fd",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "name": "TRANSFER_OUT",
+    "name": "Transfer Out",
     "description": "Transfer Out",
     "additive": false,
     "displayOrder": 2
@@ -146,7 +146,7 @@
   {
     "id": "2ae965c6-2218-4f71-88f2-d0ad1c5af7e2",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "name": "DAMAGED",
+    "name": "Damaged",
     "description": "Damaged",
     "additive": false,
     "displayOrder": 3
@@ -154,7 +154,7 @@
   {
     "id": "61f65c5b-2e29-4657-9905-459898d85426",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "name": "LOST",
+    "name": "Lost",
     "description": "Lost",
     "additive": false,
     "displayOrder": 4
@@ -162,7 +162,7 @@
   {
     "id": "8dab137b-4aff-4884-90ef-5bc7fc25fdba",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "name": "STOLEN",
+    "name": "Stolen",
     "description": "Stolen",
     "additive": false,
     "displayOrder": 5
@@ -170,7 +170,7 @@
   {
     "id": "cef4ff73-1a42-4481-98d1-57092c9d5fad",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "name": "EXPIRED",
+    "name": "Expired",
     "description": "Expired",
     "additive": false,
     "displayOrder": 6
@@ -178,7 +178,7 @@
   {
     "id": "30f6002d-a78d-44db-b2b9-46e76795a188",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "name": "PASSED_OPEN_VIAL_TIME_LIMIT",
+    "name": "Passed Open-Vial Time Limit",
     "description": "Passed Open-Vial Time Limit",
     "additive": false,
     "displayOrder": 7
@@ -186,7 +186,7 @@
   {
     "id": "6f8d0431-6ec5-4280-9019-c6024b168b23",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "name": "COLD_CHAIN_FAILURE",
+    "name": "Cold Chain Failure",
     "description": "Cold Chain Failure",
     "additive": false,
     "displayOrder": 8
