@@ -1216,9 +1216,9 @@ resourceTypes:
                         type: string
                         required: false
                         repeat: false
-                    supervisoryNodeCode:
-                        displayName: Supervisory Node Code
-                        description: The supervisory node (code) to check (for supervision rights).
+                    facilityCode:
+                        displayName: Facility Code
+                        description: The facility (code) to check (for supervision rights). If program is specified, this is required.
                         type: string
                         required: false
                         repeat: false
@@ -1235,6 +1235,12 @@ resourceTypes:
                           X-XSS-Protection:
                         body:
                           application/json:
+                    "400":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          text/plain:
                     "404":
                         headers:
                           X-Content-Type-Options:

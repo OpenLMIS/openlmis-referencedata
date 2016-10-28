@@ -6,6 +6,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
+import com.google.common.collect.Sets;
+
 import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
@@ -14,25 +16,55 @@ import java.util.Set;
 
 public class SupervisionRoleAssignmentTest {
 
-  private Right right = Right.newRight("right", SUPERVISION);
-  private Program program = new Program("em");
-  private SupervisoryNode node = SupervisoryNode.newSupervisoryNode("SN1", new Facility("F1"));
-  private Role role = Role.newRole("role", right);
-  private SupervisionRoleAssignment homeFacilityRoleAssignment =
-      new SupervisionRoleAssignment(role, program);
-  private SupervisionRoleAssignment supervisedRoleAssignment =
-      new SupervisionRoleAssignment(role, program, node);
-  private User user = new UserBuilder("testuser", "Test", "User", "test@test.com").createUser();
+  private Right right;
+  private Role role;
+  private Program program;
+  private Facility homeFacility;
+  private SupervisionRoleAssignment homeFacilityRoleAssignment;
+  private SupervisoryNode supervisoryNode;
+  private Facility supervisedFacility;
+  private SupervisionRoleAssignment supervisedRoleAssignment;
+  private User user;
 
+  /**
+   * Constructor for tests.
+   */
   public SupervisionRoleAssignmentTest() throws RightTypeException, RoleException {
+    right = Right.newRight("right", SUPERVISION);
+    role = Role.newRole("role", right);
+    program = new Program("em");
+
+    homeFacility = new Facility("F1");
+    homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, program, homeFacility);
+
+    supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility("F2"));
+    RequisitionGroup requisitionGroup = new RequisitionGroup("RG1", "RGN1", supervisoryNode);
+    supervisedFacility = new Facility("F2");
+    requisitionGroup.setMemberFacilities(Sets.newHashSet(supervisedFacility));
+    supervisoryNode.setRequisitionGroup(requisitionGroup);
+    supervisedRoleAssignment = new SupervisionRoleAssignment(role, program, supervisoryNode);
+
+    user = new UserBuilder("testuser", "Test", "User", "test@test.com").createUser();
   }
 
   @Test
-  public void shouldHaveRightWhenRightAndProgramAndSupervisoryNodeMatch()
+  public void shouldHaveRightWhenRightAndProgramAndHomeFacilityMatch()
       throws RightTypeException {
 
     //when
-    RightQuery rightQuery = new RightQuery(right, program, node);
+    RightQuery rightQuery = new RightQuery(right, program, homeFacility);
+    boolean hasRight = homeFacilityRoleAssignment.hasRight(rightQuery);
+
+    //then
+    assertTrue(hasRight);
+  }
+
+  @Test
+  public void shouldHaveRightWhenRightAndProgramAndSupervisedFacilityMatch()
+      throws RightTypeException {
+
+    //when
+    RightQuery rightQuery = new RightQuery(right, program, supervisedFacility);
     boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then
@@ -40,10 +72,11 @@ public class SupervisionRoleAssignmentTest {
   }
 
   @Test
-  public void shouldNotHaveRightWhenProgramDoesNotMatch() throws RightTypeException {
+  public void shouldNotHaveRightWhenRightDoesNotMatch() throws RightTypeException {
 
     //when
-    RightQuery rightQuery = new RightQuery(right, new Program("test"), node);
+    RightQuery rightQuery = new RightQuery(Right.newRight("right2", SUPERVISION), program,
+        homeFacility);
     boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then
@@ -51,10 +84,21 @@ public class SupervisionRoleAssignmentTest {
   }
 
   @Test
-  public void shouldNotHaveRightWhenNodeDoesNotMatch() throws RightTypeException {
+  public void shouldNotHaveRightWhenProgramDoesNotMatch() throws RightTypeException {
 
     //when
-    RightQuery rightQuery = new RightQuery(right, program, new SupervisoryNode());
+    RightQuery rightQuery = new RightQuery(right, new Program("test"), homeFacility);
+    boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
+
+    //then
+    assertFalse(hasRight);
+  }
+
+  @Test
+  public void shouldNotHaveRightWhenFacilityDoesNotMatch() throws RightTypeException {
+
+    //when
+    RightQuery rightQuery = new RightQuery(right, program, new Facility("Another"));
     boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then

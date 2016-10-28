@@ -55,7 +55,7 @@ import java.util.UUID;
 public class UserControllerTest {
 
   private static final String ACCESS_TOKEN = "49c1e712-da50-4428-ae39-2d0409bd8059";
-  
+
   @Mock
   private UserService service;
 
@@ -199,7 +199,7 @@ public class UserControllerTest {
     //given
     DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole1);
     SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole1,
-        program1);
+        program1, homeFacility);
     user1.assignRoles(roleAssignment1, roleAssignment2);
     when(repository.findOne(userId)).thenReturn(user1);
 
@@ -417,7 +417,7 @@ public class UserControllerTest {
     //given
     preparePostOrPut();
 
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, homeFacility));
 
 
     when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
@@ -448,7 +448,7 @@ public class UserControllerTest {
     preparePostOrPut();
 
 
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, homeFacility));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
     OAuth2Authentication auth = mock(OAuth2Authentication.class);
@@ -509,15 +509,15 @@ public class UserControllerTest {
   @Test
   public void shouldReturnTrueIfUserHasRight() throws RightTypeException {
     //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, homeFacility));
     when(repository.findOne(userId)).thenReturn(user1);
     when(rightRepository.findFirstByName(supervisionRight1Name)).thenReturn(supervisionRight1);
     when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
-    when(supervisoryNodeRepository.findByCode(supervisoryNodeCode)).thenReturn(supervisoryNode1);
+    when(facilityRepository.findFirstByCode(homeFacilityCode)).thenReturn(homeFacility);
 
     //when
     ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, supervisionRight1Name,
-        programCode, supervisoryNodeCode, null);
+        programCode, homeFacilityCode, null);
     HttpStatus httpStatus = responseEntity.getStatusCode();
     boolean hasRight = (boolean) responseEntity.getBody();
 
@@ -560,7 +560,7 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserHomeFacilityPrograms() throws RightTypeException {
     //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, homeFacility));
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when

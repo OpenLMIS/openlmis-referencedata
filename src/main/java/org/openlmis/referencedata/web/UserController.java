@@ -5,6 +5,8 @@ import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
 
+import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -52,8 +54,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Locale;
@@ -278,11 +278,11 @@ public class UserController extends BaseController {
   /**
    * Check if user has a right with certain criteria.
    *
-   * @param userId              id of user to check for right
-   * @param rightName           right to check
-   * @param programCode         program to check
-   * @param supervisoryNodeCode supervisory node to check
-   * @param warehouseCode       warehouse to check
+   * @param userId        id of user to check for right
+   * @param rightName     right to check
+   * @param programCode   program to check
+   * @param facilityCode  facility to check
+   * @param warehouseCode warehouse to check
    * @return if successful, true or false depending on if user has the right
    */
   @RequestMapping(value = "/users/{userId}/hasRight", method = RequestMethod.GET)
@@ -290,8 +290,8 @@ public class UserController extends BaseController {
                                                @RequestParam(value = "rightName") String rightName,
                                                @RequestParam(value = "programCode",
                                                    required = false) String programCode,
-                                               @RequestParam(value = "supervisoryNodeCode",
-                                                   required = false) String supervisoryNodeCode,
+                                               @RequestParam(value = "facilityCode",
+                                                   required = false) String facilityCode,
                                                @RequestParam(value = "warehouseCode",
                                                    required = false) String warehouseCode) {
 
@@ -309,13 +309,15 @@ public class UserController extends BaseController {
     if (programCode != null) {
 
       Program program = programRepository.findByCode(Code.code(programCode));
-      if (supervisoryNodeCode != null) {
+      if (facilityCode != null) {
 
-        SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode(supervisoryNodeCode);
-        rightQuery = new RightQuery(right, program, supervisoryNode);
+        Facility facility = facilityRepository.findFirstByCode(facilityCode);
+        rightQuery = new RightQuery(right, program, facility);
 
       } else {
-        rightQuery = new RightQuery(right, program);
+        return ResponseEntity
+            .badRequest()
+            .body("If program code is specified, facility code must also be specified");
       }
     } else if (warehouseCode != null) {
 
@@ -462,7 +464,7 @@ public class UserController extends BaseController {
     User user = userRepository.findOne(userId);
     if (user == null) {
       String messageCode = "referencedata.error.id.not-found";
-      Object[] args = { userId };
+      Object[] args = {userId};
 
       LOGGER.error(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
       throw new AuthException(
@@ -493,7 +495,7 @@ public class UserController extends BaseController {
           roleAssignment = new SupervisionRoleAssignment(role, program, supervisoryNode);
 
         } else {
-          roleAssignment = new SupervisionRoleAssignment(role, program);
+          roleAssignment = new SupervisionRoleAssignment(role, program, user.getHomeFacility());
         }
 
       } else if (warehouseCode != null) {

@@ -60,7 +60,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@SuppressWarnings({"PMD.TooManyMethods","PMD.UnusedPrivateField"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateField"})
 public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/users";
@@ -83,6 +83,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM2_CODE = "P2";
   private static final String SUPERVISORY_NODE_CODE = "SN1";
   private static final String WAREHOUSE_CODE = "W1";
+  private static final String HOME_FACILITY_CODE = "HF1";
   private static final String USER_API_STRING = "/auth/api/users";
 
   @MockBean
@@ -240,15 +241,15 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findFirstByName(SUPERVISION_RIGHT_NAME)).willReturn(supervisionRight);
-    given(programRepository.findByCode(Code.code(PROGRAM2_CODE))).willReturn(program2);
-    given(supervisoryNodeRepository.findByCode(SUPERVISORY_NODE_CODE)).willReturn(supervisoryNode);
+    given(programRepository.findByCode(Code.code(PROGRAM1_CODE))).willReturn(program1);
+    given(facilityRepository.findFirstByCode(HOME_FACILITY_CODE)).willReturn(homeFacility);
 
     Boolean response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam("rightName", SUPERVISION_RIGHT_NAME)
-        .queryParam("programCode", PROGRAM2_CODE)
-        .queryParam("supervisoryNodeCode", SUPERVISORY_NODE_CODE)
+        .queryParam("programCode", PROGRAM1_CODE)
+        .queryParam("facilityCode", HOME_FACILITY_CODE)
         .pathParam("id", userId)
         .when()
         .get(HAS_RIGHT_URL)
@@ -257,6 +258,27 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(Boolean.class);
 
     assertTrue(response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldBadRequestGetUserHasRightWithMissingFacility() {
+
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findFirstByName(SUPERVISION_RIGHT_NAME)).willReturn(supervisionRight);
+    given(programRepository.findByCode(Code.code(PROGRAM2_CODE))).willReturn(program2);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("rightName", SUPERVISION_RIGHT_NAME)
+        .queryParam("programCode", PROGRAM2_CODE)
+        .pathParam("id", userId)
+        .when()
+        .get(HAS_RIGHT_URL)
+        .then()
+        .statusCode(400);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -611,7 +633,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private User generateUser() {
     Integer instanceNumber = generateInstanceNumber();
-    homeFacility = generateFacility();
+    homeFacility = generateFacility(HOME_FACILITY_CODE);
     return new UserBuilder("kota" + instanceNumber,
         "Ala" + instanceNumber,
         "ma" + instanceNumber,
@@ -623,9 +645,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .createUser();
   }
 
-  private Facility generateFacility() {
+  private Facility generateFacility(String facilityCode) {
     FacilityType facilityType = generateFacilityType();
-    Facility facility = new Facility("W2");
+    Facility facility = new Facility(facilityCode);
     homeFacilityId = UUID.randomUUID();
     facility.setId(homeFacilityId);
     facility.setType(facilityType);
@@ -633,7 +655,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     GeographicZone geographicZone = generateGeographicZone(geographicLevel);
     facility.setGeographicZone(geographicZone);
     Integer instanceNumber = +generateInstanceNumber();
-    facility.setCode("FacilityCode" + instanceNumber);
     facility.setName("FacilityName" + instanceNumber);
     facility.setDescription("FacilityDescription" + instanceNumber);
     facility.setActive(true);
@@ -681,9 +702,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     program1 = new Program(PROGRAM1_CODE);
     program2 = new Program(PROGRAM2_CODE);
     supervisoryNode = SupervisoryNode.newSupervisoryNode(SUPERVISORY_NODE_CODE,
-        generateFacility());
+        generateFacility("F1"));
     RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);
-    supervisionGroup.setMemberFacilities(Sets.newHashSet(generateFacility(), generateFacility()));
+    supervisionGroup.setMemberFacilities(Sets.newHashSet(generateFacility("F2"),
+        generateFacility("F3")));
     supervisoryNode.setRequisitionGroup(supervisionGroup);
 
     Right fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
@@ -699,7 +721,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole);
     SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
-        program1);
+        program1, homeFacility);
     SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
         program2, supervisoryNode);
     FulfillmentRoleAssignment roleAssignment4 = new FulfillmentRoleAssignment(fulfillmentRole,

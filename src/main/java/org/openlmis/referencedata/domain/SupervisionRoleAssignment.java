@@ -15,6 +15,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
 @DiscriminatorValue("supervision")
@@ -31,6 +32,9 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   @Getter
   private SupervisoryNode supervisoryNode;
 
+  @Transient
+  private Facility homeFacility;
+
   private SupervisionRoleAssignment(Role role) throws RightTypeException {
     super(role);
   }
@@ -42,9 +46,11 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    * @param program the program where the role applies
    * @throws RightTypeException if role passed in has rights which are not an acceptable right type
    */
-  public SupervisionRoleAssignment(Role role, Program program) throws RightTypeException {
+  public SupervisionRoleAssignment(Role role, Program program, Facility homeFacility)
+      throws RightTypeException {
     super(role);
     this.program = program;
+    this.homeFacility = homeFacility;
   }
 
   /**
@@ -77,14 +83,14 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     boolean roleMatches = role.contains(rightQuery.getRight());
     boolean programMatches = program.equals(rightQuery.getProgram());
 
-    boolean nodePresentAndMatches = supervisoryNode != null
-        && supervisoryNode.equals(rightQuery.getSupervisoryNode());
-    boolean nodeAbsentAndMatches = supervisoryNode == null
-        && rightQuery.getSupervisoryNode() == null;
+    boolean facilityMatches;
+    if (homeFacility != null) {
+      facilityMatches = homeFacility.equals(rightQuery.getFacility());
+    } else {
+      facilityMatches = supervisoryNode.supervises(rightQuery.getFacility());
+    }
 
-    boolean nodeMatches = nodePresentAndMatches || nodeAbsentAndMatches;
-
-    return roleMatches && programMatches && nodeMatches;
+    return roleMatches && programMatches & facilityMatches;
   }
 
   @Override
