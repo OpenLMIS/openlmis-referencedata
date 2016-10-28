@@ -147,6 +147,13 @@ public class SupervisoryNode extends BaseEntity {
   }
 
   /**
+   * Check to see if this supervisory node supervises the specified facility.
+   */
+  public boolean supervises(Facility facility) {
+    return getAllSupervisedFacilities().contains(facility);
+  }
+
+  /**
    * Copy values of attributes into new or updated SupervisoryNode.
    *
    * @param supervisoryNode SupervisoryNode with new values.

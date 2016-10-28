@@ -1,25 +1,34 @@
 package org.openlmis.referencedata.domain;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Set;
 
 public class SupervisoryNodeTest {
 
+  private SupervisoryNode supervisoryNode1;
+  private Facility facility2;
+
+  @Before
+  public void setUp() {
+    facility2 = new Facility("C2");
+    supervisoryNode1 = SupervisoryNode.newSupervisoryNode("SN1", new Facility("C1"));
+    RequisitionGroup requisitionGroup1 = new RequisitionGroup("RG1", "RGN1", supervisoryNode1);
+    requisitionGroup1.setMemberFacilities(Sets.newHashSet(facility2, new Facility("C3")));
+    supervisoryNode1.setRequisitionGroup(requisitionGroup1);
+  }
+
   @Test
   public void shouldGetAllSupervisedFacilities() {
     //given
-    SupervisoryNode supervisoryNode1 =
-        SupervisoryNode.newSupervisoryNode("SN1", new Facility("C1"));
-    RequisitionGroup requisitionGroup1 = new RequisitionGroup("RG1", "RGN1", supervisoryNode1);
-    requisitionGroup1.setMemberFacilities(Sets.newHashSet(new Facility("C2"), new Facility("C3")));
-    supervisoryNode1.setRequisitionGroup(requisitionGroup1);
-
     SupervisoryNode supervisoryNode2 =
         SupervisoryNode.newSupervisoryNode("SN2", new Facility("C4"));
     RequisitionGroup requisitionGroup2 = new RequisitionGroup("RG2", "RGN2", supervisoryNode2);
@@ -33,5 +42,15 @@ public class SupervisoryNodeTest {
 
     //then
     assertThat(facilities.size(), is(3));
+  }
+
+  @Test
+  public void shouldReturnTrueIfSupervisesFacility() {
+    assertTrue(supervisoryNode1.supervises(facility2));
+  }
+
+  @Test
+  public void shouldReturnFalseIfDoesNotSuperviseFacility() {
+    assertFalse(supervisoryNode1.supervises(new Facility("New Facility")));
   }
 }
