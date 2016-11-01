@@ -195,6 +195,7 @@ sonarqube {
 build {
     dependsOn check
     dependsOn jacocoTestReport
+    dependsOn demoDataSeed
 }
 
 pmd {
