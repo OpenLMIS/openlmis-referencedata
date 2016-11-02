@@ -9,13 +9,6 @@
     <context:annotation-config/>
     <context:spring-configured/>
 
-    <bean id="openlmisDataSource" class="org.postgresql.ds.PGPoolingDataSource" destroy-method="close">
-        <property name="serverName" value="db"/>
-        <property name="databaseName" value="open_lmis"/>
-        <property name="user" value="${spring.datasource.username}"/>
-        <property name="password" value="${spring.datasource.password}"/>
-    </bean>
-
     <bean id="validator"
           class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 </beans>

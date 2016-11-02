@@ -1,26 +1,30 @@
 package org.openlmis.referencedata.web;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.jayway.restassured.RestAssured;
-import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.RamlLoaders;
-import guru.nidi.ramltester.restassured.RestAssuredClient;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.embedded.LocalServerPort;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import javax.annotation.PostConstruct;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.jayway.restassured.RestAssured;
+
+import org.junit.Rule;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.embedded.LocalServerPort;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlLoaders;
+import guru.nidi.ramltester.restassured.RestAssuredClient;
+
+import javax.annotation.PostConstruct;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public abstract class BaseWebIntegrationTest {
 
@@ -62,7 +66,7 @@ public abstract class BaseWebIntegrationTest {
 
   @LocalServerPort
   private int randomPort;
-  
+
   /**
    * Constructor for test.
    */
@@ -86,8 +90,8 @@ public abstract class BaseWebIntegrationTest {
   }
 
   /**
-   * Initialize the REST Assured client. Done here and not in the constructor, so that randomPort
-   * is available.
+   * Initialize the REST Assured client. Done here and not in the constructor, so that randomPort is
+   * available.
    */
   @PostConstruct
   public void init() {
@@ -95,8 +99,8 @@ public abstract class BaseWebIntegrationTest {
     RestAssured.baseURI = baseUri;
     RestAssured.port = randomPort;
     restAssured = ramlDefinition.createRestAssured();
-  } 
-  
+  }
+
   /**
    * Get an access token. An arbitrary UUID string is returned and the tests assume it is a valid
    * one.
