@@ -90,7 +90,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       facilityMatches = supervisoryNode.supervises(rightQuery.getFacility());
     }
 
-    return roleMatches && programMatches & facilityMatches;
+    return roleMatches && programMatches && facilityMatches;
   }
 
   @Override
