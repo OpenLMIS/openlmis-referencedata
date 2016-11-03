@@ -109,7 +109,6 @@ public class SupervisionRoleAssignmentTest {
   public void shouldAssignHomeFacilityProgramWhenUserAssignedWithNoNode() {
 
     //when
-    homeFacilityRoleAssignment.assignTo(user);
     Set<Program> programs = user.getHomeFacilityPrograms();
 
     //then
@@ -121,7 +120,6 @@ public class SupervisionRoleAssignmentTest {
   public void shouldAssignSupervisedProgramWhenUserAssignedWithNode() {
 
     //when
-    supervisedRoleAssignment.assignTo(user);
     Set<Program> programs = user.getSupervisedPrograms();
 
     //then

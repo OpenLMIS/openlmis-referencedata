@@ -30,11 +30,6 @@ public class DirectRoleAssignment extends RoleAssignment {
     return role.contains(rightQuery.getRight());
   }
 
-  @Override
-  public void assignTo(User user) {
-    super.assignTo(user);
-  }
-
   /**
    * Export this object to the specified exporter (DTO).
    *

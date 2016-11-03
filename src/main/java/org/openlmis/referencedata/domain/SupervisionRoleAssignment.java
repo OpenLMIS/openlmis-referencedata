@@ -52,6 +52,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     super(role, user);
     this.program = program;
     this.homeFacility = homeFacility;
+    addSupervisions();
   }
 
   /**
@@ -70,6 +71,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     super(role, user);
     this.program = program;
     this.supervisoryNode = supervisoryNode;
+    addSupervisions();
   }
 
   @Override
@@ -96,13 +98,10 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     return roleMatches && programMatches && facilityMatches;
   }
 
-  @Override
   /**
-   * Assign this role assignment to the specified user. For supervision, will also add programs 
-   * and supervised facilities to the user.
+   * Add programs and supervised facilities for the associated user.
    */
-  public void assignTo(User user) {
-    super.assignTo(user);
+  public void addSupervisions() {
     if (supervisoryNode == null) {
       user.addHomeFacilityProgram(program);
     } else {

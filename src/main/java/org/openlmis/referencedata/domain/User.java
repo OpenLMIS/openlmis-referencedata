@@ -2,11 +2,11 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import org.openlmis.referencedata.util.View;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import org.openlmis.referencedata.util.View;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -142,7 +142,6 @@ public class User extends BaseEntity {
    */
   public void assignRoles(RoleAssignment... roleAssignments) {
     for (RoleAssignment roleAssignment : Arrays.asList(roleAssignments)) {
-      roleAssignment.assignTo(this);
       this.roleAssignments.add(roleAssignment);
     }
   }
@@ -187,7 +186,9 @@ public class User extends BaseEntity {
   @PostLoad
   private void refreshSupervisions() {
     for (RoleAssignment roleAssignment : roleAssignments) {
-      roleAssignment.assignTo(this);
+      if (roleAssignment instanceof SupervisionRoleAssignment) {
+        ((SupervisionRoleAssignment) roleAssignment).addSupervisions();
+      }
     }
   }
 

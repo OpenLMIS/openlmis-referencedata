@@ -59,10 +59,6 @@ public abstract class RoleAssignment extends BaseEntity {
 
   public abstract boolean hasRight(RightQuery rightQuery);
 
-  public void assignTo(User user) {
-    this.user = user;
-  }
-
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
