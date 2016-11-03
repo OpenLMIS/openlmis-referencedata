@@ -244,7 +244,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     given(programRepository.findByCode(Code.code(PROGRAM1_CODE))).willReturn(program1);
     given(facilityRepository.findFirstByCode(HOME_FACILITY_CODE)).willReturn(homeFacility);
 
-    Boolean response = restAssured
+    BooleanResultDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam("rightName", SUPERVISION_RIGHT_NAME)
@@ -255,9 +255,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(HAS_RIGHT_URL)
         .then()
         .statusCode(200)
-        .extract().as(Boolean.class);
+        .extract().as(BooleanResultDto.class);
 
-    assertTrue(response);
+    assertTrue(response.getResult());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

@@ -9,6 +9,17 @@ documentation:
       content: Welcome to the OpenLMIS referencedata service documentation.
 
 schemas:
+  - booleanResult: |
+      {
+          "type": "object",
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "title": "BooleanResult",
+          "description": "Boolean result",
+          "properties": {
+              "result": { "type": "boolean", "required": true, "title": "result" }
+          }
+      }
+
   - errorResponse: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -1205,6 +1216,7 @@ resourceTypes:
                           X-XSS-Protection:
                         body:
                           application/json:
+                            schema: booleanResult
                     "400":
                         headers:
                           X-Content-Type-Options:

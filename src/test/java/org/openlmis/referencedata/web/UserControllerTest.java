@@ -519,11 +519,11 @@ public class UserControllerTest {
     ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, supervisionRight1Name,
         programCode, homeFacilityCode, null);
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    boolean hasRight = (boolean) responseEntity.getBody();
+    BooleanResultDto booleanResultDto = (BooleanResultDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
-    assertTrue(hasRight);
+    assertTrue(booleanResultDto.getResult());
   }
 
   @Test
@@ -539,11 +539,11 @@ public class UserControllerTest {
     ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, fulfillmentRight1Name,
         null, null, warehouseCode);
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    boolean hasRight = (boolean) responseEntity.getBody();
+    BooleanResultDto booleanResultDto = (BooleanResultDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
-    assertFalse(hasRight);
+    assertFalse(booleanResultDto.getResult());
   }
 
   @Test
