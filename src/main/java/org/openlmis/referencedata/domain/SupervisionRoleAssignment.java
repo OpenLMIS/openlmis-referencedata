@@ -35,36 +35,39 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   @Transient
   private Facility homeFacility;
 
-  private SupervisionRoleAssignment(Role role) throws RightTypeException {
-    super(role);
+  private SupervisionRoleAssignment(Role role, User user) throws RightTypeException {
+    super(role, user);
   }
 
   /**
-   * Constructor for home facility supervision. Must always have a role and a program.
+   * Constructor for home facility supervision. Must always have a role, a user and a program.
    *
    * @param role    the role being assigned
+   * @param user    the user to which the role is being assigned
    * @param program the program where the role applies
    * @throws RightTypeException if role passed in has rights which are not an acceptable right type
    */
-  public SupervisionRoleAssignment(Role role, Program program, Facility homeFacility)
+  public SupervisionRoleAssignment(Role role, User user, Program program, Facility homeFacility)
       throws RightTypeException {
-    super(role);
+    super(role, user);
     this.program = program;
     this.homeFacility = homeFacility;
   }
 
   /**
-   * Constructor for supervisory supervision. Must always have a role, a program and a supervisory
-   * node.
+   * Constructor for supervisory supervision. Must always have a role, a user, a program and a
+   * supervisory node.
    *
    * @param role            the role being assigned
+   * @param user            the user to which the role is being assigned
    * @param program         the program where the role applies
    * @param supervisoryNode the supervisory node where the role applies
    * @throws RightTypeException if role passed in has rights which are not an acceptable right type
    */
-  public SupervisionRoleAssignment(Role role, Program program, SupervisoryNode supervisoryNode)
+  public SupervisionRoleAssignment(Role role, User user, Program program,
+                                   SupervisoryNode supervisoryNode)
       throws RightTypeException {
-    super(role);
+    super(role, user);
     this.program = program;
     this.supervisoryNode = supervisoryNode;
   }

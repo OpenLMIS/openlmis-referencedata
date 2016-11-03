@@ -37,12 +37,13 @@ public abstract class RoleAssignment extends BaseEntity {
   protected User user;
 
   /**
-   * Default constructor. Must always have a role.
+   * Default constructor. Must always have a role and a user.
    *
    * @param role the role being assigned
+   * @param user the user to which the role is being assigned
    * @throws RightTypeException if role passed in has rights which are not an acceptable right type
    */
-  public RoleAssignment(Role role) throws RightTypeException {
+  public RoleAssignment(Role role, User user) throws RightTypeException {
     Set<RightType> acceptableRightTypes = getAcceptableRightTypes();
     boolean roleTypeAcceptable = acceptableRightTypes.stream()
         .anyMatch(rightType -> rightType == role.getRightType());
@@ -51,6 +52,7 @@ public abstract class RoleAssignment extends BaseEntity {
     }
 
     this.role = role;
+    this.user = user;
   }
 
   protected abstract Set<RightType> getAcceptableRightTypes();

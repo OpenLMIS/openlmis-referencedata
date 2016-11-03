@@ -492,19 +492,20 @@ public class UserController extends BaseController {
 
           SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode(
               supervisoryNodeCode);
-          roleAssignment = new SupervisionRoleAssignment(role, program, supervisoryNode);
+          roleAssignment = new SupervisionRoleAssignment(role, user, program, supervisoryNode);
 
         } else {
-          roleAssignment = new SupervisionRoleAssignment(role, program, user.getHomeFacility());
+          roleAssignment = new SupervisionRoleAssignment(role, user, program,
+              user.getHomeFacility());
         }
 
       } else if (warehouseCode != null) {
 
         Facility warehouse = facilityRepository.findFirstByCode(warehouseCode);
-        roleAssignment = new FulfillmentRoleAssignment(role, warehouse);
+        roleAssignment = new FulfillmentRoleAssignment(role, user, warehouse);
 
       } else {
-        roleAssignment = new DirectRoleAssignment(role);
+        roleAssignment = new DirectRoleAssignment(role, user);
       }
 
       user.assignRoles(roleAssignment);

@@ -37,7 +37,7 @@ public class UserTest {
   public void shouldBeAbleToAssignRoleToUser() throws RightTypeException, RoleException {
     //when
     user.assignRoles(new DirectRoleAssignment(Role.newRole(roleName, Right.newRight("reportRight1",
-        RightType.REPORTS))));
+        RightType.REPORTS)), user));
 
     //then
     assertThat(user.getRoleAssignments().size(), is(1));
@@ -82,9 +82,9 @@ public class UserTest {
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
 
-    RoleAssignment assignment3 = new SupervisionRoleAssignment(role, program1,
+    RoleAssignment assignment3 = new SupervisionRoleAssignment(role, user, program1,
         user.getHomeFacility());
-    RoleAssignment assignment4 = new SupervisionRoleAssignment(role, program2,
+    RoleAssignment assignment4 = new SupervisionRoleAssignment(role, user, program2,
         user.getHomeFacility());
 
     user.assignRoles(assignment3);
@@ -107,8 +107,10 @@ public class UserTest {
     SupervisoryNode supervisoryNode =
         SupervisoryNode.newSupervisoryNode("SN1", new Facility("C1"));
 
-    RoleAssignment assignment3 = new SupervisionRoleAssignment(role, program1, supervisoryNode);
-    RoleAssignment assignment4 = new SupervisionRoleAssignment(role, program2, supervisoryNode);
+    RoleAssignment assignment3 = new SupervisionRoleAssignment(role, user, program1, 
+        supervisoryNode);
+    RoleAssignment assignment4 = new SupervisionRoleAssignment(role, user, program2, 
+        supervisoryNode);
 
     user.assignRoles(assignment3);
     user.assignRoles(assignment4);
@@ -139,7 +141,7 @@ public class UserTest {
     Role role = Role.newRole(roleName, Right.newRight("right1", RightType.SUPERVISION));
     Program program = new Program("prog1");
 
-    RoleAssignment assignment = new SupervisionRoleAssignment(role, program, provinceNode);
+    RoleAssignment assignment = new SupervisionRoleAssignment(role, user, program, provinceNode);
 
     user.assignRoles(assignment);
 

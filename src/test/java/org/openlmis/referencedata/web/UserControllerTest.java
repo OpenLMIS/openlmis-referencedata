@@ -197,9 +197,9 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserWithRoles() throws RightTypeException {
     //given
-    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole1);
+    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole1, user1);
     SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole1,
-        program1, homeFacility);
+        user1, program1, homeFacility);
     user1.assignRoles(roleAssignment1, roleAssignment2);
     when(repository.findOne(userId)).thenReturn(user1);
 
@@ -417,7 +417,8 @@ public class UserControllerTest {
     //given
     preparePostOrPut();
 
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, homeFacility));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+        homeFacility));
 
 
     when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
@@ -448,7 +449,8 @@ public class UserControllerTest {
     preparePostOrPut();
 
 
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, homeFacility));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+        homeFacility));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
     OAuth2Authentication auth = mock(OAuth2Authentication.class);
@@ -509,7 +511,8 @@ public class UserControllerTest {
   @Test
   public void shouldReturnTrueIfUserHasRight() throws RightTypeException {
     //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, homeFacility));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+        homeFacility));
     when(repository.findOne(userId)).thenReturn(user1);
     when(rightRepository.findFirstByName(supervisionRight1Name)).thenReturn(supervisionRight1);
     when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
@@ -529,7 +532,8 @@ public class UserControllerTest {
   @Test
   public void shouldReturnFalseIfUserDoesNotHaveRight() throws RightTypeException {
     //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+        supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);
     when(rightRepository.findFirstByName(fulfillmentRight1Name)).thenReturn(fulfillmentRight1);
     when(facilityRepository.findFirstByCode(warehouseCode)).thenReturn(warehouse1);
@@ -560,7 +564,8 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserHomeFacilityPrograms() throws RightTypeException {
     //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, homeFacility));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+        homeFacility));
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
@@ -577,7 +582,8 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserSupervisoryPrograms() throws RightTypeException {
     //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+        supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
@@ -611,7 +617,8 @@ public class UserControllerTest {
     );
     supervisionGroup1.setMemberFacilities(Sets.newHashSet(new Facility("C1"), new Facility("C2")));
     supervisoryNode1.setRequisitionGroup(supervisionGroup1);
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1));
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+        supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
@@ -629,10 +636,10 @@ public class UserControllerTest {
       throws RightTypeException, RoleAssignmentException {
     //given
     FulfillmentRoleAssignment assignment1 =
-        new FulfillmentRoleAssignment(fulfillmentRole1, warehouse1);
+        new FulfillmentRoleAssignment(fulfillmentRole1, user1, warehouse1);
 
     SupervisionRoleAssignment assignment2
-        = new SupervisionRoleAssignment(supervisionRole1, program1, supervisoryNode1);
+        = new SupervisionRoleAssignment(supervisionRole1, user1, program1, supervisoryNode1);
 
     user1.assignRoles(assignment1);
     user1.assignRoles(assignment2);

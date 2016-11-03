@@ -33,18 +33,18 @@ public class SupervisionRoleAssignmentTest {
     right = Right.newRight("right", SUPERVISION);
     role = Role.newRole("role", right);
     program = new Program("em");
+    
+    user = new UserBuilder("testuser", "Test", "User", "test@test.com").createUser();
 
     homeFacility = new Facility("F1");
-    homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, program, homeFacility);
+    homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, user, program, homeFacility);
 
     supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility("F2"));
     RequisitionGroup requisitionGroup = new RequisitionGroup("RG1", "RGN1", supervisoryNode);
     supervisedFacility = new Facility("F2");
     requisitionGroup.setMemberFacilities(Sets.newHashSet(supervisedFacility));
     supervisoryNode.setRequisitionGroup(requisitionGroup);
-    supervisedRoleAssignment = new SupervisionRoleAssignment(role, program, supervisoryNode);
-
-    user = new UserBuilder("testuser", "Test", "User", "test@test.com").createUser();
+    supervisedRoleAssignment = new SupervisionRoleAssignment(role, user, program, supervisoryNode);
   }
 
   @Test

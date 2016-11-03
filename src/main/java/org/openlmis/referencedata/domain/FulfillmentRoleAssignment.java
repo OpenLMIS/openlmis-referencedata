@@ -26,23 +26,24 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   @Getter
   private Facility warehouse;
 
-  private FulfillmentRoleAssignment(Role role) throws RightTypeException {
-    super(role);
+  private FulfillmentRoleAssignment(Role role, User user) throws RightTypeException {
+    super(role, user);
   }
 
   /**
-   * Default constructor. Must always have a role and a facility, which must be of type
+   * Default constructor. Must always have a role, a user and a facility, which must be of type
    * 'warehouse'.
    *
    * @param role      the role being assigned
+   * @param user      the user to which the role is being assigned
    * @param warehouse the warehouse where the role applies
    * @throws RightTypeException      if role passed in has rights which are not an acceptable right
    *                                 type
    * @throws RoleAssignmentException if facility passed in is not of type 'warehouse'
    */
-  public FulfillmentRoleAssignment(Role role, Facility warehouse)
+  public FulfillmentRoleAssignment(Role role, User user, Facility warehouse)
       throws RightTypeException, RoleAssignmentException {
-    super(role);
+    super(role, user);
 
     if (!warehouse.getType().getCode().equalsIgnoreCase("warehouse")) {
       throw new RoleAssignmentException("referencedata.error.facility-type-must-be-warehouse");

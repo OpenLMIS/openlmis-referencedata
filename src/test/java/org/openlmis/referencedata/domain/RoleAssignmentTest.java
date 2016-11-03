@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.domain;
 
+import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.domain.RightType.GENERAL_ADMIN;
 import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 
@@ -15,8 +16,8 @@ public class RoleAssignmentTest {
   private String roleName = "role";
 
   private static class TestStub extends RoleAssignment {
-    public TestStub(Role role) throws RightTypeException {
-      super(role);
+    public TestStub(Role role, User user) throws RightTypeException {
+      super(role, user);
     }
 
     @Override
@@ -35,12 +36,14 @@ public class RoleAssignmentTest {
   @Test
   public void shouldAllowCreationWithMatchingRoleTypes() throws RightTypeException,
       RoleException {
-    new TestStub(Role.newRole(roleName, Right.newRight("adminRight1", GENERAL_ADMIN)));
+    new TestStub(Role.newRole(roleName, Right.newRight("adminRight1", GENERAL_ADMIN)),
+        mock(User.class));
   }
 
   @Test(expected = RightTypeException.class)
   public void shouldNotAllowCreationWithMismatchingRoleTypes() throws RightTypeException,
       RoleException {
-    new TestStub(Role.newRole(roleName, Right.newRight("fulfillmentRight1", ORDER_FULFILLMENT)));
+    new TestStub(Role.newRole(roleName, Right.newRight("fulfillmentRight1", ORDER_FULFILLMENT)),
+        mock(User.class));
   }
 }

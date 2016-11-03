@@ -719,13 +719,13 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     warehouse.setActive(true);
     warehouse.setEnabled(true);
 
-    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole);
-    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
-        program1, homeFacility);
+    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole, user);
+    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole, 
+        user, program1, homeFacility);
     SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
-        program2, supervisoryNode);
+        user, program2, supervisoryNode);
     FulfillmentRoleAssignment roleAssignment4 = new FulfillmentRoleAssignment(fulfillmentRole,
-        warehouse);
+        user, warehouse);
 
     user.assignRoles(roleAssignment1, roleAssignment2, roleAssignment3, roleAssignment4);
   }

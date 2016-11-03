@@ -14,6 +14,7 @@ public class FulfillmentRoleAssignmentTest {
   private Right right;
   private Facility warehouse;
   private Facility hospital;
+  private User user;
   private FulfillmentRoleAssignment fulfillmentRoleAssignment;
   private String roleName = "role";
 
@@ -27,20 +28,21 @@ public class FulfillmentRoleAssignmentTest {
     warehouse.setType(new FacilityType("warehouse"));
     hospital = new Facility("C2");
     hospital.setType(new FacilityType("hospital"));
+    user = new UserBuilder("username", "User", "Name", "test@test.com").createUser();
     fulfillmentRoleAssignment = new FulfillmentRoleAssignment(
-        Role.newRole(roleName, right), warehouse);
+        Role.newRole(roleName, right), user, warehouse);
   }
 
   @Test
   public void shouldAllowCreationWithWarehouseFacilityType()
       throws RightTypeException, RoleAssignmentException, RoleException {
-    new FulfillmentRoleAssignment(Role.newRole(roleName, right), warehouse);
+    new FulfillmentRoleAssignment(Role.newRole(roleName, right), user, warehouse);
   }
 
   @Test(expected = RoleAssignmentException.class)
   public void shouldNotAllowCreationWithNonWarehouseFacilityType()
       throws RightTypeException, RoleAssignmentException, RoleException {
-    new FulfillmentRoleAssignment(Role.newRole(roleName, right), hospital);
+    new FulfillmentRoleAssignment(Role.newRole(roleName, right), user, hospital);
   }
 
   @Test

@@ -16,8 +16,8 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 public class DirectRoleAssignment extends RoleAssignment {
 
-  public DirectRoleAssignment(Role role) throws RightTypeException {
-    super(role);
+  public DirectRoleAssignment(Role role, User user) throws RightTypeException {
+    super(role, user);
   }
 
   @Override
