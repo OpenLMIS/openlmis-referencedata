@@ -64,16 +64,9 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
         .authorizeRequests()
         .antMatchers(
             "/",
-            "/lib/*",
-            "/images/*",
-            "/css/*",
-            "/fonts/*",
-            "/lang/*",
+            "/webjars/**",
             "/index.html",
-            "/o2c.html",
-            "/generated/api-definition.json",
-            "/swagger-ui.js",
-            "/swagger-ui.min.js"
+            "/generated/api-definition.json"
         ).permitAll()
         .antMatchers("/**").fullyAuthenticated();
   }

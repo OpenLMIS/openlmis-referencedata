@@ -33,10 +33,6 @@ repositories {
     jcenter()
 }
 
-configurations {
-    webjars
-}
-
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
@@ -49,8 +45,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.security.oauth:spring-security-oauth2"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0"
-
-    webjars 'org.webjars:swagger-ui:2.2.6'
+    compile 'org.webjars:swagger-ui:2.2.6'
 
     testCompile 'io.rest-assured:rest-assured:3.0.0'
     testCompile 'io.rest-assured:json-schema-validator:3.0.0'
@@ -145,32 +140,6 @@ task checkApiIsRaml(type:Exec) {
     args "src/main/resources/api-definition.yaml"
 }
 
-task webjarExtraction(type: Copy) {
-    configurations.webjars.each {jar ->
-
-        def config = configurations.webjars.resolvedConfiguration
-        def artifact = config.resolvedArtifacts.find {
-            it.file.toString() == jar.absolutePath
-        }
-
-        def upStreamVersion = "${artifact.moduleVersion.id.version}"
-        upStreamVersion = upStreamVersion.replaceAll(/(-[\d.-]+)/, '')
-
-        copy {
-            from zipTree(jar)
-            into file("${buildDir}/webjars-content/${artifact.name}")
-        }
-        copy {
-            from "${buildDir}/webjars-content/${artifact.name}/META-INF/resources/webjars/${artifact.name}/${upStreamVersion}",
-                    "${buildDir}/webjars-content/${artifact.name}/META-INF/resources/webjars/${artifact.name}/${artifact.moduleVersion.id.version}"
-
-            into file("${buildDir}/resources/main/static/")
-            exclude '**/*.gz'
-            exclude '**/index.html'
-        }
-    }
-}
-
 processResources {
     // update version information in build
     filesMatching('**/version.properties') {
@@ -249,7 +218,6 @@ apply from: "documentation.gradle"
 integrationTest.dependsOn copyRamlToBuild
 
 check {
-    dependsOn webjarExtraction
     dependsOn ramlToHtml
     dependsOn ramlToSwagger
     dependsOn copyRamlHtmlToBuild
