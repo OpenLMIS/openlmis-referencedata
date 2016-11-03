@@ -29,8 +29,8 @@ public final class TradeItem extends OrderableProduct {
   @ManyToOne
   private GlobalProduct globalProduct;
 
-  private TradeItem(Code productCode, String name, long packSize) {
-    super(productCode, name, packSize);
+  private TradeItem(Code productCode, Dispensable dispensable, String name, long packSize) {
+    super(productCode, dispensable, name, packSize);
   }
 
   @Override
@@ -57,10 +57,12 @@ public final class TradeItem extends OrderableProduct {
    */
   @JsonCreator
   public static TradeItem newTradeItem(@JsonProperty("productCode") String productCode,
+                                       @JsonProperty("dispensingUnit") String dispensingUnit,
                                        @JsonProperty("name") String name,
                                        @JsonProperty("packSize") long packSize) {
     Code code = Code.code(productCode);
-    TradeItem tradeItem = new TradeItem(code, name, packSize);
+    Dispensable dispensable = Dispensable.createNew(dispensingUnit);
+    TradeItem tradeItem = new TradeItem(code, dispensable, name, packSize);
 
     return tradeItem;
   }
@@ -74,9 +76,10 @@ public final class TradeItem extends OrderableProduct {
   }
 
   /*
-  returns true if we have a global product and the one given is the same, false otherwise.
+  returns true if we have a global product and the one given has the same product code,
+   false otherwise.
    */
   private boolean hasGlobalProduct(OrderableProduct product) {
-    return null != globalProduct && globalProduct.equals(product);
+    return null != globalProduct && globalProduct.getProductCode().equals(product.getProductCode());
   }
 }

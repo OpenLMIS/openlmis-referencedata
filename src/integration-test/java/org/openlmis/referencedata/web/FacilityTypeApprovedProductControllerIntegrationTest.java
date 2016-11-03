@@ -56,7 +56,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         new OrderedDisplayValue("productCategoryName", 1));
     productCategory.setId(UUID.randomUUID());
 
-    orderableProduct = GlobalProduct.newGlobalProduct("abcd", "Abcd", "test", 10);
+    orderableProduct = GlobalProduct.newGlobalProduct("abcd", "each", "Abcd", "test", 10);
 
     programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct);
 

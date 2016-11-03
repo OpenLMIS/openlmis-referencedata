@@ -2,6 +2,7 @@ package org.openlmis.referencedata.domain;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -12,9 +13,9 @@ public class GlobalProductTest {
   private static TradeItem motrin;
 
   {
-    ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "Ibuprofen", "test desc", 10);
-    advil = TradeItem.newTradeItem("advil", "Advil", 12);
-    motrin = TradeItem.newTradeItem("motrin", "Motrin", 12);
+    ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "each", "Ibuprofen", "test desc", 10);
+    advil = TradeItem.newTradeItem("advil", "60 tab stripe", "Advil", 12);
+    motrin = TradeItem.newTradeItem("motrin", "each", "Motrin", 12);
     ibuprofen.addTradeItem(advil);
     ibuprofen.addTradeItem(motrin);
   }
@@ -40,7 +41,15 @@ public class GlobalProductTest {
     assertTrue(ibuprofen.equals(ibuprofen));
 
     GlobalProduct ibuprofenDupe =
-        GlobalProduct.newGlobalProduct("ibuprofen", "Ibuprofen", "dupe", 20);
+        GlobalProduct.newGlobalProduct("ibuprofen", "each", "Ibuprofen", "dupe", 20);
     assertEquals(ibuprofen.hashCode(), ibuprofenDupe.hashCode());
+  }
+
+  @Test
+  public void testEqualsWhenDispensingUnitsAreDifferent() {
+
+    GlobalProduct ibuprofenDupe =
+        GlobalProduct.newGlobalProduct("ibuprofen", "60 tab stripe", "Ibuprofen", "dupe", 20);
+    assertNotEquals(ibuprofen.hashCode(), ibuprofenDupe.hashCode());
   }
 }

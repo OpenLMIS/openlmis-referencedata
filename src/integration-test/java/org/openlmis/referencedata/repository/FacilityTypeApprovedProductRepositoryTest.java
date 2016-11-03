@@ -80,7 +80,8 @@ public class FacilityTypeApprovedProductRepositoryTest extends
       new OrderedDisplayValue("productCategoryName", 1));
     productCategoryRepository.save(productCategory);
 
-    orderableProduct = GlobalProduct.newGlobalProduct("ibuprofen", "Ibuprofen", "testDesc", 10);
+    orderableProduct = GlobalProduct.newGlobalProduct(
+        "ibuprofen", "each", "Ibuprofen", "testDesc", 10);
     programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct);
     orderableProduct.addToProgram(programProduct);
     orderableProductRepository.save(orderableProduct);

@@ -2,6 +2,7 @@
   {
     "id": "2400e410-b8dd-4954-b1c0-80d8a8e785fc",
     "code": "C1",
+    "dispensingUnit": "10 tab strip",
     "name": "Acetylsalicylic Acid",
     "packSize": 16,
     "type": "TRADE_ITEM",
@@ -14,6 +15,7 @@
   {
     "id": "103396e1-f5e4-4754-bb7b-1c799097dfea",
     "code": "C2",
+    "dispensingUnit": "each",
     "name": "Glibenclamide",
     "packSize": 40,
     "type": "TRADE_ITEM",
@@ -26,6 +28,7 @@
   {
     "id": "bac90734-6e58-426e-849b-331286ec77d2",
     "code": "C3",
+    "dispensingUnit": "10 tab strip",
     "name": "Streptococcus Pneumoniae Vaccine",
     "packSize": 5,
     "type": "TRADE_ITEM",
@@ -38,6 +41,7 @@
   {
     "id": "c9e65f02-f84f-4ba2-85f7-e2cb6f0989af",
     "code": "C4",
+    "dispensingUnit": "each",
     "name": "Streptococcus Pneumoniae Vaccine II",
     "packSize": 5,
     "type": "GLOBAL_PRODUCT",
@@ -50,6 +54,7 @@
   {
     "id": "d602d0c6-4052-456c-8ccd-61b4ad77bece",
     "code": "C100",
+    "dispensingUnit": "10 tab strip",
     "name": "Levora",
     "packSize": 84,
     "type": "GLOBAL_PRODUCT",
@@ -62,6 +67,7 @@
   {
     "id": "23819693-0670-4c4b-b400-28e009b86b51",
     "code": "C200",
+    "dispensingUnit": "each",
     "name": "Ortho-Novum",
     "packSize": 63,
     "type": "GLOBAL_PRODUCT",
@@ -74,6 +80,7 @@
   {
     "id": "7f7b83db-580d-4269-88d2-7f9c80a591a9",
     "code": "C300",
+    "dispensingUnit": "each",
     "name": "Depo-Estradiol",
     "packSize": 5,
     "type": "GLOBAL_PRODUCT",
@@ -86,6 +93,7 @@
   {
     "id": "bfde33c3-83f1-4feb-a27c-842852f66b71",
     "code": "C400",
+    "dispensingUnit": "each",
     "name": "Male Condom",
     "packSize": 1,
     "type": "GLOBAL_PRODUCT",
@@ -98,6 +106,7 @@
   {
     "id": "880cf2eb-7b68-4450-a037-a0dec1a17987",
     "code": "C500",
+    "dispensingUnit": "10 tab strip",
     "name": "Implanon",
     "packSize": 1,
     "type": "GLOBAL_PRODUCT",
@@ -110,6 +119,7 @@
   {
     "id": "7b9b66e0-f008-4c38-93ec-7a5f4868cca9",
     "code": "C600",
+    "dispensingUnit": "10 tab strip",
     "name": "Levonorgestrel ",
     "packSize": 1,
     "type": "GLOBAL_PRODUCT",

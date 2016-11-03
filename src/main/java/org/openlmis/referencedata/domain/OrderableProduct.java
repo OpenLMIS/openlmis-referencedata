@@ -29,6 +29,9 @@ public abstract class OrderableProduct extends BaseEntity {
   @Embedded
   private Code productCode;
 
+  @Embedded
+  private Dispensable dispensable;
+
   private String name;
 
   @JsonProperty
@@ -38,8 +41,10 @@ public abstract class OrderableProduct extends BaseEntity {
       fetch = FetchType.EAGER)
   private Set<ProgramProduct> programProducts;
 
-  protected OrderableProduct(Code productCode, String name, long packSize) {
+  protected OrderableProduct(
+      Code productCode, Dispensable dispensable, String name, long packSize) {
     this.productCode = productCode;
+    this.dispensable = dispensable;
     this.name = name;
     this.packSize = packSize;
     this.programProducts = new LinkedHashSet<>();
@@ -56,6 +61,11 @@ public abstract class OrderableProduct extends BaseEntity {
   @JsonProperty
   public final Code getProductCode() {
     return productCode;
+  }
+
+  @JsonProperty
+  public final Dispensable getDispensable() {
+    return dispensable;
   }
 
   /**
@@ -150,11 +160,15 @@ public abstract class OrderableProduct extends BaseEntity {
       return false;
     }
 
-    return ((OrderableProduct) object).productCode.equals(this.productCode);
+    OrderableProduct product = (OrderableProduct)object;
+    return (product.productCode.equals(this.productCode)
+        && product.dispensable.equals(this.dispensable));
   }
 
   @Override
   public final int hashCode() {
-    return productCode.hashCode();
+    int result = productCode.hashCode();
+    result = 31 * result + dispensable.hashCode();
+    return result;
   }
 }
