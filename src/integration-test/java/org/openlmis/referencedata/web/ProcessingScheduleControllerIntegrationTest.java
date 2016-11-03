@@ -2,10 +2,8 @@ package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
@@ -22,7 +20,6 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   private static final String RESOURCE_URL = "/api/processingSchedules";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String DIFFERENCE_URL = RESOURCE_URL + "/{id}/difference";
   private static final String ACCESS_TOKEN = "access_token";
 
   @MockBean
@@ -36,23 +33,6 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     processingScheduleId = UUID.randomUUID();
   }
 
-  @Ignore
-  @Test
-  public void shouldDisplayTotalDifference() {
-
-    String response = restAssured
-        .given()
-        .pathParam("id", processingScheduleId)
-        .queryParam("access_token", getToken())
-        .when()
-        .get(DIFFERENCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().asString();
-
-    assertTrue(response.contains("Period lasts 1 months and 0 days"));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
 
   @Test
   public void shouldDeleteSchedule() {

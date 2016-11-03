@@ -542,7 +542,7 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
-    /{id}/difference:
+    /{id}/length:
         uriParameters:
             id:
                 displayName: id
@@ -551,7 +551,7 @@ resourceTypes:
                 repeat: false
         get:
             is: [ secured ]
-            description: Display total days of processingPeriod.
+            description: Display total months of processingPeriod.
             responses:
                 "200":
                     headers:
@@ -940,36 +940,6 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
-    /{id}/difference:
-        uriParameters:
-            id:
-                displayName: id
-                description: ScheduleId
-                type: string
-                required: true
-                repeat: false
-        get:
-            is: [ secured ]
-            description: Display total days and months of processingSchedule periods.
-            responses:
-              200:
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                    text/plain:
-              400:
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-              404:
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-              500:
-                  headers:
-                    X-Content-TPype-Options:
-                    X-XSS-Protection:
 
 /supplyLines:
     displayName: Supply Lines

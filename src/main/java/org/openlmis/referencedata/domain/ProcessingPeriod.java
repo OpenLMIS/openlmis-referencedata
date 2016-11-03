@@ -87,6 +87,21 @@ public class ProcessingPeriod extends BaseEntity {
   }
 
   /**
+   * Returns length of period in months.
+   *
+   * @return number od months as String.
+   */
+  public String getLengthOf() {
+    java.time.Period length = java.time.Period.between(startDate, endDate);
+    int months = length.getMonths();
+    if (length.getDays() >= 15) {
+      months++;
+    }
+
+    return Integer.toString(months);
+  }
+
+  /**
    * Export this object to the specified exporter (DTO).
    *
    * @param exporter exporter to export to

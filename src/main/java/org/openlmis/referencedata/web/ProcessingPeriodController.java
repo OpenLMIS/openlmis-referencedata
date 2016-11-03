@@ -189,22 +189,19 @@ public class ProcessingPeriodController extends BaseController {
   }
 
   /**
-   * Returns total difference between start date and end date from given processingPeriod.
+   * Returns total difference between start date and end date from given processingPeriod rounded
+   * to whole months.
    *
    * @param periodId UUID of given processingPeriod.
-   * @return String which contains information about this difference.
+   * @return String which contains number of months.
    */
-  @RequestMapping(value = "/processingPeriods/{id}/difference", method = RequestMethod.GET)
+  @RequestMapping(value = "/processingPeriods/{id}/length", method = RequestMethod.GET)
   @ResponseBody
-  public String getTotalDifference(@PathVariable("id") UUID periodId) {
+  public String getLength(@PathVariable("id") UUID periodId) {
     ProcessingPeriod period = periodRepository.findOne(periodId);
 
-    java.time.Period total = java.time.Period.between(period.getStartDate(), period.getEndDate());
-    String months = Integer.toString(total.getMonths());
-    String days = Integer.toString(total.getDays() + 1);
-
-    String[] msgArgs = {months, days};
-    LOGGER.debug("Returning total days and months of schedule processingPeriods");
+    String[] msgArgs = {period.getLengthOf()};
+    LOGGER.debug("Returning total number of months of processingPeriod");
 
     return messageSource.getMessage("referencedata.message.totalPeriod", msgArgs,
         LocaleContextHolder.getLocale());

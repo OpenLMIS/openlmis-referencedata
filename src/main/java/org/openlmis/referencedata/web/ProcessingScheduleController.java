@@ -1,15 +1,10 @@
 package org.openlmis.referencedata.web;
 
-import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
-import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import java.util.UUID;
 
@@ -28,15 +23,6 @@ public class ProcessingScheduleController extends BaseController {
 
   @Autowired
   private ProcessingScheduleRepository scheduleRepository;
-
-  @Autowired
-  private ProcessingPeriodRepository periodRepository;
-
-  @Autowired
-  private ExposedMessageSource messageSource;
-
-  @Autowired
-  private ProcessingPeriodService periodService;
 
   /**
    * Allows creating new processingSchedules.
@@ -113,38 +99,6 @@ public class ProcessingScheduleController extends BaseController {
     } else {
       scheduleRepository.delete(schedule);
       return new ResponseEntity<ProcessingSchedule>(HttpStatus.NO_CONTENT);
-    }
-  }
-
-  /**
-   * Calculates total difference in days and months between processingSchedule beginning and end.
-   *
-   * @param scheduleId UUID of given processingSchedule.
-   * @return String about total difference between processingSchedule beginning and end.
-   */
-  @RequestMapping(value = "/processingSchedules/{id}/difference", method = RequestMethod.GET)
-  @ResponseBody
-  public String getTotalDifference(@PathVariable("id") UUID scheduleId) {
-    ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
-
-    Iterable<ProcessingPeriod> allPeriods = periodService.searchPeriods(schedule, null);
-    if (allPeriods.iterator().hasNext()) {
-      ProcessingPeriod firstPeriod = allPeriods.iterator().next();
-      ProcessingPeriod lastPeriod = periodRepository.findFirst1ByOrderByEndDateDesc();
-      java.time.Period total = java.time.Period.between(firstPeriod.getStartDate(),
-          lastPeriod.getEndDate());
-      String months = Integer.toString(total.getMonths());
-      String days = Integer.toString(total.getDays());
-
-      String[] msgArgs = {months, days};
-      LOGGER.debug("Returning total days and months of schedule processingPeriods");
-
-      return messageSource.getMessage("referencedata.message.totalPeriod", msgArgs,
-          LocaleContextHolder.getLocale());
-    } else {
-      String[] messageArgs = {"0", "0"};
-      return messageSource.getMessage("referencedata.message.totalPeriod", messageArgs,
-          LocaleContextHolder.getLocale());
     }
   }
 }
