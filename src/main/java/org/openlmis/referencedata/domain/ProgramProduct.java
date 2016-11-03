@@ -8,10 +8,12 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.Objects;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -34,6 +36,7 @@ public class ProgramProduct extends BaseEntity {
   private OrderableProduct product;
 
   private Integer dosesPerMonth;
+
   @Getter
   private boolean active;
 
@@ -47,6 +50,11 @@ public class ProgramProduct extends BaseEntity {
   private int displayOrder;
   private int maxMonthsStock;
 
+  @Getter
+  @Setter
+  @Embedded
+  private Money pricePerPack;
+
   private ProgramProduct(Program program,
                          OrderableProduct product,
                          ProductCategory productCategory) {
@@ -58,6 +66,7 @@ public class ProgramProduct extends BaseEntity {
     this.fullSupply = true;
     this.displayOrder = 0;
     this.maxMonthsStock = 0;
+    this.pricePerPack = new Money("0");
   }
 
   /**
@@ -102,6 +111,7 @@ public class ProgramProduct extends BaseEntity {
    * @param displayOrder the display order of this Product in this category of this Program.
    * @param maxMonthsStock the maximum months of stock this product should be stocked for in this
    *                       Program.
+   * @param pricePerPack the price of one pack.
    * @return a new ProgramProduct.
    */
   public static final ProgramProduct createNew(Program program,
@@ -111,7 +121,8 @@ public class ProgramProduct extends BaseEntity {
                                                boolean active,
                                                boolean fullSupply,
                                                int displayOrder,
-                                               int maxMonthsStock) {
+                                               int maxMonthsStock,
+                                               Money pricePerPack) {
     ProgramProduct programProduct = new ProgramProduct(program,
         product,
         category);
@@ -120,6 +131,7 @@ public class ProgramProduct extends BaseEntity {
     programProduct.fullSupply = fullSupply;
     programProduct.displayOrder = displayOrder;
     programProduct.maxMonthsStock = maxMonthsStock;
+    programProduct.pricePerPack = pricePerPack;
 
     return programProduct;
   }
@@ -176,6 +188,7 @@ public class ProgramProduct extends BaseEntity {
       if (null != programProduct.dosesPerMonth) {
         generator.writeNumberField("dosesPerMonth", programProduct.dosesPerMonth);
       }
+      generator.writeNumberField("pricePerPack", programProduct.pricePerPack.getValue());
       generator.writeEndObject();
     }
   }

@@ -3,13 +3,13 @@ package org.openlmis.referencedata.domain;
 
 import static java.math.BigDecimal.ROUND_HALF_UP;
 
-import org.openlmis.referencedata.serializer.MoneyDeSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import java.math.BigDecimal;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.openlmis.referencedata.serializer.MoneyDeSerializer;
+
+import java.math.BigDecimal;
 
 @Data
 @JsonSerialize(as = BigDecimal.class)
@@ -18,6 +18,10 @@ import lombok.EqualsAndHashCode;
 public class Money extends Number {
 
   private BigDecimal value;
+
+  public Money() {
+    this("0");
+  }
 
   public Money(String value) {
     this.value = new BigDecimal(value).setScale(2, ROUND_HALF_UP);

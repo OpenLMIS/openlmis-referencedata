@@ -8,7 +8,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 1000,
-    "displayOrder": 1
+    "displayOrder": 1,
+    "value" : "3.1"
   },
   {
     "id": "d4e4c6ca-efc9-4ab4-8966-d78ba594ac0c",
@@ -19,7 +20,8 @@
     "active": "false",
     "fullSupply": "true",
     "maxMonthsStock": 10,
-    "displayOrder": 2
+    "displayOrder": 2,
+    "value" : "2.1"
   },
   {
     "id": "267321d1-447c-4fac-9430-907ae38d1854",
@@ -30,7 +32,8 @@
     "active": "true",
     "fullSupply": "false",
     "maxMonthsStock": 30,
-    "displayOrder": 3
+    "displayOrder": 3,
+    "value" : "5.1"
   },
   {
     "id": "1af3b535-fe6a-41ce-b4c6-7d0aa4381cdb",
@@ -41,7 +44,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 30,
-    "displayOrder": 4
+    "displayOrder": 4,
+    "value" : "4.1"
   },
   {
     "id": "10d447ea-0a86-4267-8048-0b331d509601",
@@ -52,7 +56,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 1000,
-    "displayOrder": 1
+    "displayOrder": 1,
+    "value" : "10"
   },
   {
     "id": "2e9cf7eb-ae09-431b-a3da-aa51a7f4aca0",
@@ -63,7 +68,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 1000,
-    "displayOrder": 2
+    "displayOrder": 2,
+    "value" : "15"
   },
   {
     "id": "366fdbed-c1ba-4bd0-b387-b1c75df9da48",
@@ -74,7 +80,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 20,
-    "displayOrder": 6
+    "displayOrder": 6,
+    "value" : "20"
   },
   {
     "id": "e119197f-2326-47b1-9a7f-00f020d9e2b9",
@@ -85,7 +92,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 20,
-    "displayOrder": 3
+    "displayOrder": 3,
+    "value" : "25"
   },
   {
     "id": "ceaa00b6-e2bb-4908-ab82-4e2265c39404",
@@ -96,7 +104,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 20,
-    "displayOrder": 4
+    "displayOrder": 4,
+    "value" : "30"
   },
   {
     "id": "79159377-dc1c-4eaa-b4e9-8dad221a1a97",
@@ -107,7 +116,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 20,
-    "displayOrder": 5
+    "displayOrder": 5,
+    "value" : "5"
   },
   {
     "id": "99b2a62a-f96d-45ad-ba91-7dcc6cda7ce3",
@@ -118,6 +128,7 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 20,
-    "displayOrder": 6
+    "displayOrder": 6,
+    "value" : "4"
   }
 ]

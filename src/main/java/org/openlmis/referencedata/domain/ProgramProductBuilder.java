@@ -23,6 +23,7 @@ public class ProgramProductBuilder {
   private boolean fullSupply;
   private int displayOrder;
   private int maxMonthsOfStock;
+  private Money pricePerPack;
 
   private ProgramProductBuilder() {
     this.dosesPerMonth = null;
@@ -31,6 +32,7 @@ public class ProgramProductBuilder {
     this.fullSupply = false;
     this.displayOrder = 0;
     this.maxMonthsOfStock = 1;
+    this.pricePerPack = new Money("0");
   }
 
   /**
@@ -78,6 +80,11 @@ public class ProgramProductBuilder {
     return this;
   }
 
+  public ProgramProductBuilder setPricePerPack(Money pricePerPack) {
+    this.pricePerPack = pricePerPack;
+    return this;
+  }
+
   public ProgramProductBuilder setMaxMonthsOfStock(int maxMonthsOfStock) {
     this.maxMonthsOfStock = maxMonthsOfStock;
     return this;
@@ -117,6 +124,7 @@ public class ProgramProductBuilder {
       active,
       fullSupply,
       displayOrder,
-      maxMonthsOfStock);
+      maxMonthsOfStock,
+      pricePerPack);
   }
 }

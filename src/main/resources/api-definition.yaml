@@ -225,7 +225,7 @@ schemas:
               "fullSupply": { "type": "boolean", "required": true, "title": "fullSupply" },
               "displayOrder": { "type": "integer", "required": false, "title": "displayOrder" },
               "maxMonthsStock": { "type": "integer", "required": false, "title": "maxMonthsStock" },
-              "pricePerPack": { "type": "string", "required": false, "title": "pricePerPack" }
+              "pricePerPack": { "type": "number", "required": false, "title": "pricePerPack" }
           }
       }
 

@@ -67,6 +67,7 @@ public class OrderableProductTest {
     ibuprofenInEmBuilder.setProductCategoryRepository(prodCatRepo);
     ibuprofenInEmBuilder.setProgramId(emUuid);
     ibuprofenInEmBuilder.setProductCategoryId(nsaidCatUuid);
+    ibuprofenInEmBuilder.setPricePerPack(new Money("3.39"));
     Set<ProgramProductBuilder> ppBuilders = new HashSet<>();
     ppBuilders.add(ibuprofenInEmBuilder);
     ibuprofen.setPrograms(ppBuilders);
