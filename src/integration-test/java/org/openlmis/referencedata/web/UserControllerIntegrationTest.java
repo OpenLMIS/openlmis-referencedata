@@ -721,7 +721,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole, user);
     SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole, 
-        user, program1, homeFacility);
+        user, program1);
     SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
         user, program2, supervisoryNode);
     FulfillmentRoleAssignment roleAssignment4 = new FulfillmentRoleAssignment(fulfillmentRole,

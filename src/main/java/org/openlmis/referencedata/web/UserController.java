@@ -495,8 +495,7 @@ public class UserController extends BaseController {
           roleAssignment = new SupervisionRoleAssignment(role, user, program, supervisoryNode);
 
         } else {
-          roleAssignment = new SupervisionRoleAssignment(role, user, program,
-              user.getHomeFacility());
+          roleAssignment = new SupervisionRoleAssignment(role, user, program);
         }
 
       } else if (warehouseCode != null) {

@@ -33,11 +33,12 @@ public class SupervisionRoleAssignmentTest {
     right = Right.newRight("right", SUPERVISION);
     role = Role.newRole("role", right);
     program = new Program("em");
-    
-    user = new UserBuilder("testuser", "Test", "User", "test@test.com").createUser();
-
     homeFacility = new Facility("F1");
-    homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, user, program, homeFacility);
+    
+    user = new UserBuilder("testuser", "Test", "User", "test@test.com")
+        .setHomeFacility(homeFacility).createUser();
+
+    homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, user, program);
 
     supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility("F2"));
     RequisitionGroup requisitionGroup = new RequisitionGroup("RG1", "RGN1", supervisoryNode);

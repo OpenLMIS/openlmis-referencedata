@@ -82,10 +82,8 @@ public class UserTest {
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
 
-    RoleAssignment assignment3 = new SupervisionRoleAssignment(role, user, program1,
-        user.getHomeFacility());
-    RoleAssignment assignment4 = new SupervisionRoleAssignment(role, user, program2,
-        user.getHomeFacility());
+    RoleAssignment assignment3 = new SupervisionRoleAssignment(role, user, program1);
+    RoleAssignment assignment4 = new SupervisionRoleAssignment(role, user, program2);
 
     user.assignRoles(assignment3);
     user.assignRoles(assignment4);

@@ -15,7 +15,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
 
 @Entity
 @DiscriminatorValue("supervision")
@@ -32,9 +31,6 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   @Getter
   private SupervisoryNode supervisoryNode;
 
-  @Transient
-  private Facility homeFacility;
-
   private SupervisionRoleAssignment(Role role, User user) throws RightTypeException {
     super(role, user);
   }
@@ -47,11 +43,10 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    * @param program the program where the role applies
    * @throws RightTypeException if role passed in has rights which are not an acceptable right type
    */
-  public SupervisionRoleAssignment(Role role, User user, Program program, Facility homeFacility)
+  public SupervisionRoleAssignment(Role role, User user, Program program)
       throws RightTypeException {
     super(role, user);
     this.program = program;
-    this.homeFacility = homeFacility;
     addSupervisions();
   }
 
@@ -82,20 +77,23 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   @Override
   /**
    * Check if this role assignment has a right based on specified criteria. For supervision, 
-   * check also that program matches and supervisory node matches (if present).
+   * check also that program matches and facility was found, either from the supervisory node or 
+   * the user's home facility.
    */
   public boolean hasRight(RightQuery rightQuery) {
-    boolean roleMatches = role.contains(rightQuery.getRight());
+    boolean roleContainsRight = role.contains(rightQuery.getRight());
     boolean programMatches = program.equals(rightQuery.getProgram());
 
-    boolean facilityMatches;
-    if (homeFacility != null) {
-      facilityMatches = homeFacility.equals(rightQuery.getFacility());
+    boolean facilityFound;
+    if (supervisoryNode != null) {
+      facilityFound = supervisoryNode.supervises(rightQuery.getFacility());
+    } else if (user.getHomeFacility() != null) {
+      facilityFound = user.getHomeFacility().equals(rightQuery.getFacility());
     } else {
-      facilityMatches = supervisoryNode.supervises(rightQuery.getFacility());
+      facilityFound = false;
     }
 
-    return roleMatches && programMatches && facilityMatches;
+    return roleContainsRight && programMatches && facilityFound;
   }
 
   /**
