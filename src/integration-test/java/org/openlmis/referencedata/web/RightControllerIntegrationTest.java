@@ -89,6 +89,23 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldNotGetRightForNonExistingRight() {
+
+    given(rightRepository.findOne(rightId)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", rightId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPutRight() {
 
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(null);
@@ -131,7 +148,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(right);
 
-    RightDto response = restAssured
+    RightDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam("name", RIGHT_NAME)
@@ -139,10 +156,11 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(RightDto.class);
+        .extract().as(RightDto[].class);
 
-    assertEquals(RIGHT_NAME, response.getName());
-    assertEquals(RightType.GENERAL_ADMIN, response.getType());
+    RightDto rightDto = response[0];
+    assertEquals(RIGHT_NAME, rightDto.getName());
+    assertEquals(RightType.GENERAL_ADMIN, rightDto.getType());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

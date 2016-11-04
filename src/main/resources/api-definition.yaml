@@ -2516,7 +2516,7 @@ resourceTypes:
     /search:
         get:
             is: [ secured ]
-            description: Search for a right.
+            description: Search for rights.
             queryParameters:
                 name:
                     displayName: Name of the right to find
@@ -2530,7 +2530,7 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
-                        schema: right
+                        schema: rightArray
                 "404":
                     headers:
                       X-Content-Type-Options:

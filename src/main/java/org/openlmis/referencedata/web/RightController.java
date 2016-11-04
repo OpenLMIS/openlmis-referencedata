@@ -149,7 +149,7 @@ public class RightController extends BaseController {
 
     LOGGER.debug("Right found, returning");
     return ResponseEntity
-        .ok(exportToDto(foundRight));
+        .ok(Sets.newHashSet(exportToDto(foundRight)));
   }
 
   private RightDto exportToDto(Right right) {
