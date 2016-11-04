@@ -248,17 +248,12 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/right.json" }
       }
 
-  - role: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "Role",
-          "description": "A single role",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "name": { "type": "string", "required": true, "title": "name" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "rights": { "type": "array", "required": false, "title": "rights", "items": { "type": "object", "$ref": "#/schemas/right" }, "uniqueItems": false }
-          }
+  - role: !include schemas/role.json
+
+  - roleArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/role.json" }
       }
 
   - processingSchedule: |
@@ -2353,6 +2348,7 @@ resourceTypes:
           description: Create new role.
           body:
               application/json:
+                schema: role
           responses:
               "201":
                   headers:
@@ -2360,6 +2356,7 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
+                        schema: role
               "400":
                   headers:
                     X-Content-Type-Options:
@@ -2382,6 +2379,7 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
+                        schema: roleArray
     /{roleId}:
           uriParameters:
             roleId:
@@ -2394,6 +2392,7 @@ resourceTypes:
               description: Update existing role (or create new one using role ID).
               body:
                   application/json:
+                    schema: role
               responses:
                   "200":
                       headers:
@@ -2401,6 +2400,7 @@ resourceTypes:
                         X-XSS-Protection:
                       body:
                           application/json:
+                            schema: role
                   "400":
                       headers:
                         X-Content-Type-Options:
@@ -2417,6 +2417,7 @@ resourceTypes:
                         X-XSS-Protection:
                       body:
                           application/json:
+                            schema: role
                   "404":
                       headers:
                         X-Content-Type-Options:
