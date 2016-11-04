@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -499,8 +500,8 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.checkIfUserHasRight(userId, "right1", null, null, null)
-        .getStatusCode();
+    HttpStatus httpStatus = controller.checkIfUserHasRight(
+        userId, UUID.randomUUID(), null, null, null).getStatusCode();
 
     //then
     assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
@@ -511,13 +512,13 @@ public class UserControllerTest {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
-    when(rightRepository.findFirstByName(supervisionRight1Name)).thenReturn(supervisionRight1);
-    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
-    when(facilityRepository.findFirstByCode(homeFacilityCode)).thenReturn(homeFacility);
+    when(rightRepository.findOne(any(UUID.class))).thenReturn(supervisionRight1);
+    when(programRepository.findOne(any(UUID.class))).thenReturn(program1);
+    when(facilityRepository.findOne(any(UUID.class))).thenReturn(homeFacility);
 
     //when
-    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, supervisionRight1Name,
-        programCode, homeFacilityCode, null);
+    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
+        UUID.randomUUID(), UUID.randomUUID(), null);
     HttpStatus httpStatus = responseEntity.getStatusCode();
     BooleanResultDto booleanResultDto = (BooleanResultDto) responseEntity.getBody();
 
@@ -532,12 +533,12 @@ public class UserControllerTest {
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
         supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);
-    when(rightRepository.findFirstByName(fulfillmentRight1Name)).thenReturn(fulfillmentRight1);
-    when(facilityRepository.findFirstByCode(warehouseCode)).thenReturn(warehouse1);
+    when(rightRepository.findOne(any(UUID.class))).thenReturn(fulfillmentRight1);
+    when(facilityRepository.findOne(any(UUID.class))).thenReturn(warehouse1);
 
     //when
-    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, fulfillmentRight1Name,
-        null, null, warehouseCode);
+    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
+        null, null, UUID.randomUUID());
     HttpStatus httpStatus = responseEntity.getStatusCode();
     BooleanResultDto booleanResultDto = (BooleanResultDto) responseEntity.getBody();
 

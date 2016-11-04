@@ -128,10 +128,13 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private Role adminRole;
   private UUID adminRoleId;
   private Right supervisionRight;
+  private UUID supervisionRightId;
   private Role supervisionRole;
   private UUID supervisionRoleId;
   private Program program1;
+  private UUID program1Id;
   private Program program2;
+  private UUID program2Id;
   private SupervisoryNode supervisoryNode;
   private Role fulfillmentRole;
   private UUID fulfillmentRoleId;
@@ -240,16 +243,16 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserHasRight() {
 
     given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findFirstByName(SUPERVISION_RIGHT_NAME)).willReturn(supervisionRight);
-    given(programRepository.findByCode(Code.code(PROGRAM1_CODE))).willReturn(program1);
-    given(facilityRepository.findFirstByCode(HOME_FACILITY_CODE)).willReturn(homeFacility);
+    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
+    given(programRepository.findOne(program1Id)).willReturn(program1);
+    given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
 
     BooleanResultDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("rightName", SUPERVISION_RIGHT_NAME)
-        .queryParam("programCode", PROGRAM1_CODE)
-        .queryParam("facilityCode", HOME_FACILITY_CODE)
+        .queryParam("rightId", supervisionRightId)
+        .queryParam("programId", program1Id)
+        .queryParam("facilityId", homeFacilityId)
         .pathParam("id", userId)
         .when()
         .get(HAS_RIGHT_URL)
@@ -265,14 +268,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldBadRequestGetUserHasRightWithMissingFacility() {
 
     given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findFirstByName(SUPERVISION_RIGHT_NAME)).willReturn(supervisionRight);
-    given(programRepository.findByCode(Code.code(PROGRAM2_CODE))).willReturn(program2);
+    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
+    given(programRepository.findOne(program2Id)).willReturn(program2);
 
     restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("rightName", SUPERVISION_RIGHT_NAME)
-        .queryParam("programCode", PROGRAM2_CODE)
+        .queryParam("rightId", supervisionRightId)
+        .queryParam("programId", program2Id)
         .pathParam("id", userId)
         .when()
         .get(HAS_RIGHT_URL)
@@ -696,11 +699,16 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     adminRole.setId(adminRoleId);
 
     supervisionRight = Right.newRight(SUPERVISION_RIGHT_NAME, RightType.SUPERVISION);
+    supervisionRightId = UUID.randomUUID();
     supervisionRole = Role.newRole("supervisionRole", supervisionRight);
     supervisionRoleId = UUID.randomUUID();
     supervisionRole.setId(supervisionRoleId);
     program1 = new Program(PROGRAM1_CODE);
+    program1Id = UUID.randomUUID();
     program2 = new Program(PROGRAM2_CODE);
+    program2Id = UUID.randomUUID();
+    supervisionRightId = UUID.randomUUID();
+    supervisionRight.setId(supervisionRightId);
     supervisoryNode = SupervisoryNode.newSupervisoryNode(SUPERVISORY_NODE_CODE,
         generateFacility("F1"));
     RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);

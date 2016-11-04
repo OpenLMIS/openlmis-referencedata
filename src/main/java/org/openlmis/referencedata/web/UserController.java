@@ -278,22 +278,22 @@ public class UserController extends BaseController {
   /**
    * Check if user has a right with certain criteria.
    *
-   * @param userId        id of user to check for right
-   * @param rightName     right to check
-   * @param programCode   program to check
-   * @param facilityCode  facility to check
-   * @param warehouseCode warehouse to check
+   * @param userId      id of user to check for right
+   * @param rightId     right to check
+   * @param programId   program to check (for supervision rights)
+   * @param facilityId  facility to check (for supervision rights)
+   * @param warehouseId warehouse to check (for order fulfillment rights)
    * @return if successful, true or false depending on if user has the right
    */
   @RequestMapping(value = "/users/{userId}/hasRight", method = RequestMethod.GET)
   public ResponseEntity<?> checkIfUserHasRight(@PathVariable(USER_ID) UUID userId,
-                                               @RequestParam(value = "rightName") String rightName,
-                                               @RequestParam(value = "programCode",
-                                                   required = false) String programCode,
-                                               @RequestParam(value = "facilityCode",
-                                                   required = false) String facilityCode,
-                                               @RequestParam(value = "warehouseCode",
-                                                   required = false) String warehouseCode) {
+                                               @RequestParam(value = "rightId") UUID rightId,
+                                               @RequestParam(value = "programId",
+                                                   required = false) UUID programId,
+                                               @RequestParam(value = "facilityId",
+                                                   required = false) UUID facilityId,
+                                               @RequestParam(value = "warehouseId",
+                                                   required = false) UUID warehouseId) {
 
     User user;
     try {
@@ -305,13 +305,13 @@ public class UserController extends BaseController {
     }
 
     RightQuery rightQuery;
-    Right right = rightRepository.findFirstByName(rightName);
-    if (programCode != null) {
+    Right right = rightRepository.findOne(rightId);
+    if (programId != null) {
 
-      Program program = programRepository.findByCode(Code.code(programCode));
-      if (facilityCode != null) {
+      Program program = programRepository.findOne(programId);
+      if (facilityId != null) {
 
-        Facility facility = facilityRepository.findFirstByCode(facilityCode);
+        Facility facility = facilityRepository.findOne(facilityId);
         rightQuery = new RightQuery(right, program, facility);
 
       } else {
@@ -319,9 +319,9 @@ public class UserController extends BaseController {
             .badRequest()
             .body("If program code is specified, facility code must also be specified");
       }
-    } else if (warehouseCode != null) {
+    } else if (warehouseId != null) {
 
-      Facility warehouse = facilityRepository.findFirstByCode(warehouseCode);
+      Facility warehouse = facilityRepository.findOne(warehouseId);
       rightQuery = new RightQuery(right, warehouse);
 
     } else {

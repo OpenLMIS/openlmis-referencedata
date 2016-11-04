@@ -1185,27 +1185,27 @@ resourceTypes:
                 is: [ secured ]
                 description: Check if the user has a right with certain criteria.
                 queryParameters:
-                    rightName:
-                        displayName: Right Name
-                        description: The name of the right to check.
+                    rightId:
+                        displayName: Right ID
+                        description: The right to check.
                         type: string
                         required: true
                         repeat: false
-                    programCode:
-                        displayName: Program Code
-                        description: The program (code) to check (for supervision rights).
+                    programId:
+                        displayName: Program ID
+                        description: The program to check (for supervision rights).
                         type: string
                         required: false
                         repeat: false
-                    facilityCode:
-                        displayName: Facility Code
-                        description: The facility (code) to check (for supervision rights). If program is specified, this is required.
+                    facilityId:
+                        displayName: Facility ID
+                        description: The facility to check (for supervision rights). If program is specified, this is required.
                         type: string
                         required: false
                         repeat: false
-                    warehouseCode:
-                        displayName: Warehouse Code
-                        description: The warehouse (code) to check (for fulfillment rights).
+                    warehouseId:
+                        displayName: Warehouse ID
+                        description: The warehouse to check (for fulfillment rights).
                         type: string
                         required: false
                         repeat: false
