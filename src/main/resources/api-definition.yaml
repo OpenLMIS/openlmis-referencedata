@@ -569,7 +569,7 @@ resourceTypes:
                       X-Content-Type-Options:
                       X-XSS-Protection:
                     body:
-                      text/plain:
+                      application/json:
                 "400":
                     headers:
                       X-Content-Type-Options:

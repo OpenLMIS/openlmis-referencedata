@@ -11,7 +11,6 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.exception.InvalidIdException;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
@@ -22,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,9 +49,6 @@ public class ProcessingPeriodController extends BaseController {
 
   @Autowired
   private ProcessingPeriodRepository periodRepository;
-
-  @Autowired
-  private ExposedMessageSource messageSource;
 
   @Autowired
   private ProcessingPeriodService periodService;
@@ -197,14 +192,13 @@ public class ProcessingPeriodController extends BaseController {
    */
   @RequestMapping(value = "/processingPeriods/{id}/length", method = RequestMethod.GET)
   @ResponseBody
-  public String getLength(@PathVariable("id") UUID periodId) {
+  public int getLength(@PathVariable("id") UUID periodId) {
     ProcessingPeriod period = periodRepository.findOne(periodId);
 
-    String[] msgArgs = {period.getLengthOf()};
+
     LOGGER.debug("Returning total number of months of processingPeriod");
 
-    return messageSource.getMessage("referencedata.message.totalPeriod", msgArgs,
-        LocaleContextHolder.getLocale());
+    return period.getLengthOfInMonths();
   }
 
   /**

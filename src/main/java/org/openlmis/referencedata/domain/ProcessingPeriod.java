@@ -16,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -89,16 +90,16 @@ public class ProcessingPeriod extends BaseEntity {
   /**
    * Returns length of period in months.
    *
-   * @return number od months as String.
+   * @return number od months.
    */
-  public String getLengthOf() {
-    java.time.Period length = java.time.Period.between(startDate, endDate);
+  public int getLengthOfInMonths() {
+    Period length = Period.between(startDate, endDate);
     int months = length.getMonths();
     if (length.getDays() >= 15) {
       months++;
     }
 
-    return Integer.toString(months);
+    return months;
   }
 
   /**

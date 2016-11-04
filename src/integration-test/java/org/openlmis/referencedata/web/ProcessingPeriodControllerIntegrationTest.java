@@ -166,16 +166,15 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
-    String response = restAssured.given()
+    int response = restAssured.given()
         .pathParam("id", firstPeriodId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(DIFFERENCE_URL)
         .then()
-        .statusCode(200)
-        .extract().asString();
+        .statusCode(200).extract().as(int.class);
 
-    assertTrue(response.contains("Period lasts 1 months"));
+    assertTrue(response == 1);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
