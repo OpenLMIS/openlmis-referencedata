@@ -15,15 +15,6 @@ public class ProcessingPeriodTest {
   private static LocalDate endDate;
   private static final String NAME = "name";
 
-  private boolean isLengthAsExpected(LocalDate start, LocalDate end, int expected) {
-    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, start, end);
-    if (period.getLengthInMonths() == expected) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   @Before
   public void initialize() {
     schedule = new ProcessingSchedule("123", NAME);
@@ -76,5 +67,10 @@ public class ProcessingPeriodTest {
     endDate = LocalDate.of(2016, 1, 31);
 
     assertTrue(isLengthAsExpected(startDate, endDate, 1));
+  }
+
+  private boolean isLengthAsExpected(LocalDate start, LocalDate end, int expected) {
+    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, start, end);
+    return period.getLengthInMonths() == expected;
   }
 }

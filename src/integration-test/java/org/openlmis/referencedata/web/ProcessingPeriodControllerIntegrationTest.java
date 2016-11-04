@@ -173,7 +173,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .then()
         .statusCode(200).extract().as(int.class);
 
-    assertEquals(response, 1);
+    assertEquals(1, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
