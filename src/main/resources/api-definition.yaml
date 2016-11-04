@@ -2518,6 +2518,28 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
+    /search:
+        get:
+            is: [ secured ]
+            description: Search for a right.
+            queryParameters:
+                name:
+                    displayName: Name of the right to find
+                    type: string
+                    required: true
+                    repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                        schema: right
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
 
 /requisitionGroups:
     displayName: Requisition Group

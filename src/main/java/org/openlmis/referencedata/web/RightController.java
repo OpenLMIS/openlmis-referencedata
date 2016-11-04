@@ -1,7 +1,11 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toSet;
+
 import com.google.common.collect.Sets;
+
 import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -14,12 +18,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toSet;
 
 @NoArgsConstructor
 @Controller
@@ -125,6 +128,28 @@ public class RightController extends BaseController {
     return ResponseEntity
         .noContent()
         .build();
+  }
+
+  /**
+   * Find a right by its name.
+   *
+   * @param name the name of the right to find
+   * @return right
+   */
+  @RequestMapping(value = "/rights/search", method = RequestMethod.GET)
+  public ResponseEntity<?> findRightByName(@RequestParam("name") String name) {
+
+    Right foundRight = rightRepository.findFirstByName(name);
+    if (foundRight == null) {
+      LOGGER.debug("Right not found");
+      return ResponseEntity
+          .notFound()
+          .build();
+    }
+
+    LOGGER.debug("Right found, returning");
+    return ResponseEntity
+        .ok(exportToDto(foundRight));
   }
 
   private RightDto exportToDto(Right right) {

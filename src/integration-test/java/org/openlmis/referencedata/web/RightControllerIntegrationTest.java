@@ -26,6 +26,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/rights";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ACCESS_TOKEN = "access_token";
   private static final String RIGHT_NAME = "right";
 
@@ -121,6 +122,43 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
         .delete(ID_URL)
         .then()
         .statusCode(204);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindRightByName() {
+
+    given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(right);
+
+    RightDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("name", RIGHT_NAME)
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RightDto.class);
+
+    assertEquals(RIGHT_NAME, response.getName());
+    assertEquals(RightType.GENERAL_ADMIN, response.getType());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotFindRightByNameForNonExistingRight() {
+
+    given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("name", RIGHT_NAME)
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
