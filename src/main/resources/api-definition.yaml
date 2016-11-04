@@ -240,18 +240,12 @@ schemas:
           }
       }
 
-  - right: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "Right",
-          "description": "A single right",
-          "properties": {
-              "id": { "type": "string", "required": false, "title": "id" },
-              "name": { "type": "string", "required": true, "title": "name" },
-              "type": { "enum":["ORDER_FULFILLMENT", "SUPERVISION", "GENERAL_ADMIN", "REPORTS"], "required": true, "title": "type" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "attachments": { "type": "array", "required": false, "title": "attachments", "items": { "type": "object", "$ref": "#/schemas/right" }, "uniqueItems": false }
-          }
+  - right: !include schemas/right.json
+
+  - rightArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/right.json" }
       }
 
   - role: |
@@ -2478,6 +2472,7 @@ resourceTypes:
                     X-XSS-Protection:
                   body:
                       application/json:
+                          schema: rightArray
     /{rightId}:
           uriParameters:
             rightId:
