@@ -92,7 +92,7 @@ public class ProcessingPeriod extends BaseEntity {
    *
    * @return number od months.
    */
-  public int getLengthOfInMonths() {
+  public int getLengthInMonths() {
     Period length = Period.between(startDate, endDate);
     int months = length.getMonths();
     if (length.getDays() >= 15) {

@@ -198,7 +198,7 @@ public class ProcessingPeriodController extends BaseController {
 
     LOGGER.debug("Returning total number of months of processingPeriod");
 
-    return period.getLengthOfInMonths();
+    return period.getLengthInMonths();
   }
 
   /**

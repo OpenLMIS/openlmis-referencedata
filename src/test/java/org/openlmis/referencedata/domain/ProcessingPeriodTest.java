@@ -1,7 +1,7 @@
 package org.openlmis.referencedata.domain;
 
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +15,15 @@ public class ProcessingPeriodTest {
   private static LocalDate endDate;
   private static final String NAME = "name";
 
+  private boolean isLengthAsExpected(LocalDate start, LocalDate end, int expected) {
+    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, start, end);
+    if (period.getLengthInMonths() == expected) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @Before
   public void initialize() {
     schedule = new ProcessingSchedule("123", NAME);
@@ -25,9 +34,8 @@ public class ProcessingPeriodTest {
   public void shouldCalculateCorrectlyWhenTwoMonths() {
     startDate = LocalDate.of(2016, 10, 11);
     endDate = LocalDate.of(2016, 11, 30);
-    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, startDate, endDate);
 
-    assertEquals(2, period.getLengthOfInMonths());
+    assertTrue(isLengthAsExpected(startDate, endDate, 2));
   }
 
   @Test
@@ -35,9 +43,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 1, 20);
 
-    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, startDate, endDate);
-
-    assertEquals(1, period.getLengthOfInMonths());
+    assertTrue(isLengthAsExpected(startDate, endDate, 1));
   }
 
   @Test
@@ -45,9 +51,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 2, 16);
 
-    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, startDate, endDate);
-
-    assertEquals(2, period.getLengthOfInMonths());
+    assertTrue(isLengthAsExpected(startDate, endDate, 2));
   }
 
   @Test
@@ -55,9 +59,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 3, 31);
 
-    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, startDate, endDate);
-
-    assertEquals(3, period.getLengthOfInMonths());
+    assertTrue(isLengthAsExpected(startDate, endDate, 3));
   }
 
   @Test
@@ -65,9 +67,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 2, 2);
 
-    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, startDate, endDate);
-
-    assertEquals(1, period.getLengthOfInMonths());
+    assertTrue(isLengthAsExpected(startDate, endDate, 1));
   }
 
   @Test
@@ -75,8 +75,6 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 1, 31);
 
-    ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, startDate, endDate);
-
-    assertEquals(1, period.getLengthOfInMonths());
+    assertTrue(isLengthAsExpected(startDate, endDate, 1));
   }
 }

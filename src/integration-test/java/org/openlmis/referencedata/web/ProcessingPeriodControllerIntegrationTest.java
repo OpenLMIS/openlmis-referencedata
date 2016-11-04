@@ -2,7 +2,6 @@ package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
@@ -174,7 +173,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .then()
         .statusCode(200).extract().as(int.class);
 
-    assertTrue(response == 1);
+    assertEquals(response, 1);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
