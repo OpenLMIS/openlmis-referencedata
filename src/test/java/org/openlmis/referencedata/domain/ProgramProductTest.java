@@ -15,7 +15,8 @@ public class ProgramProductTest {
   {
     em = new Program("EM");
     testCat = ProductCategory.createNew(Code.code("test"));
-    ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "each", "Ibuprofen", "NSAID", 20);
+    ibuprofen =
+        GlobalProduct.newGlobalProduct("ibuprofen", "each", "Ibuprofen", "NSAID", 20, 10, false);
   }
 
   @Test

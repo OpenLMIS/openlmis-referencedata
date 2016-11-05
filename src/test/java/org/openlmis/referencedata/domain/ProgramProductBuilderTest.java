@@ -46,7 +46,7 @@ public class ProgramProductBuilderTest {
     when(productCategoryRepository.findOne(productCategory.getId())).thenReturn(productCategory);
 
     orderableProduct = GlobalProduct.newGlobalProduct("SuperCode123", "each",
-        "SuperName123", "SuperDescription", 10);
+        "SuperName123", "SuperDescription", 10, 5, false);
 
     programProductBuilder = new ProgramProductBuilder(program.getId());
     programProductBuilder.setProgramRepository(programRepository);

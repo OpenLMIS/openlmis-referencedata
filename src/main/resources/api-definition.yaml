@@ -156,7 +156,9 @@ schemas:
                 "productCode": { "type": "string", "required": true, "title": "productCode" },
                 "name": { "type": "string", "required": true, "title": "name" },
                 "description": { "type": "string", "required": true, "title": "description" },
-                "packSize": { "type": "integer", "required": true, "title": "packSize" }
+                "packSize": { "type": "integer", "required": true, "title": "packSize" },
+                "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
+                "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" }
             }
         }
 
@@ -171,6 +173,8 @@ schemas:
               "productCode": { "type": "string", "required": true, "title": "productCode" },
               "name": { "type": "string", "required": false, "title": "name" },
               "packSize": { "type": "long", "required": false, "title": "packSize" },
+              "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
+              "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
               "programs": { "type": "array", "required": false, "title": "programs", "items": { "type": "object", "$ref": "#/schemas/programProduct" }, "uniqueItems": true }
           }
       }
@@ -285,6 +289,8 @@ schemas:
                 "productCode": { "type": "string", "required": true, "title": "productCode" },
                 "name": { "type": "string", "required": false, "title": "name" },
                 "packSize": { "type": "integer", "required": false, "title": "packSize" },
+                "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
+                "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
                 "manufacturer": { "type": "string", "required": false, "title": "manufacturer" }
             }
         }

@@ -5,6 +5,8 @@
     "dispensingUnit": "10 tab strip",
     "name": "Acetylsalicylic Acid",
     "packSize": 16,
+    "packRoundingThreshold": 8,
+    "roundToZero": false,
     "type": "TRADE_ITEM",
     "programProducts": [
       {
@@ -18,6 +20,8 @@
     "dispensingUnit": "each",
     "name": "Glibenclamide",
     "packSize": 40,
+    "packRoundingThreshold": 20,
+    "roundToZero": false,
     "type": "TRADE_ITEM",
     "programProducts": [
       {
@@ -31,6 +35,8 @@
     "dispensingUnit": "10 tab strip",
     "name": "Streptococcus Pneumoniae Vaccine",
     "packSize": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
     "type": "TRADE_ITEM",
     "programProducts": [
       {
@@ -44,6 +50,8 @@
     "dispensingUnit": "each",
     "name": "Streptococcus Pneumoniae Vaccine II",
     "packSize": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
     "type": "GLOBAL_PRODUCT",
     "programProducts": [
       {
@@ -57,6 +65,8 @@
     "dispensingUnit": "10 tab strip",
     "name": "Levora",
     "packSize": 84,
+    "packRoundingThreshold": 42,
+    "roundToZero": false,
     "type": "GLOBAL_PRODUCT",
     "programProducts": [
       {
@@ -70,6 +80,8 @@
     "dispensingUnit": "each",
     "name": "Ortho-Novum",
     "packSize": 63,
+    "packRoundingThreshold": 31,
+    "roundToZero": false,
     "type": "GLOBAL_PRODUCT",
     "programProducts": [
       {
@@ -83,6 +95,8 @@
     "dispensingUnit": "each",
     "name": "Depo-Estradiol",
     "packSize": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
     "type": "GLOBAL_PRODUCT",
     "programProducts": [
       {
@@ -96,6 +110,8 @@
     "dispensingUnit": "each",
     "name": "Male Condom",
     "packSize": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
     "type": "GLOBAL_PRODUCT",
     "programProducts": [
       {
@@ -109,6 +125,8 @@
     "dispensingUnit": "10 tab strip",
     "name": "Implanon",
     "packSize": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
     "type": "GLOBAL_PRODUCT",
     "programProducts": [
       {
@@ -122,6 +140,8 @@
     "dispensingUnit": "10 tab strip",
     "name": "Levonorgestrel ",
     "packSize": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
     "type": "GLOBAL_PRODUCT",
     "programProducts": [
       {

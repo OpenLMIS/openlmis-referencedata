@@ -16,8 +16,8 @@ public class TradeItemTest {
 
   {
     ibuprofen = GlobalProduct.newGlobalProduct(
-        "ibuprofen", "each", "Ibuprofen", "test", 30);
-    advil = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 10);
+        "ibuprofen", "each", "Ibuprofen", "test", 30, 15, false);
+    advil = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 10, 5, false);
     ibuprofen.addTradeItem(advil);
   }
 
@@ -40,7 +40,7 @@ public class TradeItemTest {
   public void testEqualsAndHashCode() {
     assertTrue(advil.equals(advil));
 
-    TradeItem advilDupe = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 20);
+    TradeItem advilDupe = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 20, 10, false);
     ibuprofen.addTradeItem(advilDupe);
     assertTrue(advil.equals(advilDupe));
     assertEquals(advil.hashCode(), advilDupe.hashCode());
@@ -48,7 +48,7 @@ public class TradeItemTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void shouldThrowExceptionWhenAssigningGlobalProductWithWrongDispensingUnit() {
-    TradeItem motrin = TradeItem.newTradeItem("motrin", "10 tab strip", "Motrin", 20);
+    TradeItem motrin = TradeItem.newTradeItem("motrin", "10 tab strip", "Motrin", 20, 10, false);
     ibuprofen.addTradeItem(motrin);
   }
 

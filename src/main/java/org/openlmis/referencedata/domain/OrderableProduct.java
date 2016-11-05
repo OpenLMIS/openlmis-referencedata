@@ -25,6 +25,7 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "orderable_products", schema = "referencedata")
 @NoArgsConstructor
+@SuppressWarnings({"PMD.UnusedPrivateField"})
 public abstract class OrderableProduct extends BaseEntity {
   @Embedded
   private Code productCode;
@@ -37,16 +38,24 @@ public abstract class OrderableProduct extends BaseEntity {
   @JsonProperty
   private long packSize;
 
+  @JsonProperty
+  private long packRoundingThreshold;
+
+  @JsonProperty
+  private boolean roundToZero;
+
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
       fetch = FetchType.EAGER)
   private Set<ProgramProduct> programProducts;
 
-  protected OrderableProduct(
-      Code productCode, Dispensable dispensable, String name, long packSize) {
+  protected OrderableProduct(Code productCode, Dispensable dispensable, String name, long packSize,
+                             long packRoundingThreshold, boolean roundToZero) {
     this.productCode = productCode;
     this.dispensable = dispensable;
     this.name = name;
     this.packSize = packSize;
+    this.packRoundingThreshold = packRoundingThreshold;
+    this.roundToZero = roundToZero;
     this.programProducts = new LinkedHashSet<>();
   }
 

@@ -19,7 +19,8 @@ public class OrderableProductTest {
 
   {
     em = new Program("EssMed");
-    ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", "each", "Ibuprofen", "test", 10);
+    ibuprofen =
+        GlobalProduct.newGlobalProduct("ibuprofen", "each", "Ibuprofen", "test", 10, 5, false);
 
     ProductCategory testCat = ProductCategory.createNew(Code.code("testcat"));
     ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, testCat, ibuprofen);

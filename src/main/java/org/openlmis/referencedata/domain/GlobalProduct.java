@@ -24,8 +24,9 @@ public final class GlobalProduct extends OrderableProduct {
   @OneToMany(mappedBy = "globalProduct")
   private Set<TradeItem> tradeItems;
 
-  private GlobalProduct(Code productCode, Dispensable dispensable, String name, long packSize) {
-    super(productCode, dispensable, name, packSize);
+  private GlobalProduct(Code productCode, Dispensable dispensable, String name, long packSize,
+                        long packRoundingThreshold, boolean roundToZero) {
+    super(productCode, dispensable, name, packSize, packRoundingThreshold, roundToZero);
     tradeItems = new HashSet<>();
   }
 
@@ -33,8 +34,11 @@ public final class GlobalProduct extends OrderableProduct {
    * Create a new global product.
    *
    * @param productCode a unique product code
+   * @param name name of product
    * @param description the description to display in ordering, fulfilling, etc
    * @param packSize    the number of dispensing units in the pack
+   * @param packRoundingThreshold determines how number of packs is rounded
+   * @param roundToZero determines if number of packs can be rounded to zero
    * @return a new GlobalProduct
    */
   @JsonCreator
@@ -43,10 +47,14 @@ public final class GlobalProduct extends OrderableProduct {
                                                    String dispensingUnit,
                                                @JsonProperty("name") String name,
                                                @JsonProperty("description") String description,
-                                               @JsonProperty("packSize") long packSize) {
+                                               @JsonProperty("packSize") long packSize,
+                                               @JsonProperty("packRoundingThreshold")
+                                                     long packRoundingThreshold,
+                                               @JsonProperty("roundToZero") boolean roundToZero) {
     Code code = Code.code(productCode);
     Dispensable dispensable = Dispensable.createNew(dispensingUnit);
-    GlobalProduct globalProduct = new GlobalProduct(code, dispensable, name, packSize);
+    GlobalProduct globalProduct = new GlobalProduct(code, dispensable, name, packSize,
+        packRoundingThreshold, roundToZero);
     globalProduct.description = description;
     return globalProduct;
   }

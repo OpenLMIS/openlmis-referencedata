@@ -32,7 +32,7 @@ public class TradeItemRepositoryIntegrationTest extends
   @Override
   TradeItem generateInstance() {
     return TradeItem.newTradeItem("advil" + getNextInstanceNumber(), "each",
-        "Advil" + getNextInstanceNumber(), 10);
+        "Advil" + getNextInstanceNumber(), 10, 5, false);
   }
 
   @Test
@@ -48,7 +48,7 @@ public class TradeItemRepositoryIntegrationTest extends
 
     // save the global product with the trade items
     GlobalProduct ibuprofen = GlobalProduct.newGlobalProduct(
-        "ibuprofen", "each", "Ibuprofen", "test", 1);
+        "ibuprofen", "each", "Ibuprofen", "test", 1, 0, false);
     ibuprofen.setTradeItems(Sets.newHashSet(forFulfillment));
     globalProductRepository.save(ibuprofen);
 

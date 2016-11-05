@@ -14,9 +14,10 @@ public class GlobalProductTest {
   private static TradeItem motrin;
 
   {
-    ibuprofen = GlobalProduct.newGlobalProduct("ibuprofen", EACH, "Ibuprofen", "test desc", 10);
-    advil = TradeItem.newTradeItem("advil", EACH, "Advil", 12);
-    motrin = TradeItem.newTradeItem("motrin", EACH, "Motrin", 12);
+    ibuprofen =
+        GlobalProduct.newGlobalProduct("ibuprofen", EACH, "Ibuprofen", "test desc", 10, 5, false);
+    advil = TradeItem.newTradeItem("advil", EACH, "Advil", 12, 6, false);
+    motrin = TradeItem.newTradeItem("motrin", EACH, "Motrin", 12, 6, false);
     ibuprofen.addTradeItem(advil);
     ibuprofen.addTradeItem(motrin);
   }
@@ -42,7 +43,7 @@ public class GlobalProductTest {
     assertTrue(ibuprofen.equals(ibuprofen));
 
     GlobalProduct ibuprofenDupe =
-        GlobalProduct.newGlobalProduct("ibuprofen", EACH, "Ibuprofen", "dupe", 20);
+        GlobalProduct.newGlobalProduct("ibuprofen", EACH, "Ibuprofen", "dupe", 20, 10, false);
     assertEquals(ibuprofen.hashCode(), ibuprofenDupe.hashCode());
   }
 }
