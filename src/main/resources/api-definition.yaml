@@ -1289,7 +1289,20 @@ resourceTypes:
             displayName: User supervised facilities
             get:
                 is: [ secured ]
-                description: Get all facilities the associated user supervises.
+                description: Get all facilities the associated user supervises, by right and program.
+                queryParameters:
+                    rightId:
+                        displayName: Right ID
+                        description: The right to check.
+                        type: string
+                        required: true
+                        repeat: false
+                    programId:
+                        displayName: Program ID
+                        description: The program to check.
+                        type: string
+                        required: true
+                        repeat: false
                 responses:
                     "200":
                         headers:
@@ -1297,10 +1310,11 @@ resourceTypes:
                           X-XSS-Protection:
                         body:
                           application/json:
-                    "404":
+                    "400":
                         headers:
                           X-Content-Type-Options:
                           X-XSS-Protection:
+                        body:
     /search:
             get:
                 is: [ secured ]

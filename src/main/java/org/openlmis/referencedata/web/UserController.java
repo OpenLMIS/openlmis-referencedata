@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 
 import lombok.NoArgsConstructor;
 
+import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -40,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -364,23 +366,35 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Get all the facilities that the user supervises.
+   * Get all the facilities that the user supervises, by right and program.
    *
-   * @param userId id of user to get supervised facilities
+   * @param userId    id of user to get supervised facilities
+   * @param rightId   right to check
+   * @param programId program to check
    * @return set of supervised facilities
    */
   @RequestMapping(value = "/users/{userId}/supervisedFacilities", method = RequestMethod.GET)
-  public ResponseEntity<?> getUserSupervisedFacilities(@PathVariable(USER_ID) UUID userId) {
+  public ResponseEntity<?> getUserSupervisedFacilities(@PathVariable(USER_ID) UUID userId,
+                                                       @RequestParam(value = "rightId")
+                                                           UUID rightId,
+                                                       @RequestParam(value = "programId")
+                                                           UUID programId) {
+
     try {
-      User user = validateUser(userId);
-      Set<Facility> supervisedFacilities = user.getSupervisedFacilities();
+      User user = (User) validateId(userId, userRepository, "user");
+
+      Right right = (Right) validateId(rightId, rightRepository, "right");
+      Program program = (Program) validateId(programId, programRepository, "program");
+
+      Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
 
       return ResponseEntity
           .ok()
           .body(supervisedFacilities);
+
     } catch (AuthException err) {
       return ResponseEntity
-          .notFound()
+          .badRequest()
           .build();
     }
   }
@@ -472,6 +486,23 @@ public class UserController extends BaseController {
     }
 
     return user;
+  }
+
+  private BaseEntity validateId(UUID id,
+                                PagingAndSortingRepository<? extends BaseEntity, UUID> repository,
+                                String entityType)
+      throws AuthException {
+    BaseEntity entity = repository.findOne(id);
+    if (entity == null) {
+      String messageCode = "referencedata.error." + entityType + ".not-found";
+      Object[] args = {id};
+
+      LOGGER.error(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
+      throw new AuthException(
+          messageSource.getMessage(messageCode, args, LocaleContextHolder.getLocale()));
+    }
+
+    return entity;
   }
 
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user)

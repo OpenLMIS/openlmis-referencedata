@@ -21,8 +21,10 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
@@ -55,6 +57,7 @@ import org.springframework.web.client.RestTemplate;
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -309,10 +312,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserSupervisedFacilities() throws RightTypeException {
 
     given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
+    given(programRepository.findOne(program2Id)).willReturn(program2);
 
     Facility[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("rightId", supervisionRightId)
+        .queryParam("programId", program2Id)
         .pathParam("id", userId)
         .when()
         .get(SUPERVISED_FACILITIES_URL)
@@ -321,6 +328,28 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(Facility[].class);
 
     assertThat(response.length, is(2));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldBadRequestGetUserSupervisedFacilitiesForNonExistingUuid()
+      throws RightTypeException {
+
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
+    given(programRepository.findOne(program1Id)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("rightId", supervisionRightId)
+        .queryParam("programId", program1Id)
+        .pathParam("id", userId)
+        .when()
+        .get(SUPERVISED_FACILITIES_URL)
+        .then()
+        .statusCode(400);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -714,6 +743,11 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);
     supervisionGroup.setMemberFacilities(Sets.newHashSet(generateFacility("F2"),
         generateFacility("F3")));
+    RequisitionGroupProgramSchedule supervisionGroupProgramSchedule =
+        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
+            supervisionGroup, program2, new ProcessingSchedule("PS1", "Schedule 1"), false);
+    supervisionGroup.setRequisitionGroupProgramSchedules(
+        Collections.singletonList(supervisionGroupProgramSchedule));
     supervisoryNode.setRequisitionGroup(supervisionGroup);
 
     Right fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
@@ -728,7 +762,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     warehouse.setEnabled(true);
 
     DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole, user);
-    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole, 
+    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
         user, program1);
     SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
         user, program2, supervisoryNode);

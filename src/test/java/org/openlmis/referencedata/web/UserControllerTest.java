@@ -22,7 +22,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
@@ -530,7 +529,7 @@ public class UserControllerTest {
   @Test
   public void shouldReturnFalseIfUserDoesNotHaveRight() throws RightTypeException {
     //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
         supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);
     when(rightRepository.findOne(any(UUID.class))).thenReturn(fulfillmentRight1);
@@ -579,7 +578,7 @@ public class UserControllerTest {
   @Test
   public void shouldGetUserSupervisoryPrograms() throws RightTypeException {
     //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
         supervisoryNode1));
     when(repository.findOne(userId)).thenReturn(user1);
 
@@ -592,40 +591,6 @@ public class UserControllerTest {
     assertThat(httpStatus, is(HttpStatus.OK));
     assertThat(supervisoryPrograms.size(), is(1));
     assertTrue(supervisoryPrograms.contains(program1));
-  }
-
-  @Test
-  public void shouldNotGetUserSupervisedFacilitiesForNonExistingUser() {
-    //given
-    when(repository.findOne(userId)).thenReturn(null);
-
-    //when
-    HttpStatus httpStatus = controller.getUserSupervisedFacilities(userId).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
-  }
-
-  @Test
-  public void shouldGetUserSupervisedFacilities() throws RightTypeException {
-    //given
-    RequisitionGroup supervisionGroup1 = new RequisitionGroup(
-        "supervisionGroup1", "supervisionGroupName1", supervisoryNode1
-    );
-    supervisionGroup1.setMemberFacilities(Sets.newHashSet(new Facility("C1"), new Facility("C2")));
-    supervisoryNode1.setRequisitionGroup(supervisionGroup1);
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1, 
-        supervisoryNode1));
-    when(repository.findOne(userId)).thenReturn(user1);
-
-    //when
-    ResponseEntity responseEntity = controller.getUserSupervisedFacilities(userId);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<Facility> supervisedFacilities = (Set<Facility>) responseEntity.getBody();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.OK));
-    assertThat(supervisedFacilities.size(), is(2));
   }
 
   @Test

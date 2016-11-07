@@ -90,10 +90,6 @@ public class User extends BaseEntity {
   @Getter
   private Set<Program> supervisedPrograms = new HashSet<>();
 
-  @Transient
-  @Getter
-  private Set<Facility> supervisedFacilities = new HashSet<>();
-
   private User(Importer importer) {
     id = importer.getId();
     username = importer.getUsername();
@@ -127,7 +123,7 @@ public class User extends BaseEntity {
 
   /**
    * Construct new user based on an importer (DTO).
-   * 
+   *
    * @param importer importer (DTO) to use
    * @return new user
    */
@@ -148,12 +144,41 @@ public class User extends BaseEntity {
 
   /**
    * Check if this user has a right based on specified criteria.
-   * 
+   *
    * @param rightQuery criteria to check
    * @return true or false, depending on if user has the right
    */
   public boolean hasRight(RightQuery rightQuery) {
     return roleAssignments.stream().anyMatch(roleAssignment -> roleAssignment.hasRight(rightQuery));
+  }
+
+  /**
+   * Get all facilities being supervised by this user, by right and program.
+   *
+   * @param right   right to check
+   * @param program program to check
+   * @return set of supervised facilities
+   */
+  public Set<Facility> getSupervisedFacilities(Right right, Program program) {
+    Set<Facility> supervisedFacilities = new HashSet<>();
+
+    for (RoleAssignment roleAssignment : roleAssignments) {
+
+      if (roleAssignment instanceof SupervisionRoleAssignment
+          && ((SupervisionRoleAssignment) roleAssignment).getSupervisoryNode() != null) {
+
+        SupervisoryNode supervisoryNode = ((SupervisionRoleAssignment) roleAssignment)
+            .getSupervisoryNode();
+        Set<Facility> possibleFacilities = supervisoryNode.getAllSupervisedFacilities(program);
+
+        supervisedFacilities = possibleFacilities.stream()
+            .filter(possibleFacility -> roleAssignment.hasRight(new RightQuery(right, program,
+                possibleFacility)))
+            .collect(Collectors.toSet());
+      }
+    }
+
+    return supervisedFacilities;
   }
 
   public void addHomeFacilityProgram(Program program) {
@@ -164,12 +189,9 @@ public class User extends BaseEntity {
     supervisedPrograms.add(program);
   }
 
-  public void addSupervisedFacilities(Set<Facility> facilities) {
-    supervisedFacilities.addAll(facilities);
-  }
-
   /**
    * Get facilities that user has fulfillment rights for.
+   *
    * @return set of facilities
    */
   public Set<Facility> getFulfillmentFacilities() {
@@ -180,7 +202,7 @@ public class User extends BaseEntity {
   }
 
   /**
-   * Refresh transient supervision properties (home facility and supervised programs, supervised 
+   * Refresh transient supervision properties (home facility and supervised programs, supervised
    * facilities), after the user object is loaded from the database.
    */
   @PostLoad
@@ -250,7 +272,7 @@ public class User extends BaseEntity {
     void setVerified(boolean verified);
 
     void setActive(boolean active);
-    
+
     void setLoginRestricted(boolean loginRestricted);
 
     void addRoleAssignments(Set<RoleAssignment> roleAssignments);
@@ -274,7 +296,7 @@ public class User extends BaseEntity {
     boolean isVerified();
 
     boolean isActive();
-    
+
     boolean isLoginRestricted();
   }
 }
