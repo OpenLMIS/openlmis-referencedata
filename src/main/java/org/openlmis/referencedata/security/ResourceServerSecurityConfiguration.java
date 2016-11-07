@@ -64,7 +64,6 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
         .authorizeRequests()
         .antMatchers(
             "/",
-            "/generated/api-definition.json",
             "/webjars/**",
             "/docs/**"
         ).permitAll()

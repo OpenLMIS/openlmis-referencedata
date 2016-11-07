@@ -223,3 +223,8 @@ check {
     dependsOn copyRamlHtmlToBuild
     dependsOn integrationTest
 }
+
+jar {
+    // we want the generated swagger spec file included in the output jar
+    dependsOn ramlToSwagger
+}
