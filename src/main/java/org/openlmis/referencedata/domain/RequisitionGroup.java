@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -51,7 +52,7 @@ public class RequisitionGroup extends BaseEntity {
   @Setter
   private SupervisoryNode supervisoryNode;
 
-  @OneToMany(mappedBy = "requisitionGroup")
+  @OneToMany(mappedBy = "requisitionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
   @Getter
   @Setter
   private List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules;
@@ -131,7 +132,14 @@ public class RequisitionGroup extends BaseEntity {
     name = requisitionGroup.getName();
     description = requisitionGroup.getDescription();
     supervisoryNode = requisitionGroup.getSupervisoryNode();
-    requisitionGroupProgramSchedules = requisitionGroup.getRequisitionGroupProgramSchedules();
+
+    if (requisitionGroupProgramSchedules != null) {
+      requisitionGroupProgramSchedules.clear();
+    } else {
+      requisitionGroupProgramSchedules = new ArrayList<>();
+    }
+
+    requisitionGroupProgramSchedules.addAll(requisitionGroup.getRequisitionGroupProgramSchedules());
     memberFacilities = requisitionGroup.getMemberFacilities();
   }
 

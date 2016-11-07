@@ -899,6 +899,37 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
+
+    /search:
+        get:
+            is: [ secured ]
+            description: Retrieve Processing Schedule based on the provided parameters.
+            queryParameters:
+                programId:
+                        displayName: program
+                        type: string
+                        required: true
+                        repeat: false
+                facilityId:
+                        displayName: facility
+                        type: string
+                        required: true
+                        repeat: false
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                        schema: processingSchedule
+                "404":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+
     /{id}:
         uriParameters:
             id:
@@ -2638,119 +2669,3 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-
-/requisitionGroupProgramSchedules:
-    displayName: Requisition Group Program Schedule
-    post:
-          is: [ secured ]
-          description: Create new requisitionGroupProgramSchedule.
-          body:
-              application/json:
-          responses:
-              "201":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "500":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-    get:
-          is: [ secured ]
-          description: Get all requisitionGroupProgramSchedules.
-          responses:
-              "200":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-                  body:
-                      application/json:
-              "404":
-                  headers:
-                    X-Content-Type-Options:
-                    X-XSS-Protection:
-    /{id}:
-          uriParameters:
-            id:
-                displayName: id
-                type: string
-                required: true
-                repeat: false
-          put:
-              is: [ secured ]
-              description: Update existing requisitionGroupProgramSchedule.
-              body:
-                  application/json:
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-          get:
-              is: [ secured ]
-              description: Get chosen requisitionGroupProgramSchedule.
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                          application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-          delete:
-              is: [ secured ]
-              description: Delete chosen requisitionGroupProgramSchedule.
-              responses:
-                  "204":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                  "409":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-    /search:
-        get:
-            is: [ secured ]
-            description: Find requisitionGroupProgramSchedule with matched parameters.
-            queryParameters:
-                programId:
-                        displayName: program
-                        type: string
-                        required: true
-                        repeat: false
-                facilityId:
-                        displayName: facility
-                        type: string
-                        required: true
-                        repeat: false
-            responses:
-                "200":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                      application/json:
-                "404":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                      application/json:

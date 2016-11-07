@@ -3,7 +3,6 @@ package org.openlmis.referencedata.service;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
-import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ public class RequisitionGroupProgramScheduleService {
   private RequisitionGroupProgramScheduleRepository repository;
 
   public RequisitionGroupProgramSchedule searchRequisitionGroupProgramSchedule(
-        Program program, Facility facility) throws RequisitionGroupProgramScheduleException {
+        Program program, Facility facility) {
     return repository.searchRequisitionGroupProgramSchedule(program, facility);
   }
 }

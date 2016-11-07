@@ -116,7 +116,7 @@ public class RequisitionGroupController extends BaseController {
 
       requisitionGroupToUpdate.updateFrom(
           RequisitionGroup.newRequisitionGroup(requisitionGroupDto));
-      requisitionGroupRepository.save(requisitionGroupToUpdate);
+      requisitionGroupToUpdate = requisitionGroupRepository.save(requisitionGroupToUpdate);
 
       LOGGER.debug("Saved requisitionGroup with id: " + requisitionGroupToUpdate.getId());
       return new ResponseEntity<>(exportToDto(requisitionGroupToUpdate), HttpStatus.OK);

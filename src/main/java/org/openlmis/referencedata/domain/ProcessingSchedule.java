@@ -5,14 +5,15 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
+import org.openlmis.referencedata.util.LocalDateTimePersistenceConverter;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.openlmis.referencedata.util.LocalDateTimePersistenceConverter;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -60,6 +61,18 @@ public class ProcessingSchedule extends BaseEntity {
     this.modifiedDate = LocalDateTime.now();
   }
 
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setName(name);
+    exporter.setCode(code);
+    exporter.setDescription(description);
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -75,5 +88,25 @@ public class ProcessingSchedule extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(code);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setName(String name);
+
+    void setCode(String code);
+
+    void setDescription(String description);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    String getName();
+
+    String getCode();
+
+    String getDescription();
   }
 }

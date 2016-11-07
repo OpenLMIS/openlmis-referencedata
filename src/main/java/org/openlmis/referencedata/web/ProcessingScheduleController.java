@@ -1,7 +1,15 @@
 package org.openlmis.referencedata.web;
 
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.dto.ProcessingScheduleDto;
+import org.openlmis.referencedata.exception.InvalidIdException;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
@@ -23,6 +31,16 @@ public class ProcessingScheduleController extends BaseController {
 
   @Autowired
   private ProcessingScheduleRepository scheduleRepository;
+
+
+  @Autowired
+  private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
+
+  @Autowired
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
 
   /**
    * Allows creating new processingSchedules.
@@ -70,6 +88,38 @@ public class ProcessingScheduleController extends BaseController {
   }
 
   /**
+   * Fetches the correct schedule, based on the provided parameters.
+   *
+   * @param programId the UUID of the program
+   * @param facilityId the UUID of the facility
+   * @return Processing Schedule for the specified parameters
+   * @throws InvalidIdException when the program UUID or facility UUID were not passed to this
+   *                            method
+   */
+  @RequestMapping(value = "/processingSchedules/search", method = RequestMethod.GET)
+  public ResponseEntity<?> search(@RequestParam(name = "programId") UUID programId,
+                                  @RequestParam("facilityId") UUID facilityId)
+      throws InvalidIdException {
+
+    if (programId == null) {
+      throw new InvalidIdException("Program id must be provided.");
+    }
+
+    if (facilityId == null) {
+      throw new InvalidIdException("Facility id must be provided.");
+    }
+
+    Program program = programRepository.findOne(programId);
+    Facility facility = facilityRepository.findOne(facilityId);
+
+    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
+        requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+            program, facility);
+
+    return ResponseEntity.ok(exportToDto(requisitionGroupProgramSchedule.getProcessingSchedule()));
+  }
+
+  /**
    * Get chosen processingSchedule.
    *
    * @param scheduleId UUID of processingSchedule which we want to get
@@ -100,5 +150,11 @@ public class ProcessingScheduleController extends BaseController {
       scheduleRepository.delete(schedule);
       return new ResponseEntity<ProcessingSchedule>(HttpStatus.NO_CONTENT);
     }
+  }
+
+  private ProcessingScheduleDto exportToDto(ProcessingSchedule processingSchedule) {
+    ProcessingScheduleDto processingScheduleDto = new ProcessingScheduleDto();
+    processingSchedule.export(processingScheduleDto);
+    return processingScheduleDto;
   }
 }
