@@ -69,6 +69,14 @@ public class ProcessingPeriodTest {
     assertTrue(isDurationAsExpected(startDate, endDate, 1));
   }
 
+  @Test
+  public void shouldCalculateCorrectlyWhenLessThanTwoWeeks() {
+    startDate = LocalDate.of(2016, 1, 1);
+    endDate = LocalDate.of(2016, 1, 10);
+
+    assertTrue(isDurationAsExpected(startDate,  endDate, 1));
+  }
+
   private boolean isDurationAsExpected(LocalDate start, LocalDate end, int expected) {
     ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, start, end);
     return period.getDurationInMonths() == expected;
