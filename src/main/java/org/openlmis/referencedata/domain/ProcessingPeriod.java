@@ -95,6 +95,7 @@ public class ProcessingPeriod extends BaseEntity {
   public int getDurationInMonths() {
     Period length = Period.between(startDate, endDate);
     int months = length.getMonths();
+    months += length.getYears() * 12;
     if (length.getDays() >= 15 || months == 0) {
       months++;
     }
