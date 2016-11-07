@@ -88,6 +88,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String WAREHOUSE_CODE = "W1";
   private static final String HOME_FACILITY_CODE = "HF1";
   private static final String USER_API_STRING = "/auth/api/users";
+  private static final String RIGHT_ID_STRING = "rightId";
+  private static final String PROGRAM_ID_STRING = "programId";
 
   @MockBean
   private UserRepository userRepository;
@@ -253,8 +255,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     BooleanResultDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("rightId", supervisionRightId)
-        .queryParam("programId", program1Id)
+        .queryParam(RIGHT_ID_STRING, supervisionRightId)
+        .queryParam(PROGRAM_ID_STRING, program1Id)
         .queryParam("facilityId", homeFacilityId)
         .pathParam("id", userId)
         .when()
@@ -277,8 +279,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("rightId", supervisionRightId)
-        .queryParam("programId", program2Id)
+        .queryParam(RIGHT_ID_STRING, supervisionRightId)
+        .queryParam(PROGRAM_ID_STRING, program2Id)
         .pathParam("id", userId)
         .when()
         .get(HAS_RIGHT_URL)
@@ -318,8 +320,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     Facility[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("rightId", supervisionRightId)
-        .queryParam("programId", program2Id)
+        .queryParam(RIGHT_ID_STRING, supervisionRightId)
+        .queryParam(PROGRAM_ID_STRING, program2Id)
         .pathParam("id", userId)
         .when()
         .get(SUPERVISED_FACILITIES_URL)
@@ -342,8 +344,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("rightId", supervisionRightId)
-        .queryParam("programId", program1Id)
+        .queryParam(RIGHT_ID_STRING, supervisionRightId)
+        .queryParam(PROGRAM_ID_STRING, program1Id)
         .pathParam("id", userId)
         .when()
         .get(SUPERVISED_FACILITIES_URL)

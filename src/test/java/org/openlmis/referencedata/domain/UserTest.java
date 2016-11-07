@@ -18,6 +18,9 @@ import java.util.Collections;
 import java.util.Set;
 
 public class UserTest {
+  
+  private static final String RIGHT_NAME = "right1";
+  
   private RightQuery rightQuery = new RightQuery(Right.newRight("supervisionRight1",
       RightType.SUPERVISION));
 
@@ -81,7 +84,7 @@ public class UserTest {
   @Test
   public void shouldGetHomeFacilityPrograms() throws RightTypeException, RoleException {
     //given
-    Role role = Role.newRole(roleName, Right.newRight("right1", RightType.SUPERVISION));
+    Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
 
@@ -102,7 +105,7 @@ public class UserTest {
   @Test
   public void shouldGetSupervisedPrograms() throws RightTypeException, RoleException {
     //given
-    Role role = Role.newRole(roleName, Right.newRight("right1", RightType.SUPERVISION));
+    Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
     SupervisoryNode supervisoryNode =
@@ -129,7 +132,7 @@ public class UserTest {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
-    Right right = Right.newRight("right1", RightType.SUPERVISION);
+    Right right = Right.newRight(RIGHT_NAME, RightType.SUPERVISION);
     Role role = Role.newRole(roleName, right);
 
     RoleAssignment assignment = new SupervisionRoleAssignment(role, user, program, provinceNode);
@@ -149,7 +152,7 @@ public class UserTest {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
-    Right right = Right.newRight("right1", RightType.SUPERVISION);
+    Right right = Right.newRight(RIGHT_NAME, RightType.SUPERVISION);
     Role role = Role.newRole(roleName, right);
 
     Program anotherProgram = new Program("another");
@@ -172,7 +175,7 @@ public class UserTest {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
-    Right right = Right.newRight("right1", RightType.SUPERVISION);
+    Right right = Right.newRight(RIGHT_NAME, RightType.SUPERVISION);
     Role role = Role.newRole(roleName, right);
 
     RoleAssignment assignment = new SupervisionRoleAssignment(role, user, program, provinceNode);
