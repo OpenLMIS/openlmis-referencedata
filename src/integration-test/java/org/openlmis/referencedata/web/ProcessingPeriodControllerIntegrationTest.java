@@ -50,7 +50,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   private static final String SEARCH_BY_UUID_AND_DATE_URL =
       RESOURCE_URL + "/searchByScheduleAndDate";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String DIFFERENCE_URL = RESOURCE_URL + "/{id}/length";
+  private static final String DIFFERENCE_URL = RESOURCE_URL + "/{id}/duration";
   private static final String PROGRAM = "programId";
   private static final String FACILITY = "facilityId";
   private static final String PROCESSING_SCHEDULE = "processingScheduleId";
@@ -165,15 +165,15 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
-    int response = restAssured.given()
+    IntegerResultDto response = restAssured.given()
         .pathParam("id", firstPeriodId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(DIFFERENCE_URL)
         .then()
-        .statusCode(200).extract().as(int.class);
+        .statusCode(200).extract().as(IntegerResultDto.class);
 
-    assertEquals(1, response);
+    assertEquals(1, response.getResult());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

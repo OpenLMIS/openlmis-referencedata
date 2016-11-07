@@ -20,6 +20,17 @@ schemas:
           }
       }
 
+  - integerResult: |
+      {
+          "type": "object",
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "title": "IntegerResult",
+          "description": "Integer result",
+          "properties": {
+              "result": { "type": "number", "required": true, "title": "result" }
+          }
+      }
+
   - errorResponse: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -542,7 +553,7 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
-    /{id}/length:
+    /{id}/duration:
         uriParameters:
             id:
                 displayName: id
@@ -559,6 +570,7 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
+                        schema: integerResult
                 "400":
                     headers:
                       X-Content-Type-Options:

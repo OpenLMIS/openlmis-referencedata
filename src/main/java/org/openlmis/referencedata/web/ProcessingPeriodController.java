@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -190,15 +189,13 @@ public class ProcessingPeriodController extends BaseController {
    * @param periodId UUID of given processingPeriod.
    * @return String which contains number of months.
    */
-  @RequestMapping(value = "/processingPeriods/{id}/length", method = RequestMethod.GET)
-  @ResponseBody
-  public int getLength(@PathVariable("id") UUID periodId) {
+  @RequestMapping(value = "/processingPeriods/{id}/duration", method = RequestMethod.GET)
+  public ResponseEntity<?> getDuration(@PathVariable("id") UUID periodId) {
     ProcessingPeriod period = periodRepository.findOne(periodId);
-
 
     LOGGER.debug("Returning total number of months of processingPeriod");
 
-    return period.getLengthInMonths();
+    return ResponseEntity.ok(new IntegerResultDto(period.getDurationInMonths()));
   }
 
   /**

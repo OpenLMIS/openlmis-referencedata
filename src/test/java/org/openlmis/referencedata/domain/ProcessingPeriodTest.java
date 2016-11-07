@@ -26,7 +26,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 10, 11);
     endDate = LocalDate.of(2016, 11, 30);
 
-    assertTrue(isLengthAsExpected(startDate, endDate, 2));
+    assertTrue(isDurationAsExpected(startDate, endDate, 2));
   }
 
   @Test
@@ -34,7 +34,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 1, 20);
 
-    assertTrue(isLengthAsExpected(startDate, endDate, 1));
+    assertTrue(isDurationAsExpected(startDate, endDate, 1));
   }
 
   @Test
@@ -42,7 +42,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 2, 16);
 
-    assertTrue(isLengthAsExpected(startDate, endDate, 2));
+    assertTrue(isDurationAsExpected(startDate, endDate, 2));
   }
 
   @Test
@@ -50,7 +50,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 3, 31);
 
-    assertTrue(isLengthAsExpected(startDate, endDate, 3));
+    assertTrue(isDurationAsExpected(startDate, endDate, 3));
   }
 
   @Test
@@ -58,7 +58,7 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 2, 2);
 
-    assertTrue(isLengthAsExpected(startDate, endDate, 1));
+    assertTrue(isDurationAsExpected(startDate, endDate, 1));
   }
 
   @Test
@@ -66,11 +66,11 @@ public class ProcessingPeriodTest {
     startDate = LocalDate.of(2016, 1, 1);
     endDate = LocalDate.of(2016, 1, 31);
 
-    assertTrue(isLengthAsExpected(startDate, endDate, 1));
+    assertTrue(isDurationAsExpected(startDate, endDate, 1));
   }
 
-  private boolean isLengthAsExpected(LocalDate start, LocalDate end, int expected) {
+  private boolean isDurationAsExpected(LocalDate start, LocalDate end, int expected) {
     ProcessingPeriod period = ProcessingPeriod.newPeriod(NAME, schedule, start, end);
-    return period.getLengthInMonths() == expected;
+    return period.getDurationInMonths() == expected;
   }
 }
