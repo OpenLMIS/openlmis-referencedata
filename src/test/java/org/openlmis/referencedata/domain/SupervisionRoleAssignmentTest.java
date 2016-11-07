@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class SupervisionRoleAssignmentTest {
@@ -32,9 +33,9 @@ public class SupervisionRoleAssignmentTest {
   public SupervisionRoleAssignmentTest() throws RightTypeException, RoleException {
     right = Right.newRight("right", SUPERVISION);
     role = Role.newRole("role", right);
-    program = new Program("em");
+    program = new Program("P1");
     homeFacility = new Facility("F1");
-    
+
     user = new UserBuilder("testuser", "Test", "User", "test@test.com")
         .setHomeFacility(homeFacility).createUser();
 
@@ -44,6 +45,12 @@ public class SupervisionRoleAssignmentTest {
     RequisitionGroup requisitionGroup = new RequisitionGroup("RG1", "RGN1", supervisoryNode);
     supervisedFacility = new Facility("F2");
     requisitionGroup.setMemberFacilities(Sets.newHashSet(supervisedFacility));
+    ProcessingSchedule processingSchedule = new ProcessingSchedule("PS1", "Schedule1");
+    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
+        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
+            requisitionGroup, program, processingSchedule, false);
+    requisitionGroup.setRequisitionGroupProgramSchedules(
+        Collections.singletonList(requisitionGroupProgramSchedule));
     supervisoryNode.setRequisitionGroup(requisitionGroup);
     supervisedRoleAssignment = new SupervisionRoleAssignment(role, user, program, supervisoryNode);
   }

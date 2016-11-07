@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -124,22 +125,31 @@ public class SupervisoryNode extends BaseEntity {
   }
 
   /**
-   * Get all facilities being supervised by this supervisory node. Note, this does not get the
-   * facility attached to this supervisory node. "All supervised facilities" means all facilities
-   * supervised by this node and all recursive child nodes.
+   * Get all facilities being supervised by this supervisory node, by program.
+   * <p/>
+   * Note, this does not get the facility attached to this supervisory node. "All supervised
+   * facilities" means all facilities supervised by this node and all recursive child nodes.
    *
+   * @param program program to check
    * @return all supervised facilities
    */
-  public Set<Facility> getAllSupervisedFacilities() {
+  public Set<Facility> getAllSupervisedFacilities(Program program) {
     Set<Facility> supervisedFacilities = new HashSet<>();
 
-    if (requisitionGroup != null && requisitionGroup.getMemberFacilities() != null) {
-      supervisedFacilities.addAll(requisitionGroup.getMemberFacilities());
+    if (requisitionGroup != null
+        && requisitionGroup.getMemberFacilities() != null
+        && requisitionGroup.getRequisitionGroupProgramSchedules() != null) {
+      List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules = requisitionGroup
+          .getRequisitionGroupProgramSchedules();
+      if (requisitionGroupProgramSchedules.stream().anyMatch(
+          rgps -> rgps.getProgram().equals(program))) {
+        supervisedFacilities.addAll(requisitionGroup.getMemberFacilities());
+      }
     }
 
     if (childNodes != null) {
       for (SupervisoryNode childNode : childNodes) {
-        supervisedFacilities.addAll(childNode.getAllSupervisedFacilities());
+        supervisedFacilities.addAll(childNode.getAllSupervisedFacilities(program));
       }
     }
 
@@ -147,10 +157,10 @@ public class SupervisoryNode extends BaseEntity {
   }
 
   /**
-   * Check to see if this supervisory node supervises the specified facility.
+   * Check to see if this supervisory node supervises the specified facility, by program.
    */
-  public boolean supervises(Facility facility) {
-    return getAllSupervisedFacilities().contains(facility);
+  public boolean supervises(Facility facility, Program program) {
+    return getAllSupervisedFacilities(program).contains(facility);
   }
 
   /**

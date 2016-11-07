@@ -86,7 +86,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
 
     boolean facilityFound;
     if (supervisoryNode != null) {
-      facilityFound = supervisoryNode.supervises(rightQuery.getFacility());
+      facilityFound = supervisoryNode.supervises(rightQuery.getFacility(), rightQuery.getProgram());
     } else if (user.getHomeFacility() != null) {
       facilityFound = user.getHomeFacility().equals(rightQuery.getFacility());
     } else {
