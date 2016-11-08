@@ -21,5 +21,11 @@
     "warehouse": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
     "role": {"id": "185db8f7-ee35-44d0-8b40-6de12489ae77"}
+  },
+  {
+    "id": "710235dd-adbf-403a-989f-8e49090ac0cb",
+    "type": "direct",
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": {"id": "45cd86a4-43c1-4f23-bb64-950b10ced8cd"}
   }
 ]

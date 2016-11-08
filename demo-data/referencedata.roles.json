@@ -1,28 +1,18 @@
 [
   {
     "id": "185db8f7-ee35-44d0-8b40-6de12489ae77",
-    "name": "Storeroom Manager",
-    "role_rights": [
-      { "id": "4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22" }
-    ]
+    "name": "Storeroom Manager"
   },
   {
     "id": "d30a2fbb-51d9-49ad-90fe-fb405470a439",
-    "name": "Program Supervisor",
-    "role_rights": [
-      { "id": "5c4b3b9b-713e-4b9a-8c58-7efcd2954512" },
-      { "id": "9ade922b-3523-4582-bef4-a47701f7df14" },
-      { "id": "bffa2de2-dc2a-47dd-b126-6501748ac3fc" },
-      { "id": "feb4c0b8-f6d2-4289-b29d-811c1d0b2863" },
-      { "id": "c3eb5df0-c3ac-4e70-a978-02827462f60e" },
-      { "id": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50" }
-    ]
+    "name": "Program Supervisor"
   },
   {
     "id": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
-    "name": "Warehouse Clerk",
-    "role_rights": [
-      { "id": "fb6a0053-6254-4b41-8028-bf91421f90dd" }
-    ]
+    "name": "Warehouse Clerk"
+  },
+  {
+    "id": "45cd86a4-43c1-4f23-bb64-950b10ced8cd",
+    "name": "General Admin"
   }
 ]
