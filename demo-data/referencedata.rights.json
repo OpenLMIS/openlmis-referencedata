@@ -13,5 +13,30 @@
     "id": "fb6a0053-6254-4b41-8028-bf91421f90dd",
     "name": "MANAGE_PRODUCT",
     "type": "GENERAL_ADMIN"
+  },
+  {
+    "id": "9ade922b-3523-4582-bef4-a47701f7df14",
+    "name": "REQUISITION_CREATE",
+    "type": "SUPERVISION"
+  },
+  {
+    "id": "bffa2de2-dc2a-47dd-b126-6501748ac3fc",
+    "name": "REQUISITION_APPROVE",
+    "type": "SUPERVISION"
+  },
+  {
+    "id": "feb4c0b8-f6d2-4289-b29d-811c1d0b2863",
+    "name": "REQUISITION_AUTHORIZE",
+    "type": "SUPERVISION"
+  },
+  {
+    "id": "c3eb5df0-c3ac-4e70-a978-02827462f60e",
+    "name": "REQUISITION_DELETE",
+    "type": "SUPERVISION"
+  },
+  {
+    "id": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50",
+    "name": "REQUISITION_VIEW",
+    "type": "SUPERVISION"
   }
 ]
