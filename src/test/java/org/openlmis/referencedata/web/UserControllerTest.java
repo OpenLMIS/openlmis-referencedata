@@ -519,7 +519,7 @@ public class UserControllerTest {
     ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
         UUID.randomUUID(), UUID.randomUUID(), null);
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    BooleanResultDto booleanResultDto = (BooleanResultDto) responseEntity.getBody();
+    ResultDto<Boolean> booleanResultDto = (ResultDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));
@@ -539,7 +539,7 @@ public class UserControllerTest {
     ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
         null, null, UUID.randomUUID());
     HttpStatus httpStatus = responseEntity.getStatusCode();
-    BooleanResultDto booleanResultDto = (BooleanResultDto) responseEntity.getBody();
+    ResultDto<Boolean> booleanResultDto = (ResultDto) responseEntity.getBody();
 
     //then
     assertThat(httpStatus, is(HttpStatus.OK));

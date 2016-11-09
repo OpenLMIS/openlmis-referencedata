@@ -334,7 +334,7 @@ public class UserController extends BaseController {
 
     return ResponseEntity
         .ok()
-        .body(new BooleanResultDto(hasRight));
+        .body(new ResultDto<>(hasRight));
   }
 
   /**

@@ -1,13 +1,15 @@
 package org.openlmis.referencedata.web;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @AllArgsConstructor
-public class BooleanResultDto {
+public class ResultDto<T> {
 
-  boolean result;
+  T result;
   
-  public boolean getResult() {
+  public T getResult() {
     return result;
   }
 }
