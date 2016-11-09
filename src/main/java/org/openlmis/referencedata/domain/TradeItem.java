@@ -46,7 +46,8 @@ public final class TradeItem extends OrderableProduct {
    * @returns true if we can fulfill for the given product, false otherwise.
    */
   public boolean canFulfill(OrderableProduct product) {
-    return this.equals(product) || hasGlobalProduct(product);
+    return (this.equals(product) && hasSameDispensingUnit(product))
+        || hasGlobalProduct(product);
   }
 
   /**
@@ -71,8 +72,13 @@ public final class TradeItem extends OrderableProduct {
    * Assign a global product.
    * @param globalProduct the given global product, or null to un-assign.
    */
-  void assignGlobalProduct(GlobalProduct globalProduct) {
-    this.globalProduct = globalProduct;
+  void assignGlobalProduct(GlobalProduct globalProduct) throws IllegalArgumentException {
+    if (null == globalProduct || hasSameDispensingUnit(globalProduct)) {
+      this.globalProduct = globalProduct;
+    } else {
+      throw new IllegalArgumentException(
+          "Global product cannot be assigned because dispensing units are different");
+    }
   }
 
   /*
@@ -80,6 +86,10 @@ public final class TradeItem extends OrderableProduct {
    false otherwise.
    */
   private boolean hasGlobalProduct(OrderableProduct product) {
-    return null != globalProduct && globalProduct.getProductCode().equals(product.getProductCode());
+    return null != globalProduct && globalProduct.equals(product);
+  }
+
+  private boolean hasSameDispensingUnit(OrderableProduct product) {
+    return this.getDispensable().equals(product.getDispensable());
   }
 }

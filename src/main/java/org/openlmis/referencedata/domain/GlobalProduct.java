@@ -58,7 +58,7 @@ public final class GlobalProduct extends OrderableProduct {
 
   @Override
   public boolean canFulfill(OrderableProduct product) {
-    return (this.equals(product)) ? true : false;
+    return (this.equals(product) && this.getDispensable().equals(product.getDispensable()));
   }
 
   /**

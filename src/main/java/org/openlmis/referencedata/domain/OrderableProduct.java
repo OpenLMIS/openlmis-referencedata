@@ -160,15 +160,11 @@ public abstract class OrderableProduct extends BaseEntity {
       return false;
     }
 
-    OrderableProduct product = (OrderableProduct)object;
-    return (product.productCode.equals(this.productCode)
-        && product.dispensable.equals(this.dispensable));
+    return ((OrderableProduct) object).productCode.equals(this.productCode);
   }
 
   @Override
   public final int hashCode() {
-    int result = productCode.hashCode();
-    result = 31 * result + dispensable.hashCode();
-    return result;
+    return productCode.hashCode();
   }
 }

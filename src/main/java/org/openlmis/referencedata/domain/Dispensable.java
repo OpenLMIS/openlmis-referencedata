@@ -5,7 +5,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import javax.persistence.Embeddable;
 
-
+/**
+ * A Dispensable describes how product is dispensed/given to a patient.
+ * Description of the Dispensable contains information about product form,
+ * dosage, dispensing unit etc.
+ */
 @Embeddable
 public class Dispensable {
 
@@ -16,7 +20,7 @@ public class Dispensable {
   }
 
   protected Dispensable(String dispensingUnit) {
-    this.dispensingUnit = dispensingUnit;
+    this.dispensingUnit = dispensingUnit.trim();
   }
 
   @Override
@@ -34,7 +38,7 @@ public class Dispensable {
 
   @Override
   public final int hashCode() {
-    return dispensingUnit.hashCode();
+    return dispensingUnit.toLowerCase().hashCode();
   }
 
   @Override
@@ -45,7 +49,8 @@ public class Dispensable {
 
   @JsonCreator
   public static final Dispensable createNew(String dispensingUnit) {
-    return new Dispensable(dispensingUnit);
+    String correctDispensingUnit = (null == dispensingUnit) ? "" : dispensingUnit;
+    return new Dispensable(correctDispensingUnit);
   }
 
 }

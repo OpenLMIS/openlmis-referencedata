@@ -2,7 +2,6 @@ package org.openlmis.referencedata.domain;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -19,10 +18,10 @@ public class TradeItemTest {
 
   {
     ibuprofen = GlobalProduct.newGlobalProduct(
-        "ibuprofen", "10 tab stripe", "Ibuprofen", "test", 30);
+        "ibuprofen", "each", "Ibuprofen", "test", 30);
     advil = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 10);
     advilWithDifferentDispensingUnit = TradeItem.newTradeItem(
-        ADVIL_CODE, "10 tab stripe", ADVIL_NAME, 10);
+        ADVIL_CODE, "10 tab strip", ADVIL_NAME, 10);
     ibuprofen.addTradeItem(advil);
   }
 
@@ -56,14 +55,10 @@ public class TradeItemTest {
     assertEquals(advil.hashCode(), advilDupe.hashCode());
   }
 
-  @Test
-  public void testEqualsWithDifferentDispensingUnit() {
-
-    TradeItem advilDupe = TradeItem.newTradeItem(
-        ADVIL_CODE, "60 tab stripe", ADVIL_NAME, 20);
-    ibuprofen.addTradeItem(advilDupe);
-    assertFalse(advil.equals(advilDupe));
-    assertNotEquals(advil.hashCode(), advilDupe.hashCode());
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldThrowExceptionWhenAssigningGlobalProductWithWrongDispensingUnit() {
+    TradeItem motrin = TradeItem.newTradeItem("motrin", "10 tab strip", "Motrin", 20);
+    ibuprofen.addTradeItem(motrin);
   }
 
 }
