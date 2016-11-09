@@ -10,6 +10,7 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -97,26 +100,34 @@ public class ProcessingScheduleController extends BaseController {
    *                            method
    */
   @RequestMapping(value = "/processingSchedules/search", method = RequestMethod.GET)
-  public ResponseEntity<?> search(@RequestParam(name = "programId") UUID programId,
-                                  @RequestParam("facilityId") UUID facilityId)
-      throws InvalidIdException {
-
-    if (programId == null) {
-      throw new InvalidIdException("Program id must be provided.");
-    }
-
-    if (facilityId == null) {
-      throw new InvalidIdException("Facility id must be provided.");
-    }
+  public ResponseEntity<?> search(@RequestParam("programId") UUID programId,
+                                  @RequestParam("facilityId") UUID facilityId) {
 
     Program program = programRepository.findOne(programId);
     Facility facility = facilityRepository.findOne(facilityId);
+
+    if (program == null) {
+      return ResponseEntity.badRequest().body(new ErrorResponse("Program not found",
+          "Program with UUID " + programId.toString() + " was not found."));
+    }
+
+    if (facility == null) {
+      return ResponseEntity.badRequest().body(new ErrorResponse("Facility not found",
+          "Facility with UUID " + facilityId.toString() + " was not found."));
+    }
 
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
         requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
             program, facility);
 
-    return ResponseEntity.ok(exportToDto(requisitionGroupProgramSchedule.getProcessingSchedule()));
+    List<ProcessingScheduleDto> schedules = new ArrayList<>();
+    if (requisitionGroupProgramSchedule != null) {
+      ProcessingScheduleDto scheduleDto = exportToDto(requisitionGroupProgramSchedule
+          .getProcessingSchedule());
+      schedules.add(scheduleDto);
+    }
+
+    return ResponseEntity.ok(schedules);
   }
 
   /**

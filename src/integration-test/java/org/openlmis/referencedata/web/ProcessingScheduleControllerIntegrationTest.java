@@ -172,7 +172,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
         program, facility)).willReturn(requisitionGroupProgramSchedule);
 
-    ProcessingSchedule response = restAssured
+    ProcessingSchedule[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -182,9 +182,53 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
         .get(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(ProcessingSchedule.class);
+        .extract().as(ProcessingSchedule[].class);
 
-    assertEquals(schedule, response);
+    assertEquals(schedule, response[0]);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldBadRequestSearchWhenProgramDoesNotExist() {
+
+    given(facilityRepository.findOne(facilityId)).willReturn(facility);
+    given(programRepository.findOne(programId)).willReturn(null);
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+        program, facility)).willReturn(requisitionGroupProgramSchedule);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam("facilityId", facilityId)
+        .queryParam("programId", programId)
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldBadRequestSearchWhenFacilityDoesNotExist() {
+
+    given(facilityRepository.findOne(facilityId)).willReturn(null);
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+        program, facility)).willReturn(requisitionGroupProgramSchedule);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam("facilityId", facilityId)
+        .queryParam("programId", programId)
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(400);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

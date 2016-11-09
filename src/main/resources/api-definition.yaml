@@ -267,18 +267,12 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/role.json" }
       }
 
-  - processingSchedule: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "Processing Schedule",
-          "description": "A single processingSchedule",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "title": "code" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "modifiedDate": { "type": "string", "required": false, "title": "modifiedDate" },
-              "name": { "type": "string", "required": true, "title": "name" }
-          }
+  - processingSchedule: !include schemas/processingSchedule.json
+
+  - processingScheduleArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/processingSchedule.json" }
       }
 
   - tradeItem: |
@@ -922,8 +916,8 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
-                        schema: processingSchedule
-                "404":
+                          schema: processingScheduleArray
+                "400":
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
