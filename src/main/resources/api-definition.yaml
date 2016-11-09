@@ -923,6 +923,7 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
+                          schema: errorResponse
 
     /{id}:
         uriParameters:
