@@ -140,13 +140,6 @@ task checkApiIsRaml(type:Exec) {
     args "src/main/resources/api-definition.yaml"
 }
 
-processResources {
-    // update version information in build
-    filesMatching('**/version.properties') {
-        expand(project.properties)
-    }
-}
-
 configure(checkApiIsRaml) {
     group = JavaBasePlugin.VERIFICATION_GROUP
     description = 'Verify that the api-specification is valid RAML'
@@ -217,14 +210,19 @@ tasks.withType(Pmd){
 apply from: "documentation.gradle"
 integrationTest.dependsOn copyRamlToBuild
 
+processResources {
+    // we want the generated Swagger spec file included in the output jar
+    finalizedBy ramlToSwagger
+
+    // update version information in build
+    filesMatching('**/version.properties') {
+        expand(project.properties)
+    }
+}
+
 check {
     dependsOn ramlToHtml
     dependsOn ramlToSwagger
     dependsOn copyRamlHtmlToBuild
     dependsOn integrationTest
-}
-
-jar {
-    // we want the generated swagger spec file included in the output jar
-    dependsOn ramlToSwagger
 }
