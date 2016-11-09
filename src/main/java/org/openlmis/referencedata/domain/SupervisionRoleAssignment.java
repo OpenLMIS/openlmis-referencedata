@@ -45,7 +45,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    */
   public SupervisionRoleAssignment(Role role, User user, Program program)
       throws RightTypeException {
-    super(role, user);
+    this(role, user);
     this.program = program;
     addSupervisions();
   }
@@ -63,7 +63,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   public SupervisionRoleAssignment(Role role, User user, Program program,
                                    SupervisoryNode supervisoryNode)
       throws RightTypeException {
-    super(role, user);
+    this(role, user);
     this.program = program;
     this.supervisoryNode = supervisoryNode;
     addSupervisions();
