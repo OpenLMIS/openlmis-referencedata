@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -136,15 +135,8 @@ public class SupervisoryNode extends BaseEntity {
   public Set<Facility> getAllSupervisedFacilities(Program program) {
     Set<Facility> supervisedFacilities = new HashSet<>();
 
-    if (requisitionGroup != null
-        && requisitionGroup.getMemberFacilities() != null
-        && requisitionGroup.getRequisitionGroupProgramSchedules() != null) {
-      List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules = requisitionGroup
-          .getRequisitionGroupProgramSchedules();
-      if (requisitionGroupProgramSchedules.stream().anyMatch(
-          rgps -> rgps.getProgram().equals(program))) {
-        supervisedFacilities.addAll(requisitionGroup.getMemberFacilities());
-      }
+    if (requisitionGroup != null && requisitionGroup.supports(program)) {
+      supervisedFacilities.addAll(requisitionGroup.getMemberFacilities());
     }
 
     if (childNodes != null) {

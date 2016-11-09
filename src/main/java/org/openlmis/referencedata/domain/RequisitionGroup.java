@@ -77,6 +77,8 @@ public class RequisitionGroup extends BaseEntity {
     this.code = code;
     this.name = name;
     this.supervisoryNode = supervisoryNode;
+    this.requisitionGroupProgramSchedules = new ArrayList<>();
+    this.memberFacilities = new HashSet<>();
   }
 
   /**
@@ -119,6 +121,14 @@ public class RequisitionGroup extends BaseEntity {
     }
 
     return newRequisitionGroup;
+  }
+
+  /**
+   * Check to see if this requisition group supports the specified program.
+   */
+  public boolean supports(Program program) {
+    return requisitionGroupProgramSchedules.stream().anyMatch(
+        rgps -> rgps.getProgram().equals(program));
   }
 
   /**

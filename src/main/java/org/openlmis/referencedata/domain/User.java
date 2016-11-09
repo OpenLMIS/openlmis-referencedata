@@ -163,18 +163,9 @@ public class User extends BaseEntity {
     Set<Facility> supervisedFacilities = new HashSet<>();
 
     for (RoleAssignment roleAssignment : roleAssignments) {
-
-      if (roleAssignment instanceof SupervisionRoleAssignment
-          && ((SupervisionRoleAssignment) roleAssignment).getSupervisoryNode() != null) {
-
-        SupervisoryNode supervisoryNode = ((SupervisionRoleAssignment) roleAssignment)
-            .getSupervisoryNode();
-        Set<Facility> possibleFacilities = supervisoryNode.getAllSupervisedFacilities(program);
-
-        supervisedFacilities = possibleFacilities.stream()
-            .filter(possibleFacility -> roleAssignment.hasRight(new RightQuery(right, program,
-                possibleFacility)))
-            .collect(Collectors.toSet());
+      if (roleAssignment instanceof SupervisionRoleAssignment) {
+        supervisedFacilities.addAll((
+            (SupervisionRoleAssignment) roleAssignment).getSupervisedFacilities(right, program));
       }
     }
 

@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.domain;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -15,6 +16,7 @@ import org.openlmis.referencedata.exception.RoleException;
 import java.util.Collections;
 import java.util.Set;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisionRoleAssignmentTest {
 
   private Right right;
@@ -111,6 +113,51 @@ public class SupervisionRoleAssignmentTest {
 
     //then
     assertFalse(hasRight);
+  }
+
+  @Test
+  public void shouldGetSupervisedFacilitiesWhenRightAndProgramMatch() {
+
+    //when
+    Set<Facility> supervisedFacilities = supervisedRoleAssignment.getSupervisedFacilities(right,
+        program);
+
+    //then
+    assertThat(supervisedFacilities.size(), is(1));
+    assertEquals(supervisedFacility, supervisedFacilities.iterator().next());
+  }
+
+  @Test
+  public void shouldNotGetSupervisedFacilitiesWhenRightDoesNotMatch() {
+
+    //when
+    Set<Facility> supervisedFacilities = supervisedRoleAssignment.getSupervisedFacilities(
+        Right.newRight("another", SUPERVISION), program);
+
+    //then
+    assertThat(supervisedFacilities.size(), is(0));
+  }
+
+  @Test
+  public void shouldNotGetSupervisedFacilitiesWhenProgramDoesNotMatch() {
+
+    //when
+    Set<Facility> supervisedFacilities = supervisedRoleAssignment.getSupervisedFacilities(right,
+        new Program("another"));
+
+    //then
+    assertThat(supervisedFacilities.size(), is(0));
+  }
+
+  @Test
+  public void shouldNotGetSupervisedFacilitiesForHomeFacilitySupervision() {
+
+    //when
+    Set<Facility> supervisedFacilities = homeFacilityRoleAssignment.getSupervisedFacilities(right,
+        program);
+
+    //then
+    assertThat(supervisedFacilities.size(), is(0));
   }
 
   @Test

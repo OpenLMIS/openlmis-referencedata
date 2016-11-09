@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.exception.RightTypeException;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -94,6 +96,27 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     }
 
     return roleContainsRight && programMatches && facilityFound;
+  }
+
+  /**
+   * Get all facilities being supervised by this role assignment, by right and program.
+   *
+   * @param right   right to check
+   * @param program program to check
+   * @return set of supervised facilities
+   */
+  public Set<Facility> getSupervisedFacilities(Right right, Program program) {
+    Set<Facility> possibleFacilities = new HashSet<>();
+    
+    if (supervisoryNode == null) {
+      return possibleFacilities;
+    }
+
+    possibleFacilities = supervisoryNode.getAllSupervisedFacilities(program);
+
+    return possibleFacilities.stream()
+        .filter(possibleFacility -> hasRight(new RightQuery(right, program, possibleFacility)))
+        .collect(Collectors.toSet());
   }
 
   /**
