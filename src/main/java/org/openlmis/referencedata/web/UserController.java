@@ -380,23 +380,33 @@ public class UserController extends BaseController {
                                                        @RequestParam(value = "programId")
                                                            UUID programId) {
 
+    User user;
     try {
-      User user = (User) validateId(userId, userRepository, "user");
+      user = (User) validateId(userId, userRepository, "user");
 
-      Right right = (Right) validateId(rightId, rightRepository, "right");
-      Program program = (Program) validateId(programId, programRepository, "program");
-
-      Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
-
+    } catch (AuthException err) {
       return ResponseEntity
-          .ok()
-          .body(supervisedFacilities);
+          .notFound()
+          .build();
+    }
+
+    Right right;
+    Program program;
+    try {
+      right = (Right) validateId(rightId, rightRepository, "right");
+      program = (Program) validateId(programId, programRepository, "program");
 
     } catch (AuthException err) {
       return ResponseEntity
           .badRequest()
-          .build();
+          .body(new ErrorResponse("Not found", err.getMessage()));
     }
+
+    Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
+
+    return ResponseEntity
+        .ok()
+        .body(supervisedFacilities);
   }
 
   /**
@@ -480,7 +490,7 @@ public class UserController extends BaseController {
       String messageCode = "referencedata.error.id.not-found";
       Object[] args = {userId};
 
-      LOGGER.error(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
+      LOGGER.debug(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
       throw new AuthException(
           messageSource.getMessage(messageCode, args, LocaleContextHolder.getLocale()));
     }
@@ -497,7 +507,7 @@ public class UserController extends BaseController {
       String messageCode = "referencedata.error." + entityType + ".not-found";
       Object[] args = {id};
 
-      LOGGER.error(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
+      LOGGER.debug(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
       throw new AuthException(
           messageSource.getMessage(messageCode, args, LocaleContextHolder.getLocale()));
     }

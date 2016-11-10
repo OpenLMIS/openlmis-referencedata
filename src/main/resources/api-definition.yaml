@@ -1310,6 +1310,12 @@ resourceTypes:
                           X-Content-Type-Options:
                           X-XSS-Protection:
                         body:
+                          application/json:
+                            schema: errorResponse
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
     /search:
             get:
                 is: [ secured ]

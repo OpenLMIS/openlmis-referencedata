@@ -335,6 +335,26 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldNotFoundGetUserSupervisedFacilitiesForNonExistingUser()
+      throws RightTypeException {
+
+    given(userRepository.findOne(userId)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, supervisionRightId)
+        .queryParam(PROGRAM_ID_STRING, program2Id)
+        .pathParam("id", userId)
+        .when()
+        .get(SUPERVISED_FACILITIES_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldBadRequestGetUserSupervisedFacilitiesForNonExistingUuid()
       throws RightTypeException {
 
