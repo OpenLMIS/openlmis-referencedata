@@ -46,8 +46,7 @@ public final class TradeItem extends OrderableProduct {
    * @returns true if we can fulfill for the given product, false otherwise.
    */
   public boolean canFulfill(OrderableProduct product) {
-    return (this.equals(product) && hasSameDispensingUnit(product))
-        || hasGlobalProduct(product);
+    return this.equals(product) || hasGlobalProduct(product);
   }
 
   /**
@@ -72,7 +71,7 @@ public final class TradeItem extends OrderableProduct {
    * Assign a global product.
    * @param globalProduct the given global product, or null to un-assign.
    */
-  void assignGlobalProduct(GlobalProduct globalProduct) throws IllegalArgumentException {
+  void assignGlobalProduct(GlobalProduct globalProduct) {
     if (null == globalProduct || hasSameDispensingUnit(globalProduct)) {
       this.globalProduct = globalProduct;
     } else {

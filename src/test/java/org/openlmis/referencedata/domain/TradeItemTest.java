@@ -1,7 +1,6 @@
 package org.openlmis.referencedata.domain;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -10,7 +9,6 @@ import org.junit.Test;
 public class TradeItemTest {
   private static GlobalProduct ibuprofen;
   private static TradeItem advil;
-  private static TradeItem advilWithDifferentDispensingUnit;
 
   private static final String ADVIL_CODE = "advil";
   private static final String ADVIL_NAME = "Advil";
@@ -20,8 +18,6 @@ public class TradeItemTest {
     ibuprofen = GlobalProduct.newGlobalProduct(
         "ibuprofen", "each", "Ibuprofen", "test", 30);
     advil = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 10);
-    advilWithDifferentDispensingUnit = TradeItem.newTradeItem(
-        ADVIL_CODE, "10 tab strip", ADVIL_NAME, 10);
     ibuprofen.addTradeItem(advil);
   }
 
@@ -38,11 +34,6 @@ public class TradeItemTest {
   public void testCanFulfillWhenHasGlobalProduct() throws Exception {
     assertTrue(advil.canFulfill(ibuprofen));
     assertTrue(advil.canFulfill(advil));
-  }
-
-  @Test
-  public void shouldNotFulfillWhenDispensingUnitIsDifferent() throws Exception {
-    assertFalse(advil.canFulfill(advilWithDifferentDispensingUnit));
   }
 
   @Test
