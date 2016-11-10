@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TradeItemController {
+public class TradeItemController extends BaseController {
 
   @Autowired
   private OrderableProductRepository repository;

@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @RestController
-public class GlobalProductController {
+public class GlobalProductController extends BaseController {
   @Autowired
   private GlobalProductRepository globalProductRepository;
 
