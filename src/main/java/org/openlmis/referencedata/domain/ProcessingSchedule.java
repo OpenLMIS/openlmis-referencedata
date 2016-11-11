@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
-import org.openlmis.referencedata.util.LocalDateTimePersistenceConverter;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import org.openlmis.referencedata.util.LocalDateTimePersistenceConverter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -51,8 +51,21 @@ public class ProcessingSchedule extends BaseEntity {
   private String name;
 
   public ProcessingSchedule(String code, String name) {
-    this.code = code;
-    this.name = name;
+    this.code = Objects.requireNonNull(code);
+    this.name = Objects.requireNonNull(name);
+  }
+
+  /**
+   * Static factory method for constructing a new processing schedule using an importer (DTO).
+   *
+   * @param importer the importer (DTO)
+   */
+  public static ProcessingSchedule newProcessingSchedule(ProcessingSchedule.Importer importer) {
+    ProcessingSchedule newProcessingSchedule = new ProcessingSchedule(
+        importer.getCode(), importer.getName());
+    newProcessingSchedule.id = importer.getId();
+    newProcessingSchedule.description = importer.getDescription();
+    return newProcessingSchedule;
   }
 
   @PrePersist

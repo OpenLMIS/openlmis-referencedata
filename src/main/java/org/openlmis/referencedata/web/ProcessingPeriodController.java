@@ -68,7 +68,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param programId  program of searched ProcessingPeriods.
    * @param facilityId facility of searched ProcessingPeriods.
    * @return ResponseEntity with list of all ProcessingPeriods matching provided parameters and OK
-   * httpStatus.
+   *         httpStatus.
    */
   @RequestMapping(value = "/processingPeriods/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProcessingPeriods(

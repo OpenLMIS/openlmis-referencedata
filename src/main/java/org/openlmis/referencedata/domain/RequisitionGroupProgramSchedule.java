@@ -20,9 +20,10 @@ import javax.persistence.UniqueConstraint;
  * requisition group.
  */
 @Entity
-@Table(name = "requisition_group_program_schedules", uniqueConstraints =
-    @UniqueConstraint(name = "requisition_group_program_schedule_unique_program_requisitionGroup",
-      columnNames = { "requisitionGroupId",  "programId"}))
+@Table(name = "requisition_group_program_schedules",
+    uniqueConstraints = @UniqueConstraint(
+        name = "requisition_group_program_schedule_unique_program_requisitionGroup",
+        columnNames = {"requisitionGroupId", "programId"}))
 @NoArgsConstructor
 public class RequisitionGroupProgramSchedule extends BaseEntity {
 
@@ -55,17 +56,17 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
   @Setter
   private Facility dropOffFacility;
 
-  private RequisitionGroupProgramSchedule(RequisitionGroup requisitionGroup, Program program, 
-                                          ProcessingSchedule schedule, Boolean directDelivery) {
-    this.requisitionGroup = requisitionGroup;
-    this.program = program;
-    this.processingSchedule = schedule;
+  private RequisitionGroupProgramSchedule(RequisitionGroup requisitionGroup, Program program,
+                                          ProcessingSchedule schedule, boolean directDelivery) {
+    this.requisitionGroup = Objects.requireNonNull(requisitionGroup);
+    this.program = Objects.requireNonNull(program);
+    this.processingSchedule = Objects.requireNonNull(schedule);
     this.directDelivery = directDelivery;
   }
 
   public static RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule(
-        RequisitionGroup requisitionGroup, Program program, ProcessingSchedule schedule,
-        boolean directDelivery) {
+      RequisitionGroup requisitionGroup, Program program, ProcessingSchedule schedule,
+      boolean directDelivery) {
     return new RequisitionGroupProgramSchedule(requisitionGroup, program, schedule, directDelivery);
   }
 
@@ -76,7 +77,7 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
    * @return new RequisitionGroupProgramSchedule
    */
   public static RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule(
-        RequisitionGroupProgramSchedule.Importer importer) {
+      RequisitionGroupProgramSchedule.Importer importer) {
     RequisitionGroup requisitionGroup = null;
 
     if (importer.getRequisitionGroup() != null) {
@@ -91,7 +92,7 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
 
     RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule =
         new RequisitionGroupProgramSchedule(requisitionGroup, program,
-          importer.getProcessingSchedule(), importer.getDirectDelivery());
+            importer.getProcessingSchedule(), importer.getDirectDelivery());
 
     newRequisitionGroupProgramSchedule.id = importer.getId();
 
@@ -138,7 +139,7 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
 
   public interface Exporter {
     void setId(UUID id);
-    
+
     void setRequisitionGroup(RequisitionGroup requisitionGroup);
 
     void setProgram(Program program);

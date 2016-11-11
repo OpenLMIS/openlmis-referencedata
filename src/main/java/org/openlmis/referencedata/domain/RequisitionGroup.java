@@ -74,9 +74,9 @@ public class RequisitionGroup extends BaseEntity {
    * @param supervisoryNode specified supervisory node
    */
   public RequisitionGroup(String code, String name, SupervisoryNode supervisoryNode) {
-    this.code = code;
-    this.name = name;
-    this.supervisoryNode = supervisoryNode;
+    this.code = Objects.requireNonNull(code);
+    this.name = Objects.requireNonNull(name);
+    this.supervisoryNode = Objects.requireNonNull(supervisoryNode);
     this.requisitionGroupProgramSchedules = new ArrayList<>();
     this.memberFacilities = new HashSet<>();
   }
