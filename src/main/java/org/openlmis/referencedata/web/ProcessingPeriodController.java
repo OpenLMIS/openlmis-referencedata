@@ -43,7 +43,8 @@ public class ProcessingPeriodController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPeriodController.class);
 
-  @Autowired @Qualifier("beforeSavePeriodValidator")
+  @Autowired
+  @Qualifier("beforeSavePeriodValidator")
   private ProcessingPeriodValidator validator;
 
   @Autowired
@@ -63,16 +64,17 @@ public class ProcessingPeriodController extends BaseController {
 
   /**
    * Finds processingPeriods matching all of provided parameters.
-   * @param programId program of searched ProcessingPeriods.
+   *
+   * @param programId  program of searched ProcessingPeriods.
    * @param facilityId facility of searched ProcessingPeriods.
-   * @return ResponseEntity with list of all ProcessingPeriods matching
-   *         provided parameters and OK httpStatus.
+   * @return ResponseEntity with list of all ProcessingPeriods matching provided parameters and OK
+   * httpStatus.
    */
   @RequestMapping(value = "/processingPeriods/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProcessingPeriods(
-        @RequestParam(value = "programId", required = true) UUID programId,
-        @RequestParam(value = "facilityId", required = true) UUID facilityId)
-        throws InvalidIdException {
+      @RequestParam(value = "programId", required = true) UUID programId,
+      @RequestParam(value = "facilityId", required = true) UUID facilityId)
+      throws InvalidIdException {
 
     if (programId == null) {
       throw new InvalidIdException("Program id must be provided.");
@@ -97,13 +99,13 @@ public class ProcessingPeriodController extends BaseController {
   /**
    * Create a new processing period using the provided processing period DTO.
    *
-   * @param periodDto processing period DTO with which to create the processing period
+   * @param periodDto     processing period DTO with which to create the processing period
    * @param bindingResult Object used for validation.
    * @return if successful, the new processing period; otherwise an HTTP error
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.POST)
   public ResponseEntity<?> createProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
-                                        BindingResult bindingResult) {
+                                                  BindingResult bindingResult) {
     ProcessingPeriod newPeriod = ProcessingPeriod.newPeriod(periodDto);
     LOGGER.debug("Creating new processingPeriod");
     validator.validate(newPeriod, bindingResult);
@@ -131,8 +133,8 @@ public class ProcessingPeriodController extends BaseController {
   }
 
   /**
-   * Update an existing processingPeriod using the provided processingPeriod DTO.
-   * Note, if the role does not exist, will create one.
+   * Update an existing processingPeriod using the provided processingPeriod DTO. Note, if the role
+   * does not exist, will create one.
    *
    * @param periodId  id of the processingPeriod to update
    * @param periodDto provided processingPeriod DTO
@@ -140,13 +142,13 @@ public class ProcessingPeriodController extends BaseController {
    */
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
-                                       @PathVariable("id") UUID periodId) {
+                                                  @PathVariable("id") UUID periodId) {
     LOGGER.debug("Updating processingPeriod");
     ProcessingPeriod updatedProcessingPeriod = ProcessingPeriod.newPeriod(periodDto);
     updatedProcessingPeriod.setId(periodId);
     periodRepository.save(updatedProcessingPeriod);
     return ResponseEntity
-          .ok(exportToDto(updatedProcessingPeriod));
+        .ok(exportToDto(updatedProcessingPeriod));
   }
 
   /**
@@ -183,8 +185,8 @@ public class ProcessingPeriodController extends BaseController {
   }
 
   /**
-   * Returns total difference between start date and end date from given processingPeriod rounded
-   * to whole months.
+   * Returns total difference between start date and end date from given processingPeriod rounded to
+   * whole months.
    *
    * @param periodId UUID of given processingPeriod.
    * @return String which contains number of months.
@@ -195,13 +197,14 @@ public class ProcessingPeriodController extends BaseController {
 
     LOGGER.debug("Returning total number of months of processingPeriod");
 
-    return ResponseEntity.ok(new IntegerResultDto(period.getDurationInMonths()));
+    return ResponseEntity.ok(new ResultDto<>(period.getDurationInMonths()));
   }
 
   /**
    * Returns chosen ProcessingPeriods.
+   *
    * @param processingScheduleId processingSchedule of searched ProcessingPeriods.
-   * @param startDate which day shall ProcessingPeriod start.
+   * @param startDate            which day shall ProcessingPeriod start.
    * @return List of ProcessingPeriods.
    */
   @RequestMapping(value = "/processingPeriods/searchByScheduleAndDate", method = RequestMethod.GET)
@@ -209,7 +212,7 @@ public class ProcessingPeriodController extends BaseController {
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate)
-        throws InvalidIdException {
+      throws InvalidIdException {
     if (processingScheduleId == null) {
       throw new InvalidIdException("Processing Schedule id must be provided");
     }

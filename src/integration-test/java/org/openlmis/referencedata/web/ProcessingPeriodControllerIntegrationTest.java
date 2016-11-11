@@ -91,9 +91,9 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   public void setUp() {
     schedule = generateSchedule();
     firstPeriod = ProcessingPeriod.newPeriod("P1", schedule,
-          LocalDate.of(2016, 1, 1), LocalDate.of(2016, 2, 1));
+        LocalDate.of(2016, 1, 1), LocalDate.of(2016, 2, 1));
     secondPeriod = ProcessingPeriod.newPeriod("P2", schedule,
-          LocalDate.of(2016, 2, 2), LocalDate.of(2016, 3, 2));
+        LocalDate.of(2016, 2, 2), LocalDate.of(2016, 3, 2));
     requisitionGroupProgramSchedule = generateRequisitionGroupProgramSchedule();
     firstPeriodId = UUID.randomUUID();
     programId = UUID.randomUUID();
@@ -165,30 +165,31 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
-    IntegerResultDto response = restAssured.given()
+    ResultDto<Integer> response = new ResultDto<>();
+    response = restAssured.given()
         .pathParam("id", firstPeriodId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(DIFFERENCE_URL)
         .then()
-        .statusCode(200).extract().as(IntegerResultDto.class);
+        .statusCode(200).extract().as(response.getClass());
 
-    assertEquals(1, response.getResult());
+    assertEquals(1, (int) response.getResult());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldFindPeriodsByProgramAndFacility()
-        throws RequisitionGroupProgramScheduleException {
+      throws RequisitionGroupProgramScheduleException {
 
     given(programRepository.findOne(programId))
-          .willReturn(requisitionGroupProgramSchedule.getProgram());
+        .willReturn(requisitionGroupProgramSchedule.getProgram());
     given(facilityRepository.findOne(facilityId))
-          .willReturn(requisitionGroupProgramSchedule.getDropOffFacility());
+        .willReturn(requisitionGroupProgramSchedule.getDropOffFacility());
 
     given(periodService.filterPeriods(requisitionGroupProgramSchedule.getProgram(),
-          requisitionGroupProgramSchedule.getDropOffFacility()))
-          .willReturn(Arrays.asList(firstPeriod, secondPeriod));
+        requisitionGroupProgramSchedule.getDropOffFacility()))
+        .willReturn(Arrays.asList(firstPeriod, secondPeriod));
 
     ProcessingPeriodDto[] response = restAssured.given()
         .queryParam(PROGRAM, programId)
@@ -209,24 +210,24 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
     given(scheduleRepository.findOne(scheduleId)).willReturn(schedule);
     given(periodService.searchPeriods(schedule, secondPeriod.getStartDate()))
-          .willReturn(Arrays.asList(secondPeriod, firstPeriod));
+        .willReturn(Arrays.asList(secondPeriod, firstPeriod));
 
     ProcessingPeriodDto[] response = restAssured.given()
-          .queryParam(PROCESSING_SCHEDULE, scheduleId)
-          .queryParam(START_DATE, secondPeriod.getStartDate().toString())
-          .queryParam(ACCESS_TOKEN, getToken())
-          .when()
-          .get(SEARCH_BY_UUID_AND_DATE_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(ProcessingPeriodDto[].class);
+        .queryParam(PROCESSING_SCHEDULE, scheduleId)
+        .queryParam(START_DATE, secondPeriod.getStartDate().toString())
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SEARCH_BY_UUID_AND_DATE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProcessingPeriodDto[].class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertEquals(2, response.length);
-    for ( ProcessingPeriodDto period : response ) {
+    for (ProcessingPeriodDto period : response) {
       assertEquals(
-            period.getProcessingSchedule().getId(),
-            firstPeriod.getProcessingSchedule().getId());
+          period.getProcessingSchedule().getId(),
+          firstPeriod.getProcessingSchedule().getId());
     }
   }
 
@@ -236,13 +237,13 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", firstPeriodId)
-          .when()
-          .delete(ID_URL)
-          .then()
-          .statusCode(204);
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", firstPeriodId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -256,15 +257,15 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     ProcessingPeriodDto response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", firstPeriodId)
-          .body(firstPeriod)
-          .when()
-          .put(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(ProcessingPeriodDto.class);
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", firstPeriodId)
+        .body(firstPeriod)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProcessingPeriodDto.class);
 
     assertEquals(response.getDescription(), "OpenLMIS");
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -277,13 +278,13 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
     ProcessingPeriodDto[] response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when()
-          .get(RESOURCE_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(ProcessingPeriodDto[].class);
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProcessingPeriodDto[].class);
 
     List<ProcessingPeriodDto> periods = Arrays.asList(response);
     assertEquals(periods.size(), 2);
@@ -297,14 +298,14 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     ProcessingPeriodDto response = restAssured.given()
-          .queryParam(ACCESS_TOKEN, getToken())
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .pathParam("id", firstPeriodId)
-          .when()
-          .get(ID_URL)
-          .then()
-          .statusCode(200)
-          .extract().as(ProcessingPeriodDto.class);
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", firstPeriodId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProcessingPeriodDto.class);
 
     assertEquals(dto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
