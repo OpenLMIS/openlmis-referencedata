@@ -50,13 +50,17 @@ public class ProcessingSchedule extends BaseEntity {
   @Setter
   private String name;
 
+  /**
+   * Constructor for processing schedule. Code and name must not be null.
+   */
   public ProcessingSchedule(String code, String name) {
     this.code = Objects.requireNonNull(code);
     this.name = Objects.requireNonNull(name);
   }
 
   /**
-   * Static factory method for constructing a new processing schedule using an importer (DTO).
+   * Static factory method for constructing a new processing schedule using an importer (DTO). 
+   * Uses the {@link #ProcessingSchedule(String, String)} constructor} to help create the object.
    *
    * @param importer the importer (DTO)
    */
