@@ -27,7 +27,9 @@ public class TradeItemTest {
     assertEquals(0, advil.packsToOrder(0));
     assertEquals(1, advil.packsToOrder(1));
     assertEquals(1, advil.packsToOrder(10));
-    assertEquals(2, advil.packsToOrder(11));
+    assertEquals(1, advil.packsToOrder(11));
+    assertEquals(2, advil.packsToOrder(15));
+    assertEquals(2, advil.packsToOrder(17));
   }
 
   @Test

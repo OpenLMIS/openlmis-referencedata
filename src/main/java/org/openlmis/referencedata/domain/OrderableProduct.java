@@ -25,7 +25,6 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "orderable_products", schema = "referencedata")
 @NoArgsConstructor
-@SuppressWarnings({"PMD.UnusedPrivateField"})
 public abstract class OrderableProduct extends BaseEntity {
   @Embedded
   private Code productCode;
@@ -143,8 +142,22 @@ public abstract class OrderableProduct extends BaseEntity {
    * @return the number of packs that should be ordered.
    */
   public long packsToOrder(long dispensingUnits) {
-    double fractionalPacks = (double) (dispensingUnits) / packSize;
-    return 0 >= fractionalPacks ? 0 : (long) Math.ceil(fractionalPacks);
+    if (dispensingUnits <= 0 || packSize == 0) {
+      return 0;
+    } else {
+      long packsToOrder = dispensingUnits / packSize;
+      long remainderQuantity = dispensingUnits % packSize;
+
+      if (remainderQuantity > 0 && remainderQuantity >= packRoundingThreshold) {
+        packsToOrder += 1;
+      }
+
+      if (packsToOrder == 0 && !roundToZero) {
+        packsToOrder = 1;
+      }
+
+      return packsToOrder;
+    }
   }
 
   /**

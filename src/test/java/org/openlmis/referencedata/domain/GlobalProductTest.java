@@ -35,7 +35,9 @@ public class GlobalProductTest {
     assertEquals(0, ibuprofen.packsToOrder(0));
     assertEquals(1, ibuprofen.packsToOrder(1));
     assertEquals(1, ibuprofen.packsToOrder(10));
-    assertEquals(2, ibuprofen.packsToOrder(11));
+    assertEquals(1, ibuprofen.packsToOrder(11));
+    assertEquals(2, ibuprofen.packsToOrder(15));
+    assertEquals(2, ibuprofen.packsToOrder(17));
   }
 
   @Test
