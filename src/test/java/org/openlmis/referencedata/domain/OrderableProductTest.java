@@ -14,6 +14,9 @@ import java.util.Set;
 import java.util.UUID;
 
 public class OrderableProductTest {
+  private static final String IBUPROFEN = "ibuprofen";
+  private static final String EACH = "each";
+
   private static Program em;
   private static OrderableProduct ibuprofen;
 
@@ -75,5 +78,75 @@ public class OrderableProductTest {
 
     assertEquals(1, ibuprofen.getPrograms().size());
     assertFalse(ibuprofen.getPrograms().contains(ibuprofenInMalaria));
+  }
+
+  @Test
+  public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsSmallerThanRemainder() {
+    OrderableProduct product =
+        GlobalProduct.newGlobalProduct(IBUPROFEN, EACH, IBUPROFEN, "test1", 10, 4, false);
+
+    long packsToOrder = product.packsToOrder(26);
+
+    assertEquals(3, packsToOrder);
+  }
+
+  @Test
+  public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsGreaterThanRemainder() {
+    OrderableProduct product =
+        GlobalProduct.newGlobalProduct(IBUPROFEN, EACH, IBUPROFEN, "test2", 10, 7, false);
+
+    long packsToOrder = product.packsToOrder(26);
+
+    assertEquals(2, packsToOrder);
+  }
+
+  @Test
+  public void shouldCalculatePacksToOrderWhenCanRoundToZero() {
+    OrderableProduct product =
+        GlobalProduct.newGlobalProduct(IBUPROFEN, EACH, IBUPROFEN, "test3", 10, 7, true);
+
+    long packsToOrder = product.packsToOrder(6);
+
+    assertEquals(0, packsToOrder);
+  }
+
+  @Test
+  public void shouldCalculatePacksToOrderWhenCanNotRoundToZero() {
+    OrderableProduct product =
+        GlobalProduct.newGlobalProduct(IBUPROFEN, EACH, IBUPROFEN, "test4", 10, 7, false);
+
+    long packsToOrder = product.packsToOrder(6);
+
+    assertEquals(1, packsToOrder);
+  }
+
+  @Test
+  public void shouldReturnZeroPacksToOrderIfPackSizeIsZero() {
+    OrderableProduct product =
+        GlobalProduct.newGlobalProduct(IBUPROFEN, EACH, IBUPROFEN, "test5", 0, 7, true);
+
+    long packsToOrder = product.packsToOrder(6);
+
+    assertEquals(0, packsToOrder);
+  }
+
+  @Test
+  public void shouldReturnZeroPacksToOrderIfOrderQuantityIsZero() {
+    OrderableProduct product =
+        GlobalProduct.newGlobalProduct(IBUPROFEN, EACH, IBUPROFEN, "test6", 10, 7, false);
+
+    long packsToOrder = product.packsToOrder(0);
+
+    assertEquals(0, packsToOrder);
+  }
+
+  @Test
+  public void shouldReturnZeroPackToOrderIfOrderQuantityIsOneAndRoundToZeroTrueWithPackSizeTen() {
+    OrderableProduct product =
+        GlobalProduct.newGlobalProduct(IBUPROFEN, EACH, IBUPROFEN, "test7", 10, 7, true);
+
+    long packsToOrder = product.packsToOrder(1);
+
+    assertEquals(0, packsToOrder);
   }
 }
