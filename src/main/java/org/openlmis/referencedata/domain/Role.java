@@ -143,9 +143,7 @@ public class Role extends BaseEntity {
    * @return true if the role contains the right, false otherwise
    */
   public boolean contains(Right right) {
-    Set<Right> attachments = rights.stream().flatMap(r -> r.getAttachments().stream())
-        .collect(toSet());
-    return rights.contains(right) || attachments.contains(right);
+    return rights.contains(right);
   }
 
   /**

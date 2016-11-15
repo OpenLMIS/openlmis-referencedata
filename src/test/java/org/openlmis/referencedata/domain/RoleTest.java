@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.domain;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -85,6 +86,6 @@ public class RoleTest {
 
     //then
     assertTrue(containsRight1);
-    assertTrue(containsRight2);
+    assertFalse(containsRight2);
   }
 }
