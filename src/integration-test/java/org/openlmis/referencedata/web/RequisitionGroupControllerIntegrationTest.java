@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
@@ -130,7 +129,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  @Ignore
   public void shouldPostRequisitionGroup() {
 
     RequisitionGroupDto response = restAssured
@@ -208,7 +206,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  @Ignore
   public void shouldPutRequisitionGroup() {
 
     requisitionGroup.setDescription(DESCRIPTION);
@@ -237,7 +234,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  @Ignore
   public void shouldCreateNewRequisitionGroupIfDoesNotExist() {
 
     requisitionGroup.setDescription(DESCRIPTION);
