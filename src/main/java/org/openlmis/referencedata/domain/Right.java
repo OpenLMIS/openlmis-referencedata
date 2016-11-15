@@ -15,9 +15,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -42,13 +41,12 @@ public class Right extends BaseEntity {
   @Setter
   private String description;
 
-  @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "right_attachments",
+      joinColumns = @JoinColumn(name = "rightid", nullable = false),
+      inverseJoinColumns = @JoinColumn(name = "attachmentid", nullable = false))
   @Getter
   private Set<Right> attachments = new HashSet<>();
-
-  @ManyToOne
-  @JoinColumn(name = "parentid")
-  private Right parent;
 
   @ManyToMany(
       mappedBy = "rights"
@@ -99,6 +97,10 @@ public class Right extends BaseEntity {
         this.attachments.add(attachment);
       }
     }
+  }
+
+  public void clearAttachments() {
+    this.attachments.clear();
   }
 
   /**

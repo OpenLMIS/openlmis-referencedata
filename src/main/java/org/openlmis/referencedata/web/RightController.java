@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,20 @@ public class RightController extends BaseController {
   @RequestMapping(value = "/rights", method = RequestMethod.PUT)
   public ResponseEntity<?> saveRight(@RequestBody RightDto rightDto) {
 
+    if (rightDto.getAttachments() != null) {
+      for (Right.Importer attachmentDto : rightDto.getAttachments()) {
+        Right storedAttachment = rightRepository.findFirstByName(attachmentDto.getName());
+        if (storedAttachment == null) {
+          return ResponseEntity
+              .badRequest()
+              .body(new ErrorResponse("Attachment must exist in the system: "
+                  + attachmentDto.getName(), ""));
+        }
+
+        storedAttachment.export((RightDto) attachmentDto);
+      }
+    }
+
     Right rightToSave = Right.newRight(rightDto);
 
     Right storedRight = rightRepository.findFirstByName(rightToSave.getName());
@@ -91,9 +106,8 @@ public class RightController extends BaseController {
       rightToSave.setId(storedRight.getId());
     }
 
-
     LOGGER.debug("Saving right");
-    rightRepository.save(rightToSave);
+    rightToSave = rightRepository.save(rightToSave);
 
 
     LOGGER.debug("Saved right with id: " + rightToSave.getId());
