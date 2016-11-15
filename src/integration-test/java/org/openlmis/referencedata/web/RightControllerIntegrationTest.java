@@ -29,11 +29,13 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ACCESS_TOKEN = "access_token";
   private static final String RIGHT_NAME = "right";
+  private static final String ATTACHMENT_NAME = "attachment";
 
   @MockBean
   private RightRepository rightRepository;
 
   private Right right;
+  private Right attachment;
   private RightDto rightDto;
   private UUID rightId;
 
@@ -42,6 +44,8 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
    */
   public RightControllerIntegrationTest() {
     right = Right.newRight(RIGHT_NAME, RightType.GENERAL_ADMIN);
+    attachment = Right.newRight(ATTACHMENT_NAME, RightType.GENERAL_ADMIN);
+    right.attach(attachment);
     rightDto = new RightDto();
     right.export(rightDto);
     rightId = UUID.randomUUID();
@@ -50,7 +54,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetAllRights() {
 
-    Set<Right> storedRights = Sets.newHashSet(right,
+    Set<Right> storedRights = Sets.newHashSet(right, attachment,
         Right.newRight("right2", RightType.SUPERVISION));
     given(rightRepository.findAll()).willReturn(storedRights);
 
@@ -64,7 +68,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(RightDto[].class);
 
     List<RightDto> rights = Arrays.asList(response);
-    assertThat(rights.size(), is(2));
+    assertThat(rights.size(), is(3));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -106,9 +110,34 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldPutRight() {
+  public void putShouldCreateNewRightForNonExistingRight() {
 
+    given(rightRepository.findFirstByName(ATTACHMENT_NAME)).willReturn(attachment);
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(null);
+    given(rightRepository.save(right)).willReturn(right);
+
+    RightDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(rightDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(RightDto.class);
+
+    assertEquals(RIGHT_NAME, response.getName());
+    assertEquals(RightType.GENERAL_ADMIN, response.getType());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void putShouldUpdateRightForExistingRight() {
+
+    given(rightRepository.findFirstByName(ATTACHMENT_NAME)).willReturn(attachment);
+    given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(right);
+    given(rightRepository.save(right)).willReturn(right);
 
     RightDto response = restAssured
         .given()
@@ -139,6 +168,23 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
         .delete(ID_URL)
         .then()
         .statusCode(204);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotDeleteRightForNonExistingRight() {
+
+    given(rightRepository.findOne(rightId)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", rightId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
