@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -81,6 +82,12 @@ public class User extends BaseEntity {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
+  
+  @Column(name = "extradata", columnDefinition = "jsonb")
+  @Convert(converter = ExtraDataConverter.class)
+  @Getter
+  @Setter
+  private Object extraData;
 
   @Transient
   @Getter
@@ -105,10 +112,12 @@ public class User extends BaseEntity {
     verified = importer.isVerified();
     active = importer.isActive();
     loginRestricted = importer.isLoginRestricted();
+    extraData = importer.getExtraData();
   }
 
   User(UUID id, String username, String firstName, String lastName, String email, String timezone,
-       Facility homeFacility, boolean active, boolean verified, boolean loginRestricted) {
+       Facility homeFacility, boolean active, boolean verified, boolean loginRestricted,
+       Object extraData) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
@@ -119,6 +128,7 @@ public class User extends BaseEntity {
     this.active = active;
     this.verified = verified;
     this.loginRestricted = loginRestricted;
+    this.extraData = extraData;
   }
 
   /**
@@ -225,6 +235,7 @@ public class User extends BaseEntity {
     exporter.setActive(active);
     exporter.setVerified(verified);
     exporter.setLoginRestricted(loginRestricted);
+    exporter.setExtraData(extraData);
     exporter.addRoleAssignments(roleAssignments);
   }
 
@@ -267,6 +278,8 @@ public class User extends BaseEntity {
     void setLoginRestricted(boolean loginRestricted);
 
     void addRoleAssignments(Set<RoleAssignment> roleAssignments);
+    
+    void setExtraData(Object extraData);
   }
 
   public interface Importer {
@@ -289,5 +302,7 @@ public class User extends BaseEntity {
     boolean isActive();
 
     boolean isLoginRestricted();
+    
+    Object getExtraData();
   }
 }

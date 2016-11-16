@@ -15,6 +15,7 @@ public class UserBuilder {
   private boolean active;
   private boolean verified;
   private boolean loginRestricted;
+  private Object extraData;
 
   private UserBuilder() {
     this.homeFacility = null;
@@ -62,9 +63,14 @@ public class UserBuilder {
     this.loginRestricted = loginRestricted;
     return this;
   }
+  
+  public UserBuilder setExtraData(Object extraData) {
+    this.extraData = extraData;
+    return this;
+  }
 
   public User createUser() {
     return new User(id, username, firstName, lastName, email, timezone, homeFacility, active,
-        verified, loginRestricted);
+        verified, loginRestricted, extraData);
   }
 }
