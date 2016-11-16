@@ -78,7 +78,7 @@
     "productCategoryId": { "id": "74f39ab7-b5ce-4087-a6ea-65799a35e79b" },
     "dosesPerMonth": 1,
     "active": "true",
-    "fullSupply": "true",
+    "fullSupply": "false",
     "maxMonthsStock": 20,
     "displayOrder": 6,
     "value" : "20"
@@ -102,7 +102,7 @@
     "productCategoryId": { "id": "06606981-67cc-42d1-87ed-21f22fb0ea58" },
     "dosesPerMonth": 1,
     "active": "true",
-    "fullSupply": "true",
+    "fullSupply": "false",
     "maxMonthsStock": 20,
     "displayOrder": 4,
     "value" : "30"
