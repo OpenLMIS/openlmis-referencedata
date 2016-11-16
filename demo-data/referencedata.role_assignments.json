@@ -2,7 +2,7 @@
   {
     "id": "8ad78ea5-aa02-4b69-bb27-400e5e1d395b",
     "type": "supervision",
-    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "supervisoryNode": { "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79" },
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
     "role": {"id": "d30a2fbb-51d9-49ad-90fe-fb405470a439"}
@@ -10,7 +10,7 @@
   {
     "id": "6745e82c-99df-11e6-9f33-a24fc0d9649c",
     "type": "supervision",
-    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "supervisoryNode": { "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79" },
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
     "role": {"id": "d30a2fbb-51d9-49ad-90fe-fb405470a439"}
