@@ -144,20 +144,20 @@ public abstract class OrderableProduct extends BaseEntity {
   public long packsToOrder(long dispensingUnits) {
     if (dispensingUnits <= 0 || packSize == 0) {
       return 0;
-    } else {
-      long packsToOrder = dispensingUnits / packSize;
-      long remainderQuantity = dispensingUnits % packSize;
-
-      if (remainderQuantity > 0 && remainderQuantity >= packRoundingThreshold) {
-        packsToOrder += 1;
-      }
-
-      if (packsToOrder == 0 && !roundToZero) {
-        packsToOrder = 1;
-      }
-
-      return packsToOrder;
     }
+
+    long packsToOrder = dispensingUnits / packSize;
+    long remainderQuantity = dispensingUnits % packSize;
+
+    if (remainderQuantity > 0 && remainderQuantity >= packRoundingThreshold) {
+      packsToOrder += 1;
+    }
+
+    if (packsToOrder == 0 && !roundToZero) {
+      packsToOrder = 1;
+    }
+
+    return packsToOrder;
   }
 
   /**
