@@ -1,7 +1,6 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 
 import javax.persistence.Embeddable;
 
@@ -13,6 +12,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Dispensable {
 
+  @Getter
   private final String dispensingUnit;
 
   protected Dispensable() {
@@ -42,12 +42,10 @@ public class Dispensable {
   }
 
   @Override
-  @JsonValue
   public String toString() {
     return dispensingUnit;
   }
 
-  @JsonCreator
   public static final Dispensable createNew(String dispensingUnit) {
     String correctDispensingUnit = (null == dispensingUnit) ? "" : dispensingUnit;
     return new Dispensable(correctDispensingUnit);
