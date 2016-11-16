@@ -4,7 +4,8 @@
     "code": "PRG001",
     "name": "Family Planing",
     "active": "true",
-    "periodsSkippable": "true"
+    "periodsSkippable": "true",
+    "showNonFullSupplyTab": "true"
   },
   {
     "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
