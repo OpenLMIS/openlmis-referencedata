@@ -188,7 +188,9 @@ public class ProgramProduct extends BaseEntity {
       if (null != programProduct.dosesPerMonth) {
         generator.writeNumberField("dosesPerMonth", programProduct.dosesPerMonth);
       }
-      generator.writeNumberField("pricePerPack", programProduct.pricePerPack.getValue());
+      if (null != programProduct.pricePerPack) {
+        generator.writeNumberField("pricePerPack", programProduct.pricePerPack.getValue());
+      }
       generator.writeEndObject();
     }
   }
