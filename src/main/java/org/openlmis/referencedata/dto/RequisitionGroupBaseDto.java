@@ -53,7 +53,7 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   @Override
   public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
     if (supervisoryNode != null) {
-      this.supervisoryNode = new SupervisoryNodeBaseDto(supervisoryNode.getId());
+      this.supervisoryNode = new SupervisoryNodeDto(supervisoryNode.getId());
     } else {
       this.supervisoryNode = null;
     }

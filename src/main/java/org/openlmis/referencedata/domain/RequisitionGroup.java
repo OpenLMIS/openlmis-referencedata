@@ -88,13 +88,6 @@ public class RequisitionGroup extends BaseEntity {
    */
   public static RequisitionGroup newRequisitionGroup(Importer importer) {
     SupervisoryNode supervisoryNode = null;
-
-    if (importer.getSupervisoryNode() == null
-        || importer.getCode() == null
-        || importer.getName() == null) {
-      return null;
-    }
-
     if (importer.getSupervisoryNode() != null) {
       supervisoryNode = SupervisoryNode.newSupervisoryNode(importer.getSupervisoryNode());
     }
@@ -109,11 +102,8 @@ public class RequisitionGroup extends BaseEntity {
 
       for (RequisitionGroupProgramSchedule.Importer scheduleImporter :
           importer.getRequisitionGroupProgramSchedules()) {
-        RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
-            RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(scheduleImporter);
-        if (requisitionGroupProgramSchedule != null) {
-          requisitionGroupProgramSchedules.add(requisitionGroupProgramSchedule);
-        }
+        requisitionGroupProgramSchedules.add(
+            RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(scheduleImporter));
       }
 
       newRequisitionGroup.requisitionGroupProgramSchedules = requisitionGroupProgramSchedules;

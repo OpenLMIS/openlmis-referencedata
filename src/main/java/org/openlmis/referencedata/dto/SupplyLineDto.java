@@ -35,7 +35,7 @@ public class SupplyLineDto extends BaseDto implements SupplyLine.Exporter, Suppl
   @Override
   public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
     if (supervisoryNode != null) {
-      SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeBaseDto();
+      SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeDto();
       supervisoryNode.export(supervisoryNodeBaseDto);
       this.supervisoryNode = supervisoryNodeBaseDto;
     } else {

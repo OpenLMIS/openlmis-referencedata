@@ -51,6 +51,9 @@ public class RequisitionGroupProgramScheduleBaseDto extends BaseDto implements
   public void setRequisitionGroup(RequisitionGroup requisitionGroup) {
     if (requisitionGroup != null) {
       this.requisitionGroup = new RequisitionGroupBaseDto(requisitionGroup.getId());
+      this.requisitionGroup.setCode(requisitionGroup.getCode());
+      this.requisitionGroup.setName(requisitionGroup.getName());
+      this.requisitionGroup.setSupervisoryNode(requisitionGroup.getSupervisoryNode());
     } else {
       this.requisitionGroup = null;
     }

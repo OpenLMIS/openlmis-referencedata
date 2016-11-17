@@ -24,28 +24,14 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   @Setter
   private String code;
 
-  @Getter
-  @Setter
-  private String name;
-
-  @Getter
-  @Setter
-  private String description;
-
   @JsonProperty
   @Getter
   private FacilityDto facility;
 
-  @JsonProperty
-  @Getter
-  private SupervisoryNodeBaseDto parentNode;
 
   @JsonProperty
   private Set<SupervisoryNodeBaseDto> childNodes;
 
-  @JsonProperty
-  @Getter
-  private RequisitionGroupBaseDto requisitionGroup;
 
   public SupervisoryNodeBaseDto(UUID id) {
     setId(id);
@@ -67,17 +53,7 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
 
   @JsonIgnore
   @Override
-  public void setParentNode(SupervisoryNode parentNode) {
-    if (parentNode != null) {
-      this.parentNode = new SupervisoryNodeBaseDto(parentNode.getId());
-    } else {
-      this.parentNode = null;
-    }
-  }
-
-  public void setParentNode(SupervisoryNodeBaseDto parentNode) {
-    this.parentNode = parentNode;
-  }
+  public void setParentNode(SupervisoryNode parentNode) {}
 
   @Override
   public Set<SupervisoryNode.Importer> getChildNodes() {
@@ -97,7 +73,7 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
       this.childNodes  = new HashSet<>();
 
       for (SupervisoryNode node : childNodes) {
-        this.childNodes.add(new SupervisoryNodeBaseDto(node.getId()));
+        this.childNodes.add(new SupervisoryNodeDto(node.getId()));
       }
     } else {
       this.childNodes = null;
@@ -110,16 +86,32 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
 
   @JsonIgnore
   @Override
-  public void setRequisitionGroup(RequisitionGroup requisitionGroup) {
-    if (requisitionGroup != null) {
-      this.requisitionGroup = new RequisitionGroupBaseDto(requisitionGroup.getId());
-    } else {
-      this.requisitionGroup = null;
-    }
+  public void setRequisitionGroup(RequisitionGroup requisitionGroup) {}
+
+  @Override
+  public void setName(String name) {}
+
+  @Override
+  public void setDescription(String description) {}
+
+  @Override
+  public String getName() {
+    return null;
   }
 
-  public void setRequisitionGroup(RequisitionGroupBaseDto requisitionGroup) {
-    this.requisitionGroup = requisitionGroup;
+  @Override
+  public String getDescription() {
+    return null;
+  }
+
+  @Override
+  public SupervisoryNode.Importer getParentNode() {
+    return null;
+  }
+
+  @Override
+  public RequisitionGroup.Importer getRequisitionGroup() {
+    return null;
   }
 
   @Override

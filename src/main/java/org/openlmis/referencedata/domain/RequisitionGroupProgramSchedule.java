@@ -89,11 +89,6 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
     if (importer.getProgram() != null) {
       program = Program.newProgram(importer.getProgram());
     }
-    if (requisitionGroup == null
-        || program == null
-        || importer.getProcessingSchedule() == null) {
-      return null;
-    }
 
     RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule =
         new RequisitionGroupProgramSchedule(requisitionGroup, program,
