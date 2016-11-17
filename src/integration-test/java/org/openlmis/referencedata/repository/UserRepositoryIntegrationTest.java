@@ -67,7 +67,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.getLastName(),
         user.getHomeFacility(),
         user.isActive(),
-        user.isVerified());
+        user.isVerified(),
+        user.isLoginRestricted());
 
     Assert.assertEquals(1, receivedUsers.size());
     Assert.assertEquals(
@@ -88,13 +89,16 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Assert.assertEquals(
         user.isVerified(),
         receivedUsers.get(0).isVerified());
+    Assert.assertEquals(
+        user.isLoginRestricted(),
+        receivedUsers.get(0).isLoginRestricted());
   }
 
   @Test
-  public void testSearchUsersByAllParametersNull() {
-    List<User> receivedUsers = repository.searchUsers(null, null, null, null, null, null);
+  public void searchUsersWithAllParametersNullShouldReturnAnEmptyList() {
+    List<User> receivedUsers = repository.searchUsers(null, null, null, null, null, null, null);
 
-    Assert.assertEquals(users.size() + 1, receivedUsers.size());
+    Assert.assertEquals(0, receivedUsers.size());
   }
 
   @Test
@@ -105,6 +109,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.getFirstName(),
         user.getLastName(),
         user.getHomeFacility(),
+        null,
         null,
         null);
 

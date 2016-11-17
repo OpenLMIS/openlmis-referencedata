@@ -22,21 +22,22 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.AuthUserRequest;
 import org.openlmis.referencedata.util.NotificationRequest;
 import org.openlmis.referencedata.util.PasswordChangeRequest;
 import org.openlmis.referencedata.util.PasswordResetRequest;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -49,6 +50,7 @@ import java.util.UUID;
 public class UserServiceTest {
 
   private static final String AUTH_TOKEN = "authToken";
+  private static final String EXTRA_DATA_VALUE = "orange";
 
   @Mock
   private UserRepository userRepository;
@@ -75,11 +77,15 @@ public class UserServiceTest {
             user.getLastName(),
             user.getHomeFacility(),
             user.isActive(),
-            user.isVerified()))
+            user.isVerified(),
+            user.isLoginRestricted()))
         .thenReturn(Arrays.asList(user));
+    
+    when(userRepository.findByData(EXTRA_DATA_VALUE)).thenReturn(Collections.singletonList(user));
 
     List<User> receivedUsers = userService.searchUsers(user.getUsername(), user.getFirstName(),
-        user.getLastName(), user.getHomeFacility(), user.isActive(), user.isVerified());
+        user.getLastName(), user.getHomeFacility(), user.isActive(), user.isVerified(),
+        user.isLoginRestricted(), EXTRA_DATA_VALUE);
 
     assertEquals(1, receivedUsers.size());
     assertEquals(user, receivedUsers.get(0));
@@ -214,6 +220,8 @@ public class UserServiceTest {
         .setHomeFacility(mock(Facility.class))
         .setVerified(false)
         .setActive(true)
+        .setLoginRestricted(true)
+        .setExtraData("{\"color\":\"" + EXTRA_DATA_VALUE + "\"}")
         .createUser();
   }
 }

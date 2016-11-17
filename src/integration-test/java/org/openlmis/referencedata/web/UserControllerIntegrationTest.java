@@ -381,7 +381,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldFindUsers() {
 
     given(userService.searchUsers(user1.getUsername(), user1.getFirstName(), user1.getLastName(),
-        user1.getHomeFacility(), user1.isActive(), user1.isVerified()))
+        user1.getHomeFacility(), user1.isActive(), user1.isVerified(), user1.isLoginRestricted(),
+        (String)user1.getExtraData()))
         .willReturn(singletonList(user1));
 
     UserDto[] response = restAssured

@@ -269,9 +269,11 @@ public class UserController extends BaseController {
       @RequestParam(value = "lastName", required = false) String lastName,
       @RequestParam(value = "homeFacility", required = false) Facility homeFacility,
       @RequestParam(value = "active", required = false) Boolean active,
-      @RequestParam(value = "verified", required = false) Boolean verified) {
-    List<User> result = userService.searchUsers(username, firstName,
-        lastName, homeFacility, active, verified);
+      @RequestParam(value = "verified", required = false) Boolean verified,
+      @RequestParam(value = "loginRestricted", required = false) Boolean loginRestricted,
+      @RequestParam(value = "extraData", required = false) String extraData) {
+    List<User> result = userService.searchUsers(username, firstName, lastName, homeFacility,
+        active, verified, loginRestricted, extraData);
 
     return ResponseEntity
         .ok(exportToDtos(result));

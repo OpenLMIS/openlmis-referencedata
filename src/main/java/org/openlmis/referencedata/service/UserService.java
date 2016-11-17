@@ -16,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.annotation.PostConstruct;
 
 @Service
 public class UserService {
@@ -40,25 +42,36 @@ public class UserService {
     String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
     virtualHostBaseUrl = "http://" + virtualHost;
   }
-  
+
   /**
    * Method returns all users with matched parameters.
    *
-   * @param username     username of user.
-   * @param firstName    firstName of user.
-   * @param lastName     lastName of user.
-   * @param homeFacility homeFacility of user.
-   * @param active       is the account activated.
-   * @param verified     is the account verified.
+   * @param username        username of user.
+   * @param firstName       firstName of user.
+   * @param lastName        lastName of user.
+   * @param homeFacility    homeFacility of user.
+   * @param active          is the account activated.
+   * @param verified        is the account verified.
+   * @param loginRestricted is the login restricted.
+   * @param extraData       JSON extra data.
    * @return List of users
    */
-  public List<User> searchUsers(
-      String username, String firstName, String lastName,
-      Facility homeFacility, Boolean active, Boolean verified) {
-    return userRepository.searchUsers(
-        username, firstName,
-        lastName, homeFacility,
-        active, verified);
+  public List<User> searchUsers(String username, String firstName, String lastName,
+                                Facility homeFacility, Boolean active, Boolean verified,
+                                Boolean loginRestricted, String extraData) {
+    List<User> mainSearchUsers = userRepository.searchUsers(username, firstName, lastName,
+        homeFacility, active, verified, loginRestricted);
+    List<User> foundUsers = new ArrayList<>(mainSearchUsers);
+
+    if (extraData != null) {
+      List<User> extraDataUsers = userRepository.findByData(extraData);
+
+      // Remove duplicates, then merge the two lists
+      foundUsers.removeAll(extraDataUsers);
+      foundUsers.addAll(extraDataUsers);
+    }
+
+    return foundUsers;
   }
 
   /**
