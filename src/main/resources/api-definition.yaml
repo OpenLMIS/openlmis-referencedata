@@ -42,6 +42,14 @@ schemas:
           }
       }
 
+  - approvedProductDto: !include schemas/approvedProductDto.json
+
+  - approvedProductDtoArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/approvedProductDto.json" }
+      }
+
   - facility: |
       {
           "type": "object",
@@ -87,34 +95,14 @@ schemas:
           }
       }
 
-  - facilityType: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "FacilityType",
-          "description": "A single facilityType",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "title": "code" },
-              "name": { "type": "string", "required": false, "title": "name" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "displayOrder": { "type": "integer", "required": false, "title": "displayOrder" },
-              "active": { "type": "boolean", "required": false, "title": "active" }
-          }
-      }
+  - facilityType: !include schemas/facilityType.json
 
-  - facilityTypeApprovedProduct: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "FacilityTypeApprovedProduct",
-          "description": "A single facilityTypeApprovedProduct",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "facilityType": { "type": "object", "$ref": "#/schemas/facilityType", "required": true, "title": "facilityType" },
-              "programProduct": { "type": "object", "$ref": "#/schemas/orderableProduct", "required": true, "title": "programProduct" },
-              "maxMonthsOfStock": { "type": "number", "required": true, "title": "maxMonthsOfStock" },
-              "minMonthsOfStock": { "type": "number", "required": false, "title": "minMonthsOfStock" },
-              "emergencyOrderPoint": { "type": "number", "required": false, "title": "emergencyOrderPoint" }
-          }
+  - facilityTypeApprovedProduct: !include schemas/facilityTypeApprovedProduct.json
+
+  - facilityTypeApprovedProductArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/facilityTypeApprovedProduct.json" }
       }
 
   - geographicLevel: |
@@ -162,27 +150,12 @@ schemas:
             }
         }
 
-  - orderableProduct: |
-      {
-          "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "Orderable Product",
-          "description": "A single orderableProduct",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "productCode": { "type": "string", "required": true, "title": "productCode" },
-              "name": { "type": "string", "required": false, "title": "name" },
-              "packSize": { "type": "long", "required": false, "title": "packSize" },
-              "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
-              "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
-              "programs": { "type": "array", "required": false, "title": "programs", "items": { "type": "object", "$ref": "#/schemas/programProduct" }, "uniqueItems": true }
-          }
-      }
+  - orderableProduct: !include schemas/orderableProduct.json
 
   - orderableProductArray: |
       {
           "type": "array",
-          "items": { "type": "object", "$ref":"#/schemas/orderableProduct" }
+          "items": { "type": "object", "$ref": "schemas/orderableProduct.json" }
 
       }
 
@@ -201,59 +174,17 @@ schemas:
           }
       }
 
-  - productCategory: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "ProductCategory",
-          "description": "A single productCategory",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "title": "code" },
-              "name": { "type": "string", "required": true, "title": "name" },
-              "displayOrder": { "type": "integer", "required": true, "title": "displayOrder" }
-          }
-      }
+  - productCategory: !include schemas/productCategory.json
 
-  - program: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "Program",
-          "description": "A single program",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "title": "code" },
-              "name": { "type": "string", "required": false, "title": "name" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "active": { "type": "boolean", "required": false, "title": "active" },
-              "periodsSkippable": { "type": "boolean", "required": true, "title": "periodsSkippable" },
-              "showNonFullSupplyTab": { "type": "boolean", "required": false, "title": "showNonFullSupplyTab" }
-          }
-      }
+  - program: !include schemas/program.json
 
   - programArray: |
       {
           "type": "array",
-          "items": { "type": "object", "$ref":"#/schemas/program" }
+          "items": { "type": "object", "$ref":"schemas/program.json" }
       }
 
-  - programProduct: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "ProgramProduct",
-          "description": "A single programProduct",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "program": { "type": "object", "$ref": "#/schemas/program", "required": true, "title": "program" },
-              "product": { "type": "object", "$ref": "#/schemas/product", "required": true, "title": "product" },
-              "dosesPerMonth": { "type": "integer", "required": true, "title": "dosesPerMonth" },
-              "active": { "type": "boolean", "required": true, "title": "active" },
-              "productCategory": { "type": "object", "$ref": "#/schemas/productCategory", "required": true, "title": "productCategory" },
-              "fullSupply": { "type": "boolean", "required": true, "title": "fullSupply" },
-              "displayOrder": { "type": "integer", "required": false, "title": "displayOrder" },
-              "maxMonthsStock": { "type": "integer", "required": false, "title": "maxMonthsStock" },
-              "pricePerPack": { "type": "number", "required": false, "title": "pricePerPack" }
-          }
-      }
+  - programProduct: !include schemas/programProduct.json
 
   - right: !include schemas/right.json
 
@@ -1468,6 +1399,43 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
+    /{id}/approvedProducts:
+        uriParameters:
+            id:
+                displayName: Facility ID
+                type: string
+                required: true
+                repeat: false
+        get:
+            is: [ secured ]
+            description: Returns a list of full or non-full supply approved products for this facility
+            queryParameters:
+                programId:
+                    displayName: Program ID
+                    type: string
+                    required: true
+                    repeat: false
+                fullSupply:
+                    displayName: Full-supply product
+                    type: boolean
+                    required: true
+                    repeat: false
+            responses:
+              200:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+                      schema: approvedProductDtoArray
+
+              400:
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+                      schema: errorResponse
     /{id}/orders:
         uriParameters:
             id:

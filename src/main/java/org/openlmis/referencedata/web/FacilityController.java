@@ -1,11 +1,14 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
@@ -22,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,6 +39,9 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private FacilityRepository facilityRepository;
+
+  @Autowired
+  private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
   
   @Autowired
   private ProgramRepository programRepository;
@@ -111,6 +119,32 @@ public class FacilityController extends BaseController {
     } else {
       return ok(facility);
     }
+  }
+
+  /**
+   * Returns full or non-full supply approved products for the given facility.
+   *
+   * @param facilityId ID of the facility
+   * @param programId ID of the program
+   * @param fullSupply true to retrieve full-supply products, false to retrieve non-full supply
+   *                   products
+   * @return collection of approved products
+   */
+  @RequestMapping(value = "/facilities/{id}/approvedProducts")
+  public ResponseEntity<?> getApprovedProducts(@PathVariable("id") UUID facilityId,
+      @RequestParam(value = "programId") UUID programId,
+      @RequestParam(value = "fullSupply") boolean fullSupply) {
+
+    Facility facility = facilityRepository.findOne(facilityId);
+    if (facility == null) {
+      return ResponseEntity.badRequest().body(new ErrorResponse(
+          "referencedata.error.facility.not-found", "Facility of the given ID was not found."));
+    }
+
+    Collection<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
+        .searchProducts(facilityId, programId, fullSupply);
+
+    return ResponseEntity.ok(toDto(products));
   }
 
   /**
@@ -207,6 +241,17 @@ public class FacilityController extends BaseController {
         .stream(facilities.spliterator(), false)
         .map(this::toDto)
         .collect(Collectors.toList());
+  }
+
+  private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> products) {
+    List<ApprovedProductDto> productDtos = new ArrayList<>();
+    for (FacilityTypeApprovedProduct product : products) {
+      ApprovedProductDto productDto = new ApprovedProductDto();
+      product.export(productDto);
+      productDtos.add(productDto);
+    }
+
+    return productDtos;
   }
 
 }

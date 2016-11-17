@@ -5,17 +5,28 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.GlobalProduct;
+import org.openlmis.referencedata.domain.Money;
+import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
@@ -27,12 +38,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ACCESS_TOKEN = "access_token";
+  private static final String PROGRAM_ID = "programId";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
@@ -46,6 +59,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private ProgramRepository programRepository;
+
+  @MockBean
+  private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
 
   @MockBean
   private SupervisoryNodeRepository supervisoryNodeRepository;
@@ -81,7 +97,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(searchedSupplyLines);
 
     Facility[] response = restAssured.given()
-        .queryParam("programId", programId)
+        .queryParam(PROGRAM_ID, programId)
         .queryParam("supervisoryNodeId", supervisoryNodeId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
@@ -105,7 +121,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingSupervisorNode() {
-
     Program searchedProgram = generateProgram();
     supervisoryNodeId = UUID.randomUUID();
 
@@ -114,7 +129,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
 
     restAssured.given()
-        .queryParam("programId", programId)
+        .queryParam(PROGRAM_ID, programId)
         .queryParam("supervisoryNodeId", supervisoryNodeId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
@@ -127,7 +142,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingProgram() {
-
     SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
     programId = UUID.randomUUID();
 
@@ -135,7 +149,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
 
     restAssured.given()
-        .queryParam("programId", programId)
+        .queryParam(PROGRAM_ID, programId)
         .queryParam("supervisoryNodeId", supervisoryNodeId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
@@ -194,8 +208,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldNotFindFacilitiesWithIncorrectCodeAndName() {
-    generateFacility();
-
     Facility[] response = restAssured.given()
         .queryParam("code", "IncorrectCode")
         .queryParam("name", "NotSimilarName")
@@ -208,6 +220,42 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<Facility> facilities = Arrays.asList(response);
     assertEquals(0, facilities.size());
+  }
+
+  @Test
+  public void shouldFindApprovedProductsForFacility() {
+    when(facilityRepository.findOne(any(UUID.class))).thenReturn(generateFacility());
+    when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
+        eq(false))).thenReturn(generateFacilityTypeApprovedProducts());
+
+    List<Map<String, ?>> productDtos = restAssured.given()
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam("fullSupply", false)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
+        .then()
+        .statusCode(200)
+        .extract().as(List.class);
+
+    assertEquals(1, productDtos.size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
+    when(facilityRepository.findOne(any(UUID.class))).thenReturn(null);
+
+    restAssured.given()
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam("fullSupply", false)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
 
@@ -269,6 +317,27 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     FacilityType facilityType = new FacilityType();
     facilityType.setCode("FacilityType " + generateInstanceNumber());
     return facilityType;
+  }
+
+  private List<FacilityTypeApprovedProduct> generateFacilityTypeApprovedProducts() {
+    ProductCategory category = ProductCategory.createNew(Code.code("gloves"));
+    category.setId(UUID.randomUUID());
+    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct(
+        "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
+    orderableProduct.setId(UUID.randomUUID());
+    ProgramProduct programProduct = ProgramProduct.createNew(generateProgram(), category,
+        orderableProduct, 0, true, false, 0, 0, new Money("0"));
+    programProduct.setId(UUID.randomUUID());
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
+    ftap.setProgramProduct(programProduct);
+    ftap.setId(UUID.randomUUID());
+    ftap.setMinMonthsOfStock(1d);
+    ftap.setMaxMonthsOfStock(3d);
+    ftap.setFacilityType(generateFacilityType());
+    ftap.setEmergencyOrderPoint(1d);
+    List<FacilityTypeApprovedProduct> products = new ArrayList<>();
+    products.add(ftap);
+    return products;
   }
 
   private Integer generateInstanceNumber() {

@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -87,7 +88,8 @@ public class ProgramProduct extends BaseEntity {
    *  boolean,
    *  boolean,
    *  int,
-   *  int)}.
+   *  int,
+   *  Money)}.
    * Uses sensible defaults.
    * @param program see other
    * @param category see other
@@ -193,5 +195,62 @@ public class ProgramProduct extends BaseEntity {
       }
       generator.writeEndObject();
     }
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setProduct(product);
+    exporter.setDosesPerMonth(dosesPerMonth);
+    exporter.setActive(active);
+    exporter.setProductCategory(productCategory);
+    exporter.setFullSupply(fullSupply);
+    exporter.setDisplayOrder(displayOrder);
+    exporter.setMaxMonthsStock(maxMonthsStock);
+    exporter.setPricePerPack(pricePerPack);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setProduct(OrderableProduct product);
+
+    void setDosesPerMonth(Integer dosesPerMonth);
+
+    void setActive(boolean active);
+
+    void setProductCategory(ProductCategory category);
+
+    void setFullSupply(boolean fullSupply);
+
+    void setDisplayOrder(int displayOrder);
+
+    void setMaxMonthsStock(int maxMonthsStock);
+
+    void setPricePerPack(Money pricePerPack);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    OrderableProduct getProduct();
+
+    Integer getDosesPerMonth();
+
+    boolean isActive();
+
+    ProductCategory getProductCategory();
+
+    boolean isFullSupply();
+
+    int getDisplayOrder();
+
+    int getMaxMonthsStock();
+
+    Money getPricePerPack();
   }
 }

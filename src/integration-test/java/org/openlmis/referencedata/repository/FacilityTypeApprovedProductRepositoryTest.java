@@ -1,5 +1,11 @@
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +16,7 @@ import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.GlobalProduct;
+import org.openlmis.referencedata.domain.Money;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.ProductCategory;
@@ -18,11 +25,6 @@ import org.openlmis.referencedata.domain.ProgramProduct;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 public class FacilityTypeApprovedProductRepositoryTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
@@ -57,10 +59,15 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   private FacilityType facilityType;
   private FacilityType facilityType2;
-  private ProgramProduct programProduct;
+  private ProgramProduct programProductFullSupply;
+  private ProgramProduct programProductNonFullSupply;
   private ProductCategory productCategory;
   private Program program;
-  private OrderableProduct orderableProduct;
+  private OrderableProduct orderableProductFullSupply;
+  private OrderableProduct orderableProductNonFullSupply;
+  private GeographicLevel level;
+  private GeographicZone geographicZone;
+  private Facility facility;
 
   private static final double maxMonthsOfStockDelta = 1e-15;
 
@@ -80,25 +87,49 @@ public class FacilityTypeApprovedProductRepositoryTest extends
       new OrderedDisplayValue("productCategoryName", 1));
     productCategoryRepository.save(productCategory);
 
-    orderableProduct = GlobalProduct.newGlobalProduct(
+    orderableProductFullSupply = GlobalProduct.newGlobalProduct(
         "ibuprofen", "each", "Ibuprofen", "testDesc", 10, 5, false);
-    programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct);
-    orderableProduct.addToProgram(programProduct);
-    orderableProductRepository.save(orderableProduct);
+    programProductFullSupply = ProgramProduct.createNew(program, productCategory,
+        orderableProductFullSupply);
+    orderableProductFullSupply.addToProgram(programProductFullSupply);
+    orderableProductRepository.save(orderableProductFullSupply);
+
+    orderableProductNonFullSupply = GlobalProduct.newGlobalProduct(
+        "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
+    programProductNonFullSupply = ProgramProduct.createNew(program, productCategory,
+        orderableProductNonFullSupply, 0, true, false, 0, 0, new Money("0"));
+    orderableProductNonFullSupply.addToProgram(programProductNonFullSupply);
+    orderableProductRepository.save(orderableProductNonFullSupply);
+
+    level = new GeographicLevel();
+    level.setCode("FacilityRepositoryIntegrationTest");
+    level.setLevelNumber(1);
+    geographicLevelRepository.save(level);
+
+    geographicZone = new GeographicZone();
+    geographicZone.setCode("FacilityRepositoryIntegrationTest");
+    geographicZone.setLevel(level);
+    geographicZoneRepository.save(geographicZone);
+
+    facility = new Facility("TF1");
+    facility.setType(facilityType);
+    facility.setGeographicZone(geographicZone);
+    facility.setName("Facility #1");
+    facility.setDescription("Test facility");
+    facility.setActive(true);
+    facility.setEnabled(true);
+    facilityRepository.save(facility);
+
   }
 
   @Override
   FacilityTypeApprovedProduct generateInstance() {
-    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
-    ftap.setFacilityType(facilityType);
-    ftap.setProgramProduct(programProduct);
-    ftap.setMaxMonthsOfStock(12.00);
-    return ftap;
+    return generateProduct(true);
   }
 
   @Test
-  public void testEditExistingProducts() {
-    ftapRepository.save(this.generateInstance());
+  public void shouldEditExistingProducts() {
+    ftapRepository.save(generateInstance());
     Iterable<FacilityTypeApprovedProduct> all = ftapRepository.findAll();
     FacilityTypeApprovedProduct ftap = all.iterator().next();
     ftap.setMaxMonthsOfStock(10.00);
@@ -110,30 +141,10 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Test
   public void shouldGetFullSupply() throws Exception {
-    GeographicLevel level = new GeographicLevel();
-    level.setCode("FacilityRepositoryIntegrationTest");
-    level.setLevelNumber(1);
-    geographicLevelRepository.save(level);
-
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode("FacilityRepositoryIntegrationTest");
-    geographicZone.setLevel(level);
-    geographicZoneRepository.save(geographicZone);
-
-    int instanceNumber = this.getNextInstanceNumber();
-    Facility facility = new Facility("TF" + instanceNumber);
-    facility.setType(facilityType);
-    facility.setGeographicZone(geographicZone);
-    facility.setName("Facility #" + instanceNumber);
-    facility.setDescription("Test facility");
-    facility.setActive(true);
-    facility.setEnabled(true);
-
-    facilityRepository.save(facility);
-    ftapRepository.save(this.generateInstance());
+    ftapRepository.save(generateInstance());
 
     Collection<FacilityTypeApprovedProduct> list = ftapRepository
-        .searchFullSupply(facility.getId(), program.getId());
+        .searchProducts(facility.getId(), program.getId(), true);
 
     assertThat(list, hasSize(1));
 
@@ -144,6 +155,43 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     assertThat(ftap.getProgramProduct().getProgram().getId(), is(equalTo(program.getId())));
     assertThat(ftap.getProgramProduct().isFullSupply(), is(true));
     assertThat(ftap.getProgramProduct().isActive(), is(true));
-
   }
+
+  @Test
+  public void shouldGetNonFullSupply() {
+    // Create a full supply product
+    ftapRepository.save(generateInstance());
+
+    Collection<FacilityTypeApprovedProduct> actual = ftapRepository
+        .searchProducts(facility.getId(), program.getId(), false);
+
+    // At this point we have no non-full supply products
+    assertEquals(0, actual.size());
+
+    // Create a non-full supply product
+    ftapRepository.save(generateProduct(false));
+
+    actual = ftapRepository.searchProducts(facility.getId(), program.getId(), false);
+
+    // We should be able to find non-full supply product we have created
+    assertEquals(1, actual.size());
+
+    // And make sure it returned non-full supply one
+    FacilityTypeApprovedProduct ftap = actual.iterator().next();
+
+    assertThat(ftap.getFacilityType().getId(), is(equalTo(facilityType.getId())));
+    assertThat(ftap.getFacilityType().getId(), is(equalTo(facility.getType().getId())));
+    assertThat(ftap.getProgramProduct().getProgram().getId(), is(equalTo(program.getId())));
+    assertThat(ftap.getProgramProduct().isFullSupply(), is(false));
+    assertThat(ftap.getProgramProduct().isActive(), is(true));
+  }
+
+  private FacilityTypeApprovedProduct generateProduct(boolean fullSupply) {
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
+    ftap.setFacilityType(facilityType);
+    ftap.setProgramProduct(fullSupply ? programProductFullSupply : programProductNonFullSupply);
+    ftap.setMaxMonthsOfStock(12.00);
+    return ftap;
+  }
+
 }

@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Orderable Product",
+  "description": "A single orderableProduct",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "productCode": {
+      "type": "string",
+      "title": "productCode"
+    },
+    "name": {
+      "type": "string",
+      "title": "name"
+    },
+    "packSize": {
+      "type": "number",
+      "title": "packSize"
+    },
+    "packRoundingThreshold": {
+      "type": "integer",
+      "title": "packRoundingThreshold"
+    },
+    "roundToZero": {
+      "type": "boolean",
+      "title": "roundToZero"
+    },
+    "programs": {
+      "type": "array",
+      "title": "programs",
+      "items": {
+        "type": "object",
+        "$ref": "programProduct.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": ["id", "productCode", "packRoundingThreshold", "roundToZero"]
+}

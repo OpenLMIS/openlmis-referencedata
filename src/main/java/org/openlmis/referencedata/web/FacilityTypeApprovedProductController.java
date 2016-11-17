@@ -72,7 +72,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
   public ResponseEntity<?> getFullSupply(@RequestParam(value = "facility") UUID facility,
                                          @RequestParam(value = "program") UUID program) {
     Collection<FacilityTypeApprovedProduct> facilityTypeApprovedProducts =
-        repository.searchFullSupply(facility, program);
+        repository.searchProducts(facility, program, true);
 
     if (CollectionUtils.isEmpty(facilityTypeApprovedProducts)) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);

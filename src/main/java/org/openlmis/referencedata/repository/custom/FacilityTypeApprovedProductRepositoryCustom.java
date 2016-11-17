@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface FacilityTypeApprovedProductRepositoryCustom {
 
-  Collection<FacilityTypeApprovedProduct> searchFullSupply(UUID facility, UUID program);
+  Collection<FacilityTypeApprovedProduct> searchProducts(UUID facility, UUID program,
+                                                         boolean fullSupply);
 
 }

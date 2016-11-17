@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -20,8 +22,6 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class FacilityTypeApprovedProductRepositoryImpl
     implements FacilityTypeApprovedProductRepositoryCustom {
 
@@ -29,7 +29,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private EntityManager entityManager;
 
   @Override
-  public Collection<FacilityTypeApprovedProduct> searchFullSupply(UUID facilityId, UUID programId) {
+  public Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID programId,
+                                                                boolean fullSupply) {
     checkNotNull(facilityId);
     checkNotNull(programId);
 
@@ -53,7 +54,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     conjunction = builder.and(conjunction, builder.equal(fft.get("id"), ft.get("id")));
     conjunction = builder.and(conjunction, builder.equal(program.get("id"), programId));
     conjunction = builder.and(conjunction, builder.equal(facility.get("id"), facilityId));
-    conjunction = builder.and(conjunction, builder.isTrue(pp.get("fullSupply")));
+    conjunction = builder.and(conjunction, builder.equal(pp.get("fullSupply"), fullSupply));
     conjunction = builder.and(conjunction, builder.isTrue(pp.get("active")));
 
     query.select(ftap);

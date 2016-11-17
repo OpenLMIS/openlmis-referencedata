@@ -5,14 +5,17 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import org.openlmis.referencedata.serializer.MoneyDeSerializer;
+import org.openlmis.referencedata.serializer.MoneySerializer;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.openlmis.referencedata.serializer.MoneyDeSerializer;
 
 import java.math.BigDecimal;
 
 @Data
-@JsonSerialize(as = BigDecimal.class)
+@JsonSerialize(using = MoneySerializer.class)
 @JsonDeserialize(using = MoneyDeSerializer.class)
 @EqualsAndHashCode(callSuper = false)
 public class Money extends Number {

@@ -1,14 +1,16 @@
 package org.openlmis.referencedata.domain;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "facility_type_approved_products", schema = "referencedata")
@@ -41,4 +43,41 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   @Getter
   @Setter
   private Double emergencyOrderPoint;
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setProductDto(programProduct);
+    exporter.setMaxMonthsOfStock(maxMonthsOfStock);
+    exporter.setMinMonthsOfStock(minMonthsOfStock);
+    exporter.setEmergencyOrderPoint(emergencyOrderPoint);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setProductDto(ProgramProduct programProduct);
+
+    void setMaxMonthsOfStock(Double maxMonthsOfStock);
+
+    void setMinMonthsOfStock(Double minMonthsOfStock);
+
+    void setEmergencyOrderPoint(Double emergencyOrderPoint);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    ProgramProduct.Importer getProductDto();
+
+    Double getMaxMonthsOfStock();
+
+    Double getMinMonthsOfStock();
+
+    Double getEmergencyOrderPoint();
+  }
 }

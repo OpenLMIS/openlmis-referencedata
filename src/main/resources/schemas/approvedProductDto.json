@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "ApprovedProductDto",
+  "description": "A single approved product",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "productDto": {
+      "type": "object",
+      "$ref": "productDto.json",
+      "title": "productDto"
+    },
+    "maxMonthsOfStock": {
+      "type": "number",
+      "title": "maxMonthsOfStock"
+    },
+    "minMonthsOfStock": {
+      "type": "number",
+      "title": "minMonthsOfStock"
+    },
+    "emergencyOrderPoint": {
+      "type": "number",
+      "title": "emergencyOrderPoint"
+    }
+  },
+  "required": ["id", "productDto", "maxMonthsOfStock"]
+}

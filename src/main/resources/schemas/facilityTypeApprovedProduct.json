@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "FacilityTypeApprovedProduct",
+  "description": "A single facilityTypeApprovedProduct",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "facilityType": {
+      "type": "object",
+      "$ref": "facilityType.json",
+      "title": "facilityType"
+    },
+    "programProduct": {
+      "type": "object",
+      "$ref": "programProduct.json",
+      "title": "programProduct"
+    },
+    "maxMonthsOfStock": {
+      "type": "number",
+      "title": "maxMonthsOfStock"
+    },
+    "minMonthsOfStock": {
+      "type": "number",
+      "title": "minMonthsOfStock"
+    },
+    "emergencyOrderPoint": {
+      "type": "number",
+      "title": "emergencyOrderPoint"
+    }
+  },
+  "required": ["id", "facilityType", "programProduct", "maxMonthsOfStock"]
+}

@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "ProductDto",
+  "description": "A single product",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "product": {
+      "type": "object",
+      "$ref": "orderableProduct.json",
+      "title": "product"
+    },
+    "dosesPerMonth": {
+      "type": "integer",
+      "title": "dosesPerMonth"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "active"
+    },
+    "productCategory": {
+      "type": "object",
+      "$ref": "productCategory.json",
+      "title": "productCategory"
+    },
+    "fullSupply": {
+      "type": "boolean",
+      "title": "fullSupply"
+    },
+    "displayOrder": {
+      "type": "integer",
+      "title": "displayOrder"
+    },
+    "maxMonthsStock": {
+      "type": "integer",
+      "title": "maxMonthsStock"
+    },
+    "pricePerPack": {
+      "type": "string",
+      "title": "pricePerPack"
+    }
+  },
+  "required": ["id", "product", "dosesPerMonth", "active", "productCategory",
+    "fullSupply"]
+}
