@@ -12,10 +12,16 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateFiled"})
 public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<User> {
+
+  private static final String EXTRA_DATA_KEY = "color";
+  private static final String EXTRA_DATA_VALUE = "orange";
+  private static final int TOTAL_USERS = 5;
 
   @Autowired
   private UserRepository repository;
@@ -45,6 +51,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         .setHomeFacility(generateFacility())
         .setActive(true)
         .setVerified(true)
+        .setLoginRestricted(false)
         .createUser();
   }
 
@@ -53,7 +60,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
     users = new ArrayList<>();
 
-    for (int usersCount = 0; usersCount < 5; usersCount++) {
+    for (int usersCount = 0; usersCount < TOTAL_USERS; usersCount++) {
       users.add(repository.save(generateInstance()));
     }
   }
@@ -125,6 +132,45 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
           user.getHomeFacility().getId(),
           receivedUser.getHomeFacility().getId());
     }
+  }
+
+  @Test
+  public void findByExtraDataShouldFindDataWhenParametersMatch() {
+    //given
+    String extraDataJson = "{\"" + EXTRA_DATA_KEY + "\":\"" + EXTRA_DATA_VALUE + "\"}";
+    Map extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
+    User expectedUser = repository.findOneByUsername("user1");
+    expectedUser.setExtraData(extraData);
+    repository.save(expectedUser);
+
+    //when
+    List<User> extraDataUsers = repository.findByExtraData(extraDataJson);
+
+    //then
+    Assert.assertEquals(1, extraDataUsers.size());
+
+    User user = extraDataUsers.get(0);
+    Assert.assertEquals(expectedUser.getUsername(), user.getUsername());
+    Assert.assertEquals(expectedUser.getFirstName(), user.getFirstName());
+    Assert.assertEquals(expectedUser.getLastName(), user.getLastName());
+    Assert.assertEquals(expectedUser.getEmail(), user.getEmail());
+    Assert.assertEquals(expectedUser.getTimezone(), user.getTimezone());
+    Assert.assertEquals(expectedUser.getHomeFacility().getId(), user.getHomeFacility().getId());
+    Assert.assertEquals(expectedUser.isActive(), user.isActive());
+    Assert.assertEquals(expectedUser.isVerified(), user.isVerified());
+    Assert.assertEquals(expectedUser.isLoginRestricted(), user.isLoginRestricted());
+  }
+
+  @Test
+  public void findByExtraDataShouldNotFindDataWhenParametersDoNotMatch() {
+    //given
+    String otherExtraDataJson = "{\"" + EXTRA_DATA_KEY + "\":\"blue\"}";
+
+    //when
+    List<User> extraDataUsers = repository.findByExtraData(otherExtraDataJson);
+
+    //then
+    Assert.assertEquals(0, extraDataUsers.size());
   }
 
   private User cloneUser(User user) {
