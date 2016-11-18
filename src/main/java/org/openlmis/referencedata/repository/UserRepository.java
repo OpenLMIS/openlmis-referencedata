@@ -33,8 +33,8 @@ public interface UserRepository extends
       + ", u.loginrestricted"
       + ", u.extradata"
       + " FROM referencedata.users u"
-      + " WHERE u.extradata @> (:data)\\:\\:jsonb",
+      + " WHERE u.extradata @> (:extraData)\\:\\:jsonb",
       nativeQuery = true
   )
-  List<User> findByData(@Param("data") String data);
+  List<User> findByExtraData(@Param("extraData") String extraData);
 }

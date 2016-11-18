@@ -81,7 +81,7 @@ public class UserServiceTest {
             user.isLoginRestricted()))
         .thenReturn(Arrays.asList(user));
     
-    when(userRepository.findByData(EXTRA_DATA_VALUE)).thenReturn(Collections.singletonList(user));
+    when(userRepository.findByExtraData(EXTRA_DATA_VALUE)).thenReturn(Collections.singletonList(user));
 
     List<User> receivedUsers = userService.searchUsers(user.getUsername(), user.getFirstName(),
         user.getLastName(), user.getHomeFacility(), user.isActive(), user.isVerified(),
