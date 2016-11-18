@@ -1,8 +1,8 @@
 {
   "type": "object",
   "$schema": "http://json-schema.org/draft-04/schema",
-  "title": "FacilityType",
-  "description": "A single facilityType",
+  "title": "GeographicLevel",
+  "description": "A single geographicLevel",
   "properties": {
     "id": {
       "type": "string",
@@ -16,20 +16,13 @@
       "type": "string",
       "title": "name"
     },
-    "description": {
-      "type": "string",
-      "title": "description"
-    },
-    "displayOrder": {
+    "levelNumber": {
       "type": "integer",
-      "title": "displayOrder"
-    },
-    "active": {
-      "type": "boolean",
-      "title": "active"
+      "title": "levelNumber"
     }
   },
   "required": [
-    "code"
+    "code",
+    "levelNumber"
   ]
 }
