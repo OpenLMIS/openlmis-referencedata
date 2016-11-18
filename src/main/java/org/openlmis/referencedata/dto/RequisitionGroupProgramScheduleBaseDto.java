@@ -50,7 +50,7 @@ public class RequisitionGroupProgramScheduleBaseDto extends BaseDto implements
   @Override
   public void setRequisitionGroup(RequisitionGroup requisitionGroup) {
     if (requisitionGroup != null) {
-      this.requisitionGroup = new RequisitionGroupBaseDto(requisitionGroup.getId());
+      this.requisitionGroup = new RequisitionGroupDto(requisitionGroup.getId());
       this.requisitionGroup.setCode(requisitionGroup.getCode());
       this.requisitionGroup.setName(requisitionGroup.getName());
       this.requisitionGroup.setSupervisoryNode(requisitionGroup.getSupervisoryNode());

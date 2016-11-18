@@ -12,7 +12,7 @@ public class RequisitionGroupProgramScheduleDto extends RequisitionGroupProgramS
   @Override
   public void setRequisitionGroup(RequisitionGroup requisitionGroup) {
     if (requisitionGroup != null) {
-      RequisitionGroupBaseDto requisitionGroupBaseDto = new RequisitionGroupBaseDto();
+      RequisitionGroupBaseDto requisitionGroupBaseDto = new RequisitionGroupDto();
       requisitionGroup.export(requisitionGroupBaseDto);
       setRequisitionGroup(requisitionGroupBaseDto);
     } else {

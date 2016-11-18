@@ -9,7 +9,6 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,14 +17,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
 
-  @Getter
-  @Setter
-  private String name;
-
-  @Getter
-  @Setter
-  private String description;
-
   @JsonProperty
   @Getter
   private SupervisoryNodeBaseDto parentNode;
@@ -33,6 +24,10 @@ public class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
   @JsonProperty
   @Getter
   private RequisitionGroupBaseDto requisitionGroup;
+
+  @JsonProperty
+  private Set<SupervisoryNodeBaseDto> childNodes;
+
 
   public SupervisoryNodeDto(UUID id) {
     super(id);
@@ -84,11 +79,15 @@ public class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
     }
   }
 
+  public void setChildNodeDtos(Set<SupervisoryNodeBaseDto> childNodes) {
+    this.childNodes = childNodes;
+  }
+
   @JsonIgnore
   @Override
   public void setRequisitionGroup(RequisitionGroup requisitionGroup) {
     if (requisitionGroup != null) {
-      RequisitionGroupBaseDto requisitionGroupBaseDto = new RequisitionGroupBaseDto();
+      RequisitionGroupBaseDto requisitionGroupBaseDto = new RequisitionGroupDto();
       requisitionGroup.export(requisitionGroupBaseDto);
       setRequisitionGroup(requisitionGroupBaseDto);
     } else {
@@ -99,4 +98,17 @@ public class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
   public void setRequisitionGroup(RequisitionGroupBaseDto requisitionGroup) {
     this.requisitionGroup = requisitionGroup;
   }
+
+  @Override
+  public Set<SupervisoryNode.Importer> getChildNodes() {
+    if (this.childNodes == null) {
+      return null;
+    }
+
+    Set<SupervisoryNode.Importer> childNodes = new HashSet<>();
+    childNodes.addAll(this.childNodes);
+    return childNodes;
+  }
+
+
 }

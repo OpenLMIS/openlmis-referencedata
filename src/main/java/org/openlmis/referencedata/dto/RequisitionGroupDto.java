@@ -1,23 +1,38 @@
 package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
+@NoArgsConstructor
 public class RequisitionGroupDto extends RequisitionGroupBaseDto {
+
+  @JsonProperty
+  private List<RequisitionGroupProgramScheduleBaseDto> requisitionGroupProgramSchedules;
+
+  @JsonProperty
+  private Set<FacilityDto> memberFacilities;
+
+  public RequisitionGroupDto(UUID id) {
+    super(id);
+  }
 
   @JsonIgnore
   @Override
   public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
     if (supervisoryNode != null) {
-      SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeDto();
+      SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeBaseDto();
       supervisoryNode.export(supervisoryNodeBaseDto);
       setSupervisoryNode(supervisoryNodeBaseDto);
     } else {
@@ -44,6 +59,22 @@ public class RequisitionGroupDto extends RequisitionGroupBaseDto {
     }
   }
 
+  @Override
+  public List<RequisitionGroupProgramSchedule.Importer> getRequisitionGroupProgramSchedules() {
+    if (requisitionGroupProgramSchedules == null) {
+      return null;
+    }
+
+    List<RequisitionGroupProgramSchedule.Importer> schedules = new ArrayList<>();
+    schedules.addAll(requisitionGroupProgramSchedules);
+    return schedules;
+  }
+
+  public void setRequisitionGroupProgramScheduleDtos(
+      List<RequisitionGroupProgramScheduleBaseDto> schedules) {
+    this.requisitionGroupProgramSchedules = schedules;
+  }
+
   @JsonIgnore
   @Override
   public void setMemberFacilities(Set<Facility> memberFacilities) {
@@ -61,4 +92,20 @@ public class RequisitionGroupDto extends RequisitionGroupBaseDto {
       setMemberFacilityDtos(null);
     }
   }
+
+  @Override
+  public Set<Facility.Importer> getMemberFacilities() {
+    if (memberFacilities == null) {
+      return null;
+    }
+
+    Set<Facility.Importer> facilities = new HashSet<>();
+    facilities.addAll(memberFacilities);
+    return facilities;
+  }
+
+  public void setMemberFacilityDtos(Set<FacilityDto> memberFacilities) {
+    this.memberFacilities = memberFacilities;
+  }
+
 }

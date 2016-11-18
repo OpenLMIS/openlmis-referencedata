@@ -12,8 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -39,12 +37,6 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
   @Getter
   private SupervisoryNodeBaseDto supervisoryNode;
 
-  @JsonProperty
-  private List<RequisitionGroupProgramScheduleBaseDto> requisitionGroupProgramSchedules;
-
-  @JsonProperty
-  private Set<FacilityDto> memberFacilities;
-
   public RequisitionGroupBaseDto(UUID id) {
     setId(id);
   }
@@ -65,63 +57,22 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
 
   @Override
   public List<RequisitionGroupProgramSchedule.Importer> getRequisitionGroupProgramSchedules() {
-    if (requisitionGroupProgramSchedules == null) {
-      return null;
-    }
-
-    List<RequisitionGroupProgramSchedule.Importer> schedules = new ArrayList<>();
-    schedules.addAll(requisitionGroupProgramSchedules);
-    return schedules;
+    return null;
   }
 
   @JsonIgnore
   @Override
-  public void setRequisitionGroupProgramSchedules(List<RequisitionGroupProgramSchedule> schedules) {
-    if (schedules != null) {
-      this.requisitionGroupProgramSchedules = new ArrayList<>();
-
-      for (RequisitionGroupProgramSchedule schedule : schedules) {
-        this.requisitionGroupProgramSchedules.add(
-            new RequisitionGroupProgramScheduleBaseDto(schedule.getId()));
-      }
-    } else {
-      this.requisitionGroupProgramSchedules = null;
-    }
-  }
-
-  public void setRequisitionGroupProgramScheduleDtos(
-      List<RequisitionGroupProgramScheduleBaseDto> schedules) {
-    this.requisitionGroupProgramSchedules = schedules;
-  }
+  public void setRequisitionGroupProgramSchedules(
+      List<RequisitionGroupProgramSchedule> schedules) {}
 
   @Override
   public Set<Facility.Importer> getMemberFacilities() {
-    if (memberFacilities == null) {
-      return null;
-    }
-
-    Set<Facility.Importer> facilities = new HashSet<>();
-    facilities.addAll(memberFacilities);
-    return facilities;
+    return null;
   }
 
   @JsonIgnore
   @Override
-  public void setMemberFacilities(Set<Facility> memberFacilities) {
-    if (memberFacilities != null) {
-      this.memberFacilities = new HashSet<>();
-
-      for (Facility facility : memberFacilities) {
-        this.memberFacilities.add(new FacilityDto(facility.getId()));
-      }
-    } else {
-      this.memberFacilities = null;
-    }
-  }
-
-  public void setMemberFacilityDtos(Set<FacilityDto> memberFacilities) {
-    this.memberFacilities = memberFacilities;
-  }
+  public void setMemberFacilities(Set<Facility> memberFacilities) {}
 
   @Override
   public boolean equals(Object obj) {

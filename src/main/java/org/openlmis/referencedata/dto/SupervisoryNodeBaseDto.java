@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -28,9 +27,14 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   @Getter
   private FacilityDto facility;
 
+  @Getter
+  @Setter
+  private String name;
 
-  @JsonProperty
-  private Set<SupervisoryNodeBaseDto> childNodes;
+  @Getter
+  @Setter
+  private String description;
+
 
 
   public SupervisoryNodeBaseDto(UUID id) {
@@ -57,52 +61,16 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
 
   @Override
   public Set<SupervisoryNode.Importer> getChildNodes() {
-    if (this.childNodes == null) {
-      return null;
-    }
-
-    Set<SupervisoryNode.Importer> childNodes = new HashSet<>();
-    childNodes.addAll(this.childNodes);
-    return childNodes;
+    return null;
   }
 
   @JsonIgnore
   @Override
-  public void setChildNodes(Set<SupervisoryNode> childNodes) {
-    if (childNodes != null) {
-      this.childNodes  = new HashSet<>();
-
-      for (SupervisoryNode node : childNodes) {
-        this.childNodes.add(new SupervisoryNodeDto(node.getId()));
-      }
-    } else {
-      this.childNodes = null;
-    }
-  }
-
-  public void setChildNodeDtos(Set<SupervisoryNodeBaseDto> childNodes) {
-    this.childNodes = childNodes;
-  }
+  public void setChildNodes(Set<SupervisoryNode> childNodes) {}
 
   @JsonIgnore
   @Override
   public void setRequisitionGroup(RequisitionGroup requisitionGroup) {}
-
-  @Override
-  public void setName(String name) {}
-
-  @Override
-  public void setDescription(String description) {}
-
-  @Override
-  public String getName() {
-    return null;
-  }
-
-  @Override
-  public String getDescription() {
-    return null;
-  }
 
   @Override
   public SupervisoryNode.Importer getParentNode() {

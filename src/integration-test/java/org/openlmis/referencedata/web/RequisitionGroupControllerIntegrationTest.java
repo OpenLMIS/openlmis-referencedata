@@ -16,6 +16,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
@@ -44,7 +45,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   private RequisitionGroupValidator requisitionGroupValidator;
 
   private RequisitionGroup requisitionGroup;
-  private RequisitionGroupDto requisitionGroupDto;
+  private RequisitionGroupBaseDto requisitionGroupDto;
   private UUID requisitionGroupId;
 
   private SupervisoryNode supervisoryNode;
