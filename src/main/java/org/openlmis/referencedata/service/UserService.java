@@ -66,9 +66,8 @@ public class UserService {
     if (extraData != null) {
       List<User> extraDataUsers = userRepository.findByExtraData(extraData);
 
-      // Remove duplicates, then merge the two lists
-      foundUsers.removeAll(extraDataUsers);
-      foundUsers.addAll(extraDataUsers);
+      // intersection between two lists
+      foundUsers.retainAll(extraDataUsers);
     }
 
     return foundUsers;

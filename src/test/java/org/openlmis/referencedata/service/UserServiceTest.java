@@ -37,7 +37,6 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -51,6 +50,7 @@ public class UserServiceTest {
 
   private static final String AUTH_TOKEN = "authToken";
   private static final String EXTRA_DATA_VALUE = "orange";
+  private static final String FIRST_NAME_SEARCH = "FirstNameMatchesTwoUsers";
 
   @Mock
   private UserRepository userRepository;
@@ -62,33 +62,105 @@ public class UserServiceTest {
   private UserService userService;
 
   private User user;
+  private User user2;
+  private User user3;
+  private User user4;
 
   @Before
   public void setUp() {
     user = generateUser();
+    user2 = mock(User.class);
+    user3 = mock(User.class);
+    user4 = mock(User.class);
   }
 
   @Test
-  public void shouldFindUsersIfMatchedRequiredFields() {
+  public void searchUsersShouldGetNoUsersIfSearchesGetDisjointedResults() {
     when(userRepository
         .searchUsers(
-            user.getUsername(),
-            user.getFirstName(),
-            user.getLastName(),
-            user.getHomeFacility(),
-            user.isActive(),
-            user.isVerified(),
-            user.isLoginRestricted()))
-        .thenReturn(Arrays.asList(user));
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            any(Facility.class),
+            any(Boolean.class),
+            any(Boolean.class),
+            any(Boolean.class)))
+        .thenReturn(Arrays.asList(user, user2));
     
-    when(userRepository.findByExtraData(EXTRA_DATA_VALUE)).thenReturn(Collections.singletonList(user));
+    when(userRepository.findByExtraData(any(String.class)))
+        .thenReturn(Arrays.asList(user3, user4));
 
-    List<User> receivedUsers = userService.searchUsers(user.getUsername(), user.getFirstName(),
-        user.getLastName(), user.getHomeFacility(), user.isActive(), user.isVerified(),
-        user.isLoginRestricted(), EXTRA_DATA_VALUE);
+    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null, 
+        null, null, null, null, "ExtraDataMatchesTwoDifferentUsers");
+
+    assertEquals(0, receivedUsers.size());
+  }
+
+  @Test
+  public void searchUsersShouldGetSomeUsersForOverlappingSearchResults() {
+    when(userRepository
+        .searchUsers(
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            any(Facility.class),
+            any(Boolean.class),
+            any(Boolean.class),
+            any(Boolean.class)))
+        .thenReturn(Arrays.asList(user, user2));
+
+    when(userRepository.findByExtraData(any(String.class)))
+        .thenReturn(Arrays.asList(user2, user3));
+
+    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
+        null, null, null, null, "ExtraDataMatchesTwoUsers");
 
     assertEquals(1, receivedUsers.size());
-    assertEquals(user, receivedUsers.get(0));
+    assertEquals(receivedUsers.get(0), user2);
+  }
+
+  @Test
+  public void searchUsersShouldGetAllUsersIfSearchResultsAreTheSame() {
+    when(userRepository
+        .searchUsers(
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            any(Facility.class),
+            any(Boolean.class),
+            any(Boolean.class),
+            any(Boolean.class)))
+        .thenReturn(Arrays.asList(user, user2));
+
+    when(userRepository.findByExtraData(any(String.class)))
+        .thenReturn(Arrays.asList(user, user2));
+
+    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
+        null, null, null, null, "ExtraDataMatchesSameTwoUsers");
+
+    assertEquals(2, receivedUsers.size());
+    assertTrue(receivedUsers.contains(user));
+    assertTrue(receivedUsers.contains(user2));
+  }
+
+  @Test
+  public void searchUsersShouldNotSearchExtraDataIfParameterIsNull() {
+    when(userRepository
+        .searchUsers(
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            any(Facility.class),
+            any(Boolean.class),
+            any(Boolean.class),
+            any(Boolean.class)))
+        .thenReturn(Arrays.asList(user, user2));
+
+    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
+        null, null, null, null, null);
+
+    assertEquals(2, receivedUsers.size());
+    verify(userRepository, never()).findByExtraData(any(String.class));
   }
 
   @Test
