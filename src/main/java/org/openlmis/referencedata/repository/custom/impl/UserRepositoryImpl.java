@@ -14,7 +14,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-@SuppressWarnings("PMD.CyclomaticComplexity")
 public class UserRepositoryImpl implements UserRepositoryCustom {
 
   @PersistenceContext
@@ -46,49 +45,26 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     CriteriaQuery<User> query = builder.createQuery(User.class);
     Root<User> root = query.from(User.class);
     Predicate predicate = builder.conjunction();
-    if (username != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("username"), username));
-    }
-    if (firstName != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("firstName"), firstName));
-    }
-    if (lastName != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("lastName"), lastName));
-    }
-    if (homeFacility != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("homeFacility"), homeFacility));
-    }
-    if (active != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("active"), active));
-    }
-    if (verified != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("verified"), verified));
-    }
-    if (loginRestricted != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("loginRestricted"), loginRestricted));
-    }
+    predicate = addFilter(predicate, builder, root, "username", username);
+    predicate = addFilter(predicate, builder, root, "firstName", firstName);
+    predicate = addFilter(predicate, builder, root, "lastName", lastName);
+    predicate = addFilter(predicate, builder, root, "homeFacility", homeFacility);
+    predicate = addFilter(predicate, builder, root, "active", active);
+    predicate = addFilter(predicate, builder, root, "verified", verified);
+    predicate = addFilter(predicate, builder, root, "loginRestricted", loginRestricted);
     query.where(predicate);
     return entityManager.createQuery(query).getResultList();
+  }
+  
+  private Predicate addFilter(Predicate predicate, CriteriaBuilder builder, Root root,
+                              String filterKey, Object filterValue) {
+    if (filterValue != null) {
+      return builder.and(
+          predicate,
+          builder.equal(
+              root.get(filterKey), filterValue));
+    } else {
+      return predicate;
+    }
   }
 }
