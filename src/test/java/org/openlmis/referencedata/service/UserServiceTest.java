@@ -37,6 +37,7 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -293,7 +294,7 @@ public class UserServiceTest {
         .setVerified(false)
         .setActive(true)
         .setLoginRestricted(true)
-        .setExtraData("{\"color\":\"" + EXTRA_DATA_VALUE + "\"}")
+        .setExtraData(Collections.singletonMap("color", EXTRA_DATA_VALUE))
         .createUser();
   }
 }

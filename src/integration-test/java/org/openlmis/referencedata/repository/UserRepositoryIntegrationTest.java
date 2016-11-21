@@ -138,7 +138,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   public void findByExtraDataShouldFindDataWhenParametersMatch() {
     //given
     String extraDataJson = "{\"" + EXTRA_DATA_KEY + "\":\"" + EXTRA_DATA_VALUE + "\"}";
-    Map extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
+    Map<String, String> extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
     User expectedUser = repository.findOneByUsername("user1");
     expectedUser.setExtraData(extraData);
     repository.save(expectedUser);

@@ -14,6 +14,7 @@ import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.User;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -61,7 +62,7 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
 
   @Getter
   @Setter
-  private Object extraData;
+  private Map<String, String> extraData;
 
   @Getter
   @Setter

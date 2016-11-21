@@ -1,34 +1,41 @@
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.Map;
 
 import javax.persistence.AttributeConverter;
 import javax.validation.constraints.NotNull;
 
-public class ExtraDataConverter implements AttributeConverter<Object, String> {
+public class ExtraDataConverter implements AttributeConverter<Map<String, String>, String> {
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   @NotNull
-  public String convertToDatabaseColumn(@NotNull Object extraData) {
+  public String convertToDatabaseColumn(@NotNull Map<String, String> extraData) {
     try {
       return objectMapper.writeValueAsString(extraData);
-    } catch (Exception ex) {
+    } catch (JsonProcessingException ex) {
       return null;
     }
   }
 
   @Override
   @NotNull
-  public Object convertToEntityAttribute(@NotNull String databaseDataAsJsonString) {
+  public Map<String, String> convertToEntityAttribute(@NotNull String databaseDataAsJsonString) {
     try {
-      if (databaseDataAsJsonString.equalsIgnoreCase("null")) {
+      if (databaseDataAsJsonString == null || databaseDataAsJsonString.equalsIgnoreCase("null")) {
         return null;
       } else {
-        return objectMapper.readValue(databaseDataAsJsonString, Object.class);
+        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
+        };
+        return objectMapper.readValue(databaseDataAsJsonString, typeRef);
       }
-    } catch (Exception ex) {
+    } catch (IOException ex) {
       return null;
     }
   }

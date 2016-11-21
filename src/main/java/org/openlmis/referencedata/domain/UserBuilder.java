@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.domain;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,7 +16,7 @@ public class UserBuilder {
   private boolean active;
   private boolean verified;
   private boolean loginRestricted;
-  private Object extraData;
+  private Map<String, String> extraData;
 
   private UserBuilder() {
     this.homeFacility = null;
@@ -63,8 +64,8 @@ public class UserBuilder {
     this.loginRestricted = loginRestricted;
     return this;
   }
-  
-  public UserBuilder setExtraData(Object extraData) {
+
+  public UserBuilder setExtraData(Map<String, String> extraData) {
     this.extraData = extraData;
     return this;
   }

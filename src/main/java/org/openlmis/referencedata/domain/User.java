@@ -10,6 +10,7 @@ import org.openlmis.referencedata.util.View;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -82,12 +83,12 @@ public class User extends BaseEntity {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
-  
+
   @Column(name = "extradata", columnDefinition = "jsonb")
   @Convert(converter = ExtraDataConverter.class)
   @Getter
   @Setter
-  private Object extraData;
+  private Map<String, String> extraData;
 
   @Transient
   @Getter
@@ -117,7 +118,7 @@ public class User extends BaseEntity {
 
   User(UUID id, String username, String firstName, String lastName, String email, String timezone,
        Facility homeFacility, boolean active, boolean verified, boolean loginRestricted,
-       Object extraData) {
+       Map<String, String> extraData) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
@@ -278,8 +279,8 @@ public class User extends BaseEntity {
     void setLoginRestricted(boolean loginRestricted);
 
     void addRoleAssignments(Set<RoleAssignment> roleAssignments);
-    
-    void setExtraData(Object extraData);
+
+    void setExtraData(Map<String, String> extraData);
   }
 
   public interface Importer {
@@ -302,7 +303,7 @@ public class User extends BaseEntity {
     boolean isActive();
 
     boolean isLoginRestricted();
-    
-    Object getExtraData();
+
+    Map<String, String> getExtraData();
   }
 }
