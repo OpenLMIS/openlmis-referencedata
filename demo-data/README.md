@@ -7,8 +7,8 @@ Each .json file contains demo data that corresponds to one database table.
 
 ## Facilities
 
-In referencedata.facilities.json, .facility_operators.json, .facility_types.json and
-.supported_programs.json.
+In referencedata.facilities.json, .facility_operators.json, .facility_types.json,
+.supported_programs.json, .supervisory_nodes.json and .supply_lines.json.
 
 1. HC01/Comfort Health Clinic
   * type: Health Center
@@ -16,6 +16,8 @@ In referencedata.facilities.json, .facility_operators.json, .facility_types.json
   * operated by: moh/Ministry of Health
   * zone: Balaka (City)
   * this is the home facility for the _administrator_ user
+  * this facility is the supplying facility for the Family Planning program with the Supervisory
+    Node N1/FP Approval point
 2. DH01/Balaka District Hospital
   * type: District Hospital
   * programs: Family Planning and Essential Meds
@@ -28,7 +30,8 @@ In referencedata.facilities.json, .facility_operators.json, .facility_types.json
   * zone: Southern Region
   * this is the home facility for the _devadmin_ user
 
-There are also 2 inactive facilities, FAC003 and FAC004.
+There are also 2 inactive facilities, FAC003 and FAC004. FAC003 is the supplying facility for
+the Essential Meds program with the supervisory node N2/EM Approval point.
 
 ## Geographic Levels and Zones
 
@@ -109,7 +112,8 @@ In referencedata.users.json, .roles.json, .role_assignments.json, .role_rights.j
       N1/FP Approval point
 2. Storeroom Manager
   * no rights
-  * no users
+  * users:
+    * administrator - has this fulfillment role at warehouse HC01/Comfort Health Clinic
 3. Warehouse Clerk
   * no rights
   * no users
