@@ -59,15 +59,23 @@ public class UserService {
   public List<User> searchUsers(String username, String firstName, String lastName,
                                 Facility homeFacility, Boolean active, Boolean verified,
                                 Boolean loginRestricted, String extraData) {
-    List<User> mainSearchUsers = userRepository.searchUsers(username, firstName, lastName,
-        homeFacility, active, verified, loginRestricted);
-    List<User> foundUsers = new ArrayList<>(mainSearchUsers);
+
+    List<User> foundUsers = null;
+    if (username != null || firstName != null || lastName != null || homeFacility != null
+        || active != null || verified != null || loginRestricted != null) {
+      foundUsers = new ArrayList<>(userRepository.searchUsers(username, firstName, lastName,
+          homeFacility, active, verified, loginRestricted));
+    }
 
     if (extraData != null) {
       List<User> extraDataUsers = userRepository.findByExtraData(extraData);
 
-      // intersection between two lists
-      foundUsers.retainAll(extraDataUsers);
+      if (foundUsers != null) {
+        // intersection between two lists
+        foundUsers.retainAll(extraDataUsers);
+      } else {
+        foundUsers = extraDataUsers;
+      }
     }
 
     return foundUsers;

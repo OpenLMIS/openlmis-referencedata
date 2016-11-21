@@ -52,6 +52,7 @@ public class UserServiceTest {
   private static final String AUTH_TOKEN = "authToken";
   private static final String EXTRA_DATA_VALUE = "orange";
   private static final String FIRST_NAME_SEARCH = "FirstNameMatchesTwoUsers";
+  private static final String EXTRA_DATA_SEARCH = "ExtraDataMatchesTwoUsers";
 
   @Mock
   private UserRepository userRepository;
@@ -80,19 +81,19 @@ public class UserServiceTest {
     when(userRepository
         .searchUsers(
             any(String.class),
-            any(String.class),
+            eq(FIRST_NAME_SEARCH),
             any(String.class),
             any(Facility.class),
             any(Boolean.class),
             any(Boolean.class),
             any(Boolean.class)))
         .thenReturn(Arrays.asList(user, user2));
-    
-    when(userRepository.findByExtraData(any(String.class)))
+
+    when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
         .thenReturn(Arrays.asList(user3, user4));
 
-    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null, 
-        null, null, null, null, "ExtraDataMatchesTwoDifferentUsers");
+    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
+        null, null, null, null, EXTRA_DATA_SEARCH);
 
     assertEquals(0, receivedUsers.size());
   }
@@ -102,7 +103,7 @@ public class UserServiceTest {
     when(userRepository
         .searchUsers(
             any(String.class),
-            any(String.class),
+            eq(FIRST_NAME_SEARCH),
             any(String.class),
             any(Facility.class),
             any(Boolean.class),
@@ -110,11 +111,11 @@ public class UserServiceTest {
             any(Boolean.class)))
         .thenReturn(Arrays.asList(user, user2));
 
-    when(userRepository.findByExtraData(any(String.class)))
+    when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
         .thenReturn(Arrays.asList(user2, user3));
 
     List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
-        null, null, null, null, "ExtraDataMatchesTwoUsers");
+        null, null, null, null, EXTRA_DATA_SEARCH);
 
     assertEquals(1, receivedUsers.size());
     assertEquals(receivedUsers.get(0), user2);
@@ -125,7 +126,7 @@ public class UserServiceTest {
     when(userRepository
         .searchUsers(
             any(String.class),
-            any(String.class),
+            eq(FIRST_NAME_SEARCH),
             any(String.class),
             any(Facility.class),
             any(Boolean.class),
@@ -133,11 +134,11 @@ public class UserServiceTest {
             any(Boolean.class)))
         .thenReturn(Arrays.asList(user, user2));
 
-    when(userRepository.findByExtraData(any(String.class)))
+    when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
         .thenReturn(Arrays.asList(user, user2));
 
     List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
-        null, null, null, null, "ExtraDataMatchesSameTwoUsers");
+        null, null, null, null, EXTRA_DATA_SEARCH);
 
     assertEquals(2, receivedUsers.size());
     assertTrue(receivedUsers.contains(user));
@@ -145,11 +146,32 @@ public class UserServiceTest {
   }
 
   @Test
+  public void searchUsersShouldNotDoRegularSearchIfAllParametersAreNull() {
+    when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
+        .thenReturn(Arrays.asList(user, user2));
+
+    List<User> receivedUsers = userService.searchUsers(null, null, null,
+        null, null, null, null, EXTRA_DATA_SEARCH);
+
+    assertEquals(2, receivedUsers.size());
+    assertTrue(receivedUsers.contains(user));
+    assertTrue(receivedUsers.contains(user2));
+    verify(userRepository, never()).searchUsers(
+        any(String.class),
+        any(String.class),
+        any(String.class),
+        any(Facility.class),
+        any(Boolean.class),
+        any(Boolean.class),
+        any(Boolean.class));
+  }
+
+  @Test
   public void searchUsersShouldNotSearchExtraDataIfParameterIsNull() {
     when(userRepository
         .searchUsers(
             any(String.class),
-            any(String.class),
+            eq(FIRST_NAME_SEARCH),
             any(String.class),
             any(Facility.class),
             any(Boolean.class),
@@ -161,6 +183,8 @@ public class UserServiceTest {
         null, null, null, null, null);
 
     assertEquals(2, receivedUsers.size());
+    assertTrue(receivedUsers.contains(user));
+    assertTrue(receivedUsers.contains(user2));
     verify(userRepository, never()).findByExtraData(any(String.class));
   }
 
