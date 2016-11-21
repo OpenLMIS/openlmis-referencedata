@@ -53,6 +53,10 @@
         "$ref": "roleAssignmentDto.json"
       },
       "uniqueItems": false
+    },
+    "extraData": {
+      "type": "object",
+      "title": "extraData"
     }
   },
   "required": [

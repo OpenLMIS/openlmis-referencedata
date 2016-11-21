@@ -159,6 +159,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Assert.assertEquals(expectedUser.isActive(), user.isActive());
     Assert.assertEquals(expectedUser.isVerified(), user.isVerified());
     Assert.assertEquals(expectedUser.isLoginRestricted(), user.isLoginRestricted());
+    Assert.assertEquals(expectedUser.getExtraData(), user.getExtraData());
   }
 
   @Test
