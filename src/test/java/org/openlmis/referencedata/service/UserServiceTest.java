@@ -118,7 +118,7 @@ public class UserServiceTest {
         null, null, null, null, EXTRA_DATA_SEARCH);
 
     assertEquals(1, receivedUsers.size());
-    assertEquals(receivedUsers.get(0), user2);
+    assertEquals(user2, receivedUsers.get(0));
   }
 
   @Test

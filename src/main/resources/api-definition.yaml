@@ -1183,9 +1183,11 @@ resourceTypes:
                           X-Content-Type-Options:
                           X-XSS-Protection:
     /search:
-            get:
+            post:
                 is: [ secured ]
                 description: "Search users, matching all parameters specified. Extra Data is in JSON format, and is expected to hold a JSON object with key-value pairs. To search extraData, specify as a JSON object (e.g. extraData={\"color\":\"orange\"})"
+                body:
+                    application/json:
                 queryParameters:
                     firstName:
                         displayName: firstName
@@ -1235,13 +1237,6 @@ resourceTypes:
                         required: false
                         repeat: false
                         example: "true"
-                    extraData:
-                        displayName: Extra Data
-                        description: Searching that extra data contains specified JSON.
-                        type: string
-                        required: false
-                        repeat: false
-                        example: "{\"color\":\"orange\"}"
                 responses:
                     200:
                         headers:

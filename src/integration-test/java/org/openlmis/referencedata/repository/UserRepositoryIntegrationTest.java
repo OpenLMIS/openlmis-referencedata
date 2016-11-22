@@ -1,5 +1,8 @@
 package org.openlmis.referencedata.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +42,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   private FacilityRepository facilityRepository;
 
   private List<User> users;
+  
+  private ObjectMapper mapper = new ObjectMapper();
 
   UserRepository getRepository() {
     return this.repository;
@@ -135,10 +140,10 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   @Test
-  public void findByExtraDataShouldFindDataWhenParametersMatch() {
+  public void findByExtraDataShouldFindDataWhenParametersMatch() throws JsonProcessingException {
     //given
-    String extraDataJson = "{\"" + EXTRA_DATA_KEY + "\":\"" + EXTRA_DATA_VALUE + "\"}";
     Map<String, String> extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
+    String extraDataJson = mapper.writeValueAsString(extraData);
     User expectedUser = repository.findOneByUsername("user1");
     expectedUser.setExtraData(extraData);
     repository.save(expectedUser);

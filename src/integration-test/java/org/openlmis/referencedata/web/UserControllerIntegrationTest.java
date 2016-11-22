@@ -10,8 +10,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 
 import com.google.common.collect.Sets;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -119,6 +123,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private RequisitionGroupRepository requisitionGroupRepository;
+  
+  private ObjectMapper mapper = new ObjectMapper();
 
   private User user1;
   private UUID userId;
@@ -373,19 +379,24 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldFindUsers() {
+  public void shouldFindUsers() throws JsonProcessingException {
+
+    Map<String, String> extraData = Collections.singletonMap("color", "orange");
+    String extraDataJson = mapper.writeValueAsString(extraData);
 
     given(userService.searchUsers(any(String.class), any(String.class), any(String.class),
         any(Facility.class), any(Boolean.class), any(Boolean.class), any(Boolean.class),
-        any(String.class)))
+        eq(extraDataJson)))
         .willReturn(singletonList(user1));
 
     UserDto[] response = restAssured
         .given()
         .queryParam(USERNAME, user1.getUsername())
         .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(extraDataJson)
         .when()
-        .get(SEARCH_URL)
+        .post(SEARCH_URL)
         .then()
         .statusCode(200)
         .extract().as(UserDto[].class);

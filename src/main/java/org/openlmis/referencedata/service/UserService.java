@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,7 +79,7 @@ public class UserService {
       }
     }
 
-    return foundUsers;
+    return Optional.ofNullable(foundUsers).orElse(Collections.emptyList());
   }
 
   /**

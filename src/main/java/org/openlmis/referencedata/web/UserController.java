@@ -262,7 +262,7 @@ public class UserController extends BaseController {
    * @param verified     is the user account verified.
    * @return ResponseEntity with list of all Users matching provided parameters and OK httpStatus.
    */
-  @RequestMapping(value = "/users/search", method = RequestMethod.GET)
+  @RequestMapping(value = "/users/search", method = RequestMethod.POST)
   public ResponseEntity<?> searchUsers(
       @RequestParam(value = "username", required = false) String username,
       @RequestParam(value = "firstName", required = false) String firstName,
@@ -271,7 +271,7 @@ public class UserController extends BaseController {
       @RequestParam(value = "active", required = false) Boolean active,
       @RequestParam(value = "verified", required = false) Boolean verified,
       @RequestParam(value = "loginRestricted", required = false) Boolean loginRestricted,
-      @RequestParam(value = "extraData", required = false) String extraData) {
+      @RequestBody(required = false) String extraData) {
     List<User> result = userService.searchUsers(username, firstName, lastName, homeFacility,
         active, verified, loginRestricted, extraData);
 

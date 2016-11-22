@@ -21,17 +21,7 @@ public interface UserRepository extends
 
   User findOneByUsername(@Param("username") String username);
 
-  @Query(value = "SELECT u.id"
-      + ", u.username"
-      + ", u.firstname"
-      + ", u.lastname"
-      + ", u.email"
-      + ", u.timezone"
-      + ", u.homefacilityid"
-      + ", u.verified"
-      + ", u.active"
-      + ", u.loginrestricted"
-      + ", u.extradata"
+  @Query(value = "SELECT u.*"
       + " FROM referencedata.users u"
       + " WHERE u.extradata @> (:extraData)\\:\\:jsonb",
       nativeQuery = true
