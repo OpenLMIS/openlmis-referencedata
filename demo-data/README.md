@@ -7,8 +7,10 @@ Each .json file contains demo data that corresponds to one database table.
 
 ## Facilities
 
-In referencedata.facilities.json, .facility_operators.json, .facility_types.json,
-.supported_programs.json, .supervisory_nodes.json and .supply_lines.json.
+The facilities described below are defined in these files:
+referencedata.facilities.json, referencedata.facility_operators.json,
+referencedata.facility_types.json, referencedata.supported_programs.json,
+referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
 
 1. HC01/Comfort Health Clinic
   * type: Health Center
@@ -35,7 +37,7 @@ the Essential Meds program with the supervisory node N2/EM Approval point.
 
 ## Geographic Levels and Zones
 
-In referencedata.geographic_levels.json and .geographic_zones.json.
+Defined in referencedata.geographic_levels.json and referencedata.geographic_zones.json.
 
 1. Country - Mal/Malawi
 2. Region - Mal-So/Southern Region
@@ -44,7 +46,8 @@ In referencedata.geographic_levels.json and .geographic_zones.json.
 
 ## Programs and Products
 
-In referencedata.programs.json, .orderable_products.json and .program_products.json.
+Defined in referencedata.programs.json, referencedata.orderable_products.json and
+referencedata.program_products.json.
 
 1. Family Planning
   * skipping requisition periods is enabled
@@ -79,8 +82,9 @@ referencedata.facility_type_approved_products.json.
 
 ## Requisition Groups and Schedules
 
-In referencedata.requisition_groups.json, .processing_schedules.json,
-.requisition_group_program_schedules.json and .requisition_group_members.json.
+Defined in referencedata.requisition_groups.json, referencedata.processing_schedules.json,
+referencedata.requisition_group_program_schedules.json and
+referencedata.requisition_group_members.json.
 
 1. RG Family Planning
   * schedule: Monthly (Jan2016, Feb2016 ... Dec2016)
@@ -100,8 +104,8 @@ There are also 2 unused schedules, SCH003 and SCH004.
 
 ## Roles, Users and Rights
 
-In referencedata.users.json, .roles.json, .role_assignments.json, .role_rights.json and
-.supervisory_nodes.json.
+Defined in referencedata.users.json, referencedata.roles.json, referencedata.role_assignments.json,
+referencedata.role_rights.json and referencedata.supervisory_nodes.json.
 
 1. Program Supervisor
   * rights:
@@ -128,7 +132,7 @@ Other users with no roles:
   * admin (this admin account is built into the bootstrap data)
 
 Passwords for these user accounts come from the
-[Authentication Service demo data](https://github.com/OpenLMIS/openlmis-auth/tree/master/demo-data).
+[Authentication Service's demo data](https://github.com/OpenLMIS/openlmis-auth/tree/master/demo-data).
 
 Rights themselves come from the bootstrap data,
 [bootstrap.sql](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/bootstrap.sql).
