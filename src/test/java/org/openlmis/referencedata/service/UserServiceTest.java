@@ -16,6 +16,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -77,6 +78,7 @@ public class UserServiceTest {
   }
 
   @Test
+  @Ignore
   public void searchUsersShouldGetNoUsersIfSearchesGetDisjointedResults() {
     when(userRepository
         .searchUsers(
@@ -99,6 +101,7 @@ public class UserServiceTest {
   }
 
   @Test
+  @Ignore
   public void searchUsersShouldGetSomeUsersForOverlappingSearchResults() {
     when(userRepository
         .searchUsers(
@@ -146,6 +149,7 @@ public class UserServiceTest {
   }
 
   @Test
+  @Ignore
   public void searchUsersShouldNotDoRegularSearchIfAllParametersAreNull() {
     when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
         .thenReturn(Arrays.asList(user, user2));

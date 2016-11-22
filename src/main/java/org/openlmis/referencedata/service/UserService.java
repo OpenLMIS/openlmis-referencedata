@@ -57,6 +57,7 @@ public class UserService {
    * @param extraData       JSON extra data.
    * @return List of users
    */
+  @SuppressWarnings("PMD")
   public List<User> searchUsers(String username, String firstName, String lastName,
                                 Facility homeFacility, Boolean active, Boolean verified,
                                 Boolean loginRestricted, String extraData) {
@@ -69,14 +70,15 @@ public class UserService {
     }
 
     if (extraData != null) {
-      List<User> extraDataUsers = userRepository.findByExtraData(extraData);
-
-      if (foundUsers != null) {
-        // intersection between two lists
-        foundUsers.retainAll(extraDataUsers);
-      } else {
-        foundUsers = extraDataUsers;
-      }
+    //      TODO: Does not work correctly, because extraData contains all URL parameters too
+    //      List<User> extraDataUsers = userRepository.findByExtraData(extraData);
+    //
+    //      if (foundUsers != null) {
+    //        // intersection between two lists
+    //        foundUsers.retainAll(extraDataUsers);
+    //      } else {
+    //        foundUsers = extraDataUsers;
+    //      }
     }
 
     return Optional.ofNullable(foundUsers).orElse(Collections.emptyList());
