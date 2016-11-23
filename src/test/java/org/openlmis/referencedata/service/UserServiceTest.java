@@ -15,6 +15,9 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -39,8 +42,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -51,9 +56,10 @@ import java.util.UUID;
 public class UserServiceTest {
 
   private static final String AUTH_TOKEN = "authToken";
-  private static final String EXTRA_DATA_VALUE = "orange";
+  private static final String EXTRA_DATA_VALUE = "extraDataValue";
   private static final String FIRST_NAME_SEARCH = "FirstNameMatchesTwoUsers";
-  private static final String EXTRA_DATA_SEARCH = "ExtraDataMatchesTwoUsers";
+  private static final String EXTRA_DATA_KEY = "extraDataKey";
+  private static final String EXTRA_DATA_PROP_NAME = "extraData";
 
   @Mock
   private UserRepository userRepository;
@@ -69,12 +75,22 @@ public class UserServiceTest {
   private User user3;
   private User user4;
 
+  private Map<String, Object> userSearch;
+  private Map<String, String> extraData;
+  private ObjectMapper mapper = new ObjectMapper();
+  private String extraDataString;
+  private Map<String, Object> queryMap;
+
   @Before
-  public void setUp() {
+  public void setUp() throws JsonProcessingException {
     user = generateUser();
     user2 = mock(User.class);
     user3 = mock(User.class);
     user4 = mock(User.class);
+    userSearch = Collections.singletonMap("firstName", FIRST_NAME_SEARCH);
+    extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
+    extraDataString = mapper.writeValueAsString(extraData);
+    queryMap = new HashMap<>();
   }
 
   @Test
@@ -91,11 +107,13 @@ public class UserServiceTest {
             any(Boolean.class)))
         .thenReturn(Arrays.asList(user, user2));
 
-    when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
+    when(userRepository.findByExtraData(extraDataString))
         .thenReturn(Arrays.asList(user3, user4));
 
-    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
-        null, null, null, null, EXTRA_DATA_SEARCH);
+    queryMap.putAll(userSearch);
+    queryMap.put(EXTRA_DATA_PROP_NAME, extraData);
+
+    List<User> receivedUsers = userService.searchUsers(queryMap);
 
     assertEquals(0, receivedUsers.size());
   }
@@ -114,11 +132,13 @@ public class UserServiceTest {
             any(Boolean.class)))
         .thenReturn(Arrays.asList(user, user2));
 
-    when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
+    when(userRepository.findByExtraData(extraDataString))
         .thenReturn(Arrays.asList(user2, user3));
 
-    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
-        null, null, null, null, EXTRA_DATA_SEARCH);
+    queryMap.putAll(userSearch);
+    queryMap.put(EXTRA_DATA_PROP_NAME, extraData);
+
+    List<User> receivedUsers = userService.searchUsers(queryMap);
 
     assertEquals(1, receivedUsers.size());
     assertEquals(user2, receivedUsers.get(0));
@@ -137,11 +157,13 @@ public class UserServiceTest {
             any(Boolean.class)))
         .thenReturn(Arrays.asList(user, user2));
 
-    when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
+    when(userRepository.findByExtraData(extraDataString))
         .thenReturn(Arrays.asList(user, user2));
 
-    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
-        null, null, null, null, EXTRA_DATA_SEARCH);
+    queryMap.putAll(userSearch);
+    queryMap.put(EXTRA_DATA_PROP_NAME, extraData);
+
+    List<User> receivedUsers = userService.searchUsers(queryMap);
 
     assertEquals(2, receivedUsers.size());
     assertTrue(receivedUsers.contains(user));
@@ -149,13 +171,13 @@ public class UserServiceTest {
   }
 
   @Test
-  @Ignore
-  public void searchUsersShouldNotDoRegularSearchIfAllParametersAreNull() {
-    when(userRepository.findByExtraData(EXTRA_DATA_SEARCH))
+  public void searchUsersShouldNotDoRegularSearchIfNoParameters() {
+    when(userRepository.findByExtraData(extraDataString))
         .thenReturn(Arrays.asList(user, user2));
 
-    List<User> receivedUsers = userService.searchUsers(null, null, null,
-        null, null, null, null, EXTRA_DATA_SEARCH);
+    queryMap.put(EXTRA_DATA_PROP_NAME, extraData);
+
+    List<User> receivedUsers = userService.searchUsers(queryMap);
 
     assertEquals(2, receivedUsers.size());
     assertTrue(receivedUsers.contains(user));
@@ -171,7 +193,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void searchUsersShouldNotSearchExtraDataIfParameterIsNull() {
+  public void searchUsersShouldNotSearchExtraDataIfParameterIsNullOrEmpty() {
     when(userRepository
         .searchUsers(
             any(String.class),
@@ -183,8 +205,9 @@ public class UserServiceTest {
             any(Boolean.class)))
         .thenReturn(Arrays.asList(user, user2));
 
-    List<User> receivedUsers = userService.searchUsers(null, FIRST_NAME_SEARCH, null,
-        null, null, null, null, null);
+    queryMap.putAll(userSearch);
+
+    List<User> receivedUsers = userService.searchUsers(queryMap);
 
     assertEquals(2, receivedUsers.size());
     assertTrue(receivedUsers.contains(user));
@@ -322,7 +345,7 @@ public class UserServiceTest {
         .setVerified(false)
         .setActive(true)
         .setLoginRestricted(true)
-        .setExtraData(Collections.singletonMap("color", EXTRA_DATA_VALUE))
+        .setExtraData(Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE))
         .createUser();
   }
 }

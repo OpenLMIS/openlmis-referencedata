@@ -174,6 +174,8 @@ schemas:
           "type": "array",
           "items": { "type": "object", "$ref": "schemas/user.json" }
       }
+      
+  - userQueryDto: !include schemas/userQueryDto.json
   
   - supervisoryNode: |
       {   "type": "object",
@@ -1185,58 +1187,10 @@ resourceTypes:
     /search:
             post:
                 is: [ secured ]
-                description: "Search users, matching all parameters specified. Extra Data is in JSON format, and is expected to hold a JSON object with key-value pairs. To search extraData, specify as a JSON object (e.g. extraData={\"color\":\"orange\"})"
+                description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs."
                 body:
                     application/json:
-                queryParameters:
-                    firstName:
-                        displayName: firstName
-                        description: FirstName
-                        type: string
-                        required: false
-                        repeat: false
-                        example: firstName
-                    lastName:
-                        displayName: lastName
-                        description: LastName
-                        type: string
-                        required: false
-                        repeat: false
-                        example: lastName
-                    verified:
-                        displayName: verified
-                        description: Verified
-                        type: boolean
-                        required: false
-                        repeat: false
-                        example: "true"
-                    active:
-                        displayName: active
-                        description: Active
-                        type: boolean
-                        required: false
-                        repeat: false
-                        example: "true"
-                    homeFacility:
-                        displayName: homeFacility
-                        description: HomeFacilityId (href)
-                        type: string
-                        required: false
-                        repeat: false
-                    username:
-                        displayName: username
-                        description: Username
-                        type: string
-                        required: false
-                        repeat: false
-                        example: username
-                    loginRestricted:
-                        displayName: loginRestricted
-                        description: Login Restricted
-                        type: boolean
-                        required: false
-                        repeat: false
-                        example: "true"
+                      schema: userQueryDto
                 responses:
                     200:
                         headers:
@@ -1245,10 +1199,6 @@ resourceTypes:
                         body:
                           application/json:
                               schema: userArray
-                    500:
-                        headers:
-                          X-Content-Type-Options:
-                          X-XSS-Protection:
 
 /facilities:
     displayName: Facility

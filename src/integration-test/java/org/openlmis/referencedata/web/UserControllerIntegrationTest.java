@@ -9,8 +9,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 
 import com.google.common.collect.Sets;
 
@@ -63,6 +61,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -123,7 +122,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private RequisitionGroupRepository requisitionGroupRepository;
-  
+
   private ObjectMapper mapper = new ObjectMapper();
 
   private User user1;
@@ -381,20 +380,18 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindUsers() throws JsonProcessingException {
 
+    Map<String, Object> queryMap = new HashMap<>();
+    queryMap.put(USERNAME, user1.getUsername());
     Map<String, String> extraData = Collections.singletonMap("color", "orange");
-    String extraDataJson = mapper.writeValueAsString(extraData);
+    queryMap.put("extraData", extraData);
 
-    given(userService.searchUsers(any(String.class), any(String.class), any(String.class),
-        any(Facility.class), any(Boolean.class), any(Boolean.class), any(Boolean.class),
-        eq(extraDataJson)))
-        .willReturn(singletonList(user1));
+    given(userService.searchUsers(queryMap)).willReturn(singletonList(user1));
 
     UserDto[] response = restAssured
         .given()
-        .queryParam(USERNAME, user1.getUsername())
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(extraDataJson)
+        .body(queryMap)
         .when()
         .post(SEARCH_URL)
         .then()

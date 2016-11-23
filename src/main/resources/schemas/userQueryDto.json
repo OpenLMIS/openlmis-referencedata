@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "User Query DTO",
+  "description": "A DTO to search for users",
+  "properties": {
+    "username": {
+      "type": "string",
+      "title": "username"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "firstName"
+    },
+    "lastName": {
+      "type": "string",
+      "title": "lastName"
+    },
+    "homeFacility": {
+      "type": "object",
+      "title": "homeFacility"
+    },
+    "verified": {
+      "type": "boolean",
+      "title": "verified"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "active"
+    },
+    "loginRestricted": {
+      "type": "boolean",
+      "title": "loginRestricted"
+    },
+    "extraData": {
+      "type": "object",
+      "title": "extraData"
+    }
+  }
+}

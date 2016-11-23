@@ -1,5 +1,8 @@
 package org.openlmis.referencedata.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.ExternalApiException;
@@ -9,6 +12,8 @@ import org.openlmis.referencedata.util.AuthUserRequest;
 import org.openlmis.referencedata.util.NotificationRequest;
 import org.openlmis.referencedata.util.PasswordChangeRequest;
 import org.openlmis.referencedata.util.PasswordResetRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -18,7 +23,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,6 +34,8 @@ import javax.annotation.PostConstruct;
 @Service
 public class UserService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+
   @Autowired
   private UserRepository userRepository;
 
@@ -34,6 +43,8 @@ public class UserService {
   private ExposedMessageSource messageSource;
 
   private String virtualHostBaseUrl;
+
+  private ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Initialize service object.
@@ -47,38 +58,48 @@ public class UserService {
   /**
    * Method returns all users with matched parameters.
    *
-   * @param username        username of user.
-   * @param firstName       firstName of user.
-   * @param lastName        lastName of user.
-   * @param homeFacility    homeFacility of user.
-   * @param active          is the account activated.
-   * @param verified        is the account verified.
-   * @param loginRestricted is the login restricted.
-   * @param extraData       JSON extra data.
+   * @param queryMap request parameters (username, firstName, lastName, homeFacility, active,
+   *                 verified, loginRestricted) and JSON extraData.
    * @return List of users
    */
-  @SuppressWarnings("PMD")
-  public List<User> searchUsers(String username, String firstName, String lastName,
-                                Facility homeFacility, Boolean active, Boolean verified,
-                                Boolean loginRestricted, String extraData) {
+  public List<User> searchUsers(Map<String, Object> queryMap) {
 
-    List<User> foundUsers = null;
-    if (username != null || firstName != null || lastName != null || homeFacility != null
-        || active != null || verified != null || loginRestricted != null) {
-      foundUsers = new ArrayList<>(userRepository.searchUsers(username, firstName, lastName,
-          homeFacility, active, verified, loginRestricted));
+    if (queryMap == null || queryMap.isEmpty()) {
+      return Collections.emptyList();
     }
 
-    if (extraData != null) {
-    //      TODO: Does not work correctly, because extraData contains all URL parameters too
-    //      List<User> extraDataUsers = userRepository.findByExtraData(extraData);
-    //
-    //      if (foundUsers != null) {
-    //        // intersection between two lists
-    //        foundUsers.retainAll(extraDataUsers);
-    //      } else {
-    //        foundUsers = extraDataUsers;
-    //      }
+    List<User> foundUsers = null;
+
+    Map<String, Object> regularQueryMap = new HashMap<>(queryMap);
+    Map<String, String> extraData = (Map<String, String>) regularQueryMap.remove("extraData");
+
+    if (!regularQueryMap.isEmpty()) {
+      foundUsers = new ArrayList<>(userRepository.searchUsers(
+          (String) queryMap.get("username"),
+          (String) queryMap.get("firstName"),
+          (String) queryMap.get("lastName"),
+          (Facility) queryMap.get("homeFacility"),
+          (Boolean) queryMap.get("active"),
+          (Boolean) queryMap.get("verified"),
+          (Boolean) queryMap.get("loginRestricted")));
+    }
+
+    if (extraData != null && !extraData.isEmpty()) {
+
+      String extraDataString;
+      try {
+        extraDataString = mapper.writeValueAsString(extraData);
+        List<User> extraDataUsers = userRepository.findByExtraData(extraDataString);
+
+        if (foundUsers != null) {
+          // intersection between two lists
+          foundUsers.retainAll(extraDataUsers);
+        } else {
+          foundUsers = extraDataUsers;
+        }
+      } catch (JsonProcessingException jpe) {
+        LOGGER.debug("Cannot serialize extra data query request body into JSON");
+      }
     }
 
     return Optional.ofNullable(foundUsers).orElse(Collections.emptyList());

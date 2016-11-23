@@ -59,6 +59,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -254,26 +255,14 @@ public class UserController extends BaseController {
   /**
    * Returns all users with matched parameters
    *
-   * @param username     username of user we want to search.
-   * @param firstName    firstName of user we want to search.
-   * @param lastName     lastName of user we want to search.
-   * @param homeFacility homeFacility of user we want to search.
-   * @param active       is the user account active.
-   * @param verified     is the user account verified.
+   * @param queryMap request parameters (username, firstName, lastName, homeFacility, active,
+   *                 verified, loginRestricted) and JSON extraData.
    * @return ResponseEntity with list of all Users matching provided parameters and OK httpStatus.
    */
   @RequestMapping(value = "/users/search", method = RequestMethod.POST)
   public ResponseEntity<?> searchUsers(
-      @RequestParam(value = "username", required = false) String username,
-      @RequestParam(value = "firstName", required = false) String firstName,
-      @RequestParam(value = "lastName", required = false) String lastName,
-      @RequestParam(value = "homeFacility", required = false) Facility homeFacility,
-      @RequestParam(value = "active", required = false) Boolean active,
-      @RequestParam(value = "verified", required = false) Boolean verified,
-      @RequestParam(value = "loginRestricted", required = false) Boolean loginRestricted,
-      @RequestBody(required = false) String extraData) {
-    List<User> result = userService.searchUsers(username, firstName, lastName, homeFacility,
-        active, verified, loginRestricted, extraData);
+      @RequestBody Map<String, Object> queryMap) {
+    List<User> result = userService.searchUsers(queryMap);
 
     return ResponseEntity
         .ok(exportToDtos(result));
