@@ -16,9 +16,9 @@
       "type": "string",
       "title": "lastName"
     },
-    "homeFacility": {
-      "type": "object",
-      "title": "homeFacility"
+    "homeFacilityId": {
+      "type": "string",
+      "title": "homeFacilityId"
     },
     "verified": {
       "type": "boolean",

@@ -7,6 +7,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.ExternalApiException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.AuthUserRequest;
 import org.openlmis.referencedata.util.NotificationRequest;
@@ -38,6 +39,9 @@ public class UserService {
 
   @Autowired
   private UserRepository userRepository;
+  
+  @Autowired
+  private FacilityRepository facilityRepository;
 
   @Autowired
   private ExposedMessageSource messageSource;
@@ -74,6 +78,10 @@ public class UserService {
     Map<String, String> extraData = (Map<String, String>) regularQueryMap.remove("extraData");
 
     if (!regularQueryMap.isEmpty()) {
+      if (queryMap.containsKey("homeFacilityId")) {
+        queryMap.put("homeFacility", facilityRepository.findOne(
+            (UUID) queryMap.get("homeFacilityId")));
+      }
       foundUsers = new ArrayList<>(userRepository.searchUsers(
           (String) queryMap.get("username"),
           (String) queryMap.get("firstName"),
