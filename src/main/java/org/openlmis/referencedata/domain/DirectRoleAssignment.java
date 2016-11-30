@@ -2,9 +2,9 @@ package org.openlmis.referencedata.domain;
 
 import com.google.common.collect.Sets;
 
-import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.exception.RightTypeException;
+
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
@@ -37,5 +37,14 @@ public class DirectRoleAssignment extends RoleAssignment {
    */
   public void export(Exporter exporter) {
     exporter.setRoleId(role.getId());
+  }
+
+  /**
+   * Export this object to the specified detailed exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void detailedExport(DetailedExporter exporter) {
+    exporter.setRole(role);
   }
 }

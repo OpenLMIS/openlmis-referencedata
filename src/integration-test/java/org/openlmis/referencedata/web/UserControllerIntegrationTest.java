@@ -10,6 +10,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,6 +36,7 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
@@ -73,6 +75,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/users";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String ROLE_ASSIGNMENTS_URL = ID_URL + "/roleAssignments";
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
   private static final String PROGRAMS_URL = ID_URL + "/programs";
   private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
@@ -146,6 +149,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID fulfillmentRoleId;
   private Facility warehouse;
 
+
   /**
    * Constructor for test class.
    */
@@ -194,6 +198,26 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(UserDto.class);
 
     assertEquals(userDto, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUsersFullRoleAssignments() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+
+    DetailedRoleAssignmentDto[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(ROLE_ASSIGNMENTS_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(DetailedRoleAssignmentDto[].class);
+
+    List<DetailedRoleAssignmentDto> actual = Lists.newArrayList(response);
+    assertEquals(user1.getRoleAssignments().size(), actual.size());
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

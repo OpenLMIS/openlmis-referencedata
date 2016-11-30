@@ -176,6 +176,14 @@ schemas:
       }
       
   - userQueryDto: !include schemas/userQueryDto.json
+
+  - detailedRoleAssignmentDto: !include schemas/detailedRoleAssignmentDto.json
+
+  - detailedRoleAssignmentDtoArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/detailedRoleAssignmentDto.json" }
+      }
   
   - supervisoryNode: |
       {   "type": "object",
@@ -1075,6 +1083,22 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
+        /roleAssignments:
+            get:
+                is: [ secured ]
+                description: Return full information about user's roles and rights.
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                            schema: detailedRoleAssignmentDtoArray
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
         /hasRight:
             get:
                 is: [ secured ]

@@ -3,10 +3,10 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
+import org.openlmis.referencedata.exception.RightTypeException;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import org.openlmis.referencedata.exception.RightTypeException;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -143,6 +143,19 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     }
   }
 
+  /**
+   * Export this object to the specified detailed exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void detailedExport(DetailedExporter exporter) {
+    exporter.setRole(role);
+    exporter.setProgramCode(program.getCode().toString());
+    if (supervisoryNode != null) {
+      exporter.setSupervisoryNodeCode(supervisoryNode.getCode());
+    }
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -167,6 +180,12 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   public interface Exporter extends RoleAssignment.Exporter {
+    void setProgramCode(String programCode);
+
+    void setSupervisoryNodeCode(String supervisoryNodeCode);
+  }
+
+  public interface DetailedExporter extends RoleAssignment.DetailedExporter {
     void setProgramCode(String programCode);
 
     void setSupervisoryNodeCode(String supervisoryNodeCode);

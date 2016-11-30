@@ -1,9 +1,9 @@
 package org.openlmis.referencedata.domain;
 
+import org.openlmis.referencedata.exception.RightTypeException;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import org.openlmis.referencedata.exception.RightTypeException;
 
 import java.util.Objects;
 import java.util.Set;
@@ -79,5 +79,9 @@ public abstract class RoleAssignment extends BaseEntity {
 
   public interface Exporter {
     void setRoleId(UUID roleId);
+  }
+
+  public interface DetailedExporter {
+    void setRole(Role role);
   }
 }

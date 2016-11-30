@@ -2,11 +2,11 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Collections.singleton;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 import java.util.Set;
@@ -79,6 +79,16 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
     exporter.setWarehouseCode(warehouse.getCode());
   }
 
+  /**
+   * Export this object to the specified detailed exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void detailedExport(DetailedExporter exporter) {
+    exporter.setRole(role);
+    exporter.setWarehouseCode(warehouse.getCode());
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -102,6 +112,10 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   }
 
   public interface Exporter extends RoleAssignment.Exporter {
+    void setWarehouseCode(String warehouseCode);
+  }
+
+  public interface DetailedExporter extends RoleAssignment.DetailedExporter {
     void setWarehouseCode(String warehouseCode);
   }
 }

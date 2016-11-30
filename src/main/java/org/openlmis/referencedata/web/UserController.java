@@ -5,8 +5,6 @@ import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
 
-import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -20,6 +18,7 @@ import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.AuthException;
@@ -57,6 +56,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -174,7 +176,7 @@ public class UserController extends BaseController {
       userService.save(userToSave, token);
 
       return ResponseEntity
-          .ok(exportToDto(userToSave));
+          .ok(exportUserToDto(userToSave));
 
     } catch (ExternalApiException ex) {
 
@@ -203,7 +205,7 @@ public class UserController extends BaseController {
 
     LOGGER.debug("Getting all users");
     Set<User> users = Sets.newHashSet(userRepository.findAll());
-    Set<UserDto> userDtos = users.stream().map(user -> exportToDto(user)).collect(toSet());
+    Set<UserDto> userDtos = users.stream().map(user -> exportUserToDto(user)).collect(toSet());
 
     return ResponseEntity
         .ok(userDtos);
@@ -227,7 +229,27 @@ public class UserController extends BaseController {
           .build();
     } else {
       return ResponseEntity
-          .ok(exportToDto(user));
+          .ok(exportUserToDto(user));
+    }
+  }
+
+  /**
+   * Get all rights and roles of the specified user.
+   *
+   * @param userId UUID of the user to retrieve
+   * @return a set of user role assignments
+   */
+  @RequestMapping(value = "/users/{userId}/roleAssignments", method = RequestMethod.GET)
+  public ResponseEntity<?> getUserRightsAndRoles(@PathVariable("userId") UUID userId) {
+
+    User user = userRepository.findOne(userId);
+    if (user == null) {
+      ErrorResponse errorResponse = new ErrorResponse(
+          "referencedata.error.user.not-found", "User with ID " + userId + " was not found.");
+      return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    } else {
+      Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
+      return ResponseEntity.ok(exportRoleAssignmentsToDtos(roleAssignments));
     }
   }
 
@@ -265,7 +287,7 @@ public class UserController extends BaseController {
     List<User> result = userService.searchUsers(queryMap);
 
     return ResponseEntity
-        .ok(exportToDtos(result));
+        .ok(exportUsersToDtos(result));
   }
 
   /**
@@ -543,13 +565,35 @@ public class UserController extends BaseController {
     }
   }
 
-  private UserDto exportToDto(User user) {
+  private Set<DetailedRoleAssignmentDto> exportRoleAssignmentsToDtos(
+      Set<RoleAssignment> roleAssignments) {
+
+    Set<DetailedRoleAssignmentDto> assignmentDtos = new HashSet<>();
+
+    for (RoleAssignment assignment : roleAssignments) {
+      DetailedRoleAssignmentDto assignmentDto = new DetailedRoleAssignmentDto();
+
+      if (assignment instanceof SupervisionRoleAssignment) {
+        ((SupervisionRoleAssignment) assignment).detailedExport(assignmentDto);
+      } else if (assignment instanceof FulfillmentRoleAssignment) {
+        ((FulfillmentRoleAssignment) assignment).detailedExport(assignmentDto);
+      } else {
+        ((DirectRoleAssignment) assignment).detailedExport(assignmentDto);
+      }
+
+      assignmentDtos.add(assignmentDto);
+    }
+
+    return assignmentDtos;
+  }
+
+  private UserDto exportUserToDto(User user) {
     UserDto userDto = new UserDto();
     user.export(userDto);
     return userDto;
   }
 
-  private List<UserDto> exportToDtos(List<User> users) {
-    return users.stream().map(this::exportToDto).collect(toList());
+  private List<UserDto> exportUsersToDtos(List<User> users) {
+    return users.stream().map(this::exportUserToDto).collect(toList());
   }
 }
