@@ -149,7 +149,7 @@ public abstract class OrderableProduct extends BaseEntity {
     long packsToOrder = dispensingUnits / packSize;
     long remainderQuantity = dispensingUnits % packSize;
 
-    if (remainderQuantity > 0 && remainderQuantity >= packRoundingThreshold) {
+    if (remainderQuantity > 0 && remainderQuantity > packRoundingThreshold) {
       packsToOrder += 1;
     }
 

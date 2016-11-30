@@ -149,4 +149,19 @@ public class OrderableProductTest {
 
     assertEquals(0, packsToOrder);
   }
+
+  @Test
+  public void shouldNotRoundUpWhenEqualToThreshold() {
+    final int packSize = 100;
+    final int roundingThreshold = 50;
+
+    OrderableProduct product = GlobalProduct.newGlobalProduct(IBUPROFEN, EACH, IBUPROFEN,
+            "test8", packSize, roundingThreshold, false);
+
+    long packsToOrder = product.packsToOrder(250);
+    assertEquals(2, packsToOrder);
+
+    packsToOrder = product.packsToOrder(251);
+    assertEquals(3, packsToOrder);
+  }
 }
