@@ -32,6 +32,7 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
@@ -148,7 +149,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private Role fulfillmentRole;
   private UUID fulfillmentRoleId;
   private Facility warehouse;
-
+  private DirectRoleAssignment roleAssignment1;
+  private SupervisionRoleAssignment roleAssignment2;
+  private SupervisionRoleAssignment roleAssignment3;
+  private FulfillmentRoleAssignment roleAssignment4;
 
   /**
    * Constructor for test class.
@@ -217,6 +221,27 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<DetailedRoleAssignmentDto> actual = Lists.newArrayList(response);
     assertEquals(user1.getRoleAssignments().size(), actual.size());
+
+    assertContainsRoleAssignment(actual, roleAssignment1);
+    assertContainsRoleAssignment(actual, roleAssignment2);
+    assertContainsRoleAssignment(actual, roleAssignment3);
+    assertContainsRoleAssignment(actual, roleAssignment4);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotFoundWhenGettingFullRoleAssignmentsForNotExistingUser() {
+    given(userRepository.findOne(userId)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(ROLE_ASSIGNMENTS_URL)
+        .then()
+        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -787,14 +812,30 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     warehouse.setActive(true);
     warehouse.setEnabled(true);
 
-    DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole, user);
-    SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
+    roleAssignment1 = new DirectRoleAssignment(adminRole, user);
+    roleAssignment2 = new SupervisionRoleAssignment(supervisionRole,
         user, program1);
-    SupervisionRoleAssignment roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
+    roleAssignment3 = new SupervisionRoleAssignment(supervisionRole,
         user, program2, supervisoryNode);
-    FulfillmentRoleAssignment roleAssignment4 = new FulfillmentRoleAssignment(fulfillmentRole,
+    roleAssignment4 = new FulfillmentRoleAssignment(fulfillmentRole,
         user, warehouse);
 
     user.assignRoles(roleAssignment1, roleAssignment2, roleAssignment3, roleAssignment4);
+  }
+
+  private void assertContainsRoleAssignment(List<DetailedRoleAssignmentDto> dtos,
+                                            RoleAssignment roleAssignment) {
+
+    DetailedRoleAssignmentDto actual = new DetailedRoleAssignmentDto();
+
+    if (roleAssignment instanceof SupervisionRoleAssignment) {
+      ((SupervisionRoleAssignment) roleAssignment).detailedExport(actual);
+    } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
+      ((FulfillmentRoleAssignment) roleAssignment).detailedExport(actual);
+    } else {
+      ((DirectRoleAssignment) roleAssignment).detailedExport(actual);
+    }
+
+    assertTrue(dtos.contains(actual));
   }
 }

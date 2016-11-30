@@ -1099,6 +1099,9 @@ resourceTypes:
                         headers:
                           X-Content-Type-Options:
                           X-XSS-Protection:
+                        body:
+                          application/json:
+                            schema: errorResponse
         /hasRight:
             get:
                 is: [ secured ]
