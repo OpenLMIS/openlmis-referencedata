@@ -7,10 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -92,7 +92,7 @@ public class Facility extends BaseEntity {
       fetch = FetchType.EAGER)
   @Getter
   @Setter
-  private Set<SupportedProgram> supportedPrograms;
+  private Set<SupportedProgram> supportedPrograms = new HashSet<>();
 
   private Facility() {
 
@@ -155,23 +155,11 @@ public class Facility extends BaseEntity {
     facility.setEnabled(importer.getEnabled());
     facility.setOpenLmisAccessible(importer.getOpenLmisAccessible());
 
-    if (null != importer.getSupportedPrograms()) {
-      Set<SupportedProgram> supportedPrograms = importer.getSupportedPrograms()
-          .stream()
-          .map(Program::newProgram)
-          .map(program -> {
-            SupportedProgram supportedProgram = new SupportedProgram();
-            supportedProgram.setFacility(facility);
-            supportedProgram.setProgram(program);
-
-            return supportedProgram;
-          })
-          .collect(Collectors.toSet());
-
-      facility.setSupportedPrograms(supportedPrograms);
-    }
-
     return facility;
+  }
+
+  public void addSupportedProgram(SupportedProgram supportedProgram) {
+    supportedPrograms.add(supportedProgram);
   }
 
   /**
@@ -268,8 +256,5 @@ public class Facility extends BaseEntity {
     Boolean getEnabled();
 
     Boolean getOpenLmisAccessible();
-
-    Set<Program.Importer> getSupportedPrograms();
-
   }
 }

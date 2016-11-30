@@ -1,22 +1,18 @@
 package org.openlmis.referencedata.dto;
 
-import com.google.common.collect.Sets;
-
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityOperator;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.SupportedProgram;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Collections;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityOperator;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.web.SupportedProgramDto;
+
 import java.util.Date;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -70,7 +66,8 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
   @Setter
   private Boolean openLmisAccessible;
 
-  private Set<ProgramDto> supportedPrograms;
+  @Getter
+  private Set<SupportedProgramDto> supportedPrograms;
 
   public FacilityDto(UUID id) {
     setId(id);
@@ -96,22 +93,14 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
   }
 
   @Override
-  public Set<Program.Importer> getSupportedPrograms() {
-    return Sets.newHashSet(
-        Optional.ofNullable(this.supportedPrograms).orElse(Collections.emptySet())
-    );
-  }
-
-  @Override
   public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
     this.supportedPrograms = supportedPrograms
         .stream()
-        .map(SupportedProgram::getProgram)
-        .map(program -> {
-          ProgramDto programDto = new ProgramDto();
-          program.export(programDto);
+        .map(supportedProgram -> {
+          SupportedProgramDto supportedProgramDto = new SupportedProgramDto();
+          supportedProgram.export(supportedProgramDto);
 
-          return programDto;
+          return supportedProgramDto;
         })
         .collect(Collectors.toSet());
   }

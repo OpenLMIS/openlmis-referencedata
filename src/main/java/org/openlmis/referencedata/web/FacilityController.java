@@ -1,12 +1,15 @@
 package org.openlmis.referencedata.web;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -16,6 +19,7 @@ import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -37,35 +42,53 @@ public class FacilityController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
 
+  private static final String KEY_ERROR_PROGRAM_NOT_FOUND = "referencedata.error.program.not-found";
+
   @Autowired
   private FacilityRepository facilityRepository;
 
   @Autowired
   private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
-  
+
   @Autowired
   private ProgramRepository programRepository;
-  
+
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
   private SupplyLineService supplyLineService;
 
+  @Autowired
+  private ExposedMessageSource messageSource;
+
   /**
-   * Allows creating new facilities.
-   * If the id is specified, it will be ignored.
+   * Allows creating new facilities. If the id is specified, it will be ignored.
    *
-   * @param facility A facility bound to the request body
+   * @param facilityDto A facility bound to the request body
    * @return ResponseEntity containing the created facility
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
-  public ResponseEntity<?> createFacility(@RequestBody FacilityDto facility) {
+  public ResponseEntity<?> createFacility(@RequestBody FacilityDto facilityDto) {
     LOGGER.debug("Creating new facility");
-    facility.setId(null);
-    Facility newFacility = facilityRepository.save(Facility.newFacility(facility));
-    LOGGER.debug("Created new facility with id: " + facility.getId());
-    return ok(newFacility);
+    facilityDto.setId(null);
+    Facility newFacility = Facility.newFacility(facilityDto);
+
+    boolean addSuccessful = addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(),
+        newFacility);
+    if (!addSuccessful) {
+      return ResponseEntity
+          .badRequest()
+          .body(new ErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND,
+              messageSource.getMessage(KEY_ERROR_PROGRAM_NOT_FOUND, null,
+                  LocaleContextHolder.getLocale())));
+    }
+
+    newFacility = facilityRepository.save(newFacility);
+    LOGGER.debug("Created new facility with id: " + facilityDto.getId());
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(toDto(newFacility));
   }
 
   /**
@@ -83,26 +106,30 @@ public class FacilityController extends BaseController {
   /**
    * Allows updating facilities.
    *
-   * @param facility A facility bound to the request body
-   * @param facilityId UUID of facility which we want to update
+   * @param facilityDto A facility bound to the request body
+   * @param facilityId  UUID of facility which we want to update
    * @return ResponseEntity containing the updated facility
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateFacilities(@RequestBody FacilityDto facility,
-                                       @PathVariable("id") UUID facilityId) {
+  public ResponseEntity<?> saveFacility(@RequestBody FacilityDto facilityDto,
+                                        @PathVariable("id") UUID facilityId) {
 
-    Facility facilityToUpdate = facilityRepository.findOne(facilityId);
-    if (facilityToUpdate == null) {
-      facilityToUpdate = Facility.newFacility(facility);
-      LOGGER.debug("Creating new facility");
-    } else {
-      LOGGER.debug("Updating facility with id: " + facilityId);
+    Facility facilityToSave = Facility.newFacility(facilityDto);
+    facilityToSave.setId(facilityId);
+
+    boolean addSuccessful = addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(),
+        facilityToSave);
+    if (!addSuccessful) {
+      return ResponseEntity
+          .badRequest()
+          .body(new ErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND,
+              messageSource.getMessage(KEY_ERROR_PROGRAM_NOT_FOUND, null,
+                  LocaleContextHolder.getLocale())));
     }
+    facilityToSave = facilityRepository.save(facilityToSave);
 
-    facilityToUpdate = facilityRepository.save(facilityToUpdate);
-
-    LOGGER.debug("Saved facility with id: " + facilityToUpdate.getId());
-    return ok(facilityToUpdate);
+    LOGGER.debug("Saved facility with id: " + facilityToSave.getId());
+    return ok(facilityToSave);
   }
 
   /**
@@ -125,15 +152,16 @@ public class FacilityController extends BaseController {
    * Returns full or non-full supply approved products for the given facility.
    *
    * @param facilityId ID of the facility
-   * @param programId ID of the program
+   * @param programId  ID of the program
    * @param fullSupply true to retrieve full-supply products, false to retrieve non-full supply
    *                   products
    * @return collection of approved products
    */
   @RequestMapping(value = "/facilities/{id}/approvedProducts")
   public ResponseEntity<?> getApprovedProducts(@PathVariable("id") UUID facilityId,
-      @RequestParam(value = "programId") UUID programId,
-      @RequestParam(value = "fullSupply") boolean fullSupply) {
+                                               @RequestParam(value = "programId") UUID programId,
+                                               @RequestParam(value = "fullSupply")
+                                                   boolean fullSupply) {
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
@@ -167,7 +195,7 @@ public class FacilityController extends BaseController {
   /**
    * Retrieves all available supplying facilities for program and supervisory node.
    *
-   * @param programId program to filter facilities
+   * @param programId         program to filter facilities
    * @param supervisoryNodeId supervisoryNode to filter facilities
    * @return ResponseEntity containing matched facilities
    */
@@ -192,8 +220,8 @@ public class FacilityController extends BaseController {
       ErrorResponse errorResponse = new ErrorResponse(errorMessage, errorDescription);
       return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
-    
-    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, 
+
+    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program,
         supervisoryNode);
     List<Facility> facilities = supplyLines.stream()
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
@@ -201,8 +229,8 @@ public class FacilityController extends BaseController {
   }
 
   /**
-   * Retrieves all Facilities with facilitCode similar to code parameter or facilityName similar
-   * to name parameter.
+   * Retrieves all Facilities with facilitCode similar to code parameter or facilityName similar to
+   * name parameter.
    *
    * @param code Part of wanted facility code.
    * @param name Part of wanted facility name.
@@ -254,4 +282,19 @@ public class FacilityController extends BaseController {
     return productDtos;
   }
 
+  private boolean addSupportedProgramsToFacility(Set<SupportedProgramDto> supportedProgramDtos,
+                                                 Facility facility) {
+    for (SupportedProgramDto supportedProgramDto : supportedProgramDtos) {
+      Program program = programRepository.findByCode(Code.code(supportedProgramDto.getCode()));
+      if (program == null) {
+        LOGGER.debug("Program does not exist: " + supportedProgramDto.getCode());
+        return false;
+      }
+      SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
+          program, supportedProgramDto.isSupportActive(), supportedProgramDto.getZonedStartDate());
+      facility.addSupportedProgram(supportedProgram);
+    }
+
+    return true;
+  }
 }
