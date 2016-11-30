@@ -61,7 +61,7 @@
       "title": "supportedPrograms",
       "items": {
         "type": "object",
-        "$ref": "program.json"
+        "$ref": "supportedProgram.json"
       },
       "uniqueItems": false
     }

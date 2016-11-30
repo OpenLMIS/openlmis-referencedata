@@ -1239,15 +1239,13 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
-            "404":
-                headers:
-                  X-Content-Type-Options:
-                  X-XSS-Protection:
+                    schema: facilityArray
     post:
         is: [ secured ]
         description: Creates new facility.
         body:
             application/json:
+              schema: facility
         responses:
             "201":
                 headers:
@@ -1255,12 +1253,14 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
+                    schema: facility
             "400":
                 headers:
                   X-Content-Type-Options:
                   X-XSS-Protection:
                 body:
                   application/json:
+                    schema: errorResponse
     /{id}:
         uriParameters:
             id:
@@ -1294,6 +1294,7 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
+                        schema: facility
                 "404":
                     headers:
                       X-Content-Type-Options:
@@ -1303,6 +1304,7 @@ resourceTypes:
             description: Update existing facility.
             body:
                 application/json:
+                  schema: facility
             responses:
                 "200":
                     headers:
@@ -1310,10 +1312,14 @@ resourceTypes:
                       X-XSS-Protection:
                     body:
                       application/json:
+                        schema: facility
                 "400":
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
+                    body:
+                      application/json:
+                        schema: errorResponse
     /{id}/approvedProducts:
         uriParameters:
             id:
