@@ -3,12 +3,13 @@ package org.openlmis.referencedata.web;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.dto.BaseDto;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,11 +17,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import java.util.UUID;
 
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SupportedProgramDto implements SupportedProgram.Exporter {
+public class SupportedProgramDto extends BaseDto implements SupportedProgram.Exporter {
 
   @Getter
   private String code;
@@ -47,15 +47,12 @@ public class SupportedProgramDto implements SupportedProgram.Exporter {
   private String supportStartDate;
 
   @Override
-  public void setId(UUID id) {
-  }
-
-  @Override
   public void setFacility(Facility facility) {
   }
 
   @Override
   public void setProgram(Program program) {
+    setId(program.getId());
     code = program.getCode().toString();
     name = program.getName();
     description = program.getDescription();
