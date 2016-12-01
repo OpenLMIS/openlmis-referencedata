@@ -1,15 +1,14 @@
 package org.openlmis.referencedata.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.BaseDto;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SupportedProgramDto extends BaseDto implements SupportedProgram.Exporter {
 
   @Getter
@@ -52,7 +50,7 @@ public class SupportedProgramDto extends BaseDto implements SupportedProgram.Exp
 
   @Override
   public void setProgram(Program program) {
-    setId(program.getId());
+    id = program.getId();
     code = program.getCode().toString();
     name = program.getName();
     description = program.getDescription();

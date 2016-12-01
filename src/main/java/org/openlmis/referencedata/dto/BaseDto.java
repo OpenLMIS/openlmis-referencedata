@@ -13,7 +13,7 @@ public class BaseDto {
   
   @Getter
   @Setter
-  UUID id;
+  protected UUID id;
 
   @Override
   public boolean equals(Object obj) {
