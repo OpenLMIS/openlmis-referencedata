@@ -35,7 +35,7 @@ public class ProductCategory extends BaseEntity {
    * @param code         this ProductCategory's unique implementation code.
    * @param displayValue the display values of this ProductCategory.
    * @return a new ProductCategory.
-   * @throws NullPointerException if either paramater is null.
+   * @throws NullPointerException if either parameter is null.
    */
   protected ProductCategory(Code code, OrderedDisplayValue displayValue) {
     Objects.requireNonNull(code);
@@ -58,7 +58,7 @@ public class ProductCategory extends BaseEntity {
    *
    * @param productCategoryCode this ProductCategory's unique implementation code.
    * @return a new ProductCategory using default display value and order
-   * @throws NullPointerException if paramater is null.
+   * @throws NullPointerException if parameter is null.
    */
   public static ProductCategory createNew(Code productCategoryCode) {
     return ProductCategory.createNew(productCategoryCode,
@@ -71,12 +71,11 @@ public class ProductCategory extends BaseEntity {
    * @param productCategoryCode this ProductCategory's unique implementation code.
    * @param displayValue        the display values of this ProductCategory.
    * @return a new ProductCategory.
-   * @throws NullPointerException if either paramater is null.
+   * @throws NullPointerException if either parameter is null.
    */
   public static ProductCategory createNew(Code productCategoryCode, OrderedDisplayValue
       displayValue) {
-    ProductCategory category = new ProductCategory(productCategoryCode, displayValue);
-    return category;
+    return new ProductCategory(productCategoryCode, displayValue);
   }
 
   @Override

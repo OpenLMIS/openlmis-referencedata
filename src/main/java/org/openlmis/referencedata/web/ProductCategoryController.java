@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Controller
@@ -26,6 +27,15 @@ public class ProductCategoryController extends BaseController {
 
   @Autowired
   private ProductCategoryRepository productCategoryRepository;
+
+  /**
+   * Constructor for controller unit testing.
+   *
+   * @param repository      a ProductCategoryRepository
+   */
+  public ProductCategoryController(ProductCategoryRepository repository) {
+    this.productCategoryRepository = Objects.requireNonNull(repository);
+  }
 
   /**
    * Get all productCategories.
@@ -120,7 +130,7 @@ public class ProductCategoryController extends BaseController {
         productCategoryRepository.delete(productCategory);
       } catch (DataIntegrityViolationException ex) {
         ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while deleting productCategory with id: "
+            new ErrorResponse("An error occurred while deleting productCategory with id: "
                 + productCategoryId, ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
         return new ResponseEntity(HttpStatus.CONFLICT);
