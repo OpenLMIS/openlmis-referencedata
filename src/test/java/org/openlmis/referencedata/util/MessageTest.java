@@ -11,12 +11,12 @@ public class MessageTest {
 
   @Test(expected = NullPointerException.class)
   public void messageShouldRequireNonNullKey() {
-    Message msg = new Message(null);
+    new Message(null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void messageShouldRequireNonEmptyKey() {
-    Message msg = new Message(" ");
+    new Message(" ");
   }
 
   @Test(expected = NoSuchMessageException.class)

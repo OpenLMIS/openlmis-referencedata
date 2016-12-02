@@ -36,7 +36,7 @@ public class Message {
    * @param locale the locale to determine which localized text to use.
    * @return this message localized in a format suitable for serialization.
    * @throws org.springframework.context.NoSuchMessageException if the message doesn't exist in
-   * the messageSource.
+   *     the messageSource.
    */
   public LocalizedMessage localMessage(MessageSource messageSource, Locale locale) {
     return new LocalizedMessage(messageSource.getMessage(key, params, locale));
