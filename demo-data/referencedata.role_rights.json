@@ -22,5 +22,9 @@
   {
     "roleId": "d30a2fbb-51d9-49ad-90fe-fb405470a439",
     "rightId": "7958129d-c4c0-4294-a40c-c2b07cb8e515"
+  },
+  {
+    "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
+    "rightId": "8816edba-b8a9-11e6-80f5-76304dec7eb7"
   }
 ]
