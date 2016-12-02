@@ -298,7 +298,7 @@ public class UserControllerTest {
 
     when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
+    roleAssignmentDto.setRole(adminRole1);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
@@ -327,7 +327,7 @@ public class UserControllerTest {
     when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
     when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
+    roleAssignmentDto.setRole(supervisionRole1);
     roleAssignmentDto.setProgramCode(programCode);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
@@ -359,7 +359,7 @@ public class UserControllerTest {
     when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
     when(supervisoryNodeRepository.findByCode(supervisoryNodeCode)).thenReturn(supervisoryNode1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
+    roleAssignmentDto.setRole(supervisionRole1);
     roleAssignmentDto.setProgramCode(programCode);
     roleAssignmentDto.setSupervisoryNodeCode(supervisoryNodeCode);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
@@ -391,7 +391,7 @@ public class UserControllerTest {
     when(roleRepository.findOne(roleId)).thenReturn(fulfillmentRole1);
     when(facilityRepository.findFirstByCode(warehouseCode)).thenReturn(warehouse1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
+    roleAssignmentDto.setRole(fulfillmentRole1);
     roleAssignmentDto.setWarehouseCode(warehouseCode);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
@@ -422,7 +422,7 @@ public class UserControllerTest {
 
     when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    roleAssignmentDto.setRoleId(roleId);
+    roleAssignmentDto.setRole(adminRole1);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);

@@ -829,11 +829,11 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     DetailedRoleAssignmentDto actual = new DetailedRoleAssignmentDto();
 
     if (roleAssignment instanceof SupervisionRoleAssignment) {
-      ((SupervisionRoleAssignment) roleAssignment).detailedExport(actual);
+      ((SupervisionRoleAssignment) roleAssignment).export(actual);
     } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
-      ((FulfillmentRoleAssignment) roleAssignment).detailedExport(actual);
+      ((FulfillmentRoleAssignment) roleAssignment).export(actual);
     } else {
-      ((DirectRoleAssignment) roleAssignment).detailedExport(actual);
+      ((DirectRoleAssignment) roleAssignment).export(actual);
     }
 
     assertTrue(dtos.contains(actual));

@@ -36,15 +36,6 @@ public class DirectRoleAssignment extends RoleAssignment {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setRoleId(role.getId());
-  }
-
-  /**
-   * Export this object to the specified detailed exporter (DTO).
-   *
-   * @param exporter exporter to export to
-   */
-  public void detailedExport(DetailedExporter exporter) {
     exporter.setRole(role);
   }
 }

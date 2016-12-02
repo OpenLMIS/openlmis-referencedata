@@ -75,16 +75,6 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setRoleId(role.getId());
-    exporter.setWarehouseCode(warehouse.getCode());
-  }
-
-  /**
-   * Export this object to the specified detailed exporter (DTO).
-   *
-   * @param exporter exporter to export to
-   */
-  public void detailedExport(DetailedExporter exporter) {
     exporter.setRole(role);
     exporter.setWarehouseCode(warehouse.getCode());
   }
@@ -112,10 +102,6 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   }
 
   public interface Exporter extends RoleAssignment.Exporter {
-    void setWarehouseCode(String warehouseCode);
-  }
-
-  public interface DetailedExporter extends RoleAssignment.DetailedExporter {
     void setWarehouseCode(String warehouseCode);
   }
 }

@@ -136,19 +136,6 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setRoleId(role.getId());
-    exporter.setProgramCode(program.getCode().toString());
-    if (supervisoryNode != null) {
-      exporter.setSupervisoryNodeCode(supervisoryNode.getCode());
-    }
-  }
-
-  /**
-   * Export this object to the specified detailed exporter (DTO).
-   *
-   * @param exporter exporter to export to
-   */
-  public void detailedExport(DetailedExporter exporter) {
     exporter.setRole(role);
     exporter.setProgramCode(program.getCode().toString());
     if (supervisoryNode != null) {
@@ -180,12 +167,6 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   public interface Exporter extends RoleAssignment.Exporter {
-    void setProgramCode(String programCode);
-
-    void setSupervisoryNodeCode(String supervisoryNodeCode);
-  }
-
-  public interface DetailedExporter extends RoleAssignment.DetailedExporter {
     void setProgramCode(String programCode);
 
     void setSupervisoryNodeCode(String supervisoryNodeCode);

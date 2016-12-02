@@ -13,8 +13,8 @@ import lombok.Setter;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DetailedRoleAssignmentDto implements RoleAssignment.DetailedExporter,
-    SupervisionRoleAssignment.DetailedExporter, FulfillmentRoleAssignment.DetailedExporter {
+public class DetailedRoleAssignmentDto implements RoleAssignment.Exporter,
+    SupervisionRoleAssignment.Exporter, FulfillmentRoleAssignment.Exporter {
 
   @Getter
   private RoleDto role;

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -78,10 +77,6 @@ public abstract class RoleAssignment extends BaseEntity {
   }
 
   public interface Exporter {
-    void setRoleId(UUID roleId);
-  }
-
-  public interface DetailedExporter {
     void setRole(Role role);
   }
 }

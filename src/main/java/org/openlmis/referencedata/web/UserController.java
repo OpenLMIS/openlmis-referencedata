@@ -574,11 +574,11 @@ public class UserController extends BaseController {
       DetailedRoleAssignmentDto assignmentDto = new DetailedRoleAssignmentDto();
 
       if (assignment instanceof SupervisionRoleAssignment) {
-        ((SupervisionRoleAssignment) assignment).detailedExport(assignmentDto);
+        ((SupervisionRoleAssignment) assignment).export(assignmentDto);
       } else if (assignment instanceof FulfillmentRoleAssignment) {
-        ((FulfillmentRoleAssignment) assignment).detailedExport(assignmentDto);
+        ((FulfillmentRoleAssignment) assignment).export(assignmentDto);
       } else {
-        ((DirectRoleAssignment) assignment).detailedExport(assignmentDto);
+        ((DirectRoleAssignment) assignment).export(assignmentDto);
       }
 
       assignmentDtos.add(assignmentDto);
