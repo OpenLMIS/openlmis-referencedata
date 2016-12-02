@@ -49,12 +49,12 @@ public class ProductCategoryController extends BaseController {
   }
 
   /**
-   * Create or update a {@link ProductCategory}.
+   * Create a {@link ProductCategory}.
    *
    * @param productCategory A productCategory bound to the request body
    * @return ResponseEntity containing the created productCategory with id.
    */
-  @RequestMapping(value = "/productCategories", method = RequestMethod.PUT)
+  @RequestMapping(value = "/productCategories", method = RequestMethod.POST)
   public ResponseEntity<?> createProductCategory(@RequestBody ProductCategory productCategory) {
     ProductCategory found = productCategoryRepository.findByCode(productCategory
         .getCode());
@@ -65,7 +65,7 @@ public class ProductCategoryController extends BaseController {
     }
 
     productCategoryRepository.save(found);
-    return new ResponseEntity<>(found, HttpStatus.OK);
+    return new ResponseEntity<>(found, HttpStatus.CREATED);
   }
 
   /**

@@ -115,7 +115,7 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldPutProductCategory() {
+  public void shouldPostProductCategory() {
 
     ProductCategory response = restAssured
         .given()
@@ -123,9 +123,9 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(productCategory)
         .when()
-        .put(RESOURCE_URL)
+        .post(RESOURCE_URL)
         .then()
-        .statusCode(200)
+        .statusCode(201)
         .extract().as(ProductCategory.class);
 
     assertEquals(productCategory, response);
