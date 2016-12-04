@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -155,7 +156,7 @@ public class ProductCategoryController extends BaseController {
       if (null == productCategory) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
-      return new ResponseEntity<>(productCategory, HttpStatus.OK);
+      return new ResponseEntity<>(Collections.singletonList(productCategory), HttpStatus.OK);
     } else {
       Iterable<ProductCategory> productCategories = productCategoryRepository.findAll();
       return new ResponseEntity<>(productCategories, HttpStatus.OK);
