@@ -50,7 +50,7 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
 
     given(productCategoryRepository.findByCode(any(Code.class))).willReturn(productCategory);
 
-    ProductCategory response = restAssured
+    ProductCategory[] response = restAssured
         .given()
         .queryParam(CODE, productCategory.getCode())
         .queryParam(ACCESS_TOKEN, getToken())
@@ -58,9 +58,10 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
         .get(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(ProductCategory.class);
+        .extract().as(ProductCategory[].class);
 
-    assertEquals(productCategory, response);
+    assertEquals(1, response.length);
+    assertEquals(productCategory, response[0]);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
