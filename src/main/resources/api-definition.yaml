@@ -714,7 +714,7 @@ resourceTypes:
                 repeat: false
         get:
             is: [ secured ]
-            description: Get a list of Trade Item UUIDs that may fulfill for the given Orderable Product.
+            description: Get a list of Trade Item UUIDs that may fulfill for the given Global Product.
             responses:
                 "200":
                     headers:
@@ -729,7 +729,7 @@ resourceTypes:
                       X-XSS-Protection:
         put:
             is: [ secured ]
-            description: Update the list of Trade Item UUIDs that may fulfill for the given Orderable Product.
+            description: Update the list of Trade Item UUIDs that may fulfill for the given Global Product.
             body:
                 application/json:
                     schema: uuidArray

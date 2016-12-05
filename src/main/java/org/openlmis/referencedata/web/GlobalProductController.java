@@ -52,7 +52,7 @@ public class GlobalProductController extends BaseController {
    * Update the {@link TradeItem} that may fulfill for a {@link GlobalProduct}.
    * @param globalProductId the GlobalProduct's persistence Id.
    * @param tradeItemIds the persistence id's of the TradeItems
-   * @return {@link org.mortbay.jetty.HttpStatus#OK} if succesful.
+   * @return {@link org.springframework.http.HttpStatus#OK} if successful.
    * {@link org.springframework.http.HttpStatus#NOT_FOUND} if any of the given persistence ids
    *     are not found.
    */
