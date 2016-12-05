@@ -69,10 +69,8 @@ public final class TradeItem extends OrderableProduct {
                                        @JsonProperty("roundToZero") boolean roundToZero) {
     Code code = Code.code(productCode);
     Dispensable dispensable = Dispensable.createNew(dispensingUnit);
-    TradeItem tradeItem = new TradeItem(code, dispensable, name, packSize,
+    return new TradeItem(code, dispensable, name, packSize,
         packRoundingThreshold, roundToZero);
-
-    return tradeItem;
   }
 
   /**
