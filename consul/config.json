@@ -1,0 +1,11 @@
+{
+  "name": "referencedata",
+  "raml": "src/main/resources/api-definition.yaml",
+  "path": [
+    "referencedata",
+    "referencedata/docs",
+    "referencedata/docs/<all>",
+    "referencedata/webjars",
+    "referencedata/webjars/<all>"
+  ]
+}

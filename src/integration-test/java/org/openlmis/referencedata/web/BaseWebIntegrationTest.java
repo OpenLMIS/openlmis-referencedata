@@ -73,18 +73,18 @@ public abstract class BaseWebIntegrationTest {
   public BaseWebIntegrationTest() {
 
     // This mocks the auth check to always return valid admin credentials.
-    wireMockRule.stubFor(post(urlEqualTo("/auth/oauth/check_token"))
+    wireMockRule.stubFor(post(urlEqualTo("/api/oauth/check_token"))
         .willReturn(aResponse()
             .withHeader("Content-Type", "application/json")
             .withBody(MOCK_CHECK_RESULT)));
 
     // This mocks the call to auth to post to an auth user.
-    wireMockRule.stubFor(post(urlPathEqualTo("/auth/api/users"))
+    wireMockRule.stubFor(post(urlPathEqualTo("/api/users"))
         .willReturn(aResponse()
             .withStatus(200)));
 
     // This mocks the call to notification to post a notification.
-    wireMockRule.stubFor(post(urlPathEqualTo("/notification"))
+    wireMockRule.stubFor(post(urlPathEqualTo("/api/notification"))
         .willReturn(aResponse()
             .withStatus(200)));
   }

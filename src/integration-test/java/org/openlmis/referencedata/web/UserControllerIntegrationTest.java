@@ -90,7 +90,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SUPERVISORY_NODE_CODE = "SN1";
   private static final String WAREHOUSE_CODE = "W1";
   private static final String HOME_FACILITY_CODE = "HF1";
-  private static final String USER_API_STRING = "/auth/api/users";
+  private static final String USER_API_STRING = "/api/users";
   private static final String RIGHT_ID_STRING = "rightId";
   private static final String PROGRAM_ID_STRING = "programId";
 
