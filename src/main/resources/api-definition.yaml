@@ -1224,6 +1224,31 @@ resourceTypes:
                           headers:
                             X-Content-Type-Options:
                             X-XSS-Protection:
+          /fulfillmentFacilities:
+              is: [ secured ]
+              displayName: User fulfilled facilities
+              get:
+                  is: [ secured ]
+                  description: Get all facilities the associated user can fulfill.
+                  responses:
+                      "200":
+                          headers:
+                            X-Content-Type-Options:
+                            X-XSS-Protection:
+                          body:
+                            application/json:
+                              schema: facilityArray
+                      "400":
+                          headers:
+                            X-Content-Type-Options:
+                            X-XSS-Protection:
+                          body:
+                            application/json:
+                              schema: errorResponse
+                      "404":
+                          headers:
+                            X-Content-Type-Options:
+                            X-XSS-Protection:
       /search:
               post:
                   is: [ secured ]
