@@ -79,7 +79,7 @@ public abstract class BaseWebIntegrationTest {
             .withBody(MOCK_CHECK_RESULT)));
 
     // This mocks the call to auth to post to an auth user.
-    wireMockRule.stubFor(post(urlPathEqualTo("/api/users"))
+    wireMockRule.stubFor(post(urlPathEqualTo("/api/users/auth"))
         .willReturn(aResponse()
             .withStatus(200)));
 

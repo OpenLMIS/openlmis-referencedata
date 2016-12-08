@@ -135,7 +135,7 @@ public class UserService {
     userRequest.setEmail(user.getEmail());
     userRequest.setReferenceDataUserId(user.getId());
 
-    String url = virtualHostBaseUrl + "/api/users?access_token=" + token;
+    String url = virtualHostBaseUrl + "/api/users/auth?access_token=" + token;
     RestTemplate restTemplate = new RestTemplate();
 
     restTemplate.postForObject(url, userRequest, Object.class);
