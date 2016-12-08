@@ -2,7 +2,6 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
@@ -13,7 +12,6 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.Sets;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
@@ -44,7 +42,6 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,7 +87,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     facility = generateFacility();
   }
 
-  @Ignore
   @Test
   public void shouldReturnSupplyingDepots() {
     int searchedFacilitiesAmt = 3;
@@ -111,7 +107,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(supplyLineService.searchSupplyLines(program, searchedSupervisoryNode))
         .willReturn(searchedSupplyLines);
 
-    Facility[] response = restAssured.given()
+    FacilityDto[] response = restAssured.given()
         .queryParam(PROGRAM_ID, programId)
         .queryParam("supervisoryNodeId", supervisoryNodeId)
         .queryParam(ACCESS_TOKEN, getToken())
@@ -119,18 +115,18 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(SUPPLYING_URL)
         .then()
         .statusCode(200)
-        .extract().as(Facility[].class);
+        .extract().as(FacilityDto[].class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
 
-    assertEquals(searchedFacilitiesAmt, response.length);
+    List<Facility> expectedFacilities = searchedSupplyLines.stream()
+        .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
 
-    SupplyLine additionalSupplyLine = generateSupplyLine();
-    Collection<Facility> searchedFacilities = searchedSupplyLines
-        .stream().map(SupplyLine::getSupplyingFacility).collect(Collectors.toList());
-    for (Facility facility : response) {
-      assertTrue(searchedFacilities.contains(facility));
-      assertNotEquals(facility, additionalSupplyLine.getSupplyingFacility());
+    assertEquals(expectedFacilities.size(), response.length);
+
+    for (FacilityDto facilityDto : response) {
+      Facility facility = Facility.newFacility(facilityDto);
+      assertTrue(expectedFacilities.contains(facility));
     }
   }
 
@@ -173,7 +169,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Ignore
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
     String similarCode = "Facility";
@@ -182,21 +177,20 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityRepository.findFacilitiesByCodeOrName(similarCode, null))
         .willReturn(listToReturn);
 
-    Facility[] response = restAssured.given()
+    FacilityDto[] response = restAssured.given()
         .queryParam("code", similarCode)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
         .then()
         .statusCode(200)
-        .extract().as(Facility[].class);
+        .extract().as(FacilityDto[].class);
 
-    List<Facility> facilities = Arrays.asList(response);
+    List<FacilityDto> facilities = Arrays.asList(response);
     assertEquals(1, facilities.size());
     assertEquals(facility.getCode(), facilities.get(0).getCode());
   }
 
-  @Ignore
   @Test
   public void shouldFindFacilitiesWithSimilarName() {
     String similarName = "Facility";
@@ -205,16 +199,16 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityRepository.findFacilitiesByCodeOrName(null, similarName))
         .willReturn(listToReturn);
 
-    Facility[] response = restAssured.given()
+    FacilityDto[] response = restAssured.given()
         .queryParam("name", similarName)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
         .then()
         .statusCode(200)
-        .extract().as(Facility[].class);
+        .extract().as(FacilityDto[].class);
 
-    List<Facility> facilities = Arrays.asList(response);
+    List<FacilityDto> facilities = Arrays.asList(response);
     assertEquals(1, facilities.size());
     assertEquals(facility.getName(), facilities.get(0).getName());
   }
