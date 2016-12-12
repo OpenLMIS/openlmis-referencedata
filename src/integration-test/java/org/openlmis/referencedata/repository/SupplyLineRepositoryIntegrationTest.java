@@ -82,9 +82,17 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void testSearchSupplyLinesByAllParametersNull() {
+  public void testSearchSupplyLinesWhenProgramAndSupervisoryNodeAreNull() {
     List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
-            null, null);
+            null, (SupervisoryNode) null);
+
+    Assert.assertEquals(5, receivedSupplyLines.size());
+  }
+
+  @Test
+  public void testSearchSupplyLinesWhenProgramAndFacilityAreNull() {
+    List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
+        null, (Facility) null);
 
     Assert.assertEquals(5, receivedSupplyLines.size());
   }
@@ -93,7 +101,7 @@ public class SupplyLineRepositoryIntegrationTest
   public void testSearchSupplyLinesByProgram() {
     SupplyLine supplyLine = cloneSupplyLine(supplyLines.get(0));
     List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
-            supplyLine.getProgram(), null);
+            supplyLine.getProgram(), (SupervisoryNode) null);
 
     Assert.assertEquals(2, receivedSupplyLines.size());
     for (SupplyLine receivedSupplyLine : receivedSupplyLines) {

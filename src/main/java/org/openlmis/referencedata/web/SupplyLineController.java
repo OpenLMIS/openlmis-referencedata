@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.web;
 
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
@@ -7,6 +8,7 @@ import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.SupplyLineDto;
 import org.openlmis.referencedata.dto.SupplyLineSimpleDto;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +46,9 @@ public class SupplyLineController extends BaseController {
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
 
   /**
    * Allows creating new supplyLines. If the id is specified, it will be ignored.
@@ -169,12 +175,21 @@ public class SupplyLineController extends BaseController {
    */
   @RequestMapping(value = "/supplyLines/searchByUUID", method = RequestMethod.GET)
   public ResponseEntity<?> searchSupplyLinesByUuid(
-      @RequestParam(value = "programId", required = true) UUID programId,
-      @RequestParam(value = "supervisoryNodeId", required = true) UUID supervisoryNodeId) {
+      @RequestParam(value = "programId") UUID programId,
+      @RequestParam(value = "supervisoryNodeId", required = false) UUID supervisoryNodeId,
+      @RequestParam(value = "supplyingFacilityId", required = false) UUID supplyingFacilityId) {
     Program program = programRepository.findOne(programId);
-    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
-    List<SupplyLine> resultSupplyLine =
-        supplyLineService.searchSupplyLines(program, supervisoryNode);
+    List<SupplyLine> resultSupplyLine;
+
+    if (null != supervisoryNodeId) {
+      SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+      resultSupplyLine = supplyLineService.searchSupplyLines(program, supervisoryNode);
+    } else if (null != supplyingFacilityId) {
+      Facility supplyingFacility = facilityRepository.findOne(supplyingFacilityId);
+      resultSupplyLine = supplyLineService.searchSupplyLines(program, supplyingFacility);
+    } else {
+      resultSupplyLine = Collections.emptyList();
+    }
 
     List<SupplyLineSimpleDto> result = new ArrayList<>();
     for (SupplyLine supplyLine : resultSupplyLine) {
