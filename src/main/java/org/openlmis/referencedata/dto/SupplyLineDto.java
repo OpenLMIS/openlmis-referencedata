@@ -31,6 +31,10 @@ public class SupplyLineDto extends BaseDto implements SupplyLine.Exporter, Suppl
   @Getter
   private FacilityDto supplyingFacility;
 
+  @Getter
+  @Setter
+  private Boolean exportOrders;
+
   @JsonIgnore
   @Override
   public void setSupervisoryNode(SupervisoryNode supervisoryNode) {

@@ -41,6 +41,10 @@ public class SupplyLine extends BaseEntity {
   @Setter
   private Facility supplyingFacility;
 
+  @Setter
+  @Getter
+  private Boolean exportOrders;
+
   /**
    * Required arguments constructor.
    */
@@ -77,6 +81,7 @@ public class SupplyLine extends BaseEntity {
     SupplyLine supplyLine = new SupplyLine(supervisoryNode, program, supplyingFacility);
     supplyLine.id = importer.getId();
     supplyLine.description = importer.getDescription();
+    supplyLine.exportOrders = importer.getExportOrders();
 
     return supplyLine;
   }
@@ -91,6 +96,7 @@ public class SupplyLine extends BaseEntity {
     this.description = supplyLine.getDescription();
     this.program = supplyLine.getProgram();
     this.supplyingFacility = supplyLine.getSupplyingFacility();
+    this.exportOrders = supplyLine.getExportOrders();
   }
 
   /**
@@ -104,6 +110,7 @@ public class SupplyLine extends BaseEntity {
     exporter.setDescription(description);
     exporter.setProgram(program);
     exporter.setSupplyingFacility(supplyingFacility);
+    exporter.setExportOrders(exportOrders);
   }
 
   @Override
@@ -135,6 +142,8 @@ public class SupplyLine extends BaseEntity {
     void setProgram(Program program);
 
     void setSupplyingFacility(Facility supplyingFacility);
+
+    void setExportOrders(Boolean exportOrders);
   }
 
   public interface Importer {
@@ -147,5 +156,7 @@ public class SupplyLine extends BaseEntity {
     Program.Importer getProgram();
 
     Facility.Importer getSupplyingFacility();
+
+    Boolean getExportOrders();
   }
 }
