@@ -104,7 +104,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(programRepository.findOne(programId)).willReturn(program);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
-    given(supplyLineService.searchSupplyLines(program, searchedSupervisoryNode, null))
+    given(supplyLineService.searchSupplyLines(program, searchedSupervisoryNode))
         .willReturn(searchedSupplyLines);
 
     FacilityDto[] response = restAssured.given()

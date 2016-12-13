@@ -154,7 +154,7 @@ public class SupplyLineController extends BaseController {
       @RequestParam(value = "supervisoryNode") SupervisoryNodeDto supervisoryNodeDto) {
     Program program = Program.newProgram(programDto);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
-    List<SupplyLine> result = supplyLineService.searchSupplyLines(program, supervisoryNode, null);
+    List<SupplyLine> result = supplyLineService.searchSupplyLines(program, supervisoryNode);
 
     List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
 
