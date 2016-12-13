@@ -21,7 +21,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String ACCESS_TOKEN = "access_token";
 
   @MockBean
   private GeographicZoneRepository geographicZoneRepository;

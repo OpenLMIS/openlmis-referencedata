@@ -82,7 +82,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
   private static final String RESET_PASSWORD_URL = RESOURCE_URL + "/passwordReset";
   private static final String CHANGE_PASSWORD_URL = RESOURCE_URL + "/changePassword";
-  private static final String ACCESS_TOKEN = "access_token";
   private static final String USERNAME = "username";
   private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
   private static final String PROGRAM1_CODE = "P1";

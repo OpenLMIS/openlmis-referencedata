@@ -27,7 +27,6 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   private static final String RESOURCE_URL = "/api/processingSchedules";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
-  private static final String ACCESS_TOKEN = "access_token";
 
   @MockBean
   private ProcessingScheduleRepository scheduleRepository;

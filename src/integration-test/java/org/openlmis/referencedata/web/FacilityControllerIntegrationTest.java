@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
-  private static final String ACCESS_TOKEN = "access_token";
+
   private static final String PROGRAM_ID = "programId";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String ID_URL = RESOURCE_URL + "/{id}";

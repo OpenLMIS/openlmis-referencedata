@@ -28,6 +28,8 @@ import javax.annotation.PostConstruct;
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public abstract class BaseWebIntegrationTest {
 
+  protected static final String ACCESS_TOKEN = "access_token";
+
   protected static final String RAML_ASSERT_MESSAGE =
       "HTTP request/response should match RAML definition.";
 

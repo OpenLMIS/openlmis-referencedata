@@ -19,7 +19,6 @@ import java.util.UUID;
 
 public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/facilityOperators";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
 

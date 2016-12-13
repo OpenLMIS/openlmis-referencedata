@@ -55,7 +55,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   private static final String FACILITY = "facilityId";
   private static final String PROCESSING_SCHEDULE = "processingScheduleId";
   private static final String START_DATE = "startDate";
-  private static final String ACCESS_TOKEN = "access_token";
 
   @MockBean
   private ProcessingPeriodRepository periodRepository;

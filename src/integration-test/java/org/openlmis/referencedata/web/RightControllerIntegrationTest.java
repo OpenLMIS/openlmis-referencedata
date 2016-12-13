@@ -27,7 +27,6 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/rights";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
-  private static final String ACCESS_TOKEN = "access_token";
   private static final String RIGHT_NAME = "right";
   private static final String ATTACHMENT_NAME = "attachment";
 

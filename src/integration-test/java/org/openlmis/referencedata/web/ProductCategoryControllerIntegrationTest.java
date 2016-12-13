@@ -26,7 +26,6 @@ public class ProductCategoryControllerIntegrationTest extends BaseWebIntegration
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String CODE = "code";
-  private static final String ACCESS_TOKEN = "access_token";
 
   @MockBean
   private ProductCategoryRepository productCategoryRepository;

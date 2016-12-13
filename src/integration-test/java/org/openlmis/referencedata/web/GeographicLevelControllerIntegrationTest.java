@@ -20,7 +20,6 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
   private static final String RESOURCE_URL = "/api/geographicLevels";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String ACCESS_TOKEN = "access_token";
 
   @MockBean
   private GeographicLevelRepository geographicLevelRepository;

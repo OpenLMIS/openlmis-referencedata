@@ -1,5 +1,8 @@
 package org.openlmis.referencedata.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
+
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
@@ -12,12 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.BDDMockito.given;
-
 public class StockAdjustmentControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/stockAdjustmentReasons";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";

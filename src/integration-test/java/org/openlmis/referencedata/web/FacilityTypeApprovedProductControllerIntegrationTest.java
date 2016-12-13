@@ -30,7 +30,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String ACCESS_TOKEN = "access_token";
 
   @MockBean
   private FacilityTypeApprovedProductRepository repository;

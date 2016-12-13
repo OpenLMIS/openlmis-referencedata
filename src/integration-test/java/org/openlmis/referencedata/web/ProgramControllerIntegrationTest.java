@@ -19,7 +19,6 @@ import java.util.UUID;
 
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  private static final String ACCESS_TOKEN = "access_token";
   private static final String RESOURCE_URL = "/api/programs";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/search";

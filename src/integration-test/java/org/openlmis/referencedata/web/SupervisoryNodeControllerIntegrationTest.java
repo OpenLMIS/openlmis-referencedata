@@ -26,7 +26,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String ACCESS_TOKEN = "access_token";
 
   @MockBean
   private SupervisoryNodeRepository repository;
