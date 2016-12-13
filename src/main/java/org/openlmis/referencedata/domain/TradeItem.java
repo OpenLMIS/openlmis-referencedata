@@ -3,6 +3,8 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -81,8 +83,9 @@ public final class TradeItem extends OrderableProduct {
     if (null == globalProduct || hasSameDispensingUnit(globalProduct)) {
       this.globalProduct = globalProduct;
     } else {
-      throw new IllegalArgumentException(
-          "Global product cannot be assigned because dispensing units are different");
+      throw new ValidationMessageException(
+          new Message("referencedata.error.product.wrong-dispensing-units")
+      );
     }
   }
 

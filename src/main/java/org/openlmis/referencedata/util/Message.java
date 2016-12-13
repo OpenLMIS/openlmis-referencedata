@@ -30,6 +30,15 @@ public class Message {
     this.params = messageParameters;
   }
 
+  @Override
+  public String toString() {
+    String string = key;
+    for (Object param : params) {
+      string = string + ", " + param.toString();
+    }
+    return string;
+  }
+
   /**
    * Gets the localized version of this message as it's intended for a human.
    * @param messageSource the source of localized text.

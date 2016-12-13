@@ -4,7 +4,9 @@ import org.openlmis.referencedata.exception.CsvInputNotValidException;
 import org.openlmis.referencedata.exception.ExceptionDetail;
 import org.openlmis.referencedata.exception.InvalidIdException;
 import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.referencedata.util.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.Date;
 
 @ControllerAdvice
-public class RefDataErrorHandling {
+public class RefDataErrorHandling extends BaseHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RefDataErrorHandling.class);
 
@@ -31,6 +33,18 @@ public class RefDataErrorHandling {
   @ResponseBody
   public ErrorResponse handleDataIntegrityViolation(DataIntegrityViolationException ex) {
     return logAndRespond("Data integrity violation error occurred", ex);
+  }
+
+  /**
+   * Handles Message exceptions and returns status 400 Bad Request.
+   * @param ex the ValidationMessageException to handle
+   * @return the error response for the user
+   */
+  @ExceptionHandler(ValidationMessageException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public Message.LocalizedMessage handleMessageException(ValidationMessageException ex) {
+    return getLocalizedMessage(ex);
   }
 
   /**

@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.domain;
 
+import org.openlmis.referencedata.exception.ValidationMessageException;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -49,7 +51,7 @@ public class TradeItemTest {
     assertEquals(advil.hashCode(), advilDupe.hashCode());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionWhenAssigningGlobalProductWithWrongDispensingUnit() {
     TradeItem motrin = TradeItem.newTradeItem("motrin", "10 tab strip", "Motrin", 20, 10, false);
     ibuprofen.addTradeItem(motrin);
