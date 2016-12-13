@@ -23,22 +23,14 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   /**
    * Method returns all Supply lines with matched parameters.
    *
-   * @param program         program of searched Supply Lines.
-   * @param supervisoryNode supervisoryNode of searched Supply Lines.
+   * @param program           program of searched Supply Lines.
+   * @param supervisoryNode   supervisoryNode of searched Supply Lines.
+   * @param supplyingFacility supplyingFacility of searched Supply Lines.
    * @return list of Supply Lines with matched parameters.
    */
   @Override
-  public List<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode) {
-    return searchSupplyLines(program, supervisoryNode, null);
-  }
-
-  @Override
-  public List<SupplyLine> searchSupplyLines(Program program, Facility supplyingFacility) {
-    return searchSupplyLines(program, null, supplyingFacility);
-  }
-
-  private List<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode,
-                                             Facility supplyingFacility) {
+  public List<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode,
+                                            Facility supplyingFacility) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<SupplyLine> query = builder.createQuery(SupplyLine.class);
     Root<SupplyLine> root = query.from(SupplyLine.class);

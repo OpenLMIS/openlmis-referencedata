@@ -9,13 +9,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
-import org.openlmis.referencedata.service.SupplyLineService;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -28,17 +28,35 @@ public class SupplyLineServiceTest {
   private SupplyLineService supplyLineService;
 
   @Test
+  public void shouldFindSupplyLineIfMatchedProgram() {
+    testSupplyLineSearch(mock(Program.class), null, null);
+  }
+
+  @Test
   public void shouldFindSupplyLineIfMatchedProgramAndSupervisoryNode() {
-    Program program = mock(Program.class);
-    SupervisoryNode supervisoryNode = mock(SupervisoryNode.class);
+    testSupplyLineSearch(mock(Program.class), mock(SupervisoryNode.class), null);
+  }
+
+  @Test
+  public void shouldFindSupplyLineIfMatchedProgramAndFacility() {
+    testSupplyLineSearch(mock(Program.class), null, mock(Facility.class));
+  }
+
+  @Test
+  public void shouldFindSupplyLineIfMatchedProgramSupervisoryNodeAndFacility() {
+    testSupplyLineSearch(mock(Program.class), mock(SupervisoryNode.class), mock(Facility.class));
+  }
+
+  private void testSupplyLineSearch(Program program, SupervisoryNode supervisoryNode,
+                                    Facility supplyingFacility) {
     SupplyLine supplyLine = mock(SupplyLine.class);
 
     when(supplyLineRepository
-            .searchSupplyLines(program, supervisoryNode))
-            .thenReturn(Arrays.asList(supplyLine));
+        .searchSupplyLines(program, supervisoryNode, supplyingFacility))
+        .thenReturn(Collections.singletonList(supplyLine));
 
     List<SupplyLine> receivedSupplyLines = supplyLineService.searchSupplyLines(
-        program, supervisoryNode);
+        program, supervisoryNode, supplyingFacility);
 
     assertEquals(1, receivedSupplyLines.size());
     assertEquals(supplyLine, receivedSupplyLines.get(0));

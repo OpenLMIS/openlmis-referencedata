@@ -9,8 +9,7 @@ import java.util.List;
 
 public interface SupplyLineRepositoryCustom {
 
-  List<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode);
-
-  List<SupplyLine> searchSupplyLines(Program program, Facility supplyingFacility);
+  List<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode,
+                                     Facility supplyingFacility);
 
 }

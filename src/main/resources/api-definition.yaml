@@ -1003,7 +1003,13 @@ resourceTypes:
                       displayName: supervisoryNodeId
                       description: supervisoryNode ID
                       type: string
-                      required: true
+                      required: false
+                      repeat: false
+                  supplyingFacilityId:
+                      displayName: supplyingFacilityId
+                      description: supplyingFacility ID
+                      type: string
+                      required: false
                       repeat: false
               responses:
                   "200":

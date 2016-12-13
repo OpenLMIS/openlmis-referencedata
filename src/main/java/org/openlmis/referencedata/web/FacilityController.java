@@ -222,7 +222,7 @@ public class FacilityController extends BaseController {
     }
 
     List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program,
-        supervisoryNode);
+        supervisoryNode, null);
     List<Facility> facilities = supplyLines.stream()
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
     return ok(facilities);

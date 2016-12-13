@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,7 +86,7 @@ public class SupplyLineController extends BaseController {
    * Allows updating supplyLines.
    *
    * @param supplyLineDto A supplyLineDto bound to the request body
-   * @param supplyLineId UUID of supplyLine which we want to update
+   * @param supplyLineId  UUID of supplyLine which we want to update
    * @return ResponseEntity containing the updated supplyLine
    */
   @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.PUT)
@@ -155,7 +154,7 @@ public class SupplyLineController extends BaseController {
       @RequestParam(value = "supervisoryNode") SupervisoryNodeDto supervisoryNodeDto) {
     Program program = Program.newProgram(programDto);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
-    List<SupplyLine> result = supplyLineService.searchSupplyLines(program, supervisoryNode);
+    List<SupplyLine> result = supplyLineService.searchSupplyLines(program, supervisoryNode, null);
 
     List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
 
@@ -179,17 +178,17 @@ public class SupplyLineController extends BaseController {
       @RequestParam(value = "supervisoryNodeId", required = false) UUID supervisoryNodeId,
       @RequestParam(value = "supplyingFacilityId", required = false) UUID supplyingFacilityId) {
     Program program = programRepository.findOne(programId);
-    List<SupplyLine> resultSupplyLine;
+    SupervisoryNode supervisoryNode = null != supplyingFacilityId
+        ? supervisoryNodeRepository.findOne(supervisoryNodeId)
+        : null;
+    Facility supplyingFacility = null != supplyingFacilityId
+        ? facilityRepository.findOne(supplyingFacilityId)
+        : null;
 
-    if (null != supervisoryNodeId) {
-      SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
-      resultSupplyLine = supplyLineService.searchSupplyLines(program, supervisoryNode);
-    } else if (null != supplyingFacilityId) {
-      Facility supplyingFacility = facilityRepository.findOne(supplyingFacilityId);
-      resultSupplyLine = supplyLineService.searchSupplyLines(program, supplyingFacility);
-    } else {
-      resultSupplyLine = Collections.emptyList();
-    }
+
+    List<SupplyLine> resultSupplyLine = supplyLineService.searchSupplyLines(
+        program, supervisoryNode, supplyingFacility
+    );
 
     List<SupplyLineSimpleDto> result = new ArrayList<>();
     for (SupplyLine supplyLine : resultSupplyLine) {
