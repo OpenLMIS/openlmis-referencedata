@@ -31,10 +31,6 @@ public class SupplyLineSimpleDto extends BaseDto implements SupplyLine.Exporter,
   @JsonProperty
   private UUID supplyingFacility;
 
-  @Getter
-  @Setter
-  private Boolean exportOrders;
-
   @JsonIgnore
   @Override
   public SupervisoryNode.Importer getSupervisoryNode() {
