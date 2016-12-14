@@ -536,6 +536,15 @@ public class UserController extends BaseController {
 
       Role role = roleRepository.findOne(roleAssignmentDto.getRoleId());
 
+      if (role.getRights().isEmpty()) {
+        Object[] errorArgs = {role.getName()};
+        String errorCode = "referencedata.error.assigned-role-must-have-a-right";
+        String errorMessage =
+            messageSource.getMessage(errorCode, errorArgs, LocaleContextHolder.getLocale());
+        LOGGER.debug(errorMessage);
+        throw new RoleAssignmentException(errorMessage);
+      }
+
       String programCode = roleAssignmentDto.getProgramCode();
       String warehouseCode = roleAssignmentDto.getWarehouseCode();
       if (programCode != null) {
