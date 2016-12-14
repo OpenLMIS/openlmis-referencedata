@@ -117,7 +117,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(rightDto)
         .when()
@@ -140,7 +140,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(rightDto)
         .when()
