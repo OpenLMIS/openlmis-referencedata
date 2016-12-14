@@ -178,7 +178,7 @@ public class SupplyLineController extends BaseController {
       @RequestParam(value = "supervisoryNodeId", required = false) UUID supervisoryNodeId,
       @RequestParam(value = "supplyingFacilityId", required = false) UUID supplyingFacilityId) {
     Program program = programRepository.findOne(programId);
-    SupervisoryNode supervisoryNode = null != supplyingFacilityId
+    SupervisoryNode supervisoryNode = null != supervisoryNodeId
         ? supervisoryNodeRepository.findOne(supervisoryNodeId)
         : null;
     Facility supplyingFacility = null != supplyingFacilityId
