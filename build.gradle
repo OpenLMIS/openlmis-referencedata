@@ -230,5 +230,3 @@ check {
     dependsOn integrationTest
     dependsOn copyConsulRegistrationToBuild
 }
-
-bootRun.dependsOn consulRegistration
