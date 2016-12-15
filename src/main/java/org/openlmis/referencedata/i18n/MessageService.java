@@ -3,9 +3,9 @@ package org.openlmis.referencedata.i18n;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class MessageService {
 
   @Autowired

@@ -12,7 +12,14 @@ public class BaseHandler {
   @Autowired
   private MessageService messageService;
 
-  public Message.LocalizedMessage getLocalizedMessage(ValidationMessageException exception) {
+  /**
+   * Translate the Message in a ValidationMessageException into a LocalizedMessage.
+   *
+   * @param exception is any ValidationMessageException containing a Message
+   * @return a LocalizedMessage translated by the MessageService bean
+   */
+  protected final Message.LocalizedMessage getLocalizedMessage(
+      ValidationMessageException exception) {
     return messageService.localize(exception.asMessage());
   }
 
