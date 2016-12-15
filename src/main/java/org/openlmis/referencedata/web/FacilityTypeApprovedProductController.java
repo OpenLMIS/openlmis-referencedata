@@ -31,7 +31,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @return ResponseEntity containing the created facilityTypeApprovedProduct
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.POST)
-  public ResponseEntity<?> createFacility(
+  public ResponseEntity<?> createFacilityTypeApprovedProduct(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct) {
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
     // Ignore provided id
