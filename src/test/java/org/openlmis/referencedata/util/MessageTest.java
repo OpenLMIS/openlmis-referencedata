@@ -43,6 +43,7 @@ public class MessageTest {
     Date today = new Date();
     Message message = new Message(key, new Object[]{"a", today});
 
+    // expected is:  "key.something: a, <date>"
     assertEquals(key + ": " + "a" + ", " + today.toString(), message.toString());
   }
 
