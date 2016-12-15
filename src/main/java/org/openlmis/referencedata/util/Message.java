@@ -1,10 +1,10 @@
 package org.openlmis.referencedata.util;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.MessageSource;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 
@@ -33,8 +33,7 @@ public class Message {
 
   @Override
   public String toString() {
-    String[] paramStrings = Arrays.stream(params).map(p -> p.toString()).toArray(String[]::new);
-    return key + String.join(", ", paramStrings);
+    return key + ": " + StringUtils.join(params, ", ");
   }
 
   /**

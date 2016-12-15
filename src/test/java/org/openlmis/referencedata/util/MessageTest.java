@@ -1,10 +1,13 @@
 package org.openlmis.referencedata.util;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 
+import java.util.Date;
 import java.util.Locale;
 
 public class MessageTest {
@@ -32,6 +35,15 @@ public class MessageTest {
     Mockito.when(messageSource.getMessage(key, new Object[]{p1, p2}, locale))
         .thenThrow(NoSuchMessageException.class);
     msg.localMessage(messageSource, locale);
+  }
+
+  @Test
+  public void toStringShouldHandleObjects() {
+    String key = "key.something";
+    Date today = new Date();
+    Message message = new Message(key, new Object[]{"a", today});
+
+    assertEquals(key + ": " + "a" + ", " + today.toString(), message.toString());
   }
 
   @Test
