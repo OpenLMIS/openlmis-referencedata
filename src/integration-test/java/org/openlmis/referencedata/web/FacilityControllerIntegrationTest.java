@@ -292,7 +292,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     FacilityDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(ID_URL)
@@ -311,7 +311,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(ID_URL)
