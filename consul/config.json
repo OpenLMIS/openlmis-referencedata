@@ -1,5 +1,9 @@
 {
-  "name": "referencedata",
+  "service": {
+    "Name": "referencedata",
+    "Port": 8080,
+    "Tags": ["openlmis-service"]
+  },
   "raml": "src/main/resources/api-definition.yaml",
   "path": [
     "referencedata",
