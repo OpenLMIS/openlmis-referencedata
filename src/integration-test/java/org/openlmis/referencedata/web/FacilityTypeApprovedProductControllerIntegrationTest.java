@@ -21,8 +21,6 @@ import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 @Ignore
@@ -37,7 +35,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private Program program;
   private OrderableProduct orderableProduct;
   private FacilityType facilityType1;
-  private FacilityType facilityType2;
   private ProgramProduct programProduct;
   private FacilityTypeApprovedProduct facilityTypeAppProd;
   private UUID facilityTypeAppProdId;
@@ -56,12 +53,11 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     productCategory.setId(UUID.randomUUID());
 
     orderableProduct = GlobalProduct.newGlobalProduct("abcd", "each", "Abcd", "test", 10, 5, false);
+    orderableProduct.setId(UUID.randomUUID());
 
     programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct);
 
     facilityType1 = new FacilityType("facilityType1");
-
-    facilityType2 = new FacilityType("facilityType2");
 
     facilityTypeAppProd = new FacilityTypeApprovedProduct();
     facilityTypeAppProd.setId(facilityTypeAppProdId);
@@ -127,32 +123,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     assertEquals(facilityTypeAppProd, response);
     assertEquals(9.00, response.getMaxMonthsOfStock(), 0.00);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetAllFacilityTypeApprovedProducts() {
-
-    FacilityTypeApprovedProduct another = new FacilityTypeApprovedProduct();
-    another.setFacilityType(facilityType2);
-    another.setProgramProduct(programProduct);
-    another.setMaxMonthsOfStock(3.0);
-    List<FacilityTypeApprovedProduct> storedFacilityTypeApprovedProducts = Arrays.asList(
-        facilityTypeAppProd, another);
-
-    given(repository.findAll()).willReturn(storedFacilityTypeApprovedProducts);
-
-    Object[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(Object[].class);
-
-    assertEquals(storedFacilityTypeApprovedProducts.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

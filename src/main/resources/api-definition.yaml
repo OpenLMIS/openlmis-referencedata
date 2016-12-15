@@ -1378,7 +1378,7 @@ resourceTypes:
                   programId:
                       displayName: Program ID
                       type: string
-                      required: true
+                      required: false
                       repeat: false
                   fullSupply:
                       displayName: Full-supply product
@@ -2133,50 +2133,6 @@ resourceTypes:
                       X-Content-Type-Options:
                       X-XSS-Protection:
                     body:
-                        application/json:
-      get:
-            is: [ secured ]
-            description: Get all facilityTypeApprovedProducts.
-            responses:
-                "200":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                        application/json:
-                "404":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                       application/json:
-      /search:
-            get:
-              is: [ secured ]
-              description: Get list of full supply FacilityTypeApprovedProduct.
-              queryParameters:
-                  facility:
-                          displayName: facility
-                          type: string
-                          required: true
-                          repeat: false
-                  program:
-                          displayName: program
-                          type: string
-                          required: true
-                          repeat: false
-              responses:
-                  "200":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
-                        application/json:
-                  "404":
-                      headers:
-                        X-Content-Type-Options:
-                        X-XSS-Protection:
-                      body:
                         application/json:
       /{id}:
             uriParameters:

@@ -9,7 +9,6 @@ import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -19,7 +18,6 @@ import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -43,6 +41,8 @@ public class FacilityController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
 
   private static final String KEY_ERROR_PROGRAM_NOT_FOUND = "referencedata.error.program.not-found";
+  private static final String KEY_ERROR_FACILITY_NOT_FOUND =
+      "referencedata.error.facility.not-found";
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -59,8 +59,6 @@ public class FacilityController extends BaseController {
   @Autowired
   private SupplyLineService supplyLineService;
 
-  @Autowired
-  private ExposedMessageSource messageSource;
 
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
@@ -79,9 +77,7 @@ public class FacilityController extends BaseController {
     if (!addSuccessful) {
       return ResponseEntity
           .badRequest()
-          .body(new ErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND,
-              messageSource.getMessage(KEY_ERROR_PROGRAM_NOT_FOUND, null,
-                  LocaleContextHolder.getLocale())));
+          .body(buildErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND));
     }
 
     newFacility = facilityRepository.save(newFacility);
@@ -122,9 +118,7 @@ public class FacilityController extends BaseController {
     if (!addSuccessful) {
       return ResponseEntity
           .badRequest()
-          .body(new ErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND,
-              messageSource.getMessage(KEY_ERROR_PROGRAM_NOT_FOUND, null,
-                  LocaleContextHolder.getLocale())));
+          .body(buildErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND));
     }
     facilityToSave = facilityRepository.save(facilityToSave);
 
@@ -159,14 +153,14 @@ public class FacilityController extends BaseController {
    */
   @RequestMapping(value = "/facilities/{id}/approvedProducts")
   public ResponseEntity<?> getApprovedProducts(@PathVariable("id") UUID facilityId,
-                                               @RequestParam(value = "programId") UUID programId,
+                                               @RequestParam(required = false, value = "programId")
+                                                   UUID programId,
                                                @RequestParam(value = "fullSupply")
                                                    boolean fullSupply) {
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
-      return ResponseEntity.badRequest().body(new ErrorResponse(
-          "referencedata.error.facility.not-found", "Facility of the given ID was not found."));
+      return ResponseEntity.badRequest().body(buildErrorResponse(KEY_ERROR_FACILITY_NOT_FOUND));
     }
 
     Collection<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository

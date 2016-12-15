@@ -8,14 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Collection;
 import java.util.UUID;
 
 @Controller
@@ -42,45 +39,6 @@ public class FacilityTypeApprovedProductController extends BaseController {
     repository.save(facilityTypeApprovedProduct);
     return new ResponseEntity<>(facilityTypeApprovedProduct, HttpStatus.CREATED);
   }
-
-  /**
-   * Get all newFacilityTypeApprovedProducts.
-   *
-   * @return FacilityTypeApprovedProduct.
-   */
-  @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllFacilityTypeApprovedProducts() {
-    Iterable<FacilityTypeApprovedProduct> facilityTypeApprovedProducts = repository.findAll();
-    if (facilityTypeApprovedProducts == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(facilityTypeApprovedProducts, HttpStatus.OK);
-    }
-  }
-
-  /**
-   * Get list of full supply FacilityTypeApprovedProduct.
-   *
-   * @param facility facility id
-   * @param program  program id
-   * @return list of full supply FacilityTypeApprovedProduct
-   */
-  @RequestMapping(
-      value = "/facilityTypeApprovedProducts/search",
-      method = RequestMethod.GET
-  )
-  public ResponseEntity<?> getFullSupply(@RequestParam(value = "facility") UUID facility,
-                                         @RequestParam(value = "program") UUID program) {
-    Collection<FacilityTypeApprovedProduct> facilityTypeApprovedProducts =
-        repository.searchProducts(facility, program, true);
-
-    if (CollectionUtils.isEmpty(facilityTypeApprovedProducts)) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(facilityTypeApprovedProducts, HttpStatus.OK);
-    }
-  }
-
 
   /**
    * Allows updating facilityTypeApprovedProduct.

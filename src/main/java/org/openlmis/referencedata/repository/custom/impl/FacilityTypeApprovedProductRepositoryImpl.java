@@ -32,7 +32,6 @@ public class FacilityTypeApprovedProductRepositoryImpl
   public Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID programId,
                                                                 boolean fullSupply) {
     checkNotNull(facilityId);
-    checkNotNull(programId);
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
@@ -51,8 +50,10 @@ public class FacilityTypeApprovedProductRepositoryImpl
     Join<ProgramProduct, Program> program = pp.join("program");
 
     Predicate conjunction = builder.conjunction();
+    if (programId != null) {
+      conjunction = builder.and(conjunction, builder.equal(program.get("id"), programId));
+    }
     conjunction = builder.and(conjunction, builder.equal(fft.get("id"), ft.get("id")));
-    conjunction = builder.and(conjunction, builder.equal(program.get("id"), programId));
     conjunction = builder.and(conjunction, builder.equal(facility.get("id"), facilityId));
     conjunction = builder.and(conjunction, builder.equal(pp.get("fullSupply"), fullSupply));
     conjunction = builder.and(conjunction, builder.isTrue(pp.get("active")));

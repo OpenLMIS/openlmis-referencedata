@@ -186,6 +186,30 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     assertThat(ftap.getProgramProduct().isActive(), is(true));
   }
 
+  @Test
+  public void shouldSkipFilteringWhenProgramIsNotProvided() {
+    ftapRepository.save(generateInstance());
+    ftapRepository.save(generateInstance());
+
+    Collection<FacilityTypeApprovedProduct> list = ftapRepository
+        .searchProducts(facility.getId(), null, true);
+
+    assertThat(list, hasSize(2));
+
+    FacilityTypeApprovedProduct ftap = list.iterator().next();
+    assertFacilityTypeApprovedProduct(ftap);
+
+    ftap = list.iterator().next();
+    assertFacilityTypeApprovedProduct(ftap);
+  }
+
+  private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {
+    assertThat(ftap.getFacilityType().getId(), is(equalTo(facilityType.getId())));
+    assertThat(ftap.getFacilityType().getId(), is(equalTo(facility.getType().getId())));
+    assertThat(ftap.getProgramProduct().isFullSupply(), is(true));
+    assertThat(ftap.getProgramProduct().isActive(), is(true));
+  }
+
   private FacilityTypeApprovedProduct generateProduct(boolean fullSupply) {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setFacilityType(facilityType);

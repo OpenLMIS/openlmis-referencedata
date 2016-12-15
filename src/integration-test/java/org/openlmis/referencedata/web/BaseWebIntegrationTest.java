@@ -25,7 +25,6 @@ import javax.annotation.PostConstruct;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext
-@SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public abstract class BaseWebIntegrationTest {
 
   protected static final String ACCESS_TOKEN = "access_token";

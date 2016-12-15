@@ -8,10 +8,25 @@
       "type": "string",
       "title": "id"
     },
-    "product": {
-      "type": "object",
-      "$ref": "orderableProduct.json",
-      "title": "product"
+    "productId": {
+      "type": "string",
+      "title": "productId"
+    },
+    "productName": {
+      "type": "string",
+      "title": "productName"
+    },
+    "productCategoryId": {
+      "type": "string",
+      "title": "productCategoryId"
+    },
+    "productCategoryDisplayName": {
+      "type": "string",
+      "title": "productCategoryDisplayName"
+    },
+    "productCategoryDisplayOrder": {
+      "type": "integer",
+      "title": "productCategoryDisplayOrder"
     },
     "dosesPerMonth": {
       "type": "integer",
@@ -20,11 +35,6 @@
     "active": {
       "type": "boolean",
       "title": "active"
-    },
-    "productCategory": {
-      "type": "object",
-      "$ref": "productCategory.json",
-      "title": "productCategory"
     },
     "fullSupply": {
       "type": "boolean",
@@ -39,10 +49,10 @@
       "title": "maxMonthsStock"
     },
     "pricePerPack": {
-      "type": "string",
+      "type": "number",
       "title": "pricePerPack"
     }
   },
-  "required": ["id", "product", "dosesPerMonth", "active", "productCategory",
-    "fullSupply"]
+  "required": ["productId", "productName", "productCategoryId", "productCategoryDisplayName",
+    "productCategoryDisplayOrder", "dosesPerMonth", "active", "fullSupply"]
 }
