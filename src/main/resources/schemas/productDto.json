@@ -44,9 +44,9 @@
       "type": "integer",
       "title": "displayOrder"
     },
-    "maxMonthsStock": {
+    "maxMonthsOfStock": {
       "type": "integer",
-      "title": "maxMonthsStock"
+      "title": "maxMonthsOfStock"
     },
     "pricePerPack": {
       "type": "number",

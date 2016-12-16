@@ -29,7 +29,7 @@ public class ProductDto extends BaseDto
 
   private int displayOrder;
 
-  private int maxMonthsStock;
+  private int maxMonthsOfStock;
 
   private Integer dosesPerMonth;
 

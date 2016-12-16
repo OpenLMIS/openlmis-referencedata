@@ -215,7 +215,7 @@ public class ProgramProduct extends BaseEntity {
     exporter.setActive(active);
     exporter.setFullSupply(fullSupply);
     exporter.setDisplayOrder(displayOrder);
-    exporter.setMaxMonthsStock(maxMonthsStock);
+    exporter.setMaxMonthsOfStock(maxMonthsStock);
     exporter.setDosesPerMonth(dosesPerMonth);
     if (pricePerPack != null) {
       exporter.setPricePerPack(pricePerPack.getValue());
@@ -241,7 +241,7 @@ public class ProgramProduct extends BaseEntity {
 
     void setDisplayOrder(int displayOrder);
 
-    void setMaxMonthsStock(int maxMonthsStock);
+    void setMaxMonthsOfStock(int maxMonthsStock);
 
     void setDosesPerMonth(Integer dosesPerMonth);
 
@@ -265,7 +265,7 @@ public class ProgramProduct extends BaseEntity {
 
     int getDisplayOrder();
 
-    int getMaxMonthsStock();
+    int getMaxMonthsOfStock();
 
     Integer getDosesPerMonth();
 
