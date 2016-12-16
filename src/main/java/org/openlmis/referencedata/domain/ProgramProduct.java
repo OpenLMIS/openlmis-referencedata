@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -204,26 +205,37 @@ public class ProgramProduct extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
-    exporter.setProduct(product);
-    exporter.setDosesPerMonth(dosesPerMonth);
+    exporter.setProductId(product.getId());
+    exporter.setProductName(product.getName());
+    exporter.setProductCategoryId(productCategory.getId());
+    exporter.setProductCategoryDisplayName(
+        productCategory.getOrderedDisplayValue().getDisplayName());
+    exporter.setProductCategoryDisplayOrder(
+        productCategory.getOrderedDisplayValue().getDisplayOrder());
     exporter.setActive(active);
-    exporter.setProductCategory(productCategory);
     exporter.setFullSupply(fullSupply);
     exporter.setDisplayOrder(displayOrder);
     exporter.setMaxMonthsStock(maxMonthsStock);
-    exporter.setPricePerPack(pricePerPack);
+    exporter.setDosesPerMonth(dosesPerMonth);
+    if (pricePerPack != null) {
+      exporter.setPricePerPack(pricePerPack.getValue());
+    }
   }
 
   public interface Exporter {
     void setId(UUID id);
 
-    void setProduct(OrderableProduct product);
+    void setProductId(UUID productId);
 
-    void setDosesPerMonth(Integer dosesPerMonth);
+    void setProductName(String productName);
+
+    void setProductCategoryId(UUID productCategoryId);
+
+    void setProductCategoryDisplayName(String productCategoryDisplayName);
+
+    void setProductCategoryDisplayOrder(int productCategoryDisplayOrder);
 
     void setActive(boolean active);
-
-    void setProductCategory(ProductCategory category);
 
     void setFullSupply(boolean fullSupply);
 
@@ -231,19 +243,23 @@ public class ProgramProduct extends BaseEntity {
 
     void setMaxMonthsStock(int maxMonthsStock);
 
-    void setPricePerPack(Money pricePerPack);
+    void setDosesPerMonth(Integer dosesPerMonth);
+
+    void setPricePerPack(BigDecimal pricePerPack);
   }
 
   public interface Importer {
     UUID getId();
 
-    OrderableProduct getProduct();
+    String getProductName();
 
-    Integer getDosesPerMonth();
+    UUID getProductCategoryId();
+
+    String getProductCategoryDisplayName();
+
+    int getProductCategoryDisplayOrder();
 
     boolean isActive();
-
-    ProductCategory getProductCategory();
 
     boolean isFullSupply();
 
@@ -251,6 +267,8 @@ public class ProgramProduct extends BaseEntity {
 
     int getMaxMonthsStock();
 
-    Money getPricePerPack();
+    Integer getDosesPerMonth();
+
+    BigDecimal getPricePerPack();
   }
 }
