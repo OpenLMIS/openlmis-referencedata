@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.dto;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProgramProduct;
 
 import lombok.Getter;
@@ -16,6 +17,8 @@ public class ProductDto extends BaseDto
   private UUID productId;
 
   private String productName;
+
+  private Code productCode;
 
   private UUID productCategoryId;
 

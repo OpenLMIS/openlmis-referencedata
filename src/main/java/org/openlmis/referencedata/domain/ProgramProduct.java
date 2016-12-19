@@ -207,6 +207,7 @@ public class ProgramProduct extends BaseEntity {
     exporter.setId(id);
     exporter.setProductId(product.getId());
     exporter.setProductName(product.getName());
+    exporter.setProductCode(product.getProductCode());
     exporter.setProductCategoryId(productCategory.getId());
     exporter.setProductCategoryDisplayName(
         productCategory.getOrderedDisplayValue().getDisplayName());
@@ -228,6 +229,8 @@ public class ProgramProduct extends BaseEntity {
     void setProductId(UUID productId);
 
     void setProductName(String productName);
+
+    void setProductCode(Code productCode);
 
     void setProductCategoryId(UUID productCategoryId);
 
@@ -252,6 +255,8 @@ public class ProgramProduct extends BaseEntity {
     UUID getId();
 
     String getProductName();
+
+    Code getProductCode();
 
     UUID getProductCategoryId();
 

@@ -16,6 +16,10 @@
       "type": "string",
       "title": "productName"
     },
+    "productCode": {
+      "type": "string",
+      "title": "productCode"
+    },
     "productCategoryId": {
       "type": "string",
       "title": "productCategoryId"
