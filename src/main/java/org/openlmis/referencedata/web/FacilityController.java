@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.web;
 
+import org.javers.core.diff.Change;
+import org.javers.repository.jql.QueryBuilder;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -21,12 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,6 +58,29 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private SupplyLineService supplyLineService;
+
+  //TEMPORARY TEST CODE
+  @RequestMapping(value = "/message", method = RequestMethod.GET)
+  public ResponseEntity<?> getMessage()
+  {
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+    LocalDateTime now = LocalDateTime.now();
+    return ResponseEntity.status(HttpStatus.OK).body("hello world, at " + dateTimeFormatter.format(now));
+  }
+
+  //TEMPORARY TEST CODE
+  @RequestMapping(value = "/updateFacility", method = RequestMethod.GET)
+  public ResponseEntity<?> updateFacility()
+  {
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+    LocalDateTime now = LocalDateTime.now();
+    Facility facility = facilityRepository.findFirstByCode("FAC004");
+
+    String comment = "facility id " + facility.getId() + " last updated on " + dateTimeFormatter.format(now) + ".";
+    facility.setComment(comment);
+    facilityRepository.save(facility);
+    return ResponseEntity.status(HttpStatus.OK).body(comment);
+  }
 
 
   /**
@@ -96,6 +119,16 @@ public class FacilityController extends BaseController {
   public ResponseEntity<?> getAllFacilities() {
     Iterable<Facility> facilities = facilityRepository.findAll();
     return ok(facilities);
+  }
+
+  /**
+   * Get the audit log for all facilities.
+   *
+   * @return Facilities.
+   */
+  @RequestMapping(value = "/facilities/audit", method = RequestMethod.GET)
+  public ResponseEntity<?> getAllFacilitiesAudit() {
+    return ResponseEntity.status(HttpStatus.OK).body( getChangesByClass(Facility.class) );
   }
 
 

@@ -1271,6 +1271,32 @@ resourceTypes:
                             application/json:
                                 schema: userArray
 
+  /message:
+    displayName: TestMessage
+    get:
+        is: [ secured ]
+        description: Get a test message.
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+
+  /updateFacility:
+    displayName: Test-Update-Facility
+    get:
+        is: [ secured ]
+        description: Updates facility code FAC004 because, well, I had trouble doing so via Swagger. This endpoint exists, and uses an HTTP GET, exclusively for the sake of development.
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+
   /facilities:
       displayName: Facility
       get:
@@ -1461,6 +1487,17 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
+      /audit:
+        get:
+            is: [ secured ]
+            description: Returns facility-related audit information
+            responses:
+                "200":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
       /supplying:
           get:
               is: [ secured ]

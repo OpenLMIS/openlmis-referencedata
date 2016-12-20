@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
+@TypeName("Facility")
 @Table(name = "facilities", schema = "referencedata")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Facility extends BaseEntity {
