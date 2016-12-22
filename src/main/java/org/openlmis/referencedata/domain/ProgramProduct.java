@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -55,6 +58,7 @@ public class ProgramProduct extends BaseEntity {
   @Getter
   @Setter
   @Embedded
+  @AttributeOverrides({@AttributeOverride(name = "value", column = @Column(name = "pricePerPack"))})
   private Money pricePerPack;
 
   private ProgramProduct(Program program,
