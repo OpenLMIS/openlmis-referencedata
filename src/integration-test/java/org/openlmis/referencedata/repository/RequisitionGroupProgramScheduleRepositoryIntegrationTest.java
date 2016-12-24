@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -18,7 +17,6 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
@@ -118,16 +116,14 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
   }
 
   @Test(expected = PersistenceException.class)
-  public void shouldThrowExceptionWhenSavingTheSameRequisitionGroupProgramSchedule()
-        throws RequisitionGroupProgramScheduleException {
+  public void shouldThrowExceptionWhenSavingTheSameRequisitionGroupProgramSchedule() {
     repository.save(generateInstance());
     repository.save(generateInstance());
     entityManager.flush();
   }
 
   @Test
-  public void shouldReturnNullIfRequisitionGroupProgramScheduleIsNotFound()
-        throws RequisitionGroupProgramScheduleException {
+  public void shouldReturnNullIfRequisitionGroupProgramScheduleIsNotFound() {
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
           repository.searchRequisitionGroupProgramSchedule(program, facility);
 
@@ -135,7 +131,7 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldReturnCorrectInstance() throws RequisitionGroupProgramScheduleException {
+  public void shouldReturnCorrectInstance() {
     RequisitionGroupProgramSchedule entity = generateInstance();
     repository.save(entity);
 

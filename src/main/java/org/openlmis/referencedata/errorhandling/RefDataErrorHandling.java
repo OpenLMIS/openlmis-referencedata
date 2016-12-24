@@ -1,9 +1,7 @@
 package org.openlmis.referencedata.errorhandling;
 
-import org.openlmis.referencedata.exception.CsvInputNotValidException;
 import org.openlmis.referencedata.exception.ExceptionDetail;
 import org.openlmis.referencedata.exception.InvalidIdException;
-import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.util.ErrorResponse;
 import org.openlmis.referencedata.util.LocalizedMessage;
@@ -71,8 +69,7 @@ public class RefDataErrorHandling extends BaseHandler {
    * @param ex Exception to handle.
    * @return ResponseEntity with exception details
    */
-  @ExceptionHandler({CsvInputNotValidException.class, InvalidIdException.class,
-      RequisitionGroupProgramScheduleException.class})
+  @ExceptionHandler({InvalidIdException.class})
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public ExceptionDetail exceptionHandler(Exception ex) {

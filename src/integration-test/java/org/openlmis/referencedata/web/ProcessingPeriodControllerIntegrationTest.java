@@ -8,7 +8,7 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 
 import com.google.common.collect.Sets;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -22,7 +22,6 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
-import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
@@ -32,8 +31,6 @@ import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -178,8 +175,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldFindPeriodsByProgramAndFacility()
-      throws RequisitionGroupProgramScheduleException {
+  public void shouldFindPeriodsByProgramAndFacility() {
 
     given(programRepository.findOne(programId))
         .willReturn(requisitionGroupProgramSchedule.getProgram());

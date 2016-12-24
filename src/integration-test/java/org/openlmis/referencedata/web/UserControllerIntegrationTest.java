@@ -10,12 +10,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -39,9 +38,6 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleAssignmentException;
-import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -59,8 +55,6 @@ import org.openlmis.util.PasswordResetRequest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -156,8 +150,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   /**
    * Constructor for test class.
    */
-  public UserControllerIntegrationTest() throws RoleException, RoleAssignmentException,
-      RightTypeException {
+  public UserControllerIntegrationTest() {
     user1 = generateUser();
     assignUserRoles(user1);
     userId = UUID.randomUUID();
@@ -769,8 +762,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     return currentInstanceNumber;
   }
 
-  private void assignUserRoles(User user) throws RightTypeException, RoleException,
-      RoleAssignmentException {
+  private void assignUserRoles(User user) {
 
     Right adminRight = Right.newRight("adminRight", RightType.GENERAL_ADMIN);
     adminRole = Role.newRole("adminRole", adminRight);

@@ -542,7 +542,7 @@ public class UserController extends BaseController {
         String errorMessage =
             messageSource.getMessage(errorCode, errorArgs, LocaleContextHolder.getLocale());
         LOGGER.debug(errorMessage);
-        throw new RoleAssignmentException(errorMessage);
+        throw new AuthException(errorMessage);
       }
 
       String programCode = roleAssignmentDto.getProgramCode();
