@@ -2,7 +2,6 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Collections.singleton;
 
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 
 import lombok.Getter;
@@ -26,7 +25,7 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   @Getter
   private Facility warehouse;
 
-  private FulfillmentRoleAssignment(Role role, User user) throws RightTypeException {
+  private FulfillmentRoleAssignment(Role role, User user) {
     super(role, user);
   }
 
@@ -37,12 +36,12 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
    * @param role      the role being assigned
    * @param user      the user to which the role is being assigned
    * @param warehouse the warehouse where the role applies
-   * @throws RightTypeException      if role passed in has rights which are not an acceptable right
-   *                                 type
+   * @throws org.openlmis.referencedata.exception.AuthException if role passed in
+   *      has rights which are not an acceptable right type
    * @throws RoleAssignmentException if facility passed in is not of type 'warehouse'
    */
   public FulfillmentRoleAssignment(Role role, User user, Facility warehouse)
-      throws RightTypeException, RoleAssignmentException {
+      throws RoleAssignmentException {
     this(role, user);
 
     if (!warehouse.getType().getCode().equalsIgnoreCase("warehouse")) {

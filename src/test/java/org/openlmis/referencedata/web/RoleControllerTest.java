@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -17,7 +16,6 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -57,7 +55,7 @@ public class RoleControllerTest {
   /**
    * Constructor for test.
    */
-  public RoleControllerTest() throws RightTypeException, RoleException {
+  public RoleControllerTest() throws RoleException {
     initMocks(this);
     controller = new RoleController(repository, rightRepository, messageSource);
 
@@ -158,7 +156,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldUpdateRoleOnPut() throws RightTypeException, RoleException {
+  public void shouldUpdateRoleOnPut() throws RoleException {
     //given
     preparePostOrPut();
 
@@ -174,7 +172,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldCreateNewRoleOnPut() throws RightTypeException, RoleException {
+  public void shouldCreateNewRoleOnPut() throws RoleException {
     //given
     preparePostOrPut();
 
@@ -191,7 +189,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldAddRoleRightsOnPut() throws RightTypeException, RoleException {
+  public void shouldAddRoleRightsOnPut() throws RoleException {
     //given
     preparePostOrPut();
 
@@ -211,7 +209,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldUpdateRoleRightsOnPut() throws RightTypeException, RoleException {
+  public void shouldUpdateRoleRightsOnPut() throws RoleException {
     //given
     preparePostOrPut();
 
@@ -231,7 +229,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldDeleteRoleRightsOnPut() throws RightTypeException, RoleException {
+  public void shouldDeleteRoleRightsOnPut() throws RoleException {
     //given
     preparePostOrPut();
 

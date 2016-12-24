@@ -2,8 +2,6 @@ package org.openlmis.referencedata.domain;
 
 import com.google.common.collect.Sets;
 
-import org.openlmis.referencedata.exception.RightTypeException;
-
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
@@ -16,7 +14,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 public class DirectRoleAssignment extends RoleAssignment {
 
-  public DirectRoleAssignment(Role role, User user) throws RightTypeException {
+  public DirectRoleAssignment(Role role, User user) {
     super(role, user);
   }
 

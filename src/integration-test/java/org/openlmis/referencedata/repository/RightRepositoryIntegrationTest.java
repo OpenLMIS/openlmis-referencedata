@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RightRepositoryIntegrationTest
@@ -44,7 +43,7 @@ public class RightRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldGetFirstByNameIfExists() throws RightTypeException {
+  public void shouldGetFirstByNameIfExists() {
     //given
     String nameToFind = right2.getName();
 
@@ -56,7 +55,7 @@ public class RightRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldNotGetFirstByNameIfDoesNotExist() throws RightTypeException {
+  public void shouldNotGetFirstByNameIfDoesNotExist() {
     //given
     String nameToFind = "does not exist";
 

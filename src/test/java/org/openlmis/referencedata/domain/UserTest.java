@@ -8,10 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Collections;
@@ -40,7 +38,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldBeAbleToAssignRoleToUser() throws RightTypeException, RoleException {
+  public void shouldBeAbleToAssignRoleToUser() throws RoleException {
     //when
     user.assignRoles(new DirectRoleAssignment(Role.newRole(roleName, Right.newRight("reportRight1",
         RightType.REPORTS)), user));
@@ -82,7 +80,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetHomeFacilityPrograms() throws RightTypeException, RoleException {
+  public void shouldGetHomeFacilityPrograms() throws RoleException {
     //given
     Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
     Program program1 = new Program("prog1");
@@ -103,7 +101,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetSupervisedPrograms() throws RightTypeException, RoleException {
+  public void shouldGetSupervisedPrograms() throws RoleException {
     //given
     Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
     Program program1 = new Program("prog1");
@@ -128,7 +126,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetSupervisedFacilities() throws RightTypeException, RoleException {
+  public void shouldGetSupervisedFacilities() throws RoleException {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
@@ -147,8 +145,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldNotGetSupervisedFacilitiesForNonMatchingPrograms()
-      throws RightTypeException, RoleException {
+  public void shouldNotGetSupervisedFacilitiesForNonMatchingPrograms() throws RoleException {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
@@ -170,8 +167,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldNotGetSupervisedFacilitiesForNonMatchingRight()
-      throws RightTypeException, RoleException {
+  public void shouldNotGetSupervisedFacilitiesForNonMatchingRight() throws RoleException {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 

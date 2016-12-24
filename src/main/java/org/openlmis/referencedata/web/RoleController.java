@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toSet;
+
 import com.google.common.collect.Sets;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Right;
@@ -7,7 +9,6 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.AuthException;
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -27,8 +28,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toSet;
 
 @NoArgsConstructor
 @Controller
@@ -217,7 +216,7 @@ public class RoleController extends BaseController {
     return roleDto;
   }
 
-  private void populateRights(RoleDto roleDto) throws RightTypeException, RoleException {
+  private void populateRights(RoleDto roleDto) throws RoleException {
     Set<Right.Importer> rightDtos = roleDto.getRights();
     for (Right.Importer rightDto : rightDtos) {
       Right storedRight = rightRepository.findFirstByName(rightDto.getName());

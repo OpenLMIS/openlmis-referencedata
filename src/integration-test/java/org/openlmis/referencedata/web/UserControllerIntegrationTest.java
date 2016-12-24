@@ -334,7 +334,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetUserPrograms() throws RightTypeException {
+  public void shouldGetUserPrograms() {
 
     given(userRepository.findOne(userId)).willReturn(user1);
 
@@ -354,7 +354,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getUserSupervisedFacilitiesShouldReturnOk() throws RightTypeException {
+  public void getUserSupervisedFacilitiesShouldReturnOk() {
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
@@ -377,8 +377,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getUserSupervisedFacilitiesShouldReturnNotFoundForNonExistingUser()
-      throws RightTypeException {
+  public void getUserSupervisedFacilitiesShouldReturnNotFoundForNonExistingUser() {
 
     given(userRepository.findOne(userId)).willReturn(null);
 
@@ -397,8 +396,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getUserSupervisedFacilitiesShouldReturnBadRequestForNonExistingUuid()
-      throws RightTypeException {
+  public void getUserSupervisedFacilitiesShouldReturnBadRequestForNonExistingUuid() {
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);

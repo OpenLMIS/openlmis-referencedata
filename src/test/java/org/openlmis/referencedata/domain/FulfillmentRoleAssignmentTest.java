@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 
 import org.junit.Test;
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.exception.RoleException;
 
@@ -21,7 +20,7 @@ public class FulfillmentRoleAssignmentTest {
   /**
    * Setup constructor.
    */
-  public FulfillmentRoleAssignmentTest() throws RightTypeException, RoleAssignmentException,
+  public FulfillmentRoleAssignmentTest() throws RoleAssignmentException,
       RoleException {
     right = Right.newRight("right", ORDER_FULFILLMENT);
     warehouse = new Facility("C1");
@@ -35,19 +34,19 @@ public class FulfillmentRoleAssignmentTest {
 
   @Test
   public void shouldAllowCreationWithWarehouseFacilityType()
-      throws RightTypeException, RoleAssignmentException, RoleException {
+      throws RoleAssignmentException, RoleException {
     new FulfillmentRoleAssignment(Role.newRole(roleName, right), user, warehouse);
   }
 
   @Test(expected = RoleAssignmentException.class)
   public void shouldNotAllowCreationWithNonWarehouseFacilityType()
-      throws RightTypeException, RoleAssignmentException, RoleException {
+      throws RoleAssignmentException, RoleException {
     new FulfillmentRoleAssignment(Role.newRole(roleName, right), user, hospital);
   }
 
   @Test
   public void shouldHaveRightWhenRightAndFacilityMatch()
-      throws RightTypeException, RoleAssignmentException {
+      throws RoleAssignmentException {
     //when
     RightQuery rightQuery = new RightQuery(right, warehouse);
     boolean hasRight = fulfillmentRoleAssignment.hasRight(rightQuery);
@@ -58,7 +57,7 @@ public class FulfillmentRoleAssignmentTest {
 
   @Test
   public void shouldNotHaveRightWhenFacilityDoesNotMatch()
-      throws RightTypeException, RoleAssignmentException {
+      throws RoleAssignmentException {
     //when
     RightQuery rightQuery = new RightQuery(right, hospital);
     boolean hasRight = fulfillmentRoleAssignment.hasRight(rightQuery);

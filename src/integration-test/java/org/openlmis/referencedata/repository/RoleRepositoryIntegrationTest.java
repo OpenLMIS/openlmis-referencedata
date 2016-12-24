@@ -5,7 +5,6 @@ import static java.lang.String.valueOf;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +25,7 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   @Override
-  Role generateInstance() throws RightTypeException, RoleException {
+  Role generateInstance() throws RoleException {
     int instanceNumber = this.getNextInstanceNumber();
     Right right = Right.newRight(valueOf(instanceNumber), RightType.GENERAL_ADMIN);
     rightRepository.save(right);

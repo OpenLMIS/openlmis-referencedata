@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
-
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
@@ -31,7 +30,6 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
@@ -110,7 +108,7 @@ public class UserControllerTest {
   /**
    * Constructor for test.
    */
-  public UserControllerTest() throws RightTypeException, RoleException {
+  public UserControllerTest() throws RoleException {
     initMocks(this);
     controller = new UserController(service, repository, roleRepository, rightRepository,
         programRepository, supervisoryNodeRepository, facilityRepository, messageSource);
@@ -195,7 +193,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldGetUserWithRoles() throws RightTypeException {
+  public void shouldGetUserWithRoles() {
     //given
     DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole1, user1);
     SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole1,
@@ -271,7 +269,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldNotSaveUserForRoleAssignmentWithoutRole() throws RightTypeException {
+  public void shouldNotSaveUserForRoleAssignmentWithoutRole() {
     //given
     preparePostOrPut();
 
@@ -291,7 +289,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldSaveUserWithDirectRole() throws RightTypeException {
+  public void shouldSaveUserWithDirectRole() {
     //given
     preparePostOrPut();
 
@@ -319,7 +317,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldSaveUserWithHomeFacilityRole() throws RightTypeException {
+  public void shouldSaveUserWithHomeFacilityRole() {
     //given
     preparePostOrPut();
 
@@ -350,7 +348,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldSaveUserWithSupervisoryRole() throws RightTypeException {
+  public void shouldSaveUserWithSupervisoryRole() {
     //given
     preparePostOrPut();
 
@@ -382,8 +380,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldSaveUserWithFulfillmentRole() throws RightTypeException,
-      RoleAssignmentException {
+  public void shouldSaveUserWithFulfillmentRole() throws RoleAssignmentException {
     //given
     preparePostOrPut();
 
@@ -413,7 +410,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldReplaceExistingUserRoles() throws RightTypeException {
+  public void shouldReplaceExistingUserRoles() {
     //given
     preparePostOrPut();
 
@@ -443,7 +440,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldDeleteExistingUserRoles() throws RightTypeException {
+  public void shouldDeleteExistingUserRoles() {
     //given
     preparePostOrPut();
 
@@ -507,7 +504,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldReturnTrueIfUserHasRight() throws RightTypeException {
+  public void shouldReturnTrueIfUserHasRight() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
@@ -527,7 +524,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldReturnFalseIfUserDoesNotHaveRight() throws RightTypeException {
+  public void shouldReturnFalseIfUserDoesNotHaveRight() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
         supervisoryNode1));
@@ -559,7 +556,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldGetUserHomeFacilityPrograms() throws RightTypeException {
+  public void shouldGetUserHomeFacilityPrograms() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
@@ -576,7 +573,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldGetUserSupervisoryPrograms() throws RightTypeException {
+  public void shouldGetUserSupervisoryPrograms() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
         supervisoryNode1));
@@ -595,7 +592,7 @@ public class UserControllerTest {
 
   @Test
   public void shouldGetUserFulfillmentFacilities()
-      throws RightTypeException, RoleAssignmentException {
+      throws RoleAssignmentException {
     //given
     FulfillmentRoleAssignment assignment1 =
         new FulfillmentRoleAssignment(fulfillmentRole1, user1, warehouse1);

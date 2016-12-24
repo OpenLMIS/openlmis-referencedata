@@ -4,7 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -23,7 +23,6 @@ import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.ExternalApiException;
-import org.openlmis.referencedata.exception.RightTypeException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -56,15 +55,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import lombok.NoArgsConstructor;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.validation.Valid;
 
 @NoArgsConstructor
@@ -529,7 +525,7 @@ public class UserController extends BaseController {
   }
 
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user)
-      throws RightTypeException, RoleAssignmentException {
+      throws RoleAssignmentException {
     LOGGER.debug("Assigning roles to user and saving");
     for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
       RoleAssignment roleAssignment;
