@@ -1,6 +1,5 @@
 package org.openlmis.referencedata.errorhandling;
 
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.i18n.MessageService;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +11,8 @@ public class BaseHandler {
   @Autowired
   private MessageService messageService;
 
-  public Message.LocalizedMessage getLocalizedMessage(ValidationMessageException exception) {
-    return messageService.localize(exception.asMessage());
+  public Message.LocalizedMessage getLocalizedMessage(Message message) {
+    return messageService.localize(message);
   }
 
 }

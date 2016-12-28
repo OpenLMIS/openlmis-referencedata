@@ -4,13 +4,9 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.Right;
-import org.openlmis.referencedata.domain.RightQuery;
-import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
-import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
@@ -18,7 +14,6 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.ErrorResponse;
 import org.slf4j.Logger;
@@ -27,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,16 +55,13 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
-  
-  @Autowired
-  private UserRepository userRepository;
 
   @Autowired
   private SupplyLineService supplyLineService;
 
   @Autowired
   private ExposedMessageSource messageSource;
-
+  
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
    *
@@ -148,17 +139,9 @@ public class FacilityController extends BaseController {
    * @return Facility.
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.GET)
-  public ResponseEntity getFacility(@PathVariable("id") UUID facilityId,
-                                    OAuth2Authentication authentication) {
-    if (!authentication.isClientOnly()) {
-      String username = ((User) authentication.getPrincipal()).getUsername();
-      User user = userRepository.findOneByUsername(username);
-      
-      if (!user.hasRight(
-          new RightQuery(Right.newRight("FACILITIES_MANAGE", RightType.GENERAL_ADMIN)))) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-      }
-    }
+  public ResponseEntity getFacility(@PathVariable("id") UUID facilityId) {
+    
+    rightService.checkAdminRight("FACILITIES_MANAGE");
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {

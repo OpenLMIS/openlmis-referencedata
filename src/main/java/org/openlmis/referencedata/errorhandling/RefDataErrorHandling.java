@@ -7,6 +7,7 @@ import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleExcep
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.ErrorResponse;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.web.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -44,7 +45,22 @@ public class RefDataErrorHandling extends BaseHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public Message.LocalizedMessage handleMessageException(ValidationMessageException ex) {
-    return getLocalizedMessage(ex);
+    LOGGER.info(ex.getMessage());
+    return getLocalizedMessage(ex.asMessage());
+  }
+
+  /**
+   * Handles unauthorized exceptions and returns proper response.
+   *
+   * @param ex Exception to handle.
+   * @return ResponseEntity with exception details
+   */
+  @ExceptionHandler(UnauthorizedException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  @ResponseBody
+  public Message.LocalizedMessage handleUnauthorizedException(UnauthorizedException ex) {
+    LOGGER.info(ex.getMessage());
+    return getLocalizedMessage(ex.asMessage());
   }
 
   /**
