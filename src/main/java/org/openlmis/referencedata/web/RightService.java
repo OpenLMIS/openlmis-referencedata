@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RightService {
   
-  public static final String MESSAGEKEY_ERROR_UNAUTHORIZED = "referencedata.error.unauthorized";
+  private static final String MESSAGEKEY_ERROR_UNAUTHORIZED = "referencedata.error.unauthorized";
+  private static final String MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC = 
+      "referencedata.error.unauthorized.generic";
   
   @Autowired
   UserRepository userRepository;
@@ -39,7 +41,21 @@ public class RightService {
       }
     }
     
-    // at this point, user is unauthorized
+    // at this point, token is unauthorized
     throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
+  }
+
+  /**
+   * Check the client is a trusted client ("root" access).
+   */
+  public void checkRootAccess() {
+    OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext()
+        .getAuthentication();
+    if (authentication.isClientOnly()) { // trusted client
+      return;
+    }
+
+    // at this point, token is unauthorized
+    throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC));
   }
 }

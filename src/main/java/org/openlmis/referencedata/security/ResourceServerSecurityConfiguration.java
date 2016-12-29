@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +21,7 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -69,7 +69,6 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
             "/referencedata/webjars/**",
             "/referencedata/docs/**"
         ).permitAll()
-        .antMatchers(HttpMethod.PUT, "/api/rights").hasAuthority("TRUSTED_CLIENT")
         .antMatchers("/**").fullyAuthenticated();
   }
 

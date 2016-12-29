@@ -72,4 +72,18 @@ public class RightServiceTest {
 
     rightService.checkAdminRight(RIGHT_NAME);
   }
+  
+  @Test
+  public void checkRootAccessShouldAllowTrustedClients() {
+    when(securityContext.getAuthentication()).thenReturn(trustedClient);
+
+    rightService.checkRootAccess();
+  }
+
+  @Test(expected = UnauthorizedException.class)
+  public void checkRootAccessShouldNotAllowUserClients() {
+    when(securityContext.getAuthentication()).thenReturn(userClient);
+
+    rightService.checkRootAccess();
+  }
 }

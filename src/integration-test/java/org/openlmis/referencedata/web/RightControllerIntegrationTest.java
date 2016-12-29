@@ -51,7 +51,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetAllRights() {
+  public void getAllShouldGetAllRights() {
 
     Set<Right> storedRights = Sets.newHashSet(right, attachment,
         Right.newRight("right2", RightType.SUPERVISION));
@@ -59,7 +59,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -72,13 +72,27 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetRight() {
+  public void getAllShouldReturnForbiddenForUnauthorizedToken() {
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getShouldGetRight() {
 
     given(rightRepository.findOne(rightId)).willReturn(right);
 
     RightDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .pathParam("id", rightId)
         .when()
         .get(ID_URL)
@@ -92,13 +106,28 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldNotGetRightForNonExistingRight() {
+  public void getShouldReturnForbiddenForUnauthorizedToken() {
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", rightId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getShouldReturnNotFoundForNonExistingRight() {
 
     given(rightRepository.findOne(rightId)).willReturn(null);
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .pathParam("id", rightId)
         .when()
         .get(ID_URL)
@@ -155,13 +184,47 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldDeleteRight() {
+  public void putShouldReturnBadRequestForNonExistingAttachment() {
+
+    given(rightRepository.findFirstByName(ATTACHMENT_NAME)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getClientToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(rightDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void putShouldReturnForbiddenForUnauthorizedToken() {
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(rightDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void deleteShouldDeleteRight() {
 
     given(rightRepository.findOne(rightId)).willReturn(right);
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .pathParam("id", rightId)
         .when()
         .delete(ID_URL)
@@ -172,13 +235,28 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldNotDeleteRightForNonExistingRight() {
+  public void deleteShouldReturnForbiddenForUnauthorizedToken() {
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", rightId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void deleteShouldReturnNotFoundForNonExistingRight() {
 
     given(rightRepository.findOne(rightId)).willReturn(null);
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .pathParam("id", rightId)
         .when()
         .delete(ID_URL)
@@ -189,13 +267,13 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldFindRightByName() {
+  public void searchShouldFindRightByName() {
 
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(right);
 
     RightDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .queryParam("name", RIGHT_NAME)
         .when()
         .get(SEARCH_URL)
@@ -210,13 +288,28 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldNotFindRightByNameForNonExistingRight() {
+  public void searchShouldReturnForbiddenForUnauthorizedToken() {
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("name", RIGHT_NAME)
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void searchShouldReturnNotFoundForNonExistingRight() {
 
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(null);
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(ACCESS_TOKEN, getClientToken())
         .queryParam("name", RIGHT_NAME)
         .when()
         .get(SEARCH_URL)

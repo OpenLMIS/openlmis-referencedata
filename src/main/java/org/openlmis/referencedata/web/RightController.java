@@ -45,6 +45,8 @@ public class RightController extends BaseController {
    */
   @RequestMapping(value = "/rights", method = RequestMethod.GET)
   public ResponseEntity<?> getAllRights() {
+    
+    rightService.checkRootAccess();
 
     LOGGER.debug("Getting all rights");
     Set<Right> rights = Sets.newHashSet(rightRepository.findAll());
@@ -62,6 +64,9 @@ public class RightController extends BaseController {
    */
   @RequestMapping(value = "/rights/{id}", method = RequestMethod.GET)
   public ResponseEntity<?> getRight(@PathVariable("id") UUID rightId) {
+    
+    rightService.checkRootAccess();
+
     Right right = rightRepository.findOne(rightId);
 
     if (right == null) {
@@ -83,6 +88,8 @@ public class RightController extends BaseController {
    */
   @RequestMapping(value = "/rights", method = RequestMethod.PUT)
   public ResponseEntity<?> saveRight(@RequestBody RightDto rightDto) {
+
+    rightService.checkRootAccess();
 
     if (rightDto.getAttachments() != null) {
       for (Right.Importer attachmentDto : rightDto.getAttachments()) {
@@ -126,6 +133,8 @@ public class RightController extends BaseController {
   @RequestMapping(value = "/rights/{rightId}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteRight(@PathVariable("rightId") UUID rightId) {
 
+    rightService.checkRootAccess();
+
     Right storedRight = rightRepository.findOne(rightId);
     if (storedRight == null) {
       LOGGER.error("Right to delete does not exist");
@@ -152,6 +161,8 @@ public class RightController extends BaseController {
    */
   @RequestMapping(value = "/rights/search", method = RequestMethod.GET)
   public ResponseEntity<?> findRightByName(@RequestParam("name") String name) {
+
+    rightService.checkRootAccess();
 
     Right foundRight = rightRepository.findFirstByName(name);
     if (foundRight == null) {
