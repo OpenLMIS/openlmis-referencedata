@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class RightService {
   
+  public static final String MESSAGEKEY_ERROR_UNAUTHORIZED = "referencedata.error.unauthorized";
+  
   @Autowired
   UserRepository userRepository;
 
@@ -38,6 +40,6 @@ public class RightService {
     }
     
     // at this point, user is unauthorized
-    throw new UnauthorizedException(new Message("referencedata.error.unauthorized", rightName));
+    throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
   }
 }

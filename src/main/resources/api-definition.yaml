@@ -42,6 +42,19 @@ schemas:
           }
       }
 
+  - localizedErrorResponse: |
+      {
+          "type": "object",
+          "$schema": "http://json-schema.org/draft-04/schema",
+          "title": "LocalizedErrorResponse",
+          "description": "Localized Error response",
+          "properties": {
+              "messageKey": { "type": "string", "title": "message key" },
+              "message": { "type": "string", "title": "message" }
+          },
+          "required": ["messageKey"]
+      }
+
   - approvedProductDto: !include schemas/approvedProductDto.json
 
   - approvedProductDtoArray: |
@@ -1284,6 +1297,13 @@ resourceTypes:
                   body:
                     application/json:
                       schema: facilityArray
+              "403":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new facility.
@@ -1305,6 +1325,13 @@ resourceTypes:
                   body:
                     application/json:
                       schema: errorResponse
+              "403":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -1320,11 +1347,14 @@ resourceTypes:
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                  "404":
+                  "403":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
-                  "409":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  "404":
                       headers:
                         X-Content-Type-Options:
                         X-XSS-Protection:
@@ -1339,6 +1369,13 @@ resourceTypes:
                       body:
                         application/json:
                           schema: facility
+                  "403":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "404":
                       headers:
                         X-Content-Type-Options:
@@ -1364,6 +1401,13 @@ resourceTypes:
                       body:
                         application/json:
                           schema: errorResponse
+                  "403":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
       /{id}/approvedProducts:
           uriParameters:
               id:

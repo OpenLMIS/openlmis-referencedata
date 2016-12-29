@@ -43,6 +43,7 @@ public class FacilityController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
 
   private static final String KEY_ERROR_PROGRAM_NOT_FOUND = "referencedata.error.program.not-found";
+  private static final String RIGHTNAME_FACILITIES_MANAGE = "FACILITIES_MANAGE";
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -70,6 +71,9 @@ public class FacilityController extends BaseController {
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
   public ResponseEntity<?> createFacility(@RequestBody FacilityDto facilityDto) {
+
+    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+
     LOGGER.debug("Creating new facility");
     facilityDto.setId(null);
     Facility newFacility = Facility.newFacility(facilityDto);
@@ -98,6 +102,9 @@ public class FacilityController extends BaseController {
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.GET)
   public ResponseEntity<?> getAllFacilities() {
+
+    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+
     Iterable<Facility> facilities = facilityRepository.findAll();
     return ok(facilities);
   }
@@ -113,6 +120,8 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> saveFacility(@RequestBody FacilityDto facilityDto,
                                         @PathVariable("id") UUID facilityId) {
+
+    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
 
     Facility facilityToSave = Facility.newFacility(facilityDto);
     facilityToSave.setId(facilityId);
@@ -141,7 +150,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.GET)
   public ResponseEntity getFacility(@PathVariable("id") UUID facilityId) {
     
-    rightService.checkAdminRight("FACILITIES_MANAGE");
+    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
@@ -186,6 +195,9 @@ public class FacilityController extends BaseController {
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteFacility(@PathVariable("id") UUID facilityId) {
+
+    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
