@@ -68,7 +68,7 @@ public class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
       Set<SupervisoryNodeBaseDto> supervisoryNodeBaseDtos = new HashSet<>();
 
       for (SupervisoryNode childNode : childNodes) {
-        SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeDto();
+        SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeBaseDto();
         childNode.export(supervisoryNodeBaseDto);
         supervisoryNodeBaseDtos.add(supervisoryNodeBaseDto);
       }

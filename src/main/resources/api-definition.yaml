@@ -191,20 +191,12 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/detailedRoleAssignmentDto.json" }
       }
 
-  - supervisoryNode: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "SupervisoryNode",
-          "description": "A single supervisoryNode",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "title": "code" },
-              "name": { "type": "string", "required": false, "title": "name" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "facility": { "type": "object", "$ref": "#/schemas/facility", "required": true },
-              "parentNode": { "type": "object", "$ref": "#/schemas/supervisoryNode", "required": false },
-              "childNodes": { "type": "array", "required": false, "title": "childNodes", "items": { "type": "object", "$ref": "#/schemas/supervisoryNode" }, "uniqueItems": false}
-          }
+  - supervisoryNodeDto: !include schemas/supervisoryNodeDto.json
+
+  - supervisoryNodeDtoArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/supervisoryNodeDto.json" }
       }
 
   - supplyLine: |
@@ -214,7 +206,7 @@ schemas:
           "description": "A single supplyLine",
           "properties": {
               "id": { "type": "string", "required": true, "title": "id" },
-              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNode", "required": true },
+              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNodeDto", "required": true },
               "description": { "type": "string", "required": false, "title": "description" },
               "program": { "type": "object", "$ref": "#/schemas/program", "required": true },
               "supplyingFacility": { "type": "object", "$ref": "#/schemas/facility", "required": true }
@@ -232,7 +224,7 @@ schemas:
               "code": { "type": "string", "required": true, "unique": true, "title": "code" },
               "name": { "type": "string", "required": true, "title": "name" },
               "description": { "type": "string", "required": false, "title": "description" },
-              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNode", "required": true },
+              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNodeDto", "required": true },
               "requisitionGroupProgramScheules": { "type": "array", "required": false, "title": "requisitionGroupProgramSchedules", "items": { "type": "object", "$ref": "#/schemas/requisitionGroupProgramSchedule" }, "uniqueItems": false },
               "memberFacilities": { "type": "array", "required": false, "title": "memberFacilities", "items": { "type": "object", "$ref": "#/schemas/facility" }, "uniqueItems": false }
           }
@@ -2293,7 +2285,33 @@ resourceTypes:
                           X-XSS-Protection:
                         body:
                             application/json:
-
+      /search:
+            get:
+                is: [ secured ]
+                description: Retrieve Supervisory Node based on the provided parameters.
+                queryParameters:
+                    programId:
+                            displayName: program
+                            type: string
+                            required: true
+                            repeat: false
+                    facilityId:
+                            displayName: facility
+                            type: string
+                            required: true
+                            repeat: false
+                responses:
+                    "200":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                              schema: supervisoryNodeDtoArray
+                    "404":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
   /roles:
       displayName: Role
       post:
