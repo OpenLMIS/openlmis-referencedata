@@ -139,14 +139,41 @@ public class FacilityController extends BaseController {
     return ok(facilities);
   }
 
+
   /**
-   * Get the audit log for all facilities.
+   * Get the audit information related to facilities.
    *
-   * @return Facilities.
+   * @param type The type of class for which we wish to retrieve historical changes
+
+   */
+
+  /**
+   * Get the audit information related to facilities.
+   *
+   * @param returnJSON Whether the results should be returned as JSON, which is the default. If false, the results are returned as a much more human readable log. (Note that browsers ignore line returns and thus don’t render the log especially well. However, when viewed in other ways, such as a browser’s view-source option, the log is significantly more human readable than the JSON.)
+   *
+   * @param skip The number of historical changes to skip. Useful for paging.
+   * @param limit The maximum number of historical change results to return. Useful for paging.
+   * @param author The author of the changes which should be returned. If null or empty, changes are returned regardless of author.
+   * @param changedPropertyName The name of the property about which changes should be returned. If null or empty, changes associated with any and all properties are returned.
    */
   @RequestMapping(value = "/facilities/audit", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllFacilitiesAudit() {
-    return ResponseEntity.status(HttpStatus.OK).body( getChangesByClass(Facility.class) );
+  public ResponseEntity<?> getFacilitiesAuditLog(
+          @RequestParam(name = "returnJSON", required = false, defaultValue = "true") boolean returnJSON,
+          @RequestParam(name = "skip", required = false, defaultValue = "0") int skip,
+          @RequestParam(name = "limit", required = false, defaultValue = "100") int limit,
+          @RequestParam(name = "author", required = false, defaultValue = "") String author,
+          @RequestParam(name = "changedPropertyName", required = false, defaultValue = "") String changedPropertyName
+          )
+  {
+    //Retrieve audit related info in either JSON or raw-text format. The later is significantly more human readable.
+    String auditData = "";
+    if(returnJSON)
+      auditData = getChangesByClass(Facility.class, skip, limit, author, changedPropertyName);
+    else
+      auditData = getChangeLogByClass(Facility.class, skip, limit, author, changedPropertyName);
+
+    return ResponseEntity.status(HttpStatus.OK).body(auditData);
   }
 
 
