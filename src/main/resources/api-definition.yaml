@@ -1271,6 +1271,19 @@ resourceTypes:
                             application/json:
                                 schema: userArray
 
+  /userInfo:
+    displayName: userInfo
+    get:
+        is: [ secured ]
+        description: Get user info
+        responses:
+            "200":
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+                body:
+                  application/json:
+
   /message:
     displayName: TestMessage
     get:
@@ -1283,6 +1296,7 @@ resourceTypes:
                   X-XSS-Protection:
                 body:
                   application/json:
+
 
   /updateFacility:
     displayName: Test-Update-Facility

@@ -7,10 +7,13 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.openlmis.referencedata.domain.ProgramProductBuilder;
 import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.security.UserNameProvider;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.openlmis.referencedata.web.ProgramProductBuilderDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +52,14 @@ public class Application {
     lr.setCookieName("lang");
     lr.setDefaultLocale(Locale.ENGLISH);
     return lr;
+  }
+
+
+
+  @Bean
+  public AuthorProvider authorProvider() {
+    //return new SpringSecurityAuthorProvider();
+    return new UserNameProvider();
   }
 
   /**

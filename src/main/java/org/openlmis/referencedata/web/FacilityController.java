@@ -2,13 +2,7 @@ package org.openlmis.referencedata.web;
 
 import org.javers.core.diff.Change;
 import org.javers.repository.jql.QueryBuilder;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.domain.SupplyLine;
-import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.domain.*;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -22,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +55,8 @@ public class FacilityController extends BaseController {
   @Autowired
   private SupplyLineService supplyLineService;
 
+
+
   //TEMPORARY TEST CODE
   @RequestMapping(value = "/message", method = RequestMethod.GET)
   public ResponseEntity<?> getMessage()
@@ -80,6 +78,26 @@ public class FacilityController extends BaseController {
     facility.setComment(comment);
     facilityRepository.save(facility);
     return ResponseEntity.status(HttpStatus.OK).body(comment);
+  }
+
+  //TEMPORARY TEST CODE
+  @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
+  public ResponseEntity<?> getUserInfo()
+  {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String returnVal = "";
+
+    try
+    {
+      User user = (User)auth.getPrincipal();
+      returnVal = user.getUsername();
+    }
+    catch (Exception e)
+    {
+      returnVal = "unknown user";
+    }
+
+    return ResponseEntity.status(HttpStatus.OK).body("(v3) " + returnVal);
   }
 
 
