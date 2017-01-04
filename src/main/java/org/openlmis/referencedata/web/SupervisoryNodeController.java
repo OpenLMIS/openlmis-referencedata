@@ -178,7 +178,8 @@ public class SupervisoryNodeController extends BaseController {
     if (foundGroup == null) {
       final Object[] errorArgs = {programId, facility};
       final String message = messageSource.getMessage(
-          "referencedata.error.supervisory-node.not-found", errorArgs, LocaleContextHolder.getLocale());
+          "referencedata.error.supervisory-node.not-found", errorArgs,
+          LocaleContextHolder.getLocale());
       return ResponseEntity
           .status(HttpStatus.NOT_FOUND)
           .body(message);
