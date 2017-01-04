@@ -28,4 +28,9 @@ public abstract class BaseController {
     return new ErrorResponse(messageKey,
         messageSource.getMessage(messageKey, null, LocaleContextHolder.getLocale()));
   }
+
+  protected ErrorResponse buildErrorResponse(String messageKey, Object[] errorArgs) {
+    return new ErrorResponse(messageKey,
+        messageSource.getMessage(messageKey, errorArgs, LocaleContextHolder.getLocale()));
+  }
 }

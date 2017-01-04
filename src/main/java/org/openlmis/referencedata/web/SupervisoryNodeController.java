@@ -5,7 +5,6 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -13,7 +12,6 @@ import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -44,9 +42,6 @@ public class SupervisoryNodeController extends BaseController {
 
   @Autowired
   private ProgramRepository programRepository;
-
-  @Autowired
-  private ExposedMessageSource messageSource;
 
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
@@ -157,16 +152,14 @@ public class SupervisoryNodeController extends BaseController {
     Program program = programRepository.findOne(programId);
 
     if (program == null) {
-      final String message = messageSource.getMessage(
-              "referencedata.error.program.not-found", null, LocaleContextHolder.getLocale());
+      final String message = "referencedata.error.program.not-found";
       return ResponseEntity
           .badRequest()
           .body(buildErrorResponse(message));
     }
 
     if (facility == null) {
-      final String message = messageSource.getMessage(
-          "referencedata.error.facility.not-found", null, LocaleContextHolder.getLocale());
+      final String message = "referencedata.error.facility.not-found";
       return ResponseEntity
           .badRequest()
           .body(buildErrorResponse(message));
@@ -177,12 +170,10 @@ public class SupervisoryNodeController extends BaseController {
 
     if (foundGroup == null) {
       final Object[] errorArgs = {programId, facility};
-      final String message = messageSource.getMessage(
-          "referencedata.error.supervisory-node.not-found", errorArgs,
-          LocaleContextHolder.getLocale());
+      final String message = "referencedata.error.supervisory-node.not-found";
       return ResponseEntity
           .status(HttpStatus.NOT_FOUND)
-          .body(buildErrorResponse(message));
+          .body(buildErrorResponse(message, errorArgs));
     }
 
     SupervisoryNode result = foundGroup.getRequisitionGroup().getSupervisoryNode();
