@@ -161,7 +161,7 @@ public class SupervisoryNodeController extends BaseController {
               "referencedata.error.program.not-found", null, LocaleContextHolder.getLocale());
       return ResponseEntity
           .badRequest()
-          .body(message);
+          .body(buildErrorResponse(message));
     }
 
     if (facility == null) {
@@ -169,7 +169,7 @@ public class SupervisoryNodeController extends BaseController {
           "referencedata.error.facility.not-found", null, LocaleContextHolder.getLocale());
       return ResponseEntity
           .badRequest()
-          .body(message);
+          .body(buildErrorResponse(message));
     }
 
     RequisitionGroupProgramSchedule foundGroup = requisitionGroupProgramScheduleService
@@ -182,7 +182,7 @@ public class SupervisoryNodeController extends BaseController {
           LocaleContextHolder.getLocale());
       return ResponseEntity
           .status(HttpStatus.NOT_FOUND)
-          .body(message);
+          .body(buildErrorResponse(message));
     }
 
     SupervisoryNode result = foundGroup.getRequisitionGroup().getSupervisoryNode();

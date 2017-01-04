@@ -2313,13 +2313,15 @@ resourceTypes:
                           X-Content-Type-Options:
                           X-XSS-Protection:
                         body:
-                          text/plain:
+                          application/json:
+                            schema: errorResponse
                     "404":
                         headers:
                           X-Content-Type-Options:
                           X-XSS-Protection:
                         body:
-                          text/plain:
+                          application/json:
+                            schema: errorResponse
   /roles:
       displayName: Role
       post:
