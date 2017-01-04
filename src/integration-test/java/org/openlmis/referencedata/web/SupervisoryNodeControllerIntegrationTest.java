@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import com.jayway.restassured.response.ValidatableResponse;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
@@ -69,16 +70,17 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     final GeographicZone geoZone = new GeographicZone("geoZoneCode", geoLevel);
 
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("supervisoryNodeCode", facility);
-    supervisoryNodeDto = new SupervisoryNodeDto();
-    supervisoryNode.export(supervisoryNodeDto);
-    supervisoryNodeId = UUID.randomUUID();
-
     facility = new Facility("facilityCode");
     facility.setActive(true);
     facility.setGeographicZone(geoZone);
     facility.setType(facilityType);
     facility.setOperator(facilityOperator);
+    facility.setEnabled(true);
+
+    supervisoryNode = SupervisoryNode.newSupervisoryNode("supervisoryNodeCode", facility);
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    supervisoryNode.export(supervisoryNodeDto);
+    supervisoryNodeId = UUID.randomUUID();
 
     program = new Program("PRO-1");
     requisitionGroup = new RequisitionGroup();
@@ -201,19 +203,46 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
         program, facility)).willReturn(requisitionGroupProgramSchedule);
 
-    SupervisoryNode[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParam("facilityId", facilityId)
-        .queryParam("programId", programId)
-        .when()
-        .get(SEARCH_URL)
-        .then()
-        .statusCode(200)
+    SupervisoryNode[] response = searchForSupervisoryNode(programId, facilityId, 200)
         .extract().as(SupervisoryNode[].class);
 
     assertEquals(supervisoryNode, response[0]);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotFoundWhenSearchingForNonExistingSupervisoryNode() {
+
+    given(facilityRepository.findOne(facilityId)).willReturn(facility);
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+        program, facility)).willReturn(null);
+
+    searchForSupervisoryNode(programId, facilityId, 404);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenSearchingForSupervisoryNodeWithBadParameters() {
+
+    given(facilityRepository.findOne(facilityId)).willReturn(facility);
+    given(programRepository.findOne(programId)).willReturn(null);
+
+    searchForSupervisoryNode(programId, facilityId, 400);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private ValidatableResponse searchForSupervisoryNode(UUID programId, UUID facilityId,
+                                                       int expectedCode) {
+    return restAssured
+      .given()
+      .queryParam(ACCESS_TOKEN, getToken())
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .queryParam("facilityId", facilityId)
+      .queryParam("programId", programId)
+      .when()
+      .get(SEARCH_URL)
+      .then()
+      .statusCode(expectedCode);
   }
 }

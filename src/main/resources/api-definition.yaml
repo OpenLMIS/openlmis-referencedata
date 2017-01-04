@@ -2308,10 +2308,18 @@ resourceTypes:
                         body:
                           application/json:
                               schema: supervisoryNodeDtoArray
+                    "400":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          text/plain:
                     "404":
                         headers:
                           X-Content-Type-Options:
                           X-XSS-Protection:
+                        body:
+                          text/plain:
   /roles:
       displayName: Role
       post:

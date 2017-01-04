@@ -11,5 +11,8 @@
     "facility": { "type": "object", "$ref": "facility.json" },
     "parentNode": { "type": "object", "$ref": "supervisoryNodeDto.json" },
     "childNodes": { "type": "array", "title": "childNodes", "items": { "type": "object", "$ref": "supervisoryNodeDto.json" }, "uniqueItems": false}
-  }
+  },
+  "required": [
+    "code", "facility"
+  ]
 }
