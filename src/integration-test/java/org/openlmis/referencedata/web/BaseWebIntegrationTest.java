@@ -35,7 +35,7 @@ public abstract class BaseWebIntegrationTest {
   protected RestAssuredClient restAssured;
 
   private static final RamlDefinition ramlDefinition =
-      RamlLoaders.fromClasspath().load("api-definition-raml.yaml");
+      RamlLoaders.fromClasspath().load("api-definition-raml.yaml").ignoringXheaders();
 
   private static final String MOCK_CHECK_RESULT = "{\n"
       + "  \"aud\": [\n"
