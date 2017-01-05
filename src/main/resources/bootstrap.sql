@@ -4,6 +4,7 @@ INSERT INTO referencedata.rights (id, name, type) VALUES ('4e731cf7-854f-4af7-9e
 INSERT INTO referencedata.rights (id, name, type) VALUES ('5c4b3b9b-713e-4b9a-8c58-7efcd2954512', 'MANAGE_SUPERVISORY_NODE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('fb6a0053-6254-4b41-8028-bf91421f90dd', 'MANAGE_PRODUCT', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('8816edba-b8a9-11e6-80f5-76304dec7eb7', 'MANAGE_REQUISITION_TEMPLATES', 'GENERAL_ADMIN');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('4bed4f40-36b5-42a7-94c9-0fd3d4252374', 'MANAGE_STOCK_CARD_TEMPLATES', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('9ade922b-3523-4582-bef4-a47701f7df14', 'REQUISITION_CREATE', 'SUPERVISION');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('bffa2de2-dc2a-47dd-b126-6501748ac3fc', 'REQUISITION_APPROVE', 'SUPERVISION');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('feb4c0b8-f6d2-4289-b29d-811c1d0b2863', 'REQUISITION_AUTHORIZE', 'SUPERVISION');
