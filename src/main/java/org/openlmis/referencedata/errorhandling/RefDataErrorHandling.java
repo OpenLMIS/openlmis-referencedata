@@ -6,7 +6,7 @@ import org.openlmis.referencedata.exception.InvalidIdException;
 import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.ErrorResponse;
-import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.LocalizedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -43,7 +43,7 @@ public class RefDataErrorHandling extends BaseHandler {
   @ExceptionHandler(ValidationMessageException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
-  public Message.LocalizedMessage handleMessageException(ValidationMessageException ex) {
+  public LocalizedMessage handleMessageException(ValidationMessageException ex) {
     return getLocalizedMessage(ex);
   }
 
