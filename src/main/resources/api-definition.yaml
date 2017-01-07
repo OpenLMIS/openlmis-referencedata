@@ -277,6 +277,14 @@ schemas:
           "items": { "type": "string", "required": true, "title": "id" }
       }
 
+  - auditLogEntry: !include schemas/auditLogEntry.json
+
+  - auditLogEntryArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/auditLogEntry.json" }
+      }
+
 traits:
     - secured:
           queryParameters:
@@ -286,8 +294,54 @@ traits:
                   type: string
                   required: true
                   repeat: false
-
+    - pageable:
+          queryParameters:
+              skip:
+                  displayName: skip
+                  description: The number of results to skip.
+                  type: integer
+                  required: false
+                  repeat: false
+              limit:
+                  displayName: limit
+                  description: The maximum number of results to return.
+                  type: integer
+                  required: false
+                  repeat: false
 resourceTypes:
+    - auditLog:
+        description: This represents the audit log for all <<resourcePathName|!singularize>> resources.
+        get:
+          description: Returns all or part of the resource's audit log
+          is: [ secured, pageable ]
+          queryParameters:
+              author:
+                  displayName: author
+                  description: Name of the author of changes which should be returned. By default, all changes are returned regardless of author.
+                  type: string
+                  required: false
+                  repeat: false
+              changedPropertyName:
+                  displayName: changedPropertyName
+                  description: The name of the property about which changes should be returned. If null or empty, changes associated with any and all properties are returned.
+                  type: string
+                  required: false
+                  repeat: false
+          responses:
+              200:
+                body:
+                  application/json:
+                    schema: auditLogEntryArray
+              404:
+    - instanceAuditLog:
+        description: This represents the audit log for a specified instance of the <<resourcePathName|!singularize>> resource.
+        type: auditLog
+        uriParameters:
+            id:
+                type: string
+                required: true
+                repeat: false
+
     - collection:
         get:
             is: [ secured ]
@@ -1404,6 +1458,8 @@ resourceTypes:
                       body:
                         application/json:
                           schema: errorResponse
+      /{id}/auditLog:
+          type: instanceAuditLog
       /{id}/approvedProducts:
           uriParameters:
               id:
@@ -1501,17 +1557,6 @@ resourceTypes:
                     headers:
                       X-Content-Type-Options:
                       X-XSS-Protection:
-      /audit:
-        get:
-            is: [ secured ]
-            description: Returns facility-related audit information
-            responses:
-                "200":
-                    headers:
-                      X-Content-Type-Options:
-                      X-XSS-Protection:
-                    body:
-                      application/json:
       /supplying:
           get:
               is: [ secured ]

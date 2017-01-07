@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-
 import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.openlmis.referencedata.domain.ProgramProductBuilder;
 import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;

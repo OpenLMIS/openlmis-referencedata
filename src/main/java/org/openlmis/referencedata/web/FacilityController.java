@@ -1,8 +1,14 @@
 package org.openlmis.referencedata.web;
 
-import org.javers.core.diff.Change;
-import org.javers.repository.jql.QueryBuilder;
-import org.openlmis.referencedata.domain.*;
+
+import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -19,8 +25,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -30,6 +39,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
 
 @Controller
 public class FacilityController extends BaseController {
@@ -55,45 +65,45 @@ public class FacilityController extends BaseController {
   @Autowired
   private SupplyLineService supplyLineService;
 
-
-
-  //TEMPORARY TEST CODE
+  /**
+   * TEMPORARY TEST CODE.
+   */
   @RequestMapping(value = "/message", method = RequestMethod.GET)
-  public ResponseEntity<?> getMessage()
-  {
+  public ResponseEntity<?> getMessage() {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     LocalDateTime now = LocalDateTime.now();
-    return ResponseEntity.status(HttpStatus.OK).body("hello world, at " + dateTimeFormatter.format(now));
+    String message = "hello world, at " + dateTimeFormatter.format(now);
+    return ResponseEntity.status(HttpStatus.OK).body(message);
   }
 
-  //TEMPORARY TEST CODE
+  /**
+   * TEMPORARY TEST CODE.
+   */
   @RequestMapping(value = "/updateFacility", method = RequestMethod.GET)
-  public ResponseEntity<?> updateFacility()
-  {
+  public ResponseEntity<?> updateFacility() {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     LocalDateTime now = LocalDateTime.now();
     Facility facility = facilityRepository.findFirstByCode("FAC004");
 
-    String comment = "facility id " + facility.getId() + " last updated on " + dateTimeFormatter.format(now) + ".";
+    String comment = String.join("facility id " , facility.getId().toString() ,
+                                  " last updated on " , dateTimeFormatter.format(now) , ".");
     facility.setComment(comment);
     facilityRepository.save(facility);
     return ResponseEntity.status(HttpStatus.OK).body(comment);
   }
 
-  //TEMPORARY TEST CODE
+  /**
+   * TEMPORARY TEST CODE.
+   */
   @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
-  public ResponseEntity<?> getUserInfo()
-  {
+  public ResponseEntity<?> getUserInfo() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String returnVal = "";
 
-    try
-    {
+    try {
       User user = (User)auth.getPrincipal();
       returnVal = user.getUsername();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception ex) {
       returnVal = "unknown user";
     }
 
@@ -143,36 +153,28 @@ public class FacilityController extends BaseController {
   /**
    * Get the audit information related to facilities.
    *
-   * @param type The type of class for which we wish to retrieve historical changes
-
-   */
-
-  /**
-   * Get the audit information related to facilities.
-   *
-   * @param returnJSON Whether the results should be returned as JSON, which is the default. If false, the results are returned as a much more human readable log. (Note that browsers ignore line returns and thus don’t render the log especially well. However, when viewed in other ways, such as a browser’s view-source option, the log is significantly more human readable than the JSON.)
-   *
    * @param skip The number of historical changes to skip. Useful for paging.
    * @param limit The maximum number of historical change results to return. Useful for paging.
-   * @param author The author of the changes which should be returned. If null or empty, changes are returned regardless of author.
-   * @param changedPropertyName The name of the property about which changes should be returned. If null or empty, changes associated with any and all properties are returned.
+   * @param author The author of the changes which should be returned.
+   *               If null or empty, changes are returned regardless of author.
+   * @param changedPropertyName The name of the property about which changes should be returned.
+   *               If null or empty, changes associated with any and all properties are returned.
    */
-  @RequestMapping(value = "/facilities/audit", method = RequestMethod.GET)
+  @RequestMapping(value = "/facilities/{id}/auditLog", method = RequestMethod.GET)
   public ResponseEntity<?> getFacilitiesAuditLog(
-          @RequestParam(name = "returnJSON", required = false, defaultValue = "true") boolean returnJSON,
+          @PathVariable("id") UUID facilityId,
           @RequestParam(name = "skip", required = false, defaultValue = "0") int skip,
           @RequestParam(name = "limit", required = false, defaultValue = "100") int limit,
           @RequestParam(name = "author", required = false, defaultValue = "") String author,
-          @RequestParam(name = "changedPropertyName", required = false, defaultValue = "") String changedPropertyName
-          )
-  {
-    //Retrieve audit related info in either JSON or raw-text format. The later is significantly more human readable.
-    String auditData = "";
-    if(returnJSON)
-      auditData = getChangesByClass(Facility.class, skip, limit, author, changedPropertyName);
-    else
-      auditData = getChangeLogByClass(Facility.class, skip, limit, author, changedPropertyName);
+          @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+                        String changedPropertyName) {
+    //Return a 404 if the specified facility can't be found
+    ResponseEntity responseEntity = getFacility(facilityId);
+    if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {
+      return responseEntity;
+    }
 
+    String auditData = getChangesByClass(Facility.class, skip, limit, author, changedPropertyName);
     return ResponseEntity.status(HttpStatus.OK).body(auditData);
   }
 
