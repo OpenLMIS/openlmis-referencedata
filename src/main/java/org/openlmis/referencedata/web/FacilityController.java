@@ -42,6 +42,7 @@ import java.util.stream.StreamSupport;
 
 
 @Controller
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
