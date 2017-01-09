@@ -42,6 +42,19 @@ schemas:
           }
       }
 
+  - localizedErrorResponse: |
+      {
+          "type": "object",
+          "$schema": "http://json-schema.org/draft-04/schema",
+          "title": "LocalizedErrorResponse",
+          "description": "Localized Error response",
+          "properties": {
+              "messageKey": { "type": "string", "title": "message key" },
+              "message": { "type": "string", "title": "message" }
+          },
+          "required": ["messageKey"]
+      }
+
   - approvedProductDto: !include schemas/approvedProductDto.json
 
   - approvedProductDtoArray: |
@@ -982,6 +995,13 @@ resourceTypes:
                   body:
                     application/json:
                       schema: facilityArray
+              "403":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new facility.
@@ -997,6 +1017,13 @@ resourceTypes:
                   body:
                     application/json:
                       schema: errorResponse
+              "403":
+                  headers:
+                    X-Content-Type-Options:
+                    X-XSS-Protection:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -1009,8 +1036,20 @@ resourceTypes:
               description: Delete chosen facility.
               responses:
                   "204":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                  "403":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "404":
-                  "409":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
           get:
               is: [ secured ]
               description: Get chosen facility.
@@ -1019,6 +1058,13 @@ resourceTypes:
                       body:
                         application/json:
                           schema: facility
+                  "403":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "404":
           put:
               is: [ secured ]
@@ -1035,6 +1081,13 @@ resourceTypes:
                       body:
                         application/json:
                           schema: errorResponse
+                  "403":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
       /{id}/approvedProducts:
           uriParameters:
               id:
@@ -1769,6 +1822,13 @@ resourceTypes:
                 "400":
                     body:
                         application/json:
+                "403":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       get:
             is: [ secured ]
             description: Get all rights.
@@ -1777,6 +1837,13 @@ resourceTypes:
                     body:
                         application/json:
                             schema: rightArray
+                "403":
+                    headers:
+                      X-Content-Type-Options:
+                      X-XSS-Protection:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       /{rightId}:
             uriParameters:
               rightId:
@@ -1792,15 +1859,29 @@ resourceTypes:
                         body:
                             application/json:
                                 schema: right
+                    "403":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
                     "404":
             delete:
                 is: [ secured ]
                 description: Delete chosen right.
                 responses:
                     "204":
-                    "400":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
+                    "403":
+                        headers:
+                          X-Content-Type-Options:
+                          X-XSS-Protection:
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "404":
       /search:
           get:
@@ -1817,6 +1898,13 @@ resourceTypes:
                       body:
                         application/json:
                           schema: rightArray
+                  "403":
+                      headers:
+                        X-Content-Type-Options:
+                        X-XSS-Protection:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "404":
 
   /requisitionGroups:

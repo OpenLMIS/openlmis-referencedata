@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 public abstract class BaseController {
 
   @Autowired
+  RightService rightService;
+
+  @Autowired
   private ExposedMessageSource messageSource;
 
   protected Map<String, String> getErrors(Errors errors) {

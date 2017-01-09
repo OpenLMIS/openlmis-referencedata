@@ -15,7 +15,7 @@ public class Message {
   private Object[] params;
 
   public Message(String messageKey) {
-    this(messageKey, (Object[]) null);
+    this(messageKey, new Object[0]);
   }
 
   /**

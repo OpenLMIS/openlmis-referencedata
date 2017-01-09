@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
@@ -34,6 +36,7 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
+import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -57,6 +60,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
       RESOURCE_URL + "/search";
+  private static final String RIGHTNAME_FACILITIES_MANAGE = "FACILITIES_MANAGE";
+  private static final String MESSAGEKEY_ERROR_UNAUTHORIZED = "referencedata.error.unauthorized";
 
   @MockBean
   private FacilityRepository facilityRepository;
@@ -268,6 +273,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void getAllShouldGetAllFacilities() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
     Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
 
@@ -286,8 +294,30 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void getAllShouldReturnForbiddenForUnauthorizedToken() {
+
+    doThrow(new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void getShouldGetFacility() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
 
     FacilityDto response = restAssured
@@ -305,8 +335,31 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void getShouldReturnForbiddenForUnauthorizedToken() {
+
+    doThrow(new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void getShouldReturnNotFoundForNonExistingFacility() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
     restAssured
@@ -322,8 +375,71 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void deleteShouldDeleteFacility() {
+
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void deleteShouldReturnForbiddenForUnauthorizedToken() {
+
+    doThrow(new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void deleteShouldReturnNotFoundForNonExistingFacility() {
+
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+  
+  @Test
   public void postShouldCreateFacility() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(program);
@@ -347,6 +463,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void postShouldReturnBadRequestForNonExistentSupportedProgram() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(null);
@@ -365,8 +484,34 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void postShouldReturnForbiddenForUnauthorizedToken() {
+
+    doThrow(new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    FacilityDto facilityDto = new FacilityDto();
+    facility.export(facilityDto);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(facilityDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void putShouldSaveFacility() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(program);
@@ -391,6 +536,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void putShouldReturnBadRequestForNonExistentSupportedProgram() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(null);
@@ -405,6 +553,30 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(ID_URL)
         .then()
         .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void putShouldReturnForbiddenForUnauthorizedToken() {
+
+    doThrow(new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        .when(rightService)
+        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    FacilityDto facilityDto = new FacilityDto();
+    facility.export(facilityDto);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(facilityDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

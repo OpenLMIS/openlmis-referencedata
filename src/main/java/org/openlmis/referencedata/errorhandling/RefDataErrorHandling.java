@@ -7,6 +7,7 @@ import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleExcep
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.ErrorResponse;
 import org.openlmis.referencedata.util.LocalizedMessage;
+import org.openlmis.referencedata.web.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,6 +26,7 @@ public class RefDataErrorHandling extends BaseHandler {
 
   /**
    * Handles data integrity violation and returns status 409 CONFLICT.
+   *
    * @param ex the exception to handle
    * @return the error response for the user
    */
@@ -37,6 +39,7 @@ public class RefDataErrorHandling extends BaseHandler {
 
   /**
    * Handles Message exceptions and returns status 400 Bad Request.
+   *
    * @param ex the ValidationMessageException to handle
    * @return the error response for the user
    */
@@ -44,7 +47,22 @@ public class RefDataErrorHandling extends BaseHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public LocalizedMessage handleMessageException(ValidationMessageException ex) {
-    return getLocalizedMessage(ex);
+    LOGGER.info(ex.getMessage());
+    return getLocalizedMessage(ex.asMessage());
+  }
+
+  /**
+   * Handles unauthorized exceptions and returns proper response.
+   *
+   * @param ex Exception to handle.
+   * @return ResponseEntity with exception details
+   */
+  @ExceptionHandler(UnauthorizedException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  @ResponseBody
+  public LocalizedMessage handleUnauthorizedException(UnauthorizedException ex) {
+    LOGGER.info(ex.getMessage());
+    return getLocalizedMessage(ex.asMessage());
   }
 
   /**
@@ -54,7 +72,7 @@ public class RefDataErrorHandling extends BaseHandler {
    * @return ResponseEntity with exception details
    */
   @ExceptionHandler({CsvInputNotValidException.class, InvalidIdException.class,
-        RequisitionGroupProgramScheduleException.class})
+      RequisitionGroupProgramScheduleException.class})
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public ExceptionDetail exceptionHandler(Exception ex) {
@@ -64,7 +82,7 @@ public class RefDataErrorHandling extends BaseHandler {
   }
 
   private static ExceptionDetail getExceptionDetail(
-          Exception exception, HttpStatus status, String title) {
+      Exception exception, HttpStatus status, String title) {
     ExceptionDetail exceptionDetail = new ExceptionDetail();
     exceptionDetail.setTimeStamp(new Date().getTime());
     exceptionDetail.setStatus(status.value());
