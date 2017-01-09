@@ -27,10 +27,10 @@ public class RightServiceTest {
   private static final String RIGHT_NAME = "RIGHT_NAME";
 
   @Mock
-  UserRepository userRepository;
+  private UserRepository userRepository;
 
   @InjectMocks
-  RightService rightService;
+  private RightService rightService;
 
   private SecurityContext securityContext;
   private OAuth2Authentication trustedClient;

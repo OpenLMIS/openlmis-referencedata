@@ -19,7 +19,7 @@ public class RightService {
       "referencedata.error.unauthorized.generic";
   
   @Autowired
-  UserRepository userRepository;
+  private UserRepository userRepository;
 
   /**
    * Check the client has the admin right specified.
