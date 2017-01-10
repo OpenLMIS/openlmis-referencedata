@@ -3,9 +3,11 @@ package org.openlmis.referencedata.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +37,16 @@ public class RoleAssignmentDto implements RoleAssignment.Exporter,
   @Override
   public void setRole(Role role) {
     roleId = role.getId();
+  }
+
+  @Override
+  public void setProgram(Program program) {
+    programCode = program.getCode().toString();
+  }
+
+  @Override
+  public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
+    supervisoryNodeCode = supervisoryNode.getCode();
   }
 
   @Override
