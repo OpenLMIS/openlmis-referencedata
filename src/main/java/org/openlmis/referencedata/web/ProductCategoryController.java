@@ -3,7 +3,7 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -5,7 +5,7 @@ import org.openlmis.referencedata.exception.ExceptionDetail;
 import org.openlmis.referencedata.exception.InvalidIdException;
 import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.util.ErrorResponse;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.web.UnauthorizedException;
 import org.slf4j.Logger;

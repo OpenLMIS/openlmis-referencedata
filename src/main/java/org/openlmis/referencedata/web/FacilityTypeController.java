@@ -2,7 +2,7 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

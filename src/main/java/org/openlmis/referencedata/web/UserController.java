@@ -33,7 +33,7 @@ import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
-import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.util.ErrorResponse;
 import org.openlmis.referencedata.util.PasswordChangeRequest;
 import org.openlmis.referencedata.util.PasswordResetRequest;
 import org.slf4j.Logger;
