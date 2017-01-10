@@ -18,8 +18,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ProcessingPeriodDto extends BaseDto implements
-      ProcessingPeriod.Exporter, ProcessingPeriod.Importer {
+public class ProcessingPeriodDto extends BaseDto
+    implements ProcessingPeriod.Exporter, ProcessingPeriod.Importer {
 
   private ProcessingSchedule processingSchedule;
   private String name;
@@ -34,6 +34,8 @@ public class ProcessingPeriodDto extends BaseDto implements
   @JsonDeserialize(using = LocalDateDeserializer.class)
   @Convert(converter = LocalDatePersistenceConverter.class)
   private LocalDate endDate;
+
+  private Integer durationInMonths;
 
   @Override
   public int hashCode() {

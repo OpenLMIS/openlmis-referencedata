@@ -124,7 +124,8 @@ schemas:
               "name": { "type": "string", "required": true, "title": "name" },
               "description": { "type": "string", "required": false, "title": "description" },
               "startDate": { "type": "string", "required": true, "title": "startDate" },
-              "endDate": { "type": "string", "required": true, "title": "endDate" }
+              "endDate": { "type": "string", "required": true, "title": "endDate" },
+              "durationInMonths": { "type": "integer", "required": false, "title": "durationInMonths" }
           }
       }
 
