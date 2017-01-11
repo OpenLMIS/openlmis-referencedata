@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.openlmis.referencedata.util.View;
+import org.openlmis.util.View;
 
 import java.util.Arrays;
 import java.util.HashSet;
