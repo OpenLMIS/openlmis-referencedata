@@ -20,6 +20,8 @@ public class ProductDto extends BaseDto
 
   private Code productCode;
 
+  private Long productPackSize;
+
   private UUID productCategoryId;
 
   private String productCategoryDisplayName;
@@ -37,4 +39,5 @@ public class ProductDto extends BaseDto
   private Integer dosesPerMonth;
 
   private BigDecimal pricePerPack;
+
 }

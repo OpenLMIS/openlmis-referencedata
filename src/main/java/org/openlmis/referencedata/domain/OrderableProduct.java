@@ -1,11 +1,15 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Embedded;
@@ -35,6 +39,7 @@ public abstract class OrderableProduct extends BaseEntity {
   private String name;
 
   @JsonProperty
+  @Getter(AccessLevel.PACKAGE)
   private long packSize;
 
   @JsonProperty

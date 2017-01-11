@@ -212,6 +212,7 @@ public class ProgramProduct extends BaseEntity {
     exporter.setProductId(product.getId());
     exporter.setProductName(product.getName());
     exporter.setProductCode(product.getProductCode());
+    exporter.setProductPackSize(product.getPackSize());
     exporter.setProductCategoryId(productCategory.getId());
     exporter.setProductCategoryDisplayName(
         productCategory.getOrderedDisplayValue().getDisplayName());
@@ -225,6 +226,7 @@ public class ProgramProduct extends BaseEntity {
     if (pricePerPack != null) {
       exporter.setPricePerPack(pricePerPack.getValue());
     }
+
   }
 
   public interface Exporter {
@@ -235,6 +237,8 @@ public class ProgramProduct extends BaseEntity {
     void setProductName(String productName);
 
     void setProductCode(Code productCode);
+
+    void setProductPackSize(Long packSize);
 
     void setProductCategoryId(UUID productCategoryId);
 
@@ -261,6 +265,8 @@ public class ProgramProduct extends BaseEntity {
     String getProductName();
 
     Code getProductCode();
+
+    Long getProductPackSize();
 
     UUID getProductCategoryId();
 
