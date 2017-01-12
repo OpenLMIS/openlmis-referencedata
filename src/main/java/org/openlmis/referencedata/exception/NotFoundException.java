@@ -2,10 +2,10 @@ package org.openlmis.referencedata.exception;
 
 import org.openlmis.referencedata.util.Message;
 
-public class UnknownIdException extends RuntimeException {
+public class NotFoundException extends RuntimeException {
   private Message message;
 
-  public UnknownIdException(Message message) {
+  public NotFoundException(Message message) {
     super(message.toString());
     this.message = message;
   }

@@ -30,7 +30,7 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.exception.UnknownIdException;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -485,7 +485,7 @@ public class UserControllerTest {
     verify(repository, never()).delete(userId);
   }
 
-  @Test(expected = UnknownIdException.class)
+  @Test(expected = NotFoundException.class)
   public void shouldNotCheckIfUserHasRightForNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
@@ -538,7 +538,7 @@ public class UserControllerTest {
     assertFalse(booleanResultDto.getResult());
   }
 
-  @Test(expected = UnknownIdException.class)
+  @Test(expected = NotFoundException.class)
   public void shouldNotGetUserProgramsForNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);

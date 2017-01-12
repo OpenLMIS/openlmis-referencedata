@@ -22,7 +22,7 @@ import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.ExternalApiException;
-import org.openlmis.referencedata.exception.UnknownIdException;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -365,7 +365,7 @@ public class UserController extends BaseController {
       @RequestParam(value = "programId") UUID programId) {
 
     User user = (User) validateId(userId, userRepository).orElseThrow( () ->
-        new UnknownIdException(entityNotFoundMessage("user", userId)));
+        new NotFoundException(entityNotFoundMessage("user", userId)));
 
     Right right = (Right) validateId(rightId, rightRepository).orElseThrow( () ->
         new ValidationMessageException(entityNotFoundMessage("right", rightId )));
@@ -454,7 +454,7 @@ public class UserController extends BaseController {
     User user = userRepository.findOne(userId);
     if (user == null) {
       String messageCode = "referencedata.error.id.not-found";
-      throw new UnknownIdException( new Message(messageCode, userId) );
+      throw new NotFoundException( new Message(messageCode, userId) );
     }
 
     return user;
