@@ -6,8 +6,21 @@ public class ValidationMessageException extends RuntimeException {
 
   private final Message message;
 
+  /**
+   * Create new validation exception with the given message key.  Helper method that
+   * uses {@link #ValidationMessageException(Message)}.
+   * @param messageKey the messageKey of a {@link Message}.
+   */
+  public ValidationMessageException(String messageKey) {
+    this( new Message(messageKey) );
+  }
+
+  /**
+   * Create a new validation exception with the given message.
+   * @param message the message.
+   */
   public ValidationMessageException(Message message) {
-    super();
+    super(message.toString());
     this.message = message;
   }
 
