@@ -2,6 +2,10 @@ package org.openlmis.referencedata.exception;
 
 import org.openlmis.referencedata.util.Message;
 
+/**
+ * Exception for indicating that some input or constraint is invalid.  This should result in a
+ * BAD REQUEST api response.
+ */
 public class ValidationMessageException extends BaseMessageException {
 
   /**
