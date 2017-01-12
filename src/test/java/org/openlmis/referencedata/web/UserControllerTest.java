@@ -30,7 +30,6 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.exception.UnknownIdException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -376,7 +375,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldSaveUserWithFulfillmentRole() throws RoleAssignmentException {
+  public void shouldSaveUserWithFulfillmentRole() {
     //given
     preparePostOrPut();
 
@@ -584,8 +583,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldGetUserFulfillmentFacilities()
-      throws RoleAssignmentException {
+  public void shouldGetUserFulfillmentFacilities() {
     //given
     FulfillmentRoleAssignment assignment1 =
         new FulfillmentRoleAssignment(fulfillmentRole1, user1, warehouse1);

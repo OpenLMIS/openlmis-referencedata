@@ -22,7 +22,6 @@ import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.ExternalApiException;
-import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.exception.UnknownIdException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -476,8 +475,7 @@ public class UserController extends BaseController {
         id);
   }
 
-  private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user)
-      throws RoleAssignmentException {
+  private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user) {
     LOGGER.debug("Assigning roles to user and saving");
     for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
       RoleAssignment roleAssignment;
