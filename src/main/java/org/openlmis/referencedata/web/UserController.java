@@ -21,10 +21,10 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.ExternalApiException;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
+import org.openlmis.referencedata.exception.UnknownIdException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -32,13 +32,13 @@ import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.util.ErrorResponse;
 import org.openlmis.util.PasswordChangeRequest;
 import org.openlmis.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,8 +57,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -82,9 +82,6 @@ public class UserController extends BaseController {
 
   @Autowired
   private ProgramRepository programRepository;
-
-  @Autowired
-  private ExposedMessageSource messageSource;
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
@@ -112,8 +109,7 @@ public class UserController extends BaseController {
                         RightRepository rightRepository,
                         ProgramRepository programRepository,
                         SupervisoryNodeRepository supervisoryNodeRepository,
-                        FacilityRepository facilityRepository,
-                        ExposedMessageSource messageSource) {
+                        FacilityRepository facilityRepository ) {
     this.userService = userService;
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
@@ -121,7 +117,6 @@ public class UserController extends BaseController {
     this.programRepository = programRepository;
     this.supervisoryNodeRepository = supervisoryNodeRepository;
     this.facilityRepository = facilityRepository;
-    this.messageSource = messageSource;
   }
 
   /**
@@ -182,12 +177,6 @@ public class UserController extends BaseController {
       return ResponseEntity
           .status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(errorResponse);
-    } catch (AuthException ae) {
-      LOGGER.error("An error occurred while creating role assignment object: "
-          + ae.getMessage());
-      return ResponseEntity
-          .badRequest()
-          .body(ae.getMessage());
     }
   }
 
@@ -306,14 +295,7 @@ public class UserController extends BaseController {
                                                @RequestParam(value = "warehouseId",
                                                    required = false) UUID warehouseId) {
 
-    User user;
-    try {
-      user = validateUser(userId);
-    } catch (AuthException err) {
-      return ResponseEntity
-          .notFound()
-          .build();
-    }
+    User user = validateUser(userId);
 
     RightQuery rightQuery;
     Right right = rightRepository.findOne(rightId);
@@ -355,23 +337,18 @@ public class UserController extends BaseController {
    * @return set of programs
    */
   @RequestMapping(value = "/users/{userId}/programs", method = RequestMethod.GET)
-  public ResponseEntity<?> getUserPrograms(@PathVariable(USER_ID) UUID userId,
-                                           @RequestParam(value = "forHomeFacility",
-                                               required = false, defaultValue = "true")
-                                               boolean forHomeFacility) {
-    try {
-      User user = validateUser(userId);
-      Set<Program> programs = forHomeFacility
-          ? user.getHomeFacilityPrograms() : user.getSupervisedPrograms();
+  public ResponseEntity<Set<Program>> getUserPrograms(@PathVariable(USER_ID) UUID userId,
+                                                      @RequestParam(value = "forHomeFacility",
+                                                          required = false,
+                                                          defaultValue = "true")
+                                                            boolean forHomeFacility) {
+    User user = validateUser(userId);
+    Set<Program> programs = forHomeFacility
+        ? user.getHomeFacilityPrograms() : user.getSupervisedPrograms();
 
-      return ResponseEntity
-          .ok()
-          .body(programs);
-    } catch (AuthException err) {
-      return ResponseEntity
-          .notFound()
-          .build();
-    }
+    return ResponseEntity
+        .ok()
+        .body(programs);
   }
 
   /**
@@ -383,36 +360,21 @@ public class UserController extends BaseController {
    * @return set of supervised facilities
    */
   @RequestMapping(value = "/users/{userId}/supervisedFacilities", method = RequestMethod.GET)
-  public ResponseEntity<?> getUserSupervisedFacilities(@PathVariable(USER_ID) UUID userId,
-                                                       @RequestParam(value = "rightId")
-                                                           UUID rightId,
-                                                       @RequestParam(value = "programId")
-                                                           UUID programId) {
+  public ResponseEntity<Set<Facility>> getUserSupervisedFacilities(
+      @PathVariable(USER_ID) UUID userId,
+      @RequestParam(value = "rightId") UUID rightId,
+      @RequestParam(value = "programId") UUID programId) {
 
-    User user;
-    try {
-      user = (User) validateId(userId, userRepository, "user");
+    User user = (User) validateId(userId, userRepository).orElseThrow( () ->
+        new UnknownIdException(entityNotFoundMessage("user", userId)));
 
-    } catch (AuthException err) {
-      return ResponseEntity
-          .notFound()
-          .build();
-    }
+    Right right = (Right) validateId(rightId, rightRepository).orElseThrow( () ->
+        new ValidationMessageException(entityNotFoundMessage("right", rightId )));
 
-    Right right;
-    Program program;
-    try {
-      right = (Right) validateId(rightId, rightRepository, "right");
-      program = (Program) validateId(programId, programRepository, "program");
-
-    } catch (AuthException err) {
-      return ResponseEntity
-          .badRequest()
-          .body(new ErrorResponse("Not found", err.getMessage()));
-    }
+    Program program = (Program) validateId(programId, programRepository).orElseThrow( () ->
+        new ValidationMessageException(entityNotFoundMessage("program", programId)));
 
     Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
-
     return ResponseEntity
         .ok()
         .body(supervisedFacilities);
@@ -425,19 +387,15 @@ public class UserController extends BaseController {
    * @return set of fulfillment facilities
    */
   @RequestMapping(value = "/users/{userId}/fulfillmentFacilities", method = RequestMethod.GET)
-  public ResponseEntity<?> getUserFulfillmentFacilities(@PathVariable(USER_ID) UUID userId) {
-    try {
-      User user = validateUser(userId);
-      Set<Facility> facilities = user.getFulfillmentFacilities();
+  public ResponseEntity<Set<Facility>> getUserFulfillmentFacilities(
+      @PathVariable(USER_ID) UUID userId) {
 
-      return ResponseEntity
-          .ok()
-          .body(facilities);
-    } catch (AuthException err) {
-      return ResponseEntity
-          .notFound()
-          .build();
-    }
+    User user = validateUser(userId);
+    Set<Facility> facilities = user.getFulfillmentFacilities();
+
+    return ResponseEntity
+        .ok()
+        .body(facilities);
   }
 
   /**
@@ -493,35 +451,29 @@ public class UserController extends BaseController {
     }
   }
 
-  private User validateUser(UUID userId) throws AuthException {
+  private User validateUser(UUID userId) {
     User user = userRepository.findOne(userId);
     if (user == null) {
       String messageCode = "referencedata.error.id.not-found";
-      Object[] args = {userId};
-
-      LOGGER.debug(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
-      throw new AuthException(
-          messageSource.getMessage(messageCode, args, LocaleContextHolder.getLocale()));
+      throw new UnknownIdException( new Message(messageCode, userId) );
     }
 
     return user;
   }
 
-  private BaseEntity validateId(UUID id,
-                                PagingAndSortingRepository<? extends BaseEntity, UUID> repository,
-                                String entityType)
-      throws AuthException {
+  // finds a given entity by id, wrapping any null in an Optional
+  private Optional<BaseEntity> validateId(
+      UUID id,
+      PagingAndSortingRepository<? extends BaseEntity, UUID> repository) {
+
     BaseEntity entity = repository.findOne(id);
-    if (entity == null) {
-      String messageCode = "referencedata.error." + entityType + ".not-found";
-      Object[] args = {id};
+    return (null != entity) ? Optional.of(entity) : Optional.empty();
+  }
 
-      LOGGER.debug(messageSource.getMessage(messageCode, args, Locale.ENGLISH));
-      throw new AuthException(
-          messageSource.getMessage(messageCode, args, LocaleContextHolder.getLocale()));
-    }
-
-    return entity;
+  // helper to construct not found message for entities
+  private Message entityNotFoundMessage(String entityType, UUID id) {
+    return new Message("referencedata.error." + entityType + ".not-found",
+        id);
   }
 
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user)
@@ -533,12 +485,9 @@ public class UserController extends BaseController {
       Role role = roleRepository.findOne(roleAssignmentDto.getRoleId());
 
       if (role.getRights().isEmpty()) {
-        Object[] errorArgs = {role.getName()};
-        String errorCode = "referencedata.error.assigned-role-must-have-a-right";
-        String errorMessage =
-            messageSource.getMessage(errorCode, errorArgs, LocaleContextHolder.getLocale());
-        LOGGER.debug(errorMessage);
-        throw new AuthException(errorMessage);
+        throw new ValidationMessageException( new Message(
+            "referencedata.error.assigned-role-must-have-a-right",
+            role.getName() ));
       }
 
       String programCode = roleAssignmentDto.getProgramCode();

@@ -5,8 +5,8 @@ import static org.openlmis.referencedata.domain.RightType.GENERAL_ADMIN;
 import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 
 import org.junit.Test;
-import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.RoleException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +39,7 @@ public class RoleAssignmentTest {
         mock(User.class));
   }
 
-  @Test(expected = AuthException.class)
+  @Test(expected = ValidationMessageException.class)
   public void shouldNotAllowCreationWithMismatchingRoleTypes() throws RoleException {
     new TestStub(Role.newRole(roleName, Right.newRight("fulfillmentRight1", ORDER_FULFILLMENT)),
         mock(User.class));

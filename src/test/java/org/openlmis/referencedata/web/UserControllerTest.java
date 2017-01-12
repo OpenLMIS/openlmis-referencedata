@@ -32,7 +32,7 @@ import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
 import org.openlmis.referencedata.exception.RoleException;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
+import org.openlmis.referencedata.exception.UnknownIdException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -73,9 +73,6 @@ public class UserControllerTest {
   private FacilityRepository facilityRepository;
 
   @Mock
-  private ExposedMessageSource messageSource;
-
-  @Mock
   private RightRepository rightRepository;
 
   private UserController controller;
@@ -111,7 +108,7 @@ public class UserControllerTest {
   public UserControllerTest() throws RoleException {
     initMocks(this);
     controller = new UserController(service, repository, roleRepository, rightRepository,
-        programRepository, supervisoryNodeRepository, facilityRepository, messageSource);
+        programRepository, supervisoryNodeRepository, facilityRepository);
 
     homeFacilityCode = "homeFacilityCode";
     homeFacility = new Facility("C1");
@@ -490,17 +487,17 @@ public class UserControllerTest {
     verify(repository, never()).delete(userId);
   }
 
-  @Test
+  @Test(expected = UnknownIdException.class)
   public void shouldNotCheckIfUserHasRightForNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.checkIfUserHasRight(
-        userId, UUID.randomUUID(), null, null, null).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+    controller.checkIfUserHasRight( userId,
+        UUID.randomUUID(),
+        null,
+        null,
+        null);
   }
 
   @Test
@@ -543,16 +540,13 @@ public class UserControllerTest {
     assertFalse(booleanResultDto.getResult());
   }
 
-  @Test
+  @Test(expected = UnknownIdException.class)
   public void shouldNotGetUserProgramsForNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.getUserPrograms(userId, true).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+    controller.getUserPrograms(userId, true);
   }
 
   @Test

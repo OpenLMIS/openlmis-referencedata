@@ -36,7 +36,7 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
    * @param role      the role being assigned
    * @param user      the user to which the role is being assigned
    * @param warehouse the warehouse where the role applies
-   * @throws org.openlmis.referencedata.exception.AuthException if role passed in
+   * @throws org.openlmis.referencedata.exception.ValidationMessageException if role passed in
    *      has rights which are not an acceptable right type
    * @throws RoleAssignmentException if facility passed in is not of type 'warehouse'
    */

@@ -2,7 +2,7 @@ package org.openlmis.referencedata.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.exception.AuthException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 
 import java.util.Objects;
 import java.util.Set;
@@ -38,7 +38,7 @@ public abstract class RoleAssignment extends BaseEntity {
    *
    * @param role the role being assigned
    * @param user the user to which the role is being assigned
-   * @throws AuthException if role passed in has rights which are not an acceptable
+   * @throws ValidationMessageException if role passed in has rights which are not an acceptable
    *      right type
    */
   public RoleAssignment(Role role, User user) {
@@ -46,7 +46,7 @@ public abstract class RoleAssignment extends BaseEntity {
     boolean roleTypeAcceptable = acceptableRightTypes.stream()
         .anyMatch(rightType -> rightType == role.getRightType());
     if (!roleTypeAcceptable) {
-      throw new AuthException("referencedata.error.type-not-in-acceptable-types");
+      throw new ValidationMessageException("referencedata.error.type-not-in-acceptable-types");
     }
 
     this.role = role;

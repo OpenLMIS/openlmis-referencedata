@@ -6,8 +6,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.RoleException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 
 import java.util.Set;
 
@@ -34,7 +34,7 @@ public class RoleTest {
     assertTrue(rights.contains(right2));
   }
 
-  @Test(expected = AuthException.class)
+  @Test(expected = ValidationMessageException.class)
   public void shouldNotGroupRightsOfDifferentTypes() throws RoleException {
     //given
     Right right1 = Right.newRight(right1Name, RightType.ORDER_FULFILLMENT);
@@ -45,7 +45,7 @@ public class RoleTest {
   }
 
   @Test
-  public void shouldBeAbleToAddRightsOfSameTypeToExistingRole() throws RoleException {
+  public void shouldBeAbleToAddRightsOfSameTypeToExistingRole() {
     //given
     Role role = Role.newRole(roleName, Right.newRight(right1Name, RightType.SUPERVISION));
 
@@ -59,8 +59,8 @@ public class RoleTest {
     assertTrue(rights.contains(additionalRight));
   }
 
-  @Test(expected = AuthException.class)
-  public void shouldNotBeAbleToAddRightsOfDifferentTypeToExistingRole() throws RoleException {
+  @Test(expected = ValidationMessageException.class)
+  public void shouldNotBeAbleToAddRightsOfDifferentTypeToExistingRole() {
     //given
     Role role = Role.newRole(roleName, Right.newRight(right1Name, RightType.SUPERVISION));
 

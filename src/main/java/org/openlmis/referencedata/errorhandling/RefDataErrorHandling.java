@@ -2,6 +2,7 @@ package org.openlmis.referencedata.errorhandling;
 
 import org.openlmis.referencedata.exception.ExceptionDetail;
 import org.openlmis.referencedata.exception.InvalidIdException;
+import org.openlmis.referencedata.exception.UnknownIdException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.util.ErrorResponse;
 import org.openlmis.referencedata.util.LocalizedMessage;
@@ -47,6 +48,13 @@ public class RefDataErrorHandling extends BaseHandler {
   public LocalizedMessage handleMessageException(ValidationMessageException ex) {
     LOGGER.info(ex.getMessage());
     return getLocalizedMessage(ex.asMessage());
+  }
+
+  @ExceptionHandler(UnknownIdException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseBody
+  public void handleUnknownIdException(UnknownIdException uie) {
+    LOGGER.debug(uie.toString());
   }
 
   /**

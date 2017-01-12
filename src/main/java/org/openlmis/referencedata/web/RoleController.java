@@ -8,15 +8,12 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
-import org.openlmis.referencedata.exception.AuthException;
 import org.openlmis.referencedata.exception.RoleException;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -41,21 +38,15 @@ public class RoleController extends BaseController {
   @Autowired
   private RightRepository rightRepository;
 
-  @Autowired
-  private ExposedMessageSource messageSource;
-
   /**
    * Constructor for controller unit testing.
    *
    * @param repository      role repository
    * @param rightRepository right repository
-   * @param messageSource   message source
    */
-  public RoleController(RoleRepository repository, RightRepository rightRepository,
-                        ExposedMessageSource messageSource) {
+  public RoleController(RoleRepository repository, RightRepository rightRepository) {
     this.roleRepository = Objects.requireNonNull(repository);
     this.rightRepository = Objects.requireNonNull(rightRepository);
-    this.messageSource = Objects.requireNonNull(messageSource);
   }
 
   /**
@@ -107,8 +98,6 @@ public class RoleController extends BaseController {
   @RequestMapping(value = "/roles", method = RequestMethod.POST)
   public ResponseEntity<?> createRole(@RequestBody RoleDto roleDto) {
 
-    Role newRole;
-
     Role storedRole = roleRepository.findFirstByName(roleDto.getName());
     if (storedRole != null) {
       LOGGER.error("Role to create already exists");
@@ -117,23 +106,11 @@ public class RoleController extends BaseController {
           .body("Role to create already exists");
     }
 
-    try {
+    LOGGER.debug("Saving new role");
 
-      LOGGER.debug("Saving new role");
-
-      populateRights(roleDto);
-      newRole = Role.newRole(roleDto);
-
-      roleRepository.save(newRole);
-
-    } catch (AuthException ae) {
-
-      LOGGER.error("An error occurred while creating role object: "
-          + messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-      return ResponseEntity
-          .badRequest()
-          .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-    }
+    populateRights(roleDto);
+    Role newRole = Role.newRole(roleDto);
+    roleRepository.save(newRole);
 
     LOGGER.debug("Saved new role with id: " + newRole.getId());
 
@@ -156,25 +133,12 @@ public class RoleController extends BaseController {
 
     Role roleToSave;
 
-    try {
+    LOGGER.debug("Saving role using id: " + roleId);
 
-      LOGGER.debug("Saving role using id: " + roleId);
-
-      populateRights(roleDto);
-      roleToSave = Role.newRole(roleDto);
-
-      roleToSave.setId(roleId);
-
-      roleRepository.save(roleToSave);
-
-    } catch (AuthException ae) {
-
-      LOGGER.error("An error occurred while creating role object: "
-          + messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-      return ResponseEntity
-          .badRequest()
-          .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-    }
+    populateRights(roleDto);
+    roleToSave = Role.newRole(roleDto);
+    roleToSave.setId(roleId);
+    roleRepository.save(roleToSave);
 
     LOGGER.debug("Saved role with id: " + roleToSave.getId());
 

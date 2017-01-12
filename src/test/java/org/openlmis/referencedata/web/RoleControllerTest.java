@@ -17,7 +17,6 @@ import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.RoleException;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.springframework.http.HttpStatus;
@@ -34,9 +33,6 @@ public class RoleControllerTest {
 
   @Mock
   private RightRepository rightRepository;
-
-  @Mock
-  private ExposedMessageSource messageSource;
 
   private RoleController controller;
 
@@ -57,7 +53,7 @@ public class RoleControllerTest {
    */
   public RoleControllerTest() throws RoleException {
     initMocks(this);
-    controller = new RoleController(repository, rightRepository, messageSource);
+    controller = new RoleController(repository, rightRepository);
 
     right1Name = "right1";
     right1 = Right.newRight(right1Name, RightType.GENERAL_ADMIN);
