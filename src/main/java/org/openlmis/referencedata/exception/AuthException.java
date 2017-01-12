@@ -3,6 +3,7 @@ package org.openlmis.referencedata.exception;
 import org.openlmis.referencedata.util.Message;
 
 @SuppressWarnings({"PMD.UnusedPrivateField"})
+@Deprecated
 public class AuthException extends RuntimeException {
   private Message message;
 

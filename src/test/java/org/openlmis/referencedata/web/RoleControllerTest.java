@@ -16,7 +16,6 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
-import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.springframework.http.HttpStatus;
@@ -51,7 +50,7 @@ public class RoleControllerTest {
   /**
    * Constructor for test.
    */
-  public RoleControllerTest() throws RoleException {
+  public RoleControllerTest() {
     initMocks(this);
     controller = new RoleController(repository, rightRepository);
 
@@ -152,7 +151,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldUpdateRoleOnPut() throws RoleException {
+  public void shouldUpdateRoleOnPut() {
     //given
     preparePostOrPut();
 
@@ -168,7 +167,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldCreateNewRoleOnPut() throws RoleException {
+  public void shouldCreateNewRoleOnPut() {
     //given
     preparePostOrPut();
 
@@ -185,7 +184,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldAddRoleRightsOnPut() throws RoleException {
+  public void shouldAddRoleRightsOnPut() {
     //given
     preparePostOrPut();
 
@@ -205,7 +204,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldUpdateRoleRightsOnPut() throws RoleException {
+  public void shouldUpdateRoleRightsOnPut() {
     //given
     preparePostOrPut();
 
@@ -225,7 +224,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldDeleteRoleRightsOnPut() throws RoleException {
+  public void shouldDeleteRoleRightsOnPut() {
     //given
     preparePostOrPut();
 

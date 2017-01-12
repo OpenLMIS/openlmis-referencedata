@@ -12,7 +12,6 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
-import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -48,7 +47,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   /**
    * Constructor for test class.
    */
-  public RoleControllerIntegrationTest() throws RoleException {
+  public RoleControllerIntegrationTest() {
     right1 = Right.newRight(RIGHT1_NAME, RightType.GENERAL_ADMIN);
     right2 = Right.newRight(RIGHT2_NAME, RightType.GENERAL_ADMIN);
     role = Role.newRole(ROLE_NAME, right1, right2);
@@ -58,7 +57,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetAllRoles() throws RoleException {
+  public void shouldGetAllRoles() {
 
     Set<Role> storedRoles = Sets.newHashSet(role,
         Role.newRole("role2", right1));

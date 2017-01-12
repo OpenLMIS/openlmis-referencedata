@@ -9,7 +9,6 @@ import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import com.google.common.collect.Sets;
 import org.junit.Test;
-import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Collections;
 import java.util.Set;
@@ -30,7 +29,7 @@ public class SupervisionRoleAssignmentTest {
   /**
    * Constructor for tests.
    */
-  public SupervisionRoleAssignmentTest() throws RoleException {
+  public SupervisionRoleAssignmentTest() {
     right = Right.newRight("right", SUPERVISION);
     role = Role.newRole("role", right);
     program = new Program("P1");

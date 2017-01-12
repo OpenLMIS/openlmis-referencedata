@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Collections;
 import java.util.Set;
@@ -38,7 +37,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldBeAbleToAssignRoleToUser() throws RoleException {
+  public void shouldBeAbleToAssignRoleToUser() {
     //when
     user.assignRoles(new DirectRoleAssignment(Role.newRole(roleName, Right.newRight("reportRight1",
         RightType.REPORTS)), user));
@@ -80,7 +79,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetHomeFacilityPrograms() throws RoleException {
+  public void shouldGetHomeFacilityPrograms() {
     //given
     Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
     Program program1 = new Program("prog1");
@@ -101,7 +100,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetSupervisedPrograms() throws RoleException {
+  public void shouldGetSupervisedPrograms() {
     //given
     Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
     Program program1 = new Program("prog1");
@@ -126,7 +125,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetSupervisedFacilities() throws RoleException {
+  public void shouldGetSupervisedFacilities() {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
@@ -145,7 +144,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldNotGetSupervisedFacilitiesForNonMatchingPrograms() throws RoleException {
+  public void shouldNotGetSupervisedFacilitiesForNonMatchingPrograms() {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
@@ -167,7 +166,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldNotGetSupervisedFacilitiesForNonMatchingRight() throws RoleException {
+  public void shouldNotGetSupervisedFacilitiesForNonMatchingRight() {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 

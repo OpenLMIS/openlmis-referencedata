@@ -8,7 +8,6 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
-import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.slf4j.Logger;
@@ -180,7 +179,7 @@ public class RoleController extends BaseController {
     return roleDto;
   }
 
-  private void populateRights(RoleDto roleDto) throws RoleException {
+  private void populateRights(RoleDto roleDto) {
     Set<Right.Importer> rightDtos = roleDto.getRights();
     for (Right.Importer rightDto : rightDtos) {
       Right storedRight = rightRepository.findFirstByName(rightDto.getName());

@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 
 import java.util.Set;
@@ -19,7 +18,7 @@ public class RoleTest {
   private String right2Name = "right2";
 
   @Test
-  public void shouldGroupRightsOfSameType() throws RoleException {
+  public void shouldGroupRightsOfSameType() {
     //given
     Right right1 = Right.newRight(right1Name, RightType.ORDER_FULFILLMENT);
     Right right2 = Right.newRight(right2Name, RightType.ORDER_FULFILLMENT);
@@ -35,7 +34,7 @@ public class RoleTest {
   }
 
   @Test(expected = ValidationMessageException.class)
-  public void shouldNotGroupRightsOfDifferentTypes() throws RoleException {
+  public void shouldNotGroupRightsOfDifferentTypes() {
     //given
     Right right1 = Right.newRight(right1Name, RightType.ORDER_FULFILLMENT);
     Right right2 = Right.newRight(right2Name, RightType.SUPERVISION);
@@ -70,7 +69,7 @@ public class RoleTest {
   }
 
   @Test
-  public void shouldIndicateIfItContainsARight() throws RoleException {
+  public void shouldIndicateIfItContainsARight() {
     //given
     Right right1 = Right.newRight(right1Name, RightType.SUPERVISION);
     Right right2 = Right.newRight(right2Name, RightType.SUPERVISION);

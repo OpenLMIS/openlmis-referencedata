@@ -31,7 +31,6 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.RoleAssignmentException;
-import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.exception.UnknownIdException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -105,7 +104,7 @@ public class UserControllerTest {
   /**
    * Constructor for test.
    */
-  public UserControllerTest() throws RoleException {
+  public UserControllerTest() {
     initMocks(this);
     controller = new UserController(service, repository, roleRepository, rightRepository,
         programRepository, supervisoryNodeRepository, facilityRepository);
