@@ -3,17 +3,14 @@ package org.openlmis.referencedata.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
-import org.openlmis.referencedata.domain.SupervisoryNode;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DetailedRoleAssignmentDto implements RoleAssignment.Exporter,
@@ -34,31 +31,11 @@ public class DetailedRoleAssignmentDto implements RoleAssignment.Exporter,
   @Setter
   private String warehouseCode;
 
-  @Getter
-  @Setter
-  private UUID programId;
-
-  @Getter
-  @Setter
-  private UUID supervisoryNodeId;
-
   @Override
   public void setRole(Role role) {
     RoleDto roleDto = new RoleDto();
     role.export(roleDto);
     this.role = roleDto;
-  }
-
-  @Override
-  public void setProgram(Program program) {
-    this.programId = program.getId();
-    this.programCode = program.getCode().toString();
-  }
-
-  @Override
-  public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
-    this.supervisoryNodeId = supervisoryNode.getId();
-    this.supervisoryNodeCode = supervisoryNode.getCode();
   }
 
   @Override
@@ -73,15 +50,12 @@ public class DetailedRoleAssignmentDto implements RoleAssignment.Exporter,
     return Objects.equals(role, that.role)
         && Objects.equals(programCode, that.programCode)
         && Objects.equals(supervisoryNodeCode, that.supervisoryNodeCode)
-        && Objects.equals(warehouseCode, that.warehouseCode)
-        && Objects.equals(programId, that.programId)
-        && Objects.equals(supervisoryNodeId, that.supervisoryNodeId);
+        && Objects.equals(warehouseCode, that.warehouseCode);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(role, programCode, supervisoryNodeCode, warehouseCode, programId,
-        supervisoryNodeId);
+    return Objects.hash(role, programCode, supervisoryNodeCode, warehouseCode);
   }
 }
 
