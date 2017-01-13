@@ -61,7 +61,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
       RESOURCE_URL + "/search";
   private static final String RIGHTNAME_FACILITIES_MANAGE = "FACILITIES_MANAGE";
-  private static final String MESSAGEKEY_ERROR_UNAUTHORIZED = "referencedata.error.unauthorized";
 
   @MockBean
   private FacilityRepository facilityRepository;

@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.web;
 
+import com.google.common.collect.Lists;
+
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.slf4j.Logger;
@@ -20,6 +22,8 @@ public class GeographicZoneController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeographicZoneController.class);
 
+  private static final String MANAGE_GEOGRAPHIC_ZONE_RIGHT = "MANAGE_GEOGRAPHIC_ZONE";
+
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
 
@@ -31,26 +35,30 @@ public class GeographicZoneController extends BaseController {
    */
   @RequestMapping(value = "/geographicZones", method = RequestMethod.POST)
   public ResponseEntity<?> createGeographicZone(@RequestBody GeographicZone geographicZone) {
+    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT, false);
+
     LOGGER.debug("Creating new geographicZone");
     // Ignore provided id
     geographicZone.setId(null);
-    geographicZoneRepository.save(geographicZone);
+    geographicZone = geographicZoneRepository.save(geographicZone);
     return new ResponseEntity<>(geographicZone, HttpStatus.CREATED);
   }
 
   /**
-   * Get all geographicZones.
+   * Get all geographic zones.
    *
    * @return GeographicZones.
    */
   @RequestMapping(value = "/geographicZones", method = RequestMethod.GET)
   public ResponseEntity<?> getAllGeographicZones() {
+    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT);
+
     Iterable<GeographicZone> geographicZones = geographicZoneRepository.findAll();
     if (geographicZones == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(geographicZones, HttpStatus.OK);
+      geographicZones = Lists.newArrayList();
     }
+
+    return new ResponseEntity<>(geographicZones, HttpStatus.OK);
   }
 
   /**
@@ -63,9 +71,11 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateGeographicZone(@RequestBody GeographicZone geographicZone,
                                                 @PathVariable("id") UUID geographicZoneId) {
+    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT, false);
+
     LOGGER.debug("Updating geographicZone");
-    geographicZoneRepository.save(geographicZone);
-    return new ResponseEntity<GeographicZone>(geographicZone, HttpStatus.OK);
+    geographicZone = geographicZoneRepository.save(geographicZone);
+    return new ResponseEntity<>(geographicZone, HttpStatus.OK);
   }
 
   /**
@@ -76,6 +86,8 @@ public class GeographicZoneController extends BaseController {
    */
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.GET)
   public ResponseEntity<?> getGeographicZone(@PathVariable("id") UUID geographicZoneId) {
+    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT);
+
     GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
     if (geographicZone == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -92,12 +104,14 @@ public class GeographicZoneController extends BaseController {
    */
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteGeographicZone(@PathVariable("id") UUID geographicZoneId) {
+    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT, false);
+
     GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
     if (geographicZone == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     } else {
       geographicZoneRepository.delete(geographicZone);
-      return new ResponseEntity<GeographicZone>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
 }

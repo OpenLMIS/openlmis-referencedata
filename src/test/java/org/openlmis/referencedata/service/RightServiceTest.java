@@ -52,7 +52,14 @@ public class RightServiceTest {
     
     rightService.checkAdminRight(RIGHT_NAME);
   }
-  
+
+  @Test(expected = UnauthorizedException.class)
+  public void checkAdminRightShouldThrowExceptionWhenServiceLevelTokenNotAllowedAndNoUser() {
+    when(securityContext.getAuthentication()).thenReturn(trustedClient);
+
+    rightService.checkAdminRight(RIGHT_NAME, false);
+  }
+
   @Test
   public void checkAdminRightShouldAllowUserWhoHasRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);

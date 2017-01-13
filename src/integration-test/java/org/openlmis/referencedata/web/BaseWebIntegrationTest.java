@@ -34,6 +34,8 @@ public abstract class BaseWebIntegrationTest {
   private static final String USER_ACCESS_TOKEN = "418c89c5-7f21-4cd1-a63a-38c47892b0fe";
   private static final String CLIENT_ACCESS_TOKEN = "6d6896a5-e94c-4183-839d-911bc63174ff";
 
+  protected static final String MESSAGEKEY_ERROR_UNAUTHORIZED = "referencedata.error.unauthorized";
+
   protected static final String RAML_ASSERT_MESSAGE =
       "HTTP request/response should match RAML definition.";
 

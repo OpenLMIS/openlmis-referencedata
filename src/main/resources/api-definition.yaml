@@ -88,6 +88,12 @@ schemas:
 
   - geographicZone: !include schemas/geographicZone.json
 
+  - geographicZoneArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/geographicZone.json" }
+      }
+
   - globalProduct: |
         {   "type": "object",
             "$schema": "http://json-schema.org/draft-03/schema",
@@ -1471,19 +1477,26 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-              "404":
+                      schema: geographicZoneArray
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new geographicZone.
           body:
               application/json:
+                schema: geographicZone
           responses:
               "201":
                   body:
                     application/json:
-              "400":
+                      schema: geographicZone
+              "403":
                   body:
                     application/json:
+                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -1496,8 +1509,11 @@ resourceTypes:
               description: Delete chosen geographicZone.
               responses:
                   "204":
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "404":
-                  "409":
           get:
               is: [ secured ]
               description: Get chosen geographicZone.
@@ -1505,17 +1521,27 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
+                          schema: geographicZone
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "404":
           put:
               is: [ secured ]
               description: Update existing geographicZone.
               body:
                   application/json:
+                    schema: geographicZone
               responses:
                   "200":
                       body:
                         application/json:
-                  "400":
+                          schema: geographicZone
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /geographicLevels:
       displayName: Geographic Level
