@@ -17,7 +17,17 @@ public abstract class BaseMessageException extends RuntimeException {
    * @param messageKey the messageKey of a {@link Message}.
    */
   protected BaseMessageException(String messageKey) {
-    this( new Message(messageKey) );
+    this(new Message(messageKey));
+  }
+
+  /**
+   * Create new exception with the given message key.  Helper method that
+   * uses {@link #BaseMessageException(Message, Throwable)}.
+   * @param messageKey the messageKey of a {@link Message}.
+   * @param cause the cause of this exception.
+   */
+  protected BaseMessageException(String messageKey, Throwable cause) {
+    this(new Message(messageKey), cause);
   }
 
   /**
@@ -25,7 +35,16 @@ public abstract class BaseMessageException extends RuntimeException {
    * @param message the message.
    */
   protected BaseMessageException(Message message) {
-    super(message.toString());
+    this(message, null);
+  }
+
+  /**
+   * Create a new exception with the given message and cause.
+   * @param message the message.
+   * @param cause the cause of this exception.
+   */
+  protected BaseMessageException(Message message, Throwable cause) {
+    super(message.toString(), cause);
     this.message = message;
   }
 

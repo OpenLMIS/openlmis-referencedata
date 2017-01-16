@@ -1,7 +1,9 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
+import org.openlmis.referencedata.util.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,8 +116,8 @@ public class StockAdjustmentReasonController extends BaseController {
     if (storedStockAdjustmentReason == null) {
       LOGGER.warn("Update failed - stockAdjustmentReason with id: {} not found",
               stockAdjustmentReasonId);
-      return new ResponseEntity<>("Stock Adjustment Reason with id: " + stockAdjustmentReasonId
-          + " not found", HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(new Message(
+          "referenceData.error.stockAdjustmentReason.notFound.with.id", stockAdjustmentReasonId));
     }
 
     stockAdjustmentReasonRepository.save(stockAdjustmentReason);

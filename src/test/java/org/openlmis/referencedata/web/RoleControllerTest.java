@@ -18,6 +18,7 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -137,17 +138,13 @@ public class RoleControllerTest {
     verify(repository).save(role1);
   }
 
-  @Test
+  @Test(expected = DataIntegrityViolationException.class)
   public void shouldNotCreateExistingRoleOnPost() {
     //given
     preparePostOrPut();
 
     //when
-    HttpStatus httpStatus = controller.createRole(role1Dto).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.CONFLICT));
-    verify(repository, never()).save(role1);
+    controller.createRole(role1Dto).getStatusCode();
   }
 
   @Test

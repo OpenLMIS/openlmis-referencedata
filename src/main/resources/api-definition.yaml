@@ -914,7 +914,8 @@ resourceTypes:
                               schema: booleanResult
                       "400":
                           body:
-                            text/plain:
+                            application/json:
+                              schema: errorResponse
                       "404":
           /programs:
               is: [ secured ]

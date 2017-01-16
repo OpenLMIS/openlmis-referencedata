@@ -10,7 +10,6 @@ import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupportedProgram;
-import org.openlmis.referencedata.web.SupportedProgramDto;
 
 import java.util.Date;
 import java.util.Set;

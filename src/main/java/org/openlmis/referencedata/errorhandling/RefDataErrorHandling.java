@@ -1,12 +1,11 @@
 package org.openlmis.referencedata.errorhandling;
 
 import org.openlmis.referencedata.exception.ExceptionDetail;
-import org.openlmis.referencedata.exception.InvalidIdException;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.util.ErrorResponse;
 import org.openlmis.referencedata.util.LocalizedMessage;
-import org.openlmis.referencedata.web.UnauthorizedException;
+import org.openlmis.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,8 +31,9 @@ public class RefDataErrorHandling extends BaseHandler {
   @ExceptionHandler(DataIntegrityViolationException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   @ResponseBody
-  public ErrorResponse handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-    return logAndRespond("Data integrity violation error occurred", ex);
+  public LocalizedMessage handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+    LOGGER.error(ex.getMessage());
+    return getLocalizedMessage(ex.getMessage());
   }
 
   /**
@@ -53,8 +53,8 @@ public class RefDataErrorHandling extends BaseHandler {
   @ExceptionHandler(NotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
-  public void handleNotFoundException(NotFoundException uie) {
-    LOGGER.debug(uie.toString());
+  public void handleNotFoundException(NotFoundException ex) {
+    LOGGER.debug(ex.toString());
   }
 
   /**
@@ -71,21 +71,6 @@ public class RefDataErrorHandling extends BaseHandler {
     return getLocalizedMessage(ex.asMessage());
   }
 
-  /**
-   * Handles exceptions and returns proper response.
-   *
-   * @param ex Exception to handle.
-   * @return ResponseEntity with exception details
-   */
-  @ExceptionHandler({InvalidIdException.class})
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @ResponseBody
-  public ExceptionDetail exceptionHandler(Exception ex) {
-    String title = "Resource Property Validation Failure";
-    LOGGER.error(title, ex);
-    return getExceptionDetail(ex, HttpStatus.BAD_REQUEST, title);
-  }
-
   private static ExceptionDetail getExceptionDetail(
       Exception exception, HttpStatus status, String title) {
     ExceptionDetail exceptionDetail = new ExceptionDetail();
@@ -99,6 +84,6 @@ public class RefDataErrorHandling extends BaseHandler {
 
   private ErrorResponse logAndRespond(String message, Exception ex) {
     LOGGER.error(message, ex);
-    return new ErrorResponse(message, ex.getMessage());
+    return new ErrorResponse(getLocalizedMessage(message).toString(), ex.getMessage());
   }
 }

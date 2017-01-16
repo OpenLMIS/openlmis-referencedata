@@ -33,10 +33,10 @@ public class FacilityTypeController extends BaseController {
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.POST)
   public ResponseEntity<?> createFacilityType(@RequestBody FacilityType facilityType) {
-    LOGGER.debug("Creating new facilityType");
+    LOGGER.debug("Creating new facility type");
     facilityType.setId(null);
     facilityTypeRepository.save(facilityType);
-    LOGGER.debug("Created new facilityType with id: " + facilityType.getId());
+    LOGGER.debug("Creating new facility type with id: " + facilityType.getId());
     return new ResponseEntity<>(facilityType, HttpStatus.CREATED);
   }
 
@@ -66,20 +66,21 @@ public class FacilityTypeController extends BaseController {
     try {
       if (facilityTypeToUpdate == null) {
         facilityTypeToUpdate = new FacilityType();
-        LOGGER.info("Creating new facilityType");
+        LOGGER.debug("Creating new facility type");
       } else {
-        LOGGER.debug("Updating facility with id: " + facilityTypeId);
+        LOGGER.debug("Updating facility type with id: " + facilityTypeId);
       }
 
       facilityTypeToUpdate.updateFrom(facilityType);
       facilityTypeRepository.save(facilityTypeToUpdate);
 
-      LOGGER.debug("Saved facility with id: " + facilityTypeToUpdate.getId());
-      return new ResponseEntity<FacilityType>(facilityTypeToUpdate, HttpStatus.OK);
+      LOGGER.debug("Updating facility type with id: " + facilityTypeToUpdate.getId());
+      return new ResponseEntity<>(facilityTypeToUpdate, HttpStatus.OK);
     } catch (DataIntegrityViolationException ex) {
-      ErrorResponse errorResponse =
-          new ErrorResponse("An error accurred while saving facilityType with id: "
-              + facilityTypeToUpdate.getId(), ex.getMessage());
+
+      ErrorResponse errorResponse = new ErrorResponse(
+          "An error occurred while saving facility type with ID: " + facilityTypeToUpdate.getId(),
+          ex.getMessage());
       LOGGER.error(errorResponse.getMessage(), ex);
       return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
@@ -116,9 +117,9 @@ public class FacilityTypeController extends BaseController {
       try {
         facilityTypeRepository.delete(facilityType);
       } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-            new ErrorResponse("An error accurred while deleting facilityType with id: "
-                + facilityTypeId, ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+            "An error occurred while deleting facility type with ID: " + facilityTypeId,
+            ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
         return new ResponseEntity(HttpStatus.CONFLICT);
       }

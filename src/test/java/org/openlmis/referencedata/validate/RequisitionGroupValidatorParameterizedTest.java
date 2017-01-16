@@ -3,9 +3,7 @@ package org.openlmis.referencedata.validate;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_IS_REQUIRED;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME_IS_REQUIRED;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -86,7 +84,7 @@ public class RequisitionGroupValidatorParameterizedTest extends BaseValidatorTes
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, CODE, CODE_IS_REQUIRED);
+    assertErrorMessage(errors, CODE, "referenceData.error.requisitionGroup.code.required");
   }
 
   @Test
@@ -95,7 +93,7 @@ public class RequisitionGroupValidatorParameterizedTest extends BaseValidatorTes
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, NAME, NAME_IS_REQUIRED);
+    assertErrorMessage(errors, NAME, "referenceData.error.requisitionGroup.name.required");
   }
 
 }

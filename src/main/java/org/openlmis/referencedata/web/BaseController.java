@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.i18n.ExposedMessageSource;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.util.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -24,7 +25,9 @@ public abstract class BaseController {
     return errors
         .getFieldErrors()
         .stream()
-        .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+        .collect(Collectors.toMap(FieldError::getField,f -> messageSource.getMessage(
+            f.getDefaultMessage(), f.getArguments(), LocaleContextHolder.getLocale()))
+        );
   }
 
   protected ErrorResponse buildErrorResponse(String messageKey) {

@@ -4,12 +4,11 @@ import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
 
-import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.dto.RightDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RightRepository;
-import org.openlmis.util.ErrorResponse;
+import org.openlmis.referencedata.util.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import lombok.NoArgsConstructor;
+
+// TODO: ZACZNIJ TUTAJ W PONIEDZIALEK SMIECIU
 @NoArgsConstructor
 @Controller
 public class RightController extends BaseController {
@@ -95,10 +97,8 @@ public class RightController extends BaseController {
       for (Right.Importer attachmentDto : rightDto.getAttachments()) {
         Right storedAttachment = rightRepository.findFirstByName(attachmentDto.getName());
         if (storedAttachment == null) {
-          return ResponseEntity
-              .badRequest()
-              .body(new ErrorResponse("Attachment must exist in the system: "
-                  + attachmentDto.getName(), ""));
+          throw new ValidationMessageException(new Message(
+              "referenceData.error.right.name.nonExistent", attachmentDto.getName()));
         }
 
         storedAttachment.export((RightDto) attachmentDto);

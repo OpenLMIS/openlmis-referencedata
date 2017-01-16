@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.domain;
 
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 
@@ -104,16 +105,17 @@ public class ProgramProductBuilder {
    * this builder by resolving them using the provided repository.
    * @param product the product for which we're building this ProgramProduct.
    * @return a new ProgramProduct ready for persisting.
-   * @throws NullPointerException if {@link #setProgramRepository(ProgramRepository)}
+   * @throws ValidationMessageException if {@link #setProgramRepository(ProgramRepository)}
    *     or {@link #setProductCategoryRepository(ProductCategoryRepository)} wasn't called
    *     previously with a non-null repository.
    */
   public ProgramProduct createProgramProduct(OrderableProduct product) {
-    Objects.requireNonNull(programRepo, "Program Repository needed to be injected prior to "
-        + "creating program product");
-    Objects.requireNonNull(productCategoryRepo, "Product Category Repository needed to be "
-        + "injected prior to creating a program product");
-    Objects.requireNonNull(product, "Product can't be null when building a program product");
+    Objects.requireNonNull(programRepo,
+        "referenceData.error.programProductBuilder.programRepository.null");
+    Objects.requireNonNull(productCategoryRepo,
+        "referenceData.error.programProductBuilder.productCategoryRepository.null");
+    Objects.requireNonNull(product,
+        "referenceData.error.programProductBuilder.product.null");
 
     Program storedProgram = programRepo.findOne(programId);
     ProductCategory storedProdCategory = productCategoryRepo.findOne(productCategoryId);

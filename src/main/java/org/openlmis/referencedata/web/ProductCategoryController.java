@@ -2,7 +2,9 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProductCategory;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,10 +88,8 @@ public class ProductCategoryController extends BaseController {
         productCategoryRepository.findOne(productCategoryId);
 
     if (null == productCategoryToUpdate) {
-      ErrorResponse errorResponse = new ErrorResponse("referencedata.error.id.not-found",
-          "An error occurred while updating productCategory with id: " + productCategoryId);
-      LOGGER.error(errorResponse.getMessage());
-      return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+      throw new ValidationMessageException(new Message(
+          "referenceData.error.productCategory.notFound.with.id", productCategoryId));
     }
     productCategoryToUpdate.updateFrom(productCategory);
     productCategoryRepository.save(productCategoryToUpdate);
@@ -130,9 +130,9 @@ public class ProductCategoryController extends BaseController {
       try {
         productCategoryRepository.delete(productCategory);
       } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-            new ErrorResponse("An error occurred while deleting productCategory with id: "
-                + productCategoryId, ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+            "An error occurred while deleting product category with ID: " + productCategoryId,
+            ex.getMessage());
         LOGGER.error(errorResponse.getMessage(), ex);
         return new ResponseEntity(HttpStatus.CONFLICT);
       }

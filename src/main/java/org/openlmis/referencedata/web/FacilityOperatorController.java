@@ -21,7 +21,7 @@ public class FacilityOperatorController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityOperatorController.class);
 
   @Autowired
-  FacilityOperatorRepository facilityOperatorRepository;
+  private FacilityOperatorRepository facilityOperatorRepository;
 
   /**
    * Allows creating new facilityOperators.

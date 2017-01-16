@@ -169,7 +169,8 @@ public class UserService {
 
       verifyUser(passwordChangeRequest.getUsername());
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not change auth user password", ex);
+      throw new ExternalApiException(
+          "referenceData.error.user.external.changePassword.failed", ex);
     }
   }
 
@@ -202,7 +203,8 @@ public class UserService {
 
       return restTemplate.postForObject(url, null, UUID.class);
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not create reset password token", ex);
+      throw new ExternalApiException(
+          "referenceData.error.user.external.resetPassword.createToken.failed", ex);
     }
   }
 
@@ -215,7 +217,8 @@ public class UserService {
 
       restTemplate.postForObject(url, request, Object.class);
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not send reset password email", ex);
+      throw new ExternalApiException(
+          "referenceData.error.user.external.resetPassword.sendMessage.failed", ex);
     }
   }
 }

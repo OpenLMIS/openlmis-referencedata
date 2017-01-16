@@ -1,4 +1,4 @@
-package org.openlmis.referencedata.web;
+package org.openlmis.referencedata.exception;
 
 import org.openlmis.referencedata.util.Message;
 

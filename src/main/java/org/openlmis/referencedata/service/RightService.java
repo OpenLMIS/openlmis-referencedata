@@ -1,4 +1,4 @@
-package org.openlmis.referencedata.web;
+package org.openlmis.referencedata.service;
 
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightQuery;
@@ -6,6 +6,7 @@ import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -14,9 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RightService {
   
-  private static final String MESSAGEKEY_ERROR_UNAUTHORIZED = "referencedata.error.unauthorized";
+  private static final String MESSAGEKEY_ERROR_UNAUTHORIZED = "referenceData.error.unauthorized";
   private static final String MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC = 
-      "referencedata.error.unauthorized.generic";
+      "referenceData.error.unauthorized.generic";
   
   @Autowired
   private UserRepository userRepository;

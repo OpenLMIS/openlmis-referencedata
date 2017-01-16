@@ -9,6 +9,7 @@ import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.SupportedProgramDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -39,10 +40,6 @@ import java.util.stream.StreamSupport;
 public class FacilityController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
-
-  private static final String KEY_ERROR_PROGRAM_NOT_FOUND = "referencedata.error.program.not-found";
-  private static final String KEY_ERROR_FACILITY_NOT_FOUND =
-      "referencedata.error.facility.not-found";
   private static final String RIGHTNAME_FACILITIES_MANAGE = "FACILITIES_MANAGE";
 
   @Autowired
@@ -80,11 +77,11 @@ public class FacilityController extends BaseController {
     if (!addSuccessful) {
       return ResponseEntity
           .badRequest()
-          .body(buildErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND));
+          .body(buildErrorResponse("referenceData.error.program.notFound"));
     }
 
     newFacility = facilityRepository.save(newFacility);
-    LOGGER.debug("Created new facility with id: " + facilityDto.getId());
+    LOGGER.debug("Created new facility with id: ", facilityDto.getId());
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(toDto(newFacility));
@@ -126,7 +123,7 @@ public class FacilityController extends BaseController {
     if (!addSuccessful) {
       return ResponseEntity
           .badRequest()
-          .body(buildErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND));
+          .body(buildErrorResponse("referenceData.error.program.notFound"));
     }
     facilityToSave = facilityRepository.save(facilityToSave);
 
@@ -171,7 +168,8 @@ public class FacilityController extends BaseController {
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
-      return ResponseEntity.badRequest().body(buildErrorResponse(KEY_ERROR_FACILITY_NOT_FOUND));
+      return ResponseEntity.badRequest()
+          .body(buildErrorResponse("referenceData.error.facility.notFound"));
     }
 
     Collection<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
@@ -215,14 +213,14 @@ public class FacilityController extends BaseController {
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
 
     if (program == null) {
-      final String errorMessage = "Given Program does not exist";
+      final String errorMessage = "referencedata.error.program.doesNotExist";
       final String errorDescription = "programId: " + programId;
 
       ErrorResponse errorResponse = new ErrorResponse(errorMessage, errorDescription);
       return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
     if (supervisoryNode == null) {
-      final String errorMessage = "Given SupervisorNode does not exist";
+      final String errorMessage = "referenceData.error.supervisoryNode.doesNotExist";
       final String errorDescription = "supervisorNodeId: " + supervisoryNodeId;
 
       ErrorResponse errorResponse = new ErrorResponse(errorMessage, errorDescription);
@@ -295,7 +293,7 @@ public class FacilityController extends BaseController {
     for (SupportedProgramDto supportedProgramDto : supportedProgramDtos) {
       Program program = programRepository.findByCode(Code.code(supportedProgramDto.getCode()));
       if (program == null) {
-        LOGGER.debug("Program does not exist: " + supportedProgramDto.getCode());
+        LOGGER.debug("Program does not exist: ", supportedProgramDto.getCode());
         return false;
       }
       SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,

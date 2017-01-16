@@ -28,9 +28,11 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -263,7 +265,7 @@ public class UserControllerTest {
     verify(service).save(user1, ACCESS_TOKEN);
   }
 
-  @Test
+  @Test(expected = ValidationMessageException.class)
   public void shouldNotSaveUserForRoleAssignmentWithoutRole() {
     //given
     preparePostOrPut();
@@ -277,10 +279,7 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn("49c1e712-da50-4428-ae39-2d0409bd8059");
 
     //when
-    HttpStatus httpStatus = controller.saveUser(user1Dto, result, auth).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.BAD_REQUEST));
+    controller.saveUser(user1Dto, result, auth).getStatusCode();
   }
 
   @Test

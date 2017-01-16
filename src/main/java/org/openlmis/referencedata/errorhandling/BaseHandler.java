@@ -13,13 +13,23 @@ public class BaseHandler {
   private MessageService messageService;
 
   /**
-   * Translate the Message into a LocalizedMessage.
+   * Translate a Message into a LocalizedMessage.
    *
    * @param message a Message to translate
    * @return a LocalizedMessage translated by the MessageService bean
    */
   protected final LocalizedMessage getLocalizedMessage(Message message) {
     return messageService.localize(message);
+  }
+
+  /**
+   * Translate a String into a LocalizedMessage.
+   *
+   * @param message a String key code to translate
+   * @return a LocalizedMessage translated by the MessageService bean
+   */
+  protected final LocalizedMessage getLocalizedMessage(String message) {
+    return getLocalizedMessage(new Message(message));
   }
 
 }

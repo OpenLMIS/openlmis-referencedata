@@ -5,12 +5,12 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.dto.ProcessingScheduleDto;
-import org.openlmis.referencedata.exception.InvalidIdException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
-import org.openlmis.util.ErrorResponse;
+import org.openlmis.referencedata.util.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +96,6 @@ public class ProcessingScheduleController extends BaseController {
    * @param programId the UUID of the program
    * @param facilityId the UUID of the facility
    * @return Processing Schedule for the specified parameters
-   * @throws InvalidIdException when the program UUID or facility UUID were not passed to this
-   *                            method
    */
   @RequestMapping(value = "/processingSchedules/search", method = RequestMethod.GET)
   public ResponseEntity<?> search(@RequestParam("programId") UUID programId,
@@ -107,13 +105,13 @@ public class ProcessingScheduleController extends BaseController {
     Facility facility = facilityRepository.findOne(facilityId);
 
     if (program == null) {
-      return ResponseEntity.badRequest().body(new ErrorResponse("Program not found",
-          "Program with UUID " + programId.toString() + " was not found."));
+      throw new ValidationMessageException(
+          new Message("referenceData.error.program.notFound.with.id", programId));
     }
 
     if (facility == null) {
-      return ResponseEntity.badRequest().body(new ErrorResponse("Facility not found",
-          "Facility with UUID " + facilityId.toString() + " was not found."));
+      throw new ValidationMessageException(
+          new Message("referenceData.error.facility.notFound.with.id", facilityId));
     }
 
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =

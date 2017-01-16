@@ -5,6 +5,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -152,17 +153,11 @@ public class SupervisoryNodeController extends BaseController {
     Program program = programRepository.findOne(programId);
 
     if (program == null) {
-      final String message = "referencedata.error.program.not-found";
-      return ResponseEntity
-          .badRequest()
-          .body(buildErrorResponse(message));
+      throw new ValidationMessageException("referenceData.error.program.notFound");
     }
 
     if (facility == null) {
-      final String message = "referencedata.error.facility.not-found";
-      return ResponseEntity
-          .badRequest()
-          .body(buildErrorResponse(message));
+      throw new ValidationMessageException("referenceData.error.facility.notFound");
     }
 
     RequisitionGroupProgramSchedule foundGroup = requisitionGroupProgramScheduleService
@@ -170,16 +165,16 @@ public class SupervisoryNodeController extends BaseController {
 
     if (foundGroup == null) {
       final Object[] errorArgs = {programId, facility};
-      final String message = "referencedata.error.supervisory-node.not-found";
       return ResponseEntity
           .status(HttpStatus.NOT_FOUND)
-          .body(buildErrorResponse(message, errorArgs));
+          .body(buildErrorResponse(
+              "referenceData.error.supervisoryNode.notFound.with.program.and.facility",
+              errorArgs));
     }
 
     SupervisoryNode result = foundGroup.getRequisitionGroup().getSupervisoryNode();
 
-    return ResponseEntity
-        .ok(Arrays.asList(exportToDto(result)));
+    return ResponseEntity.ok(Collections.singletonList(exportToDto(result)));
   }
 
   private SupervisoryNodeDto exportToDto(SupervisoryNode supervisoryNode) {

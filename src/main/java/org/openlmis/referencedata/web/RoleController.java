@@ -3,7 +3,7 @@ package org.openlmis.referencedata.web;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RightDto;
@@ -13,6 +13,7 @@ import org.openlmis.referencedata.repository.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Controller
@@ -100,9 +103,7 @@ public class RoleController extends BaseController {
     Role storedRole = roleRepository.findFirstByName(roleDto.getName());
     if (storedRole != null) {
       LOGGER.error("Role to create already exists");
-      return ResponseEntity
-          .status(HttpStatus.CONFLICT)
-          .body("Role to create already exists");
+      throw new DataIntegrityViolationException("referenceData.error.role.duplicated");
     }
 
     LOGGER.debug("Saving new role");
