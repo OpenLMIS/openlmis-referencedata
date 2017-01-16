@@ -1,7 +1,7 @@
 INSERT INTO referencedata.users (id, username, firstName, lastName, email, timezone) VALUES ('35316636-6264-6331-2d34-3933322d3462', 'admin', 'Admin', 'User', 'example@mail.com', 'UTC');
 
 INSERT INTO referencedata.rights (id, name, type) VALUES ('e96017ff-af8c-4313-a070-caa70465c949', 'FACILITIES_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO referencedata.rights (id, name, type) VALUES ('4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22', 'MANAGE_GEOGRAPHIC_ZONE', 'GENERAL_ADMIN');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22', 'GEOGRAPHIC_ZONE_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('5c4b3b9b-713e-4b9a-8c58-7efcd2954512', 'MANAGE_SUPERVISORY_NODE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('fb6a0053-6254-4b41-8028-bf91421f90dd', 'MANAGE_PRODUCT', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('8816edba-b8a9-11e6-80f5-76304dec7eb7', 'MANAGE_REQUISITION_TEMPLATES', 'GENERAL_ADMIN');

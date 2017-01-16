@@ -22,7 +22,7 @@ public class GeographicZoneController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeographicZoneController.class);
 
-  private static final String MANAGE_GEOGRAPHIC_ZONE_RIGHT = "MANAGE_GEOGRAPHIC_ZONE";
+  private static final String GEOGRAPHIC_ZONE_MANAGE_RIGHT = "GEOGRAPHIC_ZONE_MANAGE";
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
@@ -35,7 +35,7 @@ public class GeographicZoneController extends BaseController {
    */
   @RequestMapping(value = "/geographicZones", method = RequestMethod.POST)
   public ResponseEntity<?> createGeographicZone(@RequestBody GeographicZone geographicZone) {
-    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT, false);
+    rightService.checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
 
     LOGGER.debug("Creating new geographicZone");
     // Ignore provided id
@@ -51,7 +51,7 @@ public class GeographicZoneController extends BaseController {
    */
   @RequestMapping(value = "/geographicZones", method = RequestMethod.GET)
   public ResponseEntity<?> getAllGeographicZones() {
-    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT);
+    rightService.checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT);
 
     Iterable<GeographicZone> geographicZones = geographicZoneRepository.findAll();
     if (geographicZones == null) {
@@ -71,7 +71,7 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateGeographicZone(@RequestBody GeographicZone geographicZone,
                                                 @PathVariable("id") UUID geographicZoneId) {
-    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT, false);
+    rightService.checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
 
     LOGGER.debug("Updating geographicZone");
     geographicZone = geographicZoneRepository.save(geographicZone);
@@ -86,7 +86,7 @@ public class GeographicZoneController extends BaseController {
    */
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.GET)
   public ResponseEntity<?> getGeographicZone(@PathVariable("id") UUID geographicZoneId) {
-    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT);
+    rightService.checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT);
 
     GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
     if (geographicZone == null) {
@@ -104,7 +104,7 @@ public class GeographicZoneController extends BaseController {
    */
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteGeographicZone(@PathVariable("id") UUID geographicZoneId) {
-    rightService.checkAdminRight(MANAGE_GEOGRAPHIC_ZONE_RIGHT, false);
+    rightService.checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
 
     GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
     if (geographicZone == null) {
