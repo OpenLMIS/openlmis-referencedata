@@ -7,12 +7,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
+
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
@@ -211,16 +211,13 @@ public class UserControllerTest {
     assertEquals(expectedUserDto, userDto);
   }
 
-  @Test
+  @Test(expected = NotFoundException.class)
   public void shouldNotGetNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.getUser(userId).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+    controller.getUser(userId).getStatusCode();
   }
 
   @Test
@@ -471,17 +468,13 @@ public class UserControllerTest {
     verify(repository).delete(userId);
   }
 
-  @Test
+  @Test(expected = NotFoundException.class)
   public void shouldNotDeleteNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.deleteUser(userId).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
-    verify(repository, never()).delete(userId);
+    controller.deleteUser(userId).getStatusCode();
   }
 
   @Test(expected = NotFoundException.class)

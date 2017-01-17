@@ -1,7 +1,9 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.FacilityOperator;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
+import org.openlmis.referencedata.util.messagekeys.FacilityOperatorMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,8 @@ public class FacilityOperatorController extends BaseController {
    * @return ResponseEntity containing the created facilityOperator.
    */
   @RequestMapping(value = "/facilityOperators", method = RequestMethod.POST)
-  public ResponseEntity<?> createFacilityOperator(@RequestBody FacilityOperator facilityOperator) {
+  public ResponseEntity<FacilityOperator> createFacilityOperator(
+      @RequestBody FacilityOperator facilityOperator) {
     LOGGER.debug("Creating new facility operator");
     // Ignore provided id
     facilityOperator.setId(null);
@@ -44,10 +47,10 @@ public class FacilityOperatorController extends BaseController {
    * @return facilityOperators.
    */
   @RequestMapping(value = "/facilityOperators", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllFacilityOperators() {
+  public ResponseEntity<Iterable<FacilityOperator>> getAllFacilityOperators() {
     Iterable<FacilityOperator> facilityOperators = facilityOperatorRepository.findAll();
     if (facilityOperators == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(facilityOperators, HttpStatus.OK);
     }
@@ -61,8 +64,8 @@ public class FacilityOperatorController extends BaseController {
    * @return ResponseEntity containing the updated facilityOperator
    */
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateFacilityOperator(@RequestBody FacilityOperator facilityOperator,
-                                                  @PathVariable("id") UUID facilityOperatorId) {
+  public ResponseEntity<FacilityOperator> updateFacilityOperator(
+      @RequestBody FacilityOperator facilityOperator, @PathVariable("id") UUID facilityOperatorId) {
     LOGGER.debug("Updating facility operator");
     facilityOperatorRepository.save(facilityOperator);
     return new ResponseEntity<>(facilityOperator, HttpStatus.OK);
@@ -75,10 +78,11 @@ public class FacilityOperatorController extends BaseController {
    * @return facilityOperator.
    */
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getFacilityOperators(@PathVariable("id") UUID facilityOperatorId) {
+  public ResponseEntity<FacilityOperator> getFacilityOperators(
+      @PathVariable("id") UUID facilityOperatorId) {
     FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
     if (facilityOperator == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(facilityOperator, HttpStatus.OK);
     }
@@ -91,13 +95,13 @@ public class FacilityOperatorController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteFacilityOperators(@PathVariable("id") UUID facilityOperatorId) {
+  public ResponseEntity deleteFacilityOperators(@PathVariable("id") UUID facilityOperatorId) {
     FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
     if (facilityOperator == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
     } else {
       facilityOperatorRepository.delete(facilityOperator);
-      return new ResponseEntity<FacilityOperator>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 }

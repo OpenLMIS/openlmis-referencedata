@@ -1,7 +1,9 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
+import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,8 @@ public class GeographicLevelController extends BaseController {
    * @return ResponseEntity containing the created geographicLevel
    */
   @RequestMapping(value = "/geographicLevels", method = RequestMethod.POST)
-  public ResponseEntity<?> createGeographicLevel(@RequestBody GeographicLevel geographicLevel) {
+  public ResponseEntity<GeographicLevel> createGeographicLevel(
+      @RequestBody GeographicLevel geographicLevel) {
     LOGGER.debug("Creating new geographicLevel");
     // Ignore provided id
     geographicLevel.setId(null);
@@ -44,10 +47,10 @@ public class GeographicLevelController extends BaseController {
    * @return GeographicLevels.
    */
   @RequestMapping(value = "/geographicLevels", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllGeographicLevel() {
+  public ResponseEntity<Iterable<GeographicLevel>> getAllGeographicLevel() {
     Iterable<GeographicLevel> geographicLevels = geographicLevelRepository.findAll();
     if (geographicLevels == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(geographicLevels, HttpStatus.OK);
     }
@@ -61,8 +64,8 @@ public class GeographicLevelController extends BaseController {
    * @return ResponseEntity containing the updated geographicLevel
    */
   @RequestMapping(value = "/geographicLevels/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateGeographicLevel(@RequestBody GeographicLevel geographicLevel,
-                                                 @PathVariable("id") UUID geographicLevelId) {
+  public ResponseEntity<GeographicLevel> updateGeographicLevel(
+      @RequestBody GeographicLevel geographicLevel, @PathVariable("id") UUID geographicLevelId) {
     LOGGER.debug("Updating geographicLevel");
     geographicLevelRepository.save(geographicLevel);
     return new ResponseEntity<>(geographicLevel, HttpStatus.OK);
@@ -75,10 +78,11 @@ public class GeographicLevelController extends BaseController {
    * @return geographicLevel.
    */
   @RequestMapping(value = "/geographicLevels/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getGeographicLevel(@PathVariable("id") UUID geographicLevelId) {
+  public ResponseEntity<GeographicLevel> getGeographicLevel(
+      @PathVariable("id") UUID geographicLevelId) {
     GeographicLevel geographicLevel = geographicLevelRepository.findOne(geographicLevelId);
     if (geographicLevel == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(geographicLevel, HttpStatus.OK);
     }
@@ -91,13 +95,14 @@ public class GeographicLevelController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/geographicLevels/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteGeographicLevel(@PathVariable("id") UUID geographicLevelId) {
+  public ResponseEntity deleteGeographicLevel(
+      @PathVariable("id") UUID geographicLevelId) {
     GeographicLevel geographicLevel = geographicLevelRepository.findOne(geographicLevelId);
     if (geographicLevel == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
     } else {
       geographicLevelRepository.delete(geographicLevel);
-      return new ResponseEntity<GeographicLevel>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 }

@@ -113,7 +113,7 @@ public class ProcessingScheduleController extends BaseController {
 
     if (facility == null) {
       throw new ValidationMessageException(
-          new Message(FacilityMessageKeys.FACILITY_NOT_FOUND_WITH_ID, facilityId));
+          new Message(FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
     }
 
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =

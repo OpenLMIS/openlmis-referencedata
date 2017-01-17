@@ -5,11 +5,13 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
@@ -54,7 +56,7 @@ public class SupervisoryNodeController extends BaseController {
    * @return ResponseEntity containing the created supervisoryNode
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.POST)
-  public ResponseEntity<?> createSupervisoryNode(
+  public ResponseEntity<SupervisoryNodeDto> createSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto) {
     LOGGER.debug("Creating new supervisoryNode");
     supervisoryNodeDto.setId(null);
@@ -70,7 +72,7 @@ public class SupervisoryNodeController extends BaseController {
    * @return SupervisoryNodeDtos.
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllSupervisoryNodes() {
+  public ResponseEntity<List<SupervisoryNodeDto>> getAllSupervisoryNodes() {
     Iterable<SupervisoryNode> supervisoryNodes = supervisoryNodeRepository.findAll();
     List<SupervisoryNodeDto> supervisoryNodeDtos = new ArrayList<>();
 
@@ -88,10 +90,11 @@ public class SupervisoryNodeController extends BaseController {
    * @return SupervisoryNode.
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getSupervisoryNode(@PathVariable("id") UUID supervisoryNodeId) {
+  public ResponseEntity<SupervisoryNodeDto> getSupervisoryNode(
+      @PathVariable("id") UUID supervisoryNodeId) {
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(exportToDto(supervisoryNode), HttpStatus.OK);
     }
@@ -105,8 +108,9 @@ public class SupervisoryNodeController extends BaseController {
    * @return ResponseEntity containing the updated supervisoryNode
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateSupervisoryNode(@RequestBody SupervisoryNodeDto supervisoryNodeDto,
-                                                 @PathVariable("id") UUID supervisoryNodeId) {
+  public ResponseEntity<SupervisoryNodeDto> updateSupervisoryNode(
+      @RequestBody SupervisoryNodeDto supervisoryNodeDto,
+      @PathVariable("id") UUID supervisoryNodeId) {
     LOGGER.debug("Updating supervisoryNode with id: " + supervisoryNodeId);
 
     SupervisoryNode supervisoryNodeToUpdate =
@@ -130,13 +134,13 @@ public class SupervisoryNodeController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteSupervisoryNode(@PathVariable("id") UUID supervisoryNodeId) {
+  public ResponseEntity deleteSupervisoryNode(@PathVariable("id") UUID supervisoryNodeId) {
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     } else {
       supervisoryNodeRepository.delete(supervisoryNode);
-      return new ResponseEntity<SupervisoryNode>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 
@@ -149,7 +153,7 @@ public class SupervisoryNodeController extends BaseController {
    * @return Found supervisoryNode
    */
   @RequestMapping(value = "/supervisoryNodes/search", method = RequestMethod.GET)
-  public ResponseEntity<?> findSupervisoryNodeByRequisitionGroupFacilityAndProgram(
+  public ResponseEntity<List<SupervisoryNodeDto>> findByRequisitionGroupFacilityAndProgram(
       @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
 
     Facility facility = facilityRepository.findOne(facilityId);
@@ -160,23 +164,19 @@ public class SupervisoryNodeController extends BaseController {
     }
 
     if (facility == null) {
-      throw new ValidationMessageException(FacilityMessageKeys.FACILITY_NOT_FOUND);
+      throw new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND);
     }
 
     RequisitionGroupProgramSchedule foundGroup = requisitionGroupProgramScheduleService
             .searchRequisitionGroupProgramSchedule(program, facility);
 
     if (foundGroup == null) {
-      final Object[] errorArgs = {programId, facility};
-      return ResponseEntity
-          .status(HttpStatus.NOT_FOUND)
-          .body(buildErrorResponse(
-              SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_PROGRAM_AND_FACILITY,
-              errorArgs));
+      throw new NotFoundException(new Message(
+          SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_PROGRAM_AND_FACILITY,
+          programId, facilityId));
     }
 
     SupervisoryNode result = foundGroup.getRequisitionGroup().getSupervisoryNode();
-
     return ResponseEntity.ok(Collections.singletonList(exportToDto(result)));
   }
 

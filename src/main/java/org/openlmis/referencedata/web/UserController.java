@@ -23,6 +23,7 @@ import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.ExternalApiException;
+import org.openlmis.referencedata.exception.InternalErrorException;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -36,7 +37,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
-import org.openlmis.util.ErrorResponse;
 import org.openlmis.util.PasswordChangeRequest;
 import org.openlmis.util.PasswordResetRequest;
 import org.slf4j.Logger;
@@ -136,7 +136,7 @@ public class UserController extends BaseController {
     String token = details.getTokenValue();
 
     if (bindingResult.hasErrors()) {
-      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
 
     String homeFacilityCode = userDto.fetchHomeFacilityCode();
@@ -171,12 +171,7 @@ public class UserController extends BaseController {
       return ResponseEntity.ok(exportUserToDto(userToSave));
 
     } catch (ExternalApiException ex) {
-      ErrorResponse errorResponse =
-          new ErrorResponse(UserMessageKeys.ERROR_SAVING, ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return ResponseEntity
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(errorResponse);
+      throw new InternalErrorException(UserMessageKeys.ERROR_SAVING, ex);
     }
   }
 
@@ -209,9 +204,7 @@ public class UserController extends BaseController {
     User user = userRepository.findOne(userId);
     if (user == null) {
       LOGGER.error("User to get does not exist");
-      return ResponseEntity
-          .notFound()
-          .build();
+      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
       return ResponseEntity
           .ok(exportUserToDto(user));
@@ -229,9 +222,7 @@ public class UserController extends BaseController {
 
     User user = userRepository.findOne(userId);
     if (user == null) {
-      ErrorResponse errorResponse = new ErrorResponse(
-          UserMessageKeys.ERROR_NOT_FOUND, UserMessageKeys.ERROR_NOT_FOUND_WITH_ID);
-      return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
       Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
       return ResponseEntity.ok(exportRoleAssignmentsToDtos(roleAssignments));
@@ -248,9 +239,7 @@ public class UserController extends BaseController {
   public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
     User user = userRepository.findOne(userId);
     if (user == null) {
-      return ResponseEntity
-          .notFound()
-          .build();
+      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
       userRepository.delete(userId);
       return ResponseEntity
@@ -410,7 +399,7 @@ public class UserController extends BaseController {
     String token = details.getTokenValue();
 
     if (bindingResult.hasErrors()) {
-      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
 
     try {
@@ -418,10 +407,7 @@ public class UserController extends BaseController {
 
       return new ResponseEntity<>(HttpStatus.OK);
     } catch (ExternalApiException ex) {
-      ErrorResponse errorResponse = new ErrorResponse(
-          UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_FAILED, ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalErrorException(UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_FAILED, ex);
     }
   }
 
@@ -429,25 +415,21 @@ public class UserController extends BaseController {
    * Changes user's password if valid reset token is provided.
    */
   @RequestMapping(value = "/users/changePassword", method = RequestMethod.POST)
-  public ResponseEntity<?> changePassword(
+  public ResponseEntity changePassword(
       @RequestBody @Valid PasswordChangeRequest passwordChangeRequest, BindingResult bindingResult,
       OAuth2Authentication auth) {
     OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
     String token = details.getTokenValue();
 
     if (bindingResult.hasErrors()) {
-      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
 
     try {
       userService.changePassword(passwordChangeRequest, token);
-
       return new ResponseEntity(HttpStatus.OK);
     } catch (ExternalApiException ex) {
-      ErrorResponse errorResponse = new ErrorResponse(
-          UserMessageKeys.ERROR_EXTERNAL_CHANGE_PASSWORD_FAILED, ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalErrorException(UserMessageKeys.ERROR_EXTERNAL_CHANGE_PASSWORD_FAILED, ex);
     }
   }
 

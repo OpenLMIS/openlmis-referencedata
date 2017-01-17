@@ -16,9 +16,11 @@ public abstract class MessageKeys {
   protected static final String NOT_FOUND = "notFound";
   protected static final String REQUIRED = "required";
   protected static final String EXTERNAL = "external";
+  protected static final String DELETING = "deleting";
   protected static final String CREATED = "created";
   protected static final String GENERIC = "generic";
   protected static final String WITHOUT = "without";
+  protected static final String SEARCH = "search";
   protected static final String FAILED = "failed";
   protected static final String SAVING = "saving";
   protected static final String EMPTY = "empty";
@@ -38,11 +40,16 @@ public abstract class MessageKeys {
   protected static final String PROGRAM = "program";
   protected static final String PRODUCT = "product";
   protected static final String FACILITY = "facility";
+  protected static final String FACILITY_TYPE = "facilityType";
+  protected static final String GEOGRAPHIC_ZONE = "geographicZone";
+  protected static final String GEOGRAPHIC_LEVEL = "geographicLevel";
   protected static final String SUPERVISORY_NODE = "supervisoryNode";
   protected static final String PRODUCT_CATEGORY = "productCategory";
+  protected static final String FACILITY_OPERATOR = "facilityOperator";
   protected static final String PROCESSING_PERIOD = "processingPeriod";
   protected static final String ORDERED_DISPLAY_VALUE = "orderedDisplayValue";
   protected static final String STOCK_ADJUSTMENT_REASON = "stockAdjustmentReason";
+  protected static final String FACILITY_TYPE_APPROVED_PRODUCT = "facilityTypeApprovedProduct";
 
   // Common to subclasses
   protected static final String EMAIL = "email";

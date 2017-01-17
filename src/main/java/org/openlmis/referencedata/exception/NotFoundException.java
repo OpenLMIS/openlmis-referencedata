@@ -11,4 +11,8 @@ public class NotFoundException extends BaseMessageException {
   public NotFoundException(Message message) {
     super(message);
   }
+
+  public NotFoundException(String messageKey) {
+    super(messageKey);
+  }
 }

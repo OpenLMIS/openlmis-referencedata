@@ -1,8 +1,10 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.exception.IntegrityViolationException;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.util.ErrorResponse;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,7 @@ public class FacilityTypeController extends BaseController {
    * @return ResponseEntity containing the created facilityType
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.POST)
-  public ResponseEntity<?> createFacilityType(@RequestBody FacilityType facilityType) {
+  public ResponseEntity<FacilityType> createFacilityType(@RequestBody FacilityType facilityType) {
     LOGGER.debug("Creating new facility type");
     facilityType.setId(null);
     facilityTypeRepository.save(facilityType);
@@ -46,7 +48,7 @@ public class FacilityTypeController extends BaseController {
    * @return FacilityTypes.
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllFacilityTypes() {
+  public ResponseEntity<Iterable<FacilityType>> getAllFacilityTypes() {
     Iterable<FacilityType> facilityTypes = facilityTypeRepository.findAll();
     return new ResponseEntity<>(facilityTypes, HttpStatus.OK);
   }
@@ -59,8 +61,8 @@ public class FacilityTypeController extends BaseController {
    * @return ResponseEntity containing the updated facilityType
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateFacilityType(@RequestBody FacilityType facilityType,
-                                              @PathVariable("id") UUID facilityTypeId) {
+  public ResponseEntity<FacilityType> updateFacilityType(
+      @RequestBody FacilityType facilityType, @PathVariable("id") UUID facilityTypeId) {
 
     FacilityType facilityTypeToUpdate = facilityTypeRepository.findOne(facilityTypeId);
     try {
@@ -77,12 +79,7 @@ public class FacilityTypeController extends BaseController {
       LOGGER.debug("Updating facility type with id: " + facilityTypeToUpdate.getId());
       return new ResponseEntity<>(facilityTypeToUpdate, HttpStatus.OK);
     } catch (DataIntegrityViolationException ex) {
-
-      ErrorResponse errorResponse = new ErrorResponse(
-          "An error occurred while saving facility type with ID: " + facilityTypeToUpdate.getId(),
-          ex.getMessage());
-      LOGGER.error(errorResponse.getMessage(), ex);
-      return new ResponseEntity(HttpStatus.BAD_REQUEST);
+      throw new IntegrityViolationException(FacilityTypeMessageKeys.ERROR_SAVING, ex);
     }
   }
 
@@ -93,10 +90,10 @@ public class FacilityTypeController extends BaseController {
    * @return FacilityType.
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getFacilityType(@PathVariable("id") UUID facilityTypeId) {
+  public ResponseEntity<FacilityType> getFacilityType(@PathVariable("id") UUID facilityTypeId) {
     FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
     if (facilityType == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(facilityType, HttpStatus.OK);
     }
@@ -109,7 +106,7 @@ public class FacilityTypeController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {
+  public ResponseEntity deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {
     FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
     if (facilityType == null) {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -117,13 +114,10 @@ public class FacilityTypeController extends BaseController {
       try {
         facilityTypeRepository.delete(facilityType);
       } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            "An error occurred while deleting facility type with ID: " + facilityTypeId,
-            ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
+        throw new IntegrityViolationException(FacilityTypeMessageKeys.ERROR_DELETING, ex);
       }
-      return new ResponseEntity<FacilityType>(HttpStatus.NO_CONTENT);
+
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 }
