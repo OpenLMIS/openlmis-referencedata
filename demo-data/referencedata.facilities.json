@@ -53,5 +53,38 @@
     "active": "false",
     "enabled": "false",
     "openLmisAccessible": "true"
+  },
+  {
+    "id": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+    "code": "HF01",
+    "name": "Kankao Health Facility",
+    "geographiczoneid": { "id": "4e471242-da63-436c-8157-ade3e615c848" },
+    "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f060",
+    "operatedbyid": { "id": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121" },
+    "active": "true",
+    "enabled": "true",
+    "openLmisAccessible": "true"
+  },
+  {
+    "id": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+    "code": "HC02",
+    "name": "Nandumbo Health Center",
+    "geographiczoneid": { "id": "4e471242-da63-436c-8157-ade3e615c848" },
+    "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f060",
+    "operatedbyid": { "id": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121" },
+    "active": "true",
+    "enabled": "true",
+    "openLmisAccessible": "true"
+  },
+  {
+    "id": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+    "code": "HC03",
+    "name": "Kalembo Health Center",
+    "geographiczoneid": { "id": "4e471242-da63-436c-8157-ade3e615c848" },
+    "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f060",
+    "operatedbyid": { "id": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121" },
+    "active": "true",
+    "enabled": "true",
+    "openLmisAccessible": "true"
   }
 ]
