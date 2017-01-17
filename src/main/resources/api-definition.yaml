@@ -1762,9 +1762,14 @@ resourceTypes:
                 "400":
                     body:
                         application/json:
+                "403":
+                    body:
+                        application/json:
+                          schema: localizedErrorResponse
                 "409":
                     body:
-                        text/plain:
+                        application/json:
+                          schema: localizedErrorResponse
       get:
             is: [ secured ]
             description: Get all roles.
@@ -1773,6 +1778,10 @@ resourceTypes:
                     body:
                         application/json:
                           schema: roleArray
+                "403":
+                    body:
+                        application/json:
+                          schema: localizedErrorResponse
       /{roleId}:
             uriParameters:
               roleId:
@@ -1794,6 +1803,10 @@ resourceTypes:
                     "400":
                         body:
                             application/json:
+                    "403":
+                        body:
+                            application/json:
+                              schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen role.
@@ -1802,6 +1815,10 @@ resourceTypes:
                         body:
                             application/json:
                               schema: role
+                    "403":
+                        body:
+                            application/json:
+                              schema: localizedErrorResponse
                     "404":
             delete:
                 is: [ secured ]
@@ -1811,6 +1828,10 @@ resourceTypes:
                     "400":
                         body:
                             application/json:
+                    "403":
+                        body:
+                            application/json:
+                              schema: localizedErrorResponse
                     "404":
 
   /rights:

@@ -9,8 +9,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
-import org.junit.Before;
+
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
@@ -18,6 +19,7 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Set;
 import java.util.UUID;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class RoleControllerTest {
 
   @Mock
@@ -34,7 +36,11 @@ public class RoleControllerTest {
   @Mock
   private RightRepository rightRepository;
 
-  private RoleController controller;
+  @Mock
+  private RightService rightService;
+
+  @InjectMocks
+  private RoleController controller = new RoleController();
 
   private String right1Name;
   private Right right1;
@@ -53,7 +59,6 @@ public class RoleControllerTest {
    */
   public RoleControllerTest() {
     initMocks(this);
-    controller = new RoleController(repository, rightRepository);
 
     right1Name = "right1";
     right1 = Right.newRight(right1Name, RightType.GENERAL_ADMIN);
@@ -67,11 +72,6 @@ public class RoleControllerTest {
     role1Dto = new RoleDto();
     role1.export(role1Dto);
     roleId = UUID.randomUUID();
-  }
-
-  @Before
-  public void setup() {
-
   }
   
   private void preparePostOrPut() {
