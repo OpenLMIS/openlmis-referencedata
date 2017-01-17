@@ -3,7 +3,10 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
+import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
+import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +44,7 @@ public class RequisitionGroupController extends BaseController {
    * @return ResponseEntity containing the created requisitionGroupDto
    */
   @RequestMapping(value = "/requisitionGroups", method = RequestMethod.POST)
-  public ResponseEntity<?> createRequisitionGroup(
+  public ResponseEntity<RequisitionGroupDto> createRequisitionGroup(
       @RequestBody RequisitionGroupBaseDto requisitionGroupDto, BindingResult bindingResult) {
     LOGGER.debug("Creating new requisitionGroup");
     validator.validate(requisitionGroupDto, bindingResult);
@@ -54,7 +57,7 @@ public class RequisitionGroupController extends BaseController {
       LOGGER.debug("Created new requisitionGroup with id: " + requisitionGroup.getId());
       return new ResponseEntity<>(exportToDto(requisitionGroup), HttpStatus.CREATED);
     } else {
-      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
   }
 
@@ -64,7 +67,7 @@ public class RequisitionGroupController extends BaseController {
    * @return RequisitionGroupDtos.
    */
   @RequestMapping(value = "/requisitionGroups", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllRequisitionGroups() {
+  public ResponseEntity<List<RequisitionGroupDto>> getAllRequisitionGroups() {
     Iterable<RequisitionGroup> requisitionGroups = requisitionGroupRepository.findAll();
     List<RequisitionGroupDto> requisitionGroupDtos = new ArrayList<>();
     for (RequisitionGroup requisitionGroup : requisitionGroups) {
@@ -80,10 +83,11 @@ public class RequisitionGroupController extends BaseController {
    * @return RequisitionGroupDto.
    */
   @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getRequisitionGroup(@PathVariable("id") UUID requisitionGroupId) {
+  public ResponseEntity<RequisitionGroupDto> getRequisitionGroup(
+      @PathVariable("id") UUID requisitionGroupId) {
     RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
     if (requisitionGroup == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(exportToDto(requisitionGroup), HttpStatus.OK);
     }
@@ -97,7 +101,7 @@ public class RequisitionGroupController extends BaseController {
    * @return ResponseEntity containing the updated requisitionGroupDto
    */
   @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateRequisitionGroup(
+  public ResponseEntity<RequisitionGroupDto> updateRequisitionGroup(
       @RequestBody RequisitionGroupBaseDto requisitionGroupDto,
       @PathVariable("id") UUID requisitionGroupId,
       BindingResult bindingResult) {
@@ -121,7 +125,7 @@ public class RequisitionGroupController extends BaseController {
       LOGGER.debug("Saved requisitionGroup with id: " + requisitionGroupToUpdate.getId());
       return new ResponseEntity<>(exportToDto(requisitionGroupToUpdate), HttpStatus.OK);
     } else {
-      return new ResponseEntity<>(getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
   }
 
@@ -132,13 +136,13 @@ public class RequisitionGroupController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteRequisitionGroup(@PathVariable("id") UUID requisitionGroupId) {
+  public ResponseEntity deleteRequisitionGroup(@PathVariable("id") UUID requisitionGroupId) {
     RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
     if (requisitionGroup == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);
     } else {
       requisitionGroupRepository.delete(requisitionGroup);
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 

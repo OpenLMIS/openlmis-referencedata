@@ -5,6 +5,7 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.dto.ProcessingScheduleDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
@@ -12,6 +13,7 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +56,8 @@ public class ProcessingScheduleController extends BaseController {
    * @return ResponseEntity containing the created processingSchedule
    */
   @RequestMapping(value = "/processingSchedules", method = RequestMethod.POST)
-  public ResponseEntity<?> createProcessingSchedule(@RequestBody ProcessingSchedule schedule) {
+  public ResponseEntity<ProcessingSchedule> createProcessingSchedule(
+      @RequestBody ProcessingSchedule schedule) {
     LOGGER.debug("Creating new processingSchedule");
     // Ignore provided id
     schedule.setId(null);
@@ -70,8 +73,8 @@ public class ProcessingScheduleController extends BaseController {
    * @return ResponseEntity containing the updated processingSchedule
    */
   @RequestMapping(value = "/processingSchedules/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateProcessingSchedule(@RequestBody ProcessingSchedule schedule,
-                                                    @PathVariable("id") UUID scheduleId) {
+  public ResponseEntity<ProcessingSchedule> updateProcessingSchedule(
+      @RequestBody ProcessingSchedule schedule, @PathVariable("id") UUID scheduleId) {
     LOGGER.debug("Updating processingSchedule");
     scheduleRepository.save(schedule);
     return new ResponseEntity<>(schedule, HttpStatus.OK);
@@ -83,10 +86,10 @@ public class ProcessingScheduleController extends BaseController {
    * @return ProcessingSchedules.
    */
   @RequestMapping(value = "/processingSchedules", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllProcessingSchedules() {
+  public ResponseEntity<Iterable<ProcessingSchedule>> getAllProcessingSchedules() {
     Iterable<ProcessingSchedule> schedules = scheduleRepository.findAll();
     if (schedules == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(schedules, HttpStatus.OK);
     }
@@ -100,8 +103,8 @@ public class ProcessingScheduleController extends BaseController {
    * @return Processing Schedule for the specified parameters
    */
   @RequestMapping(value = "/processingSchedules/search", method = RequestMethod.GET)
-  public ResponseEntity<?> search(@RequestParam("programId") UUID programId,
-                                  @RequestParam("facilityId") UUID facilityId) {
+  public ResponseEntity<List<ProcessingScheduleDto>> search(
+      @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
 
     Program program = programRepository.findOne(programId);
     Facility facility = facilityRepository.findOne(facilityId);
@@ -137,10 +140,11 @@ public class ProcessingScheduleController extends BaseController {
    * @return ProcessingSchedule.
    */
   @RequestMapping(value = "/processingSchedules/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getProcessingSchedule(@PathVariable("id") UUID scheduleId) {
+  public ResponseEntity<ProcessingSchedule> getProcessingSchedule(
+      @PathVariable("id") UUID scheduleId) {
     ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
     if (schedule == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(schedule, HttpStatus.OK);
     }
@@ -153,10 +157,11 @@ public class ProcessingScheduleController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/processingSchedules/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteProcessingSchedule(@PathVariable("id") UUID scheduleId) {
+  public ResponseEntity<ProcessingSchedule> deleteProcessingSchedule(
+      @PathVariable("id") UUID scheduleId) {
     ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
     if (schedule == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
     } else {
       scheduleRepository.delete(schedule);
       return new ResponseEntity<ProcessingSchedule>(HttpStatus.NO_CONTENT);

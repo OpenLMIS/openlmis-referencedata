@@ -8,6 +8,8 @@ public abstract class RequisitionGroupMessageKeys extends MessageKeys {
 
   public static final String ERROR_NULL = join(ERROR, NULL);
 
+  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
+
   public static final String ERROR_DESCRIPTION_TOO_LONG = join(ERROR, DESCRIPTION, TOO_LONG);
 
   public static final String ERROR_CODE_REQUIRED = join(ERROR, CODE, REQUIRED);

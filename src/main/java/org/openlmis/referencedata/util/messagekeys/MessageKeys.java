@@ -40,13 +40,16 @@ public abstract class MessageKeys {
   protected static final String PROGRAM = "program";
   protected static final String PRODUCT = "product";
   protected static final String FACILITY = "facility";
+  protected static final String SUPPLY_LINE = "supplyLine";
   protected static final String FACILITY_TYPE = "facilityType";
   protected static final String GEOGRAPHIC_ZONE = "geographicZone";
   protected static final String GEOGRAPHIC_LEVEL = "geographicLevel";
   protected static final String SUPERVISORY_NODE = "supervisoryNode";
   protected static final String PRODUCT_CATEGORY = "productCategory";
+  protected static final String ORDERABLE_PRODUCT = "orderableProduct";
   protected static final String FACILITY_OPERATOR = "facilityOperator";
   protected static final String PROCESSING_PERIOD = "processingPeriod";
+  protected static final String PROCESSING_SCHEDULE = "processingSchedule";
   protected static final String ORDERED_DISPLAY_VALUE = "orderedDisplayValue";
   protected static final String STOCK_ADJUSTMENT_REASON = "stockAdjustmentReason";
   protected static final String FACILITY_TYPE_APPROVED_PRODUCT = "facilityTypeApprovedProduct";

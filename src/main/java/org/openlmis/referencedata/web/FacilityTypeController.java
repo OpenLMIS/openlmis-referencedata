@@ -79,7 +79,7 @@ public class FacilityTypeController extends BaseController {
       LOGGER.debug("Updating facility type with id: " + facilityTypeToUpdate.getId());
       return new ResponseEntity<>(facilityTypeToUpdate, HttpStatus.OK);
     } catch (DataIntegrityViolationException ex) {
-      throw new IntegrityViolationException(FacilityTypeMessageKeys.ERROR_SAVING, ex);
+      throw new IntegrityViolationException(FacilityTypeMessageKeys.ERROR_SAVING_WITH_ID, ex);
     }
   }
 
@@ -109,12 +109,12 @@ public class FacilityTypeController extends BaseController {
   public ResponseEntity deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {
     FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
     if (facilityType == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     } else {
       try {
         facilityTypeRepository.delete(facilityType);
       } catch (DataIntegrityViolationException ex) {
-        throw new IntegrityViolationException(FacilityTypeMessageKeys.ERROR_DELETING, ex);
+        throw new IntegrityViolationException(FacilityTypeMessageKeys.ERROR_DELETING_WITH_ID, ex);
       }
 
       return new ResponseEntity(HttpStatus.NO_CONTENT);

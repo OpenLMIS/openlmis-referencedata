@@ -1,7 +1,9 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableProductRepository;
+import org.openlmis.referencedata.util.messagekeys.OrderableProductMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,10 +42,11 @@ public class OrderableProductController extends BaseController {
    * @return chosen product
    */
   @RequestMapping(value = "/orderableProducts/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getChosenOrderableProduct(@PathVariable("id") UUID productId) {
+  public ResponseEntity<OrderableProduct> getChosenOrderableProduct(
+      @PathVariable("id") UUID productId) {
     OrderableProduct product = repository.findOne(productId);
     if (product == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(OrderableProductMessageKeys.NOT_FOUND);
     } else {
       return new ResponseEntity<>(product, HttpStatus.OK);
     }
