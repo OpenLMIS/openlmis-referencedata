@@ -27,6 +27,7 @@ import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
@@ -61,7 +62,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
       RESOURCE_URL + "/search";
-  private static final String RIGHTNAME_FACILITIES_MANAGE = "FACILITIES_MANAGE";
 
   @MockBean
   private FacilityRepository facilityRepository;
@@ -275,7 +275,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
 
@@ -297,9 +297,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getAllShouldReturnForbiddenForUnauthorizedToken() {
 
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -317,7 +317,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
 
     FacilityDto response = restAssured
@@ -338,9 +338,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getShouldReturnForbiddenForUnauthorizedToken() {
 
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -359,7 +359,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
     restAssured
@@ -379,7 +379,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
 
     restAssured
@@ -398,9 +398,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void deleteShouldReturnForbiddenForUnauthorizedToken() {
 
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -419,7 +419,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
     restAssured
@@ -439,7 +439,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(program);
@@ -465,7 +465,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(null);
@@ -487,9 +487,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void postShouldReturnForbiddenForUnauthorizedToken() {
 
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
 
@@ -511,7 +511,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(program);
@@ -538,7 +538,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(null);
@@ -561,9 +561,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void putShouldReturnForbiddenForUnauthorizedToken() {
 
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RIGHTNAME_FACILITIES_MANAGE)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
 

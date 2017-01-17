@@ -4,6 +4,7 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
@@ -40,7 +41,6 @@ import java.util.stream.StreamSupport;
 public class FacilityController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
-  private static final String RIGHTNAME_FACILITIES_MANAGE = "FACILITIES_MANAGE";
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -66,7 +66,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
   public ResponseEntity<?> createFacility(@RequestBody FacilityDto facilityDto) {
 
-    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     LOGGER.debug("Creating new facility");
     facilityDto.setId(null);
@@ -95,7 +95,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities", method = RequestMethod.GET)
   public ResponseEntity<?> getAllFacilities() {
 
-    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Iterable<Facility> facilities = facilityRepository.findAll();
     return ok(facilities);
@@ -113,7 +113,7 @@ public class FacilityController extends BaseController {
   public ResponseEntity<?> saveFacility(@RequestBody FacilityDto facilityDto,
                                         @PathVariable("id") UUID facilityId) {
 
-    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Facility facilityToSave = Facility.newFacility(facilityDto);
     facilityToSave.setId(facilityId);
@@ -140,7 +140,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.GET)
   public ResponseEntity getFacility(@PathVariable("id") UUID facilityId) {
     
-    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
@@ -187,7 +187,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteFacility(@PathVariable("id") UUID facilityId) {
 
-    rightService.checkAdminRight(RIGHTNAME_FACILITIES_MANAGE);
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {

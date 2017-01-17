@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.Message;
@@ -26,8 +27,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-
-  private static final String GEOGRAPHIC_ZONE_MANAGE_RIGHT = "GEOGRAPHIC_ZONE_MANAGE";
 
   @MockBean
   private GeographicZoneRepository geographicZoneRepository;
@@ -65,7 +64,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldDeleteGeographicZone() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
     given(geographicZoneRepository.findOne(geographicZoneId)).willReturn(geographicZone);
 
     restAssured
@@ -85,7 +84,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldPostGeographicZone() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
     when(geographicZoneRepository.save(geographicZone)).thenReturn(geographicZone);
 
     GeographicZone response = restAssured
@@ -107,7 +106,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldPutGeographicZone() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
     when(geographicZoneRepository.save(geographicZone)).thenReturn(geographicZone);
 
     GeographicZone response = restAssured
@@ -130,7 +129,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldGetAllGeographicZones() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     List<GeographicZone> storedGeographicZones = Arrays.asList(geographicZone, geographicZone2);
     given(geographicZoneRepository.findAll()).willReturn(storedGeographicZones);
@@ -153,7 +152,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldGetGeographicZone() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     given(geographicZoneRepository.findOne(geographicZoneId)).willReturn(geographicZone);
 
@@ -175,9 +174,9 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   @Test
   public void getShouldReturnForbiddenOnUnauthorizedToken() {
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, GEOGRAPHIC_ZONE_MANAGE_RIGHT)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -195,9 +194,9 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   @Test
   public void getAllShouldReturnForbiddenOnUnauthorizedToken() {
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, GEOGRAPHIC_ZONE_MANAGE_RIGHT)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -214,9 +213,9 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   @Test
   public void putShouldReturnForbiddenOnUnauthorizedToken() {
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, GEOGRAPHIC_ZONE_MANAGE_RIGHT)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
 
     restAssured
         .given()
@@ -235,9 +234,9 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   @Test
   public void deleteShouldReturnForbiddenOnUnauthorizedToken() {
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, GEOGRAPHIC_ZONE_MANAGE_RIGHT)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
 
     restAssured
         .given()
@@ -255,9 +254,9 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   @Test
   public void postShouldReturnForbiddenOnUnauthorizedToken() {
     doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, GEOGRAPHIC_ZONE_MANAGE_RIGHT)))
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
         .when(rightService)
-        .checkAdminRight(GEOGRAPHIC_ZONE_MANAGE_RIGHT, false);
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
 
     restAssured
         .given()

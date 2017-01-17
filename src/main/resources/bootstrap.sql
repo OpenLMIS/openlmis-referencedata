@@ -1,9 +1,9 @@
 INSERT INTO referencedata.users (id, username, firstName, lastName, email, timezone) VALUES ('35316636-6264-6331-2d34-3933322d3462', 'admin', 'Admin', 'User', 'example@mail.com', 'UTC');
 
 INSERT INTO referencedata.rights (id, name, type) VALUES ('e96017ff-af8c-4313-a070-caa70465c949', 'FACILITIES_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO referencedata.rights (id, name, type) VALUES ('4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22', 'GEOGRAPHIC_ZONE_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO referencedata.rights (id, name, type) VALUES ('5c4b3b9b-713e-4b9a-8c58-7efcd2954512', 'SUPERVISORY_NODE_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO referencedata.rights (id, name, type) VALUES ('fb6a0053-6254-4b41-8028-bf91421f90dd', 'PRODUCT_MANAGE', 'GENERAL_ADMIN');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22', 'GEOGRAPHIC_ZONES_MANAGE', 'GENERAL_ADMIN');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('5c4b3b9b-713e-4b9a-8c58-7efcd2954512', 'SUPERVISORY_NODES_MANAGE', 'GENERAL_ADMIN');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('fb6a0053-6254-4b41-8028-bf91421f90dd', 'PRODUCTS_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('8816edba-b8a9-11e6-80f5-76304dec7eb7', 'REQUISITION_TEMPLATES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('4bed4f40-36b5-42a7-94c9-0fd3d4252374', 'STOCK_CARD_TEMPLATES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('9ade922b-3523-4582-bef4-a47701f7df14', 'REQUISITION_CREATE', 'SUPERVISION');
