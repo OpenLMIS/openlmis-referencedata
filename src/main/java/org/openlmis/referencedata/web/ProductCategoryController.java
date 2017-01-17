@@ -5,6 +5,7 @@ import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.ProductCategoryMessageKeys;
 import org.openlmis.util.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +90,7 @@ public class ProductCategoryController extends BaseController {
 
     if (null == productCategoryToUpdate) {
       throw new ValidationMessageException(new Message(
-          "referenceData.error.productCategory.notFound.with.id", productCategoryId));
+          ProductCategoryMessageKeys.ERROR_NOT_FOUND_WITH_ID, productCategoryId));
     }
     productCategoryToUpdate.updateFrom(productCategory);
     productCategoryRepository.save(productCategoryToUpdate);

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.openlmis.referencedata.domain.ProgramProductBuilder;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.util.messagekeys.ProgramProductBuilderDeserializerMessageKeys;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -46,11 +47,11 @@ public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramPr
     super(ProgramProductBuilder.class);
 
     Objects.requireNonNull(defaultDeserializer,
-        "referenceData.error.programProductBuilderDeserializer.defaultSerializer.null");
+        ProgramProductBuilderDeserializerMessageKeys.ERROR_DEFAULT_SERIALIZER_NULL);
     Objects.requireNonNull(programRepository,
-        "referenceData.error.programProductBuilderDeserializer.programRepository.null");
+        ProgramProductBuilderDeserializerMessageKeys.ERROR_PROGRAM_REPOSITORY_NULL);
     Objects.requireNonNull(productCategoryRepository,
-        "referenceData.error.programProductBuilderDeserializer.productCategoryRepository.null");
+        ProgramProductBuilderDeserializerMessageKeys.ERROR_PRODUCT_CATEGORY_REPOSITORY_NULL);
     this.defaultDeserializer = defaultDeserializer;
     this.programRepository = programRepository;
     this.productCategoryRepository = productCategoryRepository;
@@ -60,7 +61,7 @@ public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramPr
   public ProgramProductBuilder deserialize(JsonParser jsonParser, DeserializationContext ctxt)
       throws IOException {
     Objects.requireNonNull(programRepository,
-        "referenceData.error.programProductBuilderDeserializer.programRepository.notInjected");
+        ProgramProductBuilderDeserializerMessageKeys.ERROR_PROGRAM_REPOSITORY_NOT_INJECTED);
 
     // default bean deserialization
     ProgramProductBuilder ppBuilder = (ProgramProductBuilder) defaultDeserializer.deserialize(

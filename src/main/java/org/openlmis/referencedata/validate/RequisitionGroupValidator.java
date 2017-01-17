@@ -10,6 +10,8 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ValidationMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -102,8 +104,8 @@ public class RequisitionGroupValidator implements Validator {
   }
 
   private void verifyArguments(Object target, Errors errors) {
-    Message targetMessage = new Message("referenceData.error.requisitionGroup.null");
-    Message errorsMessage = new Message("referenceData.error.validation.contextualState.null");
+    Message targetMessage = new Message(RequisitionGroupMessageKeys.ERROR_NULL);
+    Message errorsMessage = new Message(ValidationMessageKeys.ERROR_CONTEXTUAL_STATE_NULL);
     checkNotNull(target, targetMessage.toString());
     checkNotNull(errors, errorsMessage.toString());
   }
@@ -111,31 +113,31 @@ public class RequisitionGroupValidator implements Validator {
   private void verifyProperties(RequisitionGroupBaseDto group, Errors errors) {
     // the Requisition Group Code is required, length 50 characters
     rejectIfEmptyOrWhitespace(errors, CODE, EMPTY,
-        "referenceData.error.requisitionGroup.code.required");
+        RequisitionGroupMessageKeys.ERROR_CODE_REQUIRED);
 
     // the requisition group name is required, length 50 characters
     rejectIfEmptyOrWhitespace(errors, NAME, EMPTY,
-        "referenceData.error.requisitionGroup.name.required");
+        RequisitionGroupMessageKeys.ERROR_NAME_REQUIRED);
 
     // the supervisory node is required
     rejectIfEmpty(errors, SUPERVISORY_NODE, EMPTY,
-        "referenceData.error.requisitionGroup.supervisoryNode.required");
+        RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ID_REQUIRED);
 
     if (!errors.hasErrors()) {
       // the Requisition Group Code max length 50 characters
       if (group.getCode().length() > 50) {
-        rejectValue(errors, CODE, IS_TOO_LONG, "referenceData.error.requisitionGroup.code.tooLong");
+        rejectValue(errors, CODE, IS_TOO_LONG, RequisitionGroupMessageKeys.ERROR_CODE_TOO_LONG);
       }
 
       // the requisition group name max length 50 characters
       if (group.getName().length() > 50) {
-        rejectValue(errors, NAME, IS_TOO_LONG, "referenceData.error.requisitionGroup.name.tooLong");
+        rejectValue(errors, NAME, IS_TOO_LONG, RequisitionGroupMessageKeys.ERROR_NAME_TOO_LONG);
       }
 
       // description max length 250 characters
       if (null != group.getDescription() && group.getDescription().length() > 250) {
         rejectValue(errors, DESCRIPTION, IS_TOO_LONG,
-            "referenceData.error.requisitionGroup.description.tooLong");
+            RequisitionGroupMessageKeys.ERROR_DESCRIPTION_TOO_LONG);
       }
     }
   }
@@ -145,7 +147,7 @@ public class RequisitionGroupValidator implements Validator {
     RequisitionGroup db = requisitionGroups.findByCode(code);
 
     if (null != db && (null == id || !id.equals(db.getId()))) {
-      rejectValue(errors, CODE, DUPLICATE, "referenceData.error.requisitionGroup.code.duplicated");
+      rejectValue(errors, CODE, DUPLICATE, RequisitionGroupMessageKeys.ERROR_CODE_DUPLICATED);
     }
   }
 
@@ -153,10 +155,10 @@ public class RequisitionGroupValidator implements Validator {
     // supervisory node matches a defined supervisory node
     if (null == supervisoryNode.getId()) {
       rejectValue(errors, SUPERVISORY_NODE, MISSING_ID,
-          "referenceData.error.requisitionGroup.supervisoryNode.id.required");
+          RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ID_REQUIRED);
     } else if (null == supervisoryNodes.findOne(supervisoryNode.getId())) {
       rejectValue(errors, SUPERVISORY_NODE, NOT_EXIST,
-          "referenceData.error.requisitionGroup.supervisoryNode.nonExistent");
+          RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_NON_EXISTENT);
     }
   }
 
@@ -165,13 +167,13 @@ public class RequisitionGroupValidator implements Validator {
     for (FacilityDto facility : memberFacilities) {
       if (null == facility) {
         rejectValue(errors, MEMBER_FACILITIES, IS_NULL,
-            "referenceData.error.requisitionGroup.facility.null");
+            RequisitionGroupMessageKeys.ERROR_FACILITY_NULL);
       } else if (null == facility.getId()) {
         rejectValue(errors, MEMBER_FACILITIES, MISSING_ID,
-            "referenceData.error.requisitionGroup.facility.id.required");
+            RequisitionGroupMessageKeys.ERROR_FACILITY_ID_REQUIRED);
       } else if (null == this.facilities.findOne(facility.getId())) {
         rejectValue(errors, MEMBER_FACILITIES, NOT_EXIST,
-            "referenceData.error.requisitionGroup.facility.nonExistent");
+            RequisitionGroupMessageKeys.ERROR_FACILITY_NON_EXISTENT);
       }
     }
   }
@@ -189,6 +191,7 @@ public class RequisitionGroupValidator implements Validator {
     errors.rejectValue(field, getErrorCode(field, suffix), message);
   }
 
+  // TODO: TUTAJ!!!
   private String getErrorCode(String field, String suffix) {
     return ERROR_CODE_PREFIX + '.' + field + '.' + suffix;
   }

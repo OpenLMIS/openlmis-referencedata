@@ -4,6 +4,7 @@ import org.openlmis.referencedata.domain.StockAdjustmentReason;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.StockAdjustmentReasonMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,7 +118,7 @@ public class StockAdjustmentReasonController extends BaseController {
       LOGGER.warn("Update failed - stockAdjustmentReason with id: {} not found",
               stockAdjustmentReasonId);
       throw new ValidationMessageException(new Message(
-          "referenceData.error.stockAdjustmentReason.notFound.with.id", stockAdjustmentReasonId));
+          StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND_WITH_ID, stockAdjustmentReasonId));
     }
 
     stockAdjustmentReasonRepository.save(stockAdjustmentReason);

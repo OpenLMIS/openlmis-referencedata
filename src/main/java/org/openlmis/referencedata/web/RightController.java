@@ -9,6 +9,7 @@ import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,6 @@ import java.util.UUID;
 
 import lombok.NoArgsConstructor;
 
-// TODO: ZACZNIJ TUTAJ W PONIEDZIALEK SMIECIU
 @NoArgsConstructor
 @Controller
 public class RightController extends BaseController {
@@ -98,7 +98,7 @@ public class RightController extends BaseController {
         Right storedAttachment = rightRepository.findFirstByName(attachmentDto.getName());
         if (storedAttachment == null) {
           throw new ValidationMessageException(new Message(
-              "referenceData.error.right.name.nonExistent", attachmentDto.getName()));
+              RightMessageKeys.ERROR_NAME_NON_EXISTENT, attachmentDto.getName()));
         }
 
         storedAttachment.export((RightDto) attachmentDto);

@@ -16,6 +16,7 @@ import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -84,7 +85,7 @@ public class RequisitionGroupValidatorParameterizedTest extends BaseValidatorTes
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, CODE, "referenceData.error.requisitionGroup.code.required");
+    assertErrorMessage(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_REQUIRED);
   }
 
   @Test
@@ -93,7 +94,7 @@ public class RequisitionGroupValidatorParameterizedTest extends BaseValidatorTes
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, NAME, "referenceData.error.requisitionGroup.name.required");
+    assertErrorMessage(errors, NAME, RequisitionGroupMessageKeys.ERROR_NAME_REQUIRED);
   }
 
 }

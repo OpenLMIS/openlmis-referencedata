@@ -10,6 +10,8 @@ import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.AuthUserRequest;
+import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.openlmis.util.NotificationRequest;
 import org.openlmis.util.PasswordChangeRequest;
 import org.openlmis.util.PasswordResetRequest;
@@ -153,7 +155,7 @@ public class UserService {
 
       verifyUser(passwordResetRequest.getUsername());
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not reset auth user password", ex);
+      throw new ExternalApiException(UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_FAILED, ex);
     }
   }
 
@@ -170,7 +172,7 @@ public class UserService {
       verifyUser(passwordChangeRequest.getUsername());
     } catch (RestClientException ex) {
       throw new ExternalApiException(
-          "referenceData.error.user.external.changePassword.failed", ex);
+          UserMessageKeys.ERROR_EXTERNAL_CHANGE_PASSWORD_FAILED, ex);
     }
   }
 
@@ -187,9 +189,9 @@ public class UserService {
     String[] msgArgs = {user.getFirstName(), user.getLastName(),
         user.getUsername(), virtualHostBaseUrl + "reset-password.html" + "/username/"
         + user.getUsername() + "/token/" + token};
-    String mailBody = messageSource.getMessage("password.reset.email.body",
+    String mailBody = messageSource.getMessage(SystemMessageKeys.PASSWORD_RESET_EMAIL_BODY,
         msgArgs, LocaleContextHolder.getLocale());
-    String mailSubject = messageSource.getMessage("account.created.email.subject",
+    String mailSubject = messageSource.getMessage(SystemMessageKeys.ACCOUNT_CREATED_EMAIL_SUBJECT,
         new String[]{}, LocaleContextHolder.getLocale());
 
     sendMail("notification", user.getEmail(), mailSubject, mailBody, authToken);
@@ -204,7 +206,7 @@ public class UserService {
       return restTemplate.postForObject(url, null, UUID.class);
     } catch (RestClientException ex) {
       throw new ExternalApiException(
-          "referenceData.error.user.external.resetPassword.createToken.failed", ex);
+          UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_CREATE_TOKEN_FAILED, ex);
     }
   }
 
@@ -218,7 +220,7 @@ public class UserService {
       restTemplate.postForObject(url, request, Object.class);
     } catch (RestClientException ex) {
       throw new ExternalApiException(
-          "referenceData.error.user.external.resetPassword.sendMessage.failed", ex);
+          UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_SEND_MESSAGE_FAILED, ex);
     }
   }
 }

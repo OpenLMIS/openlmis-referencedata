@@ -10,6 +10,9 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,11 +156,11 @@ public class SupervisoryNodeController extends BaseController {
     Program program = programRepository.findOne(programId);
 
     if (program == null) {
-      throw new ValidationMessageException("referenceData.error.program.notFound");
+      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
 
     if (facility == null) {
-      throw new ValidationMessageException("referenceData.error.facility.notFound");
+      throw new ValidationMessageException(FacilityMessageKeys.FACILITY_NOT_FOUND);
     }
 
     RequisitionGroupProgramSchedule foundGroup = requisitionGroupProgramScheduleService
@@ -168,7 +171,7 @@ public class SupervisoryNodeController extends BaseController {
       return ResponseEntity
           .status(HttpStatus.NOT_FOUND)
           .body(buildErrorResponse(
-              "referenceData.error.supervisoryNode.notFound.with.program.and.facility",
+              SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_PROGRAM_AND_FACILITY,
               errorArgs));
     }
 

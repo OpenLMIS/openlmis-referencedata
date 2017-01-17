@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
+import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -58,7 +59,7 @@ public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
-    assertErrorMessage(errors, "startDate", "referenceData.error.processingPeriod.startDate.null");
+    assertErrorMessage(errors, "startDate", ProcessingPeriodMessageKeys.ERROR_START_DATE_NULL);
   }
 
   @Test
@@ -69,7 +70,7 @@ public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
-    assertErrorMessage(errors, "endDate", "referenceData.error.processingPeriod.endDate.null");
+    assertErrorMessage(errors, "endDate", ProcessingPeriodMessageKeys.ERROR_END_DATE_NULL);
   }
 
   @Test
@@ -81,9 +82,9 @@ public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
     assertTrue(errors.hasErrors());
     assertEquals(2, errors.getErrorCount());
     assertErrorMessage(errors, "startDate",
-        "referenceData.error.processingPeriod.startDate.after.endDate");
+        ProcessingPeriodMessageKeys.ERROR_START_DATE_AFTER_END_DATE);
     assertErrorMessage(errors, "endDate",
-        "referenceData.error.processingPeriod.endDate.before.startDate");
+        ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
   }
 
   @Test
@@ -97,7 +98,7 @@ public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
     assertErrorMessage(errors, "startDate",
-        "referenceData.error.processingPeriod.gap.between.lastEndDate.and.startDate");
+        ProcessingPeriodMessageKeys.ERROR_GAP_BETWEEN_LAST_END_DATE_AND_START_DATE);
   }
 
   @Test

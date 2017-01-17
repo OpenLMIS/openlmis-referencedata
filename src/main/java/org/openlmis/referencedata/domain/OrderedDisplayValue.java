@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.OrderedDisplayValueMessageKeys;
 
 import java.util.Objects;
 
@@ -36,8 +37,7 @@ public class OrderedDisplayValue {
   public OrderedDisplayValue(String displayName, int displayOrder) {
     displayName = displayName.trim();
     if (Strings.isNullOrEmpty(displayName)) {
-      throw new ValidationMessageException(
-          "referenceData.error.orderedDisplayValue.displayName.empty");
+      throw new ValidationMessageException(OrderedDisplayValueMessageKeys.ERROR_DISPLAY_NAME_EMPTY);
     }
 
     this.displayName = displayName;

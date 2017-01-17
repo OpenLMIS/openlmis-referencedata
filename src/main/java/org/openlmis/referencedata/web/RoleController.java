@@ -10,6 +10,7 @@ import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +104,7 @@ public class RoleController extends BaseController {
     Role storedRole = roleRepository.findFirstByName(roleDto.getName());
     if (storedRole != null) {
       LOGGER.error("Role to create already exists");
-      throw new DataIntegrityViolationException("referenceData.error.role.duplicated");
+      throw new DataIntegrityViolationException(RoleMessageKeys.ERROR_DUPLICATED);
     }
 
     LOGGER.debug("Saving new role");

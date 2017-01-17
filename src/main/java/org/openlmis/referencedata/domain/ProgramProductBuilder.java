@@ -3,6 +3,7 @@ package org.openlmis.referencedata.domain;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.util.messagekeys.ProgramProductBuilderMessageKeys;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -111,11 +112,10 @@ public class ProgramProductBuilder {
    */
   public ProgramProduct createProgramProduct(OrderableProduct product) {
     Objects.requireNonNull(programRepo,
-        "referenceData.error.programProductBuilder.programRepository.null");
+        ProgramProductBuilderMessageKeys.ERROR_PROGRAM_REPOSITORY_NULL);
     Objects.requireNonNull(productCategoryRepo,
-        "referenceData.error.programProductBuilder.productCategoryRepository.null");
-    Objects.requireNonNull(product,
-        "referenceData.error.programProductBuilder.product.null");
+        ProgramProductBuilderMessageKeys.ERROR_PRODUCT_CATEGORY_REPOSITORY_NULL);
+    Objects.requireNonNull(product, ProgramProductBuilderMessageKeys.ERROR_PRODUCT_NULL);
 
     Program storedProgram = programRepo.findOne(programId);
     ProductCategory storedProdCategory = productCategoryRepo.findOne(productCategoryId);

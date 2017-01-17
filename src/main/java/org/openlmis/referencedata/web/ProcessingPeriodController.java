@@ -17,6 +17,7 @@ import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
+import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,11 +78,11 @@ public class ProcessingPeriodController extends BaseController {
       @RequestParam(value = "facilityId", required = true) UUID facilityId) {
 
     if (programId == null) {
-      throw new ValidationMessageException("referenceData.error.processingPeriod.program.id.null");
+      throw new ValidationMessageException(ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL);
     }
 
     if (facilityId == null) {
-      throw new ValidationMessageException("referenceData.error.processingPeriod.facility.id.null");
+      throw new ValidationMessageException(ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL);
     }
 
     Program program = programRepository.findOne(programId);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.ProductMessageKeys;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -84,7 +85,7 @@ public final class TradeItem extends OrderableProduct {
     if (null == globalProduct || hasSameDispensingUnit(globalProduct)) {
       this.globalProduct = globalProduct;
     } else {
-      throw new ValidationMessageException("referenceData.error.product.dispensingUnits.wrong");
+      throw new ValidationMessageException(ProductMessageKeys.ERROR_DISPENSING_UNITS_WRONG);
     }
   }
 

@@ -30,6 +30,7 @@ import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -101,7 +102,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     validator.validate(requisitionGroupDto, errors);
 
     assertErrorMessage(errors, SUPERVISORY_NODE,
-        "referenceData.error.requisitionGroup.supervisoryNode.required");
+        RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_REQUIRED);
   }
 
   @Test
@@ -112,7 +113,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, CODE, "referenceData.error.requisitionGroup.code.duplicated");
+    assertErrorMessage(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_DUPLICATED);
   }
 
   @Test
@@ -122,7 +123,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     validator.validate(requisitionGroupDto, errors);
 
     assertErrorMessage(errors, SUPERVISORY_NODE,
-        "referenceData.error.requisitionGroup.supervisoryNode.id.required");
+        RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ID_REQUIRED);
   }
 
   @Test
@@ -134,7 +135,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     validator.validate(requisitionGroupDto, errors);
 
     assertErrorMessage(errors, SUPERVISORY_NODE,
-        "referenceData.error.requisitionGroup.supervisoryNode.nonExistent");
+        RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_NON_EXISTENT);
   }
 
   @Test
@@ -144,7 +145,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     validator.validate(requisitionGroupDto, errors);
 
     assertErrorMessage(errors, MEMBER_FACILITIES,
-        "referenceData.error.requisitionGroup.facility.null");
+        RequisitionGroupMessageKeys.ERROR_FACILITY_NULL);
   }
 
   @Test
@@ -154,7 +155,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     validator.validate(requisitionGroupDto, errors);
 
     assertErrorMessage(errors, MEMBER_FACILITIES,
-        "referenceData.error.requisitionGroup.facility.id.required");
+        RequisitionGroupMessageKeys.ERROR_FACILITY_ID_REQUIRED);
   }
 
   @Test
@@ -165,7 +166,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     validator.validate(requisitionGroupDto, errors);
 
     assertErrorMessage(errors, MEMBER_FACILITIES,
-        "referenceData.error.requisitionGroup.facility.nonExistent");
+        RequisitionGroupMessageKeys.ERROR_FACILITY_NON_EXISTENT);
   }
 
   @Test
@@ -181,7 +182,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     requisitionGroupDto.setCode(RandomStringUtils.randomAlphanumeric(51));
 
     validator.validate(requisitionGroupDto, errors);
-    assertErrorMessage(errors, CODE, "referenceData.error.requisitionGroup.code.tooLong");
+    assertErrorMessage(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_TOO_LONG);
   }
 
   @Test
@@ -189,7 +190,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     requisitionGroupDto.setName(RandomStringUtils.randomAlphanumeric(51));
 
     validator.validate(requisitionGroupDto, errors);
-    assertErrorMessage(errors, NAME, "referenceData.error.requisitionGroup.name.tooLong");
+    assertErrorMessage(errors, NAME, RequisitionGroupMessageKeys.ERROR_NAME_TOO_LONG);
   }
 
   @Test
@@ -198,7 +199,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
     assertErrorMessage(errors, DESCRIPTION,
-        "referenceData.error.requisitionGroup.description.tooLong");
+        RequisitionGroupMessageKeys.ERROR_DESCRIPTION_TOO_LONG);
   }
 
   @Test
@@ -232,6 +233,6 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
         .findByCode(requisitionGroupDto.getCode());
 
     validator.validate(requisitionGroupDto, errors);
-    assertErrorMessage(errors, CODE, "referenceData.error.requisitionGroup.code.duplicated");
+    assertErrorMessage(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_DUPLICATED);
   }
 }
