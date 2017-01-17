@@ -60,6 +60,62 @@
     "role": {"id": "2a2eaeba-bb9a-11e6-a4a6-cec0c932ce01"}
   },
   {
+    "id": "4d5264f2-dc9e-11e6-bf26-cec0c932ce01",
+    "type": "supervision",
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0" },
+    "role": {"id": "185db8f7-ee35-44d0-8b40-6de12489ae77"}
+  },
+  {
+    "id": "50e9e1e8-dc9f-11e6-bf26-cec0c932ce01",
+    "type": "supervision",
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
+    "user": { "id": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0" },
+    "role": {"id": "185db8f7-ee35-44d0-8b40-6de12489ae77"}
+  },
+  {
+    "id": "485189ea-dca0-11e6-bf26-cec0c932ce01",
+    "type": "supervision",
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "9b2778af-5372-4410-a5c8-899e7f74296b" },
+    "role": {"id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec"}
+  },
+  {
+    "id": "4dfb8e5e-dca0-11e6-bf26-cec0c932ce01",
+    "type": "supervision",
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
+    "user": { "id": "9b2778af-5372-4410-a5c8-899e7f74296b" },
+    "role": {"id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec"}
+  },
+  {
+    "id": "676b7a70-dca0-11e6-bf26-cec0c932ce01",
+    "type": "supervision",
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "573cf089-dfff-4273-b353-d94058164e55" },
+    "role": {"id": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d"}
+  },
+  {
+    "id": "6f0b6ae2-dca0-11e6-bf26-cec0c932ce01",
+    "type": "supervision",
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
+    "user": { "id": "573cf089-dfff-4273-b353-d94058164e55" },
+    "role": {"id": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d"}
+  },
+  {
+    "id": "ac00daa4-dca0-11e6-bf26-cec0c932ce01",
+    "type": "supervision",
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "2bb552b3-0324-42ef-bb21-c5cc74a38592" },
+    "role": {"id": "d30a2fbb-51d9-49ad-90fe-fb405470a439"}
+  },
+  {
+    "id": "2adf5f08-dca1-11e6-bf26-cec0c932ce01",
+    "type": "fulfillment",
+    "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "user": { "id": "247b366d-f8ab-4226-9ae9-a188d5ee8e22" },
+    "role": {"id": "e16d802b-8eb1-43f7-adf8-ef123227cb88"}
+  },
+  {
     "id": "4b3c6622-48cb-4c1b-9a79-f37243c37063",
     "type": "fulfillment",
     "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
