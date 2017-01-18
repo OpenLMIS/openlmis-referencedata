@@ -8,22 +8,6 @@
     "emergencyOrderPoint": "6"
   },
   {
-    "id": "f691c323-e152-459a-ba64-15c23e34dedd",
-    "facilityTypeId": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
-    "programProductId": { "id": "9e25fd93-d8a0-4d1d-8188-55dd3c408d24" },
-    "maxMonthsOfStock": "12",
-    "minMonthsOfStock": "8.5",
-    "emergencyOrderPoint": "15"
-  },
-  {
-    "id": "43f407db-29b8-4525-baaa-e1cd6844093f",
-    "facilityTypeId": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
-    "programProductId": { "id": "267321d1-447c-4fac-9430-907ae38d1854" },
-    "maxMonthsOfStock": "18",
-    "minMonthsOfStock": "12",
-    "emergencyOrderPoint": "24"
-  },
-  {
     "id": "1125d62f-f9f3-40b8-8327-5204b64315ed",
     "facilityTypeId": { "id": "ac1d268b-ce10-455f-bf87-9c667da8f060" },
     "programProductId": { "id": "1af3b535-fe6a-41ce-b4c6-7d0aa4381cdb" },
@@ -86,5 +70,21 @@
     "maxMonthsOfStock": "500",
     "minMonthsOfStock": "50",
     "emergencyOrderPoint": "25"
+  },
+  {
+    "id": "f691c323-e152-459a-ba64-15c23e34dedd",
+    "facilityTypeId": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
+    "programProductId": { "id": "9e25fd93-d8a0-4d1d-8188-55dd3c408d24" },
+    "maxMonthsOfStock": "12",
+    "minMonthsOfStock": "8.5",
+    "emergencyOrderPoint": "15"
+  },
+  {
+    "id": "43f407db-29b8-4525-baaa-e1cd6844093f",
+    "facilityTypeId": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
+    "programProductId": { "id": "267321d1-447c-4fac-9430-907ae38d1854" },
+    "maxMonthsOfStock": "18",
+    "minMonthsOfStock": "12",
+    "emergencyOrderPoint": "24"
   }
 ]

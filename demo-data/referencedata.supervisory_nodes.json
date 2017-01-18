@@ -1,22 +1,22 @@
 [
   {
     "id": "fb38bd1c-beeb-4527-8345-900900329c10",
-    "code": "N1",
+    "code": "SN1",
     "name": "FP Approval point",
-    "facility": { "id": "13037147-1769-4735-90a7-b9b310d128b8" }
+    "facilityid": { "id": "13037147-1769-4735-90a7-b9b310d128b8" }
   },
   {
     "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79",
-    "code": "N1.1",
+    "code": "SN1.1",
     "name": "FP Approval sub point",
     "parentid": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
-    "facilityid": { "id": "5b39f0fb-5c47-4551-b983-1e30ac6df65d" }
+    "facilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" }
   },
   {
     "id": "6d5831e7-c336-4129-bd10-0149910a72aa",
-    "code": "N2",
+    "code": "SN2",
     "name": "EM Approval point",
-    "facilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" }
+    "facilityid": { "id": "7938919f-6f61-4d1a-a4dc-923c31e9cd45" }
   },
   {
     "id": "0f48d25f-2cc3-4f42-a58b-5c74aab70224",
