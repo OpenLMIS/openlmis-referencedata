@@ -6,7 +6,7 @@ public abstract class MessageKeys {
   private static final String DELIMITER = ".";
 
   // General
-  private static final String SERVICE = "requisition";
+  private static final String SERVICE = "referenceData";
   protected static final String SERVICE_ERROR = join(SERVICE, "error");
 
   protected static final String NON_EXISTENT = "nonExistent";
