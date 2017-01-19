@@ -136,5 +136,18 @@
     "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
     "user": { "id": "247b366d-f8ab-4226-9ae9-a188d5ee8e22" },
     "role": {"id": "e16d802b-8eb1-43f7-adf8-ef123227cb88"}
+  },
+  {
+    "id": "4b3c6622-48cb-4c1b-9a79-f37243c37063",
+    "type": "fulfillment",
+    "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": {"id": "185db8f7-ee35-44d0-8b40-6de12489ae77"}
+  },
+  {
+    "id": "27c94f92-b8aa-11e6-80f5-76304dec7eb7",
+    "type": "direct",
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": {"id": "a439c5de-b8aa-11e6-80f5-76304dec7eb7"}
   }
 ]
