@@ -44,8 +44,24 @@
     "rightId": "7958129d-c4c0-4294-a40c-c2b07cb8e515"
   },
   {
+    "roleId": "2a2eaeba-bb9a-11e6-a4a6-cec0c932ce01",
+    "rightId": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50"
+  },
+  {
     "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
     "rightId": "e96017ff-af8c-4313-a070-caa70465c949"
+  },
+  {
+    "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
+    "rightId": "4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22"
+  },
+  {
+    "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
+    "rightId": "5c4b3b9b-713e-4b9a-8c58-7efcd2954512"
+  },
+  {
+    "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
+    "rightId": "fb6a0053-6254-4b41-8028-bf91421f90dd"
   },
   {
     "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
@@ -54,17 +70,5 @@
   {
     "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
     "rightId": "4bed4f40-36b5-42a7-94c9-0fd3d4252374"
-  },
-  {
-    "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
-    "rightId": "4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22"
-  },
-  {
-    "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
-    "rightId": "ebad51c3-f7c3-4fab-97e1-839973b045d4"
-  },
-  {
-    "roleId": "2a2eaeba-bb9a-11e6-a4a6-cec0c932ce01",
-    "rightId": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50"
   }
 ]

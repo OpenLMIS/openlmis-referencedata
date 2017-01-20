@@ -1,20 +1,20 @@
 [
   {
     "id": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05",
-    "code": "RGFP",
-    "name": "RG Family Planning",
-    "supervisoryNodeId": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" }
+    "code": "RGFP1",
+    "name": "RG Family Planning 1",
+    "supervisoryNodeId": { "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79" }
   },
   {
     "id": "84b33e28-f537-4a76-8895-9d4d564a623a",
-    "code": "RGES",
-    "name": "RG Essential Meds",
+    "code": "RGEM1",
+    "name": "RG Essential Meds 1",
     "supervisoryNodeId": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" }
   },
   {
     "id": "e90da490-a371-4c2f-83c3-7c1dc9748d48",
-    "code": "RGNP",
-    "name": "RG New program",
-    "supervisoryNodeId": { "id": "0f48d25f-2cc3-4f42-a58b-5c74aab70224" }
+    "code": "RGFP2",
+    "name": "RG Family Planning 2",
+    "supervisoryNodeId": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" }
   }
 ]
