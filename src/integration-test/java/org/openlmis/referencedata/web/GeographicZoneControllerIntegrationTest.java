@@ -1,27 +1,30 @@
 package org.openlmis.referencedata.web;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -131,20 +134,29 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    List<GeographicZone> storedGeographicZones = Arrays.asList(geographicZone, geographicZone2);
-    given(geographicZoneRepository.findAll()).willReturn(storedGeographicZones);
+    List<GeographicZone> geographicZones = Arrays.asList(geographicZone, geographicZone2);
+    Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
 
-    GeographicZone[] response = restAssured
+    int pageNumber = 0;
+    int pageSize = 1000; //Neither 0 nor Integer.MAX_VALUE work in this context
+
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    given(geographicZoneRepository.findAll(pageRequest)).willReturn(geographicZonesPage);
+
+    Page<GeographicZone> response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("page", pageNumber)
+        .queryParam("size", pageSize)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(GeographicZone[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    assertEquals(storedGeographicZones.size(), response.length);
+    assertEquals(geographicZones.size(), response.getContent().size());
+    assertEquals(geographicZones.size(), response.getNumberOfElements());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

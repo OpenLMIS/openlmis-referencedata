@@ -1,7 +1,5 @@
 package org.openlmis.referencedata.web;
 
-import com.google.common.collect.Lists;
-
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -10,6 +8,9 @@ import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -46,21 +47,21 @@ public class GeographicZoneController extends BaseController {
     return new ResponseEntity<>(geographicZone, HttpStatus.CREATED);
   }
 
+
   /**
    * Get all geographic zones.
    *
    * @return GeographicZones.
    */
   @RequestMapping(value = "/geographicZones", method = RequestMethod.GET)
-  public ResponseEntity<Iterable<GeographicZone>> getAllGeographicZones() {
+  public ResponseEntity<Page<GeographicZone>> getAllGeographicZones_new(Pageable pageable) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    Iterable<GeographicZone> geographicZones = geographicZoneRepository.findAll();
-    if (geographicZones == null) {
-      geographicZones = Lists.newArrayList();
-    }
+    Page<GeographicZone> geographicZones = geographicZoneRepository.findAll(pageable);
 
-    return new ResponseEntity<>(geographicZones, HttpStatus.OK);
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Type", "application/json; charset=utf-8");
+    return new ResponseEntity<>(geographicZones, headers, HttpStatus.OK);
   }
 
   /**
