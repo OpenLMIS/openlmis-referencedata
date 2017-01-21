@@ -75,27 +75,5 @@
     "active": "true",
     "enabled": "true",
     "openLmisAccessible": "true"
-  },
-  {
-    "id": "44a29ccb-ed55-4c26-9eca-7e5759269b25",
-    "code": "FAC003",
-    "name": "Facility Inactive Enabled",
-    "geographiczoneid": { "id": "0bbd69c1-e20f-48f5-aae4-26dcd8aa7602" },
-    "typeid": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
-    "operatedbyid": { "id": "1074353d-7364-4618-a127-708d7303a231" },
-    "active": "false",
-    "enabled": "true",
-    "openLmisAccessible": "false"
-  },
-  {
-    "id": "ab95f1cf-ae8d-4888-ba9d-05141d3f50de",
-    "code": "FAC004",
-    "name": "Facility Inactive Disabled",
-    "geographiczoneid": { "id": "0bbd69c1-e20f-48f5-aae4-26dcd8aa7602" },
-    "typeid": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
-    "operatedbyid": { "id": "1074353d-7364-4618-a127-708d7303a231" },
-    "active": "false",
-    "enabled": "false",
-    "openLmisAccessible": "true"
   }
 ]
