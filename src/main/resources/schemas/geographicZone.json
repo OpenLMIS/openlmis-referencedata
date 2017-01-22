@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-03/schema",
   "title": "GeographicZone",
   "description": "A single geographicZone",
   "properties": {
@@ -10,7 +10,8 @@
     },
     "code": {
       "type": "string",
-      "title": "code"
+      "title": "code",
+      "required": true
     },
     "name": {
       "type": "string",
@@ -18,7 +19,8 @@
     },
     "level": {
       "type": "object",
-      "$ref": "geographicLevel.json"
+      "$ref": "geographicLevel.json",
+      "required": true
     },
     "catchmentPopulation": {
       "type": "integer",
@@ -31,7 +33,6 @@
     "longitude": {
       "type": "number",
       "title": "longitude"
-    },
-    "required": ["code" , "level"]
+    }
   }
 }

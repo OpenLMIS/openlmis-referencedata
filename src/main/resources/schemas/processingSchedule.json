@@ -1,16 +1,18 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-03/schema",
   "title": "Processing Schedule",
   "description": "A single processingSchedule",
   "properties": {
     "id": {
       "type": "string",
-      "title": "id"
+      "title": "id",
+      "required": true
     },
     "code": {
       "type": "string",
-      "title": "code"
+      "title": "code",
+      "required": true
     },
     "description": {
       "type": "string",
@@ -22,10 +24,8 @@
     },
     "name": {
       "type": "string",
-      "title": "name"
+      "title": "name",
+      "required": true
     }
-  },
-  "required": [
-    "id", "code", "name"
-  ]
+  }
 }

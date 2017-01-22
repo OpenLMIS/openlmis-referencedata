@@ -1,16 +1,18 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-03/schema",
   "title": "Orderable Product",
   "description": "A single orderableProduct",
   "properties": {
     "id": {
       "type": "string",
-      "title": "id"
+      "title": "id",
+      "required": true
     },
     "productCode": {
       "type": "string",
-      "title": "productCode"
+      "title": "productCode",
+      "required": true
     },
     "name": {
       "type": "string",
@@ -22,11 +24,13 @@
     },
     "packRoundingThreshold": {
       "type": "integer",
-      "title": "packRoundingThreshold"
+      "title": "packRoundingThreshold",
+      "required": true
     },
     "roundToZero": {
       "type": "boolean",
-      "title": "roundToZero"
+      "title": "roundToZero",
+      "required": true
     },
     "programs": {
       "type": "array",
@@ -37,6 +41,5 @@
       },
       "uniqueItems": true
     }
-  },
-  "required": ["id", "productCode", "packRoundingThreshold", "roundToZero"]
+  }
 }

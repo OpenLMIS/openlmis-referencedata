@@ -1,12 +1,13 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-03/schema",
   "title": "Role Assignment",
   "description": "A single role assignment",
   "properties": {
     "roleId": {
       "type": "string",
-      "title": "roleId"
+      "title": "roleId",
+      "required": true
     },
     "programCode": {
       "type": "string",
@@ -20,8 +21,5 @@
       "type": "string",
       "title": "warehouseCode"
     }
-  },
-  "required": [
-    "roleId"
-  ]
+  }
 }

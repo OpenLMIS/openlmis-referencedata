@@ -1,39 +1,46 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-03/schema",
   "title": "ProgramProduct",
   "description": "A single programProduct",
   "properties": {
     "id": {
       "type": "string",
-      "title": "id"
+      "title": "id",
+      "required": true
     },
     "program": {
       "type": "object",
       "$ref": "program.json",
-      "title": "program"
+      "title": "program",
+      "required": true
     },
     "product": {
       "type": "object",
       "$ref": "orderableProduct.json",
-      "title": "product"
+      "title": "product",
+      "required": true
     },
     "dosesPerMonth": {
       "type": "integer",
-      "title": "dosesPerMonth"
+      "title": "dosesPerMonth",
+      "required": true
     },
     "active": {
       "type": "boolean",
-      "title": "active"
+      "title": "active",
+      "required": true
     },
     "productCategory": {
       "type": "object",
       "$ref": "productCategory.json",
-      "title": "productCategory"
+      "title": "productCategory",
+      "required": true
     },
     "fullSupply": {
       "type": "boolean",
-      "title": "fullSupply"
+      "title": "fullSupply",
+      "required": true
     },
     "displayOrder": {
       "type": "integer",
@@ -47,7 +54,5 @@
       "type": "number",
       "title": "pricePerPack"
     }
-  },
-  "required": ["id", "program", "product", "dosesPerMonth", "active", "productCategory",
-    "fullSupply"]
+  }
 }

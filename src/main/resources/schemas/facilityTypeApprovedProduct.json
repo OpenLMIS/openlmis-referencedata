@@ -1,26 +1,30 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-03/schema",
   "title": "FacilityTypeApprovedProduct",
   "description": "A single facilityTypeApprovedProduct",
   "properties": {
     "id": {
       "type": "string",
-      "title": "id"
+      "title": "id",
+      "required": true
     },
     "facilityType": {
       "type": "object",
       "$ref": "facilityType.json",
-      "title": "facilityType"
+      "title": "facilityType",
+      "required": true
     },
     "programProduct": {
       "type": "object",
       "$ref": "programProduct.json",
-      "title": "programProduct"
+      "title": "programProduct",
+      "required": true
     },
     "maxMonthsOfStock": {
       "type": "number",
-      "title": "maxMonthsOfStock"
+      "title": "maxMonthsOfStock",
+      "required": true
     },
     "minMonthsOfStock": {
       "type": "number",
@@ -30,6 +34,5 @@
       "type": "number",
       "title": "emergencyOrderPoint"
     }
-  },
-  "required": ["id", "facilityType", "programProduct", "maxMonthsOfStock"]
+  }
 }

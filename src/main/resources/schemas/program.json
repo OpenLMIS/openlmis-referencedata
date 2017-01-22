@@ -1,16 +1,18 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-03/schema",
   "title": "Program",
   "description": "A single program",
   "properties": {
     "id": {
       "type": "string",
-      "title": "id"
+      "title": "id",
+      "required": true
     },
     "code": {
       "type": "string",
-      "title": "code"
+      "title": "code",
+      "required": true
     },
     "name": {
       "type": "string",
@@ -26,12 +28,12 @@
     },
     "periodsSkippable": {
       "type": "boolean",
-      "title": "periodsSkippable"
+      "title": "periodsSkippable",
+      "required": true
     },
     "showNonFullSupplyTab": {
       "type": "boolean",
       "title": "showNonFullSupplyTab"
     }
-  },
-  "required": ["id", "code", "periodsSkippable"]
+  }
 }

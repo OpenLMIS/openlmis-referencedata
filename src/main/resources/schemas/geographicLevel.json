@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-03/schema",
   "title": "GeographicLevel",
   "description": "A single geographicLevel",
   "properties": {
@@ -10,7 +10,8 @@
     },
     "code": {
       "type": "string",
-      "title": "code"
+      "title": "code",
+      "required": true
     },
     "name": {
       "type": "string",
@@ -18,11 +19,8 @@
     },
     "levelNumber": {
       "type": "integer",
-      "title": "levelNumber"
+      "title": "levelNumber",
+      "required": true
     }
-  },
-  "required": [
-    "code",
-    "levelNumber"
-  ]
+  }
 }
