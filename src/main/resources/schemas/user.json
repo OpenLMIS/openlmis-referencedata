@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-03/schema",
+  "$schema": "http://json-schema.org/draft-04/schema",
   "title": "User",
   "description": "A single user",
   "properties": {
@@ -10,23 +10,19 @@
     },
     "username": {
       "type": "string",
-      "title": "username",
-      "required": true
+      "title": "username"
     },
     "firstName": {
       "type": "string",
-      "title": "firstName",
-      "required": true
+      "title": "firstName"
     },
     "lastName": {
       "type": "string",
-      "title": "lastName",
-      "required": true
+      "title": "lastName"
     },
     "email": {
       "type": "string",
-      "title": "email",
-      "required": true
+      "title": "email"
     },
     "timezone": {
       "type": "string",
@@ -39,18 +35,15 @@
     },
     "verified": {
       "type": "boolean",
-      "title": "verified",
-      "required": true
+      "title": "verified"
     },
     "active": {
       "type": "boolean",
-      "title": "active",
-      "required": true
+      "title": "active"
     },
     "loginRestricted": {
       "type": "boolean",
-      "title": "loginRestricted",
-      "required": true
+      "title": "loginRestricted"
     },
     "roleAssignments": {
       "type": "array",
@@ -65,5 +58,14 @@
       "type": "object",
       "title": "extraData"
     }
-  }
+  },
+  "required": [
+    "username",
+    "firstName",
+    "lastName",
+    "email",
+    "verified",
+    "active",
+    "loginRestricted"
+  ]
 }

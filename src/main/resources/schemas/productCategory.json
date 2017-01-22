@@ -1,23 +1,21 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-03/schema",
+  "$schema": "http://json-schema.org/draft-04/schema",
   "title": "ProductCategory",
   "description": "A single productCategory",
   "properties": {
     "code": {
       "type": "string",
-      "title": "code",
-      "required": true
+      "title": "code"
     },
     "displayName": {
       "type": "string",
-      "title": "displayName",
-      "required": true
+      "title": "displayName"
     },
     "displayOrder": {
       "type": "integer",
-      "title": "displayOrder",
-      "required": true
+      "title": "displayOrder"
     }
-  }
+  },
+  "required": ["code", "displayName", "displayOrder"]
 }

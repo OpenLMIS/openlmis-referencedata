@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-03/schema",
+  "$schema": "http://json-schema.org/draft-04/schema",
   "title": "Role",
   "description": "A single role",
   "properties": {
@@ -10,8 +10,7 @@
     },
     "name": {
       "type": "string",
-      "title": "name",
-      "required": true
+      "title": "name"
     },
     "description": {
       "type": "string",
@@ -24,8 +23,11 @@
         "type": "object",
         "$ref": "right.json"
       },
-      "uniqueItems": false,
-      "required": true
+      "uniqueItems": false
     }
-  }
+  },
+  "required": [
+    "name",
+    "rights"
+  ]
 }

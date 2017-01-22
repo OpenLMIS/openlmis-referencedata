@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-03/schema",
+  "$schema": "http://json-schema.org/draft-04/schema",
   "title": "FacilityType",
   "description": "A single facilityType",
   "properties": {
@@ -10,8 +10,7 @@
     },
     "code": {
       "type": "string",
-      "title": "code",
-      "required": true
+      "title": "code"
     },
     "name": {
       "type": "string",
@@ -29,5 +28,8 @@
       "type": "boolean",
       "title": "active"
     }
-  }
+  },
+  "required": [
+    "code"
+  ]
 }

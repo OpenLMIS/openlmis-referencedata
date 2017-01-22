@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-03/schema",
+  "$schema": "http://json-schema.org/draft-04/schema",
   "title": "ProductDto",
   "description": "A single product",
   "properties": {
@@ -10,13 +10,11 @@
     },
     "productId": {
       "type": "string",
-      "title": "productId",
-      "required": true
+      "title": "productId"
     },
     "productName": {
       "type": "string",
-      "title": "productName",
-      "required": true
+      "title": "productName"
     },
     "productCode": {
       "type": "string",
@@ -24,38 +22,31 @@
     },
     "productPackSize": {
       "type": "number",
-      "title": "productPackSize",
-      "required": true
+      "title": "productPackSize"
     },
     "productCategoryId": {
       "type": "string",
-      "title": "productCategoryId",
-      "required": true
+      "title": "productCategoryId"
     },
     "productCategoryDisplayName": {
       "type": "string",
-      "title": "productCategoryDisplayName",
-      "required": true
+      "title": "productCategoryDisplayName"
     },
     "productCategoryDisplayOrder": {
       "type": "integer",
-      "title": "productCategoryDisplayOrder",
-      "required": true
+      "title": "productCategoryDisplayOrder"
     },
     "dosesPerMonth": {
       "type": "integer",
-      "title": "dosesPerMonth",
-      "required": true
+      "title": "dosesPerMonth"
     },
     "active": {
       "type": "boolean",
-      "title": "active",
-      "required": true
+      "title": "active"
     },
     "fullSupply": {
       "type": "boolean",
-      "title": "fullSupply",
-      "required": true
+      "title": "fullSupply"
     },
     "displayOrder": {
       "type": "integer",
@@ -69,5 +60,16 @@
       "type": "number",
       "title": "pricePerPack"
     }
-  }
+  },
+  "required": [
+    "productId",
+    "productName",
+    "productPackSize",
+    "productCategoryId",
+    "productCategoryDisplayName",
+    "productCategoryDisplayOrder",
+    "dosesPerMonth",
+    "active",
+    "fullSupply"
+  ]
 }

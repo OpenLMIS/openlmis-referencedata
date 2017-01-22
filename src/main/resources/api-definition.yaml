@@ -45,7 +45,7 @@ schemas:
   - localizedErrorResponse: |
       {
           "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "LocalizedErrorResponse",
           "description": "Localized Error response",
           "properties": {
@@ -83,6 +83,12 @@ schemas:
           "type": "array",
           "items": { "type": "object", "$ref": "schemas/facilityTypeApprovedProduct.json" }
       }
+
+  - geographicLevel: !include schemas/geographicLevel.json
+
+  - geographicZone: !include schemas/geographicZone.json
+
+  - geographicZoneCollection: !include schemas/geographicZoneCollection.json
 
   - globalProduct: |
         {   "type": "object",
@@ -279,11 +285,6 @@ schemas:
           "items": { "type": "string", "required": true, "title": "id" }
       }
 
-  - geographicLevel: !include schemas/geographicLevel.json
-
-  - geographicZone: !include schemas/geographicZone.json
-
-
 traits:
     - secured:
           queryParameters:
@@ -305,37 +306,30 @@ traits:
                   type: integer
                   required: false
                   repeat: false
-          responses:
-            200:
-              body:
-                application/json:
-                  schema: |
-                    {
-                        "type": "object",
-                        "$schema": "http://json-schema.org/draft-03/schema",
-                        "title": "Collection",
-                        "description": "Paginated collection",
-                        "properties": {
-                            "content": {
-                                "type": "array",
-                                "items": { "type": "object", "$ref": "<<memberSchema>>" }
-                              },
-                              "totalPages": { "type": "integer", "title": "totalPages" },
-                              "totalElements": { "type": "integer", "title": "totalElements" },
-                              "size": { "type": "integer", "title": "size" },
-                              "number": { "type": "integer", "title": "number" },
-                              "numberOfElements": { "type": "integer", "title": "numberOfElements" },
-                              "last": { "type": "boolean", "title": "last" },
-                              "first": { "type": "boolean", "title": "first" },
-                              "sort?": {
-                                "title": "sort",
-                                  "type": "array",
-                                  "items": { "type": "object" }
-                                }
-                        }
-                    }
 
 resourceTypes:
+    - collection:
+        get:
+            is: [ secured ]
+            responses:
+                200:
+                  description: Collection retrieved successfully
+                  body:
+                      application/json:
+                          schema: <<schema>>
+                404:
+                  description: Collection is empty.
+        post:
+            is: [ secured ]
+            body:
+                application/json:
+                    schema: <<schema>>
+            responses:
+                201:
+                  description: Item created successfully
+                  body:
+                      application/json:
+                          schema: <<schema>>
     - member:
         get:
             is: [ secured ]
@@ -1483,13 +1477,17 @@ resourceTypes:
   /geographicZones:
       displayName: Geographic Zone
       get:
-          is: [ secured, paginated: {memberSchema: "schemas/geographicZone.json"} ]
+          is: [ secured, paginated ]
           description: Get all geographicZones.
           responses:
-            "403":
-                body:
-                  application/json:
-                    schema: localizedErrorResponse
+              "200":
+                  body:
+                    application/json:
+                      schema: geographicZoneCollection
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new geographicZone.

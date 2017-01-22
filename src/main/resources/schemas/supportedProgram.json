@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-03/schema",
+  "$schema": "http://json-schema.org/draft-04/schema",
   "title": "Supported Program",
   "description": "A supported program",
   "properties": {
@@ -10,8 +10,7 @@
     },
     "code": {
       "type": "string",
-      "title": "code",
-      "required": true
+      "title": "code"
     },
     "name": {
       "type": "string",
@@ -23,27 +22,30 @@
     },
     "programActive": {
       "type": "boolean",
-      "title": "programActive",
-      "required": true
+      "title": "programActive"
     },
     "periodsSkippable": {
       "type": "boolean",
-      "title": "periodsSkippable",
-      "required": true
+      "title": "periodsSkippable"
     },
     "showNonFullSupplyTab": {
       "type": "boolean",
-      "title": "showNonFullSupplyTab",
-      "required": true
+      "title": "showNonFullSupplyTab"
     },
     "supportActive": {
       "type": "boolean",
-      "title": "supportActive",
-      "required": true
+      "title": "supportActive"
     },
     "supportStartDate": {
       "type": "string",
       "title": "supportStartDate"
     }
-  }
+  },
+  "required": [
+    "code",
+    "programActive",
+    "periodsSkippable",
+    "showNonFullSupplyTab",
+    "supportActive"
+  ]
 }

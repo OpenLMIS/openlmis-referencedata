@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-03/schema",
+  "$schema": "http://json-schema.org/draft-04/schema",
   "title": "Facility",
   "description": "A single facility",
   "properties": {
@@ -10,8 +10,7 @@
     },
     "code": {
       "type": "string",
-      "title": "code",
-      "required": true
+      "title": "code"
     },
     "name": {
       "type": "string",
@@ -23,13 +22,11 @@
     },
     "geographicZone": {
       "type": "object",
-      "$ref": "geographicZone.json",
-      "required": true
+      "$ref": "geographicZone.json"
     },
     "type": {
       "type": "object",
-      "$ref": "facilityType.json",
-      "required": true
+      "$ref": "facilityType.json"
     },
     "operator": {
       "type": "object",
@@ -37,8 +34,7 @@
     },
     "active": {
       "type": "boolean",
-      "title": "active",
-      "required": true
+      "title": "active"
     },
     "goLiveDate": {
       "type": "string",
@@ -54,8 +50,7 @@
     },
     "enabled": {
       "type": "boolean",
-      "title": "enabled",
-      "required": true
+      "title": "enabled"
     },
     "openLmisAccessible": {
       "type": "boolean",
@@ -70,5 +65,12 @@
       },
       "uniqueItems": false
     }
-  }
+  },
+  "required": [
+    "code",
+    "geographicZone",
+    "type",
+    "active",
+    "enabled"
+  ]
 }

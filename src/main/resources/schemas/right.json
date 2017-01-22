@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "$schema": "http://json-schema.org/draft-03/schema",
+  "$schema": "http://json-schema.org/draft-04/schema",
   "title": "Right",
   "description": "A single right",
   "properties": {
@@ -10,8 +10,7 @@
     },
     "name": {
       "type": "string",
-      "title": "name",
-      "required": true
+      "title": "name"
     },
     "type": {
       "enum": [
@@ -20,8 +19,7 @@
         "GENERAL_ADMIN",
         "REPORTS"
       ],
-      "title": "type",
-      "required": true
+      "title": "type"
     },
     "description": {
       "type": "string",
@@ -36,5 +34,9 @@
       },
       "uniqueItems": false
     }
-  }
+  },
+  "required": [
+    "name",
+    "type"
+  ]
 }
