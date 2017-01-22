@@ -1485,6 +1485,7 @@ resourceTypes:
       get:
           is: [ secured, paginated: {memberSchema: "schemas/geographicZone.json"} ]
           description: Get all geographicZones.
+          responses:
             "403":
                 body:
                   application/json:
