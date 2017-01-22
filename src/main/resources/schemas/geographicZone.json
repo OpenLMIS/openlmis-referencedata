@@ -31,10 +31,7 @@
     "longitude": {
       "type": "number",
       "title": "longitude"
-    }
-  },
-  "required": [
-    "code",
-    "level"
-  ]
+    },
+    "required": ["code" , "level"]
+  }
 }

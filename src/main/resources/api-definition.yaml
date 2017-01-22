@@ -12,7 +12,7 @@ schemas:
   - booleanResult: |
       {
           "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "BooleanResult",
           "description": "Boolean result",
           "properties": {
@@ -23,7 +23,7 @@ schemas:
   - integerResult: |
       {
           "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "IntegerResult",
           "description": "Integer result",
           "properties": {
@@ -33,7 +33,7 @@ schemas:
 
   - errorResponse: |
       {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "ErrorResponse",
           "description": "Error response",
           "properties": {
@@ -84,15 +84,9 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/facilityTypeApprovedProduct.json" }
       }
 
-  - geographicLevel: !include schemas/geographicLevel.json
-
-  - geographicZone: !include schemas/geographicZone.json
-
-  - geographicZoneCollection: !include schemas/geographicZoneCollection.json
-
   - globalProduct: |
         {   "type": "object",
-            "$schema": "http://json-schema.org/draft-03/schema",
+            "$schema": "http://json-schema.org/draft-04/schema",
             "title": "Global Product",
             "description": "A single globalProduct",
             "properties": {
@@ -117,7 +111,7 @@ schemas:
 
   - processingPeriod: |
       {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "Processing Period",
           "description": "A single processingPeriod",
           "properties": {
@@ -175,7 +169,7 @@ schemas:
 
   - tradeItem: |
         {   "type": "object",
-            "$schema": "http://json-schema.org/draft-03/schema",
+            "$schema": "http://json-schema.org/draft-04/schema",
             "title": "Trade Item",
             "description": "A single tradeItem",
             "properties": {
@@ -217,7 +211,7 @@ schemas:
 
   - supplyLine: |
       {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "SupplyLine",
           "description": "A single supplyLine",
           "properties": {
@@ -232,7 +226,7 @@ schemas:
 
   - requisitionGroup: |
       {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "RequisitionGroup",
           "description": "A single requisitionGroup",
           "properties": {
@@ -248,7 +242,7 @@ schemas:
 
   - requisitionGroupProgramSchedule: |
       {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "RequisitionGroupProgramSchedule",
           "description": "A single requisitionGroupProgramSchedule",
           "properties": {
@@ -262,7 +256,7 @@ schemas:
 
   - stockAdjustmentReason: |
       {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
+          "$schema": "http://json-schema.org/draft-04/schema",
           "title": "Stock Adjustment Reason",
           "description": "A single stockAdjustmentReason",
           "properties": {
@@ -285,6 +279,11 @@ schemas:
           "items": { "type": "string", "required": true, "title": "id" }
       }
 
+  - geographicLevel: !include schemas/geographicLevel.json
+
+  - geographicZone: !include schemas/geographicZone.json
+
+
 traits:
     - secured:
           queryParameters:
@@ -306,30 +305,37 @@ traits:
                   type: integer
                   required: false
                   repeat: false
+          responses:
+            200:
+              body:
+                application/json:
+                  schema: |
+                    {
+                        "type": "object",
+                        "$schema": "http://json-schema.org/draft-04/schema",
+                        "title": "Collection",
+                        "description": "Paginated collection",
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": { "type": "object", "$ref": "<<memberSchema>>" }
+                              },
+                              "totalPages": { "type": "integer", "title": "totalPages" },
+                              "totalElements": { "type": "integer", "title": "totalElements" },
+                              "size": { "type": "integer", "title": "size" },
+                              "number": { "type": "integer", "title": "number" },
+                              "numberOfElements": { "type": "integer", "title": "numberOfElements" },
+                              "last": { "type": "boolean", "title": "last" },
+                              "first": { "type": "boolean", "title": "first" },
+                              "sort?": {
+                                "title": "sort",
+                                  "type": "array",
+                                  "items": { "type": "object" }
+                                }
+                        }
+                    }
 
 resourceTypes:
-    - collection:
-        get:
-            is: [ secured ]
-            responses:
-                200:
-                  description: Collection retrieved successfully
-                  body:
-                      application/json:
-                          schema: <<schema>>
-                404:
-                  description: Collection is empty.
-        post:
-            is: [ secured ]
-            body:
-                application/json:
-                    schema: <<schema>>
-            responses:
-                201:
-                  description: Item created successfully
-                  body:
-                      application/json:
-                          schema: <<schema>>
     - member:
         get:
             is: [ secured ]
@@ -1477,17 +1483,12 @@ resourceTypes:
   /geographicZones:
       displayName: Geographic Zone
       get:
-          is: [ secured, paginated ]
+          is: [ secured, paginated: {memberSchema: "schemas/geographicZone.json"} ]
           description: Get all geographicZones.
-          responses:
-              "200":
-                  body:
-                    application/json:
-                      schema: geographicZoneCollection
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
+            "403":
+                body:
+                  application/json:
+                    schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new geographicZone.
