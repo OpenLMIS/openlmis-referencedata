@@ -50,13 +50,13 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'org.openlmis:openlmis-service-util:3.0.0-SNAPSHOT'
 
-    testCompile 'io.rest-assured:rest-assured:3.0.0'
-    testCompile 'io.rest-assured:json-schema-validator:3.0.0'
+    testCompile 'io.rest-assured:rest-assured:3.0.2'
+    testCompile 'io.rest-assured:json-schema-validator:3.0.1'
     testCompile 'io.rest-assured:spring-mock-mvc:3.0.0'
     testCompile "com.jayway.restassured:rest-assured:2.7.0"
 
     testCompile "org.springframework.boot:spring-boot-starter-test"
-    testCompile "guru.nidi.raml:raml-tester:0.8.9"
+    testCompile "guru.nidi.raml:raml-tester:0.8.13"
     testCompile "junit:junit"
     testCompile "org.mockito:mockito-core:1.+"
     testCompile "org.powermock:powermock-api-mockito:1.6.5"

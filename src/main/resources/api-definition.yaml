@@ -16,8 +16,9 @@ schemas:
           "title": "BooleanResult",
           "description": "Boolean result",
           "properties": {
-              "result": { "type": "boolean", "required": true, "title": "result" }
-          }
+              "result": { "type": "boolean", "title": "result" }
+          },
+          "required": ["result"]
       }
 
   - integerResult: |
@@ -27,8 +28,9 @@ schemas:
           "title": "IntegerResult",
           "description": "Integer result",
           "properties": {
-              "result": { "type": "number", "required": true, "title": "result" }
-          }
+              "result": { "type": "number", "title": "result" }
+          },
+          "required": ["result"]
       }
 
   - errorResponse: |
@@ -37,9 +39,10 @@ schemas:
           "title": "ErrorResponse",
           "description": "Error response",
           "properties": {
-              "message": { "type": "string", "required": true, "title": "message" },
-              "description": { "type": "string", "required": false, "title": "description" }
-          }
+              "message": { "type": "string", "title": "message" },
+              "description": { "type": "string", "title": "description" }
+          },
+          "required": ["message"]
       }
 
   - localizedErrorResponse: |
@@ -90,14 +93,15 @@ schemas:
             "title": "Global Product",
             "description": "A single globalProduct",
             "properties": {
-                "id": { "type": "string", "required": false, "title": "id" },
-                "productCode": { "type": "string", "required": true, "title": "productCode" },
-                "name": { "type": "string", "required": true, "title": "name" },
-                "description": { "type": "string", "required": true, "title": "description" },
-                "packSize": { "type": "integer", "required": true, "title": "packSize" },
-                "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
-                "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" }
-            }
+                "id": { "type": "string", "title": "id" },
+                "productCode": { "type": "string", "title": "productCode" },
+                "name": { "type": "string", "title": "name" },
+                "description": { "type": "string", "title": "description" },
+                "packSize": { "type": "integer", "title": "packSize" },
+                "packRoundingThreshold": { "type": "integer", "title": "packRoundingThreshold" },
+                "roundToZero": { "type": "boolean", "title": "roundToZero" }
+            },
+            "required": ["productCode", "name", "description", "packSize", "packRoundingThreshold", "roundToZero"]
         }
 
   - orderableProduct: !include schemas/orderableProduct.json
@@ -115,14 +119,15 @@ schemas:
           "title": "Processing Period",
           "description": "A single processingPeriod",
           "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "processingSchedule": { "type": "object", "$ref": "#/schemas/processingSchedule", "required": true, "title": "processingSchedule" },
-              "name": { "type": "string", "required": true, "title": "name" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "startDate": { "type": "string", "required": true, "title": "startDate" },
-              "endDate": { "type": "string", "required": true, "title": "endDate" },
-              "durationInMonths": { "type": "integer", "required": false, "title": "durationInMonths" }
-          }
+              "id": { "type": "string", "title": "id" },
+              "processingSchedule": { "type": "object", "$ref": "#/schemas/processingSchedule", "title": "processingSchedule" },
+              "name": { "type": "string", "title": "name" },
+              "description": { "type": "string", "title": "description" },
+              "startDate": { "type": "string", "title": "startDate" },
+              "endDate": { "type": "string", "title": "endDate" },
+              "durationInMonths": { "type": "integer", "title": "durationInMonths" }
+          },
+          "required": ["id", "processingSchedule", "name", "startDate", "endDate"]
       }
 
   - productCategory: !include schemas/productCategory.json
@@ -173,14 +178,15 @@ schemas:
             "title": "Trade Item",
             "description": "A single tradeItem",
             "properties": {
-                "id": { "type": "string", "required": false, "title": "id" },
-                "productCode": { "type": "string", "required": true, "title": "productCode" },
-                "name": { "type": "string", "required": false, "title": "name" },
-                "packSize": { "type": "integer", "required": false, "title": "packSize" },
-                "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
-                "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
-                "manufacturer": { "type": "string", "required": false, "title": "manufacturer" }
-            }
+                "id": { "type": "string", "title": "id" },
+                "productCode": { "type": "string", "title": "productCode" },
+                "name": { "type": "string", "title": "name" },
+                "packSize": { "type": "integer", "title": "packSize" },
+                "packRoundingThreshold": { "type": "integer", "title": "packRoundingThreshold" },
+                "roundToZero": { "type": "boolean", "title": "roundToZero" },
+                "manufacturer": { "type": "string", "title": "manufacturer" }
+            },
+            "required": ["productCode", "packRoundingThreshold", "roundToZero"]
         }
 
   - user: !include schemas/user.json
@@ -215,12 +221,13 @@ schemas:
           "title": "SupplyLine",
           "description": "A single supplyLine",
           "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNodeDto", "required": true },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "program": { "type": "object", "$ref": "#/schemas/program", "required": true },
-              "supplyingFacility": { "type": "object", "$ref": "#/schemas/facility", "required": true }
-          }
+              "id": { "type": "string", "title": "id" },
+              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNodeDto" },
+              "description": { "type": "string", "title": "description" },
+              "program": { "type": "object", "$ref": "#/schemas/program" },
+              "supplyingFacility": { "type": "object", "$ref": "#/schemas/facility" }
+          },
+          "required": ["id", "supervisoryNode", "program", "supplyingFacility"]
       }
 
 
@@ -230,14 +237,15 @@ schemas:
           "title": "RequisitionGroup",
           "description": "A single requisitionGroup",
           "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "unique": true, "title": "code" },
-              "name": { "type": "string", "required": true, "title": "name" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNodeDto", "required": true },
-              "requisitionGroupProgramScheules": { "type": "array", "required": false, "title": "requisitionGroupProgramSchedules", "items": { "type": "object", "$ref": "#/schemas/requisitionGroupProgramSchedule" }, "uniqueItems": false },
-              "memberFacilities": { "type": "array", "required": false, "title": "memberFacilities", "items": { "type": "object", "$ref": "#/schemas/facility" }, "uniqueItems": false }
-          }
+              "id": { "type": "string", "title": "id" },
+              "code": { "type": "string", "unique": true, "title": "code" },
+              "name": { "type": "string", "title": "name" },
+              "description": { "type": "string", "title": "description" },
+              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNodeDto" },
+              "requisitionGroupProgramScheules": { "type": "array", "title": "requisitionGroupProgramSchedules", "items": { "type": "object", "$ref": "#/schemas/requisitionGroupProgramSchedule" }, "uniqueItems": false },
+              "memberFacilities": { "type": "array", "title": "memberFacilities", "items": { "type": "object", "$ref": "#/schemas/facility" }, "uniqueItems": false }
+          },
+          "required": ["id", "code", "name", "supervisoryNode"]
       }
 
   - requisitionGroupProgramSchedule: |
@@ -246,12 +254,13 @@ schemas:
           "title": "RequisitionGroupProgramSchedule",
           "description": "A single requisitionGroupProgramSchedule",
           "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "program": { "type": "object", "$ref": "#/schemas/program", "required": true },
-              "processingSchedule": { "type": "object", "$ref": "#/schemas/processingSchedule", "required": true },
-              "directDelivery": { "type": "boolean", "required": true, "title": "directDelivery" },
-              "dropOffFacility": { "type": "object", "$ref": "#/schemas/facility", "required": false }
-          }
+              "id": { "type": "string", "title": "id" },
+              "program": { "type": "object", "$ref": "#/schemas/program" },
+              "processingSchedule": { "type": "object", "$ref": "#/schemas/processingSchedule" },
+              "directDelivery": { "type": "boolean", "title": "directDelivery" },
+              "dropOffFacility": { "type": "object", "$ref": "#/schemas/facility" }
+          },
+          "required": ["id", "program", "processingSchedule", "directDelivery"]
       }
 
   - stockAdjustmentReason: |
@@ -260,11 +269,12 @@ schemas:
           "title": "Stock Adjustment Reason",
           "description": "A single stockAdjustmentReason",
           "properties": {
-              "name": { "type": "string", "required": true, "title": "name" },
-              "description": { "type": "string", "required": true, "title": "description" },
-              "additive": { "type": "boolean", "required": false, "title": "additive" },
-              "displayOrder": { "type": "integer", "required": false, "title": "displayOrder" }
-          }
+              "name": { "type": "string", "title": "name" },
+              "description": { "type": "string", "title": "description" },
+              "additive": { "type": "boolean",  "title": "additive" },
+              "displayOrder": { "type": "integer",  "title": "displayOrder" }
+          },
+          "required": ["name", "description"]
       }
 
   - stockAdjustmentReasonArray: |
@@ -276,7 +286,7 @@ schemas:
   - uuidArray: |
       {
           "type": "array",
-          "items": { "type": "string", "required": true, "title": "id" }
+          "items": { "type": "string", "title": "id" }
       }
 
   - geographicLevel: !include schemas/geographicLevel.json
