@@ -340,7 +340,35 @@ resourceTypes:
                 body:
                   application/json:
                     schema: auditLogEntryArray
+                    example: |
+                      [
+                        {
+                          "changeType": "ValueChange",
+                          "globalId": {
+                            "entity": "org.openlmis.SomeClass",
+                            "cdoId": 1
+                          },
+                          "commitMetadata": {
+                            "author": "SomeUserName",
+                            "properties": [],
+                            "commitDate": "2016-12-17T19:39:57.621",
+                            "id": 3
+                          },
+                          "property": "PropertyName",
+                          "left": "OldValue",
+                          "right": "NewValue"
+                        }
+                      ]
+              403:
+                body:
+                  application/json:
+                    schema: localizedErrorResponse
               404:
+                description: Collection is empty.
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+
     - instanceAuditLog:
         description: This represents the audit log for a specified instance of the <<resourcePathName|!singularize>> resource.
         type: auditLog

@@ -59,6 +59,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM_ID = "programId";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
       RESOURCE_URL + "/search";
@@ -396,7 +397,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void deleteShouldReturnForbiddenForUnauthorizedToken() {
-
     doThrow(new UnauthorizedException(
         new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
         .when(rightService)
@@ -413,6 +413,27 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
+
+
+  @Test
+  public void getFacilityAuditLogShouldReturnNotFoundIfFacilityDoesNotExist() {
+    doNothing()
+            .when(rightService)
+            .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
 
   @Test
   public void deleteShouldReturnNotFoundForNonExistingFacility() {
@@ -433,7 +454,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-  
+
   @Test
   public void postShouldCreateFacility() {
 

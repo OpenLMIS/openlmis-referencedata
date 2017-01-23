@@ -35,7 +35,10 @@
             },
           "properties": {
               "description": "Optional metadata manually associated with the audit log's entry",
-              "type": "array"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
           "commitDate": {
               "description": "When the commit was made",

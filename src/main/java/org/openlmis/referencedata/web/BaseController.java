@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api")
@@ -53,17 +54,23 @@ public abstract class BaseController {
 
 
   /**
-   * Return a list of changes via JSON.
+   * Return a list of audited changes via JSON.
    * @param type The type of class for which we wish to retrieve historical changes.
    */
-  protected String getChangesByClass(Class type) {
-    return getChangesByClass(type, 0, DEFAULT_AUDIT_RESULT_LIMIT, null, null);
+  protected String getAuditedChanges(Class type) {
+    return getAuditedChanges(type, null, 0, DEFAULT_AUDIT_RESULT_LIMIT, null, null);
+  }
+
+  protected String getAuditedChanges(Class type, UUID id) {
+    return getAuditedChanges(type, id, 0, DEFAULT_AUDIT_RESULT_LIMIT, null, null);
   }
 
   /**
    * Return a list of changes via JSON.
    *
-   * @param type The type of class for which we wish to retrieve historical changes
+   * @param type The type of class for which we wish to retrieve historical changes.
+   * @param id The ID of class for which we wish to retrieve historical changes.
+   *           If null, entries are returned regardless of their ID.
    * @param skip The number of historical changes to skip. Useful for paging.
    * @param limit The maximum number of historical change results to return. Useful for paging.
    * @param author The author of the changes which should be returned.
@@ -71,9 +78,9 @@ public abstract class BaseController {
    * @param changedPropertyName The name of the property about which changes should be returned.
    *               If null or empty, changes associated with any and all properties are returned.
    */
-  protected String getChangesByClass(Class type, int skip, int limit,
+  protected String getAuditedChanges(Class type, UUID id, int skip, int limit,
                                      String author, String changedPropertyName) {
-    List<Change> changes = getChangesByType(type, skip, limit, author, changedPropertyName);
+    List<Change> changes = getChangesByType(type, id, skip, limit, author, changedPropertyName);
     JsonConverter jsonConverter = javers.getJsonConverter();
     return jsonConverter.toJson(changes);
   }
@@ -83,29 +90,48 @@ public abstract class BaseController {
    * Return a list of changes as a log (in other words, as a series of line entries).
    * @param type The type of class for which we wish to retrieve historical changes.
    */
-  protected String getChangeLogByClass(Class type) {
-    return getChangeLogByClass(type, 0, DEFAULT_AUDIT_RESULT_LIMIT, null, null);
+  protected String getAuditedChangeLog(Class type) {
+    return getAuditedChangeLog(type, null, 0, DEFAULT_AUDIT_RESULT_LIMIT, null, null);
+  }
+
+  /**
+   * Return a list of changes as a log (in other words, as a series of line entries).
+   * @param type The type of class for which we wish to retrieve historical changes.
+   * @param id The ID of class for which we wish to retrieve historical changes.
+   *           If null, entries are returned regardless of their ID.
+   */
+  protected String getAuditedChangeLog(Class type, UUID id) {
+    return getAuditedChangeLog(type, id, 0, DEFAULT_AUDIT_RESULT_LIMIT, null, null);
   }
 
   /**
    * Return a list of changes as a log (in other words, as a series of line entries).
    * The available parameters and their means are the same as for the getChangesByClass() method.
    */
-  protected String getChangeLogByClass(Class type, int skip, int limit,
+  protected String getAuditedChangeLog(Class type, UUID id, int skip, int limit,
                                        String author, String changedPropertyName) {
-    List<Change> changes = getChangesByType(type, skip, limit, author, changedPropertyName);
+    List<Change> changes = getChangesByType(type, id, skip, limit, author, changedPropertyName);
     return javers.processChangeList(changes, new SimpleTextChangeLog());
   }
 
 
   /*
-    Return JaVers changes for the specified class type.
+    Return JaVers changes for the specified type, optionally filtered by id, author, and property.
   */
-  private List<Change> getChangesByType(Class type, int skip, int limit,
+  private List<Change> getChangesByType(Class type, UUID id, int skip, int limit,
                                         String author, String changedPropertyName) {
-    QueryBuilder queryBuilder = QueryBuilder.byClass(type)
-                                            .withNewObjectChanges(true)
-                                            .skip(skip).limit(limit);
+
+    QueryBuilder queryBuilder;
+
+    if (id != null) {
+      queryBuilder = QueryBuilder.byInstanceId(id, type);
+    } else {
+      queryBuilder = QueryBuilder.byClass(type);
+    }
+
+    queryBuilder = queryBuilder.withNewObjectChanges(true).skip(skip).limit(limit);
+
+
     if (author != null && !author.isEmpty()) {
       queryBuilder = queryBuilder.byAuthor(author);
     }

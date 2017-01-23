@@ -168,19 +168,30 @@ public class FacilityController extends BaseController {
    */
   @RequestMapping(value = "/facilities/{id}/auditLog", method = RequestMethod.GET)
   public ResponseEntity<?> getFacilitiesAuditLog(
-          @PathVariable("id") UUID facilityId,
+          @PathVariable("id") UUID id,
           @RequestParam(name = "skip", required = false, defaultValue = "0") int skip,
           @RequestParam(name = "limit", required = false, defaultValue = "100") int limit,
           @RequestParam(name = "author", required = false, defaultValue = "") String author,
           @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-                        String changedPropertyName) {
+                        String changedPropertyName,
+          @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+                        boolean returnJson) {
+
     //Return a 404 if the specified facility can't be found
-    ResponseEntity responseEntity = getFacility(facilityId);
+    ResponseEntity responseEntity = getFacility(id);
     if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {
       return responseEntity;
     }
 
-    String auditData = getChangesByClass(Facility.class, skip, limit, author, changedPropertyName);
+    //Retrieve audit related info in either JSON or raw-text format.
+    //The later is significantly more human readable.
+    String auditData = "";
+    if (returnJson) {
+      auditData = getAuditedChanges(Facility.class, id, skip, limit, author, changedPropertyName);
+    } else {
+      auditData = getAuditedChangeLog(Facility.class, id, skip, limit, author, changedPropertyName);
+    }
+
     return ResponseEntity.status(HttpStatus.OK).body(auditData);
   }
 
