@@ -2,11 +2,11 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import org.openlmis.util.View;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.openlmis.util.View;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -194,13 +193,24 @@ public class User extends BaseEntity {
   /**
    * Get facilities that user has fulfillment rights for.
    *
+   * @param right the right to check for
    * @return set of facilities
    */
-  public Set<Facility> getFulfillmentFacilities() {
-    return roleAssignments.stream()
-        .filter(assignment -> assignment instanceof FulfillmentRoleAssignment)
-        .map(assignment -> ((FulfillmentRoleAssignment) assignment).getWarehouse())
-        .collect(Collectors.toSet());
+  public Set<Facility> getFulfillmentFacilities(Right right) {
+    Set<Facility> fulfillmentFacilities = new HashSet<>();
+
+    for (RoleAssignment roleAssignment : roleAssignments) {
+      if (roleAssignment instanceof FulfillmentRoleAssignment) {
+        Facility warehouse = ((FulfillmentRoleAssignment) roleAssignment).getWarehouse();
+
+        RightQuery rightQuery = new RightQuery(right, warehouse);
+        if (roleAssignment.hasRight(rightQuery)) {
+          fulfillmentFacilities.add(warehouse);
+        }
+      }
+    }
+
+    return fulfillmentFacilities;
   }
 
   /**

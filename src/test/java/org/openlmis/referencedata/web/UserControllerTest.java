@@ -88,6 +88,7 @@ public class UserControllerTest {
   private Set<User> users;
   private UUID userId;
   private UUID roleId;
+  private UUID rightId;
   private Role adminRole1;
   private String supervisionRight1Name;
   private Right supervisionRight1;
@@ -586,9 +587,10 @@ public class UserControllerTest {
     user1.assignRoles(assignment1);
     user1.assignRoles(assignment2);
     when(repository.findOne(userId)).thenReturn(user1);
+    when(rightRepository.findOne(rightId)).thenReturn(fulfillmentRight1);
 
     //when
-    ResponseEntity responseEntity = controller.getUserFulfillmentFacilities(userId);
+    ResponseEntity responseEntity = controller.getUserFulfillmentFacilities(userId, rightId);
     Set<Facility> facilities = (Set<Facility>) responseEntity.getBody();
 
     //then

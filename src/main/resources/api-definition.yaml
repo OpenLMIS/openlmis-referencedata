@@ -975,6 +975,13 @@ resourceTypes:
               get:
                   is: [ secured ]
                   description: Get all facilities the associated user can fulfill.
+                  queryParameters:
+                      rightId:
+                          displayName: Right ID
+                          description: The right to check.
+                          type: string
+                          required: true
+                          repeat: false
                   responses:
                       "200":
                           body:
@@ -983,7 +990,7 @@ resourceTypes:
                       "400":
                           body:
                             application/json:
-                              schema: errorResponse
+                              schema: localizedErrorResponse
                       "404":
       /search:
               post:

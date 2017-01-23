@@ -1,15 +1,17 @@
 package org.openlmis.referencedata.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupportedProgram;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.Set;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.Importer {
 
   @Getter

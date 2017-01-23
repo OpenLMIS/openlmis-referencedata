@@ -19,6 +19,7 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
+import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -58,6 +59,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.NoArgsConstructor;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +70,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.validation.Valid;
-
-import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
@@ -347,7 +349,7 @@ public class UserController extends BaseController {
    * @return set of supervised facilities
    */
   @RequestMapping(value = "/users/{userId}/supervisedFacilities", method = RequestMethod.GET)
-  public ResponseEntity<Set<Facility>> getUserSupervisedFacilities(
+  public ResponseEntity<Set<FacilityDto>> getUserSupervisedFacilities(
       @PathVariable(USER_ID) UUID userId,
       @RequestParam(value = "rightId") UUID rightId,
       @RequestParam(value = "programId") UUID programId) {
@@ -366,7 +368,7 @@ public class UserController extends BaseController {
     Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
     return ResponseEntity
         .ok()
-        .body(supervisedFacilities);
+        .body(facilitiesToDto(supervisedFacilities));
   }
 
   /**
@@ -376,15 +378,20 @@ public class UserController extends BaseController {
    * @return set of fulfillment facilities
    */
   @RequestMapping(value = "/users/{userId}/fulfillmentFacilities", method = RequestMethod.GET)
-  public ResponseEntity<Set<Facility>> getUserFulfillmentFacilities(
-      @PathVariable(USER_ID) UUID userId) {
+  public ResponseEntity<Set<FacilityDto>> getUserFulfillmentFacilities(
+      @PathVariable(USER_ID) UUID userId,
+      @RequestParam(value = "rightId") UUID rightId) {
 
     User user = validateUser(userId);
-    Set<Facility> facilities = user.getFulfillmentFacilities();
+    Right right = (Right) validateId(rightId, rightRepository).orElseThrow( () ->
+        new ValidationMessageException(
+            new Message(RightMessageKeys.ERROR_NOT_FOUND_WITH_ID, rightId)));
+
+    Set<Facility> facilities = user.getFulfillmentFacilities(right);
 
     return ResponseEntity
         .ok()
-        .body(facilities);
+        .body(facilitiesToDto(facilities));
   }
 
   /**
@@ -527,5 +534,16 @@ public class UserController extends BaseController {
 
   private List<UserDto> exportUsersToDtos(List<User> users) {
     return users.stream().map(this::exportUserToDto).collect(toList());
+  }
+
+  private Set<FacilityDto> facilitiesToDto(Collection<Facility> facilities) {
+    Set<FacilityDto> dtos = new HashSet<>();
+    for (Facility facility : facilities) {
+      FacilityDto dto = new FacilityDto();
+      facility.export(dto);
+      dtos.add(dto);
+    }
+
+    return dtos;
   }
 }

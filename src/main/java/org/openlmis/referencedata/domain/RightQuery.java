@@ -1,5 +1,10 @@
 package org.openlmis.referencedata.domain;
 
+import lombok.Getter;
+
+import java.util.Objects;
+
+@Getter
 public class RightQuery {
 
   private Right right;
@@ -42,19 +47,23 @@ public class RightQuery {
     this.warehouse = warehouse;
   }
 
-  public Right getRight() {
-    return right;
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (other == null || getClass() != other.getClass()) {
+      return false;
+    }
+    RightQuery that = (RightQuery) other;
+    return Objects.equals(right, that.right)
+        && Objects.equals(program, that.program)
+        && Objects.equals(facility, that.facility)
+        && Objects.equals(warehouse, that.warehouse);
   }
 
-  public Program getProgram() {
-    return program;
-  }
-
-  public Facility getFacility() {
-    return facility;
-  }
-
-  public Facility getWarehouse() {
-    return warehouse;
+  @Override
+  public int hashCode() {
+    return Objects.hash(right, program, facility, warehouse);
   }
 }

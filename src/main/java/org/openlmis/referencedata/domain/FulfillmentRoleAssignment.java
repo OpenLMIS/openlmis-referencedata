@@ -2,12 +2,14 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Collections.singleton;
 
+import org.openlmis.referencedata.exception.ValidationMessageException;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 
 import java.util.Objects;
 import java.util.Set;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

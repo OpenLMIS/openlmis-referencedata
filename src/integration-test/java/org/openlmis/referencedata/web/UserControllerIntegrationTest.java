@@ -10,11 +10,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -57,6 +58,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,10 +78,12 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
   private static final String PROGRAMS_URL = ID_URL + "/programs";
   private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
+  private static final String FULFILLMENT_FACILITIES_URL = ID_URL + "/fulfillmentFacilities";
   private static final String RESET_PASSWORD_URL = RESOURCE_URL + "/passwordReset";
   private static final String CHANGE_PASSWORD_URL = RESOURCE_URL + "/changePassword";
   private static final String USERNAME = "username";
   private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
+  private static final String FULFILLMENT_RIGHT_NAME = "fulfillmentRight";
   private static final String PROGRAM1_CODE = "P1";
   private static final String PROGRAM2_CODE = "P2";
   private static final String SUPERVISORY_NODE_CODE = "SN1";
@@ -133,6 +138,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID adminRoleId;
   private Right supervisionRight;
   private UUID supervisionRightId;
+  private Right fulfillmentRight;
+  private UUID fulfillmentRightId;
   private Role supervisionRole;
   private UUID supervisionRoleId;
   private Program program1;
@@ -411,6 +418,44 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .pathParam("id", userId)
         .when()
         .get(SUPERVISED_FACILITIES_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserFulfillmentFacilities() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(fulfillmentRightId)).willReturn(fulfillmentRight);
+
+    Facility[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, fulfillmentRightId)
+        .pathParam("id", userId)
+        .when()
+        .get(FULFILLMENT_FACILITIES_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    assertThat(response.length, is(1));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenGettingFulfillmentFacilitiesWithIncorrectRight() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(fulfillmentRightId)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, fulfillmentRightId)
+        .pathParam("id", userId)
+        .when()
+        .get(FULFILLMENT_FACILITIES_URL)
         .then()
         .statusCode(400);
 
@@ -791,7 +836,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         Collections.singletonList(supervisionGroupProgramSchedule));
     supervisoryNode.setRequisitionGroup(supervisionGroup);
 
-    Right fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
+    fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
+    fulfillmentRightId = UUID.randomUUID();
     fulfillmentRole = Role.newRole("fulfillmentRole", fulfillmentRight);
     fulfillmentRoleId = UUID.randomUUID();
     fulfillmentRole.setId(fulfillmentRoleId);
