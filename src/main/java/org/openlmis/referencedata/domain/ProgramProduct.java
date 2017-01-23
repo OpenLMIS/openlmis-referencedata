@@ -1,10 +1,14 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +19,6 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -57,8 +57,8 @@ public class ProgramProduct extends BaseEntity {
 
   @Getter
   @Setter
-  @Embedded
-  @AttributeOverrides({@AttributeOverride(name = "value", column = @Column(name = "pricePerPack"))})
+  @Type(type = "org.jadira.usertype.moneyandcurrency.joda.PersistentMoneyAmount",
+      parameters = {@Parameter(name = "currencyCode", value = "USD")})
   private Money pricePerPack;
 
   private ProgramProduct(Program program,
@@ -72,7 +72,7 @@ public class ProgramProduct extends BaseEntity {
     this.fullSupply = true;
     this.displayOrder = 0;
     this.maxMonthsStock = 0;
-    this.pricePerPack = new Money("0");
+    this.pricePerPack = Money.of(CurrencyUnit.USD, BigDecimal.ZERO);
   }
 
   /**
@@ -178,7 +178,7 @@ public class ProgramProduct extends BaseEntity {
 
     @Override
     public void serialize(ProgramProduct programProduct, JsonGenerator generator,
-                          SerializerProvider provider) throws IOException, JsonProcessingException {
+                          SerializerProvider provider) throws IOException {
       generator.writeStartObject();
       generator.writeStringField("programId", programProduct.program.getId().toString());
       generator.writeStringField("productId", programProduct.product.getId().toString());
@@ -196,7 +196,7 @@ public class ProgramProduct extends BaseEntity {
         generator.writeNumberField("dosesPerMonth", programProduct.dosesPerMonth);
       }
       if (null != programProduct.pricePerPack) {
-        generator.writeNumberField("pricePerPack", programProduct.pricePerPack.getValue());
+        generator.writeNumberField("pricePerPack", programProduct.pricePerPack.getAmount());
       }
       generator.writeEndObject();
     }
@@ -224,7 +224,7 @@ public class ProgramProduct extends BaseEntity {
     exporter.setMaxMonthsOfStock(maxMonthsStock);
     exporter.setDosesPerMonth(dosesPerMonth);
     if (pricePerPack != null) {
-      exporter.setPricePerPack(pricePerPack.getValue());
+      exporter.setPricePerPack(pricePerPack);
     }
 
   }
@@ -256,7 +256,7 @@ public class ProgramProduct extends BaseEntity {
 
     void setDosesPerMonth(Integer dosesPerMonth);
 
-    void setPricePerPack(BigDecimal pricePerPack);
+    void setPricePerPack(Money pricePerPack);
   }
 
   public interface Importer {
@@ -284,6 +284,6 @@ public class ProgramProduct extends BaseEntity {
 
     Integer getDosesPerMonth();
 
-    BigDecimal getPricePerPack();
+    Money getPricePerPack();
   }
 }

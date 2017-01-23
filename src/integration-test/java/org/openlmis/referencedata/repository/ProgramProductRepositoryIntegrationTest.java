@@ -1,5 +1,9 @@
 package org.openlmis.referencedata.repository;
 
+import static org.junit.Assert.assertEquals;
+
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,6 +94,20 @@ public class ProgramProductRepositoryIntegrationTest
 
     Assert.assertEquals(programProducts.size(), receivedProgramProducts.size());
   }
+
+  @Test
+  public void shouldPersistWithMoney() {
+    Money pricePerPack = Money.of(CurrencyUnit.USD, 12.91);
+
+    ProgramProduct programProduct = new ProgramProduct();
+    programProduct.setPricePerPack(pricePerPack);
+
+    ProgramProduct product = programProductRepository.save(programProduct);
+    product = programProductRepository.findOne(product.getId());
+
+    assertEquals(pricePerPack, product.getPricePerPack());
+  }
+
 
   private ProgramProduct cloneProgramProduct(ProgramProduct programProduct) {
     ProgramProduct clonedProgramProduct = ProgramProduct.createNew(programProduct.getProgram(),

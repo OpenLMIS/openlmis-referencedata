@@ -1,12 +1,17 @@
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import org.joda.money.Money;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.serializer.MoneyDeserializer;
+import org.openlmis.referencedata.serializer.MoneySerializer;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -38,6 +43,8 @@ public class ProductDto extends BaseDto
 
   private Integer dosesPerMonth;
 
-  private BigDecimal pricePerPack;
+  @JsonSerialize(using = MoneySerializer.class)
+  @JsonDeserialize(using = MoneyDeserializer.class)
+  private Money pricePerPack;
 
 }

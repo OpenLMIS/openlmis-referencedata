@@ -1,10 +1,13 @@
 package org.openlmis.referencedata.domain;
 
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.messagekeys.ProgramProductBuilderMessageKeys;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -34,7 +37,7 @@ public class ProgramProductBuilder {
     this.fullSupply = false;
     this.displayOrder = 0;
     this.maxMonthsOfStock = 1;
-    this.pricePerPack = new Money("0");
+    this.pricePerPack = Money.of(CurrencyUnit.USD, BigDecimal.ZERO);
   }
 
   /**

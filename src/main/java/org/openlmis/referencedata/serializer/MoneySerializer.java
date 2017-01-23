@@ -1,11 +1,10 @@
 package org.openlmis.referencedata.serializer;
 
-
-import org.openlmis.referencedata.domain.Money;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+
+import org.joda.money.Money;
 
 import java.io.IOException;
 
@@ -17,7 +16,7 @@ public class MoneySerializer extends JsonSerializer<Money> {
 
   @Override
   public void serialize(Money value, JsonGenerator generator, SerializerProvider provider)
-      throws IOException, JsonProcessingException {
-    generator.writeString(value.toString());
+      throws IOException {
+    generator.writeNumber(value.getAmount());
   }
 }

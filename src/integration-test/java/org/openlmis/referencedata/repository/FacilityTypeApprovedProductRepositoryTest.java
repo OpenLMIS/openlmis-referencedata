@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import org.joda.money.CurrencyUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.GlobalProduct;
-import org.openlmis.referencedata.domain.Money;
+import org.joda.money.Money;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.ProductCategory;
@@ -97,7 +98,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     orderableProductNonFullSupply = GlobalProduct.newGlobalProduct(
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     programProductNonFullSupply = ProgramProduct.createNew(program, productCategory,
-        orderableProductNonFullSupply, 0, true, false, 0, 0, new Money("0"));
+        orderableProductNonFullSupply, 0, true, false, 0, 0, Money.of(CurrencyUnit.USD, 0));
     orderableProductNonFullSupply.addToProgram(programProductNonFullSupply);
     orderableProductRepository.save(orderableProductNonFullSupply);
 

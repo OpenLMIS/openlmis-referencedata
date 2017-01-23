@@ -13,6 +13,8 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -22,7 +24,6 @@ import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.GlobalProduct;
-import org.openlmis.referencedata.domain.Money;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
@@ -651,7 +652,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     orderableProduct.setId(UUID.randomUUID());
     ProgramProduct programProduct = ProgramProduct.createNew(program, category,
-        orderableProduct, 0, true, false, 0, 0, new Money("0"));
+        orderableProduct, 0, true, false, 0, 0, Money.of(CurrencyUnit.USD, 0));
     programProduct.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setProgramProduct(programProduct);

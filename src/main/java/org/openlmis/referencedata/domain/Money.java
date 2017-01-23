@@ -6,7 +6,7 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import org.openlmis.referencedata.serializer.MoneyDeSerializer;
+import org.openlmis.referencedata.serializer.MoneyDeserializer;
 import org.openlmis.referencedata.serializer.MoneySerializer;
 
 import lombok.Data;
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 
 @Data
 @JsonSerialize(using = MoneySerializer.class)
-@JsonDeserialize(using = MoneyDeSerializer.class)
+@JsonDeserialize(using = MoneyDeserializer.class)
 @EqualsAndHashCode(callSuper = false)
 public class Money extends Number {
 
