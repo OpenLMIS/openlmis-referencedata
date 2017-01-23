@@ -1,7 +1,11 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
+import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.StockAdjustmentReasonMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +37,7 @@ public class StockAdjustmentReasonController extends BaseController {
    * @return ResponseEntity containing the created stockAdjustmentReason
    */
   @RequestMapping(value = "/stockAdjustmentReasons", method = RequestMethod.POST)
-  public ResponseEntity<?> createStockAdjustmentReason(
+  public ResponseEntity<StockAdjustmentReason> createStockAdjustmentReason(
           @RequestBody StockAdjustmentReason stockAdjustmentReason) {
     LOGGER.debug("Creating new stockAdjustmentReason");
     // Ignore provided id
@@ -48,11 +52,11 @@ public class StockAdjustmentReasonController extends BaseController {
    * @return StockAdjustmentReasons.
    */
   @RequestMapping(value = "/stockAdjustmentReasons", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllStockAdjustmentReasons() {
+  public ResponseEntity<Iterable<StockAdjustmentReason>> getAllStockAdjustmentReasons() {
     Iterable<StockAdjustmentReason> stockAdjustmentReasons =
             stockAdjustmentReasonRepository.findAll();
     if (stockAdjustmentReasons == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(stockAdjustmentReasons, HttpStatus.OK);
     }
@@ -70,7 +74,7 @@ public class StockAdjustmentReasonController extends BaseController {
     StockAdjustmentReason stockAdjustmentReason =
             stockAdjustmentReasonRepository.findOne(stockAdjustmentReasonId);
     if (stockAdjustmentReason == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(stockAdjustmentReason, HttpStatus.OK);
     }
@@ -88,7 +92,7 @@ public class StockAdjustmentReasonController extends BaseController {
     StockAdjustmentReason stockAdjustmentReason =
             stockAdjustmentReasonRepository.findOne(stockAdjustmentReasonId);
     if (stockAdjustmentReason == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND);
     } else {
       stockAdjustmentReasonRepository.delete(stockAdjustmentReason);
       return new ResponseEntity<StockAdjustmentReason>(HttpStatus.NO_CONTENT);
@@ -106,7 +110,7 @@ public class StockAdjustmentReasonController extends BaseController {
           @RequestBody StockAdjustmentReason stockAdjustmentReason) {
     if (stockAdjustmentReason == null || stockAdjustmentReasonId == null) {
       LOGGER.debug("Update failed - stockAdjustmentReason id not specified");
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(StockAdjustmentReasonMessageKeys.ERROR_ID_NULL);
     }
 
     StockAdjustmentReason storedStockAdjustmentReason =
@@ -114,8 +118,8 @@ public class StockAdjustmentReasonController extends BaseController {
     if (storedStockAdjustmentReason == null) {
       LOGGER.warn("Update failed - stockAdjustmentReason with id: {} not found",
               stockAdjustmentReasonId);
-      return new ResponseEntity<>("Stock Adjustment Reason with id: " + stockAdjustmentReasonId
-          + " not found", HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(new Message(
+          StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND_WITH_ID, stockAdjustmentReasonId));
     }
 
     stockAdjustmentReasonRepository.save(stockAdjustmentReason);

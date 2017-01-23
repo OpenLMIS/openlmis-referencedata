@@ -1,5 +1,10 @@
 package org.openlmis.referencedata.validate;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -8,17 +13,13 @@ import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
+import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import java.util.Collections;
 
 public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
 
@@ -58,7 +59,7 @@ public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
-    assertErrorMessage(errors, "startDate", "Start date is null");
+    assertErrorMessage(errors, "startDate", ProcessingPeriodMessageKeys.ERROR_START_DATE_NULL);
   }
 
   @Test
@@ -69,7 +70,7 @@ public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
-    assertErrorMessage(errors, "endDate", "End date is null");
+    assertErrorMessage(errors, "endDate", ProcessingPeriodMessageKeys.ERROR_END_DATE_NULL);
   }
 
   @Test
@@ -80,14 +81,16 @@ public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(2, errors.getErrorCount());
-    assertErrorMessage(errors, "startDate", "Start date should be before end date");
-    assertErrorMessage(errors, "endDate", "End date should be after start date");
+    assertErrorMessage(errors, "startDate",
+        ProcessingPeriodMessageKeys.ERROR_START_DATE_AFTER_END_DATE);
+    assertErrorMessage(errors, "endDate",
+        ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
   }
 
   @Test
   public void shouldRejectPeriodIfItWouldIntroduceGapBetweenPeriods() {
-    when(processingPeriodService.searchPeriods(
-            processingSchedule, null)).thenReturn(Arrays.asList(previousPeriod));
+    when(processingPeriodService.searchPeriods(processingSchedule, null))
+        .thenReturn(Collections.singletonList(previousPeriod));
     when(previousPeriod.getEndDate()).thenReturn(LocalDate.of(2016, 5, 27));
 
     validator.validate(processingPeriod, errors);
@@ -95,7 +98,7 @@ public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
     assertErrorMessage(errors, "startDate",
-            "Start date should be one day after last added end date");
+        ProcessingPeriodMessageKeys.ERROR_GAP_BETWEEN_LAST_END_DATE_AND_START_DATE);
   }
 
   @Test

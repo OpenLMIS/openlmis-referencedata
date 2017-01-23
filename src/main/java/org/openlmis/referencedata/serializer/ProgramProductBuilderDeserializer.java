@@ -1,4 +1,4 @@
-package org.openlmis.referencedata.web;
+package org.openlmis.referencedata.serializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -6,9 +6,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
 import org.openlmis.referencedata.domain.ProgramProductBuilder;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.util.messagekeys.ProgramProductBuilderDeserializerMessageKeys;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -44,10 +46,12 @@ public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramPr
                                            ProductCategoryRepository productCategoryRepository) {
     super(ProgramProductBuilder.class);
 
-    Objects.requireNonNull(defaultDeserializer, "Default deserializer was passed as null");
-    Objects.requireNonNull(programRepository, "ProgramRepository was passed as null");
-    Objects.requireNonNull(productCategoryRepository, "ProductCategoryRepository was passed as "
-        + "null");
+    Objects.requireNonNull(defaultDeserializer,
+        ProgramProductBuilderDeserializerMessageKeys.ERROR_DEFAULT_SERIALIZER_NULL);
+    Objects.requireNonNull(programRepository,
+        ProgramProductBuilderDeserializerMessageKeys.ERROR_PROGRAM_REPOSITORY_NULL);
+    Objects.requireNonNull(productCategoryRepository,
+        ProgramProductBuilderDeserializerMessageKeys.ERROR_PRODUCT_CATEGORY_REPOSITORY_NULL);
     this.defaultDeserializer = defaultDeserializer;
     this.programRepository = programRepository;
     this.productCategoryRepository = productCategoryRepository;
@@ -56,7 +60,8 @@ public class ProgramProductBuilderDeserializer extends StdDeserializer<ProgramPr
   @Override
   public ProgramProductBuilder deserialize(JsonParser jsonParser, DeserializationContext ctxt)
       throws IOException {
-    Objects.requireNonNull(programRepository, "Program repository was not successfully injected");
+    Objects.requireNonNull(programRepository,
+        ProgramProductBuilderDeserializerMessageKeys.ERROR_PROGRAM_REPOSITORY_NOT_INJECTED);
 
     // default bean deserialization
     ProgramProductBuilder ppBuilder = (ProgramProductBuilder) defaultDeserializer.deserialize(

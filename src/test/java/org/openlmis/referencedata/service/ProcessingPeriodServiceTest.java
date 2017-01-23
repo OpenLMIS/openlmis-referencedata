@@ -1,5 +1,11 @@
 package org.openlmis.referencedata.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -10,7 +16,6 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
-import org.openlmis.referencedata.exception.RequisitionGroupProgramScheduleException;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 
@@ -19,12 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 public class ProcessingPeriodServiceTest {
@@ -64,8 +63,7 @@ public class ProcessingPeriodServiceTest {
   }
 
   @Test
-  public void shouldFindPeriodsByProgramAndFacility()
-        throws RequisitionGroupProgramScheduleException {
+  public void shouldFindPeriodsByProgramAndFacility() {
     doReturn(requisitionGroupProgramSchedule).when(repository)
           .searchRequisitionGroupProgramSchedule(program, facility);
     doReturn(Arrays.asList(period)).when(periodRepository).searchPeriods(schedule, null);

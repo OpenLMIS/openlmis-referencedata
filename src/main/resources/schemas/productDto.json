@@ -16,6 +16,14 @@
       "type": "string",
       "title": "productName"
     },
+    "productCode": {
+      "type": "string",
+      "title": "productCode"
+    },
+    "productPackSize": {
+      "type": "number",
+      "title": "productPackSize"
+    },
     "productCategoryId": {
       "type": "string",
       "title": "productCategoryId"
@@ -44,15 +52,24 @@
       "type": "integer",
       "title": "displayOrder"
     },
-    "maxMonthsStock": {
+    "maxMonthsOfStock": {
       "type": "integer",
-      "title": "maxMonthsStock"
+      "title": "maxMonthsOfStock"
     },
     "pricePerPack": {
       "type": "number",
       "title": "pricePerPack"
     }
   },
-  "required": ["productId", "productName", "productCategoryId", "productCategoryDisplayName",
-    "productCategoryDisplayOrder", "dosesPerMonth", "active", "fullSupply"]
+  "required": [
+    "productId",
+    "productName",
+    "productPackSize",
+    "productCategoryId",
+    "productCategoryDisplayName",
+    "productCategoryDisplayOrder",
+    "dosesPerMonth",
+    "active",
+    "fullSupply"
+  ]
 }

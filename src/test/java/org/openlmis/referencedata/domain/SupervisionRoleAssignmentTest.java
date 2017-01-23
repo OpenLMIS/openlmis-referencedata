@@ -8,10 +8,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import com.google.common.collect.Sets;
-
 import org.junit.Test;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Collections;
 import java.util.Set;
@@ -32,7 +29,7 @@ public class SupervisionRoleAssignmentTest {
   /**
    * Constructor for tests.
    */
-  public SupervisionRoleAssignmentTest() throws RightTypeException, RoleException {
+  public SupervisionRoleAssignmentTest() {
     right = Right.newRight("right", SUPERVISION);
     role = Role.newRole("role", right);
     program = new Program("P1");
@@ -58,8 +55,7 @@ public class SupervisionRoleAssignmentTest {
   }
 
   @Test
-  public void shouldHaveRightWhenRightAndProgramAndHomeFacilityMatch()
-      throws RightTypeException {
+  public void shouldHaveRightWhenRightAndProgramAndHomeFacilityMatch() {
 
     //when
     RightQuery rightQuery = new RightQuery(right, program, homeFacility);
@@ -70,8 +66,7 @@ public class SupervisionRoleAssignmentTest {
   }
 
   @Test
-  public void shouldHaveRightWhenRightAndProgramAndSupervisedFacilityMatch()
-      throws RightTypeException {
+  public void shouldHaveRightWhenRightAndProgramAndSupervisedFacilityMatch() {
 
     //when
     RightQuery rightQuery = new RightQuery(right, program, supervisedFacility);
@@ -82,7 +77,7 @@ public class SupervisionRoleAssignmentTest {
   }
 
   @Test
-  public void shouldNotHaveRightWhenRightDoesNotMatch() throws RightTypeException {
+  public void shouldNotHaveRightWhenRightDoesNotMatch() {
 
     //when
     RightQuery rightQuery = new RightQuery(Right.newRight("right2", SUPERVISION), program,
@@ -94,7 +89,7 @@ public class SupervisionRoleAssignmentTest {
   }
 
   @Test
-  public void shouldNotHaveRightWhenProgramDoesNotMatch() throws RightTypeException {
+  public void shouldNotHaveRightWhenProgramDoesNotMatch() {
 
     //when
     RightQuery rightQuery = new RightQuery(right, new Program("test"), homeFacility);
@@ -105,7 +100,7 @@ public class SupervisionRoleAssignmentTest {
   }
 
   @Test
-  public void shouldNotHaveRightWhenFacilityDoesNotMatch() throws RightTypeException {
+  public void shouldNotHaveRightWhenFacilityDoesNotMatch() {
 
     //when
     RightQuery rightQuery = new RightQuery(right, program, new Facility("Another"));

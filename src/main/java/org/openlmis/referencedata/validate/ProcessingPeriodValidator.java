@@ -2,6 +2,7 @@ package org.openlmis.referencedata.validate;
 
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
+import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -22,8 +23,10 @@ public class ProcessingPeriodValidator implements Validator {
 
   @Override
   public void validate(Object obj, Errors err) {
-    ValidationUtils.rejectIfEmpty(err, "startDate", "startDate.empty", "Start date is null");
-    ValidationUtils.rejectIfEmpty(err, "endDate", "endDate.empty", "End date is null");
+    ValidationUtils.rejectIfEmpty(err, "startDate", "startDate.empty",
+        ProcessingPeriodMessageKeys.ERROR_START_DATE_NULL);
+    ValidationUtils.rejectIfEmpty(err, "endDate", "endDate.empty",
+        ProcessingPeriodMessageKeys.ERROR_END_DATE_NULL);
 
     if (!err.hasErrors()) {
       ProcessingPeriod period = (ProcessingPeriod) obj;
@@ -38,14 +41,14 @@ public class ProcessingPeriodValidator implements Validator {
           LocalDate lastEndDate = periodList.get(periodList.size() - 1).getEndDate();
           if (!startDate.equals(lastEndDate.plusDays(1))) {
             err.rejectValue("startDate", "{gap.between.lastEndDate.and.startDate.validation.error}",
-                    "Start date should be one day after last added end date");
+                ProcessingPeriodMessageKeys.ERROR_GAP_BETWEEN_LAST_END_DATE_AND_START_DATE);
           }
         }
       } else {
         err.rejectValue("startDate", "{startDate.after.endDate.validation.error}",
-                "Start date should be before end date");
+            ProcessingPeriodMessageKeys.ERROR_START_DATE_AFTER_END_DATE);
         err.rejectValue("endDate", "{startDate.after.endDate.validation.error}",
-                "End date should be after start date");
+            ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
       }
     }
   }

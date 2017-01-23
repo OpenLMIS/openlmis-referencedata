@@ -5,9 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 
 import org.junit.Test;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleAssignmentException;
-import org.openlmis.referencedata.exception.RoleException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 
 public class FulfillmentRoleAssignmentTest {
 
@@ -21,8 +19,7 @@ public class FulfillmentRoleAssignmentTest {
   /**
    * Setup constructor.
    */
-  public FulfillmentRoleAssignmentTest() throws RightTypeException, RoleAssignmentException,
-      RoleException {
+  public FulfillmentRoleAssignmentTest() {
     right = Right.newRight("right", ORDER_FULFILLMENT);
     warehouse = new Facility("C1");
     warehouse.setType(new FacilityType("warehouse"));
@@ -34,20 +31,17 @@ public class FulfillmentRoleAssignmentTest {
   }
 
   @Test
-  public void shouldAllowCreationWithWarehouseFacilityType()
-      throws RightTypeException, RoleAssignmentException, RoleException {
+  public void shouldAllowCreationWithWarehouseFacilityType() {
     new FulfillmentRoleAssignment(Role.newRole(roleName, right), user, warehouse);
   }
 
-  @Test(expected = RoleAssignmentException.class)
-  public void shouldNotAllowCreationWithNonWarehouseFacilityType()
-      throws RightTypeException, RoleAssignmentException, RoleException {
+  @Test(expected = ValidationMessageException.class)
+  public void shouldNotAllowCreationWithNonWarehouseFacilityType() {
     new FulfillmentRoleAssignment(Role.newRole(roleName, right), user, hospital);
   }
 
   @Test
-  public void shouldHaveRightWhenRightAndFacilityMatch()
-      throws RightTypeException, RoleAssignmentException {
+  public void shouldHaveRightWhenRightAndFacilityMatch() {
     //when
     RightQuery rightQuery = new RightQuery(right, warehouse);
     boolean hasRight = fulfillmentRoleAssignment.hasRight(rightQuery);
@@ -57,8 +51,7 @@ public class FulfillmentRoleAssignmentTest {
   }
 
   @Test
-  public void shouldNotHaveRightWhenFacilityDoesNotMatch()
-      throws RightTypeException, RoleAssignmentException {
+  public void shouldNotHaveRightWhenFacilityDoesNotMatch() {
     //when
     RightQuery rightQuery = new RightQuery(right, hospital);
     boolean hasRight = fulfillmentRoleAssignment.hasRight(rightQuery);

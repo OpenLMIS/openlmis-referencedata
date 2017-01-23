@@ -12,8 +12,8 @@ import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.security.UserNameProvider;
+import org.openlmis.referencedata.serializer.ProgramProductBuilderDeserializer;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
-import org.openlmis.referencedata.web.ProgramProductBuilderDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -95,24 +95,22 @@ public class Application {
     SimpleModule module = new SimpleModule();
     module.setDeserializerModifier(new BeanDeserializerModifier() {
       @Override
-      public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config,
-                                                    BeanDescription beanDesc,
-                                                    JsonDeserializer<?> deserializer) {
+      public JsonDeserializer<?> modifyDeserializer(
+          DeserializationConfig config,BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
         Objects.requireNonNull(deserializer, "Jackson passed a null deserializer");
-        Objects.requireNonNull(programRepository, "Spring Boot didn't autowire the "
-            + "Program Repository");
-        Objects.requireNonNull(productCategoryRepository, "Spring didn't autowire the product "
-            + "category repository");
+        Objects.requireNonNull(programRepository,
+            "Spring Boot didn't autowire the Program Repository");
+        Objects.requireNonNull(productCategoryRepository,
+            "Spring Boot didn't autowire the Product Category Repository");
 
         if (beanDesc.getBeanClass() == ProgramProductBuilder.class) {
-          return new ProgramProductBuilderDeserializer(deserializer,
-            programRepository,
-            productCategoryRepository);
+          return new ProgramProductBuilderDeserializer(
+              deserializer, programRepository, productCategoryRepository);
         }
 
         return deserializer;
       }
-    } );
+    });
 
     return module;
   }

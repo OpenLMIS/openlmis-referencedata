@@ -10,12 +10,14 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
-import org.openlmis.referencedata.exception.InvalidIdException;
+import org.openlmis.referencedata.dto.ResultDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
+import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,15 +75,14 @@ public class ProcessingPeriodController extends BaseController {
   @RequestMapping(value = "/processingPeriods/search", method = RequestMethod.GET)
   public ResponseEntity<?> searchProcessingPeriods(
       @RequestParam(value = "programId", required = true) UUID programId,
-      @RequestParam(value = "facilityId", required = true) UUID facilityId)
-      throws InvalidIdException {
+      @RequestParam(value = "facilityId", required = true) UUID facilityId) {
 
     if (programId == null) {
-      throw new InvalidIdException("Program id must be provided.");
+      throw new ValidationMessageException(ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL);
     }
 
     if (facilityId == null) {
-      throw new InvalidIdException("Facility id must be provided.");
+      throw new ValidationMessageException(ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL);
     }
 
     Program program = programRepository.findOne(programId);
@@ -104,8 +105,8 @@ public class ProcessingPeriodController extends BaseController {
    * @return if successful, the new processing period; otherwise an HTTP error
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.POST)
-  public ResponseEntity<?> createProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
-                                                  BindingResult bindingResult) {
+  public ResponseEntity<?> createProcessingPeriod(
+      @RequestBody ProcessingPeriodDto periodDto, BindingResult bindingResult) {
     ProcessingPeriod newPeriod = ProcessingPeriod.newPeriod(periodDto);
     LOGGER.debug("Creating new processingPeriod");
     validator.validate(newPeriod, bindingResult);
@@ -211,10 +212,9 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> searchPeriodsByUuuidAndDate(
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate)
-      throws InvalidIdException {
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
     if (processingScheduleId == null) {
-      throw new InvalidIdException("Processing Schedule id must be provided");
+      throw new ValidationMessageException("Processing Schedule id must be provided");
     }
 
     ProcessingSchedule processingSchedule =

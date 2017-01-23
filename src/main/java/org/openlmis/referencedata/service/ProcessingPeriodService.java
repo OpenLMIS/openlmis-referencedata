@@ -51,10 +51,8 @@ public class ProcessingPeriodService {
         repository.searchRequisitionGroupProgramSchedule(program, facility);
 
     if (null == schedule) {
-      LOGGER.warn(
-          "Cannot find Requisition Group Program Schedule for program {} and facility {}",
-          program.getId(), facility.getId()
-      );
+      LOGGER.warn("Cannot find Requisition Group Program Schedule for program {} and facility {}",
+          program.getId(), facility.getId());
       return Collections.emptyList();
     }
 

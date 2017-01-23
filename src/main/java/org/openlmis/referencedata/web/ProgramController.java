@@ -1,7 +1,11 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +36,7 @@ public class ProgramController extends BaseController {
    * @return ResponseEntity containing the created program
    */
   @RequestMapping(value = "/programs", method = RequestMethod.POST)
-  public ResponseEntity<?> createProgram(@RequestBody Program program) {
+  public ResponseEntity<Program> createProgram(@RequestBody Program program) {
     LOGGER.debug("Creating new program");
     // Ignore provided id
     program.setId(null);
@@ -46,10 +50,10 @@ public class ProgramController extends BaseController {
    * @return Programs.
    */
   @RequestMapping(value = "/programs", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllPrograms() {
+  public ResponseEntity<Iterable<Program>> getAllPrograms() {
     Iterable<Program> programs = programRepository.findAll();
     if (programs == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(programs, HttpStatus.OK);
     }
@@ -62,10 +66,10 @@ public class ProgramController extends BaseController {
    * @return Program.
    */
   @RequestMapping(value = "/programs/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getChosenProgram(@PathVariable("id") UUID programId) {
+  public ResponseEntity<Program> getChosenProgram(@PathVariable("id") UUID programId) {
     Program program = programRepository.findOne(programId);
     if (program == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(program, HttpStatus.OK);
     }
@@ -78,13 +82,13 @@ public class ProgramController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/programs/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteProgram(@PathVariable("id") UUID programId) {
+  public ResponseEntity deleteProgram(@PathVariable("id") UUID programId) {
     Program program = programRepository.findOne(programId);
     if (program == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     } else {
       programRepository.delete(program);
-      return new ResponseEntity<Program>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 
@@ -94,17 +98,18 @@ public class ProgramController extends BaseController {
    * @param program DTO class used to update program's code and name
    */
   @RequestMapping(value = "/programs/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateProgram(@PathVariable("id") UUID programId,
-                                         @RequestBody Program program) {
+  public ResponseEntity<Program> updateProgram(
+      @PathVariable("id") UUID programId, @RequestBody Program program) {
     if (program == null || programId == null) {
       LOGGER.debug("Update failed - program id not specified");
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(ProgramMessageKeys.ERROR_ID_NULL);
     }
 
     Program storedProgram = programRepository.findOne(programId);
     if (storedProgram == null) {
       LOGGER.warn("Update failed - program with id: {} not found", programId);
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(
+          new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
 
     programRepository.save(program);
@@ -120,7 +125,8 @@ public class ProgramController extends BaseController {
    * @return List of wanted Programs.
    */
   @RequestMapping(value = "/programs/search", method = RequestMethod.GET)
-  public ResponseEntity<?> findProgramsByName(@RequestParam("name") String programName) {
+  public ResponseEntity<List<Program>> findProgramsByName(
+      @RequestParam("name") String programName) {
     List<Program> foundPrograms = programRepository.findProgramsByName(programName);
     return new ResponseEntity<>(foundPrograms, HttpStatus.OK);
   }

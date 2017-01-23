@@ -2,8 +2,12 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProductCategory;
+import org.openlmis.referencedata.exception.IntegrityViolationException;
+import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.ProductCategoryMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -44,7 +48,7 @@ public class ProductCategoryController extends BaseController {
    * @return ProductCategories.
    */
   @RequestMapping(value = "/productCategories", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllProductCategories() {
+  public ResponseEntity<Iterable<ProductCategory>> getAllProductCategories() {
     Iterable<ProductCategory> productCategories = productCategoryRepository.findAll();
     return new ResponseEntity<>(productCategories, HttpStatus.OK);
   }
@@ -56,7 +60,8 @@ public class ProductCategoryController extends BaseController {
    * @return ResponseEntity containing the created productCategory with id.
    */
   @RequestMapping(value = "/productCategories", method = RequestMethod.POST)
-  public ResponseEntity<?> createProductCategory(@RequestBody ProductCategory productCategory) {
+  public ResponseEntity<ProductCategory> createProductCategory(
+      @RequestBody ProductCategory productCategory) {
     ProductCategory found = productCategoryRepository.findByCode(productCategory
         .getCode());
     if (null != found) {
@@ -78,18 +83,16 @@ public class ProductCategoryController extends BaseController {
    * @return ResponseEntity containing the updated productCategory
    */
   @RequestMapping(value = "/productCategories/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateProductCategory(@RequestBody ProductCategory productCategory,
-                                                 @PathVariable("id") UUID productCategoryId) {
+  public ResponseEntity<ProductCategory> updateProductCategory(
+      @RequestBody ProductCategory productCategory, @PathVariable("id") UUID productCategoryId) {
     LOGGER.debug("Updating productCategory with id: " + productCategoryId);
 
     ProductCategory productCategoryToUpdate =
         productCategoryRepository.findOne(productCategoryId);
 
     if (null == productCategoryToUpdate) {
-      ErrorResponse errorResponse = new ErrorResponse("referencedata.error.id.not-found",
-          "An error occurred while updating productCategory with id: " + productCategoryId);
-      LOGGER.error(errorResponse.getMessage());
-      return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+      throw new ValidationMessageException(new Message(
+          ProductCategoryMessageKeys.ERROR_NOT_FOUND_WITH_ID, productCategoryId));
     }
     productCategoryToUpdate.updateFrom(productCategory);
     productCategoryRepository.save(productCategoryToUpdate);
@@ -105,10 +108,11 @@ public class ProductCategoryController extends BaseController {
    * @return ProductCategory.
    */
   @RequestMapping(value = "/productCategories/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getProductCategory(@PathVariable("id") UUID productCategoryId) {
+  public ResponseEntity<ProductCategory> getProductCategory(
+      @PathVariable("id") UUID productCategoryId) {
     ProductCategory productCategory = productCategoryRepository.findOne(productCategoryId);
     if (productCategory == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ProductCategoryMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(productCategory, HttpStatus.OK);
     }
@@ -121,22 +125,19 @@ public class ProductCategoryController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/productCategories/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteProductCategory(@PathVariable("id") UUID productCategoryId) {
+  public ResponseEntity deleteProductCategory(@PathVariable("id") UUID productCategoryId) {
 
     ProductCategory productCategory = productCategoryRepository.findOne(productCategoryId);
     if (productCategory == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ProductCategoryMessageKeys.ERROR_NOT_FOUND);
     } else {
       try {
         productCategoryRepository.delete(productCategory);
       } catch (DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse =
-            new ErrorResponse("An error occurred while deleting productCategory with id: "
-                + productCategoryId, ex.getMessage());
-        LOGGER.error(errorResponse.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.CONFLICT);
+        throw new IntegrityViolationException(new Message(
+            ProductCategoryMessageKeys.ERROR_DELETING_WITH_ID, productCategoryId), ex);
       }
-      return new ResponseEntity<ProductCategory>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 
@@ -147,16 +148,16 @@ public class ProductCategoryController extends BaseController {
    * @return ResponseEntity with list of all Product Categories matching provided parameters
    */
   @RequestMapping(value = "/productCategories/search", method = RequestMethod.GET)
-  public ResponseEntity<?> searchProductCategories(
+  public ResponseEntity<Iterable<ProductCategory>> searchProductCategories(
       @RequestParam(value = "code", required = false) String codeParam) {
 
     if (codeParam != null) {
       ProductCategory productCategory = productCategoryRepository
           .findByCode(Code.code(codeParam));
       if (null == productCategory) {
-        return ResponseEntity.notFound().build();
+        throw new NotFoundException(ProductCategoryMessageKeys.ERROR_NOT_FOUND);
       }
-      return ResponseEntity.ok(Arrays.asList(productCategory));
+      return ResponseEntity.ok(Collections.singletonList(productCategory));
     } else {
       Iterable<ProductCategory> productCategories = productCategoryRepository.findAll();
       return ResponseEntity.ok(productCategories);

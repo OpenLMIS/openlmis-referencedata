@@ -10,25 +10,24 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleException;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.service.RightService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Set;
 import java.util.UUID;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class RoleControllerTest {
 
   @Mock
@@ -38,9 +37,10 @@ public class RoleControllerTest {
   private RightRepository rightRepository;
 
   @Mock
-  private ExposedMessageSource messageSource;
+  private RightService rightService;
 
-  private RoleController controller;
+  @InjectMocks
+  private RoleController controller = new RoleController();
 
   private String right1Name;
   private Right right1;
@@ -57,9 +57,8 @@ public class RoleControllerTest {
   /**
    * Constructor for test.
    */
-  public RoleControllerTest() throws RightTypeException, RoleException {
+  public RoleControllerTest() {
     initMocks(this);
-    controller = new RoleController(repository, rightRepository, messageSource);
 
     right1Name = "right1";
     right1 = Right.newRight(right1Name, RightType.GENERAL_ADMIN);
@@ -73,11 +72,6 @@ public class RoleControllerTest {
     role1Dto = new RoleDto();
     role1.export(role1Dto);
     roleId = UUID.randomUUID();
-  }
-
-  @Before
-  public void setup() {
-
   }
   
   private void preparePostOrPut() {
@@ -144,21 +138,17 @@ public class RoleControllerTest {
     verify(repository).save(role1);
   }
 
-  @Test
+  @Test(expected = DataIntegrityViolationException.class)
   public void shouldNotCreateExistingRoleOnPost() {
     //given
     preparePostOrPut();
 
     //when
-    HttpStatus httpStatus = controller.createRole(role1Dto).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.CONFLICT));
-    verify(repository, never()).save(role1);
+    controller.createRole(role1Dto).getStatusCode();
   }
 
   @Test
-  public void shouldUpdateRoleOnPut() throws RightTypeException, RoleException {
+  public void shouldUpdateRoleOnPut() {
     //given
     preparePostOrPut();
 
@@ -174,7 +164,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldCreateNewRoleOnPut() throws RightTypeException, RoleException {
+  public void shouldCreateNewRoleOnPut() {
     //given
     preparePostOrPut();
 
@@ -191,7 +181,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldAddRoleRightsOnPut() throws RightTypeException, RoleException {
+  public void shouldAddRoleRightsOnPut() {
     //given
     preparePostOrPut();
 
@@ -211,7 +201,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldUpdateRoleRightsOnPut() throws RightTypeException, RoleException {
+  public void shouldUpdateRoleRightsOnPut() {
     //given
     preparePostOrPut();
 
@@ -231,7 +221,7 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldDeleteRoleRightsOnPut() throws RightTypeException, RoleException {
+  public void shouldDeleteRoleRightsOnPut() {
     //given
     preparePostOrPut();
 

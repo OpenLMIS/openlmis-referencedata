@@ -2,26 +2,26 @@ package org.openlmis.referencedata.exception;
 
 import org.openlmis.referencedata.util.Message;
 
-public class ValidationMessageException extends RuntimeException {
+/**
+ * Exception for indicating that some input or constraint is invalid.  This should result in a
+ * BAD REQUEST api response.
+ */
+public class ValidationMessageException extends BaseMessageException {
 
-  private final Message message;
-
-  public ValidationMessageException(Message message) {
-    super();
-    this.message = message;
-  }
-
-  public Message asMessage() {
-    return message;
+  /**
+   * Create new validation exception with the given message key.  Helper method that
+   * uses {@link #ValidationMessageException(Message)}.
+   * @param messageKey the messageKey of a {@link Message}.
+   */
+  public ValidationMessageException(String messageKey) {
+    super( messageKey );
   }
 
   /**
-   * Overrides RuntimeException's public String getMessage().
-   *
-   * @return a localized string description
+   * Create a new validation exception with the given message.
+   * @param message the message.
    */
-  @Override
-  public String getMessage() {
-    return this.message.toString();
+  public ValidationMessageException(Message message) {
+    super(message);
   }
 }

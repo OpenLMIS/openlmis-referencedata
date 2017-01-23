@@ -1,6 +1,6 @@
 package org.openlmis.referencedata.web;
 
-import org.openlmis.referencedata.util.Version;
+import org.openlmis.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;

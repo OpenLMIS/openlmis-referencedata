@@ -11,8 +11,6 @@ import com.google.common.collect.Sets;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleException;
 
 import java.util.Collections;
 import java.util.Set;
@@ -40,7 +38,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldBeAbleToAssignRoleToUser() throws RightTypeException, RoleException {
+  public void shouldBeAbleToAssignRoleToUser() {
     //when
     user.assignRoles(new DirectRoleAssignment(Role.newRole(roleName, Right.newRight("reportRight1",
         RightType.REPORTS)), user));
@@ -82,7 +80,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetHomeFacilityPrograms() throws RightTypeException, RoleException {
+  public void shouldGetHomeFacilityPrograms() {
     //given
     Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
     Program program1 = new Program("prog1");
@@ -103,7 +101,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetSupervisedPrograms() throws RightTypeException, RoleException {
+  public void shouldGetSupervisedPrograms() {
     //given
     Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
     Program program1 = new Program("prog1");
@@ -128,7 +126,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldGetSupervisedFacilities() throws RightTypeException, RoleException {
+  public void shouldGetSupervisedFacilities() {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
@@ -147,8 +145,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldNotGetSupervisedFacilitiesForNonMatchingPrograms()
-      throws RightTypeException, RoleException {
+  public void shouldNotGetSupervisedFacilitiesForNonMatchingPrograms() {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
@@ -170,8 +167,7 @@ public class UserTest {
   }
 
   @Test
-  public void shouldNotGetSupervisedFacilitiesForNonMatchingRight()
-      throws RightTypeException, RoleException {
+  public void shouldNotGetSupervisedFacilitiesForNonMatchingRight() {
     //given
     SupervisoryNode provinceNode = getSupervisoryHierarchy();
 
@@ -193,17 +189,31 @@ public class UserTest {
   @Test
   public void shouldGetFulfillmentFacilities() {
     //given
-    FulfillmentRoleAssignment fulfillmentRoleAssignment = mock(FulfillmentRoleAssignment.class);
+    FulfillmentRoleAssignment fulfillmentRoleAssignment1 = mock(FulfillmentRoleAssignment.class);
+    FulfillmentRoleAssignment fulfillmentRoleAssignment2 = mock(FulfillmentRoleAssignment.class);
+    Right fulfillmentRight1 = mock(Right.class);
+    Facility facility1 = mock(Facility.class);
+    Facility facility2 = mock(Facility.class);
 
-    user.assignRoles(fulfillmentRoleAssignment);
+    when(fulfillmentRoleAssignment1.getWarehouse()).thenReturn(facility1);
+    when(fulfillmentRoleAssignment2.getWarehouse()).thenReturn(facility2);
+
+    when(fulfillmentRoleAssignment1.hasRight(new RightQuery(fulfillmentRight1, facility1)))
+        .thenReturn(true);
+    when(fulfillmentRoleAssignment2.hasRight(new RightQuery(fulfillmentRight1, facility2)))
+        .thenReturn(false);
+
+    user.assignRoles(fulfillmentRoleAssignment1);
+    user.assignRoles(fulfillmentRoleAssignment2);
     user.assignRoles(assignment1);
     user.assignRoles(assignment2);
 
     //when
-    Set<Facility> facilities = user.getFulfillmentFacilities();
+    Set<Facility> facilities = user.getFulfillmentFacilities(fulfillmentRight1);
 
-    //then
+    //then - only facilities where we have the right are returned
     assertThat(facilities.size(), is(1));
+    assertThat(facilities.iterator().next(), is(facility1));
   }
 
   private SupervisoryNode getSupervisoryHierarchy() {

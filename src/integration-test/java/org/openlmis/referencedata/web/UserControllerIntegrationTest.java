@@ -38,10 +38,8 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
+import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleAssignmentException;
-import org.openlmis.referencedata.exception.RoleException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -54,8 +52,8 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.AuthUserRequest;
-import org.openlmis.referencedata.util.PasswordChangeRequest;
-import org.openlmis.referencedata.util.PasswordResetRequest;
+import org.openlmis.util.PasswordChangeRequest;
+import org.openlmis.util.PasswordResetRequest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
@@ -80,10 +78,12 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
   private static final String PROGRAMS_URL = ID_URL + "/programs";
   private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
+  private static final String FULFILLMENT_FACILITIES_URL = ID_URL + "/fulfillmentFacilities";
   private static final String RESET_PASSWORD_URL = RESOURCE_URL + "/passwordReset";
   private static final String CHANGE_PASSWORD_URL = RESOURCE_URL + "/changePassword";
   private static final String USERNAME = "username";
   private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
+  private static final String FULFILLMENT_RIGHT_NAME = "fulfillmentRight";
   private static final String PROGRAM1_CODE = "P1";
   private static final String PROGRAM2_CODE = "P2";
   private static final String SUPERVISORY_NODE_CODE = "SN1";
@@ -138,6 +138,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID adminRoleId;
   private Right supervisionRight;
   private UUID supervisionRightId;
+  private Right fulfillmentRight;
+  private UUID fulfillmentRightId;
   private Role supervisionRole;
   private UUID supervisionRoleId;
   private Program program1;
@@ -156,8 +158,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   /**
    * Constructor for test class.
    */
-  public UserControllerIntegrationTest() throws RoleException, RoleAssignmentException,
-      RightTypeException {
+  public UserControllerIntegrationTest() {
     user1 = generateUser();
     assignUserRoles(user1);
     userId = UUID.randomUUID();
@@ -341,7 +342,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetUserPrograms() throws RightTypeException {
+  public void shouldGetUserPrograms() {
 
     given(userRepository.findOne(userId)).willReturn(user1);
 
@@ -361,7 +362,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getUserSupervisedFacilitiesShouldReturnOk() throws RightTypeException {
+  public void getUserSupervisedFacilitiesShouldReturnOk() {
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
@@ -384,8 +385,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getUserSupervisedFacilitiesShouldReturnNotFoundForNonExistingUser()
-      throws RightTypeException {
+  public void getUserSupervisedFacilitiesShouldReturnNotFoundForNonExistingUser() {
 
     given(userRepository.findOne(userId)).willReturn(null);
 
@@ -404,8 +404,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getUserSupervisedFacilitiesShouldReturnBadRequestForNonExistingUuid()
-      throws RightTypeException {
+  public void getUserSupervisedFacilitiesShouldReturnBadRequestForNonExistingUuid() {
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
@@ -419,6 +418,44 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .pathParam("id", userId)
         .when()
         .get(SUPERVISED_FACILITIES_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserFulfillmentFacilities() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(fulfillmentRightId)).willReturn(fulfillmentRight);
+
+    Facility[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, fulfillmentRightId)
+        .pathParam("id", userId)
+        .when()
+        .get(FULFILLMENT_FACILITIES_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    assertThat(response.length, is(1));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenGettingFulfillmentFacilitiesWithIncorrectRight() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(fulfillmentRightId)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, fulfillmentRightId)
+        .pathParam("id", userId)
+        .when()
+        .get(FULFILLMENT_FACILITIES_URL)
         .then()
         .statusCode(400);
 
@@ -769,8 +806,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     return currentInstanceNumber;
   }
 
-  private void assignUserRoles(User user) throws RightTypeException, RoleException,
-      RoleAssignmentException {
+  private void assignUserRoles(User user) {
 
     Right adminRight = Right.newRight("adminRight", RightType.GENERAL_ADMIN);
     adminRole = Role.newRole("adminRole", adminRight);
@@ -800,7 +836,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         Collections.singletonList(supervisionGroupProgramSchedule));
     supervisoryNode.setRequisitionGroup(supervisionGroup);
 
-    Right fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
+    fulfillmentRight = Right.newRight("fulfillmentRight", RightType.ORDER_FULFILLMENT);
+    fulfillmentRightId = UUID.randomUUID();
     fulfillmentRole = Role.newRole("fulfillmentRole", fulfillmentRight);
     fulfillmentRoleId = UUID.randomUUID();
     fulfillmentRole.setId(fulfillmentRoleId);

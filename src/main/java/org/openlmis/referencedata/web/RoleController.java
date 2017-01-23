@@ -1,21 +1,21 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toSet;
+
 import com.google.common.collect.Sets;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
-import org.openlmis.referencedata.exception.AuthException;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleException;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,11 +24,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.Objects;
+import lombok.NoArgsConstructor;
+
 import java.util.Set;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toSet;
 
 @NoArgsConstructor
 @Controller
@@ -42,23 +41,6 @@ public class RoleController extends BaseController {
   @Autowired
   private RightRepository rightRepository;
 
-  @Autowired
-  private ExposedMessageSource messageSource;
-
-  /**
-   * Constructor for controller unit testing.
-   *
-   * @param repository      role repository
-   * @param rightRepository right repository
-   * @param messageSource   message source
-   */
-  public RoleController(RoleRepository repository, RightRepository rightRepository,
-                        ExposedMessageSource messageSource) {
-    this.roleRepository = Objects.requireNonNull(repository);
-    this.rightRepository = Objects.requireNonNull(rightRepository);
-    this.messageSource = Objects.requireNonNull(messageSource);
-  }
-
   /**
    * Get all roles in the system.
    *
@@ -66,6 +48,7 @@ public class RoleController extends BaseController {
    */
   @RequestMapping(value = "/roles", method = RequestMethod.GET)
   public ResponseEntity<?> getAllRoles() {
+    rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
 
     LOGGER.debug("Getting all roles");
     Set<Role> roles = Sets.newHashSet(roleRepository.findAll());
@@ -84,6 +67,7 @@ public class RoleController extends BaseController {
    */
   @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.GET)
   public ResponseEntity<?> getRole(@PathVariable("roleId") UUID roleId) {
+    rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
 
     LOGGER.debug("Getting role");
     Role role = roleRepository.findOne(roleId);
@@ -107,34 +91,19 @@ public class RoleController extends BaseController {
    */
   @RequestMapping(value = "/roles", method = RequestMethod.POST)
   public ResponseEntity<?> createRole(@RequestBody RoleDto roleDto) {
-
-    Role newRole;
+    rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
     Role storedRole = roleRepository.findFirstByName(roleDto.getName());
     if (storedRole != null) {
       LOGGER.error("Role to create already exists");
-      return ResponseEntity
-          .status(HttpStatus.CONFLICT)
-          .body("Role to create already exists");
+      throw new DataIntegrityViolationException(RoleMessageKeys.ERROR_DUPLICATED);
     }
 
-    try {
+    LOGGER.debug("Saving new role");
 
-      LOGGER.debug("Saving new role");
-
-      populateRights(roleDto);
-      newRole = Role.newRole(roleDto);
-
-      roleRepository.save(newRole);
-
-    } catch (AuthException ae) {
-
-      LOGGER.error("An error occurred while creating role object: "
-          + messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-      return ResponseEntity
-          .badRequest()
-          .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-    }
+    populateRights(roleDto);
+    Role newRole = Role.newRole(roleDto);
+    roleRepository.save(newRole);
 
     LOGGER.debug("Saved new role with id: " + newRole.getId());
 
@@ -154,28 +123,15 @@ public class RoleController extends BaseController {
   @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateRole(@PathVariable("roleId") UUID roleId,
                                       @RequestBody RoleDto roleDto) {
+    rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
     Role roleToSave;
+    LOGGER.debug("Saving role using id: " + roleId);
 
-    try {
-
-      LOGGER.debug("Saving role using id: " + roleId);
-
-      populateRights(roleDto);
-      roleToSave = Role.newRole(roleDto);
-
-      roleToSave.setId(roleId);
-
-      roleRepository.save(roleToSave);
-
-    } catch (AuthException ae) {
-
-      LOGGER.error("An error occurred while creating role object: "
-          + messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-      return ResponseEntity
-          .badRequest()
-          .body(messageSource.getMessage(ae.getMessage(), null, LocaleContextHolder.getLocale()));
-    }
+    populateRights(roleDto);
+    roleToSave = Role.newRole(roleDto);
+    roleToSave.setId(roleId);
+    roleRepository.save(roleToSave);
 
     LOGGER.debug("Saved role with id: " + roleToSave.getId());
 
@@ -192,6 +148,7 @@ public class RoleController extends BaseController {
    */
   @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteRole(@PathVariable("roleId") UUID roleId) {
+    rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
     Role storedRole = roleRepository.findOne(roleId);
     if (storedRole == null) {
@@ -217,7 +174,7 @@ public class RoleController extends BaseController {
     return roleDto;
   }
 
-  private void populateRights(RoleDto roleDto) throws RightTypeException, RoleException {
+  private void populateRights(RoleDto roleDto) {
     Set<Right.Importer> rightDtos = roleDto.getRights();
     for (Right.Importer rightDto : rightDtos) {
       Right storedRight = rightRepository.findFirstByName(rightDto.getName());

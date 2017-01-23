@@ -31,6 +31,7 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
     jcenter()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 dependencies {
@@ -48,6 +49,7 @@ dependencies {
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0"
     compile 'org.webjars:swagger-ui:2.2.6'
     compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'org.openlmis:openlmis-service-util:3.0.0-SNAPSHOT'
 
     testCompile 'io.rest-assured:rest-assured:3.0.0'
     testCompile 'io.rest-assured:json-schema-validator:3.0.0'
@@ -184,7 +186,7 @@ sonarqube {
         property "sonar.jacoco.reportPath", "build/jacoco/test.exec"
         //Tells SonarQube where the integration tests code coverage report is
         property "sonar.jacoco.itReportPath", "build/jacoco/integrationTest.exec"
-	properties["sonar.tests"] += sourceSets.integrationTest.java
+        properties["sonar.tests"] += sourceSets.integrationTest.java
     }
 }
 

@@ -22,5 +22,64 @@
     "loginRestricted": "false",
     "homefacilityid": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
     "timeZone": "CET"
+  },
+  {
+    "id": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0",
+    "username": "srmanager",
+    "email": "srmanager@openlmis.org",
+    "firstName": "Prince",
+    "lastName": "Nyondo",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
+    "timeZone": "CET"
+  },
+  {
+    "id": "9b2778af-5372-4410-a5c8-899e7f74296b",
+    "username": "smanager",
+    "email": "smanager@openlmis.org",
+    "firstName": "Vincent",
+    "lastName": "Muyila",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
+    "timeZone": "CET"
+  },
+  {
+    "id": "573cf089-dfff-4273-b353-d94058164e55",
+    "username": "dsrmanager",
+    "email": "dsrmanager@openlmis.org",
+    "firstName": "Blessings",
+    "lastName": "Kalagho",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "homefacilityid": { "id": "13037147-1769-4735-90a7-b9b310d128b8" },
+    "timeZone": "CET"
+  },
+  {
+    "id": "2bb552b3-0324-42ef-bb21-c5cc74a38592",
+    "username": "psupervisor",
+    "email": "psupervisor@openlmis.org",
+    "firstName": "Francis",
+    "lastName": "Chirwa",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "timeZone": "CET"
+  },
+  {
+    "id": "247b366d-f8ab-4226-9ae9-a188d5ee8e22",
+    "username": "wclerk",
+    "email": "wclerk@openlmis.org",
+    "firstName": "Kennedy",
+    "lastName": "Banda",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "homefacilityid": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "timeZone": "CET"
   }
 ]

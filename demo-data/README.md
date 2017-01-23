@@ -17,23 +17,44 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
   * programs: Family Planning and Essential Meds
   * operated by: moh/Ministry of Health
   * zone: Balaka (City)
-  * this is the home facility for the _administrator_ user
+  * this is the home facility for the _administrator_, _srmanager_ and _smanager_ users
   * this facility is the supplying facility for the Family Planning program with the Supervisory
-    Node N1/FP Approval point
+    Node SN1.1/FP Approval sub point and SN3/FP Approval point
 2. DH01/Balaka District Hospital
   * type: District Hospital
   * programs: Family Planning and Essential Meds
   * operated by: moh/Ministry of Health
   * zone: Balaka District
+  * this is the home facility for the _dsrmanager_ user
+  * this facility is the supplying facility for the Family Planning program with the Supervisory
+  Node SN1/FP Approval Point and for the Essential Meds program with the Supervisory Node SN2/EM
+  Approval Point
 3. W01/CMST Warehouse
   * type: Warehouse
-  * programs: New Program
+  * programs: Family Planning
   * operated by: moh/Ministry of Health
   * zone: Southern Region
-  * this is the home facility for the _devadmin_ user
-
-There are also 2 inactive facilities, FAC003 and FAC004. FAC003 is the supplying facility for
-the Essential Meds program with the supervisory node N2/EM Approval point.
+  * this is the home facility for the _devadmin_ and _wclerk_ users
+4. HF01/Kankao Health Facility
+  * type: Health Center
+  * programs: Family Planning and Essential Meds
+  * operated by: moh/Ministry of Health
+  * zone: Malawi
+5. HC02/Nandumbo Health Center
+  * type: Health Center
+  * programs: Family Planning
+  * operated by: moh/Ministry of Health
+  * zone: Malawi
+6. HC03/Kalembo Health Center
+  * type: Health Center
+  * programs: Essential Meds
+  * operated by: moh/Ministry of Health
+  * zone: Malawi
+7. WH02/South Warehouse
+  * type: Warehouse
+  * programs: Family Planning and Essential Meds
+  * operated by: moh/Ministry of Health
+  * zone: Malawi
 
 ## Geographic Levels and Zones
 
@@ -86,19 +107,25 @@ Defined in referencedata.requisition_groups.json, referencedata.processing_sched
 referencedata.requisition_group_program_schedules.json and
 referencedata.requisition_group_members.json.
 
-1. RG Family Planning
+1. RGFP1/RG Family Planning 1
   * schedule: Monthly (Jan2016, Feb2016 ... Dec2016)
   * facilities:
-    * HC01/Comfort Health Clinic (in two programs and two requisition groups)
+    * HC01/Comfort Health Clinic
+    * HC02/Nandumbo Health Center
   * note: Family Planning program is also supported at Balaka District Hospital,
     but that facility is not in any requisition group
-2. RG Essential Meds
+2. RGEM1/RG Essential Meds 1
   * schedule: Quarterly (Q1, Q2, Q3, Q4 of 2016)
   * facilities:
-    * HC01/Comfort Health Clinic (in two programs and two requisition groups)
-3. RG New program
-  * schedule: SCH005.
-    * W01/CMST Warehouse
+    * HC02/Nandumbo Health Center
+    * HC03/Kalembo Health Center
+    * DH01/Balaka District Hospital
+    * HF01/Kankao Health Facility
+3. RGFP2/RG Family Planning 2
+  * schedule: SCH005
+  * facilities:
+    * DH01/Balaka District Hospital
+    * HF01/Kankao Health Facility
 
 There are also 2 unused schedules, SCH003 and SCH004.
 
@@ -107,28 +134,80 @@ There are also 2 unused schedules, SCH003 and SCH004.
 Defined in referencedata.users.json, referencedata.roles.json, referencedata.role_assignments.json,
 referencedata.role_rights.json and referencedata.supervisory_nodes.json.
 
-1. Program Supervisor
+1. Storeroom Manager
   * rights:
-    * Requisition Create, Approve, Authorize, Delete and View
+    * Requisition View
+    * Requisition Delete
+    * Requisition Create
   * users:
-    * administrator - has this role for both Essential Meds and Family Planning programs
-      at their home facility, HC01/Comfort Health Clinic, _and_ at the Supervisory Node
-      N1/FP Approval point
-2. Storeroom Manager
-  * no rights
+    * administrator - has this role for Family Planning & Essential Meds
+    * srmanager - has this role for Family Planning & Essential Meds
+2. Store Manager
+  * rights:
+    * Requisition View
+    * Requisition Authorize
   * users:
-    * administrator - has this fulfillment role at warehouse HC01/Comfort Health Clinic
-3. Warehouse Clerk
-  * no rights
-  * no users
+    * administrator - has this role for Family Planning & Essential Meds
+    * smanager - has this role for Family Planning & Essential Meds
+3. District Storeroom Manager
+  * rights:
+    * Requisition View
+    * Requisition Approve
+  * users:
+    * administrator - has this role for Family Planning & Essential Meds
+    * dsrmanager - has this role for Family Planning & Essential Meds
+4. Program Supervisor
+  * rights:
+    * Requisition View
+    * Requisition Approve
+  * users:
+    * administrator - has this role for Family Planning & Essential Meds for SN1/FP Approval
+                      point supervisory node
+    * psupervisor - has this role for Family Planning & Essential Meds for SN1/FP Approval
+                    point supervisory node
+5. Warehouse Clerk
+  * rights:
+    * Requisition View
+    * Requisition Convert to Order
+  * users:
+    * administrator - has this role for WH01/CMST Warehouse and WH02/South Warehouse
+    * wclerk
+6. Admin
+  * rights:
+    * Facilities manage
+    * Geographic zones manage
+    * Supervisory nodes manage
+    * Products manage
+    * Requisition templates manage
+    * Stock card templates manage
+  * users:
+    * administrator
+7. Program Coordinator
+  * users:
+    * administrator - has this role for Family Planning & Essential Meds
+    * devadmin - has this role for Family Planning & Essential Meds for SN1/FP Approval point
 
-Other supervisory nodes are not currently used:
-  * N1.1/FP Approval sub point
-  * N2/EM Approval point
-  * N3/New program approval point
+## Supervisory Nodes and Supply Lines
+1. SN1/FP Approval point
+  * facility: DH01/Balaka District Hospital
+  * supply lines:
+    * family planning
+      * warehouse:
+        * WH01/CMST Warehouse
+        * WH02/South Warehouse
+2. SN1.1/FP Approval sub point
+  * facility: HC01/Comfort Health Clinic
+  * parent: SN1/FP Approval point
+3. SN2/EM Approval point
+  * facility: DH01/Balaka District Hospital
+  * supply lines:
+    * essential meds
+      * warehouse: WH02/South Warehouse
+4. SN3/FP Approval point
+  * facility: HC01/Comfort Health Clinic
+
 
 Other users with no roles:
-  * devadmin (home facility is W01/CMST Warehouse)
   * admin (this admin account is built into the bootstrap data)
 
 Passwords for these user accounts come from the

@@ -4,12 +4,12 @@ import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
 
-import lombok.NoArgsConstructor;
-
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.dto.RightDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RightRepository;
-import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Controller
@@ -45,6 +47,8 @@ public class RightController extends BaseController {
    */
   @RequestMapping(value = "/rights", method = RequestMethod.GET)
   public ResponseEntity<?> getAllRights() {
+    
+    rightService.checkRootAccess();
 
     LOGGER.debug("Getting all rights");
     Set<Right> rights = Sets.newHashSet(rightRepository.findAll());
@@ -62,6 +66,9 @@ public class RightController extends BaseController {
    */
   @RequestMapping(value = "/rights/{id}", method = RequestMethod.GET)
   public ResponseEntity<?> getRight(@PathVariable("id") UUID rightId) {
+    
+    rightService.checkRootAccess();
+
     Right right = rightRepository.findOne(rightId);
 
     if (right == null) {
@@ -84,14 +91,14 @@ public class RightController extends BaseController {
   @RequestMapping(value = "/rights", method = RequestMethod.PUT)
   public ResponseEntity<?> saveRight(@RequestBody RightDto rightDto) {
 
+    rightService.checkRootAccess();
+
     if (rightDto.getAttachments() != null) {
       for (Right.Importer attachmentDto : rightDto.getAttachments()) {
         Right storedAttachment = rightRepository.findFirstByName(attachmentDto.getName());
         if (storedAttachment == null) {
-          return ResponseEntity
-              .badRequest()
-              .body(new ErrorResponse("Attachment must exist in the system: "
-                  + attachmentDto.getName(), ""));
+          throw new ValidationMessageException(new Message(
+              RightMessageKeys.ERROR_NAME_NON_EXISTENT, attachmentDto.getName()));
         }
 
         storedAttachment.export((RightDto) attachmentDto);
@@ -126,6 +133,8 @@ public class RightController extends BaseController {
   @RequestMapping(value = "/rights/{rightId}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteRight(@PathVariable("rightId") UUID rightId) {
 
+    rightService.checkRootAccess();
+
     Right storedRight = rightRepository.findOne(rightId);
     if (storedRight == null) {
       LOGGER.error("Right to delete does not exist");
@@ -152,6 +161,8 @@ public class RightController extends BaseController {
    */
   @RequestMapping(value = "/rights/search", method = RequestMethod.GET)
   public ResponseEntity<?> findRightByName(@RequestParam("name") String name) {
+
+    rightService.checkRootAccess();
 
     Right foundRight = rightRepository.findFirstByName(name);
     if (foundRight == null) {

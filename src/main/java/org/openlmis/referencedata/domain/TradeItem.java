@@ -2,13 +2,15 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.ProductMessageKeys;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+
+import lombok.NoArgsConstructor;
 
 /**
  * TradeItems represent branded/produced/physical products.  A TradeItem is used for Product's that
@@ -41,13 +43,13 @@ public final class TradeItem extends OrderableProduct {
     return manufacturer;
   }
 
-  @Override
   /**
    * A TradeItem can fulfill for the given product if the product is this trade item or if this
    * product's GlobalProduct is the given product.
    * @param product the product we'd like to fulfill for.
-   * @returns true if we can fulfill for the given product, false otherwise.
+   * @return true if we can fulfill for the given product, false otherwise.
    */
+  @Override
   public boolean canFulfill(OrderableProduct product) {
     return this.equals(product) || hasGlobalProduct(product);
   }
@@ -83,9 +85,7 @@ public final class TradeItem extends OrderableProduct {
     if (null == globalProduct || hasSameDispensingUnit(globalProduct)) {
       this.globalProduct = globalProduct;
     } else {
-      throw new ValidationMessageException(
-          new Message("referencedata.error.product.wrong-dispensing-units")
-      );
+      throw new ValidationMessageException(ProductMessageKeys.ERROR_DISPENSING_UNITS_WRONG);
     }
   }
 

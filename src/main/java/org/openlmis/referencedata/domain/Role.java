@@ -7,16 +7,14 @@ import static java.util.stream.Stream.concat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -50,7 +48,7 @@ public class Role extends BaseEntity {
   @Getter
   private Set<Right> rights;
 
-  private Role(String name, Right... rights) throws RightTypeException, RoleException {
+  private Role(String name, Right... rights) {
     this.name = name;
     group(rights);
   }
@@ -60,10 +58,9 @@ public class Role extends BaseEntity {
    *
    * @param name   the role name
    * @param rights the rights to group
-   * @throws RightTypeException if the rights do not have the same right type
+   * @throws ValidationMessageException if the rights do not have the same right type
    */
-  public static Role newRole(String name, Right... rights) throws
-      RightTypeException, RoleException {
+  public static Role newRole(String name, Right... rights) {
     return new Role(name, rights);
   }
 
@@ -71,9 +68,9 @@ public class Role extends BaseEntity {
    * Static factory method for constructing a new role using an importer (DTO).
    *
    * @param importer the role importer (DTO)
-   * @throws RightTypeException if the rights do not have the same right type
+   * @throws ValidationMessageException if the rights do not have the same right type
    */
-  public static Role newRole(Importer importer) throws RightTypeException, RoleException {
+  public static Role newRole(Importer importer) {
     Set<Right> importedRights = importer.getRights().stream().map(
         rightImporter -> Right.newRight(rightImporter))
         .collect(toSet());
@@ -91,17 +88,19 @@ public class Role extends BaseEntity {
    * rights.
    *
    * @param rights the rights to group
-   * @throws RightTypeException if the rights do not have the same right type
+   * @throws ValidationMessageException if the rights do not have the same right type
    */
-  public void group(Right... rights) throws RightTypeException, RoleException {
+  public void group(Right... rights) {
     Set<Right> rightsList = new HashSet<>(asList(rights));
     if (rightsList.size() == 0) {
-      throw new RoleException("referencedata.error.role-must-have-a-right");
+      throw new ValidationMessageException(
+          new Message("referencedata.error.role-must-have-a-right"));
     }
     if (checkRightTypesMatch(rightsList)) {
       this.rights = rightsList;
     } else {
-      throw new RightTypeException("referencedata.error.rights-are-different-types");
+      throw new ValidationMessageException(
+          new Message("referencedata.error.rights-are-different-types"));
     }
   }
 
@@ -109,7 +108,7 @@ public class Role extends BaseEntity {
     return rights.iterator().next().getType();
   }
 
-  private static boolean checkRightTypesMatch(Set<Right> rightSet) throws RightTypeException {
+  private static boolean checkRightTypesMatch(Set<Right> rightSet) {
     if (rightSet.isEmpty()) {
       return true;
     } else {
@@ -122,16 +121,17 @@ public class Role extends BaseEntity {
    * Add additional rights to the role.
    *
    * @param additionalRights the rights to add
-   * @throws RightTypeException if the resulting rights do not have the same right type
+   * @throws ValidationMessageException if the resulting rights do not have the same right type
    */
-  public void add(Right... additionalRights) throws RightTypeException {
+  public void add(Right... additionalRights) {
     Set<Right> allRights = concat(rights.stream(), asList(additionalRights).stream())
         .collect(toSet());
 
     if (checkRightTypesMatch(allRights)) {
       rights.addAll(Arrays.asList(additionalRights));
     } else {
-      throw new RightTypeException("referencedata.error.rights-are-different-types");
+      throw new ValidationMessageException(
+          new Message("referencedata.error.rights-are-different-types" ));
     }
   }
 

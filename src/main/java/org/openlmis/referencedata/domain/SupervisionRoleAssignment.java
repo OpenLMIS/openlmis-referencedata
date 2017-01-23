@@ -3,8 +3,6 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
-import org.openlmis.referencedata.exception.RightTypeException;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,7 +31,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   @Getter
   private SupervisoryNode supervisoryNode;
 
-  private SupervisionRoleAssignment(Role role, User user) throws RightTypeException {
+  private SupervisionRoleAssignment(Role role, User user) {
     super(role, user);
   }
 
@@ -43,10 +41,10 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    * @param role    the role being assigned
    * @param user    the user to which the role is being assigned
    * @param program the program where the role applies
-   * @throws RightTypeException if role passed in has rights which are not an acceptable right type
+   * @throws org.openlmis.referencedata.exception.ValidationMessageException if role passed in
+   *      has rights which are not an acceptable right type
    */
-  public SupervisionRoleAssignment(Role role, User user, Program program)
-      throws RightTypeException {
+  public SupervisionRoleAssignment(Role role, User user, Program program) {
     this(role, user);
     this.program = program;
     addSupervisions();
@@ -60,11 +58,11 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    * @param user            the user to which the role is being assigned
    * @param program         the program where the role applies
    * @param supervisoryNode the supervisory node where the role applies
-   * @throws RightTypeException if role passed in has rights which are not an acceptable right type
+   * @throws org.openlmis.referencedata.exception.ValidationMessageException if role passed in
+   *      has rights which are not an acceptable right type
    */
   public SupervisionRoleAssignment(Role role, User user, Program program,
-                                   SupervisoryNode supervisoryNode)
-      throws RightTypeException {
+                                   SupervisoryNode supervisoryNode) {
     this(role, user);
     this.program = program;
     this.supervisoryNode = supervisoryNode;

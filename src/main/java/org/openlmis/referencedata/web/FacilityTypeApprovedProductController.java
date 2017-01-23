@@ -1,7 +1,9 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @return ResponseEntity containing the created facilityTypeApprovedProduct
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.POST)
-  public ResponseEntity<?> createFacilityTypeApprovedProduct(
+  public ResponseEntity<FacilityTypeApprovedProduct> createFacilityTypeApprovedProduct(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct) {
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
     // Ignore provided id
@@ -49,7 +51,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @return ResponseEntity containing the updated facilityTypeApprovedProduct
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateFacilityTypeApprovedProduct(
+  public ResponseEntity<FacilityTypeApprovedProduct> updateFacilityTypeApprovedProduct(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     LOGGER.debug("Updating facilityTypeApprovedProduct");
@@ -64,12 +66,12 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @return FacilityTypeApprovedProduct.
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getFacilityTypeApprovedProduct(
+  public ResponseEntity<FacilityTypeApprovedProduct> getFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
           repository.findOne(facilityTypeApprovedProductId);
     if (facilityTypeApprovedProduct == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(facilityTypeApprovedProduct, HttpStatus.OK);
     }
@@ -83,15 +85,15 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteFacilityTypeApprovedProduct(
+  public ResponseEntity deleteFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
           repository.findOne(facilityTypeApprovedProductId);
     if (facilityTypeApprovedProduct == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     } else {
       repository.delete(facilityTypeApprovedProduct);
-      return new ResponseEntity<FacilityTypeApprovedProduct>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 }

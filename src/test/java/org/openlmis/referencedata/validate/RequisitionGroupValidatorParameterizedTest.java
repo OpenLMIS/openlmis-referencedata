@@ -3,9 +3,7 @@ package org.openlmis.referencedata.validate;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_IS_REQUIRED;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME_IS_REQUIRED;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +16,7 @@ import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -86,7 +85,7 @@ public class RequisitionGroupValidatorParameterizedTest extends BaseValidatorTes
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, CODE, CODE_IS_REQUIRED);
+    assertErrorMessage(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_REQUIRED);
   }
 
   @Test
@@ -95,7 +94,7 @@ public class RequisitionGroupValidatorParameterizedTest extends BaseValidatorTes
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, NAME, NAME_IS_REQUIRED);
+    assertErrorMessage(errors, NAME, RequisitionGroupMessageKeys.ERROR_NAME_REQUIRED);
   }
 
 }

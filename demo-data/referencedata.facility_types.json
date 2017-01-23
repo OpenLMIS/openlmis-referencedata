@@ -1,21 +1,21 @@
 [
   {
     "id": "ac1d268b-ce10-455f-bf87-9c667da8f060",
-    "code": "HC",
+    "code": "health_center",
     "name": "Health Center",
     "active": "true",
     "displayOrder": 1
   },
   {
     "id": "663b1d34-cc17-4d60-9619-e553e45aa441",
-    "code": "DH",
+    "code": "dist_hosp",
     "name": "District Hospital",
     "active": "true",
     "displayOrder": 2
   },
   {
     "id": "e2faaa9e-4b2d-4212-bb60-fd62970b2113",
-    "code": "WH",
+    "code": "warehouse",
     "name": "Warehouse",
     "active": "true",
     "displayOrder": 3

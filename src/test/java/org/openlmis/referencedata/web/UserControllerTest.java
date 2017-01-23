@@ -7,7 +7,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -29,12 +28,11 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.exception.RightTypeException;
-import org.openlmis.referencedata.exception.RoleAssignmentException;
-import org.openlmis.referencedata.exception.RoleException;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
+import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -75,9 +73,6 @@ public class UserControllerTest {
   private FacilityRepository facilityRepository;
 
   @Mock
-  private ExposedMessageSource messageSource;
-
-  @Mock
   private RightRepository rightRepository;
 
   private UserController controller;
@@ -93,6 +88,7 @@ public class UserControllerTest {
   private Set<User> users;
   private UUID userId;
   private UUID roleId;
+  private UUID rightId;
   private Role adminRole1;
   private String supervisionRight1Name;
   private Right supervisionRight1;
@@ -110,10 +106,10 @@ public class UserControllerTest {
   /**
    * Constructor for test.
    */
-  public UserControllerTest() throws RightTypeException, RoleException {
+  public UserControllerTest() {
     initMocks(this);
     controller = new UserController(service, repository, roleRepository, rightRepository,
-        programRepository, supervisoryNodeRepository, facilityRepository, messageSource);
+        programRepository, supervisoryNodeRepository, facilityRepository);
 
     homeFacilityCode = "homeFacilityCode";
     homeFacility = new Facility("C1");
@@ -195,7 +191,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldGetUserWithRoles() throws RightTypeException {
+  public void shouldGetUserWithRoles() {
     //given
     DirectRoleAssignment roleAssignment1 = new DirectRoleAssignment(adminRole1, user1);
     SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole1,
@@ -216,16 +212,13 @@ public class UserControllerTest {
     assertEquals(expectedUserDto, userDto);
   }
 
-  @Test
+  @Test(expected = NotFoundException.class)
   public void shouldNotGetNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.getUser(userId).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+    controller.getUser(userId).getStatusCode();
   }
 
   @Test
@@ -270,8 +263,8 @@ public class UserControllerTest {
     verify(service).save(user1, ACCESS_TOKEN);
   }
 
-  @Test
-  public void shouldNotSaveUserForRoleAssignmentWithoutRole() throws RightTypeException {
+  @Test(expected = ValidationMessageException.class)
+  public void shouldNotSaveUserForRoleAssignmentWithoutRole() {
     //given
     preparePostOrPut();
 
@@ -284,14 +277,11 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn("49c1e712-da50-4428-ae39-2d0409bd8059");
 
     //when
-    HttpStatus httpStatus = controller.saveUser(user1Dto, result, auth).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.BAD_REQUEST));
+    controller.saveUser(user1Dto, result, auth).getStatusCode();
   }
 
   @Test
-  public void shouldSaveUserWithDirectRole() throws RightTypeException {
+  public void shouldSaveUserWithDirectRole() {
     //given
     preparePostOrPut();
 
@@ -319,7 +309,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldSaveUserWithHomeFacilityRole() throws RightTypeException {
+  public void shouldSaveUserWithHomeFacilityRole() {
     //given
     preparePostOrPut();
 
@@ -350,7 +340,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldSaveUserWithSupervisoryRole() throws RightTypeException {
+  public void shouldSaveUserWithSupervisoryRole() {
     //given
     preparePostOrPut();
 
@@ -382,8 +372,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldSaveUserWithFulfillmentRole() throws RightTypeException,
-      RoleAssignmentException {
+  public void shouldSaveUserWithFulfillmentRole() {
     //given
     preparePostOrPut();
 
@@ -413,7 +402,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldReplaceExistingUserRoles() throws RightTypeException {
+  public void shouldReplaceExistingUserRoles() {
     //given
     preparePostOrPut();
 
@@ -443,7 +432,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldDeleteExistingUserRoles() throws RightTypeException {
+  public void shouldDeleteExistingUserRoles() {
     //given
     preparePostOrPut();
 
@@ -480,34 +469,30 @@ public class UserControllerTest {
     verify(repository).delete(userId);
   }
 
-  @Test
+  @Test(expected = NotFoundException.class)
   public void shouldNotDeleteNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.deleteUser(userId).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
-    verify(repository, never()).delete(userId);
+    controller.deleteUser(userId).getStatusCode();
   }
 
-  @Test
+  @Test(expected = NotFoundException.class)
   public void shouldNotCheckIfUserHasRightForNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.checkIfUserHasRight(
-        userId, UUID.randomUUID(), null, null, null).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+    controller.checkIfUserHasRight( userId,
+        UUID.randomUUID(),
+        null,
+        null,
+        null);
   }
 
   @Test
-  public void shouldReturnTrueIfUserHasRight() throws RightTypeException {
+  public void shouldReturnTrueIfUserHasRight() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
@@ -527,7 +512,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldReturnFalseIfUserDoesNotHaveRight() throws RightTypeException {
+  public void shouldReturnFalseIfUserDoesNotHaveRight() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
         supervisoryNode1));
@@ -546,20 +531,17 @@ public class UserControllerTest {
     assertFalse(booleanResultDto.getResult());
   }
 
-  @Test
+  @Test(expected = NotFoundException.class)
   public void shouldNotGetUserProgramsForNonExistingUser() {
     //given
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.getUserPrograms(userId, true).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+    controller.getUserPrograms(userId, true);
   }
 
   @Test
-  public void shouldGetUserHomeFacilityPrograms() throws RightTypeException {
+  public void shouldGetUserHomeFacilityPrograms() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
@@ -576,7 +558,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldGetUserSupervisoryPrograms() throws RightTypeException {
+  public void shouldGetUserSupervisoryPrograms() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
         supervisoryNode1));
@@ -594,8 +576,7 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldGetUserFulfillmentFacilities()
-      throws RightTypeException, RoleAssignmentException {
+  public void shouldGetUserFulfillmentFacilities() {
     //given
     FulfillmentRoleAssignment assignment1 =
         new FulfillmentRoleAssignment(fulfillmentRole1, user1, warehouse1);
@@ -606,9 +587,10 @@ public class UserControllerTest {
     user1.assignRoles(assignment1);
     user1.assignRoles(assignment2);
     when(repository.findOne(userId)).thenReturn(user1);
+    when(rightRepository.findOne(rightId)).thenReturn(fulfillmentRight1);
 
     //when
-    ResponseEntity responseEntity = controller.getUserFulfillmentFacilities(userId);
+    ResponseEntity responseEntity = controller.getUserFulfillmentFacilities(userId, rightId);
     Set<Facility> facilities = (Set<Facility>) responseEntity.getBody();
 
     //then

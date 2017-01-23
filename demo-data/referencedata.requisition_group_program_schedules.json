@@ -4,23 +4,20 @@
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "processingScheduleId": { "id": "9c15bd6e-3f6b-4b91-b53a-36c199d35eac" },
     "directDelivery": "true",
-    "dropOffFacilityId": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "requisitionGroupId": { "id": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05" }
   },
   {
     "id": "56b50f88-13e2-4dd1-8210-fead7025b106",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" },
-    "directDelivery": "false",
-    "dropOffFacilityId": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
+    "directDelivery": "true",
     "requisitionGroupId": { "id": "84b33e28-f537-4a76-8895-9d4d564a623a" }
   },
   {
     "id": "298da8ae-bff9-4f1c-99f5-49e02b2b3b91",
-    "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
+    "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "processingScheduleId": { "id": "083775ab-b9af-41a3-b845-0fbf4fe1583d" },
-    "directDelivery": "false",
-    "dropOffFacilityId": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "directDelivery": "true",
     "requisitionGroupId": { "id": "e90da490-a371-4c2f-83c3-7c1dc9748d48" }
   }
 ]

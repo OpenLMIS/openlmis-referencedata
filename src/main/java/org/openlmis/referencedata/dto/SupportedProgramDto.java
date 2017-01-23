@@ -1,4 +1,4 @@
-package org.openlmis.referencedata.web;
+package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

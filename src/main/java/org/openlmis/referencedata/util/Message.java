@@ -1,6 +1,5 @@
 package org.openlmis.referencedata.util;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.MessageSource;
@@ -16,7 +15,7 @@ public class Message {
   private Object[] params;
 
   public Message(String messageKey) {
-    this(messageKey, (Object[]) null);
+    this(messageKey, new Object[0]);
   }
 
   /**
@@ -27,7 +26,7 @@ public class Message {
    */
   public Message(String messageKey, Object... messageParameters) {
     Validate.notBlank(messageKey);
-    this.key = messageKey.trim().toLowerCase();
+    this.key = messageKey.trim();
     this.params = messageParameters;
   }
 
@@ -45,7 +44,7 @@ public class Message {
    *     the messageSource.
    */
   public LocalizedMessage localMessage(MessageSource messageSource, Locale locale) {
-    return new LocalizedMessage(messageSource.getMessage(key, params, locale));
+    return new LocalizedMessage(key, messageSource.getMessage(key, params, locale));
   }
 
   @Override
@@ -67,25 +66,4 @@ public class Message {
     return key.hashCode();
   }
 
-  /**
-   * Value class of a localized message.  Useful for JSON serialization, logging, etc...
-   */
-  public final class LocalizedMessage {
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String messageKey;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String message;
-
-    LocalizedMessage(String message) {
-      Validate.notBlank(message);
-      this.messageKey = Message.this.key;
-      this.message = message;
-    }
-
-    @Override
-    public String toString() {
-      return messageKey + ": " + message;
-    }
-  }
 }

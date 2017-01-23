@@ -5,18 +5,25 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.SupportedProgramDto;
+import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
-import org.openlmis.referencedata.util.ErrorResponse;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -46,10 +54,6 @@ import java.util.stream.StreamSupport;
 public class FacilityController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
-
-  private static final String KEY_ERROR_PROGRAM_NOT_FOUND = "referencedata.error.program.not-found";
-  private static final String KEY_ERROR_FACILITY_NOT_FOUND =
-      "referencedata.error.facility.not-found";
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -119,24 +123,23 @@ public class FacilityController extends BaseController {
    * @return ResponseEntity containing the created facility
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
-  public ResponseEntity<?> createFacility(@RequestBody FacilityDto facilityDto) {
+  public ResponseEntity<FacilityDto> createFacility(@RequestBody FacilityDto facilityDto) {
+
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     LOGGER.debug("Creating new facility");
     facilityDto.setId(null);
     Facility newFacility = Facility.newFacility(facilityDto);
 
-    boolean addSuccessful = addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(),
-        newFacility);
+    boolean addSuccessful = addSupportedProgramsToFacility(
+        facilityDto.getSupportedPrograms(), newFacility);
     if (!addSuccessful) {
-      return ResponseEntity
-          .badRequest()
-          .body(buildErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND));
+      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
 
     newFacility = facilityRepository.save(newFacility);
-    LOGGER.debug("Created new facility with id: " + facilityDto.getId());
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(toDto(newFacility));
+    LOGGER.debug("Created new facility with id: ", facilityDto.getId());
+    return new ResponseEntity<>(toDto(newFacility), HttpStatus.CREATED);
   }
 
   /**
@@ -145,7 +148,9 @@ public class FacilityController extends BaseController {
    * @return Facilities.
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllFacilities() {
+  public ResponseEntity<List<FacilityDto>> getAllFacilities() {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     Iterable<Facility> facilities = facilityRepository.findAll();
     return ok(facilities);
   }
@@ -188,8 +193,10 @@ public class FacilityController extends BaseController {
    * @return ResponseEntity containing the updated facility
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> saveFacility(@RequestBody FacilityDto facilityDto,
-                                        @PathVariable("id") UUID facilityId) {
+  public ResponseEntity<FacilityDto> saveFacility(
+      @RequestBody FacilityDto facilityDto, @PathVariable("id") UUID facilityId) {
+
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Facility facilityToSave = Facility.newFacility(facilityDto);
     facilityToSave.setId(facilityId);
@@ -197,9 +204,7 @@ public class FacilityController extends BaseController {
     boolean addSuccessful = addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(),
         facilityToSave);
     if (!addSuccessful) {
-      return ResponseEntity
-          .badRequest()
-          .body(buildErrorResponse(KEY_ERROR_PROGRAM_NOT_FOUND));
+      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
     facilityToSave = facilityRepository.save(facilityToSave);
 
@@ -214,10 +219,13 @@ public class FacilityController extends BaseController {
    * @return Facility.
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getFacility(@PathVariable("id") UUID facilityId) {
+  public ResponseEntity getFacility(@PathVariable("id") UUID facilityId) {
+    
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
     } else {
       return ok(facility);
     }
@@ -233,15 +241,14 @@ public class FacilityController extends BaseController {
    * @return collection of approved products
    */
   @RequestMapping(value = "/facilities/{id}/approvedProducts")
-  public ResponseEntity<?> getApprovedProducts(@PathVariable("id") UUID facilityId,
-                                               @RequestParam(required = false, value = "programId")
-                                                   UUID programId,
-                                               @RequestParam(value = "fullSupply")
-                                                   boolean fullSupply) {
+  public ResponseEntity<List<ApprovedProductDto>> getApprovedProducts(
+      @PathVariable("id") UUID facilityId,
+      @RequestParam(required = false, value = "programId") UUID programId,
+      @RequestParam(value = "fullSupply") boolean fullSupply) {
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
-      return ResponseEntity.badRequest().body(buildErrorResponse(KEY_ERROR_FACILITY_NOT_FOUND));
+      throw new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND);
     }
 
     Collection<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
@@ -257,13 +264,16 @@ public class FacilityController extends BaseController {
    * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteFacility(@PathVariable("id") UUID facilityId) {
+  public ResponseEntity deleteFacility(@PathVariable("id") UUID facilityId) {
+
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
     } else {
       facilityRepository.delete(facility);
-      return new ResponseEntity<Facility>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 
@@ -275,29 +285,22 @@ public class FacilityController extends BaseController {
    * @return ResponseEntity containing matched facilities
    */
   @RequestMapping(value = "/facilities/supplying", method = RequestMethod.GET)
-  public ResponseEntity<?> getSupplyingDepots(
+  public ResponseEntity<List<FacilityDto>> getSupplyingDepots(
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
     Program program = programRepository.findOne(programId);
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
 
     if (program == null) {
-      final String errorMessage = "Given Program does not exist";
-      final String errorDescription = "programId: " + programId;
-
-      ErrorResponse errorResponse = new ErrorResponse(errorMessage, errorDescription);
-      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(
+          new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
     if (supervisoryNode == null) {
-      final String errorMessage = "Given SupervisorNode does not exist";
-      final String errorDescription = "supervisorNodeId: " + supervisoryNodeId;
-
-      ErrorResponse errorResponse = new ErrorResponse(errorMessage, errorDescription);
-      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(
+          new Message(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_ID, supervisoryNodeId));
     }
 
-    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program,
-        supervisoryNode);
+    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, supervisoryNode);
     List<Facility> facilities = supplyLines.stream()
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
     return ok(facilities);
@@ -311,16 +314,15 @@ public class FacilityController extends BaseController {
    * @param name Part of wanted facility name.
    * @return List of wanted Facilities.
    */
-  @RequestMapping(value = "/facilities/search",
-      method = RequestMethod.GET)
-  public ResponseEntity<?> findFacilitiesWithSimilarCodeOrName(
+  @RequestMapping(value = "/facilities/search", method = RequestMethod.GET)
+  public ResponseEntity<List<FacilityDto>> findFacilitiesWithSimilarCodeOrName(
       @RequestParam(value = "code", required = false) String code,
       @RequestParam(value = "name", required = false) String name) {
     if (code == null && name == null) {
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      throw new ValidationMessageException(
+          FacilityMessageKeys.ERROR_SEARCH_CODE_NULL_AND_NAME_NULL);
     }
-    List<Facility> foundFacilities =
-        facilityRepository.findFacilitiesByCodeOrName(code, name);
+    List<Facility> foundFacilities = facilityRepository.findFacilitiesByCodeOrName(code, name);
     return ok(foundFacilities);
   }
 
@@ -362,7 +364,7 @@ public class FacilityController extends BaseController {
     for (SupportedProgramDto supportedProgramDto : supportedProgramDtos) {
       Program program = programRepository.findByCode(Code.code(supportedProgramDto.getCode()));
       if (program == null) {
-        LOGGER.debug("Program does not exist: " + supportedProgramDto.getCode());
+        LOGGER.debug("Program does not exist: ", supportedProgramDto.getCode());
         return false;
       }
       SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,

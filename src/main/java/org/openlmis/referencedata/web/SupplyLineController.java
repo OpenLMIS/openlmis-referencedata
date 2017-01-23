@@ -8,11 +8,13 @@ import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.SupplyLineDto;
 import org.openlmis.referencedata.dto.SupplyLineSimpleDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
+import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +120,7 @@ public class SupplyLineController extends BaseController {
   public ResponseEntity<?> getSupplyLine(@PathVariable("id") UUID supplyLineId) {
     SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
     if (supplyLine == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     } else {
       return new ResponseEntity<>(exportToDto(supplyLine), HttpStatus.OK);
     }
@@ -134,7 +136,7 @@ public class SupplyLineController extends BaseController {
   public ResponseEntity<?> deleteSupplyLine(@PathVariable("id") UUID supplyLineId) {
     SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
     if (supplyLine == null) {
-      return new ResponseEntity(HttpStatus.NOT_FOUND);
+      throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     } else {
       supplyLineRepository.delete(supplyLine);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);

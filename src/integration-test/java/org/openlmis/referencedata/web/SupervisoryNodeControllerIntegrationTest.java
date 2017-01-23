@@ -4,15 +4,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import com.jayway.restassured.response.ValidatableResponse;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
+import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -26,13 +33,29 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SEARCH_URL = RESOURCE_URL + "/search";
 
   @MockBean
   private SupervisoryNodeRepository repository;
 
+  @MockBean
+  private ProgramRepository programRepository;
+
+  @MockBean
+  private FacilityRepository facilityRepository;
+
+  @MockBean
+  private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
+
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;
   private UUID supervisoryNodeId;
+  private Facility facility;
+  private Program program;
+  private RequisitionGroupProgramSchedule requisitionGroupProgramSchedule;
+  private RequisitionGroup requisitionGroup;
+  private UUID facilityId;
+  private UUID programId;
 
   /**
    * Constructor for tests.
@@ -41,22 +64,32 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     FacilityOperator facilityOperator = new FacilityOperator();
     facilityOperator.setCode("facilityOperator");
 
-    FacilityType facilityType = new FacilityType("facilityTypeCode");
+    final FacilityType facilityType = new FacilityType("facilityTypeCode");
 
-    GeographicLevel geoLevel = new GeographicLevel("geoCode", 1);
+    final GeographicLevel geoLevel = new GeographicLevel("geoCode", 1);
 
-    GeographicZone geoZone = new GeographicZone("geoZoneCode", geoLevel);
+    final GeographicZone geoZone = new GeographicZone("geoZoneCode", geoLevel);
 
-    Facility facility = new Facility("facilityCode");
+    facility = new Facility("facilityCode");
     facility.setActive(true);
     facility.setGeographicZone(geoZone);
     facility.setType(facilityType);
     facility.setOperator(facilityOperator);
+    facility.setEnabled(true);
 
     supervisoryNode = SupervisoryNode.newSupervisoryNode("supervisoryNodeCode", facility);
     supervisoryNodeDto = new SupervisoryNodeDto();
     supervisoryNode.export(supervisoryNodeDto);
     supervisoryNodeId = UUID.randomUUID();
+
+    program = new Program("PRO-1");
+    requisitionGroup = new RequisitionGroup();
+    requisitionGroup.setSupervisoryNode(supervisoryNode);
+    requisitionGroupProgramSchedule = new RequisitionGroupProgramSchedule();
+    requisitionGroupProgramSchedule.setRequisitionGroup(requisitionGroup);
+    facilityId = UUID.randomUUID();
+    programId = UUID.randomUUID();
+
   }
 
   @Test
@@ -160,5 +193,56 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     assertEquals(supervisoryNodeDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetProcessingScheduleByFacilityAndProgram() {
+
+    given(facilityRepository.findOne(facilityId)).willReturn(facility);
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+        program, facility)).willReturn(requisitionGroupProgramSchedule);
+
+    SupervisoryNode[] response = searchForSupervisoryNode(programId, facilityId, 200)
+        .extract().as(SupervisoryNode[].class);
+
+    assertEquals(supervisoryNode, response[0]);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotFoundWhenSearchingForNonExistingSupervisoryNode() {
+
+    given(facilityRepository.findOne(facilityId)).willReturn(facility);
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+        program, facility)).willReturn(null);
+
+    searchForSupervisoryNode(programId, facilityId, 404);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenSearchingForSupervisoryNodeWithBadParameters() {
+
+    given(facilityRepository.findOne(facilityId)).willReturn(facility);
+    given(programRepository.findOne(programId)).willReturn(null);
+
+    searchForSupervisoryNode(programId, facilityId, 400);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private ValidatableResponse searchForSupervisoryNode(UUID programId, UUID facilityId,
+                                                       int expectedCode) {
+    return restAssured
+      .given()
+      .queryParam(ACCESS_TOKEN, getToken())
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .queryParam("facilityId", facilityId)
+      .queryParam("programId", programId)
+      .when()
+      .get(SEARCH_URL)
+      .then()
+      .statusCode(expectedCode);
   }
 }

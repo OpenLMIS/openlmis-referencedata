@@ -57,9 +57,9 @@ public class MessageTest {
   }
 
   @Test
-  public void equalsAndHashCodeShouldIgnoreSpaceAndCase() {
-    Message foo1 = new Message("foo" );
-    Message foo2 = new Message(" Foo " );
+  public void equalsAndHashCodeShouldIgnoreSpace() {
+    Message foo1 = new Message("Foo");
+    Message foo2 = new Message(" Foo ");
     assert foo1.equals(foo2);
     assert foo2.equals(foo1);
     assert foo1.hashCode() == foo2.hashCode();

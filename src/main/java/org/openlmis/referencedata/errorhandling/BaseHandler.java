@@ -1,7 +1,7 @@
 package org.openlmis.referencedata.errorhandling;
 
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.i18n.MessageService;
+import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,14 +13,23 @@ public class BaseHandler {
   private MessageService messageService;
 
   /**
-   * Translate the Message in a ValidationMessageException into a LocalizedMessage.
+   * Translate a Message into a LocalizedMessage.
    *
-   * @param exception is any ValidationMessageException containing a Message
+   * @param message a Message to translate
    * @return a LocalizedMessage translated by the MessageService bean
    */
-  protected final Message.LocalizedMessage getLocalizedMessage(
-      ValidationMessageException exception) {
-    return messageService.localize(exception.asMessage());
+  protected final LocalizedMessage getLocalizedMessage(Message message) {
+    return messageService.localize(message);
+  }
+
+  /**
+   * Translate a String into a LocalizedMessage.
+   *
+   * @param message a String key code to translate
+   * @return a LocalizedMessage translated by the MessageService bean
+   */
+  protected final LocalizedMessage getLocalizedMessage(String message) {
+    return getLocalizedMessage(new Message(message));
   }
 
 }

@@ -23,7 +23,7 @@
   },
   {
     "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
-    "code": "W01",
+    "code": "WH01",
     "name": "CMST Warehouse",
     "geographiczoneid": { "id": "0bbd69c1-e20f-48f5-aae4-26dcd8aa7602" },
     "typeid": { "id": "e2faaa9e-4b2d-4212-bb60-fd62970b2113" },
@@ -33,25 +33,47 @@
     "openLmisAccessible": "true"
   },
   {
-    "id": "44a29ccb-ed55-4c26-9eca-7e5759269b25",
-    "code": "FAC003",
-    "name": "Facility Inactive Enabled",
-    "geographiczoneid": { "id": "0bbd69c1-e20f-48f5-aae4-26dcd8aa7602" },
-    "typeid": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
-    "operatedbyid": { "id": "1074353d-7364-4618-a127-708d7303a231" },
-    "active": "false",
+    "id": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+    "code": "HF01",
+    "name": "Kankao Health Facility",
+    "geographiczoneid": { "id": "4e471242-da63-436c-8157-ade3e615c848" },
+    "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f060",
+    "operatedbyid": { "id": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121" },
+    "active": "true",
     "enabled": "true",
-    "openLmisAccessible": "false"
+    "openLmisAccessible": "true"
   },
   {
-    "id": "ab95f1cf-ae8d-4888-ba9d-05141d3f50de",
-    "code": "FAC004",
-    "name": "Facility Inactive Disabled",
-    "geographiczoneid": { "id": "0bbd69c1-e20f-48f5-aae4-26dcd8aa7602" },
-    "typeid": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
-    "operatedbyid": { "id": "1074353d-7364-4618-a127-708d7303a231" },
-    "active": "false",
-    "enabled": "false",
+    "id": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+    "code": "HC02",
+    "name": "Nandumbo Health Center",
+    "geographiczoneid": { "id": "4e471242-da63-436c-8157-ade3e615c848" },
+    "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f060",
+    "operatedbyid": { "id": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121" },
+    "active": "true",
+    "enabled": "true",
+    "openLmisAccessible": "true"
+  },
+  {
+    "id": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+    "code": "HC03",
+    "name": "Kalembo Health Center",
+    "geographiczoneid": { "id": "4e471242-da63-436c-8157-ade3e615c848" },
+    "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f060",
+    "operatedbyid": { "id": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121" },
+    "active": "true",
+    "enabled": "true",
+    "openLmisAccessible": "true"
+  },
+  {
+    "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+    "code": "WH02",
+    "name": "South Warehouse",
+    "geographiczoneid": { "id": "4e471242-da63-436c-8157-ade3e615c848" },
+    "typeid": "e2faaa9e-4b2d-4212-bb60-fd62970b2113",
+    "operatedbyid": { "id": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121" },
+    "active": "true",
+    "enabled": "true",
     "openLmisAccessible": "true"
   }
 ]

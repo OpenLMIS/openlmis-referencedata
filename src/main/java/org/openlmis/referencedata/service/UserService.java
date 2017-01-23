@@ -10,9 +10,11 @@ import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.AuthUserRequest;
-import org.openlmis.referencedata.util.NotificationRequest;
-import org.openlmis.referencedata.util.PasswordChangeRequest;
-import org.openlmis.referencedata.util.PasswordResetRequest;
+import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
+import org.openlmis.util.NotificationRequest;
+import org.openlmis.util.PasswordChangeRequest;
+import org.openlmis.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,14 +148,14 @@ public class UserService {
    */
   public void passwordReset(PasswordResetRequest passwordResetRequest, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/passwordReset?access_token=" + token;
+      String url = virtualHostBaseUrl + "/api/users/auth/passwordReset?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, passwordResetRequest, String.class);
 
       verifyUser(passwordResetRequest.getUsername());
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not reset auth user password", ex);
+      throw new ExternalApiException(UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_FAILED, ex);
     }
   }
 
@@ -162,14 +164,15 @@ public class UserService {
    */
   public void changePassword(PasswordChangeRequest passwordChangeRequest, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/changePassword?access_token=" + token;
+      String url = virtualHostBaseUrl + "/api/users/auth/changePassword?access_token=" + token;
 
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.postForObject(url, passwordChangeRequest, String.class);
 
       verifyUser(passwordChangeRequest.getUsername());
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not change auth user password", ex);
+      throw new ExternalApiException(
+          UserMessageKeys.ERROR_EXTERNAL_CHANGE_PASSWORD_FAILED, ex);
     }
   }
 
@@ -186,9 +189,9 @@ public class UserService {
     String[] msgArgs = {user.getFirstName(), user.getLastName(),
         user.getUsername(), virtualHostBaseUrl + "reset-password.html" + "/username/"
         + user.getUsername() + "/token/" + token};
-    String mailBody = messageSource.getMessage("password.reset.email.body",
+    String mailBody = messageSource.getMessage(SystemMessageKeys.PASSWORD_RESET_EMAIL_BODY,
         msgArgs, LocaleContextHolder.getLocale());
-    String mailSubject = messageSource.getMessage("account.created.email.subject",
+    String mailSubject = messageSource.getMessage(SystemMessageKeys.ACCOUNT_CREATED_EMAIL_SUBJECT,
         new String[]{}, LocaleContextHolder.getLocale());
 
     sendMail("notification", user.getEmail(), mailSubject, mailBody, authToken);
@@ -196,13 +199,14 @@ public class UserService {
 
   private UUID createPasswordResetToken(UUID userId, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/passwordResetToken?userId=" + userId
+      String url = virtualHostBaseUrl + "/api/users/auth/passwordResetToken?userId=" + userId
           + "&access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       return restTemplate.postForObject(url, null, UUID.class);
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not create reset password token", ex);
+      throw new ExternalApiException(
+          UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_CREATE_TOKEN_FAILED, ex);
     }
   }
 
@@ -215,7 +219,8 @@ public class UserService {
 
       restTemplate.postForObject(url, request, Object.class);
     } catch (RestClientException ex) {
-      throw new ExternalApiException("Could not send reset password email", ex);
+      throw new ExternalApiException(
+          UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_SEND_MESSAGE_FAILED, ex);
     }
   }
 }

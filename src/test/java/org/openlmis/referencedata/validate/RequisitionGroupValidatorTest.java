@@ -7,20 +7,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_CANNOT_BE_DUPLICATED;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE_IS_TOO_LONG;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.DESCRIPTION;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.DESCRIPTION_IS_TOO_LONG;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_CAN_NOT_BE_NULL;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_MUST_EXIST;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.FACILITY_MUST_HAVE_ID;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.MEMBER_FACILITIES;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME_IS_TOO_LONG;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_IS_REQUIRED;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_MUST_EXIST;
-import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE_MUST_HAVE_ID;
 
 import com.google.common.collect.Sets;
 
@@ -40,6 +30,7 @@ import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -110,7 +101,8 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, SUPERVISORY_NODE, SUPERVISORY_NODE_IS_REQUIRED);
+    assertErrorMessage(errors, SUPERVISORY_NODE,
+        RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_REQUIRED);
   }
 
   @Test
@@ -121,7 +113,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, CODE, CODE_CANNOT_BE_DUPLICATED);
+    assertErrorMessage(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_DUPLICATED);
   }
 
   @Test
@@ -130,7 +122,8 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, SUPERVISORY_NODE, SUPERVISORY_NODE_MUST_HAVE_ID);
+    assertErrorMessage(errors, SUPERVISORY_NODE,
+        RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ID_REQUIRED);
   }
 
   @Test
@@ -141,7 +134,8 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, SUPERVISORY_NODE, SUPERVISORY_NODE_MUST_EXIST);
+    assertErrorMessage(errors, SUPERVISORY_NODE,
+        RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_NON_EXISTENT);
   }
 
   @Test
@@ -150,7 +144,8 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, MEMBER_FACILITIES, FACILITY_CAN_NOT_BE_NULL);
+    assertErrorMessage(errors, MEMBER_FACILITIES,
+        RequisitionGroupMessageKeys.ERROR_FACILITY_NULL);
   }
 
   @Test
@@ -159,7 +154,8 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, MEMBER_FACILITIES, FACILITY_MUST_HAVE_ID);
+    assertErrorMessage(errors, MEMBER_FACILITIES,
+        RequisitionGroupMessageKeys.ERROR_FACILITY_ID_REQUIRED);
   }
 
   @Test
@@ -169,7 +165,8 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
 
-    assertErrorMessage(errors, MEMBER_FACILITIES, FACILITY_MUST_EXIST);
+    assertErrorMessage(errors, MEMBER_FACILITIES,
+        RequisitionGroupMessageKeys.ERROR_FACILITY_NON_EXISTENT);
   }
 
   @Test
@@ -185,7 +182,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     requisitionGroupDto.setCode(RandomStringUtils.randomAlphanumeric(51));
 
     validator.validate(requisitionGroupDto, errors);
-    assertErrorMessage(errors, CODE, CODE_IS_TOO_LONG);
+    assertErrorMessage(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_TOO_LONG);
   }
 
   @Test
@@ -193,7 +190,7 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     requisitionGroupDto.setName(RandomStringUtils.randomAlphanumeric(51));
 
     validator.validate(requisitionGroupDto, errors);
-    assertErrorMessage(errors, NAME, NAME_IS_TOO_LONG);
+    assertErrorMessage(errors, NAME, RequisitionGroupMessageKeys.ERROR_NAME_TOO_LONG);
   }
 
   @Test
@@ -201,7 +198,8 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
     requisitionGroupDto.setDescription(RandomStringUtils.randomAlphanumeric(251));
 
     validator.validate(requisitionGroupDto, errors);
-    assertErrorMessage(errors, DESCRIPTION, DESCRIPTION_IS_TOO_LONG);
+    assertErrorMessage(errors, DESCRIPTION,
+        RequisitionGroupMessageKeys.ERROR_DESCRIPTION_TOO_LONG);
   }
 
   @Test
@@ -235,6 +233,6 @@ public class RequisitionGroupValidatorTest extends BaseValidatorTest {
         .findByCode(requisitionGroupDto.getCode());
 
     validator.validate(requisitionGroupDto, errors);
-    assertErrorMessage(errors, CODE, CODE_CANNOT_BE_DUPLICATED);
+    assertErrorMessage(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_DUPLICATED);
   }
 }
