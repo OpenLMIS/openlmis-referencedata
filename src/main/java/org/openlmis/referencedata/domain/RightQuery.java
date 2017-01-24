@@ -52,7 +52,7 @@ public class RightQuery {
     if (this == other) {
       return true;
     }
-    if (other == null || getClass() != other.getClass()) {
+    if (!(other instanceof RightQuery)) {
       return false;
     }
     RightQuery that = (RightQuery) other;
