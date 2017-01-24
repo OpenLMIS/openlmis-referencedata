@@ -1,13 +1,15 @@
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -15,10 +17,6 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "processing_periods", schema = "referencedata")
@@ -36,21 +34,17 @@ public class ProcessingPeriod extends BaseEntity {
   @Setter
   private String name;
 
-  @Column(nullable = true, columnDefinition = "text")
+  @Column(columnDefinition = "text")
   @Getter
   @Setter
   private String description;
 
-  @JsonSerialize(using = LocalDateSerializer.class)
-  @JsonDeserialize(using = LocalDateDeserializer.class)
   @Convert(converter = LocalDatePersistenceConverter.class)
   @Column(nullable = false)
   @Getter
   @Setter
   private LocalDate startDate;
 
-  @JsonSerialize(using = LocalDateSerializer.class)
-  @JsonDeserialize(using = LocalDateDeserializer.class)
   @Convert(converter = LocalDatePersistenceConverter.class)
   @Column(nullable = false)
   @Getter

@@ -44,7 +44,7 @@ import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -619,7 +619,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     facility.setEnabled(true);
     facility.setActive(true);
     SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
-        program, true, ZonedDateTime.now());
+        program, true, LocalDate.now());
     facility.addSupportedProgram(supportedProgram);
     return facility;
   }

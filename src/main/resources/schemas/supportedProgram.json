@@ -32,13 +32,13 @@
       "type": "boolean",
       "title": "showNonFullSupplyTab"
     },
-    "supportActive": {
+    "active": {
       "type": "boolean",
-      "title": "supportActive"
+      "title": "active"
     },
-    "supportStartDate": {
+    "startDate": {
       "type": "string",
-      "title": "supportStartDate"
+      "title": "startDate"
     }
   },
   "required": [
@@ -46,6 +46,6 @@
     "programActive",
     "periodsSkippable",
     "showNonFullSupplyTab",
-    "supportActive"
+    "active"
   ]
 }

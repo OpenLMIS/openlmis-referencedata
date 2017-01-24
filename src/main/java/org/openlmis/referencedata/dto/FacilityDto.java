@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,51 +21,20 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
 public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.Importer {
-
-  @Getter
-  @Setter
   private String code;
-
-  @Getter
-  @Setter
   private String name;
-
-  @Getter
-  @Setter
   private String description;
-
-  @Getter
   private GeographicZoneDto geographicZone;
-
-  @Getter
   private FacilityTypeDto type;
-
-  @Getter
   private FacilityOperatorDto operator;
-
-  @Getter
-  @Setter
   private Boolean active;
-
-  @Getter
-  @Setter
-  private Date goLiveDate;
-
-  @Getter
-  @Setter
-  private Date goDownDate;
-
-  @Getter
-  @Setter
+  private LocalDate goLiveDate;
+  private LocalDate goDownDate;
   private String comment;
-
-  @Getter
-  @Setter
   private Boolean enabled;
-
-  @Getter
-  @Setter
   private Boolean openLmisAccessible;
 
   @Getter

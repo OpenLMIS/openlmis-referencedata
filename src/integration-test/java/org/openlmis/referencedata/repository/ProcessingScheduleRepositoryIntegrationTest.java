@@ -1,13 +1,14 @@
 package org.openlmis.referencedata.repository;
 
+import com.google.common.collect.Lists;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.google.common.collect.Lists;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class ProcessingScheduleRepositoryIntegrationTest
       extends BaseCrudRepositoryIntegrationTest<ProcessingSchedule> {
@@ -47,7 +48,7 @@ public class ProcessingScheduleRepositoryIntegrationTest
 
     scheduleFromRepo.setDescription(newDescription);
     repository.save(scheduleFromRepo);
-    LocalDateTime savingDateTime = scheduleFromRepo.getModifiedDate();
+    ZonedDateTime savingDateTime = scheduleFromRepo.getModifiedDate();
     iterable = repository.findAll();
     scheduleFromRepo = iterable.iterator().next();
     Assert.assertTrue(savingDateTime.isBefore(scheduleFromRepo.getModifiedDate()));

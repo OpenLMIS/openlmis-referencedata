@@ -41,11 +41,10 @@ dependencies {
     compile "org.postgresql:postgresql:9.4.1208"
     compile "com.github.tomakehurst:wiremock:1.58"
     compile "org.springframework:spring-test"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.4.0"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.8.6"
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.security.oauth:spring-security-oauth2"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0"
     compile 'org.webjars:swagger-ui:2.2.6'
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'org.openlmis:openlmis-service-util:3.0.0-SNAPSHOT'

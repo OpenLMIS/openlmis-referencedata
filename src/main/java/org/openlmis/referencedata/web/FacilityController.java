@@ -285,7 +285,7 @@ public class FacilityController extends BaseController {
         return false;
       }
       SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
-          program, supportedProgramDto.isSupportActive(), supportedProgramDto.getZonedStartDate());
+          program, supportedProgramDto.isActive(), supportedProgramDto.getStartDate());
       facility.addSupportedProgram(supportedProgram);
     }
 

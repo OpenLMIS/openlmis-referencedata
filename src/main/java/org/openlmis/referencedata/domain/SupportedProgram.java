@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -38,8 +38,7 @@ public class SupportedProgram extends BaseEntity {
   @Column(nullable = false)
   private Boolean active;
 
-  @Column(columnDefinition = "timestamp with time zone")
-  private ZonedDateTime startDate;
+  private LocalDate startDate;
 
   private SupportedProgram(Facility facility, Program program, boolean active) {
     this.facility = Objects.requireNonNull(facility);
@@ -48,7 +47,7 @@ public class SupportedProgram extends BaseEntity {
   }
 
   private SupportedProgram(Facility facility, Program program, boolean active,
-                           ZonedDateTime startDate) {
+                           LocalDate startDate) {
     this(facility, program, active);
     this.startDate = startDate;
   }
@@ -59,7 +58,7 @@ public class SupportedProgram extends BaseEntity {
   }
 
   public static SupportedProgram newSupportedProgram(Facility facility, Program program,
-                                                     boolean active, ZonedDateTime startDate) {
+                                                     boolean active, LocalDate startDate) {
     return new SupportedProgram(facility, program, active, startDate);
   }
 
@@ -70,7 +69,6 @@ public class SupportedProgram extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
-    exporter.setFacility(facility);
     exporter.setProgram(program);
     exporter.setActive(active);
     exporter.setStartDate(startDate);
@@ -79,12 +77,10 @@ public class SupportedProgram extends BaseEntity {
   public interface Exporter {
     void setId(UUID id);
 
-    void setFacility(Facility facility);
-
     void setProgram(Program program);
 
     void setActive(boolean active);
 
-    void setStartDate(ZonedDateTime startDate);
+    void setStartDate(LocalDate startDate);
   }
 }

@@ -3,10 +3,12 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -14,6 +16,7 @@ import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -68,11 +71,13 @@ public class Facility extends BaseEntity {
 
   @Getter
   @Setter
-  private Date goLiveDate;
+  @Convert(converter = LocalDatePersistenceConverter.class)
+  private LocalDate goLiveDate;
 
   @Getter
   @Setter
-  private Date goDownDate;
+  @Convert(converter = LocalDatePersistenceConverter.class)
+  private LocalDate goDownDate;
 
   @Column(columnDefinition = TEXT)
   @Getter
@@ -215,9 +220,9 @@ public class Facility extends BaseEntity {
 
     void setActive(Boolean active);
 
-    void setGoLiveDate(Date goLiveDate);
+    void setGoLiveDate(LocalDate goLiveDate);
 
-    void setGoDownDate(Date goDownDate);
+    void setGoDownDate(LocalDate goDownDate);
 
     void setComment(String comment);
 
@@ -247,9 +252,9 @@ public class Facility extends BaseEntity {
 
     Boolean getActive();
 
-    Date getGoLiveDate();
+    LocalDate getGoLiveDate();
 
-    Date getGoDownDate();
+    LocalDate getGoDownDate();
 
     String getComment();
 

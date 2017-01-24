@@ -1,20 +1,15 @@
 package org.openlmis.referencedata.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.SupportedProgram;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.SupportedProgram;
-import org.openlmis.referencedata.dto.BaseDto;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @NoArgsConstructor
@@ -39,14 +34,13 @@ public class SupportedProgramDto extends BaseDto implements SupportedProgram.Exp
   private boolean showNonFullSupplyTab;
 
   @Getter
-  private boolean supportActive;
+  @Setter
+  private boolean active;
 
   @Getter
-  private String supportStartDate;
-
-  @Override
-  public void setFacility(Facility facility) {
-  }
+  @Setter
+  @JsonFormat(pattern = "yyyy-MM-dd")
+  private LocalDate startDate;
 
   @Override
   public void setProgram(Program program) {
@@ -59,24 +53,4 @@ public class SupportedProgramDto extends BaseDto implements SupportedProgram.Exp
     showNonFullSupplyTab = Optional.ofNullable(program.getShowNonFullSupplyTab()).orElse(false);
   }
 
-  @Override
-  public void setActive(boolean active) {
-    supportActive = active;
-  }
-
-  @Override
-  public void setStartDate(ZonedDateTime startDate) {
-    supportStartDate = (startDate == null) ? null : startDate.format(
-        DateTimeFormatter.ISO_LOCAL_DATE);
-  }
-
-  /**
-   * Get supportStartDate from string and turn it into ZonedDateTime. Use midnight for time and UTC
-   * for zone. If supportStartDate is null, return null.
-   */
-  @JsonIgnore
-  public ZonedDateTime getZonedStartDate() {
-    return (supportStartDate == null) ? null : ZonedDateTime.of(LocalDate.parse(supportStartDate),
-        LocalTime.MIDNIGHT, ZoneId.of("UTC"));
-  }
 }
