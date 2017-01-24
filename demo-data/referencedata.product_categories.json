@@ -32,25 +32,25 @@
   {
     "id": "15b8ef1f-a5d6-42dd-95bf-bb68a4504e82",
     "code": "oc",
-    "displayName": "Oral Contraceptive",
+    "displayName": "Oral contraceptive",
     "displayOrder": 6
   },
   {
     "id": "3bfe0282-732b-4ce8-b4f9-aa7ffb297758",
     "code": "bm",
-    "displayName": "Barrier Method",
+    "displayName": "Barrier method",
     "displayOrder": 7
   },
   {
     "id": "06606981-67cc-42d1-87ed-21f22fb0ea58",
     "code": "imp",
-    "displayName": "Implantable Contraceptive",
+    "displayName": "Implantable contraceptive",
     "displayOrder": 8
   },
   {
     "id": "74f39ab7-b5ce-4087-a6ea-65799a35e79b",
     "code": "inj",
-    "displayName": "Injectable Hormonal Contraceptive",
+    "displayName": "Injectable hormonal contraceptive",
     "displayOrder": 9
   }
 ]
