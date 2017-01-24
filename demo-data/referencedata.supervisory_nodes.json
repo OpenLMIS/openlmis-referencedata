@@ -17,11 +17,5 @@
     "code": "SN2",
     "name": "EM Approval point",
     "facilityid": { "id": "13037147-1769-4735-90a7-b9b310d128b8" }
-  },
-  {
-    "id": "0f48d25f-2cc3-4f42-a58b-5c74aab70224",
-    "code": "SN3",
-    "name": "FP Approval point",
-    "facilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" }
   }
 ]
