@@ -88,7 +88,7 @@ schemas:
 
   - geographicZone: !include schemas/geographicZone.json
 
-  - geographicZoneCollection: !include schemas/geographicZoneCollection.json
+  - geographicZonePage: !include schemas/geographicZonePage.json
 
   - globalProduct: |
         {   "type": "object",
@@ -1490,7 +1490,7 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-                      schema: geographicZoneCollection
+                      schema: geographicZonePage
               "403":
                   body:
                     application/json:

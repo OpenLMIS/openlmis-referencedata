@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -54,14 +53,10 @@ public class GeographicZoneController extends BaseController {
    * @return GeographicZones.
    */
   @RequestMapping(value = "/geographicZones", method = RequestMethod.GET)
-  public ResponseEntity<Page<GeographicZone>> getAllGeographicZones_new(Pageable pageable) {
+  public ResponseEntity<Page<GeographicZone>> getAllGeographicZones(Pageable pageable) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
     Page<GeographicZone> geographicZones = geographicZoneRepository.findAll(pageable);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Type", "application/json; charset=utf-8");
-    return new ResponseEntity<>(geographicZones, headers, HttpStatus.OK);
+    return new ResponseEntity<>(geographicZones, HttpStatus.OK);
   }
 
   /**
