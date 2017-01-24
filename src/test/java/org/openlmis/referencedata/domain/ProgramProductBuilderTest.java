@@ -13,6 +13,7 @@ import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;
 
@@ -49,6 +50,7 @@ public class ProgramProductBuilderTest {
         "SuperName123", "SuperDescription", 10, 5, false);
 
     programProductBuilder = new ProgramProductBuilder(program.getId());
+    ReflectionTestUtils.setField(programProductBuilder, "currencyCode", "USD");
     programProductBuilder.setProgramRepository(programRepository);
     programProductBuilder.setProductCategoryRepository(productCategoryRepository);
     programProductBuilder.setProductCategoryId(productCategory.getId());

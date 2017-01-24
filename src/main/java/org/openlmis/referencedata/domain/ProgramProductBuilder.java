@@ -6,8 +6,8 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.messagekeys.ProgramProductBuilderMessageKeys;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -18,6 +18,10 @@ import java.util.UUID;
  * it to {@link Program} in order to build a {@link ProgramProduct}.
  */
 public class ProgramProductBuilder {
+
+  @Value("${currencyCode}")
+  private String currencyCode;
+
   private ProgramRepository programRepo;
   private ProductCategoryRepository productCategoryRepo;
 
@@ -37,7 +41,6 @@ public class ProgramProductBuilder {
     this.fullSupply = false;
     this.displayOrder = 0;
     this.maxMonthsOfStock = 1;
-    this.pricePerPack = Money.of(CurrencyUnit.USD, BigDecimal.ZERO);
   }
 
   /**
@@ -122,14 +125,9 @@ public class ProgramProductBuilder {
 
     Program storedProgram = programRepo.findOne(programId);
     ProductCategory storedProdCategory = productCategoryRepo.findOne(productCategoryId);
-    return ProgramProduct.createNew(storedProgram,
-      storedProdCategory,
-      product,
-      dosesPerMonth,
-      active,
-      fullSupply,
-      displayOrder,
-      maxMonthsOfStock,
-      pricePerPack);
+    return ProgramProduct.createNew(storedProgram, storedProdCategory, product, dosesPerMonth,
+        active, fullSupply, displayOrder, maxMonthsOfStock, pricePerPack,
+        CurrencyUnit.of(currencyCode)
+    );
   }
 }

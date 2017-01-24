@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 
 public class ProgramProductTest {
@@ -21,11 +22,13 @@ public class ProgramProductTest {
 
   @Test
   public void shouldBeEqualByProgramAndProduct() {
-    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, testCat, ibuprofen);
+    ProgramProduct ibuprofenInEm =
+        ProgramProduct.createNew(em, testCat, ibuprofen, CurrencyUnit.USD);
 
     Program emDupe = new Program("EM");
     ProductCategory testCatDupe = ProductCategory.createNew(Code.code("catdupe"));
-    ProgramProduct ibuprofenInEmDupe = ProgramProduct.createNew(emDupe, testCatDupe, ibuprofen);
+    ProgramProduct ibuprofenInEmDupe =
+        ProgramProduct.createNew(emDupe, testCatDupe, ibuprofen, CurrencyUnit.USD);
 
     assertEquals(ibuprofenInEm, ibuprofenInEmDupe);
     assertEquals(ibuprofenInEmDupe, ibuprofenInEm);
@@ -34,13 +37,15 @@ public class ProgramProductTest {
 
   @Test
   public void isForProgramShouldBeTrue() {
-    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, testCat, ibuprofen);
+    ProgramProduct ibuprofenInEm =
+        ProgramProduct.createNew(em, testCat, ibuprofen, CurrencyUnit.USD);
     assertTrue(ibuprofenInEm.isForProgram(em));
   }
 
   @Test
   public void isForProgramShouldBeFalse() {
-    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, testCat, ibuprofen);
+    ProgramProduct ibuprofenInEm =
+        ProgramProduct.createNew(em, testCat, ibuprofen, CurrencyUnit.USD);
 
     assertFalse(ibuprofenInEm.isForProgram(null));
     assertFalse(ibuprofenInEm.isForProgram(new Program("fail")));

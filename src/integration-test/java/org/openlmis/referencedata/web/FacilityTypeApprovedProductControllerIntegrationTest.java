@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import org.joda.money.CurrencyUnit;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -55,7 +56,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderableProduct = GlobalProduct.newGlobalProduct("abcd", "each", "Abcd", "test", 10, 5, false);
     orderableProduct.setId(UUID.randomUUID());
 
-    programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct);
+    programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct,
+        CurrencyUnit.USD);
 
     facilityType1 = new FacilityType("facilityType1");
 

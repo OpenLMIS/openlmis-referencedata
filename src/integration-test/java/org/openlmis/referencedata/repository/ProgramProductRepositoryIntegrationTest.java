@@ -43,10 +43,7 @@ public class ProgramProductRepositoryIntegrationTest
     GlobalProduct globalProduct = orderableProductRepository.save(new GlobalProduct());
     ProductCategory productCategory = ProductCategory.createNew(Code.code("testcat"));
     productCategoryRepository.save(productCategory);
-    ProgramProduct programProduct = ProgramProduct.createNew(program,
-        productCategory,
-        globalProduct);
-    return programProduct;
+    return ProgramProduct.createNew(program, productCategory, globalProduct, CurrencyUnit.USD);
   }
 
   @Before
@@ -111,8 +108,7 @@ public class ProgramProductRepositoryIntegrationTest
 
   private ProgramProduct cloneProgramProduct(ProgramProduct programProduct) {
     ProgramProduct clonedProgramProduct = ProgramProduct.createNew(programProduct.getProgram(),
-        programProduct.getProductCategory(),
-        programProduct.getProduct());
+        programProduct.getProductCategory(), programProduct.getProduct(), CurrencyUnit.USD);
     programProductRepository.save(clonedProgramProduct);
     return clonedProgramProduct;
   }

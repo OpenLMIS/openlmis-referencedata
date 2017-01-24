@@ -10,6 +10,7 @@ import org.joda.money.Money;
 import org.junit.Test;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,14 +29,16 @@ public class OrderableProductTest {
         GlobalProduct.newGlobalProduct("ibuprofen", "each", "Ibuprofen", "test", 10, 5, false);
 
     ProductCategory testCat = ProductCategory.createNew(Code.code("testcat"));
-    ProgramProduct ibuprofenInEm = ProgramProduct.createNew(em, testCat, ibuprofen);
+    ProgramProduct ibuprofenInEm =
+        ProgramProduct.createNew(em, testCat, ibuprofen, CurrencyUnit.USD);
     ibuprofen.addToProgram(ibuprofenInEm);
   }
 
   @Test
   public void shouldReplaceProgramProductOnEquals() {
     ProductCategory nsaidCat = ProductCategory.createNew(Code.code("nsaid"));
-    ProgramProduct ibuprofenInEmForNsaid = ProgramProduct.createNew(em, nsaidCat, ibuprofen);
+    ProgramProduct ibuprofenInEmForNsaid =
+        ProgramProduct.createNew(em, nsaidCat, ibuprofen, CurrencyUnit.USD);
     ibuprofen.addToProgram(ibuprofenInEmForNsaid);
 
     assertEquals(1, ibuprofen.getPrograms().size());
@@ -52,8 +55,10 @@ public class OrderableProductTest {
     ProductCategory painCat = ProductCategory.createNew(Code.code("pain"));
 
     // associate ibuprofen with 2 programs
-    ProgramProduct ibuprofenInEmForNsaid = ProgramProduct.createNew(em, nsaidCat, ibuprofen);
-    ProgramProduct ibuprofenInMalaria = ProgramProduct.createNew(malaria, painCat, ibuprofen);
+    ProgramProduct ibuprofenInEmForNsaid =
+        ProgramProduct.createNew(em, nsaidCat, ibuprofen, CurrencyUnit.USD);
+    ProgramProduct ibuprofenInMalaria =
+        ProgramProduct.createNew(malaria, painCat, ibuprofen, CurrencyUnit.USD);
     ibuprofen.addToProgram(ibuprofenInEmForNsaid);
     ibuprofen.addToProgram(ibuprofenInMalaria);
 
@@ -69,6 +74,7 @@ public class OrderableProductTest {
 
     // create a set with one builder for a link from ibuprofen to EM program
     ProgramProductBuilder ibuprofenInEmBuilder = new ProgramProductBuilder(emUuid);
+    ReflectionTestUtils.setField(ibuprofenInEmBuilder, "currencyCode", "USD");
     ibuprofenInEmBuilder.setProgramRepository(progRepo);
     ibuprofenInEmBuilder.setProductCategoryRepository(prodCatRepo);
     ibuprofenInEmBuilder.setProgramId(emUuid);

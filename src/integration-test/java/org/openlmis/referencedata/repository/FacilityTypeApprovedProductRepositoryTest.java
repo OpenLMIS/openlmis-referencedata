@@ -91,14 +91,15 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     orderableProductFullSupply = GlobalProduct.newGlobalProduct(
         "ibuprofen", "each", "Ibuprofen", "testDesc", 10, 5, false);
     programProductFullSupply = ProgramProduct.createNew(program, productCategory,
-        orderableProductFullSupply);
+        orderableProductFullSupply, CurrencyUnit.USD);
     orderableProductFullSupply.addToProgram(programProductFullSupply);
     orderableProductRepository.save(orderableProductFullSupply);
 
     orderableProductNonFullSupply = GlobalProduct.newGlobalProduct(
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     programProductNonFullSupply = ProgramProduct.createNew(program, productCategory,
-        orderableProductNonFullSupply, 0, true, false, 0, 0, Money.of(CurrencyUnit.USD, 0));
+        orderableProductNonFullSupply, 0, true, false, 0, 0,
+        Money.of(CurrencyUnit.USD, 0), CurrencyUnit.USD);
     orderableProductNonFullSupply.addToProgram(programProductNonFullSupply);
     orderableProductRepository.save(orderableProductNonFullSupply);
 

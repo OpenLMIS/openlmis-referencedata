@@ -72,7 +72,6 @@ public class ProgramProduct extends BaseEntity {
     this.fullSupply = true;
     this.displayOrder = 0;
     this.maxMonthsStock = 0;
-    this.pricePerPack = Money.of(CurrencyUnit.USD, BigDecimal.ZERO);
   }
 
   /**
@@ -94,7 +93,8 @@ public class ProgramProduct extends BaseEntity {
    *  boolean,
    *  int,
    *  int,
-   *  Money)}.
+   *  Money,
+   *  CurrencyUnit)}.
    * Uses sensible defaults.
    * @param program see other
    * @param category see other
@@ -103,8 +103,10 @@ public class ProgramProduct extends BaseEntity {
    */
   public static final ProgramProduct createNew(Program program,
                                                ProductCategory category,
-                                               OrderableProduct product) {
+                                               OrderableProduct product,
+                                               CurrencyUnit currencyUnit) {
     ProgramProduct programProduct = new ProgramProduct(program, product, category);
+    programProduct.pricePerPack = Money.of(currencyUnit, BigDecimal.ZERO);
     return programProduct;
   }
 
@@ -129,17 +131,17 @@ public class ProgramProduct extends BaseEntity {
                                                boolean fullSupply,
                                                int displayOrder,
                                                int maxMonthsStock,
-                                               Money pricePerPack) {
-    ProgramProduct programProduct = new ProgramProduct(program,
-        product,
-        category);
+                                               Money pricePerPack,
+                                               CurrencyUnit currencyUnit) {
+    ProgramProduct programProduct = createNew(program, category, product, currencyUnit);
     programProduct.dosesPerMonth = dosesPerMonth;
     programProduct.active = active;
     programProduct.fullSupply = fullSupply;
     programProduct.displayOrder = displayOrder;
     programProduct.maxMonthsStock = maxMonthsStock;
-    programProduct.pricePerPack = pricePerPack;
-
+    if (pricePerPack != null) {
+      programProduct.pricePerPack = pricePerPack;
+    }
     return programProduct;
   }
 

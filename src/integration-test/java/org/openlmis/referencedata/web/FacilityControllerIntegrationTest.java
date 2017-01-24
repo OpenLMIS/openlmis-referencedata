@@ -652,7 +652,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     orderableProduct.setId(UUID.randomUUID());
     ProgramProduct programProduct = ProgramProduct.createNew(program, category,
-        orderableProduct, 0, true, false, 0, 0, Money.of(CurrencyUnit.USD, 0));
+        orderableProduct, 0, true, false, 0, 0, Money.of(CurrencyUnit.USD, 0), CurrencyUnit.USD);
     programProduct.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setProgramProduct(programProduct);
