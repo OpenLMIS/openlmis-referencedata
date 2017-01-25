@@ -1,7 +1,5 @@
 package org.openlmis.referencedata.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
 
@@ -35,12 +33,11 @@ public class SupportedProgramDto extends BaseDto implements SupportedProgram.Exp
 
   @Getter
   @Setter
-  private boolean active;
+  private boolean supportActive;
 
   @Getter
   @Setter
-  @JsonFormat(pattern = "yyyy-MM-dd")
-  private LocalDate startDate;
+  private LocalDate supportStartDate;
 
   @Override
   public void setProgram(Program program) {

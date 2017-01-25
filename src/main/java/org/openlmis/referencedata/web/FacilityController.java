@@ -278,14 +278,14 @@ public class FacilityController extends BaseController {
 
   private boolean addSupportedProgramsToFacility(Set<SupportedProgramDto> supportedProgramDtos,
                                                  Facility facility) {
-    for (SupportedProgramDto supportedProgramDto : supportedProgramDtos) {
-      Program program = programRepository.findByCode(Code.code(supportedProgramDto.getCode()));
+    for (SupportedProgramDto dto : supportedProgramDtos) {
+      Program program = programRepository.findByCode(Code.code(dto.getCode()));
       if (program == null) {
-        LOGGER.debug("Program does not exist: ", supportedProgramDto.getCode());
+        LOGGER.debug("Program does not exist: ", dto.getCode());
         return false;
       }
       SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
-          program, supportedProgramDto.isActive(), supportedProgramDto.getStartDate());
+          program, dto.isSupportActive(), dto.getSupportStartDate());
       facility.addSupportedProgram(supportedProgram);
     }
 
