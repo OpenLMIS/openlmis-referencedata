@@ -1982,3 +1982,13 @@ resourceTypes:
                     "204":
                     "404":
                     "409":
+
+  /currencySettings:
+      displayName: Currency settings
+      get:
+            is: [ secured ]
+            description: Get all currency settings.
+            responses:
+                "200":
+                    body:
+                        application/json:
