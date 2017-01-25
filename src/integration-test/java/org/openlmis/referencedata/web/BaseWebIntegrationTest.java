@@ -6,13 +6,17 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.config.ObjectMapperConfig;
+import com.jayway.restassured.config.RestAssuredConfig;
 
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,6 +85,9 @@ public abstract class BaseWebIntegrationTest {
   @SpyBean
   protected RightService rightService;
 
+  @Autowired
+  private ObjectMapper objectMapper;
+
   /**
    * Constructor for test.
    */
@@ -120,6 +127,9 @@ public abstract class BaseWebIntegrationTest {
 
     RestAssured.baseURI = baseUri;
     RestAssured.port = randomPort;
+    RestAssured.config = RestAssuredConfig.config().objectMapperConfig(
+        new ObjectMapperConfig().jackson2ObjectMapperFactory((clazz, charset) -> objectMapper)
+    );
     restAssured = ramlDefinition.createRestAssured();
   }
 
