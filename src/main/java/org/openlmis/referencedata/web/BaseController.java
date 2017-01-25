@@ -54,12 +54,13 @@ public abstract class BaseController {
 
 
   /**
+   * <p>
    * Convenience method intended to return audit log information via either JSON or raw text,
    * based on the value of the returnJson argument.
-   *
+   * </p><p>
    * For testing and development, it’s useful to set this to false in order to retrieve a
    * human-readable response. For production, however, JSON should exclusively be returned.
-   *
+   * </p>
    * See getAuditedChanges() for a list and explanation of the available parameters.
    */
   protected String getAuditHistory(Class type, UUID id, String author, String changedPropertyName,

@@ -9,7 +9,6 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
-import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.SupportedProgramDto;
@@ -28,11 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,8 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -71,51 +65,6 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private SupplyLineService supplyLineService;
-
-  /**
-   * TEMPORARY TEST CODE.
-   */
-  @RequestMapping(value = "/message", method = RequestMethod.GET)
-  public ResponseEntity<?> getMessage() {
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-    LocalDateTime now = LocalDateTime.now();
-    String message = "hello world, at " + dateTimeFormatter.format(now);
-    return ResponseEntity.status(HttpStatus.OK).body(message);
-  }
-
-  /**
-   * TEMPORARY TEST CODE.
-   */
-  @RequestMapping(value = "/updateFacility", method = RequestMethod.GET)
-  public ResponseEntity<?> updateFacility() {
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-    LocalDateTime now = LocalDateTime.now();
-    Facility facility = facilityRepository.findFirstByCode("FAC004");
-
-    String comment = String.join("facility id " , facility.getId().toString() ,
-                                  " last updated on " , dateTimeFormatter.format(now) , ".");
-    facility.setComment(comment);
-    facilityRepository.save(facility);
-    return ResponseEntity.status(HttpStatus.OK).body(comment);
-  }
-
-  /**
-   * TEMPORARY TEST CODE.
-   */
-  @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
-  public ResponseEntity<?> getUserInfo() {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    String returnVal = "";
-
-    try {
-      User user = (User)auth.getPrincipal();
-      returnVal = user.getUsername();
-    } catch (Exception ex) {
-      returnVal = "unknown user";
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).body("(v3) " + returnVal);
-  }
 
 
   /**
@@ -189,26 +138,6 @@ public class FacilityController extends BaseController {
                                           changedPropertyName, page, returnJson);
 
     return ResponseEntity.status(HttpStatus.OK).body(auditData);
-  }
-
-  @RequestMapping(value = "/facilities/{id}/getSampleAuditLog", method = RequestMethod.GET)
-  public ResponseEntity<?> getFacilitiesgetSampleAuditLog(
-          @PathVariable("id") UUID id,
-          @RequestParam(name = "author", required = false, defaultValue = "") String author,
-          @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-                  String changedPropertyName,
-          //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
-          @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-                  boolean returnJson,
-          Pageable page) {
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Type", "application/json; charset=UTF-8");
-    String auditData = "      [ { \"changeType\": \"ValueChange\", \"globalId\": { \"entity\": \"org.javers.organization.structure.domain.Person\", \"cdoId\": 13 }, \"commitMetadata\": { \"author\": \"System: AuditLogInitializer\", \"properties\": [], \"commitDate\": \"2017-01-24T21:12:31.137\", \"id\": 26.00 }, \"property\": \"id\", \"left\": 0, \"right\": 13 }, { \"changeType\": \"ValueChange\", \"globalId\": { \"entity\": \"org.javers.organization.structure.domain.Person\", \"cdoId\": 13 }, \"commitMetadata\": { \"author\": \"System: AuditLogInitializer\", \"properties\": [], \"commitDate\": \"2017-01-24T21:12:31.137\", \"id\": 26.00 }, \"property\": \"firstName\", \"left\": null, \"right\": \"Kenny\" } ]     ";
-    ResponseEntity responseEntity = new ResponseEntity(auditData, headers, HttpStatus.OK);
-
-    //return ResponseEntity.status(HttpStatus.OK).body(auditData);
-    return responseEntity;
   }
 
 
