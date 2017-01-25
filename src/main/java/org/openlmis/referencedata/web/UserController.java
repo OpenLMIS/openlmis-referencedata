@@ -1,10 +1,7 @@
 package org.openlmis.referencedata.web;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
 import com.google.common.collect.Sets;
-
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -43,6 +40,7 @@ import org.openlmis.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,8 +57,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import lombok.NoArgsConstructor;
-
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -69,7 +66,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.validation.Valid;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
@@ -265,6 +263,26 @@ public class UserController extends BaseController {
     return ResponseEntity
         .ok(exportUsersToDtos(result));
   }
+
+
+  /**
+   * Returns all users with matched parameters
+   *
+   * @param queryMap request parameters (username, firstName, lastName, homeFacility, active,
+   *                 verified, loginRestricted) and JSON extraData.
+   * @return ResponseEntity with list of all Users matching provided parameters and OK httpStatus.
+   */
+  @RequestMapping(value = "/users/search_2", method = RequestMethod.POST)
+  public ResponseEntity<?> searchUsers_2( @RequestBody Map<String, Object> queryMap,
+                                           Pageable pageable) {
+    List<User> result = userService.searchUsers(queryMap);
+
+    List<UserDto> userDtoList = exportUsersToDtos(result);
+
+    return ResponseEntity
+            .ok(userDtoList);
+  }
+
 
   /**
    * Check if user has a right with certain criteria.

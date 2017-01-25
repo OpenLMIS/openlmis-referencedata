@@ -37,6 +37,7 @@ repositories {
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
+    compile 'org.javers:javers-spring-boot-starter-sql:2.8.1'
     compile "org.projectlombok:lombok:1.16.8"
     compile "org.postgresql:postgresql:9.4.1208"
     compile "com.github.tomakehurst:wiremock:1.58"
@@ -219,6 +220,15 @@ processResources {
 }
 
 apply from: "registration.gradle"
+
+assemble {
+    dependsOn ramlToHtml
+    dependsOn ramlToSwagger
+    dependsOn copyRamlHtmlToBuild
+    dependsOn copyConsulRegistrationToBuild
+    dependsOn jacocoTestReport
+    dependsOn demoDataSeed
+}
 
 build {
     dependsOn check

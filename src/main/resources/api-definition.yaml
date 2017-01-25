@@ -285,6 +285,14 @@ schemas:
           "items": { "type": "string", "required": true, "title": "id" }
       }
 
+  - auditLogEntry: !include schemas/auditLogEntry.json
+
+  - auditLogEntryArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/auditLogEntry.json" }
+      }
+
 traits:
     - secured:
           queryParameters:
@@ -294,6 +302,7 @@ traits:
                   type: string
                   required: true
                   repeat: false
+
     - paginated:
           queryParameters:
               page:
@@ -308,6 +317,70 @@ traits:
                   repeat: false
 
 resourceTypes:
+    - auditLog:
+        description: This represents the audit log for all <<resourcePathName|!singularize>> resources.
+        get:
+          description: Returns all or part of the resource's audit log
+          # Although */auditLog endpoints support "page" and "number" query parameters for pagination,
+          # they don’t return the response body and set of pagination-related values used by collections
+          # of core domain resources.
+          is: [ secured, paginated ]
+          queryParameters:
+              author:
+                  displayName: author
+                  description: Name of the author of changes which should be returned. By default, all changes are returned regardless of author.
+                  type: string
+                  required: false
+                  repeat: false
+              changedPropertyName:
+                  displayName: changedPropertyName
+                  description: The name of the property about which changes should be returned. If null or empty, changes associated with any and all properties are returned.
+                  type: string
+                  required: false
+                  repeat: false
+          responses:
+              200:
+                body:
+                  application/json:
+                    schema: auditLogEntryArray
+                    example: |
+                      [
+                        {
+                          "changeType": "ValueChange",
+                          "globalId": {
+                            "entity": "org.openlmis.SomeClass",
+                            "cdoId": 1
+                          },
+                          "commitMetadata": {
+                            "author": "SomeUserName",
+                            "properties": [],
+                            "commitDate": "2016-12-17T19:39:57.621",
+                            "id": 3
+                          },
+                          "property": "PropertyName",
+                          "left": "OldValue",
+                          "right": "NewValue"
+                        }
+                      ]
+              403:
+                body:
+                  application/json:
+                    schema: localizedErrorResponse
+              404:
+                description: Collection is empty.
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
+
+    - instanceAuditLog:
+        description: This represents the audit log for a specified instance of the <<resourcePathName|!singularize>> resource.
+        type: auditLog
+        uriParameters:
+            id:
+                type: string
+                required: true
+                repeat: false
+
     - collection:
         get:
             is: [ secured ]
@@ -1087,6 +1160,9 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
+      /{id}/auditLog:
+          type: instanceAuditLog
+
       /{id}/approvedProducts:
           uriParameters:
               id:

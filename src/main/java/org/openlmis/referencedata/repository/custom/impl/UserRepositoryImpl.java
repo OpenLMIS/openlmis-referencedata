@@ -3,6 +3,7 @@ package org.openlmis.referencedata.repository.custom.impl;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +36,37 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   public List<User> searchUsers(String username, String firstName, String lastName,
                                 Facility homeFacility, Boolean active, Boolean verified,
                                 Boolean loginRestricted) {
+    return searchUsers(username, firstName, lastName, homeFacility, active, verified,
+                        loginRestricted, null);
+  }
 
+  /**
+   * Method returns all users with matched parameters. If all parameters are null, returns an
+   * empty list.
+   *
+   * @param username        username of user.
+   * @param firstName       firstName of user.
+   * @param lastName        lastName of user.
+   * @param homeFacility    homeFacility of user.
+   * @param active          is the account activated.
+   * @param verified        is the account verified.
+   * @param loginRestricted is the account login restricted.
+   * @return List of users
+   */
+  public List<User> searchUsers(String username, String firstName, String lastName,
+                                Facility homeFacility, Boolean active, Boolean verified,
+                                Boolean loginRestricted, Pageable pageable) {
     if (username == null && firstName == null && lastName == null && homeFacility == null
-        && active == null && verified == null && loginRestricted == null) {
+            && active == null && verified == null && loginRestricted == null) {
       return new ArrayList<>();
+    }
+
+
+    int pageNumber = 0;
+    int pageSize = 0;
+    if (pageable != null) {
+      pageNumber = pageable.getPageNumber();
+      pageSize = pageable.getPageSize();
     }
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -53,9 +81,12 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     predicate = addFilter(predicate, builder, root, "verified", verified);
     predicate = addFilter(predicate, builder, root, "loginRestricted", loginRestricted);
     query.where(predicate);
-    return entityManager.createQuery(query).getResultList();
+    return entityManager.createQuery(query).setMaxResults(pageSize)
+                        .setFirstResult(pageNumber * pageSize)
+                        .getResultList();
   }
-  
+
+
   private Predicate addFilter(Predicate predicate, CriteriaBuilder builder, Root root,
                               String filterKey, Object filterValue) {
     if (filterValue != null) {
