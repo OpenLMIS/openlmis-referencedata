@@ -434,7 +434,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-  
+
   @Test
   public void postShouldCreateFacility() {
 
@@ -619,6 +619,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     facility.setDescription("FacilityDescription " + instanceNumber);
     facility.setEnabled(true);
     facility.setActive(true);
+    facility.setGoLiveDate(LocalDate.now());
+    facility.setGoDownDate(LocalDate.now().plusMonths(1));
     SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
         program, true, LocalDate.now());
     facility.addSupportedProgram(supportedProgram);
