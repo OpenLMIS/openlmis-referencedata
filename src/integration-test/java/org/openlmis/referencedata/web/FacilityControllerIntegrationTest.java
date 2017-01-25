@@ -336,6 +336,26 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void getShouldGetFacilityAuditLog() {
+
+    doNothing()
+            .when(rightService)
+            .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
+
+    restAssured
+            .given()
+            .queryParam(ACCESS_TOKEN, getToken())
+            .pathParam("id", UUID.randomUUID())
+            .when()
+            .get("/api/facilities/{id}/getSampleAuditLog")
+            .then()
+            .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void getShouldReturnForbiddenForUnauthorizedToken() {
 
     doThrow(new UnauthorizedException(

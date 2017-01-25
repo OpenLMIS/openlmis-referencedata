@@ -27,6 +27,8 @@ import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -159,23 +161,23 @@ public class FacilityController extends BaseController {
   /**
    * Get the audit information related to facilities.
    *
-   * @param skip The number of historical changes to skip. Useful for paging.
-   * @param limit The maximum number of historical change results to return. Useful for paging.
    * @param author The author of the changes which should be returned.
    *               If null or empty, changes are returned regardless of author.
    * @param changedPropertyName The name of the property about which changes should be returned.
    *               If null or empty, changes associated with any and all properties are returned.
+   * @param page A Pageable object that allows client to optionally add "page" (page number)
+   *             and "size" (page size) query parameters to the request.
    */
   @RequestMapping(value = "/facilities/{id}/auditLog", method = RequestMethod.GET)
   public ResponseEntity<?> getFacilitiesAuditLog(
           @PathVariable("id") UUID id,
-          @RequestParam(name = "skip", required = false, defaultValue = "0") int skip,
-          @RequestParam(name = "limit", required = false, defaultValue = "100") int limit,
           @RequestParam(name = "author", required = false, defaultValue = "") String author,
           @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
                         String changedPropertyName,
+          //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
           @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-                        boolean returnJson) {
+                        boolean returnJson,
+          Pageable page) {
 
     //Return a 404 if the specified facility can't be found
     ResponseEntity responseEntity = getFacility(id);
@@ -183,16 +185,30 @@ public class FacilityController extends BaseController {
       return responseEntity;
     }
 
-    //Retrieve audit related info in either JSON or raw-text format.
-    //The later is significantly more human readable.
-    String auditData = "";
-    if (returnJson) {
-      auditData = getAuditedChanges(Facility.class, id, skip, limit, author, changedPropertyName);
-    } else {
-      auditData = getAuditedChangeLog(Facility.class, id, skip, limit, author, changedPropertyName);
-    }
+    String auditData = getAuditHistory(Facility.class, id, author,
+                                          changedPropertyName, page, returnJson);
 
     return ResponseEntity.status(HttpStatus.OK).body(auditData);
+  }
+
+  @RequestMapping(value = "/facilities/{id}/getSampleAuditLog", method = RequestMethod.GET)
+  public ResponseEntity<?> getFacilitiesgetSampleAuditLog(
+          @PathVariable("id") UUID id,
+          @RequestParam(name = "author", required = false, defaultValue = "") String author,
+          @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+                  String changedPropertyName,
+          //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+          @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+                  boolean returnJson,
+          Pageable page) {
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Type", "application/json; charset=UTF-8");
+    String auditData = "      [ { \"changeType\": \"ValueChange\", \"globalId\": { \"entity\": \"org.javers.organization.structure.domain.Person\", \"cdoId\": 13 }, \"commitMetadata\": { \"author\": \"System: AuditLogInitializer\", \"properties\": [], \"commitDate\": \"2017-01-24T21:12:31.137\", \"id\": 26.00 }, \"property\": \"id\", \"left\": 0, \"right\": 13 }, { \"changeType\": \"ValueChange\", \"globalId\": { \"entity\": \"org.javers.organization.structure.domain.Person\", \"cdoId\": 13 }, \"commitMetadata\": { \"author\": \"System: AuditLogInitializer\", \"properties\": [], \"commitDate\": \"2017-01-24T21:12:31.137\", \"id\": 26.00 }, \"property\": \"firstName\", \"left\": null, \"right\": \"Kenny\" } ]     ";
+    ResponseEntity responseEntity = new ResponseEntity(auditData, headers, HttpStatus.OK);
+
+    //return ResponseEntity.status(HttpStatus.OK).body(auditData);
+    return responseEntity;
   }
 
 

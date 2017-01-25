@@ -20,7 +20,11 @@
           },
           "cdoId": {
               "description": "The ID of the entity which was changed",
-              "type": "string"
+              "anyOf": [
+                { "type": ["string", "null"] },
+                { "type": ["object", "null"] },
+                { "type": ["number", "null"] }
+              ]
           }
       }
     },
@@ -46,7 +50,11 @@
           },
           "id": {
               "description": "ID of the commit",
-              "type": "integer"
+              "anyOf": [
+                { "type": ["string", "null"] },
+                { "type": ["object", "null"] },
+                { "type": ["number", "null"] }
+              ]
           }
       }
     },

@@ -1,4 +1,4 @@
-package org.openlmis.referencedata.infrastructure;
+package org.openlmis.referencedata;
 
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;

@@ -321,6 +321,9 @@ resourceTypes:
         description: This represents the audit log for all <<resourcePathName|!singularize>> resources.
         get:
           description: Returns all or part of the resource's audit log
+          # Although */auditLog endpoints support "page" and "number" query parameters for pagination,
+          # they don’t return the response body and set of pagination-related values used by collections
+          # of core domain resources.
           is: [ secured, paginated ]
           queryParameters:
               author:
@@ -1198,6 +1201,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
       /{id}/auditLog:
+          type: instanceAuditLog
+
+      /{id}/getSampleAuditLog:
           type: instanceAuditLog
 
       /{id}/approvedProducts:
