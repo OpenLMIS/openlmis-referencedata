@@ -24,6 +24,7 @@ import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Collection;
 
@@ -53,6 +54,9 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
+
+  @Value("${currencyCode}")
+  private String currencyCode;
 
   FacilityTypeApprovedProductRepository getRepository() {
     return this.ftapRepository;
@@ -91,7 +95,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     orderableProductFullSupply = GlobalProduct.newGlobalProduct(
         "ibuprofen", "each", "Ibuprofen", "testDesc", 10, 5, false);
     programProductFullSupply = ProgramProduct.createNew(program, productCategory,
-        orderableProductFullSupply, CurrencyUnit.USD);
+        orderableProductFullSupply, CurrencyUnit.of(currencyCode));
     orderableProductFullSupply.addToProgram(programProductFullSupply);
     orderableProductRepository.save(orderableProductFullSupply);
 
@@ -99,7 +103,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     programProductNonFullSupply = ProgramProduct.createNew(program, productCategory,
         orderableProductNonFullSupply, 0, true, false, 0, 0,
-        Money.of(CurrencyUnit.USD, 0), CurrencyUnit.USD);
+        Money.of(CurrencyUnit.of(currencyCode), 0), CurrencyUnit.of(currencyCode));
     orderableProductNonFullSupply.addToProgram(programProductNonFullSupply);
     orderableProductRepository.save(orderableProductNonFullSupply);
 

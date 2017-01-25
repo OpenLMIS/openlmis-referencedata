@@ -17,6 +17,7 @@ import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -32,6 +33,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @MockBean
   private FacilityTypeApprovedProductRepository repository;
+
+  @Value("${currencyCode}")
+  private String currencyCode;
 
   private Program program;
   private OrderableProduct orderableProduct;
@@ -57,7 +61,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderableProduct.setId(UUID.randomUUID());
 
     programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct,
-        CurrencyUnit.USD);
+        CurrencyUnit.of(currencyCode));
 
     facilityType1 = new FacilityType("facilityType1");
 
