@@ -161,11 +161,11 @@ public abstract class BaseWebIntegrationTest {
     return CLIENT_ACCESS_TOKEN;
   }
 
-  protected void hasRight(String rightName) {
+  protected void mockEnableRight(String rightName) {
     doNothing().when(rightService).checkAdminRight(rightName);
   }
 
-  protected void hasNoRight(String rightName) {
+  protected void mockDisableRight(String rightName) {
     Message message = new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName);
     UnauthorizedException exception = new UnauthorizedException(message);
 

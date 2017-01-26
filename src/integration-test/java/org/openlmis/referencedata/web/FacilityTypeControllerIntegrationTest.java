@@ -40,7 +40,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldDeleteFacilityType() {
-    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityTypeRepository.findOne(facilityTypeId)).willReturn(facilityType);
 
     restAssured
@@ -58,7 +58,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldRejectDeleteRequestIfUserHasNoRight() {
-    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -78,7 +78,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldPostFacilityType() {
-    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     FacilityType response = restAssured
         .given()
@@ -97,7 +97,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldRejectCreateRequestIfUserHasNoRight() {
-    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -117,7 +117,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldPutFacilityType() {
-    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     facilityType.setDescription(DESCRIPTION);
 
@@ -140,7 +140,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldRejectUpdateRequestIfUserHasNoRight() {
-    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -161,7 +161,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldGetAllFacilityTypes() {
-    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<FacilityType> storedFacilityTypes = Arrays.asList(facilityType, new FacilityType("code2"));
     given(facilityTypeRepository.findAll()).willReturn(storedFacilityTypes);
@@ -182,7 +182,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldRejectGetAllRequestIfUserHasNoRight() {
-    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -201,7 +201,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldGetFacilityType() {
-    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
     
     given(facilityTypeRepository.findOne(facilityTypeId)).willReturn(facilityType);
 
@@ -222,7 +222,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldRejectGetRequestIfUserHasNoRight() {
-    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
