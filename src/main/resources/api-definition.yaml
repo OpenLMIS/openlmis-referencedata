@@ -992,6 +992,10 @@ resourceTypes:
               "200":
                   body:
                     application/json:
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       put:
           is: [ secured ]
           description: Create or update user.
@@ -1007,6 +1011,10 @@ resourceTypes:
               "500":
                   body:
                     application/json:
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{userId}:
           uriParameters:
               userId:
@@ -1026,6 +1034,10 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen user.
@@ -1034,6 +1046,10 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  "403":
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1047,6 +1063,10 @@ resourceTypes:
                             application/json:
                               schema: detailedRoleAssignmentDtoArray
                       "404":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+                      "403":
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1089,6 +1109,10 @@ resourceTypes:
                             application/json:
                               schema: errorResponse
                       "404":
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /programs:
               is: [ secured ]
               displayName: User supervised programs
@@ -1108,6 +1132,10 @@ resourceTypes:
                           body:
                             application/json:
                       "404":
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /supervisedFacilities:
               is: [ secured ]
               displayName: User supervised facilities
@@ -1136,6 +1164,7 @@ resourceTypes:
                             application/json:
                               schema: errorResponse
                       "404":
+                      "403":
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1162,6 +1191,10 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
                       "404":
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
       /search:
               post:
                   is: [ secured ]
@@ -1170,10 +1203,14 @@ resourceTypes:
                       application/json:
                         schema: userQueryDto
                   responses:
-                      200:
+                      "200":
                           body:
                             application/json:
                                 schema: userArray
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
 
   /facilities:
       displayName: Facility
