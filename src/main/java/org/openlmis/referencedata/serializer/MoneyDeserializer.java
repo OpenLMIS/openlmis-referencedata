@@ -18,7 +18,6 @@ public class MoneyDeserializer extends JsonDeserializer<Money> {
   @Value("${currencyCode}")
   private String currencyCode;
 
-
   @Override
   public Money deserialize(JsonParser jsonParser, DeserializationContext ctxt)
       throws IOException {
