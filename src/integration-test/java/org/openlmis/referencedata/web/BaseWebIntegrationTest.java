@@ -5,6 +5,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -14,7 +16,9 @@ import com.jayway.restassured.config.RestAssuredConfig;
 
 import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +51,8 @@ public abstract class BaseWebIntegrationTest {
 
   protected static final String RAML_ASSERT_MESSAGE =
       "HTTP request/response should match RAML definition.";
+  
+  static final String MESSAGE_KEY = "messageKey";
 
   protected RestAssuredClient restAssured;
 
@@ -154,4 +160,16 @@ public abstract class BaseWebIntegrationTest {
   String getClientToken() {
     return CLIENT_ACCESS_TOKEN;
   }
+
+  protected void hasRight(String rightName) {
+    doNothing().when(rightService).checkAdminRight(rightName);
+  }
+
+  protected void hasNoRight(String rightName) {
+    Message message = new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName);
+    UnauthorizedException exception = new UnauthorizedException(message);
+
+    doThrow(exception).when(rightService).checkAdminRight(rightName);
+  }
+
 }

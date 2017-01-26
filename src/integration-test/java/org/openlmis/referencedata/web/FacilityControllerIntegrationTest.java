@@ -1,7 +1,20 @@
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Sets;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
+import org.hamcrest.Matchers;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -33,6 +46,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,21 +57,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String PROGRAM_ID = "programId";
+  static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String AUDIT_URL = ID_URL + "/auditLog";
@@ -98,6 +103,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnSupplyingDepots() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     int searchedFacilitiesAmt = 3;
 
     SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
@@ -118,7 +125,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     FacilityDto[] response = restAssured.given()
         .queryParam(PROGRAM_ID, programId)
-        .queryParam("supervisoryNodeId", supervisoryNodeId)
+        .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(SUPPLYING_URL)
@@ -140,7 +147,46 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRejectGetSupplingRequestIfUserHasNoRight() {
+    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    int searchedFacilitiesAmt = 3;
+
+    SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
+
+    List<SupplyLine> searchedSupplyLines = new ArrayList<>();
+    for (int i = 0; i < searchedFacilitiesAmt; i++) {
+      SupplyLine supplyLine = generateSupplyLine();
+      supplyLine.setProgram(program);
+      supplyLine.setSupervisoryNode(searchedSupervisoryNode);
+
+      searchedSupplyLines.add(supplyLine);
+    }
+
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
+    given(supplyLineService.searchSupplyLines(program, searchedSupervisoryNode))
+        .willReturn(searchedSupplyLines);
+
+    String messageKey = restAssured.given()
+        .queryParam(PROGRAM_ID, programId)
+        .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SUPPLYING_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingSupervisorNode() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     supervisoryNodeId = UUID.randomUUID();
 
     given(programRepository.findOne(programId)).willReturn(program);
@@ -149,7 +195,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured.given()
         .queryParam(PROGRAM_ID, programId)
-        .queryParam("supervisoryNodeId", supervisoryNodeId)
+        .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(SUPPLYING_URL)
@@ -161,6 +207,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingProgram() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
 
     given(programRepository.findOne(programId)).willReturn(null);
@@ -168,7 +216,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured.given()
         .queryParam(PROGRAM_ID, programId)
-        .queryParam("supervisoryNodeId", supervisoryNodeId)
+        .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(SUPPLYING_URL)
@@ -180,6 +228,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     String similarCode = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
@@ -201,7 +251,27 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRejectSearchRequestIfUserHasNoRight() {
+    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    String messageKey = restAssured.given()
+        .queryParam("code", "Facility")
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldFindFacilitiesWithSimilarName() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     String similarName = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
@@ -224,6 +294,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldNotFindFacilitiesWithIncorrectCodeAndName() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     Facility[] response = restAssured.given()
         .queryParam("code", "IncorrectCode")
         .queryParam("name", "NotSimilarName")
@@ -240,6 +312,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindApprovedProductsForFacility() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
     when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
         eq(false))).thenReturn(generateFacilityTypeApprovedProducts());
@@ -259,7 +333,28 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRejectGetApprovedProductsRequestIfUserHasNoRight() {
+    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    String messageKey = restAssured.given()
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam("fullSupply", false)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(null);
 
     restAssured.given()

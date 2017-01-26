@@ -203,6 +203,7 @@ public class FacilityController extends BaseController {
       @PathVariable("id") UUID facilityId,
       @RequestParam(required = false, value = "programId") UUID programId,
       @RequestParam(value = "fullSupply") boolean fullSupply) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
@@ -246,6 +247,8 @@ public class FacilityController extends BaseController {
   public ResponseEntity<List<FacilityDto>> getSupplyingDepots(
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     Program program = programRepository.findOne(programId);
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
 
@@ -276,6 +279,8 @@ public class FacilityController extends BaseController {
   public ResponseEntity<List<FacilityDto>> findFacilitiesWithSimilarCodeOrName(
       @RequestParam(value = "code", required = false) String code,
       @RequestParam(value = "name", required = false) String name) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     if (code == null && name == null) {
       throw new ValidationMessageException(
           FacilityMessageKeys.ERROR_SEARCH_CODE_NULL_AND_NAME_NULL);

@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
@@ -35,6 +36,7 @@ public class FacilityTypeController extends BaseController {
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.POST)
   public ResponseEntity<FacilityType> createFacilityType(@RequestBody FacilityType facilityType) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     LOGGER.debug("Creating new facility type");
     facilityType.setId(null);
     facilityTypeRepository.save(facilityType);
@@ -49,6 +51,7 @@ public class FacilityTypeController extends BaseController {
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.GET)
   public ResponseEntity<Iterable<FacilityType>> getAllFacilityTypes() {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     Iterable<FacilityType> facilityTypes = facilityTypeRepository.findAll();
     return new ResponseEntity<>(facilityTypes, HttpStatus.OK);
   }
@@ -63,6 +66,7 @@ public class FacilityTypeController extends BaseController {
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.PUT)
   public ResponseEntity<FacilityType> updateFacilityType(
       @RequestBody FacilityType facilityType, @PathVariable("id") UUID facilityTypeId) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     FacilityType facilityTypeToUpdate = facilityTypeRepository.findOne(facilityTypeId);
     try {
@@ -91,6 +95,7 @@ public class FacilityTypeController extends BaseController {
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.GET)
   public ResponseEntity<FacilityType> getFacilityType(@PathVariable("id") UUID facilityTypeId) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
     if (facilityType == null) {
       throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
@@ -107,6 +112,7 @@ public class FacilityTypeController extends BaseController {
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
     if (facilityType == null) {
       throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);

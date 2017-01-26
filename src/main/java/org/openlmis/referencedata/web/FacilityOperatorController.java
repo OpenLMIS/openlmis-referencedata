@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.FacilityOperator;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.util.messagekeys.FacilityOperatorMessageKeys;
@@ -34,6 +35,7 @@ public class FacilityOperatorController extends BaseController {
   @RequestMapping(value = "/facilityOperators", method = RequestMethod.POST)
   public ResponseEntity<FacilityOperator> createFacilityOperator(
       @RequestBody FacilityOperator facilityOperator) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     LOGGER.debug("Creating new facility operator");
     // Ignore provided id
     facilityOperator.setId(null);
@@ -48,6 +50,7 @@ public class FacilityOperatorController extends BaseController {
    */
   @RequestMapping(value = "/facilityOperators", method = RequestMethod.GET)
   public ResponseEntity<Iterable<FacilityOperator>> getAllFacilityOperators() {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     Iterable<FacilityOperator> facilityOperators = facilityOperatorRepository.findAll();
     if (facilityOperators == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
@@ -66,6 +69,7 @@ public class FacilityOperatorController extends BaseController {
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.PUT)
   public ResponseEntity<FacilityOperator> updateFacilityOperator(
       @RequestBody FacilityOperator facilityOperator, @PathVariable("id") UUID facilityOperatorId) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     LOGGER.debug("Updating facility operator");
     facilityOperatorRepository.save(facilityOperator);
     return new ResponseEntity<>(facilityOperator, HttpStatus.OK);
@@ -80,6 +84,7 @@ public class FacilityOperatorController extends BaseController {
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.GET)
   public ResponseEntity<FacilityOperator> getFacilityOperators(
       @PathVariable("id") UUID facilityOperatorId) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
     if (facilityOperator == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
@@ -96,6 +101,7 @@ public class FacilityOperatorController extends BaseController {
    */
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteFacilityOperators(@PathVariable("id") UUID facilityOperatorId) {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
     if (facilityOperator == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);

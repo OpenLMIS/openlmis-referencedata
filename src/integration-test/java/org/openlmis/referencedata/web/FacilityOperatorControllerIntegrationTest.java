@@ -1,5 +1,7 @@
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -7,6 +9,7 @@ import static org.mockito.BDDMockito.given;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityOperator;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -17,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/facilityOperators";
@@ -38,6 +42,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldPostFacilityOperator() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     FacilityOperator response = restAssured
         .given()
@@ -55,7 +60,28 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void shouldRejectCreateRequestIfUserHasNoRight() {
+    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(facilityOperator)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetAllFacilityOperators() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<FacilityOperator> facilityOperators = Arrays.asList(facilityOperator,
         generateFacilityOperator());
@@ -77,7 +103,27 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void shouldRejectGetAllRequestIfUserHasNoRight() {
+    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPutFacilityOperator() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     facilityOperator.setName("NewNameUpdate");
 
@@ -99,9 +145,31 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
     assertEquals("NewNameUpdate", response.getName());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
+
+  @Test
+  public void shouldRejectUpdateRequestIfUserHasNoRight() {
+    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityOperatorId)
+        .body(facilityOperator)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
   
   @Test
   public void shouldGetFacilityOperator() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     given(facilityOperatorRepository.findOne(facilityOperatorId)).willReturn(facilityOperator);
 
@@ -121,8 +189,29 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldDeleteFacilityOperator() {
+  public void shouldRejectGetRequestIfUserHasNoRight() {
+    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityOperatorId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldDeleteFacilityOperator() {
+    hasRight(RightName.FACILITIES_MANAGE_RIGHT);
+    
     given(facilityOperatorRepository.findOne(facilityOperatorId)).willReturn(facilityOperator);
 
     restAssured
@@ -135,6 +224,26 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
         .then()
         .statusCode(204);
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectDeleteRequestIfUserHasNoRight() {
+    hasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityOperatorId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

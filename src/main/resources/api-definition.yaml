@@ -1188,59 +1188,14 @@ resourceTypes:
                     body:
                       application/json:
                         schema: approvedProductDtoArray
-
                 400:
                     body:
                       application/json:
                         schema: errorResponse
-      /{id}/orders:
-          uriParameters:
-              id:
-                  displayName: homeFacilityId
-                  type: string
-                  required: true
-                  repeat: false
-          get:
-              is: [ secured ]
-              description: Returns a list of filtered orders supplied by a home facility.
-              queryParameters:
-                  program:
-                      displayName: program
-                      type: string
-                      required: false
-                      repeat: false
-                  requestingFacility:
-                      displayName: requestingFacility
-                      type: string
-                      required: false
-                      repeat: false
-                  period:
-                      displayName: processingPeriod
-                      type: string
-                      required: false
-                      repeat: false
-                  schedule:
-                      displayName: processingSchedule
-                      type: string
-                      required: false
-                      repeat: false
-                  startDate:
-                      displayName: startDate
-                      type: string
-                      required: false
-                      repeat: false
-                  endDate:
-                      displayName: endDate
-                      type: string
-                      required: false
-                      repeat: false
-              responses:
-                200:
+                403:
                     body:
                       application/json:
-                400:
-                404:
-                500:
+                        schema: localizedErrorResponse
       /supplying:
           get:
               is: [ secured ]
@@ -1265,6 +1220,10 @@ resourceTypes:
                       application/json:
                         schema: errorResponse
                 404:
+                403:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
                 500:
 
       /search:
@@ -1287,6 +1246,10 @@ resourceTypes:
                     body:
                       application/json:
                           schema: facilityArray
+                403:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
                 404:
 
   /facilityTypes:
@@ -1299,6 +1262,10 @@ resourceTypes:
                   body:
                     application/json:
               "404":
+              403:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new facilityType.
@@ -1311,6 +1278,10 @@ resourceTypes:
               "400":
                   body:
                     application/json:
+              403:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -1325,6 +1296,10 @@ resourceTypes:
                   "204":
                   "404":
                   "409":
+                  403:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen facilityType.
@@ -1333,6 +1308,10 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                  403:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing facilityType.
@@ -1343,6 +1322,10 @@ resourceTypes:
                       body:
                         application/json:
                   "400":
+                  403:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /programs:
       displayName: Program
@@ -1502,6 +1485,10 @@ resourceTypes:
                 "201":
                     body:
                         application/json:
+                403:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
                 "500":
                     body:
                         application/json:
@@ -1512,6 +1499,10 @@ resourceTypes:
                 "200":
                     body:
                         application/json:
+                403:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
                 "404":
                     body:
                        application/json:
@@ -1534,6 +1525,10 @@ resourceTypes:
                     "404":
                         body:
                             application/json:
+                    403:
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Updates Facility Operators with given id from database.
@@ -1544,6 +1539,10 @@ resourceTypes:
                     "404":
                         body:
                             application/json:
+                    403:
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: Updates Facility Operators with given id from database.
@@ -1555,6 +1554,10 @@ resourceTypes:
                     "409":
                         body:
                             application/json:
+                    403:
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
 
   /geographicZones:
       displayName: Geographic Zone
