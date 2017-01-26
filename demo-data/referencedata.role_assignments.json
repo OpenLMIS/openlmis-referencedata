@@ -2,7 +2,7 @@
   {
     "id": "8ad78ea5-aa02-4b69-bb27-400e5e1d395b",
     "type": "supervision",
-    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
     "role": {"id": "d30a2fbb-51d9-49ad-90fe-fb405470a439"}
@@ -58,7 +58,23 @@
   {
     "id": "97653326-1d84-4c6e-86a5-a856a183bc06",
     "type": "supervision",
-    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": {"id": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d"}
+  },
+  {
+    "id": "881669c3-209b-4d73-b8b6-b96059e361e6",
+    "type": "supervision",
+    "supervisoryNode": { "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": {"id": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d"}
+  },
+  {
+    "id": "a3128cf0-f7c4-4b86-8d5a-94072878279d",
+    "type": "supervision",
+    "supervisoryNode": { "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79" },
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
     "role": {"id": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d"}
