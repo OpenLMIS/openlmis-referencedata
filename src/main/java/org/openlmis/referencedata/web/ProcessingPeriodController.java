@@ -9,6 +9,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -76,7 +77,7 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> searchProcessingPeriods(
       @RequestParam(value = "programId", required = true) UUID programId,
       @RequestParam(value = "facilityId", required = true) UUID facilityId) {
-
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     if (programId == null) {
       throw new ValidationMessageException(ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL);
     }
@@ -107,6 +108,7 @@ public class ProcessingPeriodController extends BaseController {
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.POST)
   public ResponseEntity<?> createProcessingPeriod(
       @RequestBody ProcessingPeriodDto periodDto, BindingResult bindingResult) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod newPeriod = ProcessingPeriod.newPeriod(periodDto);
     LOGGER.debug("Creating new processingPeriod");
     validator.validate(newPeriod, bindingResult);
@@ -126,6 +128,7 @@ public class ProcessingPeriodController extends BaseController {
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.GET)
   public ResponseEntity<?> getAllProcessingPeriods() {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     Set<ProcessingPeriod> processingPeriods = Sets.newHashSet(periodRepository.findAll());
     Set<ProcessingPeriodDto> periodDtos = processingPeriods.stream().map(
         period -> exportToDto(period)).collect(toSet());
@@ -144,6 +147,7 @@ public class ProcessingPeriodController extends BaseController {
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
                                                   @PathVariable("id") UUID periodId) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     LOGGER.debug("Updating processingPeriod");
     ProcessingPeriod updatedProcessingPeriod = ProcessingPeriod.newPeriod(periodDto);
     updatedProcessingPeriod.setId(periodId);
@@ -160,6 +164,7 @@ public class ProcessingPeriodController extends BaseController {
    */
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.GET)
   public ResponseEntity<?> getProcessingPeriod(@PathVariable("id") UUID periodId) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
       return ResponseEntity.notFound().build();
@@ -176,6 +181,7 @@ public class ProcessingPeriodController extends BaseController {
    */
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteProcessingPeriod(@PathVariable("id") UUID periodId) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
       return ResponseEntity.notFound().build();
@@ -194,6 +200,7 @@ public class ProcessingPeriodController extends BaseController {
    */
   @RequestMapping(value = "/processingPeriods/{id}/duration", method = RequestMethod.GET)
   public ResponseEntity<?> getDuration(@PathVariable("id") UUID periodId) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod period = periodRepository.findOne(periodId);
 
     LOGGER.debug("Returning total number of months of processingPeriod");
@@ -213,6 +220,7 @@ public class ProcessingPeriodController extends BaseController {
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     if (processingScheduleId == null) {
       throw new ValidationMessageException("Processing Schedule id must be provided");
     }

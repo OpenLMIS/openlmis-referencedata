@@ -4,6 +4,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -58,6 +59,7 @@ public class ProcessingScheduleController extends BaseController {
   @RequestMapping(value = "/processingSchedules", method = RequestMethod.POST)
   public ResponseEntity<ProcessingSchedule> createProcessingSchedule(
       @RequestBody ProcessingSchedule schedule) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     LOGGER.debug("Creating new processingSchedule");
     // Ignore provided id
     schedule.setId(null);
@@ -75,6 +77,7 @@ public class ProcessingScheduleController extends BaseController {
   @RequestMapping(value = "/processingSchedules/{id}", method = RequestMethod.PUT)
   public ResponseEntity<ProcessingSchedule> updateProcessingSchedule(
       @RequestBody ProcessingSchedule schedule, @PathVariable("id") UUID scheduleId) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     LOGGER.debug("Updating processingSchedule");
     scheduleRepository.save(schedule);
     return new ResponseEntity<>(schedule, HttpStatus.OK);
@@ -87,6 +90,7 @@ public class ProcessingScheduleController extends BaseController {
    */
   @RequestMapping(value = "/processingSchedules", method = RequestMethod.GET)
   public ResponseEntity<Iterable<ProcessingSchedule>> getAllProcessingSchedules() {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     Iterable<ProcessingSchedule> schedules = scheduleRepository.findAll();
     if (schedules == null) {
       throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
@@ -105,6 +109,8 @@ public class ProcessingScheduleController extends BaseController {
   @RequestMapping(value = "/processingSchedules/search", method = RequestMethod.GET)
   public ResponseEntity<List<ProcessingScheduleDto>> search(
       @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
+
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     Program program = programRepository.findOne(programId);
     Facility facility = facilityRepository.findOne(facilityId);
@@ -142,6 +148,7 @@ public class ProcessingScheduleController extends BaseController {
   @RequestMapping(value = "/processingSchedules/{id}", method = RequestMethod.GET)
   public ResponseEntity<ProcessingSchedule> getProcessingSchedule(
       @PathVariable("id") UUID scheduleId) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
     if (schedule == null) {
       throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
@@ -159,6 +166,7 @@ public class ProcessingScheduleController extends BaseController {
   @RequestMapping(value = "/processingSchedules/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<ProcessingSchedule> deleteProcessingSchedule(
       @PathVariable("id") UUID scheduleId) {
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
     if (schedule == null) {
       throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
