@@ -14,7 +14,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import com.google.common.collect.Sets;
 
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -40,7 +39,6 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +49,7 @@ import org.springframework.validation.BindingResult;
 import java.util.Set;
 import java.util.UUID;
 
-@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class UserControllerTest {
 
   private static final String ACCESS_TOKEN = "49c1e712-da50-4428-ae39-2d0409bd8059";
@@ -77,11 +75,7 @@ public class UserControllerTest {
   @Mock
   private RightRepository rightRepository;
 
-  @Mock
-  private RightService rightService;
-
-  @InjectMocks
-  private UserController controller = new UserController();
+  private UserController controller;
 
   private String homeFacilityCode;
   private Facility homeFacility;
@@ -114,6 +108,8 @@ public class UserControllerTest {
    */
   public UserControllerTest() {
     initMocks(this);
+    controller = new UserController(service, repository, roleRepository, rightRepository,
+        programRepository, supervisoryNodeRepository, facilityRepository);
 
     homeFacilityCode = "homeFacilityCode";
     homeFacility = new Facility("C1");
