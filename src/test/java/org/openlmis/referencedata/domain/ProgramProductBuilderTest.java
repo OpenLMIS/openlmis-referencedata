@@ -1,9 +1,12 @@
 package org.openlmis.referencedata.domain;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +18,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @RunWith(PowerMockRunner.class)
@@ -28,11 +32,13 @@ public class ProgramProductBuilderTest {
   private ProductCategoryRepository productCategoryRepository;
 
   private ProgramProduct programProduct;
+
   private OrderableProduct orderableProduct;
   private ProgramProductBuilder programProductBuilder;
-
   private Program program;
   private ProductCategory productCategory;
+
+  private static final String CURRENCY_CODE = "USD";
 
   @Before
   public void setUp() {
@@ -50,27 +56,48 @@ public class ProgramProductBuilderTest {
         "SuperName123", "SuperDescription", 10, 5, false);
 
     programProductBuilder = new ProgramProductBuilder(program.getId());
-    ReflectionTestUtils.setField(programProductBuilder, "currencyCode", "USD");
+    ReflectionTestUtils.setField(programProductBuilder, "currencyCode", CURRENCY_CODE);
     programProductBuilder.setProgramRepository(programRepository);
     programProductBuilder.setProductCategoryRepository(productCategoryRepository);
     programProductBuilder.setProductCategoryId(productCategory.getId());
-
-    programProduct = programProductBuilder.createProgramProduct(orderableProduct);
   }
 
   @Test
   public void programProductShouldBeCreated() {
+    programProduct = programProductBuilder.createProgramProduct(orderableProduct);
     assertNotNull(programProduct);
   }
 
   @Test
+  public void programProductShouldBeCreatedWithPricePerPack() {
+    Money money = Money.of(CurrencyUnit.USD, 10);
+    programProductBuilder.setPricePerPack(money);
+
+    programProduct = programProductBuilder.createProgramProduct(orderableProduct);
+    pricePerPackEquals(new BigDecimal("10.00"));
+  }
+
+  @Test
+  public void programProductShouldBeCreatedWithPricePerPackZeroIfNotSpecified() {
+    programProduct = programProductBuilder.createProgramProduct(orderableProduct);
+    pricePerPackEquals(new BigDecimal("0.00"));
+  }
+
+  @Test
   public void isForProgramShouldBeTrue() {
+    programProduct = programProductBuilder.createProgramProduct(orderableProduct);
     assertTrue(programProduct.isForProgram(program));
   }
 
   @Test
   public void productCategoryShouldBeSet() {
+    programProduct = programProductBuilder.createProgramProduct(orderableProduct);
     assertNotNull(programProduct.getProductCategory().getId());
   }
 
+  private void pricePerPackEquals(BigDecimal expected) {
+    assertEquals(expected, programProduct.getPricePerPack().getAmount());
+    assertEquals(CurrencyUnit.of(CURRENCY_CODE),
+        programProduct.getPricePerPack().getCurrencyUnit());
+  }
 }
