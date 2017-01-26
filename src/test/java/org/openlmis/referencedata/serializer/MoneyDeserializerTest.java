@@ -48,9 +48,8 @@ public class MoneyDeserializerTest {
   private Money deserializeMoney(String json) throws IOException {
     InputStream stream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
     JsonParser parser = mapper.getFactory().createParser(stream);
-    parser.nextToken();
-    parser.nextToken();
-    parser.nextToken();
+    parser.nextValue();
+    parser.nextValue();
     DeserializationContext ctxt = mapper.getDeserializationContext();
 
     return moneyDeserializer.deserialize(parser, ctxt);
