@@ -135,9 +135,9 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    */
   public void export(Exporter exporter) {
     exporter.setRole(role);
-    exporter.setProgramCode(program.getCode().toString());
+    exporter.setProgram(program);
     if (supervisoryNode != null) {
-      exporter.setSupervisoryNodeCode(supervisoryNode.getCode());
+      exporter.setSupervisoryNode(supervisoryNode);
     }
   }
 
@@ -165,8 +165,8 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   public interface Exporter extends RoleAssignment.Exporter {
-    void setProgramCode(String programCode);
+    void setProgram(Program program);
 
-    void setSupervisoryNodeCode(String supervisoryNodeCode);
+    void setSupervisoryNode(SupervisoryNode supervisoryNode);
   }
 }
