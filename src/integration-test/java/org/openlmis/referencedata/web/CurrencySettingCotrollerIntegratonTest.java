@@ -5,10 +5,14 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.openlmis.referencedata.dto.CurrencySettingDto;
+import org.springframework.beans.factory.annotation.Value;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 public class CurrencySettingCotrollerIntegratonTest extends BaseWebIntegrationTest {
+
+  @Value("${currencyCode}")
+  private String currencyCode;
 
   @Test
   public void shouldReturnCurrencySetting() {
@@ -22,7 +26,7 @@ public class CurrencySettingCotrollerIntegratonTest extends BaseWebIntegrationTe
         .statusCode(200)
         .extract().as(response.getClass());
 
-    assertEquals("USD", response.getCurrencyCode());
+    assertEquals(currencyCode, response.getCurrencyCode());
     assertEquals("$", response.getCurrencySymbol());
     assertEquals("left", response.getCurrencySymbolSide());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
