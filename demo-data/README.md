@@ -195,7 +195,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
 
 ## Supervisory Nodes and Supply Lines
 
-Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
+Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json, referencedata.requisition_groups.json
 
 1. SN1/FP Approval point
   * requisition group: RGFP1
@@ -203,12 +203,12 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
   * supply lines:
     * WH01/CMST Warehouse
     * WH02/South Warehouse
-  * facility: DH01/Balaka District Hospital
+  * facility: HC01/Comfort Health Clinic
 2. SN1.1/FP Approval sub point
   * requisition group: RGFP2
     * program: Family Planning
   * parent: SN1/FP Approval point
-    * facility: HC01/Comfort Health Clinic
+    * facility: DH01/Balaka District Hospital
 3. SN2/EM Approval point
   * requisition group: RGEM1
     * program: Essential Meds
