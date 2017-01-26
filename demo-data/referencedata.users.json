@@ -144,14 +144,26 @@
   },
   {
     "id": "247b366d-f8ab-4226-9ae9-a188d5ee8e22",
-    "username": "wclerk",
-    "email": "wclerk@openlmis.org",
+    "username": "wclerk1",
+    "email": "wclerk1@openlmis.org",
     "firstName": "Kennedy",
     "lastName": "Banda",
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
     "homefacilityid": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "timeZone": "CET"
+  },
+  {
+    "id": "476415b1-ca81-4561-a3b7-fa3d08434800",
+    "username": "wclerk2",
+    "email": "wclerk2@openlmis.org",
+    "firstName": "Felix",
+    "lastName": "Gwaza",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "homefacilityid": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
     "timeZone": "CET"
   }
 ]
