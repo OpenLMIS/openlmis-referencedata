@@ -63,7 +63,7 @@
   },
   {
     "id": "8c2ba0dd-a157-42b2-b33a-e0bb5938edf1",
-    "type": "supervision", ,
+    "type": "supervision",
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
     "role": {"id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec"}
