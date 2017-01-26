@@ -1,6 +1,5 @@
 package org.openlmis.referencedata.web;
 
-import org.apache.commons.lang3.StringUtils;
 import org.javers.core.Javers;
 import org.javers.core.changelog.SimpleTextChangeLog;
 import org.javers.core.diff.Change;
@@ -64,12 +63,12 @@ public abstract class BaseController {
    * </p>
    * See getAuditedChanges() for a list and explanation of the available parameters.
    */
-  protected String getAuditLog(Class type, UUID id, String author, String changedPropertyName,
-                               Pageable page, boolean returnJson) {
+  protected String getAuditHistory(Class type, UUID id, String author, String changedPropertyName,
+                                   Pageable page, boolean returnJson) {
     if (returnJson) {
-      return getAuditLogJson(type, id, author, changedPropertyName, page);
+      return getAuditedChanges(type, id, author, changedPropertyName, page);
     } else {
-      return getAuditLogText(type, id, author, changedPropertyName, page);
+      return getAuditedChangeLog(type, id, author, changedPropertyName, page);
     }
   }
 
@@ -77,12 +76,12 @@ public abstract class BaseController {
    * Return a list of audited changes via JSON.
    * @param type The type of class for which we wish to retrieve historical changes.
    */
-  protected String getAuditLogJson(Class type) {
-    return getAuditLogJson(type, null, null, null, null);
+  protected String getAuditedChanges(Class type) {
+    return getAuditedChanges(type, null, null, null, null);
   }
 
-  protected String getAuditLogJson(Class type, UUID id) {
-    return getAuditLogJson(type, id, null, null, null);
+  protected String getAuditedChanges(Class type, UUID id) {
+    return getAuditedChanges(type, id, null, null, null);
   }
 
   /**
@@ -97,7 +96,7 @@ public abstract class BaseController {
    *               If null or empty, changes associated with any and all properties are returned.
    * @param page A Pageable object with PageNumber and PageSize values used for pagination.
    */
-  protected String getAuditLogJson(Class type, UUID id, String author,
+  protected String getAuditedChanges(Class type, UUID id, String author,
                                      String changedPropertyName, Pageable page) {
     List<Change> changes = getChangesByType(type, id, author, changedPropertyName, page);
     JsonConverter jsonConverter = javers.getJsonConverter();
@@ -109,8 +108,8 @@ public abstract class BaseController {
    * Return a list of changes as a log (in other words, as a series of line entries).
    * @param type The type of class for which we wish to retrieve historical changes.
    */
-  protected String getAuditLogText(Class type) {
-    return getAuditLogText(type, null, null, null, null);
+  protected String getAuditedChangeLog(Class type) {
+    return getAuditedChangeLog(type, null, null, null, null);
   }
 
   /**
@@ -119,16 +118,16 @@ public abstract class BaseController {
    * @param id The ID of class for which we wish to retrieve historical changes.
    *           If null, entries are returned regardless of their ID.
    */
-  protected String getAuditLogText(Class type, UUID id) {
-    return getAuditLogText(type, id, null, null, null);
+  protected String getAuditedChangeLog(Class type, UUID id) {
+    return getAuditedChangeLog(type, id, null, null, null);
   }
 
   /**
    * Return a list of changes as a log (in other words, as a series of line entries).
    * The available parameters and their means are the same as for the getChangesByClass() method.
    */
-  protected String getAuditLogText(Class type, UUID id, String author,
-                                   String changedPropertyName, Pageable page) {
+  protected String getAuditedChangeLog(Class type, UUID id, String author,
+                                       String changedPropertyName, Pageable page) {
     List<Change> changes = getChangesByType(type, id, author, changedPropertyName, page);
     return javers.processChangeList(changes, new SimpleTextChangeLog());
   }
@@ -139,6 +138,7 @@ public abstract class BaseController {
   */
   private List<Change> getChangesByType(Class type, UUID id, String author,
                                         String changedPropertyName, Pageable page) {
+
     QueryBuilder queryBuilder;
 
     if (id != null) {
@@ -152,10 +152,11 @@ public abstract class BaseController {
 
     queryBuilder = queryBuilder.withNewObjectChanges(true).skip(skip).limit(limit);
 
-    if ( ! StringUtils.isBlank(author) ) {
+
+    if (author != null && !author.isEmpty()) {
       queryBuilder = queryBuilder.byAuthor(author);
     }
-    if ( ! StringUtils.isBlank(changedPropertyName) ) {
+    if (changedPropertyName != null && !changedPropertyName.isEmpty()) {
       queryBuilder = queryBuilder.andProperty(changedPropertyName);
     }
 

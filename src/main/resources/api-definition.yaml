@@ -367,7 +367,10 @@ resourceTypes:
                   application/json:
                     schema: localizedErrorResponse
               404:
-                description: The specified <<resourcePathName|!singularize>> does not exist.
+                description: Collection is empty.
+                headers:
+                  X-Content-Type-Options:
+                  X-XSS-Protection:
 
     - instanceAuditLog:
         description: This represents the audit log for a specified instance of the <<resourcePathName|!singularize>> resource.

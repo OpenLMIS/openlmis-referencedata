@@ -128,16 +128,14 @@ public class FacilityController extends BaseController {
                         boolean returnJson,
           Pageable page) {
 
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     //Return a 404 if the specified facility can't be found
-    Facility facility = facilityRepository.findOne(id);
-    if (facility == null) {
-      throw new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND);
+    ResponseEntity responseEntity = getFacility(id);
+    if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {
+      return responseEntity;
     }
 
-    String auditData = getAuditLog(Facility.class, id, author,
-                                        changedPropertyName, page, returnJson);
+    String auditData = getAuditHistory(Facility.class, id, author,
+                                          changedPropertyName, page, returnJson);
 
     return ResponseEntity.status(HttpStatus.OK).body(auditData);
   }
