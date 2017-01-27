@@ -24,10 +24,10 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   private FacilityType facilityType;
 
   @ManyToOne
-  @JoinColumn(name = "programProductId", nullable = false)
+  @JoinColumn(name = "programOrderableId", nullable = false)
   @Getter
   @Setter
-  private ProgramProduct programProduct;
+  private ProgramOrderable programOrderable;
 
   @Column(nullable = false)
   @Getter
@@ -51,7 +51,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
-    exporter.setProduct(programProduct);
+    exporter.setProduct(programOrderable);
     exporter.setMaxMonthsOfStock(maxMonthsOfStock);
     exporter.setMinMonthsOfStock(minMonthsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
@@ -60,7 +60,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   public interface Exporter {
     void setId(UUID id);
 
-    void setProduct(ProgramProduct programProduct);
+    void setProduct(ProgramOrderable programOrderable);
 
     void setMaxMonthsOfStock(Double maxMonthsOfStock);
 
@@ -72,7 +72,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   public interface Importer {
     UUID getId();
 
-    ProgramProduct.Importer getProduct();
+    ProgramOrderable.Importer getProduct();
 
     Double getMaxMonthsOfStock();
 

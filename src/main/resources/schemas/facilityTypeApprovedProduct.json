@@ -13,10 +13,10 @@
       "$ref": "facilityType.json",
       "title": "facilityType"
     },
-    "programProduct": {
+    "programOrderable": {
       "type": "object",
-      "$ref": "programProduct.json",
-      "title": "programProduct"
+      "$ref": "programOrderable.json",
+      "title": "programOrderable"
     },
     "maxMonthsOfStock": {
       "type": "number",
@@ -31,5 +31,5 @@
       "title": "emergencyOrderPoint"
     }
   },
-  "required": ["id", "facilityType", "programProduct", "maxMonthsOfStock"]
+  "required": ["id", "facilityType", "programOrderable", "maxMonthsOfStock"]
 }

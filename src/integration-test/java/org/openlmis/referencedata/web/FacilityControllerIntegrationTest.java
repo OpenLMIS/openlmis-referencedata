@@ -21,16 +21,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.GlobalProduct;
-import org.openlmis.referencedata.domain.OrderableProduct;
-import org.openlmis.referencedata.domain.ProductCategory;
+import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
@@ -763,18 +763,18 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private List<FacilityTypeApprovedProduct> generateFacilityTypeApprovedProducts() {
-    ProductCategory category = ProductCategory.createNew(Code.code("gloves"));
+    OrderableDisplayCategory category = OrderableDisplayCategory.createNew(Code.code("gloves"));
     category.setId(UUID.randomUUID());
-    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct(
+    Orderable orderable = CommodityType.newCommodityType(
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
-    orderableProduct.setId(UUID.randomUUID());
+    orderable.setId(UUID.randomUUID());
     CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
-    ProgramProduct programProduct = ProgramProduct.createNew(program, category,
-        orderableProduct, 0, true, false, 0, 0, Money.of(currencyUnit, 0),
+    ProgramOrderable programOrderable = ProgramOrderable.createNew(program, category,
+        orderable, 0, true, false, 0, 0, Money.of(currencyUnit, 0),
         currencyUnit);
-    programProduct.setId(UUID.randomUUID());
+    programOrderable.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
-    ftap.setProgramProduct(programProduct);
+    ftap.setProgramOrderable(programOrderable);
     ftap.setId(UUID.randomUUID());
     ftap.setMinMonthsOfStock(1d);
     ftap.setMaxMonthsOfStock(3d);

@@ -9,7 +9,7 @@ import org.junit.Test;
 
 
 public class TradeItemTest {
-  private static GlobalProduct ibuprofen;
+  private static CommodityType ibuprofen;
   private static TradeItem advil;
 
   private static final String ADVIL_CODE = "advil";
@@ -17,7 +17,7 @@ public class TradeItemTest {
 
 
   {
-    ibuprofen = GlobalProduct.newGlobalProduct(
+    ibuprofen = CommodityType.newCommodityType(
         "ibuprofen", "each", "Ibuprofen", "test", 30, 15, false);
     advil = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 10, 5, false);
     ibuprofen.addTradeItem(advil);
@@ -36,7 +36,7 @@ public class TradeItemTest {
   }
 
   @Test
-  public void testCanFulfillWhenHasGlobalProduct() throws Exception {
+  public void testCanFulfillWhenHasCommodityType() throws Exception {
     assertTrue(advil.canFulfill(ibuprofen));
     assertTrue(advil.canFulfill(advil));
   }
@@ -52,7 +52,7 @@ public class TradeItemTest {
   }
 
   @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionWhenAssigningGlobalProductWithWrongDispensingUnit() {
+  public void shouldThrowExceptionWhenAssigningCommodityTypeWithWrongDispensingUnit() {
     TradeItem motrin = TradeItem.newTradeItem("motrin", "10 tab strip", "Motrin", 20, 10, false);
     ibuprofen.addTradeItem(motrin);
   }

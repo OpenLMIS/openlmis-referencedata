@@ -1,7 +1,7 @@
 package org.openlmis.referencedata.dto;
 
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +11,7 @@ import lombok.Setter;
 public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedProduct.Exporter,
     FacilityTypeApprovedProduct.Importer {
 
-  private ProductDto product;
+  private ProgramOrderableDto product;
 
   private Double maxMonthsOfStock;
 
@@ -20,8 +20,8 @@ public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedP
   private Double emergencyOrderPoint;
 
   @Override
-  public void setProduct(ProgramProduct programProduct) {
-    this.product = new ProductDto();
-    programProduct.export(product);
+  public void setProduct(ProgramOrderable programOrderable) {
+    this.product = new ProgramOrderableDto();
+    programOrderable.export(product);
   }
 }

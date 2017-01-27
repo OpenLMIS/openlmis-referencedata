@@ -10,7 +10,7 @@
     },
     "product": {
       "type": "object",
-      "$ref": "productDto.json",
+      "$ref": "programOrderableDto.json",
       "title": "product"
     },
     "maxMonthsOfStock": {

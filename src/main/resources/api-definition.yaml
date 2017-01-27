@@ -90,11 +90,11 @@ schemas:
 
   - geographicZonePage: !include schemas/geographicZonePage.json
 
-  - globalProduct: |
+  - commodityType: |
         {   "type": "object",
             "$schema": "http://json-schema.org/draft-03/schema",
-            "title": "Global Product",
-            "description": "A single globalProduct",
+            "title": "Commodity Type",
+            "description": "A single commodityType",
             "properties": {
                 "id": { "type": "string", "required": false, "title": "id" },
                 "productCode": { "type": "string", "required": true, "title": "productCode" },
@@ -106,12 +106,12 @@ schemas:
             }
         }
 
-  - orderableProduct: !include schemas/orderableProduct.json
+  - orderable: !include schemas/orderable.json
 
-  - orderableProductArray: |
+  - orderableArray: |
       {
           "type": "array",
-          "items": { "type": "object", "$ref": "schemas/orderableProduct.json" }
+          "items": { "type": "object", "$ref": "schemas/orderable.json" }
 
       }
 
@@ -131,12 +131,12 @@ schemas:
           }
       }
 
-  - productCategory: !include schemas/productCategory.json
+  - orderableDisplayCategory: !include schemas/orderableDisplayCategory.json
 
-  - productCategoryArray: |
+  - orderableDisplayCategoryArray: |
       {
           "type": "array",
-          "items": { "type": "object", "$ref": "schemas/productCategory.json" }
+          "items": { "type": "object", "$ref": "schemas/orderableDisplayCategory.json" }
       }
 
   - program: !include schemas/program.json
@@ -147,7 +147,7 @@ schemas:
           "items": { "type": "object", "$ref":"schemas/program.json" }
       }
 
-  - programProduct: !include schemas/programProduct.json
+  - programOrderable: !include schemas/programOrderable.json
 
   - right: !include schemas/right.json
 
@@ -587,30 +587,30 @@ resourceTypes:
                       body:
                         application/json:
 
-  /productCategories:
+  /orderableDisplayCategories:
       displayName: Product Categories
       post:
             is: [ secured ]
-            description: Create new productCategory.
+            description: Create new orderableDisplayCategory.
             body:
                 application/json:
-                    schema: productCategory
+                    schema: orderableDisplayCategory
             responses:
                 "201":
                     body:
                         application/json:
-                            schema: productCategory
+                            schema: orderableDisplayCategory
                 "400":
                     body:
                         application/json:
       get:
             is: [ secured ]
-            description: Get all productCategories.
+            description: Get all orderableDisplayCategories.
             responses:
                 "200":
                     body:
                         application/json:
-                            schema: productCategoryArray
+                            schema: orderableDisplayCategoryArray
                 "404":
                     body:
                        application/json:
@@ -623,32 +623,32 @@ resourceTypes:
                   repeat: false
             put:
                 is: [ secured ]
-                description: Update existing productCategory.
+                description: Update existing orderableDisplayCategory.
                 body:
                     application/json:
                 responses:
                     "200":
                         body:
                             application/json:
-                                schema: productCategory
+                                schema: orderableDisplayCategory
                     "404":
                         body:
                           application/json:
                             schema: localizedErrorResponse
             get:
                 is: [ secured ]
-                description: Get chosen productCategory.
+                description: Get chosen orderableDisplayCategory.
                 responses:
                     "200":
                         body:
                             application/json:
-                                schema: productCategory
+                                schema: orderableDisplayCategory
                     "404":
                         body:
                             application/json:
             delete:
                 is: [ secured ]
-                description: Delete chosen productCategory.
+                description: Delete chosen orderableDisplayCategory.
                 responses:
                     "204":
                     "404":
@@ -665,7 +665,7 @@ resourceTypes:
               queryParameters:
                   code:
                       displayName: code
-                      description: productCategory code.
+                      description: orderableDisplayCategory code.
                       type: string
                       required: false
                       repeat: false
@@ -673,10 +673,10 @@ resourceTypes:
                  "200":
                      body:
                        application/json:
-                          schema: productCategoryArray
+                          schema: orderableDisplayCategoryArray
                  "404":
 
-  /orderableProducts:
+  /orderables:
       displayName: Orderable Product
       get:
           is: [ secured ]
@@ -685,7 +685,7 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-                        schema: orderableProductArray
+                        schema: orderableArray
       /{id}:
           uriParameters:
               id:
@@ -700,7 +700,7 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
-                            schema: orderableProduct
+                            schema: orderable
                   "404":
                       body:
                         application/json:
@@ -717,16 +717,16 @@ resourceTypes:
                     application/json:
                         schema: tradeItem
 
-  /globalProducts:
-      displayName: Global Product
+  /CommodityTypes:
+      displayName: Commodity Type
       put:
           is: [ secured ]
-          description: Create or update a Global Product.
+          description: Create or update a Commodity Type.
           responses:
               "200":
                   body:
                     application/json:
-                        schema: globalProduct
+                        schema: commodityType
       /{id}/tradeItems:
           uriParameters:
               id:
@@ -736,7 +736,7 @@ resourceTypes:
                   repeat: false
           get:
               is: [ secured ]
-              description: Get a list of Trade Item UUIDs that may fulfill for the given Global Product.
+              description: Get a list of Trade Item UUIDs that may fulfill for the given Commodity Type.
               responses:
                   "200":
                       body:
@@ -745,7 +745,7 @@ resourceTypes:
                   "404":
           put:
               is: [ secured ]
-              description: Update the list of Trade Item UUIDs that may fulfill for the given Global Product.
+              description: Update the list of Trade Item UUIDs that may fulfill for the given Commodity Type.
               body:
                   application/json:
                       schema: uuidArray
