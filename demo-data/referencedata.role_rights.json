@@ -20,6 +20,10 @@
     "rightId": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50"
   },
   {
+    "roleId": "b6134c01-cb37-4303-85f0-8c8eab9d3cec",
+    "rightId": "c3eb5df0-c3ac-4e70-a978-02827462f60e"
+  },
+  {
     "roleId": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d",
     "rightId": "bffa2de2-dc2a-47dd-b126-6501748ac3fc"
   },
@@ -42,10 +46,6 @@
   {
     "roleId": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
     "rightId": "7958129d-c4c0-4294-a40c-c2b07cb8e515"
-  },
-  {
-    "roleId": "2a2eaeba-bb9a-11e6-a4a6-cec0c932ce01",
-    "rightId": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50"
   },
   {
     "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",

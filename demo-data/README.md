@@ -148,6 +148,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
 2. Store Manager
   * rights:
     * Requisition View
+    * Requisition Delete
     * Requisition Authorize
   * users:
     * administrator - has this role for Family Planning & Essential Meds
@@ -188,10 +189,6 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Stock card templates manage
   * users:
     * administrator
-7. Program Coordinator
-  * users:
-    * administrator - has this role for Family Planning & Essential Meds
-    * devadmin - has this role for Family Planning & Essential Meds for SN1/FP Approval point
 
 ## Supervisory Nodes and Supply Lines
 
