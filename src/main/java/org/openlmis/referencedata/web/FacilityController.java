@@ -203,8 +203,6 @@ public class FacilityController extends BaseController {
       @PathVariable("id") UUID facilityId,
       @RequestParam(required = false, value = "programId") UUID programId,
       @RequestParam(value = "fullSupply") boolean fullSupply) {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
       throw new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND);
