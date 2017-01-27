@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.dto.RightDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.util.Message;
@@ -72,9 +73,7 @@ public class RightController extends BaseController {
     Right right = rightRepository.findOne(rightId);
 
     if (right == null) {
-      return ResponseEntity
-          .notFound()
-          .build();
+      throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
     } else {
       return ResponseEntity
           .ok(exportToDto(right));
@@ -137,16 +136,11 @@ public class RightController extends BaseController {
 
     Right storedRight = rightRepository.findOne(rightId);
     if (storedRight == null) {
-      LOGGER.error("Right to delete does not exist");
-      return ResponseEntity
-          .notFound()
-          .build();
+      throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
     }
-
 
     LOGGER.debug("Deleting right");
     rightRepository.delete(rightId);
-
 
     return ResponseEntity
         .noContent()
@@ -166,10 +160,7 @@ public class RightController extends BaseController {
 
     Right foundRight = rightRepository.findFirstByName(name);
     if (foundRight == null) {
-      LOGGER.debug("Right not found");
-      return ResponseEntity
-          .notFound()
-          .build();
+      throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
     }
 
     LOGGER.debug("Right found, returning");

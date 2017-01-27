@@ -11,8 +11,6 @@ import com.google.common.collect.Sets;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -34,13 +32,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -141,14 +139,11 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   public void shouldReturnBadRequestIfThereAreValidationErrors() {
     mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
-    doAnswer(new Answer() {
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        Object[] args = invocation.getArguments();
-        Errors errors = (Errors) args[1];
-        errors.reject("testReject");
-        return null;
-      }
+    doAnswer(invocation -> {
+      Object[] args = invocation.getArguments();
+      Errors errors = (Errors) args[1];
+      errors.reject("testReject", "rejectMessage");
+      return null;
     }).when(validator).validate(anyObject(), any(Errors.class));
 
     restAssured.given()

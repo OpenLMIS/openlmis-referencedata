@@ -3,7 +3,6 @@ package org.openlmis.referencedata.web;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -17,6 +16,7 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.service.RightService;
@@ -111,16 +111,13 @@ public class RoleControllerTest {
     assertEquals(role1Dto, roleDto);
   }
 
-  @Test
+  @Test(expected = NotFoundException.class)
   public void shouldNotGetNonExistingRole() {
     //given
     when(repository.findOne(roleId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.getRole(roleId).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
+    controller.getRole(roleId).getStatusCode();
   }
 
   @Test
@@ -250,16 +247,12 @@ public class RoleControllerTest {
     verify(repository).delete(roleId);
   }
 
-  @Test
+  @Test(expected = NotFoundException.class)
   public void shouldNotDeleteNonExistingRole() {
     //given
     when(repository.findOne(roleId)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.deleteRole(roleId).getStatusCode();
-
-    //then
-    assertThat(httpStatus, is(HttpStatus.NOT_FOUND));
-    verify(repository, never()).delete(roleId);
+    controller.deleteRole(roleId).getStatusCode();
   }
 }

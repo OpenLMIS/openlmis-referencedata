@@ -12,6 +12,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ResultDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
@@ -117,7 +118,7 @@ public class ProcessingPeriodController extends BaseController {
 
       return ResponseEntity.status(HttpStatus.CREATED).body(exportToDto(newPeriod));
     } else {
-      return ResponseEntity.badRequest().body(getErrors(bindingResult));
+      throw new ValidationMessageException(bindingResult.getAllErrors().get(0).getDefaultMessage());
     }
   }
 
@@ -130,8 +131,8 @@ public class ProcessingPeriodController extends BaseController {
   public ResponseEntity<?> getAllProcessingPeriods() {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     Set<ProcessingPeriod> processingPeriods = Sets.newHashSet(periodRepository.findAll());
-    Set<ProcessingPeriodDto> periodDtos = processingPeriods.stream().map(
-        period -> exportToDto(period)).collect(toSet());
+    Set<ProcessingPeriodDto> periodDtos = processingPeriods.stream()
+        .map(this::exportToDto).collect(toSet());
 
     return ResponseEntity.ok(periodDtos);
   }
@@ -167,7 +168,7 @@ public class ProcessingPeriodController extends BaseController {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
-      return ResponseEntity.notFound().build();
+      throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
     } else {
       return ResponseEntity.ok(exportToDto(period));
     }
@@ -184,7 +185,7 @@ public class ProcessingPeriodController extends BaseController {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
-      return ResponseEntity.notFound().build();
+      throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
     } else {
       periodRepository.delete(period);
       return ResponseEntity.noContent().build();

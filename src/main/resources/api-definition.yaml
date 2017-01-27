@@ -370,6 +370,9 @@ resourceTypes:
                     schema: localizedErrorResponse
               404:
                 description: The specified <<resourcePathName|!singularize>> does not exist.
+                body:
+                  application/json:
+                    schema: localizedErrorResponse
 
     - instanceAuditLog:
         description: This represents the audit log for a specified instance of the <<resourcePathName|!singularize>> resource.
@@ -473,6 +476,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -486,6 +492,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing processingPeriod.
@@ -624,7 +633,8 @@ resourceTypes:
                                 schema: productCategory
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen productCategory.
@@ -643,7 +653,8 @@ resourceTypes:
                     "204":
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
                         body:
                             application/json:
@@ -691,6 +702,9 @@ resourceTypes:
                         application/json:
                             schema: orderableProduct
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /tradeItems:
       displayName: Trade Item
@@ -817,6 +831,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -830,6 +847,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing processingSchedule.
@@ -880,6 +900,9 @@ resourceTypes:
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -889,6 +912,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing supplyLine.
@@ -899,6 +925,10 @@ resourceTypes:
                       body:
                         application/json:
                   "400":
+                  "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
       /search:
           get:
               is: [ secured ]
@@ -993,6 +1023,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen user.
@@ -1001,6 +1034,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           /roleAssignments:
               get:
                   is: [ secured ]
@@ -1011,6 +1047,9 @@ resourceTypes:
                             application/json:
                               schema: detailedRoleAssignmentDtoArray
                       "404":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /hasRight:
               get:
                   is: [ secured ]
@@ -1097,6 +1136,9 @@ resourceTypes:
                             application/json:
                               schema: errorResponse
                       "404":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /fulfillmentFacilities:
               is: [ secured ]
               displayName: User fulfilled facilities
@@ -1183,6 +1225,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen facility.
@@ -1196,6 +1241,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing facility.
@@ -1351,6 +1399,9 @@ resourceTypes:
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
                   403:
                       body:
@@ -1364,6 +1415,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   403:
                       body:
                         application/json:
@@ -1418,6 +1472,9 @@ resourceTypes:
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -1427,6 +1484,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing program.
@@ -1491,6 +1551,9 @@ resourceTypes:
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -1501,6 +1564,9 @@ resourceTypes:
                         application/json:
                           schema: stockAdjustmentReason
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing Stock Adjustment Reason.
@@ -1561,7 +1627,8 @@ resourceTypes:
                         schema: localizedErrorResponse
                 "404":
                     body:
-                       application/json:
+                      application/json:
+                        schema: localizedErrorResponse
       /{id}:
             uriParameters:
               id:
@@ -1580,7 +1647,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     403:
                         body:
                           application/json:
@@ -1594,7 +1662,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     403:
                         body:
                           application/json:
@@ -1606,7 +1675,8 @@ resourceTypes:
                     "204":
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
                         body:
                             application/json:
@@ -1661,6 +1731,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen geographicZone.
@@ -1674,6 +1747,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing geographicZone.
@@ -1725,6 +1801,9 @@ resourceTypes:
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -1734,6 +1813,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing geographicLevel.
@@ -1777,7 +1859,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen facilityTypeApprovedProduct.
@@ -1787,7 +1870,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: Delete chosen facilityTypeApprovedProduct.
@@ -1795,7 +1879,8 @@ resourceTypes:
                     "204":
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
                         body:
                             application/json:
@@ -1823,7 +1908,8 @@ resourceTypes:
                         application/json:
                 "404":
                     body:
-                       application/json:
+                      application/json:
+                        schema: localizedErrorResponse
       /{id}:
             uriParameters:
               id:
@@ -1842,7 +1928,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen supervisoryNode.
@@ -1852,7 +1939,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: Delete chosen supervisoryNode.
@@ -1860,7 +1948,8 @@ resourceTypes:
                     "204":
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
                         body:
                             application/json:
@@ -1889,6 +1978,9 @@ resourceTypes:
                           application/json:
                             schema: errorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
   /roles:
       displayName: Role
       post:
@@ -1963,6 +2055,9 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: Delete chosen role.
@@ -1976,6 +2071,9 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
 
   /rights:
       displayName: Right
@@ -2029,6 +2127,9 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: Delete chosen right.
@@ -2039,6 +2140,9 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
       /search:
           get:
               is: [ secured ]
@@ -2059,6 +2163,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /requisitionGroups:
       displayName: Requisition Group
@@ -2100,7 +2207,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen requisitionGroup.
@@ -2109,12 +2217,18 @@ resourceTypes:
                         body:
                             application/json:
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: Delete chosen requisitionGroup.
                 responses:
                     "204":
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
 
   /currencySettings:

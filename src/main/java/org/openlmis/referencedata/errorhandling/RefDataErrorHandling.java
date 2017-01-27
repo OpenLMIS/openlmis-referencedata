@@ -64,8 +64,9 @@ public class RefDataErrorHandling extends BaseHandler {
   @ExceptionHandler(NotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
-  public void handleNotFoundException(NotFoundException ex) {
-    LOGGER.debug(ex.toString());
+  public LocalizedMessage handleNotFoundException(NotFoundException ex) {
+    LOGGER.info(ex.getMessage());
+    return getLocalizedMessage(ex.asMessage());
   }
 
   /**

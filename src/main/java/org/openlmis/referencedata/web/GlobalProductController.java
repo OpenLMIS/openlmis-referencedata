@@ -3,9 +3,14 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.GlobalProductRepository;
 import org.openlmis.referencedata.repository.OrderableProductRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.GlobalProductMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,13 +68,13 @@ public class GlobalProductController extends BaseController {
 
     // ensure trade item list isn't null
     if (null == tradeItemIds) {
-      return ResponseEntity.badRequest().build();
+      throw new ValidationMessageException(GlobalProductMessageKeys.ERROR_TRADE_ITEMS_NULL);
     }
 
     // ensure global product exists
     GlobalProduct globalProduct = globalProductRepository.findOne(globalProductId);
     if (null == globalProduct) {
-      return ResponseEntity.notFound().build();
+      throw new NotFoundException(GlobalProductMessageKeys.ERROR_NOT_FOUND);
     }
 
     // create set of trade items from their ids, stop if any one is not found
@@ -77,7 +82,7 @@ public class GlobalProductController extends BaseController {
     for (UUID id : tradeItemIds) {
       TradeItem item = tradeItemRepository.findOne(id);
       if (null == item) {
-        return ResponseEntity.notFound().build();
+        throw new NotFoundException(new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, id));
       }
 
       tradeItems.add(item);
@@ -102,7 +107,7 @@ public class GlobalProductController extends BaseController {
     // ensure global product exists
     GlobalProduct globalProduct = globalProductRepository.findOne(globalProductId);
     if (null == globalProduct) {
-      return ResponseEntity.notFound().build();
+      throw new NotFoundException(GlobalProductMessageKeys.ERROR_NOT_FOUND);
     }
 
     Set<UUID> ids = new HashSet<>();
