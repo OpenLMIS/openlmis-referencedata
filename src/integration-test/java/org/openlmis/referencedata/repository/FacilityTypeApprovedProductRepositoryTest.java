@@ -16,13 +16,13 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.GlobalProduct;
+import org.openlmis.referencedata.domain.CommodityType;
 import org.joda.money.Money;
-import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
-import org.openlmis.referencedata.domain.ProductCategory;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -41,10 +41,10 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private ProgramRepository programRepository;
 
   @Autowired
-  private ProductCategoryRepository productCategoryRepository;
+  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
   @Autowired
-  private OrderableProductRepository orderableProductRepository;
+  private OrderableRepository orderableRepository;
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -64,12 +64,12 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   private FacilityType facilityType;
   private FacilityType facilityType2;
-  private ProgramProduct programProductFullSupply;
-  private ProgramProduct programProductNonFullSupply;
-  private ProductCategory productCategory;
+  private ProgramOrderable programOrderableFullSupply;
+  private ProgramOrderable programOrderableNonFullSupply;
+  private OrderableDisplayCategory orderableDisplayCategory;
   private Program program;
-  private OrderableProduct orderableProductFullSupply;
-  private OrderableProduct orderableProductNonFullSupply;
+  private Orderable orderableFullSupply;
+  private Orderable orderableNonFullSupply;
   private GeographicLevel level;
   private GeographicZone geographicZone;
   private Facility facility;
@@ -88,24 +88,25 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     programRepository.save(program);
 
 
-    productCategory = ProductCategory.createNew(Code.code("productCategoryCode"),
-      new OrderedDisplayValue("productCategoryName", 1));
-    productCategoryRepository.save(productCategory);
+    orderableDisplayCategory = OrderableDisplayCategory.createNew(
+        Code.code("orderableDisplayCategoryCode"),
+      new OrderedDisplayValue("orderableDisplayCategoryName", 1));
+    orderableDisplayCategoryRepository.save(orderableDisplayCategory);
 
-    orderableProductFullSupply = GlobalProduct.newGlobalProduct(
+    orderableFullSupply = CommodityType.newCommodityType(
         "ibuprofen", "each", "Ibuprofen", "testDesc", 10, 5, false);
-    programProductFullSupply = ProgramProduct.createNew(program, productCategory,
-        orderableProductFullSupply, CurrencyUnit.of(currencyCode));
-    orderableProductFullSupply.addToProgram(programProductFullSupply);
-    orderableProductRepository.save(orderableProductFullSupply);
+    programOrderableFullSupply = ProgramOrderable.createNew(program, orderableDisplayCategory,
+        orderableFullSupply, CurrencyUnit.of(currencyCode));
+    orderableFullSupply.addToProgram(programOrderableFullSupply);
+    orderableRepository.save(orderableFullSupply);
 
-    orderableProductNonFullSupply = GlobalProduct.newGlobalProduct(
+    orderableNonFullSupply = CommodityType.newCommodityType(
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
-    programProductNonFullSupply = ProgramProduct.createNew(program, productCategory,
-        orderableProductNonFullSupply, 0, true, false, 0, 0,
+    programOrderableNonFullSupply = ProgramOrderable.createNew(program, orderableDisplayCategory,
+        orderableNonFullSupply, 0, true, false, 0, 0,
         Money.of(CurrencyUnit.of(currencyCode), 0), CurrencyUnit.of(currencyCode));
-    orderableProductNonFullSupply.addToProgram(programProductNonFullSupply);
-    orderableProductRepository.save(orderableProductNonFullSupply);
+    orderableNonFullSupply.addToProgram(programOrderableNonFullSupply);
+    orderableRepository.save(orderableNonFullSupply);
 
     level = new GeographicLevel();
     level.setCode("FacilityRepositoryIntegrationTest");
@@ -158,9 +159,9 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
     assertThat(ftap.getFacilityType().getId(), is(equalTo(facilityType.getId())));
     assertThat(ftap.getFacilityType().getId(), is(equalTo(facility.getType().getId())));
-    assertThat(ftap.getProgramProduct().getProgram().getId(), is(equalTo(program.getId())));
-    assertThat(ftap.getProgramProduct().isFullSupply(), is(true));
-    assertThat(ftap.getProgramProduct().isActive(), is(true));
+    assertThat(ftap.getProgramOrderable().getProgram().getId(), is(equalTo(program.getId())));
+    assertThat(ftap.getProgramOrderable().isFullSupply(), is(true));
+    assertThat(ftap.getProgramOrderable().isActive(), is(true));
   }
 
   @Test
@@ -187,9 +188,9 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
     assertThat(ftap.getFacilityType().getId(), is(equalTo(facilityType.getId())));
     assertThat(ftap.getFacilityType().getId(), is(equalTo(facility.getType().getId())));
-    assertThat(ftap.getProgramProduct().getProgram().getId(), is(equalTo(program.getId())));
-    assertThat(ftap.getProgramProduct().isFullSupply(), is(false));
-    assertThat(ftap.getProgramProduct().isActive(), is(true));
+    assertThat(ftap.getProgramOrderable().getProgram().getId(), is(equalTo(program.getId())));
+    assertThat(ftap.getProgramOrderable().isFullSupply(), is(false));
+    assertThat(ftap.getProgramOrderable().isActive(), is(true));
   }
 
   @Test
@@ -212,14 +213,15 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {
     assertThat(ftap.getFacilityType().getId(), is(equalTo(facilityType.getId())));
     assertThat(ftap.getFacilityType().getId(), is(equalTo(facility.getType().getId())));
-    assertThat(ftap.getProgramProduct().isFullSupply(), is(true));
-    assertThat(ftap.getProgramProduct().isActive(), is(true));
+    assertThat(ftap.getProgramOrderable().isFullSupply(), is(true));
+    assertThat(ftap.getProgramOrderable().isActive(), is(true));
   }
 
   private FacilityTypeApprovedProduct generateProduct(boolean fullSupply) {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setFacilityType(facilityType);
-    ftap.setProgramProduct(fullSupply ? programProductFullSupply : programProductNonFullSupply);
+    ftap.setProgramOrderable(
+        fullSupply ? programOrderableFullSupply : programOrderableNonFullSupply);
     ftap.setMaxMonthsOfStock(12.00);
     return ftap;
   }

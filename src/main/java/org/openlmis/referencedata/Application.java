@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.javers.spring.auditable.AuthorProvider;
-import org.openlmis.referencedata.domain.ProgramProductBuilder;
+import org.openlmis.referencedata.domain.ProgramOrderableBuilder;
 import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
-import org.openlmis.referencedata.repository.ProductCategoryRepository;
+import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.security.UserNameProvider;
-import org.openlmis.referencedata.serializer.ProgramProductBuilderDeserializer;
+import org.openlmis.referencedata.serializer.ProgramOrderableBuilderDeserializer;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -33,7 +33,7 @@ public class Application {
   private ProgramRepository programRepository;
 
   @Autowired
-  private ProductCategoryRepository productCategoryRepository;
+  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
@@ -86,12 +86,12 @@ public class Application {
 
   /**
    * Registers a modified deserializer with Jackson's
-   * {@link com.fasterxml.jackson.databind.ObjectMapper} for {@link ProgramProductBuilder}.  This
+   * {@link com.fasterxml.jackson.databind.ObjectMapper} for {@link ProgramOrderableBuilder}.  This
    * is useful for overriding the default deserializer that SpringBoot is using.
    * @return a Jackson module that SpringBoot will register with Jackson.
    */
   @Bean
-  public Module registerProgramProductBuilderDeserializer() {
+  public Module registerProgramOrderableBuilderDeserializer() {
     SimpleModule module = new SimpleModule();
     module.setDeserializerModifier(new BeanDeserializerModifier() {
       @Override
@@ -100,12 +100,12 @@ public class Application {
         Objects.requireNonNull(deserializer, "Jackson passed a null deserializer");
         Objects.requireNonNull(programRepository,
             "Spring Boot didn't autowire the Program Repository");
-        Objects.requireNonNull(productCategoryRepository,
+        Objects.requireNonNull(orderableDisplayCategoryRepository,
             "Spring Boot didn't autowire the Product Category Repository");
 
-        if (beanDesc.getBeanClass() == ProgramProductBuilder.class) {
-          return new ProgramProductBuilderDeserializer(
-              deserializer, programRepository, productCategoryRepository);
+        if (beanDesc.getBeanClass() == ProgramOrderableBuilder.class) {
+          return new ProgramOrderableBuilderDeserializer(
+              deserializer, programRepository, orderableDisplayCategoryRepository);
         }
 
         return deserializer;

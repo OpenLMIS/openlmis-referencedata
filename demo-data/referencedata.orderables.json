@@ -1,0 +1,152 @@
+[
+  {
+    "id": "2400e410-b8dd-4954-b1c0-80d8a8e785fc",
+    "code": "C1",
+    "dispensingUnit": "10 tab strip",
+    "name": "Acetylsalicylic Acid",
+    "packSize": 16,
+    "packRoundingThreshold": 8,
+    "roundToZero": false,
+    "type": "TRADE_ITEM",
+    "programOrderables": [
+      {
+        "id": "9e25fd93-d8a0-4d1d-8188-55dd3c408d24"
+      }
+    ]
+  },
+  {
+    "id": "103396e1-f5e4-4754-bb7b-1c799097dfea",
+    "code": "C2",
+    "dispensingUnit": "each",
+    "name": "Glibenclamide",
+    "packSize": 40,
+    "packRoundingThreshold": 20,
+    "roundToZero": false,
+    "type": "TRADE_ITEM",
+    "programOrderables": [
+      {
+        "id": "d4e4c6ca-efc9-4ab4-8966-d78ba594ac0c"
+      }
+    ]
+  },
+  {
+    "id": "bac90734-6e58-426e-849b-331286ec77d2",
+    "code": "C3",
+    "dispensingUnit": "10 tab strip",
+    "name": "Streptococcus Pneumoniae Vaccine",
+    "packSize": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
+    "type": "TRADE_ITEM",
+    "programOrderables": [
+      {
+        "id": "267321d1-447c-4fac-9430-907ae38d1854"
+      }
+    ]
+  },
+  {
+    "id": "c9e65f02-f84f-4ba2-85f7-e2cb6f0989af",
+    "code": "C4",
+    "dispensingUnit": "each",
+    "name": "Streptococcus Pneumoniae Vaccine II",
+    "packSize": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
+    "type": "COMMODITY_TYPE",
+    "programOrderables": [
+      {
+        "id": "1af3b535-fe6a-41ce-b4c6-7d0aa4381cdb"
+      }
+    ]
+  },
+  {
+    "id": "d602d0c6-4052-456c-8ccd-61b4ad77bece",
+    "code": "C100",
+    "dispensingUnit": "10 tab strip",
+    "name": "Levora",
+    "packSize": 84,
+    "packRoundingThreshold": 42,
+    "roundToZero": false,
+    "type": "COMMODITY_TYPE",
+    "programOrderables": [
+      {
+        "id": "10d447ea-0a86-4267-8048-0b331d509601"
+      }
+    ]
+  },
+  {
+    "id": "23819693-0670-4c4b-b400-28e009b86b51",
+    "code": "C200",
+    "dispensingUnit": "each",
+    "name": "Ortho-Novum",
+    "packSize": 63,
+    "packRoundingThreshold": 31,
+    "roundToZero": false,
+    "type": "COMMODITY_TYPE",
+    "programOrderables": [
+      {
+        "id": "2e9cf7eb-ae09-431b-a3da-aa51a7f4aca0"
+      }
+    ]
+  },
+  {
+    "id": "7f7b83db-580d-4269-88d2-7f9c80a591a9",
+    "code": "C300",
+    "dispensingUnit": "each",
+    "name": "Depo-Estradiol",
+    "packSize": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
+    "type": "COMMODITY_TYPE",
+    "programOrderables": [
+      {
+        "id": "366fdbed-c1ba-4bd0-b387-b1c75df9da48"
+      }
+    ]
+  },
+  {
+    "id": "bfde33c3-83f1-4feb-a27c-842852f66b71",
+    "code": "C400",
+    "dispensingUnit": "each",
+    "name": "Male Condom",
+    "packSize": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "type": "COMMODITY_TYPE",
+    "programOrderables": [
+      {
+        "id": "e119197f-2326-47b1-9a7f-00f020d9e2b9"
+      }
+    ]
+  },
+  {
+    "id": "880cf2eb-7b68-4450-a037-a0dec1a17987",
+    "code": "C500",
+    "dispensingUnit": "10 tab strip",
+    "name": "Implanon",
+    "packSize": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "type": "COMMODITY_TYPE",
+    "programOrderables": [
+      {
+        "id": "ceaa00b6-e2bb-4908-ab82-4e2265c39404"
+      }
+    ]
+  },
+  {
+    "id": "7b9b66e0-f008-4c38-93ec-7a5f4868cca9",
+    "code": "C600",
+    "dispensingUnit": "10 tab strip",
+    "name": "Levonorgestrel ",
+    "packSize": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "type": "COMMODITY_TYPE",
+    "programOrderables": [
+      {
+        "id": "79159377-dc1c-4eaa-b4e9-8dad221a1a97"
+      }
+    ]
+  }
+]

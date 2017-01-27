@@ -10,12 +10,12 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.GlobalProduct;
-import org.openlmis.referencedata.domain.OrderableProduct;
+import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
-import org.openlmis.referencedata.domain.ProductCategory;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -38,9 +38,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private String currencyCode;
 
   private Program program;
-  private OrderableProduct orderableProduct;
+  private Orderable orderable;
   private FacilityType facilityType1;
-  private ProgramProduct programProduct;
+  private ProgramOrderable programOrderable;
   private FacilityTypeApprovedProduct facilityTypeAppProd;
   private UUID facilityTypeAppProdId;
 
@@ -53,14 +53,15 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     program.setPeriodsSkippable(true);
     program.setId(UUID.randomUUID());
 
-    ProductCategory productCategory = ProductCategory.createNew(Code.code("productCategoryCode"),
-        new OrderedDisplayValue("productCategoryName", 1));
-    productCategory.setId(UUID.randomUUID());
+    OrderableDisplayCategory orderableDisplayCategory = OrderableDisplayCategory.createNew(
+        Code.code("orderableDisplayCategoryCode"),
+        new OrderedDisplayValue("orderableDisplayCategoryName", 1));
+    orderableDisplayCategory.setId(UUID.randomUUID());
 
-    orderableProduct = GlobalProduct.newGlobalProduct("abcd", "each", "Abcd", "test", 10, 5, false);
-    orderableProduct.setId(UUID.randomUUID());
+    orderable = CommodityType.newCommodityType("abcd", "each", "Abcd", "test", 10, 5, false);
+    orderable.setId(UUID.randomUUID());
 
-    programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct,
+    programOrderable = ProgramOrderable.createNew(program, orderableDisplayCategory, orderable,
         CurrencyUnit.of(currencyCode));
 
     facilityType1 = new FacilityType("facilityType1");
@@ -68,7 +69,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     facilityTypeAppProd = new FacilityTypeApprovedProduct();
     facilityTypeAppProd.setId(facilityTypeAppProdId);
     facilityTypeAppProd.setFacilityType(facilityType1);
-    facilityTypeAppProd.setProgramProduct(programProduct);
+    facilityTypeAppProd.setProgramOrderable(programOrderable);
     facilityTypeAppProd.setMaxMonthsOfStock(6.00);
     facilityTypeAppProdId = UUID.randomUUID();
   }

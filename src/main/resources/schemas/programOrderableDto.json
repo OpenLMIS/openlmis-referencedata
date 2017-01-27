@@ -1,0 +1,75 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "ProgramOrderableDto",
+  "description": "A single product",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "productId": {
+      "type": "string",
+      "title": "productId"
+    },
+    "productName": {
+      "type": "string",
+      "title": "productName"
+    },
+    "productCode": {
+      "type": "string",
+      "title": "productCode"
+    },
+    "productPackSize": {
+      "type": "number",
+      "title": "productPackSize"
+    },
+    "orderableDisplayCategoryId": {
+      "type": "string",
+      "title": "orderableDisplayCategoryId"
+    },
+    "productCategoryDisplayName": {
+      "type": "string",
+      "title": "productCategoryDisplayName"
+    },
+    "productCategoryDisplayOrder": {
+      "type": "integer",
+      "title": "productCategoryDisplayOrder"
+    },
+    "dosesPerMonth": {
+      "type": "integer",
+      "title": "dosesPerMonth"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "active"
+    },
+    "fullSupply": {
+      "type": "boolean",
+      "title": "fullSupply"
+    },
+    "displayOrder": {
+      "type": "integer",
+      "title": "displayOrder"
+    },
+    "maxMonthsOfStock": {
+      "type": "integer",
+      "title": "maxMonthsOfStock"
+    },
+    "pricePerPack": {
+      "type": "number",
+      "title": "pricePerPack"
+    }
+  },
+  "required": [
+    "productId",
+    "productName",
+    "productPackSize",
+    "orderableDisplayCategoryId",
+    "productCategoryDisplayName",
+    "productCategoryDisplayOrder",
+    "dosesPerMonth",
+    "active",
+    "fullSupply"
+  ]
+}

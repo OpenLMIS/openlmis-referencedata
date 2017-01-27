@@ -7,10 +7,10 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.openlmis.referencedata.repository.ProductCategoryRepository;
-import org.openlmis.referencedata.repository.ProgramProductRepository;
+import org.openlmis.referencedata.repository.ProgramOrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
@@ -32,7 +32,7 @@ public class CleanRepositoryHelper {
       UUID.fromString("35316636-6264-6331-2d34-3933322d3462");
 
   @Autowired
-  private ProgramProductRepository programProductRepository;
+  private ProgramOrderableRepository programOrderableRepository;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -62,7 +62,7 @@ public class CleanRepositoryHelper {
   private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
 
   @Autowired
-  private ProductCategoryRepository productCategoryRepository;
+  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
 
   @Autowired
@@ -94,14 +94,14 @@ public class CleanRepositoryHelper {
   public void cleanAll() {
     requisitionGroupRepository.deleteAll();
     facilityTypeApprovedProductRepository.deleteAll();
-    programProductRepository.deleteAll();
+    programOrderableRepository.deleteAll();
     requisitionGroupProgramScheduleRepository.deleteAll();
     supplyLineRepository.deleteAll();
     periodRepository.deleteAll();
     programRepository.deleteAll();
     supervisoryNodeRepository.deleteAll();
     deleteAllUsersExceptAdmin();
-    productCategoryRepository.deleteAll();
+    orderableDisplayCategoryRepository.deleteAll();
     scheduleRepository.deleteAll();
     facilityRepository.deleteAll();
     facilityTypeRepository.deleteAll();
