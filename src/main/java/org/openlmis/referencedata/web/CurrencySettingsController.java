@@ -1,14 +1,14 @@
 package org.openlmis.referencedata.web;
 
-import org.openlmis.referencedata.dto.CurrencySettingDto;
+import org.openlmis.referencedata.dto.CurrencySettingsDto;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-public class CurrencySettingController extends BaseController {
+public class CurrencySettingsController extends BaseController {
 
   @Value("${currencyCode}")
   private String currencyCode;
@@ -25,9 +25,9 @@ public class CurrencySettingController extends BaseController {
    * @return {Version} Returns currency settings from properties.
    */
   @RequestMapping(value = "/currencySettings", method = RequestMethod.GET)
-  public ResponseEntity<CurrencySettingDto> getCurrencySettings() {
+  @ResponseBody
+  public CurrencySettingsDto getCurrencySettings() {
 
-    return ResponseEntity
-        .ok(new CurrencySettingDto(currencyCode, currencySymbol, currencySymbolSide));
+    return new CurrencySettingsDto(currencyCode, currencySymbol, currencySymbolSide);
   }
 }

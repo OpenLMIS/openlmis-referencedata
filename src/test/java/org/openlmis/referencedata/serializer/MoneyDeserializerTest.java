@@ -10,7 +10,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,7 +26,6 @@ public class MoneyDeserializerTest {
   public void setup() {
     mapper = new ObjectMapper();
     moneyDeserializer = new MoneyDeserializer();
-    ReflectionTestUtils.setField(moneyDeserializer, "currencyCode", "USD");
   }
 
   @Test(expected = NumberFormatException.class)
@@ -54,5 +52,4 @@ public class MoneyDeserializerTest {
 
     return moneyDeserializer.deserialize(parser, ctxt);
   }
-
 }

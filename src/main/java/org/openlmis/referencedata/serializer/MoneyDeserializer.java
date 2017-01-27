@@ -4,23 +4,21 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import org.springframework.beans.factory.annotation.Value;
+import org.openlmis.BuildConfig;
 
 import java.io.IOException;
 
 /**
  * MoneyDeserializer class represents the deserializer for Money.
  */
-
 public class MoneyDeserializer extends JsonDeserializer<Money> {
-
-  @Value("${currencyCode}")
-  private String currencyCode;
 
   @Override
   public Money deserialize(JsonParser jsonParser, DeserializationContext ctxt)
       throws IOException {
-    return Money.parse(currencyCode + " " + jsonParser.getText());
+    return Money.parse(
+        CurrencyUnit.of(BuildConfig.CURRENCY_CODE).getCode() + " " + jsonParser.getText());
   }
 }

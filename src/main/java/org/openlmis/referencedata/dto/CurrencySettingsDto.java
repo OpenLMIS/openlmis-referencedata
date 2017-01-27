@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class CurrencySettingDto {
+public class CurrencySettingsDto {
 
   private String currencyCode;
 

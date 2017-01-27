@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
-import org.openlmis.referencedata.dto.CurrencySettingDto;
+import org.openlmis.referencedata.dto.CurrencySettingsDto;
 import org.springframework.beans.factory.annotation.Value;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -17,7 +17,7 @@ public class CurrencySettingCotrollerIntegratonTest extends BaseWebIntegrationTe
   @Test
   public void shouldReturnCurrencySetting() {
 
-    CurrencySettingDto response = new CurrencySettingDto();
+    CurrencySettingsDto response = new CurrencySettingsDto();
     response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
