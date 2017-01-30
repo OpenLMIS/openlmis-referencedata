@@ -38,9 +38,9 @@ public class ProgramOrderable extends BaseEntity {
   private Program program;
 
   @ManyToOne
-  @JoinColumn(name = "productId", nullable = false)
+  @JoinColumn(name = "orderableId", nullable = false)
   @Getter
-  private Orderable product;
+  private Orderable orderable;
 
   private Integer dosesPerMonth;
 
@@ -64,10 +64,10 @@ public class ProgramOrderable extends BaseEntity {
   private Money pricePerPack;
 
   private ProgramOrderable(Program program,
-                           Orderable product,
+                           Orderable orderable,
                            OrderableDisplayCategory orderableDisplayCategory) {
     this.program = program;
-    this.product = product;
+    this.orderable = orderable;
     this.orderableDisplayCategory = orderableDisplayCategory;
     this.dosesPerMonth = null;
     this.active = true;
@@ -86,7 +86,7 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   /**
-   * Create program product association.
+   * Create program orderable association.
    * See {@link #createNew(Program,
    *  OrderableDisplayCategory,
    *  Orderable,
@@ -113,14 +113,14 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   /**
-   * Create program product.
+   * Create program orderable.
    * @param program The Program this Product will be in.
    * @param category the category this Product will be in, in this Program.
    * @param product the Product.
-   * @param dosesPerMonth the number of doses a patient needs of this product in a month.
-   * @param active weather this product is active in this program at this time.
+   * @param dosesPerMonth the number of doses a patient needs of this orderable in a month.
+   * @param active weather this orderable is active in this program at this time.
    * @param displayOrder the display order of this Product in this category of this Program.
-   * @param maxMonthsStock the maximum months of stock this product should be stocked for in this
+   * @param maxMonthsStock the maximum months of stock this orderable should be stocked for in this
    *                       Program.
    * @param pricePerPack the price of one pack.
    * @return a new ProgramOrderable.
@@ -160,12 +160,12 @@ public class ProgramOrderable extends BaseEntity {
     }
 
     ProgramOrderable otherProgProduct = (ProgramOrderable) other;
-    return program.equals(otherProgProduct.program) && product.equals(otherProgProduct.product);
+    return program.equals(otherProgProduct.program) && orderable.equals(otherProgProduct.orderable);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(program, product);
+    return Objects.hash(program, orderable);
   }
 
   /**
@@ -185,7 +185,7 @@ public class ProgramOrderable extends BaseEntity {
                           SerializerProvider provider) throws IOException {
       generator.writeStartObject();
       generator.writeStringField("programId", programOrderable.program.getId().toString());
-      generator.writeStringField("productId", programOrderable.product.getId().toString());
+      generator.writeStringField("orderableId", programOrderable.orderable.getId().toString());
       generator.writeStringField("orderableDisplayCategoryId",
           programOrderable.orderableDisplayCategory.getId().toString());
       generator.writeStringField("productCategoryDisplayName",
@@ -213,10 +213,10 @@ public class ProgramOrderable extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
-    exporter.setProductId(product.getId());
-    exporter.setProductName(product.getName());
-    exporter.setProductCode(product.getProductCode());
-    exporter.setProductPackSize(product.getPackSize());
+    exporter.setOrderableId(orderable.getId());
+    exporter.setOrderableName(orderable.getName());
+    exporter.setOrderableCode(orderable.getProductCode());
+    exporter.setOrderablePackSize(orderable.getPackSize());
     exporter.setOrderableDisplayCategoryId(orderableDisplayCategory.getId());
     exporter.setProductCategoryDisplayName(
         orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
@@ -236,13 +236,13 @@ public class ProgramOrderable extends BaseEntity {
   public interface Exporter {
     void setId(UUID id);
 
-    void setProductId(UUID productId);
+    void setOrderableId(UUID productId);
 
-    void setProductName(String productName);
+    void setOrderableName(String productName);
 
-    void setProductCode(Code productCode);
+    void setOrderableCode(Code productCode);
 
-    void setProductPackSize(Long packSize);
+    void setOrderablePackSize(Long packSize);
 
     void setOrderableDisplayCategoryId(UUID orderableDisplayCategoryId);
 
@@ -266,11 +266,11 @@ public class ProgramOrderable extends BaseEntity {
   public interface Importer {
     UUID getId();
 
-    String getProductName();
+    String getOrderableName();
 
-    Code getProductCode();
+    Code getOrderableCode();
 
-    Long getProductPackSize();
+    Long getOrderablePackSize();
 
     UUID getOrderableDisplayCategoryId();
 

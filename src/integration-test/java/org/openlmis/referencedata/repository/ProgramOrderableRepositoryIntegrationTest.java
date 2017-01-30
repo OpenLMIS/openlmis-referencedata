@@ -115,7 +115,7 @@ public class ProgramOrderableRepositoryIntegrationTest
   private ProgramOrderable cloneProgramOrderable(ProgramOrderable programOrderable) {
     ProgramOrderable clonedProgramOrderable = ProgramOrderable.createNew(
         programOrderable.getProgram(), programOrderable.getOrderableDisplayCategory(),
-        programOrderable.getProduct(),
+        programOrderable.getOrderable(),
         CurrencyUnit.of(currencyCode));
     programOrderableRepository.save(clonedProgramOrderable);
     return clonedProgramOrderable;

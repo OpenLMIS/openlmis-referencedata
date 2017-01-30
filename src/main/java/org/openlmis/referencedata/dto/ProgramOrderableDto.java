@@ -19,13 +19,13 @@ import java.util.UUID;
 public class ProgramOrderableDto extends BaseDto
     implements ProgramOrderable.Exporter, ProgramOrderable.Importer {
 
-  private UUID productId;
+  private UUID orderableId;
 
-  private String productName;
+  private String orderableName;
 
-  private Code productCode;
+  private Code orderableCode;
 
-  private Long productPackSize;
+  private Long orderablePackSize;
 
   private UUID orderableDisplayCategoryId;
 

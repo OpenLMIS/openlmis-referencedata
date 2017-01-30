@@ -13,10 +13,10 @@
       "$ref": "program.json",
       "title": "program"
     },
-    "product": {
+    "orderable": {
       "type": "object",
       "$ref": "orderable.json",
-      "title": "product"
+      "title": "orderable"
     },
     "dosesPerMonth": {
       "type": "integer",
@@ -48,6 +48,6 @@
       "title": "pricePerPack"
     }
   },
-  "required": ["id", "program", "product", "dosesPerMonth", "active", "orderableDisplayCategory",
+  "required": ["id", "program", "orderable", "dosesPerMonth", "active", "orderableDisplayCategory",
     "fullSupply"]
 }

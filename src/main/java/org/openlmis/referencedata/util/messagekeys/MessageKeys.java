@@ -43,7 +43,7 @@ public abstract class MessageKeys {
   protected static final String TRADE_ITEM = "tradeItem";
   protected static final String SUPPLY_LINE = "supplyLine";
   protected static final String FACILITY_TYPE = "facilityType";
-  protected static final String GLOBAL_PRODUCT = "globalProduct";
+  protected static final String COMMODITY_TYPE = "commodityType";
   protected static final String GEOGRAPHIC_ZONE = "geographicZone";
   protected static final String GEOGRAPHIC_LEVEL = "geographicLevel";
   protected static final String SUPERVISORY_NODE = "supervisoryNode";

@@ -661,7 +661,7 @@ resourceTypes:
       /search:
           get:
               is: [ secured ]
-              description: Find product categories with matched code.
+              description: Find orderable categories with matched code.
               queryParameters:
                   code:
                       displayName: code
@@ -695,7 +695,7 @@ resourceTypes:
                   repeat: false
           get:
               is: [ secured ]
-              description: Get chosen orderable product.
+              description: Get chosen orderable orderable.
               responses:
                   "200":
                       body:
@@ -1323,7 +1323,7 @@ resourceTypes:
                       required: false
                       repeat: false
                   fullSupply:
-                      displayName: Full-supply product
+                      displayName: Full-supply orderable
                       type: boolean
                       required: true
                       repeat: false

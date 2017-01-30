@@ -8,21 +8,21 @@
       "type": "string",
       "title": "id"
     },
-    "productId": {
+    "orderableId": {
       "type": "string",
-      "title": "productId"
+      "title": "orderableId"
     },
-    "productName": {
+    "orderableName": {
       "type": "string",
-      "title": "productName"
+      "title": "orderableName"
     },
-    "productCode": {
+    "orderableCode": {
       "type": "string",
-      "title": "productCode"
+      "title": "orderableCode"
     },
-    "productPackSize": {
+    "orderablePackSize": {
       "type": "number",
-      "title": "productPackSize"
+      "title": "orderablePackSize"
     },
     "orderableDisplayCategoryId": {
       "type": "string",
@@ -62,9 +62,9 @@
     }
   },
   "required": [
-    "productId",
-    "productName",
-    "productPackSize",
+    "orderableId",
+    "orderableName",
+    "orderablePackSize",
     "orderableDisplayCategoryId",
     "productCategoryDisplayName",
     "productCategoryDisplayOrder",

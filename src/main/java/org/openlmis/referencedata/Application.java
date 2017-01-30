@@ -101,7 +101,7 @@ public class Application {
         Objects.requireNonNull(programRepository,
             "Spring Boot didn't autowire the Program Repository");
         Objects.requireNonNull(orderableDisplayCategoryRepository,
-            "Spring Boot didn't autowire the Product Category Repository");
+            "Spring Boot didn't autowire the Orderable Display Category Repository");
 
         if (beanDesc.getBeanClass() == ProgramOrderableBuilder.class) {
           return new ProgramOrderableBuilderDeserializer(

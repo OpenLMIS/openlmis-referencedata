@@ -9,7 +9,7 @@ import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.GlobalProductMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -68,13 +68,13 @@ public class CommodityTypeController extends BaseController {
 
     // ensure trade item list isn't null
     if (null == tradeItemIds) {
-      throw new ValidationMessageException(GlobalProductMessageKeys.ERROR_TRADE_ITEMS_NULL);
+      throw new ValidationMessageException(CommodityTypeMessageKeys.ERROR_TRADE_ITEMS_NULL);
     }
 
     // ensure commodity type exists
     CommodityType commodityType = commodityTypeRepository.findOne(commodityTypeId);
     if (null == commodityType) {
-      throw new NotFoundException(GlobalProductMessageKeys.ERROR_NOT_FOUND);
+      throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }
 
     // create set of trade items from their ids, stop if any one is not found
@@ -107,7 +107,7 @@ public class CommodityTypeController extends BaseController {
     // ensure commodity type exists
     CommodityType commodityType = commodityTypeRepository.findOne(commodityTypeId);
     if (null == commodityType) {
-      throw new NotFoundException(GlobalProductMessageKeys.ERROR_NOT_FOUND);
+      throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }
 
     Set<UUID> ids = new HashSet<>();

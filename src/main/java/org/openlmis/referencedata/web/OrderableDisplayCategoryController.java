@@ -151,7 +151,7 @@ public class OrderableDisplayCategoryController extends BaseController {
    * Finds OrderableDisplayCategories matching all of provided parameters.
    *
    * @param codeParam code of orderableDisplayCategory.
-   * @return ResponseEntity with list of all Product Categories matching provided parameters
+   * @return ResponseEntity with list of all OrderableDisplayCategories matching provided parameters
    */
   @RequestMapping(value = "/orderableDisplayCategories/search", method = RequestMethod.GET)
   public ResponseEntity<Iterable<OrderableDisplayCategory>> searchOrderableDisplayCategories(
