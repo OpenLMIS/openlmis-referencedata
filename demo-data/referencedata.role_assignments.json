@@ -96,6 +96,12 @@
     "role": {"id": "a439c5de-b8aa-11e6-80f5-76304dec7eb7"}
   },
   {
+    "id": "272ddb53-928c-4283-ae27-181280c0a570",
+    "type": "direct",
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": {"id": "2fef03c4-8854-4dc8-b126-007f5e2afcc1"}
+  },
+  {
     "id": "4d5264f2-dc9e-11e6-bf26-cec0c932ce01",
     "type": "supervision",
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },

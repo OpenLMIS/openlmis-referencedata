@@ -17,3 +17,5 @@ INSERT INTO referencedata.rights (id, name, type) VALUES ('e101d2b8-6a0f-4af6-a5
 INSERT INTO referencedata.rights (id, name, type) VALUES ('7958129d-c4c0-4294-a40c-c2b07cb8e515', 'REQUISITION_CONVERT_TO_ORDER', 'ORDER_FULFILLMENT');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('65626c3d-513f-4255-93fd-808709860594', 'FULFILLMENT_TRANSFER_ORDER', 'ORDER_FULFILLMENT');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('24df2715-850c-4336-b650-90eb78c544bf', 'PODS_MANAGE', 'ORDER_FULFILLMENT');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('35cf256f-1b28-41ad-84f5-99c158083dfc', 'REPORTS_VIEW', 'REPORTS');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('60561639-4f94-4371-a5b5-ba95ecf7627f', 'REPORT_TEMPLATES_EDIT', 'REPORTS');

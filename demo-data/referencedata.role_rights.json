@@ -86,5 +86,13 @@
   {
     "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
     "rightId": "3687ea98-8a1e-4347-984c-3fd97d072066"
+  },
+  {
+    "roleId": "2fef03c4-8854-4dc8-b126-007f5e2afcc1",
+    "rightId": "35cf256f-1b28-41ad-84f5-99c158083dfc"
+  },
+  {
+    "roleId": "2fef03c4-8854-4dc8-b126-007f5e2afcc1",
+    "rightId": "60561639-4f94-4371-a5b5-ba95ecf7627f"
   }
 ]
