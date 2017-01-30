@@ -11,7 +11,7 @@ import lombok.Setter;
 public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedProduct.Exporter,
     FacilityTypeApprovedProduct.Importer {
 
-  private ProgramOrderableDto product;
+  private ProgramOrderableDto programOrderable;
 
   private Double maxMonthsOfStock;
 
@@ -20,8 +20,8 @@ public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedP
   private Double emergencyOrderPoint;
 
   @Override
-  public void setProduct(ProgramOrderable programOrderable) {
-    this.product = new ProgramOrderableDto();
-    programOrderable.export(product);
+  public void setProgramOrderable(ProgramOrderable programOrderable) {
+    this.programOrderable = new ProgramOrderableDto();
+    programOrderable.export(this.programOrderable);
   }
 }

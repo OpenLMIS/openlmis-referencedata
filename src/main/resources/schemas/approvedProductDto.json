@@ -8,10 +8,10 @@
       "type": "string",
       "title": "id"
     },
-    "product": {
+    "programOrderable": {
       "type": "object",
       "$ref": "programOrderableDto.json",
-      "title": "product"
+      "title": "programOrderable"
     },
     "maxMonthsOfStock": {
       "type": "number",
@@ -26,5 +26,5 @@
       "title": "emergencyOrderPoint"
     }
   },
-  "required": ["id", "product", "maxMonthsOfStock"]
+  "required": ["id", "programOrderable", "maxMonthsOfStock"]
 }

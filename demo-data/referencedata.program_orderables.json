@@ -2,7 +2,7 @@
   {
     "id": "9e25fd93-d8a0-4d1d-8188-55dd3c408d24",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "productId": { "id": "2400e410-b8dd-4954-b1c0-80d8a8e785fc" },
+    "orderableId": { "id": "2400e410-b8dd-4954-b1c0-80d8a8e785fc" },
     "orderableDisplayCategoryId": { "id": "6805dd74-ec00-4697-9a5d-5b78414fcaf6" },
     "dosesPerMonth": 10,
     "active": "true",
@@ -14,7 +14,7 @@
   {
     "id": "d4e4c6ca-efc9-4ab4-8966-d78ba594ac0c",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "productId": { "id": "103396e1-f5e4-4754-bb7b-1c799097dfea" },
+    "orderableId": { "id": "103396e1-f5e4-4754-bb7b-1c799097dfea" },
     "orderableDisplayCategoryId": { "id": "6805dd74-ec00-4697-9a5d-5b78414fcaf6" },
     "dosesPerMonth": 3,
     "active": "false",
@@ -26,7 +26,7 @@
   {
     "id": "267321d1-447c-4fac-9430-907ae38d1854",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "productId": { "id": "bac90734-6e58-426e-849b-331286ec77d2" },
+    "orderableId": { "id": "bac90734-6e58-426e-849b-331286ec77d2" },
     "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
     "dosesPerMonth": 1,
     "active": "true",
@@ -38,7 +38,7 @@
   {
     "id": "1af3b535-fe6a-41ce-b4c6-7d0aa4381cdb",
     "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "productId": { "id": "c9e65f02-f84f-4ba2-85f7-e2cb6f0989af" },
+    "orderableId": { "id": "c9e65f02-f84f-4ba2-85f7-e2cb6f0989af" },
     "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
     "dosesPerMonth": 1,
     "active": "true",
@@ -50,7 +50,7 @@
   {
     "id": "10d447ea-0a86-4267-8048-0b331d509601",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "productId": { "id": "d602d0c6-4052-456c-8ccd-61b4ad77bece" },
+    "orderableId": { "id": "d602d0c6-4052-456c-8ccd-61b4ad77bece" },
     "orderableDisplayCategoryId": { "id": "15b8ef1f-a5d6-42dd-95bf-bb68a4504e82" },
     "dosesPerMonth": 1,
     "active": "true",
@@ -62,7 +62,7 @@
   {
     "id": "2e9cf7eb-ae09-431b-a3da-aa51a7f4aca0",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "productId": { "id": "23819693-0670-4c4b-b400-28e009b86b51" },
+    "orderableId": { "id": "23819693-0670-4c4b-b400-28e009b86b51" },
     "orderableDisplayCategoryId": { "id": "15b8ef1f-a5d6-42dd-95bf-bb68a4504e82" },
     "dosesPerMonth": 1,
     "active": "true",
@@ -74,7 +74,7 @@
   {
     "id": "366fdbed-c1ba-4bd0-b387-b1c75df9da48",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "productId": { "id": "7f7b83db-580d-4269-88d2-7f9c80a591a9" },
+    "orderableId": { "id": "7f7b83db-580d-4269-88d2-7f9c80a591a9" },
     "orderableDisplayCategoryId": { "id": "74f39ab7-b5ce-4087-a6ea-65799a35e79b" },
     "dosesPerMonth": 1,
     "active": "true",
@@ -86,7 +86,7 @@
   {
     "id": "e119197f-2326-47b1-9a7f-00f020d9e2b9",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "productId": { "id": "bfde33c3-83f1-4feb-a27c-842852f66b71" },
+    "orderableId": { "id": "bfde33c3-83f1-4feb-a27c-842852f66b71" },
     "orderableDisplayCategoryId": { "id": "3bfe0282-732b-4ce8-b4f9-aa7ffb297758" },
     "dosesPerMonth": 1,
     "active": "true",
@@ -98,7 +98,7 @@
   {
     "id": "ceaa00b6-e2bb-4908-ab82-4e2265c39404",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "productId": { "id": "880cf2eb-7b68-4450-a037-a0dec1a17987" },
+    "orderableId": { "id": "880cf2eb-7b68-4450-a037-a0dec1a17987" },
     "orderableDisplayCategoryId": { "id": "06606981-67cc-42d1-87ed-21f22fb0ea58" },
     "dosesPerMonth": 1,
     "active": "true",
@@ -110,7 +110,7 @@
   {
     "id": "79159377-dc1c-4eaa-b4e9-8dad221a1a97",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "productId": { "id": "7b9b66e0-f008-4c38-93ec-7a5f4868cca9" },
+    "orderableId": { "id": "7b9b66e0-f008-4c38-93ec-7a5f4868cca9" },
     "orderableDisplayCategoryId": { "id": "06606981-67cc-42d1-87ed-21f22fb0ea58" },
     "dosesPerMonth": 1,
     "active": "true",
@@ -122,7 +122,7 @@
   {
     "id": "99b2a62a-f96d-45ad-ba91-7dcc6cda7ce3",
     "programId": { "id": "66032ea8-b69b-4102-a1eb-844e57143187" },
-    "productId": { "id": "7f7b83db-580d-4269-88d2-7f9c80a591a9" },
+    "orderableId": { "id": "7f7b83db-580d-4269-88d2-7f9c80a591a9" },
     "orderableDisplayCategoryId": { "id": "74f39ab7-b5ce-4087-a6ea-65799a35e79b" },
     "dosesPerMonth": 1,
     "active": "true",

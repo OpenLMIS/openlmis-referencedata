@@ -62,12 +62,12 @@ public class FacilityTypeApprovedProductRepositoryImpl
     query.where(conjunction);
 
     Join<ProgramOrderable, OrderableDisplayCategory> category = pp.join("orderableDisplayCategory");
-    Join<ProgramOrderable, Orderable> product = pp.join("product");
+    Join<ProgramOrderable, Orderable> orderable = pp.join("orderable");
 
     query.orderBy(
         builder.asc(category.get("orderedDisplayValue").get("displayOrder")),
         builder.asc(category.get("orderedDisplayValue").get("displayName")),
-        builder.asc(product.get("productCode"))
+        builder.asc(orderable.get("productCode"))
     );
 
     return entityManager.createQuery(query).getResultList();

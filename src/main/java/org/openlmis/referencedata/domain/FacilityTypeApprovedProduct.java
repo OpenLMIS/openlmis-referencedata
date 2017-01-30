@@ -51,7 +51,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
-    exporter.setProduct(programOrderable);
+    exporter.setProgramOrderable(programOrderable);
     exporter.setMaxMonthsOfStock(maxMonthsOfStock);
     exporter.setMinMonthsOfStock(minMonthsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
@@ -60,7 +60,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   public interface Exporter {
     void setId(UUID id);
 
-    void setProduct(ProgramOrderable programOrderable);
+    void setProgramOrderable(ProgramOrderable programOrderable);
 
     void setMaxMonthsOfStock(Double maxMonthsOfStock);
 
@@ -72,7 +72,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   public interface Importer {
     UUID getId();
 
-    ProgramOrderable.Importer getProduct();
+    ProgramOrderable.Importer getProgramOrderable();
 
     Double getMaxMonthsOfStock();
 
