@@ -60,7 +60,6 @@ public class DetailedRoleAssignmentDto implements RoleAssignment.Exporter,
         && Objects.equals(programCode, that.programCode)
         && Objects.equals(supervisoryNodeCode, that.supervisoryNodeCode)
         && Objects.equals(warehouseCode, that.warehouseCode)
-        && Objects.equals(warehouseCode, that.warehouseCode)
         && Objects.equals(programId, that.programId)
         && Objects.equals(supervisoryNodeId, that.supervisoryNodeId);
   }
