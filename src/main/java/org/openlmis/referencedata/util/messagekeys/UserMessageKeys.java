@@ -11,9 +11,9 @@ public abstract class UserMessageKeys extends MessageKeys {
   private static final String CHANGE_PASSWORD = "changePassword";
 
   public static final String ERROR_ROLE_ID_NULL = join(ERROR, ROLE, ID, NULL);
-  public static final String ERROR_NOT_FOUND = join(ERROR, USER, NOT_FOUND);
+  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
-  public static final String ERROR_SAVING = join(ERROR, USER, SAVING);
+  public static final String ERROR_SAVING = join(ERROR, SAVING);
   public static final String ERROR_HOME_FACILITY_NON_EXISTENT =
       join(ERROR, HOME_FACILITY, NON_EXISTENT);
   public static final String ERROR_PROGRAM_WITHOUT_FACILITY =
