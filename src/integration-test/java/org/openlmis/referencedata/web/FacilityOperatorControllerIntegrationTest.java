@@ -42,7 +42,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldPostFacilityOperator() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     FacilityOperator response = restAssured
         .given()
@@ -61,7 +61,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldRejectCreateRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -81,7 +81,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetAllFacilityOperators() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<FacilityOperator> facilityOperators = Arrays.asList(facilityOperator,
         generateFacilityOperator());
@@ -104,7 +104,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldRejectGetAllRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -123,7 +123,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldPutFacilityOperator() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     facilityOperator.setName("NewNameUpdate");
 
@@ -148,7 +148,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldRejectUpdateRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -169,7 +169,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
   
   @Test
   public void shouldGetFacilityOperator() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     given(facilityOperatorRepository.findOne(facilityOperatorId)).willReturn(facilityOperator);
 
@@ -190,7 +190,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldRejectGetRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -210,7 +210,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldDeleteFacilityOperator() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
     
     given(facilityOperatorRepository.findOne(facilityOperatorId)).willReturn(facilityOperator);
 
@@ -229,7 +229,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldRejectDeleteRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()

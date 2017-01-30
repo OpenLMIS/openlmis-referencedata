@@ -175,7 +175,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetAllUsers() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Set<User> storedUsers = Sets.newHashSet(user1, generateUser());
     given(userRepository.findAll()).willReturn(storedUsers);
@@ -196,7 +196,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetAllUsersIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = restAssured
         .given()
@@ -214,7 +214,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUser() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     UserDto userDto = new UserDto();
     user1.export(userDto);
@@ -230,7 +230,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserWithNoRightIfUserRequestsTheirOwnRecord() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT, userId);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     getUser()
       .then()
@@ -241,7 +241,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetUserIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = getUser()
         .then()
@@ -255,7 +255,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUsersFullRoleAssignments() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     DetailedRoleAssignmentDto[] response = getUsersFullRoleAssignments()
         .then()
@@ -275,7 +275,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUsersFullRoleAssignmentsWithNoRightIfUserRequestsTheirOwnRecord() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT, userId);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     getUsersFullRoleAssignments()
         .then()
@@ -286,7 +286,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetUsersFullRoleAssignmentsIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = getUsersFullRoleAssignments()
         .then()
@@ -300,7 +300,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnNotFoundWhenGettingFullRoleAssignmentsForNotExistingUser() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.findOne(userId)).willReturn(null);
 
@@ -318,7 +318,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldPutUser() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     UserDto userDto = new UserDto();
 
@@ -333,7 +333,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectPutUserIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = putUser(null)
         .then()
@@ -347,7 +347,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldDeleteUser() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     deleteUser()
         .then()
@@ -358,7 +358,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldDeleteUserWithNoRightIfUserRequestsTheirOwnRecord() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT, userId);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     deleteUser()
         .then()
@@ -369,7 +369,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectDeleteUserIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = deleteUser()
         .then()
@@ -383,7 +383,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserHasRight() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
 
@@ -399,7 +399,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserHasRightIfUserRequestsTheirOwnRecord() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT, userId);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
 
@@ -412,7 +412,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetUserHasRightIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = getUserHasRight()
         .then()
@@ -426,7 +426,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldBadRequestGetUserHasRightWithMissingFacility() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
@@ -448,7 +448,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserPrograms() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Program[] response = getUserPrograms()
         .then()
@@ -462,7 +462,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserProgramsWithNoRightIfUserRequestsTheirOwnRecord() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT, userId);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     getUserPrograms()
         .then()
@@ -473,7 +473,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetUserProgramsIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = getUserPrograms()
         .then()
@@ -487,7 +487,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserSupervisedFacilities() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Facility[] response = getUserSupervisedFacilities()
         .then()
@@ -500,7 +500,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserSupervisedFacilitiesWithNoRightIfUserRequestsTheirOwnRecord() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT, userId);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     Facility[] response = getUserSupervisedFacilities()
         .then()
@@ -513,7 +513,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetUserSupervisedFacilitiesIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = getUserSupervisedFacilities()
         .then()
@@ -527,7 +527,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getUserSupervisedFacilitiesShouldReturnNotFoundForNonExistingUser() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.findOne(userId)).willReturn(null);
     restAssured
@@ -546,7 +546,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getUserSupervisedFacilitiesShouldReturnBadRequestForNonExistingUuid() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
@@ -568,7 +568,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserFulfillmentFacilities() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Facility[] response = getUserFulfillmentFacilities()
         .then()
@@ -581,7 +581,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserFulfillmentFacilitiesWithNoRightIfUserRequestsTheirOwnRecord() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT, userId);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     getUserFulfillmentFacilities()
         .then()
@@ -592,7 +592,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetUserFulfillmentFacilitiesIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = getUserFulfillmentFacilities()
         .then()
@@ -606,7 +606,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenGettingFulfillmentFacilitiesWithIncorrectRight() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(fulfillmentRightId)).willReturn(null);
 
@@ -625,7 +625,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindUsers() throws JsonProcessingException {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Map<String, Object> queryMap = new HashMap<>();
     queryMap.put(USERNAME, user1.getUsername());
@@ -651,7 +651,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectFindUsersIfUserHasNoRight() {
-    mockDisableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     Map<String, Object> queryMap = new HashMap<>();
     queryMap.put(USERNAME, user1.getUsername());
@@ -678,7 +678,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldCreateRequisitionAndAuthUsers() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User user = generateUser();
 
     User response = restAssured
@@ -719,7 +719,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldCreateRequisitionAndAuthUsersAndSendResetPasswordEmail() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User user = generateUser();
 
     User response = restAssured
@@ -759,7 +759,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldResetPassword() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User savedUser = createUser();
     saveAuthUser(savedUser);
 
@@ -794,7 +794,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldChangePasswordIfValidResetTokenIsProvided() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User savedUser = createUser();
     saveAuthUser(savedUser);
 
@@ -832,7 +832,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldUpdateRequisitionAndAuthUsers() {
-    mockEnableRight(RightName.USERS_MANAGE_RIGHT);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User newUser = generateUser();
     UserDto newUserDto = new UserDto();
     newUser.export(newUserDto);

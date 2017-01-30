@@ -51,10 +51,11 @@ public class RightService {
    *
    * @param rightName the name of the right to check
    * @param allowServiceTokens whether to allow service-level tokens with root access
-   * @param userId id of the user that can bypass the right check e.g. to retrieve his own info
+   * @param expectedUserId id of the user that can bypass the right check
+   *                       e.g. to retrieve his own info
    * @throws UnauthorizedException in case the client has got no right to access the resource
    */
-  public void checkAdminRight(String rightName, boolean allowServiceTokens, UUID userId) {
+  public void checkAdminRight(String rightName, boolean allowServiceTokens, UUID expectedUserId) {
     OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext()
         .getAuthentication();
 
@@ -69,7 +70,7 @@ public class RightService {
       User user = userRepository.findOneByUsername(username);
 
       // bypass the right check if user id matches
-      if (null != userId && userId.equals(user.getId())) {
+      if (null != expectedUserId && expectedUserId.equals(user.getId())) {
         return;
       }
 

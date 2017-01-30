@@ -104,7 +104,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnSupplyingDepots() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     int searchedFacilitiesAmt = 3;
 
@@ -149,7 +149,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetSupplingRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     int searchedFacilitiesAmt = 3;
 
@@ -186,7 +186,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingSupervisorNode() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     supervisoryNodeId = UUID.randomUUID();
 
@@ -208,7 +208,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingProgram() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
 
@@ -229,7 +229,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String similarCode = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
@@ -253,7 +253,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectSearchRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured.given()
         .queryParam("code", "Facility")
@@ -271,7 +271,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindFacilitiesWithSimilarName() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String similarName = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
@@ -295,7 +295,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldNotFindFacilitiesWithIncorrectCodeAndName() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Facility[] response = restAssured.given()
         .queryParam("code", "IncorrectCode")
@@ -313,7 +313,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindApprovedProductsForFacility() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
     when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
@@ -336,7 +336,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   @Ignore("currently this endpoint doesn't have permission check")
   public void shouldRejectGetApprovedProductsRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
@@ -355,7 +355,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(null);
 

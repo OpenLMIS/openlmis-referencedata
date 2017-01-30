@@ -67,7 +67,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldDeleteSchedule() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
 
     restAssured
@@ -85,7 +85,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldPostProcessingSchedule() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingSchedule response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -103,7 +103,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldPutProcessingSchedule() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     schedule.setDescription("OpenLMIS");
     given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
 
@@ -126,7 +126,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldGetAllProcessingSchedules() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     List<ProcessingSchedule> storedProcessingSchedules = Arrays.asList(schedule,
         new ProcessingSchedule("PS2", "Schedule2"));
     given(scheduleRepository.findAll()).willReturn(storedProcessingSchedules);
@@ -147,7 +147,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldGetProcessingSchedule() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
 
     ProcessingSchedule response = restAssured
@@ -167,7 +167,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldGetProcessingScheduleByFacilityAndProgram() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
@@ -191,7 +191,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldBadRequestSearchWhenProgramDoesNotExist() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(null);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
@@ -213,7 +213,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldBadRequestSearchWhenFacilityDoesNotExist() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(facilityRepository.findOne(facilityId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
@@ -235,7 +235,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnUnauthorizedOnDeleteScheduleIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -252,7 +252,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnUnauthorizedOnPostProcessingScheduleIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -269,7 +269,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnUnauthorizedOnPutProcessingScheduleIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -287,7 +287,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnUnauthorizedOnGetAllProcessingSchedulesIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -303,7 +303,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnUnauthorizedOnGetProcessingScheduleIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured
         .given()
