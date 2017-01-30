@@ -202,7 +202,7 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
   public ResponseEntity<?> getUser(@PathVariable("userId") UUID userId) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     LOGGER.debug("Getting user");
     User user = userRepository.findOne(userId);
@@ -223,7 +223,7 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{userId}/roleAssignments", method = RequestMethod.GET)
   public ResponseEntity<?> getUserRightsAndRoles(@PathVariable("userId") UUID userId) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = userRepository.findOne(userId);
     if (user == null) {
@@ -242,7 +242,7 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = userRepository.findOne(userId);
     if (user == null) {
@@ -293,7 +293,7 @@ public class UserController extends BaseController {
                                                    required = false) UUID facilityId,
                                                @RequestParam(value = "warehouseId",
                                                    required = false) UUID warehouseId) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = validateUser(userId);
 
@@ -340,7 +340,7 @@ public class UserController extends BaseController {
                                                           required = false,
                                                           defaultValue = "true")
                                                             boolean forHomeFacility) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = validateUser(userId);
     Set<Program> programs = forHomeFacility
@@ -364,7 +364,7 @@ public class UserController extends BaseController {
       @PathVariable(USER_ID) UUID userId,
       @RequestParam(value = "rightId") UUID rightId,
       @RequestParam(value = "programId") UUID programId) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = (User) validateId(userId, userRepository).orElseThrow( () ->
         new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId)));
@@ -393,7 +393,7 @@ public class UserController extends BaseController {
   public ResponseEntity<Set<FacilityDto>> getUserFulfillmentFacilities(
       @PathVariable(USER_ID) UUID userId,
       @RequestParam(value = "rightId") UUID rightId) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = validateUser(userId);
     Right right = (Right) validateId(rightId, rightRepository).orElseThrow( () ->

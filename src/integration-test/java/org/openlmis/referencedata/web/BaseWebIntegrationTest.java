@@ -5,6 +5,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
@@ -34,6 +37,7 @@ import guru.nidi.ramltester.RamlLoaders;
 import guru.nidi.ramltester.restassured.RestAssuredClient;
 
 import javax.annotation.PostConstruct;
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -162,14 +166,23 @@ public abstract class BaseWebIntegrationTest {
   }
 
   protected void mockEnableRight(String rightName) {
+    doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), any());
     doNothing().when(rightService).checkAdminRight(rightName);
   }
 
   protected void mockDisableRight(String rightName) {
+    mockDisableRight(rightName, null);
+  }
+
+  protected void mockDisableRight(String rightName, UUID userId) {
     Message message = new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName);
     UnauthorizedException exception = new UnauthorizedException(message);
 
     doThrow(exception).when(rightService).checkAdminRight(rightName);
+    doThrow(exception).when(rightService).checkAdminRight(eq(rightName), anyBoolean(), any());
+    if (userId != null) {
+      doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), eq(userId));
+    }
   }
 
 }

@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 
+import java.util.UUID;
+
 @RunWith(MockitoJUnitRunner.class)
 public class RightServiceTest {
 
@@ -43,6 +45,7 @@ public class RightServiceTest {
     trustedClient = new OAuth2Authentication(mock(OAuth2Request.class), null);
     userClient = new OAuth2Authentication(mock(OAuth2Request.class), mock(Authentication.class));
     user = mock(User.class);
+    when(user.getId()).thenReturn(UUID.randomUUID());
   }
   
   @Test
@@ -67,6 +70,16 @@ public class RightServiceTest {
     when(user.hasRight(any(RightQuery.class))).thenReturn(true);
 
     rightService.checkAdminRight(RIGHT_NAME);
+  }
+
+  @Test
+  public void checkAdminRightShouldAllowRequesterWithSpecifiedUserId() {
+    when(securityContext.getAuthentication()).thenReturn(userClient);
+    when(userClient.getPrincipal()).thenReturn(user);
+    when(userRepository.findOneByUsername(any(String.class))).thenReturn(user);
+    when(user.hasRight(any(RightQuery.class))).thenReturn(false);
+
+    rightService.checkAdminRight(RIGHT_NAME, true, user.getId());
   }
   
   @Test(expected = UnauthorizedException.class)
