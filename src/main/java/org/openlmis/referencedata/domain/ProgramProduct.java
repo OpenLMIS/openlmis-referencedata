@@ -5,12 +5,11 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import org.openlmis.BuildConfig;
-
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.openlmis.referencedata.CurrencyConfig;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,7 +59,7 @@ public class ProgramProduct extends BaseEntity {
   @Getter
   @Setter
   @Type(type = "org.jadira.usertype.moneyandcurrency.joda.PersistentMoneyAmount",
-      parameters = {@Parameter(name = "currencyCode", value = BuildConfig.CURRENCY_CODE)})
+      parameters = {@Parameter(name = "currencyCode", value = CurrencyConfig.CURRENCY_CODE)})
   private Money pricePerPack;
 
   private ProgramProduct(Program program,

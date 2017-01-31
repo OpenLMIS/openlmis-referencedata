@@ -14,4 +14,6 @@ public class CurrencySettingsDto {
   private String currencySymbol;
 
   private String currencySymbolSide;
+
+  private int currencyDecimalPlaces;
 }

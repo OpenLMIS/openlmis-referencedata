@@ -7,9 +7,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -17,14 +19,12 @@ import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.GlobalProduct;
-import org.joda.money.Money;
 import org.openlmis.referencedata.domain.OrderableProduct;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Collection;
 
@@ -54,9 +54,6 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
-
-  @Value("${currencyCode}")
-  private String currencyCode;
 
   FacilityTypeApprovedProductRepository getRepository() {
     return this.ftapRepository;
@@ -94,8 +91,9 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
     orderableProductFullSupply = GlobalProduct.newGlobalProduct(
         "ibuprofen", "each", "Ibuprofen", "testDesc", 10, 5, false);
+    CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
     programProductFullSupply = ProgramProduct.createNew(program, productCategory,
-        orderableProductFullSupply, CurrencyUnit.of(currencyCode));
+        orderableProductFullSupply, currencyUnit);
     orderableProductFullSupply.addToProgram(programProductFullSupply);
     orderableProductRepository.save(orderableProductFullSupply);
 
@@ -103,7 +101,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     programProductNonFullSupply = ProgramProduct.createNew(program, productCategory,
         orderableProductNonFullSupply, 0, true, false, 0, 0,
-        Money.of(CurrencyUnit.of(currencyCode), 0), CurrencyUnit.of(currencyCode));
+        Money.of(currencyUnit, 0), currencyUnit);
     orderableProductNonFullSupply.addToProgram(programProductNonFullSupply);
     orderableProductRepository.save(orderableProductNonFullSupply);
 

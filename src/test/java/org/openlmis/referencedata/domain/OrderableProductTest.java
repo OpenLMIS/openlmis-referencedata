@@ -10,7 +10,6 @@ import org.joda.money.Money;
 import org.junit.Test;
 import org.openlmis.referencedata.repository.ProductCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -74,7 +73,6 @@ public class OrderableProductTest {
 
     // create a set with one builder for a link from ibuprofen to EM program
     ProgramProductBuilder ibuprofenInEmBuilder = new ProgramProductBuilder(emUuid);
-    ReflectionTestUtils.setField(ibuprofenInEmBuilder, "currencyCode", "USD");
     ibuprofenInEmBuilder.setProgramRepository(progRepo);
     ibuprofenInEmBuilder.setProductCategoryRepository(prodCatRepo);
     ibuprofenInEmBuilder.setProgramId(emUuid);

@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import org.joda.money.CurrencyUnit;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -17,7 +18,6 @@ import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -33,9 +33,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @MockBean
   private FacilityTypeApprovedProductRepository repository;
-
-  @Value("${currencyCode}")
-  private String currencyCode;
 
   private Program program;
   private OrderableProduct orderableProduct;
@@ -61,7 +58,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderableProduct.setId(UUID.randomUUID());
 
     programProduct = ProgramProduct.createNew(program, productCategory, orderableProduct,
-        CurrencyUnit.of(currencyCode));
+        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
 
     facilityType1 = new FacilityType("facilityType1");
 

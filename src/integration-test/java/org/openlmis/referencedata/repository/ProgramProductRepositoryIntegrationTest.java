@@ -7,13 +7,13 @@ import org.joda.money.Money;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.GlobalProduct;
 import org.openlmis.referencedata.domain.ProductCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramProduct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +33,6 @@ public class ProgramProductRepositoryIntegrationTest
   @Autowired
   private OrderableProductRepository orderableProductRepository;
 
-  @Value("${currencyCode}")
-  private String currencyCode;
-
   private List<ProgramProduct> programProducts;
 
   ProgramProductRepository getRepository() {
@@ -48,7 +45,7 @@ public class ProgramProductRepositoryIntegrationTest
     ProductCategory productCategory = ProductCategory.createNew(Code.code("testcat"));
     productCategoryRepository.save(productCategory);
     return ProgramProduct.createNew(program, productCategory, globalProduct,
-        CurrencyUnit.of(currencyCode));
+        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
   }
 
   @Before
@@ -99,7 +96,7 @@ public class ProgramProductRepositoryIntegrationTest
 
   @Test
   public void shouldPersistWithMoney() {
-    Money pricePerPack = Money.of(CurrencyUnit.of(currencyCode), 12.91);
+    Money pricePerPack = Money.of(CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE), 12.91);
 
     ProgramProduct programProduct = new ProgramProduct();
     programProduct.setPricePerPack(pricePerPack);
@@ -114,7 +111,7 @@ public class ProgramProductRepositoryIntegrationTest
   private ProgramProduct cloneProgramProduct(ProgramProduct programProduct) {
     ProgramProduct clonedProgramProduct = ProgramProduct.createNew(programProduct.getProgram(),
         programProduct.getProductCategory(), programProduct.getProduct(),
-        CurrencyUnit.of(currencyCode));
+        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
     programProductRepository.save(clonedProgramProduct);
     return clonedProgramProduct;
   }

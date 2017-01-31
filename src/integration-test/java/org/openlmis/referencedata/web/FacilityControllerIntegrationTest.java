@@ -19,6 +19,7 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -42,7 +43,6 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -83,9 +83,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Value("${currencyCode}")
-  private String currencyCode;
 
   private Integer currentInstanceNumber;
   private UUID programId;
@@ -771,9 +768,10 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct(
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     orderableProduct.setId(UUID.randomUUID());
+    CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
     ProgramProduct programProduct = ProgramProduct.createNew(program, category,
-        orderableProduct, 0, true, false, 0, 0, Money.of(CurrencyUnit.of(currencyCode), 0),
-        CurrencyUnit.of(currencyCode));
+        orderableProduct, 0, true, false, 0, 0, Money.of(currencyUnit, 0),
+        currencyUnit);
     programProduct.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setProgramProduct(programProduct);
