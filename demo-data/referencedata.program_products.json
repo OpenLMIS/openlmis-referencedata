@@ -56,7 +56,8 @@
     "active": "true",
     "fullSupply": "true",
     "maxMonthsStock": 1000,
-    "displayOrder": 1
+    "displayOrder": 1,
+    "pricePerPack" : 5.225
   },
   {
     "id": "2e9cf7eb-ae09-431b-a3da-aa51a7f4aca0",
