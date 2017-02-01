@@ -39,7 +39,7 @@ public class ProgramOrderable extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "orderableId", nullable = false)
   @Getter
-  private Orderable orderable;
+  private Orderable product;
 
   private Integer dosesPerMonth;
 
@@ -63,10 +63,10 @@ public class ProgramOrderable extends BaseEntity {
   private Money pricePerPack;
 
   private ProgramOrderable(Program program,
-                           Orderable orderable,
+                           Orderable product,
                            OrderableDisplayCategory orderableDisplayCategory) {
     this.program = program;
-    this.orderable = orderable;
+    this.product = product;
     this.orderableDisplayCategory = orderableDisplayCategory;
     this.dosesPerMonth = null;
     this.active = true;
@@ -159,12 +159,12 @@ public class ProgramOrderable extends BaseEntity {
     }
 
     ProgramOrderable otherProgProduct = (ProgramOrderable) other;
-    return program.equals(otherProgProduct.program) && orderable.equals(otherProgProduct.orderable);
+    return program.equals(otherProgProduct.program) && product.equals(otherProgProduct.product);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(program, orderable);
+    return Objects.hash(program, product);
   }
 
   /**
@@ -184,7 +184,7 @@ public class ProgramOrderable extends BaseEntity {
                           SerializerProvider provider) throws IOException {
       generator.writeStartObject();
       generator.writeStringField("programId", programOrderable.program.getId().toString());
-      generator.writeStringField("orderableId", programOrderable.orderable.getId().toString());
+      generator.writeStringField("orderableId", programOrderable.product.getId().toString());
       generator.writeStringField("orderableDisplayCategoryId",
           programOrderable.orderableDisplayCategory.getId().toString());
       generator.writeStringField("productCategoryDisplayName",
@@ -212,10 +212,10 @@ public class ProgramOrderable extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
-    exporter.setOrderableId(orderable.getId());
-    exporter.setOrderableName(orderable.getName());
-    exporter.setOrderableCode(orderable.getProductCode());
-    exporter.setOrderablePackSize(orderable.getPackSize());
+    exporter.setOrderableId(product.getId());
+    exporter.setOrderableName(product.getName());
+    exporter.setOrderableCode(product.getProductCode());
+    exporter.setOrderablePackSize(product.getPackSize());
     exporter.setOrderableDisplayCategoryId(orderableDisplayCategory.getId());
     exporter.setProductCategoryDisplayName(
         orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
