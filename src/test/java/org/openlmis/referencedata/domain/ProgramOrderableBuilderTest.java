@@ -35,7 +35,7 @@ public class ProgramOrderableBuilderTest {
   private Orderable orderable;
   private ProgramOrderableBuilder programOrderableBuilder;
   private Program program;
-  private OrderableDisplayCategory productCategory;
+  private OrderableDisplayCategory orderableDisplayCategory;
 
   private static final String CURRENCY_CODE = "USD";
 
@@ -46,11 +46,11 @@ public class ProgramOrderableBuilderTest {
 
     when(programRepository.findOne(program.getId())).thenReturn(program);
 
-    productCategory = OrderableDisplayCategory.createNew(Code.code("SuperCategoryCode"));
-    productCategory.setId(UUID.randomUUID());
+    orderableDisplayCategory = OrderableDisplayCategory.createNew(Code.code("SuperCategoryCode"));
+    orderableDisplayCategory.setId(UUID.randomUUID());
 
     when(orderableDisplayCategoryRepository.findOne(
-        productCategory.getId())).thenReturn(productCategory);
+        orderableDisplayCategory.getId())).thenReturn(orderableDisplayCategory);
 
     orderable = CommodityType.newCommodityType("SuperCode123", "each",
         "SuperName123", "SuperDescription", 10, 5, false);
@@ -59,7 +59,7 @@ public class ProgramOrderableBuilderTest {
     programOrderableBuilder.setProgramRepository(programRepository);
     programOrderableBuilder.setOrderableDisplayCategoryRepository(
         orderableDisplayCategoryRepository);
-    programOrderableBuilder.setOrderableDisplayCategoryId(productCategory.getId());
+    programOrderableBuilder.setOrderableDisplayCategoryId(orderableDisplayCategory.getId());
   }
 
   @Test
