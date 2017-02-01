@@ -187,9 +187,9 @@ public class ProgramOrderable extends BaseEntity {
       generator.writeStringField("orderableId", programOrderable.product.getId().toString());
       generator.writeStringField("orderableDisplayCategoryId",
           programOrderable.orderableDisplayCategory.getId().toString());
-      generator.writeStringField("productCategoryDisplayName",
+      generator.writeStringField("orderableCategoryDisplayName",
           programOrderable.orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
-      generator.writeNumberField("productCategoryDisplayOrder",
+      generator.writeNumberField("orderableCategoryDisplayOrder",
           programOrderable.orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder());
       generator.writeBooleanField("active", programOrderable.active);
       generator.writeBooleanField("fullSupply", programOrderable.fullSupply);
@@ -217,9 +217,9 @@ public class ProgramOrderable extends BaseEntity {
     exporter.setOrderableCode(product.getProductCode());
     exporter.setOrderablePackSize(product.getPackSize());
     exporter.setOrderableDisplayCategoryId(orderableDisplayCategory.getId());
-    exporter.setProductCategoryDisplayName(
+    exporter.setOrderableCategoryDisplayName(
         orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
-    exporter.setProductCategoryDisplayOrder(
+    exporter.setOrderableCategoryDisplayOrder(
         orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder());
     exporter.setActive(active);
     exporter.setFullSupply(fullSupply);
@@ -245,9 +245,9 @@ public class ProgramOrderable extends BaseEntity {
 
     void setOrderableDisplayCategoryId(UUID orderableDisplayCategoryId);
 
-    void setProductCategoryDisplayName(String productCategoryDisplayName);
+    void setOrderableCategoryDisplayName(String orderableCategoryDisplayName);
 
-    void setProductCategoryDisplayOrder(int productCategoryDisplayOrder);
+    void setOrderableCategoryDisplayOrder(int orderableCategoryDisplayOrder);
 
     void setActive(boolean active);
 
@@ -273,9 +273,9 @@ public class ProgramOrderable extends BaseEntity {
 
     UUID getOrderableDisplayCategoryId();
 
-    String getProductCategoryDisplayName();
+    String getOrderableCategoryDisplayName();
 
-    int getProductCategoryDisplayOrder();
+    int getOrderableCategoryDisplayOrder();
 
     boolean isActive();
 

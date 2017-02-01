@@ -29,9 +29,9 @@ public class ProgramOrderableDto extends BaseDto
 
   private UUID orderableDisplayCategoryId;
 
-  private String productCategoryDisplayName;
+  private String orderableCategoryDisplayName;
 
-  private int productCategoryDisplayOrder;
+  private int orderableCategoryDisplayOrder;
 
   private boolean active;
 

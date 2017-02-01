@@ -28,13 +28,13 @@
       "type": "string",
       "title": "orderableDisplayCategoryId"
     },
-    "productCategoryDisplayName": {
+    "orderableCategoryDisplayName": {
       "type": "string",
-      "title": "productCategoryDisplayName"
+      "title": "orderableCategoryDisplayName"
     },
-    "productCategoryDisplayOrder": {
+    "orderableCategoryDisplayOrder": {
       "type": "integer",
-      "title": "productCategoryDisplayOrder"
+      "title": "orderableCategoryDisplayOrder"
     },
     "dosesPerMonth": {
       "type": "integer",
@@ -66,8 +66,8 @@
     "orderableName",
     "orderablePackSize",
     "orderableDisplayCategoryId",
-    "productCategoryDisplayName",
-    "productCategoryDisplayOrder",
+    "orderableCategoryDisplayName",
+    "orderableCategoryDisplayOrder",
     "dosesPerMonth",
     "active",
     "fullSupply"
