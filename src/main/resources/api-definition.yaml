@@ -293,7 +293,7 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/auditLogEntry.json" }
       }
 
-  - currencySettingDto: !include schemas/currencySettingDto.json
+  - currencySettingsDto: !include schemas/currencySettingsDto.json
 
 traits:
     - secured:
@@ -2280,4 +2280,4 @@ resourceTypes:
                 "200":
                     body:
                         application/json:
-                          schema: currencySettingDto
+                          schema: currencySettingsDto

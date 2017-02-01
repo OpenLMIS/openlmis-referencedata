@@ -15,6 +15,10 @@
     "currencySymbolSide": {
       "type": "string",
       "title": "currencySymbolSide"
+    },
+    "currencyDecimalPlaces": {
+      "type": "integer",
+      "title": "currencyDecimalPlaces"
     }
   }
 }
