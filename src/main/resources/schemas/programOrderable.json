@@ -18,9 +18,9 @@
       "$ref": "orderable.json",
       "title": "orderable"
     },
-    "dosesPerMonth": {
+    "dosesPerPatient": {
       "type": "integer",
-      "title": "dosesPerMonth"
+      "title": "dosesPerPatient"
     },
     "active": {
       "type": "boolean",
@@ -39,15 +39,11 @@
       "type": "integer",
       "title": "displayOrder"
     },
-    "maxMonthsStock": {
-      "type": "integer",
-      "title": "maxMonthsStock"
-    },
     "pricePerPack": {
       "type": "number",
       "title": "pricePerPack"
     }
   },
-  "required": ["id", "program", "orderable", "dosesPerMonth", "active", "orderableDisplayCategory",
+  "required": ["id", "program", "orderable", "dosesPerPatient", "active", "orderableDisplayCategory",
     "fullSupply"]
 }

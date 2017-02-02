@@ -41,7 +41,7 @@ public class ProgramOrderable extends BaseEntity {
   @Getter
   private Orderable product;
 
-  private Integer dosesPerMonth;
+  private Integer dosesPerPatient;
 
   @Getter
   private boolean active;
@@ -54,7 +54,6 @@ public class ProgramOrderable extends BaseEntity {
   @Getter
   private boolean fullSupply;
   private int displayOrder;
-  private int maxMonthsStock;
 
   @Getter
   @Setter
@@ -68,11 +67,10 @@ public class ProgramOrderable extends BaseEntity {
     this.program = program;
     this.product = product;
     this.orderableDisplayCategory = orderableDisplayCategory;
-    this.dosesPerMonth = null;
+    this.dosesPerPatient = null;
     this.active = true;
     this.fullSupply = true;
     this.displayOrder = 0;
-    this.maxMonthsStock = 0;
   }
 
   /**
@@ -92,7 +90,6 @@ public class ProgramOrderable extends BaseEntity {
    *  Integer,
    *  boolean,
    *  boolean,
-   *  int,
    *  int,
    *  Money,
    *  CurrencyUnit)}.
@@ -116,30 +113,26 @@ public class ProgramOrderable extends BaseEntity {
    * @param program The Program this Product will be in.
    * @param category the category this Product will be in, in this Program.
    * @param product the Product.
-   * @param dosesPerMonth the number of doses a patient needs of this orderable in a month.
+   * @param dosesPerPatient the number of doses a patient needs of this orderable.
    * @param active weather this orderable is active in this program at this time.
    * @param displayOrder the display order of this Product in this category of this Program.
-   * @param maxMonthsStock the maximum months of stock this orderable should be stocked for in this
-   *                       Program.
    * @param pricePerPack the price of one pack.
    * @return a new ProgramOrderable.
    */
   public static final ProgramOrderable createNew(Program program,
                                                  OrderableDisplayCategory category,
                                                  Orderable product,
-                                                 Integer dosesPerMonth,
+                                                 Integer dosesPerPatient,
                                                  boolean active,
                                                  boolean fullSupply,
                                                  int displayOrder,
-                                                 int maxMonthsStock,
                                                  Money pricePerPack,
                                                  CurrencyUnit currencyUnit) {
     ProgramOrderable programOrderable = createNew(program, category, product, currencyUnit);
-    programOrderable.dosesPerMonth = dosesPerMonth;
+    programOrderable.dosesPerPatient = dosesPerPatient;
     programOrderable.active = active;
     programOrderable.fullSupply = fullSupply;
     programOrderable.displayOrder = displayOrder;
-    programOrderable.maxMonthsStock = maxMonthsStock;
     if (pricePerPack != null) {
       programOrderable.pricePerPack = pricePerPack;
     }
@@ -194,9 +187,8 @@ public class ProgramOrderable extends BaseEntity {
       generator.writeBooleanField("active", programOrderable.active);
       generator.writeBooleanField("fullSupply", programOrderable.fullSupply);
       generator.writeNumberField("displayOrder", programOrderable.displayOrder);
-      generator.writeNumberField("maxMonthsOfStock", programOrderable.maxMonthsStock);
-      if (null != programOrderable.dosesPerMonth) {
-        generator.writeNumberField("dosesPerMonth", programOrderable.dosesPerMonth);
+      if (null != programOrderable.dosesPerPatient) {
+        generator.writeNumberField("dosesPerPatient", programOrderable.dosesPerPatient);
       }
       if (null != programOrderable.pricePerPack) {
         generator.writeNumberField("pricePerPack", programOrderable.pricePerPack.getAmount());
@@ -224,8 +216,7 @@ public class ProgramOrderable extends BaseEntity {
     exporter.setActive(active);
     exporter.setFullSupply(fullSupply);
     exporter.setDisplayOrder(displayOrder);
-    exporter.setMaxMonthsOfStock(maxMonthsStock);
-    exporter.setDosesPerMonth(dosesPerMonth);
+    exporter.setDosesPerPatient(dosesPerPatient);
     if (pricePerPack != null) {
       exporter.setPricePerPack(pricePerPack);
     }
@@ -255,9 +246,7 @@ public class ProgramOrderable extends BaseEntity {
 
     void setDisplayOrder(int displayOrder);
 
-    void setMaxMonthsOfStock(int maxMonthsStock);
-
-    void setDosesPerMonth(Integer dosesPerMonth);
+    void setDosesPerPatient(Integer dosesPerPatient);
 
     void setPricePerPack(Money pricePerPack);
   }
@@ -283,9 +272,7 @@ public class ProgramOrderable extends BaseEntity {
 
     int getDisplayOrder();
 
-    int getMaxMonthsOfStock();
-
-    Integer getDosesPerMonth();
+    Integer getDosesPerPatient();
 
     Money getPricePerPack();
   }

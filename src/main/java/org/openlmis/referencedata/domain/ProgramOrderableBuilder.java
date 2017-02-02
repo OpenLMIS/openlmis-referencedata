@@ -23,21 +23,19 @@ public class ProgramOrderableBuilder {
   private OrderableDisplayCategoryRepository orderableDisplayCategoryRepo;
 
   private UUID programId;
-  private Integer dosesPerMonth;
+  private Integer dosesPerPatient;
   private boolean active;
   private UUID orderableDisplayCategoryId;
   private boolean fullSupply;
   private int displayOrder;
-  private int maxMonthsOfStock;
   private Money pricePerPack;
 
   private ProgramOrderableBuilder() {
-    this.dosesPerMonth = null;
+    this.dosesPerPatient = null;
     this.active = true;
     this.orderableDisplayCategoryId = null;
     this.fullSupply = false;
     this.displayOrder = 0;
-    this.maxMonthsOfStock = 1;
   }
 
   /**
@@ -60,8 +58,8 @@ public class ProgramOrderableBuilder {
     return this;
   }
 
-  public ProgramOrderableBuilder setDosesPerMonth(Integer dosesPerMonth) {
-    this.dosesPerMonth = dosesPerMonth;
+  public ProgramOrderableBuilder setDosesPerPatient(Integer dosesPerPatient) {
+    this.dosesPerPatient = dosesPerPatient;
     return this;
   }
 
@@ -87,11 +85,6 @@ public class ProgramOrderableBuilder {
 
   public ProgramOrderableBuilder setPricePerPack(Money pricePerPack) {
     this.pricePerPack = pricePerPack;
-    return this;
-  }
-
-  public ProgramOrderableBuilder setMaxMonthsOfStock(int maxMonthsOfStock) {
-    this.maxMonthsOfStock = maxMonthsOfStock;
     return this;
   }
 
@@ -125,8 +118,8 @@ public class ProgramOrderableBuilder {
     Program storedProgram = programRepo.findOne(programId);
     OrderableDisplayCategory storedProdCategory = orderableDisplayCategoryRepo.findOne(
         orderableDisplayCategoryId);
-    return ProgramOrderable.createNew(storedProgram, storedProdCategory, orderable, dosesPerMonth,
-        active, fullSupply, displayOrder, maxMonthsOfStock, pricePerPack,
+    return ProgramOrderable.createNew(storedProgram, storedProdCategory, orderable, dosesPerPatient,
+        active, fullSupply, displayOrder, pricePerPack,
         CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE)
     );
   }

@@ -68,7 +68,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     facilityTypeAppProd.setId(facilityTypeAppProdId);
     facilityTypeAppProd.setFacilityType(facilityType1);
     facilityTypeAppProd.setProgramOrderable(programOrderable);
-    facilityTypeAppProd.setMaxMonthsOfStock(6.00);
+    facilityTypeAppProd.setMaxStock(6.00);
     facilityTypeAppProdId = UUID.randomUUID();
   }
 
@@ -111,7 +111,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @Test
   public void shouldPutFacilityTypeApprovedProduct() {
 
-    facilityTypeAppProd.setMaxMonthsOfStock(9.00);
+    facilityTypeAppProd.setMaxStock(9.00);
     given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
 
     FacilityTypeApprovedProduct response = restAssured
@@ -127,7 +127,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .extract().as(FacilityTypeApprovedProduct.class);
 
     assertEquals(facilityTypeAppProd, response);
-    assertEquals(9.00, response.getMaxMonthsOfStock(), 0.00);
+    assertEquals(9.00, response.getMaxStock(), 0.00);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

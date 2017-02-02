@@ -18,18 +18,18 @@
       "$ref": "programOrderable.json",
       "title": "programOrderable"
     },
-    "maxMonthsOfStock": {
+    "maxStock": {
       "type": "number",
-      "title": "maxMonthsOfStock"
+      "title": "maxStock"
     },
-    "minMonthsOfStock": {
+    "minStock": {
       "type": "number",
-      "title": "minMonthsOfStock"
+      "title": "minStock"
     },
     "emergencyOrderPoint": {
       "type": "number",
       "title": "emergencyOrderPoint"
     }
   },
-  "required": ["id", "facilityType", "programOrderable", "maxMonthsOfStock"]
+  "required": ["id", "facilityType", "programOrderable", "maxStock"]
 }
