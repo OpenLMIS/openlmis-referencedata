@@ -7,7 +7,7 @@
     "dosesPerMonth": 10,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 1000,
+    "maxMonthsStock": 3,
     "displayOrder": 1,
     "pricePerPack" : 3.155
   },
@@ -19,7 +19,7 @@
     "dosesPerMonth": 3,
     "active": "false",
     "fullSupply": "true",
-    "maxMonthsStock": 10,
+    "maxMonthsStock": 3,
     "displayOrder": 2,
     "pricePerPack" : 2.134
   },
@@ -31,7 +31,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "false",
-    "maxMonthsStock": 30,
+    "maxMonthsStock": 3,
     "displayOrder": 3,
     "pricePerPack" : 5.153
   },
@@ -43,7 +43,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 30,
+    "maxMonthsStock": 3,
     "displayOrder": 4,
     "pricePerPack" : 4.1344
   },
@@ -55,7 +55,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 1000,
+    "maxMonthsStock": 3,
     "displayOrder": 1,
     "pricePerPack" : 5.225
   },
@@ -67,7 +67,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 1000,
+    "maxMonthsStock": 3,
     "displayOrder": 2,
     "pricePerPack" : 15.9394
   },
@@ -79,7 +79,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "false",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 6,
     "pricePerPack" : 20.774
   },
@@ -91,7 +91,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 3,
     "pricePerPack" : 25.464
   },
@@ -103,7 +103,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "false",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 4,
     "pricePerPack" : 30.9831
   },
@@ -115,7 +115,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 5,
     "pricePerPack" : 5.1
   },
@@ -127,7 +127,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 6,
     "pricePerPack" : 4.34
   },
@@ -139,7 +139,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 6,
     "pricePerPack" : 5.1
   },
@@ -151,7 +151,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 7,
     "pricePerPack" : 5.1
   },
@@ -163,7 +163,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 8,
     "pricePerPack" : 5.1
   },
@@ -175,7 +175,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 9,
     "pricePerPack" : 5.1
   },
@@ -187,7 +187,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 10,
     "pricePerPack" : 5.1
   },
@@ -199,7 +199,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 11,
     "pricePerPack" : 5.1
   },
@@ -211,7 +211,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 12,
     "pricePerPack" : 5.1
   },
@@ -223,7 +223,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 4,
     "pricePerPack" : 5.1
   },
@@ -235,7 +235,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 5,
     "pricePerPack" : 5.1
   },
@@ -247,7 +247,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 6,
     "pricePerPack" : 5.1
   },
@@ -259,7 +259,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 7,
     "pricePerPack" : 5.1
   },
@@ -271,7 +271,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 8,
     "pricePerPack" : 5.1
   },
@@ -283,7 +283,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 9,
     "pricePerPack" : 5.1
   },
@@ -295,7 +295,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 10,
     "pricePerPack" : 5.1
   },
@@ -307,7 +307,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 11,
     "pricePerPack" : 5.1
   },
@@ -319,7 +319,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 12,
     "pricePerPack" : 5.1
   },
@@ -331,7 +331,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 5,
     "pricePerPack" : 5.1
   },
@@ -343,7 +343,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 3,
     "pricePerPack" : 5.1
   },
@@ -355,7 +355,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 4,
     "pricePerPack" : 5.1
   },
@@ -367,7 +367,7 @@
     "dosesPerMonth": 1,
     "active": "true",
     "fullSupply": "true",
-    "maxMonthsStock": 20,
+    "maxMonthsStock": 3,
     "displayOrder": 5,
     "pricePerPack" : 5.1
   }
