@@ -1,10 +1,17 @@
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import com.jayway.restassured.response.ValidatableResponse;
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import org.javers.common.collections.Sets;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
@@ -14,26 +21,33 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightType;
+import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
+import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SUPERVISING_USERS_URL = ID_URL + "/supervisingUsers";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
+  private static final String RIGHT_ID_PARAM = "rightId";
+  private static final String PROGRAM_ID_PARAM = "programId";
 
   @MockBean
   private SupervisoryNodeRepository repository;
@@ -43,6 +57,12 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @MockBean
   private FacilityRepository facilityRepository;
+  
+  @MockBean
+  private RightRepository rightRepository;
+  
+  @MockBean
+  private UserRepository userRepository;
 
   @MockBean
   private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
@@ -52,10 +72,12 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private UUID supervisoryNodeId;
   private Facility facility;
   private Program program;
+  private Right right;
   private RequisitionGroupProgramSchedule requisitionGroupProgramSchedule;
   private RequisitionGroup requisitionGroup;
   private UUID facilityId;
   private UUID programId;
+  private UUID rightId;
 
   /**
    * Constructor for tests.
@@ -87,9 +109,12 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     requisitionGroup.setSupervisoryNode(supervisoryNode);
     requisitionGroupProgramSchedule = new RequisitionGroupProgramSchedule();
     requisitionGroupProgramSchedule.setRequisitionGroup(requisitionGroup);
+
+    right = Right.newRight("right1", RightType.SUPERVISION);
+    
     facilityId = UUID.randomUUID();
     programId = UUID.randomUUID();
-
+    rightId = UUID.randomUUID();
   }
 
   @Test
@@ -196,6 +221,111 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void findSupervisingUsersShouldGetSupervisingUsers() {
+
+    Role role = Role.newRole("role", right);
+    role.setId(UUID.randomUUID());
+
+    User supervisingUser = new UserBuilder("supervisingUser", "Supervising", "User",
+        "a@b.com").createUser();
+    supervisingUser.assignRoles(
+        new SupervisionRoleAssignment(role, supervisingUser, program, supervisoryNode));
+
+    User nonSupervisingUser = new UserBuilder("nonSupervisingUser", "Non-supervising", "User", 
+        "c@d.com").createUser();
+
+    Set<User> allUsers = Sets.asSet(supervisingUser, nonSupervisingUser);
+
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(rightRepository.findOne(rightId)).willReturn(right);
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(userRepository.findAll()).willReturn(allUsers);
+
+    UserDto[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .queryParam(RIGHT_ID_PARAM, rightId)
+        .queryParam(PROGRAM_ID_PARAM, programId)
+        .when()
+        .get(SUPERVISING_USERS_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto[].class);
+
+    assertThat(response.length, is(1));
+    assertEquals(supervisingUser.getUsername(), response[0].getUsername());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void findSupervisingUsersShouldReturnBadRequestIfRightNotFound() {
+
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(rightRepository.findOne(rightId)).willReturn(null);
+    given(programRepository.findOne(programId)).willReturn(program);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .queryParam(RIGHT_ID_PARAM, rightId)
+        .queryParam(PROGRAM_ID_PARAM, programId)
+        .when()
+        .get(SUPERVISING_USERS_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void findSupervisingUsersShouldReturnBadRequestIfProgramNotFound() {
+
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(rightRepository.findOne(rightId)).willReturn(right);
+    given(programRepository.findOne(programId)).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .queryParam(RIGHT_ID_PARAM, rightId)
+        .queryParam(PROGRAM_ID_PARAM, programId)
+        .when()
+        .get(SUPERVISING_USERS_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void findSupervisingUsersShouldReturnNotFoundIfSupervisoryNodeNotFound() {
+
+    given(repository.findOne(supervisoryNodeId)).willReturn(null);
+    given(rightRepository.findOne(rightId)).willReturn(right);
+    given(programRepository.findOne(programId)).willReturn(program);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .queryParam(RIGHT_ID_PARAM, rightId)
+        .queryParam(PROGRAM_ID_PARAM, programId)
+        .when()
+        .get(SUPERVISING_USERS_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetProcessingScheduleByFacilityAndProgram() {
 
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
@@ -239,7 +369,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
       .queryParam(ACCESS_TOKEN, getToken())
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .queryParam("facilityId", facilityId)
-      .queryParam("programId", programId)
+      .queryParam(PROGRAM_ID_PARAM, programId)
       .when()
       .get(SEARCH_URL)
       .then()
