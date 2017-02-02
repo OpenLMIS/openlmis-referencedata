@@ -3,6 +3,7 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
 
 import lombok.Getter;
@@ -97,6 +98,7 @@ public class Facility extends BaseEntity {
 
   @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true,
       fetch = FetchType.EAGER)
+  @DiffIgnore
   @Getter
   @Setter
   private Set<SupportedProgram> supportedPrograms = new HashSet<>();
