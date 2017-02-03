@@ -45,6 +45,10 @@
       "type": "boolean",
       "title": "loginRestricted"
     },
+    "allowNotify": {
+      "type": "boolean",
+      "title": "allowNotify"
+    },
     "roleAssignments": {
       "type": "array",
       "title": "roleAssignments",

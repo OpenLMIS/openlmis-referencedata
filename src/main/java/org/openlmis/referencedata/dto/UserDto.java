@@ -62,6 +62,10 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
 
   @Getter
   @Setter
+  private Boolean allowNotify;
+
+  @Getter
+  @Setter
   private Map<String, String> extraData;
 
   @Getter
@@ -115,4 +119,5 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
   public int hashCode() {
     return Objects.hash(username);
   }
+
 }

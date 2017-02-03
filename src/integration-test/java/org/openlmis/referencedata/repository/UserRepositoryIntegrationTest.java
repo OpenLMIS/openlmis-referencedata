@@ -1,5 +1,6 @@
 package org.openlmis.referencedata.repository;
 
+
 import static org.junit.Assert.assertEquals;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
@@ -10,6 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -224,6 +229,25 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     //then
     assertEquals(1, supervisingUsers.size());
     assertEquals(supervisingUser, supervisingUsers.iterator().next());
+  }
+
+  @Test
+  public void shouldReturnTrueWhenAllowNotifyIsNotSet() {
+    User user = generateInstance();
+    user = repository.save(user);
+    assertThat(user.getAllowNotify(), is(Boolean.TRUE));
+  }
+
+  @Test
+  public void testEditOfAllowNotify() {
+    User user = generateInstance();
+    user.setAllowNotify(true);
+    user = repository.save(user);
+    assertThat(user.getAllowNotify(), is(Boolean.TRUE));
+
+    user.setAllowNotify(false);
+    user = repository.save(user);
+    assertThat(user.getAllowNotify(), is(Boolean.FALSE));
   }
 
   private User cloneUser(User user) {

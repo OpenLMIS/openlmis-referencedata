@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-
 import org.junit.Before;
 import org.junit.Test;
 

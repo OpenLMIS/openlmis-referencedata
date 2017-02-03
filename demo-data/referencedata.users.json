@@ -8,6 +8,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "timeZone": "CET"
   },
@@ -20,6 +21,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
     "timeZone": "CET"
   },
@@ -32,6 +34,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "176c4276-1fb1-4507-8ad2-cdfba0f47445" },
     "timeZone": "CET"
   },
@@ -44,6 +47,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "timeZone": "CET"
   },
@@ -56,6 +60,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "5b39f0fb-5c47-4551-b983-1e30ac6df65d" },
     "timeZone": "CET"
   },
@@ -68,6 +73,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "7938919f-6f61-4d1a-a4dc-923c31e9cd45" },
     "timeZone": "CET"
   },
@@ -80,6 +86,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "176c4276-1fb1-4507-8ad2-cdfba0f47445" },
     "timeZone": "CET"
   },
@@ -92,6 +99,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "timeZone": "CET"
   },
@@ -104,6 +112,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "5b39f0fb-5c47-4551-b983-1e30ac6df65d" },
     "timeZone": "CET"
   },
@@ -116,6 +125,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "7938919f-6f61-4d1a-a4dc-923c31e9cd45" },
     "timeZone": "CET"
   },
@@ -128,6 +138,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "13037147-1769-4735-90a7-b9b310d128b8" },
     "timeZone": "CET"
   },
@@ -140,6 +151,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "timeZone": "CET"
   },
   {
@@ -151,6 +163,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
     "timeZone": "CET"
   },
@@ -163,6 +176,7 @@
     "verified": "true",
     "active": "true",
     "loginRestricted": "false",
+    "allowNotify": "true",
     "homefacilityid": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
     "timeZone": "CET"
   }
