@@ -20,3 +20,4 @@ INSERT INTO referencedata.rights (id, name, type) VALUES ('24df2715-850c-4336-b6
 INSERT INTO referencedata.rights (id, name, type) VALUES ('35cf256f-1b28-41ad-84f5-99c158083dfc', 'REPORTS_VIEW', 'REPORTS');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('60561639-4f94-4371-a5b5-ba95ecf7627f', 'REPORT_TEMPLATES_EDIT', 'REPORTS');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('7b2da074-b754-4e49-bad3-2520651e5107', 'ORDERS_VIEW', 'ORDER_FULFILLMENT');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('60580166-ab1c-464a-8401-08384efc57b7', 'ORDERS_EDIT', 'ORDER_FULFILLMENT');
