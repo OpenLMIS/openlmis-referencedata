@@ -1939,6 +1939,10 @@ resourceTypes:
                 "500":
                     body:
                         application/json:
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       get:
             is: [ secured ]
             description: Get all supervisoryNodes.
@@ -1950,6 +1954,11 @@ resourceTypes:
                     body:
                       application/json:
                         schema: localizedErrorResponse
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
+
       /{id}:
             uriParameters:
               id:
@@ -1970,6 +1979,10 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen supervisoryNode.
@@ -1978,6 +1991,10 @@ resourceTypes:
                         body:
                             application/json:
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
+                    "403":
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -1993,6 +2010,10 @@ resourceTypes:
                     "409":
                         body:
                             application/json:
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             /supervisingUsers:
                   get:
                       is: [ secured ]
@@ -2050,6 +2071,10 @@ resourceTypes:
                           application/json:
                             schema: errorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
+                    "403":
                         body:
                           application/json:
                             schema: localizedErrorResponse

@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toSet;
+import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
@@ -64,6 +66,9 @@ public class SupervisoryNodeController extends BaseController {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private RightService rightService;
+
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
    *
@@ -73,6 +78,8 @@ public class SupervisoryNodeController extends BaseController {
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.POST)
   public ResponseEntity<SupervisoryNodeDto> createSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
     LOGGER.debug("Creating new supervisoryNode");
     supervisoryNodeDto.setId(null);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
@@ -88,6 +95,8 @@ public class SupervisoryNodeController extends BaseController {
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.GET)
   public ResponseEntity<List<SupervisoryNodeDto>> getAllSupervisoryNodes() {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
     Iterable<SupervisoryNode> supervisoryNodes = supervisoryNodeRepository.findAll();
     List<SupervisoryNodeDto> supervisoryNodeDtos = new ArrayList<>();
 
@@ -107,6 +116,8 @@ public class SupervisoryNodeController extends BaseController {
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.GET)
   public ResponseEntity<SupervisoryNodeDto> getSupervisoryNode(
       @PathVariable("id") UUID supervisoryNodeId) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
@@ -126,6 +137,7 @@ public class SupervisoryNodeController extends BaseController {
   public ResponseEntity<SupervisoryNodeDto> updateSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto,
       @PathVariable("id") UUID supervisoryNodeId) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
     LOGGER.debug("Updating supervisoryNode with id: " + supervisoryNodeId);
 
     SupervisoryNode supervisoryNodeToUpdate =
@@ -150,6 +162,8 @@ public class SupervisoryNodeController extends BaseController {
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteSupervisoryNode(@PathVariable("id") UUID supervisoryNodeId) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
@@ -171,7 +185,6 @@ public class SupervisoryNodeController extends BaseController {
       @PathVariable("id") UUID supervisoryNodeId,
       @RequestParam("rightId") UUID rightId,
       @RequestParam("programId") UUID programId) {
-    
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
@@ -206,6 +219,7 @@ public class SupervisoryNodeController extends BaseController {
   @RequestMapping(value = "/supervisoryNodes/search", method = RequestMethod.GET)
   public ResponseEntity<List<SupervisoryNodeDto>> findByRequisitionGroupFacilityAndProgram(
       @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
     Facility facility = facilityRepository.findOne(facilityId);
     Program program = programRepository.findOne(programId);

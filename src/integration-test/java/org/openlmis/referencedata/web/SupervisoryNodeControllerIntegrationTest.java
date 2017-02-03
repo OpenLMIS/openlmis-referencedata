@@ -1,6 +1,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -13,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import org.hamcrest.Matchers;
 import org.javers.common.collections.Sets;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -124,7 +127,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldDeleteSupervisoryNode() {
-
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     restAssured
@@ -141,7 +144,29 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectDeleteSupervisoryNodeIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPostSupervisoryNode() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     SupervisoryNodeDto response = restAssured
         .given()
@@ -159,7 +184,29 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectPostSupervisoryNodeIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(supervisoryNodeDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPutSupervisoryNode() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     supervisoryNode.setDescription("OpenLMIS");
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
@@ -185,7 +232,30 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectPutSupervisoryNodeIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .body(supervisoryNodeDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetAllSupervisoryNodes() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     List<SupervisoryNode> storedSupervisoryNodes = Arrays.asList(supervisoryNode,
         SupervisoryNode.newSupervisoryNode("SN2", new Facility("F2")));
@@ -206,7 +276,28 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectGetAllSupervisoryNodesIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetSupervisoryNode() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
@@ -226,7 +317,29 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectGetSupervisoryNodeIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void findSupervisingUsersShouldGetSupervisingUsers() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Role role = Role.newRole("role", right);
     role.setId(UUID.randomUUID());
@@ -238,9 +351,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     Set<User> supervisingUsers = Sets.asSet(supervisingUser);
 
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(program);
@@ -267,10 +377,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void findSupervisingUsersShouldReturnBadRequestIfRightNotFound() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
@@ -292,7 +400,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void findSupervisingUsersShouldReturnBadRequestIfProgramNotFound() {
-
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
@@ -365,6 +472,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldGetProcessingScheduleByFacilityAndProgram() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
@@ -379,7 +487,25 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectGetProcessingScheduleByFacilityAndPrograIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    given(facilityRepository.findOne(facilityId)).willReturn(facility);
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+        program, facility)).willReturn(requisitionGroupProgramSchedule);
+
+    String messageKey = searchForSupervisoryNode(programId, facilityId, 403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnNotFoundWhenSearchingForNonExistingSupervisoryNode() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
@@ -392,6 +518,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupervisoryNodeWithBadParameters() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(null);
