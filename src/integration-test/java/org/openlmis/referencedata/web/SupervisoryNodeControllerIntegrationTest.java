@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -22,6 +24,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
@@ -30,12 +33,14 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -233,6 +238,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     Set<User> supervisingUsers = Sets.asSet(supervisingUser);
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(program);
@@ -260,6 +268,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void findSupervisingUsersShouldReturnBadRequestIfRightNotFound() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
@@ -282,6 +293,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void findSupervisingUsersShouldReturnBadRequestIfProgramNotFound() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(null);
@@ -302,8 +316,34 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void findSupervisingUsersShouldReturnForbiddenForUnauthorizedToken() {
+
+    doThrow(new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.USERS_MANAGE_RIGHT)))
+        .when(rightService)
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .queryParam(RIGHT_ID_PARAM, rightId)
+        .queryParam(PROGRAM_ID_PARAM, programId)
+        .when()
+        .get(SUPERVISING_USERS_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void findSupervisingUsersShouldReturnNotFoundIfSupervisoryNodeNotFound() {
 
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(repository.findOne(supervisoryNodeId)).willReturn(null);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(program);

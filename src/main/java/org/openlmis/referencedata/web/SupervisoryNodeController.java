@@ -11,6 +11,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
@@ -170,6 +171,8 @@ public class SupervisoryNodeController extends BaseController {
       @PathVariable("id") UUID supervisoryNodeId,
       @RequestParam("rightId") UUID rightId,
       @RequestParam("programId") UUID programId) {
+    
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     Right right = rightRepository.findOne(rightId);
