@@ -3,16 +3,18 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @DiscriminatorValue("supervision")
@@ -39,8 +41,8 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    * @param role    the role being assigned
    * @param user    the user to which the role is being assigned
    * @param program the program where the role applies
-   * @throws org.openlmis.referencedata.exception.ValidationMessageException if role passed in has
-   *         rights which are not an acceptable right type
+   * @throws org.openlmis.referencedata.exception.ValidationMessageException if role passed in
+   *      has rights which are not an acceptable right type
    */
   public SupervisionRoleAssignment(Role role, User user, Program program) {
     this(role, user);
@@ -56,11 +58,11 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    * @param user            the user to which the role is being assigned
    * @param program         the program where the role applies
    * @param supervisoryNode the supervisory node where the role applies
-   * @throws org.openlmis.referencedata.exception.ValidationMessageException if role passed in has
-   *         rights which are not an acceptable right type
+   * @throws org.openlmis.referencedata.exception.ValidationMessageException if role passed in
+   *      has rights which are not an acceptable right type
    */
   public SupervisionRoleAssignment(Role role, User user, Program program,
-      SupervisoryNode supervisoryNode) {
+                                   SupervisoryNode supervisoryNode) {
     this(role, user);
     this.program = program;
     this.supervisoryNode = supervisoryNode;
@@ -82,22 +84,16 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     boolean roleContainsRight = role.contains(rightQuery.getRight());
     boolean programMatches = program.equals(rightQuery.getProgram());
 
-    boolean facilityOrNodeFound;
-    if (rightQuery.getSupervisoryNode() != null) {
-      facilityOrNodeFound = supervisoryNode != null
-          && supervisoryNode.equals(rightQuery.getSupervisoryNode());
+    boolean facilityFound;
+    if (supervisoryNode != null) {
+      facilityFound = supervisoryNode.supervises(rightQuery.getFacility(), rightQuery.getProgram());
+    } else if (user.getHomeFacility() != null) {
+      facilityFound = user.getHomeFacility().equals(rightQuery.getFacility());
     } else {
-      if (supervisoryNode != null) {
-        facilityOrNodeFound = supervisoryNode
-            .supervises(rightQuery.getFacility(), rightQuery.getProgram());
-      } else if (user.getHomeFacility() != null) {
-        facilityOrNodeFound = user.getHomeFacility().equals(rightQuery.getFacility());
-      } else {
-        facilityOrNodeFound = false;
-      }
+      facilityFound = false;
     }
 
-    return roleContainsRight && programMatches && facilityOrNodeFound;
+    return roleContainsRight && programMatches && facilityFound;
   }
 
   /**
@@ -109,7 +105,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    */
   public Set<Facility> getSupervisedFacilities(Right right, Program program) {
     Set<Facility> possibleFacilities = new HashSet<>();
-
+    
     if (supervisoryNode == null) {
       return possibleFacilities;
     }
@@ -169,7 +165,6 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   }
 
   public interface Exporter extends RoleAssignment.Exporter {
-
     void setProgram(Program program);
 
     void setSupervisoryNode(SupervisoryNode supervisoryNode);

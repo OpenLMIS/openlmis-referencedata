@@ -231,15 +231,13 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     supervisingUser.assignRoles(
         new SupervisionRoleAssignment(role, supervisingUser, program, supervisoryNode));
 
-    User nonSupervisingUser = new UserBuilder("nonSupervisingUser", "Non-supervising", "User", 
-        "c@d.com").createUser();
-
-    Set<User> allUsers = Sets.asSet(supervisingUser, nonSupervisingUser);
+    Set<User> supervisingUsers = Sets.asSet(supervisingUser);
 
     given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(program);
-    given(userRepository.findAll()).willReturn(allUsers);
+    given(userRepository.findSupervisingUsersBy(right, supervisoryNode, program))
+        .willReturn(supervisingUsers);
 
     UserDto[] response = restAssured
         .given()

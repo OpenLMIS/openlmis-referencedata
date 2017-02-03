@@ -66,32 +66,10 @@ public class SupervisionRoleAssignmentTest {
   }
 
   @Test
-  public void shouldNotHaveRightWhenSupervisoryNodeNotFound() {
-
-    //when
-    RightQuery rightQuery = new RightQuery(right, program, supervisoryNode);
-    boolean hasRight = homeFacilityRoleAssignment.hasRight(rightQuery);
-
-    //then
-    assertFalse(hasRight);
-  }
-
-  @Test
   public void shouldHaveRightWhenRightAndProgramAndSupervisedFacilityMatch() {
 
     //when
     RightQuery rightQuery = new RightQuery(right, program, supervisedFacility);
-    boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
-
-    //then
-    assertTrue(hasRight);
-  }
-
-  @Test
-  public void shouldHaveRightWhenRightAndProgramAndSupervisoryNodeMatch() {
-
-    //when
-    RightQuery rightQuery = new RightQuery(right, program, supervisoryNode);
     boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then
@@ -126,17 +104,6 @@ public class SupervisionRoleAssignmentTest {
 
     //when
     RightQuery rightQuery = new RightQuery(right, program, new Facility("Another"));
-    boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
-
-    //then
-    assertFalse(hasRight);
-  }
-
-  @Test
-  public void shouldNotHaveRightWhenSupervisoryNodeDoesNotMatch() {
-
-    //when
-    RightQuery rightQuery = new RightQuery(right, program, new SupervisoryNode());
     boolean hasRight = supervisedRoleAssignment.hasRight(rightQuery);
 
     //then

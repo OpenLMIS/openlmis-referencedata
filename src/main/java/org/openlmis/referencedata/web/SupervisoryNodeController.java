@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -12,7 +11,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.Right;
-import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
@@ -189,15 +187,9 @@ public class SupervisoryNodeController extends BaseController {
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
     
-    Set<User> supervisingUsers = new HashSet<>();
-    Iterable<User> allUsers = userRepository.findAll();
+    Set<User> supervisingUsers = userRepository.findSupervisingUsersBy(right, supervisoryNode,
+        program);
 
-    allUsers.forEach(user -> {
-      if (user.hasRight(new RightQuery(right, program, supervisoryNode))) {
-        supervisingUsers.add(user);
-      }
-    });
-    
     return ResponseEntity.ok(supervisingUsers.stream().map(this::exportToDto).collect(toSet()));
   }
 

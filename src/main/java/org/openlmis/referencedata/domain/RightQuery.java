@@ -1,7 +1,8 @@
 package org.openlmis.referencedata.domain;
 
-import java.util.Objects;
 import lombok.Getter;
+
+import java.util.Objects;
 
 @Getter
 public class RightQuery {
@@ -9,7 +10,6 @@ public class RightQuery {
   private Right right;
   private Program program;
   private Facility facility;
-  private SupervisoryNode supervisoryNode;
   private Facility warehouse;
 
   /**
@@ -23,7 +23,7 @@ public class RightQuery {
 
   /**
    * Constructor to create query if user has a right in a specified program at a specified facility.
-   * This is for supervision rights.
+   * This is for all supervision rights.
    *
    * @param right    the right to check
    * @param program  the program to check
@@ -33,20 +33,6 @@ public class RightQuery {
     this.right = right;
     this.program = program;
     this.facility = facility;
-  }
-
-  /**
-   * Constructor to create query if user has a right in a specified program at a specified
-   * supervisory node. This is also for supervision rights.
-   *
-   * @param right           the right to check
-   * @param program         the program to check
-   * @param supervisoryNode the supervisory node to check
-   */
-  public RightQuery(Right right, Program program, SupervisoryNode supervisoryNode) {
-    this.right = right;
-    this.program = program;
-    this.supervisoryNode = supervisoryNode;
   }
 
   /**
@@ -73,12 +59,11 @@ public class RightQuery {
     return Objects.equals(right, that.right)
         && Objects.equals(program, that.program)
         && Objects.equals(facility, that.facility)
-        && Objects.equals(supervisoryNode, that.supervisoryNode)
         && Objects.equals(warehouse, that.warehouse);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(right, program, facility, supervisoryNode, warehouse);
+    return Objects.hash(right, program, facility, warehouse);
   }
 }
