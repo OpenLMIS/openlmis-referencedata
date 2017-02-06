@@ -44,6 +44,7 @@ import java.util.Objects;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
 @ImportResource("applicationContext.xml")
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class Application {
 
   private Logger logger = LoggerFactory.getLogger(Application.class);

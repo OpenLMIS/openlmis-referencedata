@@ -46,7 +46,7 @@ CREATE TABLE facility_type_approved_products (
     maxmonthsofstock double precision NOT NULL,
     minmonthsofstock double precision,
     facilitytypeid uuid NOT NULL,
-    programproductid uuid NOT NULL
+    programorderableid uuid NOT NULL
 );
 
 
@@ -100,10 +100,24 @@ CREATE TABLE geographic_zones (
 ALTER TABLE geographic_zones OWNER TO postgres;
 
 --
--- Name: orderable_products; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
+-- Name: orderable_display_categories; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
 
-CREATE TABLE orderable_products (
+CREATE TABLE orderable_display_categories (
+    id uuid NOT NULL,
+    code character varying(255),
+    displayname character varying(255),
+    displayorder integer NOT NULL
+);
+
+
+ALTER TABLE orderable_display_categories OWNER TO postgres;
+
+--
+-- Name: orderables; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE orderables (
     type character varying(31) NOT NULL,
     id uuid NOT NULL,
     dispensingunit character varying(255),
@@ -114,11 +128,11 @@ CREATE TABLE orderable_products (
     roundtozero boolean NOT NULL,
     description character varying(255),
     manufacturer character varying(255),
-    globalproductid uuid
+    commoditytypeid uuid
 );
 
 
-ALTER TABLE orderable_products OWNER TO postgres;
+ALTER TABLE orderables OWNER TO postgres;
 
 --
 -- Name: processing_periods; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -152,24 +166,10 @@ CREATE TABLE processing_schedules (
 ALTER TABLE processing_schedules OWNER TO postgres;
 
 --
--- Name: product_categories; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
+-- Name: program_orderables; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
 
-CREATE TABLE product_categories (
-    id uuid NOT NULL,
-    code character varying(255),
-    displayname character varying(255),
-    displayorder integer NOT NULL
-);
-
-
-ALTER TABLE product_categories OWNER TO postgres;
-
---
--- Name: program_products; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE program_products (
+CREATE TABLE program_orderables (
     id uuid NOT NULL,
     active boolean NOT NULL,
     displayorder integer NOT NULL,
@@ -177,13 +177,13 @@ CREATE TABLE program_products (
     fullsupply boolean NOT NULL,
     maxmonthsstock integer NOT NULL,
     priceperpack numeric(19,2),
-    productid uuid NOT NULL,
-    productcategoryid uuid NOT NULL,
+    orderabledisplaycategoryid uuid NOT NULL,
+    orderableid uuid NOT NULL,
     programid uuid NOT NULL
 );
 
 
-ALTER TABLE program_products OWNER TO postgres;
+ALTER TABLE program_orderables OWNER TO postgres;
 
 --
 -- Name: programs; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -382,6 +382,7 @@ ALTER TABLE supported_programs OWNER TO postgres;
 CREATE TABLE users (
     id uuid NOT NULL,
     active boolean DEFAULT false NOT NULL,
+    allownotify boolean DEFAULT true,
     email character varying(255) NOT NULL,
     extradata jsonb,
     firstname text NOT NULL,
@@ -395,180 +396,6 @@ CREATE TABLE users (
 
 
 ALTER TABLE users OWNER TO postgres;
-
---
--- Data for Name: facilities; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: facility_operators; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: facility_type_approved_products; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: facility_types; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: geographic_levels; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: geographic_zones; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: orderable_products; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: processing_periods; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: processing_schedules; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: product_categories; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: program_products; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: programs; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: requisition_group_members; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: requisition_group_program_schedules; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: requisition_groups; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: right_attachments; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: rights; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-INSERT INTO rights (id, description, name, type) VALUES ('e96017ff-af8c-4313-a070-caa70465c949', NULL, 'FACILITIES_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22', NULL, 'GEOGRAPHIC_ZONES_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('5c4b3b9b-713e-4b9a-8c58-7efcd2954512', NULL, 'SUPERVISORY_NODES_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('fb6a0053-6254-4b41-8028-bf91421f90dd', NULL, 'PRODUCTS_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('8816edba-b8a9-11e6-80f5-76304dec7eb7', NULL, 'REQUISITION_TEMPLATES_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('4bed4f40-36b5-42a7-94c9-0fd3d4252374', NULL, 'STOCK_CARD_TEMPLATES_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('ebad51c3-f7c3-4fab-97e1-839973b045d4', NULL, 'USER_ROLES_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('9ade922b-3523-4582-bef4-a47701f7df14', NULL, 'REQUISITION_CREATE', 'SUPERVISION');
-INSERT INTO rights (id, description, name, type) VALUES ('bffa2de2-dc2a-47dd-b126-6501748ac3fc', NULL, 'REQUISITION_APPROVE', 'SUPERVISION');
-INSERT INTO rights (id, description, name, type) VALUES ('feb4c0b8-f6d2-4289-b29d-811c1d0b2863', NULL, 'REQUISITION_AUTHORIZE', 'SUPERVISION');
-INSERT INTO rights (id, description, name, type) VALUES ('c3eb5df0-c3ac-4e70-a978-02827462f60e', NULL, 'REQUISITION_DELETE', 'SUPERVISION');
-INSERT INTO rights (id, description, name, type) VALUES ('e101d2b8-6a0f-4af6-a5de-a9576b4ebc50', NULL, 'REQUISITION_VIEW', 'SUPERVISION');
-INSERT INTO rights (id, description, name, type) VALUES ('7958129d-c4c0-4294-a40c-c2b07cb8e515', NULL, 'REQUISITION_CONVERT_TO_ORDER', 'ORDER_FULFILLMENT');
-INSERT INTO rights (id, description, name, type) VALUES ('65626c3d-513f-4255-93fd-808709860594', NULL, 'FULFILLMENT_TRANSFER_ORDER', 'ORDER_FULFILLMENT');
-
-
---
--- Data for Name: role_assignments; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-INSERT INTO role_assignments (type, id, roleid, userid, warehouseid, programid, supervisorynodeid) VALUES ('direct', '3104bc34-d83b-4139-9008-87f180ac6259', 'a439c5de-b8aa-11e6-80f5-76304dec7eb7', '35316636-6264-6331-2d34-3933322d3462', NULL, NULL, NULL);
-
-
---
--- Data for Name: role_rights; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-INSERT INTO role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', 'e96017ff-af8c-4313-a070-caa70465c949');
-INSERT INTO role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '8816edba-b8a9-11e6-80f5-76304dec7eb7');
-INSERT INTO role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '4bed4f40-36b5-42a7-94c9-0fd3d4252374');
-INSERT INTO role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22');
-INSERT INTO role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', 'ebad51c3-f7c3-4fab-97e1-839973b045d4');
-INSERT INTO role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '5c4b3b9b-713e-4b9a-8c58-7efcd2954512');
-INSERT INTO role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', 'fb6a0053-6254-4b41-8028-bf91421f90dd');
-
-
---
--- Data for Name: roles; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-INSERT INTO roles (id, description, name) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', NULL, 'System Administrator');
-
-
---
--- Data for Name: stock_adjustment_reasons; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: supervisory_nodes; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: supply_lines; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: supported_programs; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-
-
---
--- Data for Name: users; Type: TABLE DATA; Schema: referencedata; Owner: postgres
---
-
-INSERT INTO users (id, active, email, extradata, firstname, lastname, loginrestricted, timezone, username, verified, homefacilityid) VALUES ('35316636-6264-6331-2d34-3933322d3462', false, 'example@mail.com', NULL, 'Admin', 'User', false, 'UTC', 'admin', false, NULL);
-
 
 --
 -- Name: facilities_pkey; Type: CONSTRAINT; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -619,11 +446,19 @@ ALTER TABLE ONLY geographic_zones
 
 
 --
--- Name: orderable_products_pkey; Type: CONSTRAINT; Schema: referencedata; Owner: postgres; Tablespace: 
+-- Name: orderable_display_categories_pkey; Type: CONSTRAINT; Schema: referencedata; Owner: postgres; Tablespace: 
 --
 
-ALTER TABLE ONLY orderable_products
-    ADD CONSTRAINT orderable_products_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY orderable_display_categories
+    ADD CONSTRAINT orderable_display_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: orderables_pkey; Type: CONSTRAINT; Schema: referencedata; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY orderables
+    ADD CONSTRAINT orderables_pkey PRIMARY KEY (id);
 
 
 --
@@ -643,19 +478,11 @@ ALTER TABLE ONLY processing_schedules
 
 
 --
--- Name: product_categories_pkey; Type: CONSTRAINT; Schema: referencedata; Owner: postgres; Tablespace: 
+-- Name: program_orderables_pkey; Type: CONSTRAINT; Schema: referencedata; Owner: postgres; Tablespace: 
 --
 
-ALTER TABLE ONLY product_categories
-    ADD CONSTRAINT product_categories_pkey PRIMARY KEY (id);
-
-
---
--- Name: program_products_pkey; Type: CONSTRAINT; Schema: referencedata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY program_products
-    ADD CONSTRAINT program_products_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY program_orderables
+    ADD CONSTRAINT program_orderables_pkey PRIMARY KEY (id);
 
 
 --
@@ -883,6 +710,14 @@ ALTER TABLE ONLY users
 
 
 --
+-- Name: fk1utrvcvl0bmr3l3ysq9fesvtx; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
+--
+
+ALTER TABLE ONLY program_orderables
+    ADD CONSTRAINT fk1utrvcvl0bmr3l3ysq9fesvtx FOREIGN KEY (programid) REFERENCES programs(id);
+
+
+--
 -- Name: fk2tcq3p7atk25pe8xmdbuwy2wo; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
 --
 
@@ -947,19 +782,19 @@ ALTER TABLE ONLY requisition_group_members
 
 
 --
--- Name: fk5oymdkhd5bylwwqavf2q6o8ny; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
---
-
-ALTER TABLE ONLY facility_type_approved_products
-    ADD CONSTRAINT fk5oymdkhd5bylwwqavf2q6o8ny FOREIGN KEY (programproductid) REFERENCES program_products(id);
-
-
---
 -- Name: fk5yvqwsfj7a21e34vp9rb13ibj; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
 --
 
 ALTER TABLE ONLY requisition_group_program_schedules
     ADD CONSTRAINT fk5yvqwsfj7a21e34vp9rb13ibj FOREIGN KEY (processingscheduleid) REFERENCES processing_schedules(id);
+
+
+--
+-- Name: fk65l9b1mrvec9tqosisdkp6clu; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
+--
+
+ALTER TABLE ONLY program_orderables
+    ADD CONSTRAINT fk65l9b1mrvec9tqosisdkp6clu FOREIGN KEY (orderabledisplaycategoryid) REFERENCES orderable_display_categories(id);
 
 
 --
@@ -1075,30 +910,6 @@ ALTER TABLE ONLY role_assignments
 
 
 --
--- Name: fkivotepe50ydd4ixp6u4wev8ks; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
---
-
-ALTER TABLE ONLY program_products
-    ADD CONSTRAINT fkivotepe50ydd4ixp6u4wev8ks FOREIGN KEY (productcategoryid) REFERENCES product_categories(id);
-
-
---
--- Name: fkjbgjp8u70m6wtmg45c02f8y1y; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
---
-
-ALTER TABLE ONLY orderable_products
-    ADD CONSTRAINT fkjbgjp8u70m6wtmg45c02f8y1y FOREIGN KEY (globalproductid) REFERENCES orderable_products(id);
-
-
---
--- Name: fkkcrn1ejnd2cmaf3bmfbwlnbv8; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
---
-
-ALTER TABLE ONLY program_products
-    ADD CONSTRAINT fkkcrn1ejnd2cmaf3bmfbwlnbv8 FOREIGN KEY (productid) REFERENCES orderable_products(id);
-
-
---
 -- Name: fkkg17afgncqqlfht3u37cfl7d6; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
 --
 
@@ -1123,14 +934,6 @@ ALTER TABLE ONLY role_assignments
 
 
 --
--- Name: fkmuld4symcrudni1xc70pngxdm; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
---
-
-ALTER TABLE ONLY program_products
-    ADD CONSTRAINT fkmuld4symcrudni1xc70pngxdm FOREIGN KEY (programid) REFERENCES programs(id);
-
-
---
 -- Name: fkn4fxuvpiasbtskg8avi5pnff0; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
 --
 
@@ -1147,6 +950,22 @@ ALTER TABLE ONLY role_assignments
 
 
 --
+-- Name: fkp2b6lcwnyqul4yi2vnd2vvq50; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
+--
+
+ALTER TABLE ONLY program_orderables
+    ADD CONSTRAINT fkp2b6lcwnyqul4yi2vnd2vvq50 FOREIGN KEY (orderableid) REFERENCES orderables(id);
+
+
+--
+-- Name: fkp4q342m2u7dunheo0wsfoxx; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
+--
+
+ALTER TABLE ONLY orderables
+    ADD CONSTRAINT fkp4q342m2u7dunheo0wsfoxx FOREIGN KEY (commoditytypeid) REFERENCES orderables(id);
+
+
+--
 -- Name: fkpc0soanvqabccyg5br9aexoc1; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
 --
 
@@ -1160,6 +979,14 @@ ALTER TABLE ONLY facilities
 
 ALTER TABLE ONLY supervisory_nodes
     ADD CONSTRAINT fkpjjkmuhcksc8mhfsnfxf8d9fh FOREIGN KEY (parentid) REFERENCES supervisory_nodes(id);
+
+
+--
+-- Name: fkqb7qvltam3dbmgf2ju6p41mp; Type: FK CONSTRAINT; Schema: referencedata; Owner: postgres
+--
+
+ALTER TABLE ONLY facility_type_approved_products
+    ADD CONSTRAINT fkqb7qvltam3dbmgf2ju6p41mp FOREIGN KEY (programorderableid) REFERENCES program_orderables(id);
 
 
 --
