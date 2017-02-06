@@ -78,7 +78,7 @@ public class User extends BaseEntity {
   @Setter
   private boolean loginRestricted;
 
-  @Column
+  @Column(columnDefinition = "boolean DEFAULT true")
   @Getter
   @Setter
   private Boolean allowNotify;

@@ -6,15 +6,6 @@ import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -29,6 +20,12 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateFiled"})
 public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<User> {
@@ -229,25 +226,6 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     //then
     assertEquals(1, supervisingUsers.size());
     assertEquals(supervisingUser, supervisingUsers.iterator().next());
-  }
-
-  @Test
-  public void shouldReturnTrueWhenAllowNotifyIsNotSet() {
-    User user = generateInstance();
-    user = repository.save(user);
-    assertThat(user.getAllowNotify(), is(Boolean.TRUE));
-  }
-
-  @Test
-  public void testEditOfAllowNotify() {
-    User user = generateInstance();
-    user.setAllowNotify(true);
-    user = repository.save(user);
-    assertThat(user.getAllowNotify(), is(Boolean.TRUE));
-
-    user.setAllowNotify(false);
-    user = repository.save(user);
-    assertThat(user.getAllowNotify(), is(Boolean.FALSE));
   }
 
   private User cloneUser(User user) {
