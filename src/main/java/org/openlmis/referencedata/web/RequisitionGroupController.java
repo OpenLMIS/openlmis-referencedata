@@ -6,6 +6,7 @@ import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
+
 @Controller
 public class RequisitionGroupController extends BaseController {
 
@@ -37,6 +40,9 @@ public class RequisitionGroupController extends BaseController {
   @Autowired
   private RequisitionGroupRepository requisitionGroupRepository;
 
+  @Autowired
+  private RightService rightService;
+
   /**
    * Allows creating new requisitionGroup. If the id is specified, it will be ignored.
    *
@@ -46,6 +52,8 @@ public class RequisitionGroupController extends BaseController {
   @RequestMapping(value = "/requisitionGroups", method = RequestMethod.POST)
   public ResponseEntity<RequisitionGroupDto> createRequisitionGroup(
       @RequestBody RequisitionGroupBaseDto requisitionGroupDto, BindingResult bindingResult) {
+    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+
     LOGGER.debug("Creating new requisitionGroup");
     validator.validate(requisitionGroupDto, bindingResult);
 
@@ -68,6 +76,8 @@ public class RequisitionGroupController extends BaseController {
    */
   @RequestMapping(value = "/requisitionGroups", method = RequestMethod.GET)
   public ResponseEntity<List<RequisitionGroupDto>> getAllRequisitionGroups() {
+    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+
     Iterable<RequisitionGroup> requisitionGroups = requisitionGroupRepository.findAll();
     List<RequisitionGroupDto> requisitionGroupDtos = new ArrayList<>();
     for (RequisitionGroup requisitionGroup : requisitionGroups) {
@@ -85,6 +95,8 @@ public class RequisitionGroupController extends BaseController {
   @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.GET)
   public ResponseEntity<RequisitionGroupDto> getRequisitionGroup(
       @PathVariable("id") UUID requisitionGroupId) {
+    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+
     RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
     if (requisitionGroup == null) {
       throw new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);
@@ -105,6 +117,8 @@ public class RequisitionGroupController extends BaseController {
       @RequestBody RequisitionGroupBaseDto requisitionGroupDto,
       @PathVariable("id") UUID requisitionGroupId,
       BindingResult bindingResult) {
+    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+
     validator.validate(requisitionGroupDto, bindingResult);
 
     if (bindingResult.getErrorCount() == 0) {
@@ -137,6 +151,8 @@ public class RequisitionGroupController extends BaseController {
    */
   @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteRequisitionGroup(@PathVariable("id") UUID requisitionGroupId) {
+    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+
     RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
     if (requisitionGroup == null) {
       throw new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);

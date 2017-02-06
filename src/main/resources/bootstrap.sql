@@ -9,6 +9,7 @@ INSERT INTO referencedata.rights (id, name, type) VALUES ('4bed4f40-36b5-42a7-94
 INSERT INTO referencedata.rights (id, name, type) VALUES ('ebad51c3-f7c3-4fab-97e1-839973b045d4', 'USER_ROLES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('42791f7a-84a1-470b-bc3c-4160bc99f13c', 'PROCESSING_SCHEDULES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('3687ea98-8a1e-4347-984c-3fd97d072066', 'USERS_MANAGE', 'GENERAL_ADMIN');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('c996d0c6-4f7d-46b5-a376-6f93a3071cb0', 'REQUISITION_GROUPS_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('9ade922b-3523-4582-bef4-a47701f7df14', 'REQUISITION_CREATE', 'SUPERVISION');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('bffa2de2-dc2a-47dd-b126-6501748ac3fc', 'REQUISITION_APPROVE', 'SUPERVISION');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('feb4c0b8-f6d2-4289-b29d-811c1d0b2863', 'REQUISITION_AUTHORIZE', 'SUPERVISION');

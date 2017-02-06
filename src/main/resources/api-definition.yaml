@@ -2278,6 +2278,10 @@ resourceTypes:
                 "500":
                     body:
                         application/json:
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       get:
             is: [ secured ]
             description: Get all requisitionGroups.
@@ -2286,6 +2290,10 @@ resourceTypes:
                     body:
                         application/json:
                 "404":
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       /{id}:
             uriParameters:
               id:
@@ -2306,6 +2314,10 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen requisitionGroup.
@@ -2314,6 +2326,10 @@ resourceTypes:
                         body:
                             application/json:
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
+                    "403":
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2327,6 +2343,10 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "409":
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
 
   /currencySettings:
       displayName: Currency settings

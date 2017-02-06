@@ -9,4 +9,5 @@ public class RightName {
   public static final String PROCESSING_SCHEDULES_MANAGE_RIGHT = "PROCESSING_SCHEDULES_MANAGE";
   public static final String USERS_MANAGE_RIGHT = "USERS_MANAGE";
   public static final String SUPERVISORY_NODES_MANAGE = "SUPERVISORY_NODES_MANAGE";
+  public static final String REQUISITION_GROUPS_MANAGE = "REQUISITION_GROUPS_MANAGE";
 }
