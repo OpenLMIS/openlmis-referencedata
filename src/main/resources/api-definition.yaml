@@ -468,7 +468,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen processingPeriod.
+              description: "[AVOID USING] Completely removes processing period. This action is not recoverable."
               responses:
                   "204":
                   "403":
@@ -648,7 +648,7 @@ resourceTypes:
                             application/json:
             delete:
                 is: [ secured ]
-                description: Delete chosen orderableDisplayCategory.
+                description: "[AVOID USING] Completely removes display category. This action is not recoverable."
                 responses:
                     "204":
                     "404":
@@ -823,7 +823,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen processingSchedule.
+              description: "[AVOID USING] Completely removes processing schedule. This action is not recoverable."
               responses:
                   "204":
                   "403":
@@ -896,7 +896,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen supplyLine.
+              description: "[AVOID USING] Completely removes supply line. This action is not recoverable."
               responses:
                   "204":
                   "404":
@@ -1024,7 +1024,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen user.
+              description: "[AVOID USING] Completely removes user. This action is not recoverable."
               responses:
                   "204":
                   "400":
@@ -1257,7 +1257,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen facility.
+              description: "[AVOID USING] Completely removes facility. This action is not recoverable."
               responses:
                   "204":
                   "403":
@@ -1435,7 +1435,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen facilityType.
+              description: "[AVOID USING] Completely removes facility type. This action is not recoverable."
               responses:
                   "204":
                   "404":
@@ -1508,7 +1508,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen program.
+              description: "[AVOID USING] Completely removes program. This action is not recoverable."
               responses:
                   "204":
                   "404":
@@ -1587,7 +1587,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen Stock Adjustment Reason.
+              description: "[AVOID USING] Completely removes stock adjustment reason. This action is not recoverable."
               responses:
                   "204":
                   "404":
@@ -1710,7 +1710,7 @@ resourceTypes:
                             schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Updates Facility Operators with given id from database.
+                description: "[AVOID USING] Completely removes facility operator. This action is  not recoverable."
                 responses:
                     "204":
                     "404":
@@ -1763,7 +1763,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen geographicZone.
+              description: "[AVOID USING] Completely removes geographic zone. This action is not recoverable."
               responses:
                   "204":
                   "403":
@@ -1837,7 +1837,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen geographicLevel.
+              description: "[AVOID USING] Completely removes geographic level. This action is not recoverable."
               responses:
                   "204":
                   "404":
@@ -1914,7 +1914,7 @@ resourceTypes:
                             schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen facilityTypeApprovedProduct.
+                description: "[AVOID USING] Completely removes facility type approved product. This action is not recoverable."
                 responses:
                     "204":
                     "404":
@@ -2000,7 +2000,7 @@ resourceTypes:
                             schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen supervisoryNode.
+                description: "[AVOID USING] Completely removes supervisory node. This action is not recoverable."
                 responses:
                     "204":
                     "404":
@@ -2157,7 +2157,7 @@ resourceTypes:
                             schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen role.
+                description: "[AVOID USING] Completely removes role. This action is not recoverable."
                 responses:
                     "204":
                     "400":
@@ -2229,7 +2229,7 @@ resourceTypes:
                             schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen right.
+                description: "[AVOID USING] Completely removes right. This action is not recoverable."
                 responses:
                     "204":
                     "403":
@@ -2319,7 +2319,7 @@ resourceTypes:
                             schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen requisitionGroup.
+                description: "[AVOID USING] Completely removes requisition group. This action is not recoverable."
                 responses:
                     "204":
                     "404":
