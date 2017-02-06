@@ -14,7 +14,7 @@ INSERT INTO referencedata.rights (id, name, type) VALUES ('bffa2de2-dc2a-47dd-b1
 INSERT INTO referencedata.rights (id, name, type) VALUES ('feb4c0b8-f6d2-4289-b29d-811c1d0b2863', 'REQUISITION_AUTHORIZE', 'SUPERVISION');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('c3eb5df0-c3ac-4e70-a978-02827462f60e', 'REQUISITION_DELETE', 'SUPERVISION');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('e101d2b8-6a0f-4af6-a5de-a9576b4ebc50', 'REQUISITION_VIEW', 'SUPERVISION');
-INSERT INTO referencedata.rights (id, name, type) VALUES ('65626c3d-513f-4255-93fd-808709860594', 'FULFILLMENT_TRANSFER_ORDER', 'ORDER_FULFILLMENT');
+INSERT INTO referencedata.rights (id, name, type) VALUES ('65626c3d-513f-4255-93fd-808709860594', 'ORDERS_TRANSFER', 'ORDER_FULFILLMENT');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('24df2715-850c-4336-b650-90eb78c544bf', 'PODS_MANAGE', 'ORDER_FULFILLMENT');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('35cf256f-1b28-41ad-84f5-99c158083dfc', 'REPORTS_VIEW', 'REPORTS');
 INSERT INTO referencedata.rights (id, name, type) VALUES ('60561639-4f94-4371-a5b5-ba95ecf7627f', 'REPORT_TEMPLATES_EDIT', 'REPORTS');
