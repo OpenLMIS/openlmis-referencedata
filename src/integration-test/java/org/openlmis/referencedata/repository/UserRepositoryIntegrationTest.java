@@ -1,15 +1,22 @@
 package org.openlmis.referencedata.repository;
 
+
+import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateFiled"})
 public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<User> {
@@ -40,6 +48,18 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   @Autowired
   private FacilityRepository facilityRepository;
+  
+  @Autowired
+  private RightRepository rightRepository;
+  
+  @Autowired
+  private RoleRepository roleRepository;
+  
+  @Autowired
+  private ProgramRepository programRepository;
+  
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   private List<User> users;
   
@@ -82,26 +102,26 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.isVerified(),
         user.isLoginRestricted());
 
-    Assert.assertEquals(1, receivedUsers.size());
-    Assert.assertEquals(
+    assertEquals(1, receivedUsers.size());
+    assertEquals(
         user.getUsername(),
         receivedUsers.get(0).getUsername());
-    Assert.assertEquals(
+    assertEquals(
         user.getFirstName(),
         receivedUsers.get(0).getFirstName());
-    Assert.assertEquals(
+    assertEquals(
         user.getLastName(),
         receivedUsers.get(0).getLastName());
-    Assert.assertEquals(
+    assertEquals(
         user.getHomeFacility().getId(),
         receivedUsers.get(0).getHomeFacility().getId());
-    Assert.assertEquals(
+    assertEquals(
         user.isActive(),
         receivedUsers.get(0).isActive());
-    Assert.assertEquals(
+    assertEquals(
         user.isVerified(),
         receivedUsers.get(0).isVerified());
-    Assert.assertEquals(
+    assertEquals(
         user.isLoginRestricted(),
         receivedUsers.get(0).isLoginRestricted());
   }
@@ -110,7 +130,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   public void searchUsersWithAllParametersNullShouldReturnAnEmptyList() {
     List<User> receivedUsers = repository.searchUsers(null, null, null, null, null, null, null);
 
-    Assert.assertEquals(0, receivedUsers.size());
+    assertEquals(0, receivedUsers.size());
   }
 
   @Test
@@ -125,15 +145,15 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         null,
         null);
 
-    Assert.assertEquals(2, receivedUsers.size());
+    assertEquals(2, receivedUsers.size());
     for (User receivedUser : receivedUsers) {
-      Assert.assertEquals(
+      assertEquals(
           user.getFirstName(),
           receivedUser.getFirstName());
-      Assert.assertEquals(
+      assertEquals(
           user.getLastName(),
           receivedUser.getLastName());
-      Assert.assertEquals(
+      assertEquals(
           user.getHomeFacility().getId(),
           receivedUser.getHomeFacility().getId());
     }
@@ -152,19 +172,19 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     List<User> extraDataUsers = repository.findByExtraData(extraDataJson);
 
     //then
-    Assert.assertEquals(1, extraDataUsers.size());
+    assertEquals(1, extraDataUsers.size());
 
     User user = extraDataUsers.get(0);
-    Assert.assertEquals(expectedUser.getUsername(), user.getUsername());
-    Assert.assertEquals(expectedUser.getFirstName(), user.getFirstName());
-    Assert.assertEquals(expectedUser.getLastName(), user.getLastName());
-    Assert.assertEquals(expectedUser.getEmail(), user.getEmail());
-    Assert.assertEquals(expectedUser.getTimezone(), user.getTimezone());
-    Assert.assertEquals(expectedUser.getHomeFacility().getId(), user.getHomeFacility().getId());
-    Assert.assertEquals(expectedUser.isActive(), user.isActive());
-    Assert.assertEquals(expectedUser.isVerified(), user.isVerified());
-    Assert.assertEquals(expectedUser.isLoginRestricted(), user.isLoginRestricted());
-    Assert.assertEquals(expectedUser.getExtraData(), user.getExtraData());
+    assertEquals(expectedUser.getUsername(), user.getUsername());
+    assertEquals(expectedUser.getFirstName(), user.getFirstName());
+    assertEquals(expectedUser.getLastName(), user.getLastName());
+    assertEquals(expectedUser.getEmail(), user.getEmail());
+    assertEquals(expectedUser.getTimezone(), user.getTimezone());
+    assertEquals(expectedUser.getHomeFacility().getId(), user.getHomeFacility().getId());
+    assertEquals(expectedUser.isActive(), user.isActive());
+    assertEquals(expectedUser.isVerified(), user.isVerified());
+    assertEquals(expectedUser.isLoginRestricted(), user.isLoginRestricted());
+    assertEquals(expectedUser.getExtraData(), user.getExtraData());
   }
 
   @Test
@@ -176,7 +196,36 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     List<User> extraDataUsers = repository.findByExtraData(otherExtraDataJson);
 
     //then
-    Assert.assertEquals(0, extraDataUsers.size());
+    assertEquals(0, extraDataUsers.size());
+  }
+
+  @Test
+  public void findSupervisingUsersByShouldOnlyFindMatchingUsers() {
+    //given
+    Right right = Right.newRight("right", SUPERVISION);
+    rightRepository.save(right);
+
+    Role role = Role.newRole("role", right);
+    roleRepository.save(role);
+
+    Program program = new Program("P1");
+    programRepository.save(program);
+
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", generateFacility());
+    supervisoryNodeRepository.save(supervisoryNode);
+
+    User supervisingUser = repository.findOneByUsername("user1");
+    supervisingUser.assignRoles(new SupervisionRoleAssignment(role, supervisingUser, program,
+        supervisoryNode));
+    repository.save(supervisingUser);
+
+    //when
+    Set<User> supervisingUsers = repository.findSupervisingUsersBy(right, supervisoryNode, 
+        program);
+
+    //then
+    assertEquals(1, supervisingUsers.size());
+    assertEquals(supervisingUser, supervisingUsers.iterator().next());
   }
 
   private User cloneUser(User user) {

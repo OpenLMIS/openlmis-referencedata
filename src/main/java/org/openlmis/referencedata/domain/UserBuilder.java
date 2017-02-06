@@ -16,6 +16,7 @@ public class UserBuilder {
   private boolean active;
   private boolean verified;
   private boolean loginRestricted;
+  private Boolean allowNotify;
   private Map<String, String> extraData;
 
   private UserBuilder() {
@@ -65,6 +66,11 @@ public class UserBuilder {
     return this;
   }
 
+  public UserBuilder setAllowNotify(Boolean allowNotify) {
+    this.allowNotify = allowNotify;
+    return this;
+  }
+
   public UserBuilder setExtraData(Map<String, String> extraData) {
     this.extraData = extraData;
     return this;
@@ -72,6 +78,6 @@ public class UserBuilder {
 
   public User createUser() {
     return new User(id, username, firstName, lastName, email, timezone, homeFacility, active,
-        verified, loginRestricted, extraData);
+        verified, loginRestricted, allowNotify,extraData);
   }
 }

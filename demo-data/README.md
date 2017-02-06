@@ -70,13 +70,13 @@ Defined in referencedata.geographic_levels.json and referencedata.geographic_zon
 
 ## Programs and Products
 
-Defined in referencedata.programs.json, referencedata.orderable_products.json and
-referencedata.program_products.json.
+Defined in referencedata.programs.json, referencedata.orderables.json and
+referencedata.program_orderables.json.
 
 1. Family Planning
   * skipping requisition periods is enabled
   * non-full-supply tab is enabled
-  * products: (all of these are Global Products)
+  * products: (all of these are Commodity Types)
     * Oral Contraceptive
       1. C100/Levora
       2. C200/Ortho-Novum
@@ -94,7 +94,7 @@ referencedata.program_products.json.
       2. C2/Glibenclamide (a Trade Item)
     * Vaccines
       1. C3/Streptococcus Pneumoniae Vaccine (a Trade Item)
-      2. C4/Streptococcus Pneumoniae Vaccine II (a Global Product)
+      2. C4/Streptococcus Pneumoniae Vaccine II (a Commodity Type)
 3. PRG003/New program
   * products:
     * Injectable Hormonal Contraceptive
@@ -148,6 +148,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
 2. Store Manager
   * rights:
     * Requisition View
+    * Requisition Delete
     * Requisition Authorize
   * users:
     * administrator - has this role for Family Planning & Essential Meds
@@ -188,10 +189,6 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Stock card templates manage
   * users:
     * administrator
-7. Program Coordinator
-  * users:
-    * administrator - has this role for Family Planning & Essential Meds
-    * devadmin - has this role for Family Planning & Essential Meds for SN1/FP Approval point
 
 ## Supervisory Nodes and Supply Lines
 

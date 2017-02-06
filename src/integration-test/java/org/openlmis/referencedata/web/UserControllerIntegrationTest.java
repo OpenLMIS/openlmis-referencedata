@@ -2,6 +2,7 @@ package org.openlmis.referencedata.web;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -16,6 +17,8 @@ import com.google.common.collect.Sets;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.jayway.restassured.response.Response;
+import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -30,6 +33,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
@@ -50,6 +54,7 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.AuthUserRequest;
 import org.openlmis.util.PasswordChangeRequest;
@@ -126,6 +131,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @MockBean
   private RequisitionGroupRepository requisitionGroupRepository;
 
+  @MockBean
+  private RightService rightService;
+
   private ObjectMapper mapper = new ObjectMapper();
 
   private User user1;
@@ -159,13 +167,15 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
    * Constructor for test class.
    */
   public UserControllerIntegrationTest() {
-    user1 = generateUser();
-    assignUserRoles(user1);
     userId = UUID.randomUUID();
+    user1 = generateUser();
+    user1.setId(userId);
+    assignUserRoles(user1);
   }
 
   @Test
   public void shouldGetAllUsers() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Set<User> storedUsers = Sets.newHashSet(user1, generateUser());
     given(userRepository.findAll()).willReturn(storedUsers);
@@ -185,18 +195,31 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRejectGetAllUsersIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetUser() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     UserDto userDto = new UserDto();
     user1.export(userDto);
-    given(userRepository.findOne(userId)).willReturn(user1);
 
-    UserDto response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", userId)
-        .when()
-        .get(ID_URL)
+    UserDto response = getUser()
         .then()
         .statusCode(200)
         .extract().as(UserDto.class);
@@ -206,15 +229,35 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetUsersFullRoleAssignments() {
-    given(userRepository.findOne(userId)).willReturn(user1);
+  public void shouldGetUserWithNoRightIfUserRequestsTheirOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
-    DetailedRoleAssignmentDto[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", userId)
-        .when()
-        .get(ROLE_ASSIGNMENTS_URL)
+    getUser()
+      .then()
+      .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetUserIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = getUser()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUsersFullRoleAssignments() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    DetailedRoleAssignmentDto[] response = getUsersFullRoleAssignments()
         .then()
         .statusCode(200)
         .extract().as(DetailedRoleAssignmentDto[].class);
@@ -231,7 +274,34 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldGetUsersFullRoleAssignmentsWithNoRightIfUserRequestsTheirOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+
+    getUsersFullRoleAssignments()
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetUsersFullRoleAssignmentsIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = getUsersFullRoleAssignments()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnNotFoundWhenGettingFullRoleAssignmentsForNotExistingUser() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
     given(userRepository.findOne(userId)).willReturn(null);
 
     restAssured
@@ -248,26 +318,11 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldPutUser() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     UserDto userDto = new UserDto();
-    user1.export(userDto);
-    given(facilityRepository.findFirstByCode(userDto.fetchHomeFacilityCode()))
-        .willReturn(homeFacility);
-    given(roleRepository.findOne(adminRoleId)).willReturn(adminRole);
-    given(roleRepository.findOne(supervisionRoleId)).willReturn(supervisionRole);
-    given(programRepository.findByCode(Code.code(PROGRAM1_CODE))).willReturn(program1);
-    given(programRepository.findByCode(Code.code(PROGRAM2_CODE))).willReturn(program2);
-    given(supervisoryNodeRepository.findByCode(SUPERVISORY_NODE_CODE)).willReturn(supervisoryNode);
-    given(roleRepository.findOne(fulfillmentRoleId)).willReturn(fulfillmentRole);
-    given(facilityRepository.findFirstByCode(WAREHOUSE_CODE)).willReturn(warehouse);
 
-    UserDto response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(userDto)
-        .when()
-        .put(RESOURCE_URL)
+    UserDto response = putUser(userDto)
         .then()
         .statusCode(200)
         .extract().as(UserDto.class);
@@ -277,17 +332,24 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRejectPutUserIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = putUser(null)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldDeleteUser() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.findOne(userId)).willReturn(user1);
-
-    restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", userId)
-        .when()
-        .delete(ID_URL)
+    deleteUser()
         .then()
         .statusCode(204);
 
@@ -295,23 +357,38 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetUserHasRight() {
+  public void shouldDeleteUserWithNoRightIfUserRequestsTheirOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
-    given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
-    given(programRepository.findOne(program1Id)).willReturn(program1);
+    deleteUser()
+        .then()
+        .statusCode(204);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectDeleteUserIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = deleteUser()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserHasRight() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
     given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
 
     ResultDto<Boolean> response = new ResultDto<>();
-    response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(RIGHT_ID_STRING, supervisionRightId)
-        .queryParam(PROGRAM_ID_STRING, program1Id)
-        .queryParam("facilityId", homeFacilityId)
-        .pathParam("id", userId)
-        .when()
-        .get(HAS_RIGHT_URL)
+    response = getUserHasRight()
         .then()
         .statusCode(200)
         .extract().as(response.getClass());
@@ -321,7 +398,35 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldGetUserHasRightIfUserRequestsTheirOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+
+    given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
+
+    getUserHasRight()
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetUserHasRightIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = getUserHasRight()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldBadRequestGetUserHasRightWithMissingFacility() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
@@ -343,15 +448,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserPrograms() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.findOne(userId)).willReturn(user1);
-
-    Program[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .pathParam("id", userId)
-        .when()
-        .get(PROGRAMS_URL)
+    Program[] response = getUserPrograms()
         .then()
         .statusCode(200)
         .extract().as(Program[].class);
@@ -362,20 +461,35 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getUserSupervisedFacilitiesShouldReturnOk() {
+  public void shouldGetUserProgramsWithNoRightIfUserRequestsTheirOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
-    given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
-    given(programRepository.findOne(program2Id)).willReturn(program2);
+    getUserPrograms()
+        .then()
+        .statusCode(200);
 
-    Facility[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(RIGHT_ID_STRING, supervisionRightId)
-        .queryParam(PROGRAM_ID_STRING, program2Id)
-        .pathParam("id", userId)
-        .when()
-        .get(SUPERVISED_FACILITIES_URL)
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetUserProgramsIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = getUserPrograms()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserSupervisedFacilities() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    Facility[] response = getUserSupervisedFacilities()
         .then()
         .statusCode(200)
         .extract().as(Facility[].class);
@@ -385,10 +499,37 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldGetUserSupervisedFacilitiesWithNoRightIfUserRequestsTheirOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+
+    Facility[] response = getUserSupervisedFacilities()
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    assertThat(response.length, is(2));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetUserSupervisedFacilitiesIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = getUserSupervisedFacilities()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void getUserSupervisedFacilitiesShouldReturnNotFoundForNonExistingUser() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.findOne(userId)).willReturn(null);
-
     restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -405,6 +546,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getUserSupervisedFacilitiesShouldReturnBadRequestForNonExistingUuid() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
@@ -426,16 +568,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetUserFulfillmentFacilities() {
-    given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findOne(fulfillmentRightId)).willReturn(fulfillmentRight);
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    Facility[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(RIGHT_ID_STRING, fulfillmentRightId)
-        .pathParam("id", userId)
-        .when()
-        .get(FULFILLMENT_FACILITIES_URL)
+    Facility[] response = getUserFulfillmentFacilities()
         .then()
         .statusCode(200)
         .extract().as(Facility[].class);
@@ -445,7 +580,33 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldGetUserFulfillmentFacilitiesWithNoRightIfUserRequestsTheirOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+
+    getUserFulfillmentFacilities()
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetUserFulfillmentFacilitiesIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = getUserFulfillmentFacilities()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnBadRequestWhenGettingFulfillmentFacilitiesWithIncorrectRight() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     given(userRepository.findOne(userId)).willReturn(user1);
     given(rightRepository.findOne(fulfillmentRightId)).willReturn(null);
 
@@ -464,6 +625,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindUsers() throws JsonProcessingException {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Map<String, Object> queryMap = new HashMap<>();
     queryMap.put(USERNAME, user1.getUsername());
@@ -487,12 +649,36 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Test
+  public void shouldRejectFindUsersIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    Map<String, Object> queryMap = new HashMap<>();
+    queryMap.put(USERNAME, user1.getUsername());
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(queryMap)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
   /**
    * Creating requisition and auth users.
    */
   @Ignore
   @Test
   public void shouldCreateRequisitionAndAuthUsers() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User user = generateUser();
 
     User response = restAssured
@@ -533,6 +719,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldCreateRequisitionAndAuthUsersAndSendResetPasswordEmail() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User user = generateUser();
 
     User response = restAssured
@@ -572,6 +759,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldResetPassword() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User savedUser = createUser();
     saveAuthUser(savedUser);
 
@@ -606,6 +794,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldChangePasswordIfValidResetTokenIsProvided() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User savedUser = createUser();
     saveAuthUser(savedUser);
 
@@ -643,6 +832,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Ignore
   @Test
   public void shouldUpdateRequisitionAndAuthUsers() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User newUser = generateUser();
     UserDto newUserDto = new UserDto();
     newUser.export(newUserDto);
@@ -703,6 +893,120 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
 
     removeAuthUserByUsername(authUser.getUsername());
+  }
+
+  private Response getUser() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(ID_URL);
+  }
+
+  private Response getUsersFullRoleAssignments() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(ROLE_ASSIGNMENTS_URL);
+  }
+
+  private Response putUser(UserDto userDto) {
+    if (userDto == null) {
+      userDto = new UserDto();
+    }
+    user1.export(userDto);
+    given(facilityRepository.findFirstByCode(userDto.fetchHomeFacilityCode()))
+        .willReturn(homeFacility);
+    given(roleRepository.findOne(adminRoleId)).willReturn(adminRole);
+    given(roleRepository.findOne(supervisionRoleId)).willReturn(supervisionRole);
+    given(programRepository.findByCode(Code.code(PROGRAM1_CODE))).willReturn(program1);
+    given(programRepository.findByCode(Code.code(PROGRAM2_CODE))).willReturn(program2);
+    given(supervisoryNodeRepository.findByCode(SUPERVISORY_NODE_CODE)).willReturn(supervisoryNode);
+    given(roleRepository.findOne(fulfillmentRoleId)).willReturn(fulfillmentRole);
+    given(facilityRepository.findFirstByCode(WAREHOUSE_CODE)).willReturn(warehouse);
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(userDto)
+        .when()
+        .put(RESOURCE_URL);
+  }
+
+  private Response deleteUser() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", userId)
+        .when()
+        .delete(ID_URL);
+  }
+
+  private Response getUserHasRight() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
+    given(programRepository.findOne(program1Id)).willReturn(program1);
+    given(programRepository.findOne(program2Id)).willReturn(program2);
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, supervisionRightId)
+        .queryParam(PROGRAM_ID_STRING, program1Id)
+        .queryParam("facilityId", homeFacilityId)
+        .pathParam("id", userId)
+        .when()
+        .get(HAS_RIGHT_URL);
+  }
+
+  private Response getUserPrograms() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(PROGRAMS_URL);
+  }
+
+  private Response getUserSupervisedFacilities() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
+    given(programRepository.findOne(program2Id)).willReturn(program2);
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, supervisionRightId)
+        .queryParam(PROGRAM_ID_STRING, program2Id)
+        .pathParam("id", userId)
+        .when()
+        .get(SUPERVISED_FACILITIES_URL);
+  }
+
+  private Response getUserFulfillmentFacilities() {
+    given(userRepository.findOne(userId)).willReturn(user1);
+    given(rightRepository.findOne(fulfillmentRightId)).willReturn(fulfillmentRight);
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, fulfillmentRightId)
+        .pathParam("id", userId)
+        .when()
+        .get(FULFILLMENT_FACILITIES_URL);
   }
 
   private void saveAuthUser(User user) {

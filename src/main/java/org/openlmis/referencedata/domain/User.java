@@ -1,12 +1,10 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import org.openlmis.util.View;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.openlmis.util.View;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -23,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -79,6 +78,11 @@ public class User extends BaseEntity {
   @Setter
   private boolean loginRestricted;
 
+  @Column(columnDefinition = "boolean DEFAULT true")
+  @Getter
+  @Setter
+  private Boolean allowNotify;
+
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
@@ -97,6 +101,13 @@ public class User extends BaseEntity {
   @Getter
   private Set<Program> supervisedPrograms = new HashSet<>();
 
+  @PrePersist
+  private void prePersist() {
+    if (allowNotify == null ) {
+      setAllowNotify(Boolean.TRUE);
+    }
+  }
+
   private User(Importer importer) {
     id = importer.getId();
     username = importer.getUsername();
@@ -112,12 +123,13 @@ public class User extends BaseEntity {
     verified = importer.isVerified();
     active = importer.isActive();
     loginRestricted = importer.isLoginRestricted();
+    allowNotify = importer.getAllowNotify();
     extraData = importer.getExtraData();
   }
 
   User(UUID id, String username, String firstName, String lastName, String email, String timezone,
        Facility homeFacility, boolean active, boolean verified, boolean loginRestricted,
-       Map<String, String> extraData) {
+       Boolean allowNotify, Map<String, String> extraData) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
@@ -128,6 +140,7 @@ public class User extends BaseEntity {
     this.active = active;
     this.verified = verified;
     this.loginRestricted = loginRestricted;
+    this.allowNotify = allowNotify;
     this.extraData = extraData;
   }
 
@@ -246,6 +259,7 @@ public class User extends BaseEntity {
     exporter.setActive(active);
     exporter.setVerified(verified);
     exporter.setLoginRestricted(loginRestricted);
+    exporter.setAllowNotify(allowNotify);
     exporter.setExtraData(extraData);
     exporter.addRoleAssignments(roleAssignments);
   }
@@ -288,6 +302,8 @@ public class User extends BaseEntity {
 
     void setLoginRestricted(boolean loginRestricted);
 
+    void setAllowNotify(Boolean allowNotify);
+
     void addRoleAssignments(Set<RoleAssignment> roleAssignments);
 
     void setExtraData(Map<String, String> extraData);
@@ -313,6 +329,8 @@ public class User extends BaseEntity {
     boolean isActive();
 
     boolean isLoginRestricted();
+
+    Boolean getAllowNotify();
 
     Map<String, String> getExtraData();
   }

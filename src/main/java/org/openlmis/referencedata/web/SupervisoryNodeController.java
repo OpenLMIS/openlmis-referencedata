@@ -1,19 +1,35 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toSet;
+import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
+import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +42,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @Controller
 public class SupervisoryNodeController extends BaseController {
@@ -48,6 +59,15 @@ public class SupervisoryNodeController extends BaseController {
 
   @Autowired
   private ProgramRepository programRepository;
+  
+  @Autowired
+  private RightRepository rightRepository;
+  
+  @Autowired
+  private UserRepository userRepository;
+
+  @Autowired
+  private RightService rightService;
 
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
@@ -58,6 +78,8 @@ public class SupervisoryNodeController extends BaseController {
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.POST)
   public ResponseEntity<SupervisoryNodeDto> createSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
     LOGGER.debug("Creating new supervisoryNode");
     supervisoryNodeDto.setId(null);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
@@ -73,6 +95,8 @@ public class SupervisoryNodeController extends BaseController {
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.GET)
   public ResponseEntity<List<SupervisoryNodeDto>> getAllSupervisoryNodes() {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
     Iterable<SupervisoryNode> supervisoryNodes = supervisoryNodeRepository.findAll();
     List<SupervisoryNodeDto> supervisoryNodeDtos = new ArrayList<>();
 
@@ -92,6 +116,8 @@ public class SupervisoryNodeController extends BaseController {
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.GET)
   public ResponseEntity<SupervisoryNodeDto> getSupervisoryNode(
       @PathVariable("id") UUID supervisoryNodeId) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
@@ -111,6 +137,7 @@ public class SupervisoryNodeController extends BaseController {
   public ResponseEntity<SupervisoryNodeDto> updateSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto,
       @PathVariable("id") UUID supervisoryNodeId) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
     LOGGER.debug("Updating supervisoryNode with id: " + supervisoryNodeId);
 
     SupervisoryNode supervisoryNodeToUpdate =
@@ -135,6 +162,8 @@ public class SupervisoryNodeController extends BaseController {
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteSupervisoryNode(@PathVariable("id") UUID supervisoryNodeId) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
@@ -144,6 +173,41 @@ public class SupervisoryNodeController extends BaseController {
     }
   }
 
+  /**
+   * Find supervising users by right and program.
+   *
+   * @param rightId UUID of right that user has
+   * @param programId UUID of program
+   * @return Found users
+   */
+  @RequestMapping(value = "/supervisoryNodes/{id}/supervisingUsers", method = RequestMethod.GET)
+  public ResponseEntity<Set<UserDto>> findSupervisingUsers(
+      @PathVariable("id") UUID supervisoryNodeId,
+      @RequestParam("rightId") UUID rightId,
+      @RequestParam("programId") UUID programId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+    Right right = rightRepository.findOne(rightId);
+    Program program = programRepository.findOne(programId);
+
+    if (supervisoryNode == null) {
+      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    if (right == null) {
+      throw new ValidationMessageException(RightMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    if (program == null) {
+      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
+    }
+    
+    Set<User> supervisingUsers = userRepository.findSupervisingUsersBy(right, supervisoryNode,
+        program);
+
+    return ResponseEntity.ok(supervisingUsers.stream().map(this::exportToDto).collect(toSet()));
+  }
 
   /**
    * Searching for supervisoryNode with given parameters.
@@ -155,6 +219,7 @@ public class SupervisoryNodeController extends BaseController {
   @RequestMapping(value = "/supervisoryNodes/search", method = RequestMethod.GET)
   public ResponseEntity<List<SupervisoryNodeDto>> findByRequisitionGroupFacilityAndProgram(
       @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
     Facility facility = facilityRepository.findOne(facilityId);
     Program program = programRepository.findOne(programId);
@@ -189,5 +254,16 @@ public class SupervisoryNodeController extends BaseController {
     }
 
     return supervisoryNodeDto;
+  }
+
+  private UserDto exportToDto(User user) {
+    UserDto userDto = null;
+
+    if (user != null) {
+      userDto = new UserDto();
+      user.export(userDto);
+    }
+
+    return userDto;
   }
 }

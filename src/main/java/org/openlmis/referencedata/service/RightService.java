@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class RightService {
   
@@ -41,6 +43,19 @@ public class RightService {
    * @throws UnauthorizedException in case the client has got no right to access the resource
    */
   public void checkAdminRight(String rightName, boolean allowServiceTokens) {
+    checkAdminRight(rightName, allowServiceTokens, null);
+  }
+
+  /**
+   * Check the client has the admin right specified.
+   *
+   * @param rightName the name of the right to check
+   * @param allowServiceTokens whether to allow service-level tokens with root access
+   * @param expectedUserId id of the user that can bypass the right check
+   *                       e.g. to retrieve his own info
+   * @throws UnauthorizedException in case the client has got no right to access the resource
+   */
+  public void checkAdminRight(String rightName, boolean allowServiceTokens, UUID expectedUserId) {
     OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext()
         .getAuthentication();
 
@@ -54,12 +69,17 @@ public class RightService {
       String username = ((User) authentication.getPrincipal()).getUsername();
       User user = userRepository.findOneByUsername(username);
 
+      // bypass the right check if user id matches
+      if (null != expectedUserId && expectedUserId.equals(user.getId())) {
+        return;
+      }
+
       if (user.hasRight(
           new RightQuery(Right.newRight(rightName, RightType.GENERAL_ADMIN)))) {
         return;
       }
     }
-    
+
     // at this point, token is unauthorized
     throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
   }

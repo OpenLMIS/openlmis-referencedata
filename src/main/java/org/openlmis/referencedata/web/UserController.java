@@ -9,6 +9,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
@@ -131,6 +132,8 @@ public class UserController extends BaseController {
   public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto,
                                     BindingResult bindingResult,
                                     OAuth2Authentication auth) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+
     OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
     String token = details.getTokenValue();
 
@@ -181,6 +184,7 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users", method = RequestMethod.GET)
   public ResponseEntity<?> getAllUsers() {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     LOGGER.debug("Getting all users");
     Set<User> users = Sets.newHashSet(userRepository.findAll());
@@ -198,6 +202,7 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
   public ResponseEntity<?> getUser(@PathVariable("userId") UUID userId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     LOGGER.debug("Getting user");
     User user = userRepository.findOne(userId);
@@ -218,6 +223,7 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{userId}/roleAssignments", method = RequestMethod.GET)
   public ResponseEntity<?> getUserRightsAndRoles(@PathVariable("userId") UUID userId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = userRepository.findOne(userId);
     if (user == null) {
@@ -236,6 +242,8 @@ public class UserController extends BaseController {
    */
   @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+
     User user = userRepository.findOne(userId);
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
@@ -257,6 +265,8 @@ public class UserController extends BaseController {
   @RequestMapping(value = "/users/search", method = RequestMethod.POST)
   public ResponseEntity<?> searchUsers(
       @RequestBody Map<String, Object> queryMap) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+
     List<User> result = userService.searchUsers(queryMap);
 
     return ResponseEntity
@@ -283,6 +293,7 @@ public class UserController extends BaseController {
                                                    required = false) UUID facilityId,
                                                @RequestParam(value = "warehouseId",
                                                    required = false) UUID warehouseId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = validateUser(userId);
 
@@ -329,6 +340,8 @@ public class UserController extends BaseController {
                                                           required = false,
                                                           defaultValue = "true")
                                                             boolean forHomeFacility) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+
     User user = validateUser(userId);
     Set<Program> programs = forHomeFacility
         ? user.getHomeFacilityPrograms() : user.getSupervisedPrograms();
@@ -351,6 +364,7 @@ public class UserController extends BaseController {
       @PathVariable(USER_ID) UUID userId,
       @RequestParam(value = "rightId") UUID rightId,
       @RequestParam(value = "programId") UUID programId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = (User) validateId(userId, userRepository).orElseThrow( () ->
         new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId)));
@@ -379,6 +393,7 @@ public class UserController extends BaseController {
   public ResponseEntity<Set<FacilityDto>> getUserFulfillmentFacilities(
       @PathVariable(USER_ID) UUID userId,
       @RequestParam(value = "rightId") UUID rightId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = validateUser(userId);
     Right right = (Right) validateId(rightId, rightRepository).orElseThrow( () ->
@@ -399,6 +414,7 @@ public class UserController extends BaseController {
   public ResponseEntity<?> passwordReset(
       @RequestBody @Valid PasswordResetRequest passwordResetRequest,
       BindingResult bindingResult, OAuth2Authentication auth) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
     String token = details.getTokenValue();

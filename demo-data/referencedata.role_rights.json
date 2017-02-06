@@ -12,6 +12,10 @@
     "rightId": "c3eb5df0-c3ac-4e70-a978-02827462f60e"
   },
   {
+    "roleId": "185db8f7-ee35-44d0-8b40-6de12489ae77",
+    "rightId": "94ae9da9-3d66-465e-9b1f-572c705e5d7f"
+  },
+  {
     "roleId": "b6134c01-cb37-4303-85f0-8c8eab9d3cec",
     "rightId": "feb4c0b8-f6d2-4289-b29d-811c1d0b2863"
   },
@@ -20,6 +24,10 @@
     "rightId": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50"
   },
   {
+    "roleId": "b6134c01-cb37-4303-85f0-8c8eab9d3cec",
+    "rightId": "c3eb5df0-c3ac-4e70-a978-02827462f60e"
+  },
+  {
     "roleId": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d",
     "rightId": "bffa2de2-dc2a-47dd-b126-6501748ac3fc"
   },
@@ -36,16 +44,28 @@
     "rightId": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50"
   },
   {
+    "roleId": "d30a2fbb-51d9-49ad-90fe-fb405470a439",
+    "rightId": "feb4c0b8-f6d2-4289-b29d-811c1d0b2863"
+  },
+  {
+    "roleId": "d30a2fbb-51d9-49ad-90fe-fb405470a439",
+    "rightId": "9ade922b-3523-4582-bef4-a47701f7df14"
+  },
+  {
     "roleId": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
     "rightId": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50"
   },
   {
     "roleId": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
-    "rightId": "7958129d-c4c0-4294-a40c-c2b07cb8e515"
+    "rightId": "24df2715-850c-4336-b650-90eb78c544bf"
   },
   {
-    "roleId": "2a2eaeba-bb9a-11e6-a4a6-cec0c932ce01",
-    "rightId": "e101d2b8-6a0f-4af6-a5de-a9576b4ebc50"
+    "roleId": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
+    "rightId": "7b2da074-b754-4e49-bad3-2520651e5107"
+  },
+  {
+    "roleId": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
+    "rightId": "60580166-ab1c-464a-8401-08384efc57b7"
   },
   {
     "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
@@ -78,5 +98,21 @@
   {
     "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
     "rightId": "42791f7a-84a1-470b-bc3c-4160bc99f13c"
+  },
+  {
+    "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
+    "rightId": "3687ea98-8a1e-4347-984c-3fd97d072066"
+  },
+  {
+    "roleId": "a439c5de-b8aa-11e6-80f5-76304dec7eb7",
+    "rightId": "c996d0c6-4f7d-46b5-a376-6f93a3071cb0"
+  },
+  {
+    "roleId": "2fef03c4-8854-4dc8-b126-007f5e2afcc1",
+    "rightId": "35cf256f-1b28-41ad-84f5-99c158083dfc"
+  },
+  {
+    "roleId": "2fef03c4-8854-4dc8-b126-007f5e2afcc1",
+    "rightId": "60561639-4f94-4371-a5b5-ba95ecf7627f"
   }
 ]

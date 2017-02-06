@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * TradeItems represent branded/produced/physical products.  A TradeItem is used for Product's that
- * are made and then bought/sold/exchanged.  Unlike a {@link GlobalProduct} a TradeItem usually
+ * are made and then bought/sold/exchanged.  Unlike a {@link CommodityType} a TradeItem usually
  * has one and only one manufacturer and is shipped in exactly one primary package.
  *
  * <p>TradeItem's also may:
@@ -26,12 +26,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @DiscriminatorValue("TRADE_ITEM")
 @NoArgsConstructor
-public final class TradeItem extends OrderableProduct {
+public final class TradeItem extends Orderable {
   @JsonProperty
   private String manufacturer;
 
   @ManyToOne
-  private GlobalProduct globalProduct;
+  private CommodityType commodityType;
 
   private TradeItem(Code productCode, Dispensable dispensable, String name, long packSize,
                     long packRoundingThreshold, boolean roundToZero) {
@@ -45,13 +45,13 @@ public final class TradeItem extends OrderableProduct {
 
   /**
    * A TradeItem can fulfill for the given product if the product is this trade item or if this
-   * product's GlobalProduct is the given product.
+   * product's CommodityType is the given product.
    * @param product the product we'd like to fulfill for.
    * @return true if we can fulfill for the given product, false otherwise.
    */
   @Override
-  public boolean canFulfill(OrderableProduct product) {
-    return this.equals(product) || hasGlobalProduct(product);
+  public boolean canFulfill(Orderable product) {
+    return this.equals(product) || hasCommodityType(product);
   }
 
   /**
@@ -78,26 +78,26 @@ public final class TradeItem extends OrderableProduct {
   }
 
   /**
-   * Assign a global product.
-   * @param globalProduct the given global product, or null to un-assign.
+   * Assign a commodity type.
+   * @param commodityType the given commodity type, or null to un-assign.
    */
-  void assignGlobalProduct(GlobalProduct globalProduct) {
-    if (null == globalProduct || hasSameDispensingUnit(globalProduct)) {
-      this.globalProduct = globalProduct;
+  void assignCommodityType(CommodityType commodityType) {
+    if (null == commodityType || hasSameDispensingUnit(commodityType)) {
+      this.commodityType = commodityType;
     } else {
       throw new ValidationMessageException(ProductMessageKeys.ERROR_DISPENSING_UNITS_WRONG);
     }
   }
 
   /*
-  returns true if we have a global product and the one given has the same product code,
+  returns true if we have a commodity type and the one given has the same product code,
    false otherwise.
    */
-  private boolean hasGlobalProduct(OrderableProduct product) {
-    return null != globalProduct && globalProduct.equals(product);
+  private boolean hasCommodityType(Orderable product) {
+    return null != commodityType && commodityType.equals(product);
   }
 
-  private boolean hasSameDispensingUnit(OrderableProduct product) {
+  private boolean hasSameDispensingUnit(Orderable product) {
     return this.getDispensable().equals(product.getDispensable());
   }
 }

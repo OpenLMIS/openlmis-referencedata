@@ -11,8 +11,6 @@ import com.google.common.collect.Sets;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -34,13 +32,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -103,7 +101,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldPostPeriodWithoutGap() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriodDto dto = new ProcessingPeriodDto();
     firstPeriod.export(dto);
 
@@ -139,16 +137,13 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldReturnBadRequestIfThereAreValidationErrors() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
-    doAnswer(new Answer() {
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        Object[] args = invocation.getArguments();
-        Errors errors = (Errors) args[1];
-        errors.reject("testReject");
-        return null;
-      }
+    doAnswer(invocation -> {
+      Object[] args = invocation.getArguments();
+      Errors errors = (Errors) args[1];
+      errors.reject("testReject", "rejectMessage");
+      return null;
     }).when(validator).validate(anyObject(), any(Errors.class));
 
     restAssured.given()
@@ -165,7 +160,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldDisplayTotalDifference() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     ResultDto<Integer> response = new ResultDto<>();
@@ -183,7 +178,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldFindPeriodsByProgramAndFacility() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(programRepository.findOne(programId))
         .willReturn(requisitionGroupProgramSchedule.getProgram());
     given(facilityRepository.findOne(facilityId))
@@ -209,7 +204,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldFindPeriodsByScheduleAndDate() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(scheduleRepository.findOne(scheduleId)).willReturn(schedule);
     given(periodService.searchPeriods(schedule, secondPeriod.getStartDate()))
         .willReturn(Arrays.asList(secondPeriod, firstPeriod));
@@ -235,7 +230,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldDeletePeriod() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     restAssured.given()
@@ -252,7 +247,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldPutPeriod() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     firstPeriod.setDescription("OpenLMIS");
     ProcessingPeriodDto dto = new ProcessingPeriodDto();
     firstPeriod.export(dto);
@@ -276,7 +271,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetAllPeriods() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod);
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
@@ -296,7 +291,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetChosenPeriod() {
-    mockEnableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriodDto dto = new ProcessingPeriodDto();
     firstPeriod.export(dto);
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
@@ -317,7 +312,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldReturnUnauthorizedOnDisplayTotalDurationIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
         .pathParam("id", firstPeriodId)
@@ -332,7 +327,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldReturnUnauthorizedOnDeletePeriodIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -348,7 +343,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldReturnUnauthorizedOnPutPeriodIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -365,7 +360,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldReturnUnauthorizedOnGetAllPeriodsIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -380,7 +375,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldReturnUnauthorizedOnGetChosenPeriodIfUserHasNoRight() {
-    mockDisableRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())

@@ -40,13 +40,15 @@ public abstract class MessageKeys {
   protected static final String PROGRAM = "program";
   protected static final String PRODUCT = "product";
   protected static final String FACILITY = "facility";
+  protected static final String TRADE_ITEM = "tradeItem";
   protected static final String SUPPLY_LINE = "supplyLine";
   protected static final String FACILITY_TYPE = "facilityType";
+  protected static final String COMMODITY_TYPE = "commodityType";
   protected static final String GEOGRAPHIC_ZONE = "geographicZone";
   protected static final String GEOGRAPHIC_LEVEL = "geographicLevel";
   protected static final String SUPERVISORY_NODE = "supervisoryNode";
-  protected static final String PRODUCT_CATEGORY = "productCategory";
-  protected static final String ORDERABLE_PRODUCT = "orderableProduct";
+  protected static final String ORDERABLE_DISPLAY_CATEGORY = "orderableDisplayCategory";
+  protected static final String ORDERABLE = "orderable";
   protected static final String FACILITY_OPERATOR = "facilityOperator";
   protected static final String PROCESSING_PERIOD = "processingPeriod";
   protected static final String PROCESSING_SCHEDULE = "processingSchedule";
@@ -61,7 +63,8 @@ public abstract class MessageKeys {
   protected static final String SUBJECT = "subject";
   protected static final String PASSWORD = "password";
   protected static final String PROGRAM_REPOSITORY = "programRepository";
-  protected static final String PRODUCT_CATEGORY_REPOSITORY = "productCategoryRepository";
+  protected static final String ORDERABLE_DISPLAY_CATEGORY_REPOSITORY =
+      "orderableDisplayCategoryRepository";
 
   protected static String join(String... params) {
     return String.join(DELIMITER, Arrays.asList(params));

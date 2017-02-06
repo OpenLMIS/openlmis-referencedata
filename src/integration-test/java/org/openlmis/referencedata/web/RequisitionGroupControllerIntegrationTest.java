@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
@@ -30,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings({"PMD.UnusedPrivateField"})
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/requisitionGroups";
@@ -94,6 +96,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldDeleteRequisitionGroup() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
 
@@ -111,7 +114,30 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void shouldRejectDeleteRequisitionGroupIfUserHasNoRight() {
+    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
+
+    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(Matchers.equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldNotDeleteNonexistentRequisitionGroup() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);
 
@@ -130,6 +156,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldPostRequisitionGroup() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     RequisitionGroupDto response = restAssured
         .given()
@@ -147,7 +174,28 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void shouldRejectPostRequisitionGroupIfUserHasNoRight() {
+    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(requisitionGroupDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(Matchers.equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetAllRequisitionGroups() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     List<RequisitionGroup> storedRequisitionGroups = Arrays.asList(requisitionGroup,
         new RequisitionGroup("RG2", "Requisition Group 2", supervisoryNode));
@@ -168,7 +216,27 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void shouldRejectGetAllRequisitionGroupsIfUserHasNoRight() {
+    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(Matchers.equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetRequisitionGroup() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
 
@@ -188,7 +256,30 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void shouldRejectGetRequisitionGroupIfUserHasNoRight() {
+    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
+
+    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(Matchers.equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldNotGetNonexistentRequisitionGroup() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);
 
@@ -207,6 +298,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldPutRequisitionGroup() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     requisitionGroup.setDescription(DESCRIPTION);
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
@@ -234,7 +326,37 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void shouldRejectPutRequisitionGroupIfUserHasNoRight() {
+    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
+
+    requisitionGroup.setDescription(DESCRIPTION);
+    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+    given(requisitionGroupRepository.save(any(RequisitionGroup.class)))
+        .willReturn(requisitionGroup);
+
+    RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
+    requisitionGroup.export(requisitionGroupDto);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupId)
+        .body(requisitionGroupDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(Matchers.equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldCreateNewRequisitionGroupIfDoesNotExist() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     requisitionGroup.setDescription(DESCRIPTION);
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);

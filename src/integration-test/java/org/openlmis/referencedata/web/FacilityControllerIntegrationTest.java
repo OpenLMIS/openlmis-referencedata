@@ -19,17 +19,18 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.GlobalProduct;
-import org.openlmis.referencedata.domain.OrderableProduct;
-import org.openlmis.referencedata.domain.ProductCategory;
+import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
@@ -42,7 +43,6 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -84,9 +84,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @MockBean
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
-  @Value("${currencyCode}")
-  private String currencyCode;
-
   private Integer currentInstanceNumber;
   private UUID programId;
   private UUID supervisoryNodeId;
@@ -103,7 +100,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnSupplyingDepots() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     int searchedFacilitiesAmt = 3;
 
@@ -148,7 +145,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetSupplingRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     int searchedFacilitiesAmt = 3;
 
@@ -185,7 +182,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingSupervisorNode() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     supervisoryNodeId = UUID.randomUUID();
 
@@ -207,7 +204,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingProgram() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
 
@@ -228,7 +225,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String similarCode = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
@@ -252,7 +249,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectSearchRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured.given()
         .queryParam("code", "Facility")
@@ -270,7 +267,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindFacilitiesWithSimilarName() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String similarName = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
@@ -294,7 +291,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldNotFindFacilitiesWithIncorrectCodeAndName() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Facility[] response = restAssured.given()
         .queryParam("code", "IncorrectCode")
@@ -312,7 +309,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindApprovedProductsForFacility() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
     when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
@@ -334,7 +331,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetApprovedProductsRequestIfUserHasNoRight() {
-    mockDisableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
@@ -353,7 +350,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
-    mockEnableRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(null);
 
@@ -766,17 +763,18 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private List<FacilityTypeApprovedProduct> generateFacilityTypeApprovedProducts() {
-    ProductCategory category = ProductCategory.createNew(Code.code("gloves"));
+    OrderableDisplayCategory category = OrderableDisplayCategory.createNew(Code.code("gloves"));
     category.setId(UUID.randomUUID());
-    OrderableProduct orderableProduct = GlobalProduct.newGlobalProduct(
+    Orderable orderable = CommodityType.newCommodityType(
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
-    orderableProduct.setId(UUID.randomUUID());
-    ProgramProduct programProduct = ProgramProduct.createNew(program, category,
-        orderableProduct, 0, true, false, 0, 0, Money.of(CurrencyUnit.of(currencyCode), 0),
-        CurrencyUnit.of(currencyCode));
-    programProduct.setId(UUID.randomUUID());
+    orderable.setId(UUID.randomUUID());
+    CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
+    ProgramOrderable programOrderable = ProgramOrderable.createNew(program, category,
+        orderable, 0, true, false, 0, 0, Money.of(currencyUnit, 0),
+        currencyUnit);
+    programOrderable.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
-    ftap.setProgramProduct(programProduct);
+    ftap.setProgramOrderable(programOrderable);
     ftap.setId(UUID.randomUUID());
     ftap.setMinMonthsOfStock(1d);
     ftap.setMaxMonthsOfStock(3d);

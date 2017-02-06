@@ -5,10 +5,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.OrderableProduct;
-import org.openlmis.referencedata.domain.ProductCategory;
+import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramProduct;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 
 import java.util.Collection;
@@ -45,9 +45,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
     Join<Facility, FacilityType> fft = facility.join("type");
 
     Join<FacilityTypeApprovedProduct, FacilityType> ft = ftap.join("facilityType");
-    Join<FacilityTypeApprovedProduct, ProgramProduct> pp = ftap.join("programProduct");
+    Join<FacilityTypeApprovedProduct, ProgramOrderable> pp = ftap.join("programOrderable");
 
-    Join<ProgramProduct, Program> program = pp.join("program");
+    Join<ProgramOrderable, Program> program = pp.join("program");
 
     Predicate conjunction = builder.conjunction();
     if (programId != null) {
@@ -61,13 +61,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
     query.select(ftap);
     query.where(conjunction);
 
-    Join<ProgramProduct, ProductCategory> category = pp.join("productCategory");
-    Join<ProgramProduct, OrderableProduct> product = pp.join("product");
+    Join<ProgramOrderable, OrderableDisplayCategory> category = pp.join("orderableDisplayCategory");
+    Join<ProgramOrderable, Orderable> orderable = pp.join("product");
 
     query.orderBy(
         builder.asc(category.get("orderedDisplayValue").get("displayOrder")),
         builder.asc(category.get("orderedDisplayValue").get("displayName")),
-        builder.asc(product.get("productCode"))
+        builder.asc(orderable.get("productCode"))
     );
 
     return entityManager.createQuery(query).getResultList();

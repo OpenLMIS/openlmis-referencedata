@@ -17,7 +17,6 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -345,6 +344,7 @@ public class UserServiceTest {
         .setVerified(false)
         .setActive(true)
         .setLoginRestricted(true)
+        .setAllowNotify(true)
         .setExtraData(Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE))
         .createUser();
   }

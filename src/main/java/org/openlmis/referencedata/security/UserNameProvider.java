@@ -5,6 +5,10 @@ import org.openlmis.referencedata.domain.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * This class is used by JaVers to retrieve the name of the user currently logged in.
+ * JaVers then associates audited changes being made with this particular user.
+ */
 public class UserNameProvider implements AuthorProvider {
 
   @Override

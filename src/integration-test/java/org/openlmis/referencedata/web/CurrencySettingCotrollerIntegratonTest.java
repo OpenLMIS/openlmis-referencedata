@@ -2,22 +2,20 @@ package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.openlmis.referencedata.CurrencyConfig.CURRENCY_CODE;
 
+import org.joda.money.CurrencyUnit;
 import org.junit.Test;
-import org.openlmis.referencedata.dto.CurrencySettingDto;
-import org.springframework.beans.factory.annotation.Value;
+import org.openlmis.referencedata.dto.CurrencySettingsDto;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 public class CurrencySettingCotrollerIntegratonTest extends BaseWebIntegrationTest {
 
-  @Value("${currencyCode}")
-  private String currencyCode;
-
   @Test
   public void shouldReturnCurrencySetting() {
 
-    CurrencySettingDto response = new CurrencySettingDto();
+    CurrencySettingsDto response = new CurrencySettingsDto();
     response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
@@ -26,9 +24,11 @@ public class CurrencySettingCotrollerIntegratonTest extends BaseWebIntegrationTe
         .statusCode(200)
         .extract().as(response.getClass());
 
-    assertEquals(currencyCode, response.getCurrencyCode());
+    assertEquals(CURRENCY_CODE, response.getCurrencyCode());
     assertEquals("$", response.getCurrencySymbol());
     assertEquals("left", response.getCurrencySymbolSide());
+    assertEquals(CurrencyUnit.of(CURRENCY_CODE).getDecimalPlaces(),
+        response.getCurrencyDecimalPlaces());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

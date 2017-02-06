@@ -90,11 +90,11 @@ schemas:
 
   - geographicZonePage: !include schemas/geographicZonePage.json
 
-  - globalProduct: |
+  - commodityType: |
         {   "type": "object",
             "$schema": "http://json-schema.org/draft-03/schema",
-            "title": "Global Product",
-            "description": "A single globalProduct",
+            "title": "Commodity Type",
+            "description": "A single commodityType",
             "properties": {
                 "id": { "type": "string", "required": false, "title": "id" },
                 "productCode": { "type": "string", "required": true, "title": "productCode" },
@@ -106,12 +106,12 @@ schemas:
             }
         }
 
-  - orderableProduct: !include schemas/orderableProduct.json
+  - orderable: !include schemas/orderable.json
 
-  - orderableProductArray: |
+  - orderableArray: |
       {
           "type": "array",
-          "items": { "type": "object", "$ref": "schemas/orderableProduct.json" }
+          "items": { "type": "object", "$ref": "schemas/orderable.json" }
 
       }
 
@@ -131,12 +131,12 @@ schemas:
           }
       }
 
-  - productCategory: !include schemas/productCategory.json
+  - orderableDisplayCategory: !include schemas/orderableDisplayCategory.json
 
-  - productCategoryArray: |
+  - orderableDisplayCategoryArray: |
       {
           "type": "array",
-          "items": { "type": "object", "$ref": "schemas/productCategory.json" }
+          "items": { "type": "object", "$ref": "schemas/orderableDisplayCategory.json" }
       }
 
   - program: !include schemas/program.json
@@ -147,7 +147,7 @@ schemas:
           "items": { "type": "object", "$ref":"schemas/program.json" }
       }
 
-  - programProduct: !include schemas/programProduct.json
+  - programOrderable: !include schemas/programOrderable.json
 
   - right: !include schemas/right.json
 
@@ -293,7 +293,7 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/auditLogEntry.json" }
       }
 
-  - currencySettingDto: !include schemas/currencySettingDto.json
+  - currencySettingsDto: !include schemas/currencySettingsDto.json
 
 traits:
     - secured:
@@ -370,6 +370,9 @@ resourceTypes:
                     schema: localizedErrorResponse
               404:
                 description: The specified <<resourcePathName|!singularize>> does not exist.
+                body:
+                  application/json:
+                    schema: localizedErrorResponse
 
     - instanceAuditLog:
         description: This represents the audit log for a specified instance of the <<resourcePathName|!singularize>> resource.
@@ -465,7 +468,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen processingPeriod.
+              description: "[AVOID USING] Completely removes processing period. This action is not recoverable."
               responses:
                   "204":
                   "403":
@@ -473,6 +476,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -486,6 +492,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing processingPeriod.
@@ -578,30 +587,30 @@ resourceTypes:
                       body:
                         application/json:
 
-  /productCategories:
+  /orderableDisplayCategories:
       displayName: Product Categories
       post:
             is: [ secured ]
-            description: Create new productCategory.
+            description: Create new orderableDisplayCategory.
             body:
                 application/json:
-                    schema: productCategory
+                    schema: orderableDisplayCategory
             responses:
                 "201":
                     body:
                         application/json:
-                            schema: productCategory
+                            schema: orderableDisplayCategory
                 "400":
                     body:
                         application/json:
       get:
             is: [ secured ]
-            description: Get all productCategories.
+            description: Get all orderableDisplayCategories.
             responses:
                 "200":
                     body:
                         application/json:
-                            schema: productCategoryArray
+                            schema: orderableDisplayCategoryArray
                 "404":
                     body:
                        application/json:
@@ -614,47 +623,49 @@ resourceTypes:
                   repeat: false
             put:
                 is: [ secured ]
-                description: Update existing productCategory.
+                description: Update existing orderableDisplayCategory.
                 body:
                     application/json:
                 responses:
                     "200":
                         body:
                             application/json:
-                                schema: productCategory
+                                schema: orderableDisplayCategory
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
-                description: Get chosen productCategory.
+                description: Get chosen orderableDisplayCategory.
                 responses:
                     "200":
                         body:
                             application/json:
-                                schema: productCategory
+                                schema: orderableDisplayCategory
                     "404":
                         body:
                             application/json:
             delete:
                 is: [ secured ]
-                description: Delete chosen productCategory.
+                description: "[AVOID USING] Completely removes display category. This action is not recoverable."
                 responses:
                     "204":
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
                         body:
                             application/json:
       /search:
           get:
               is: [ secured ]
-              description: Find product categories with matched code.
+              description: Find orderable categories with matched code.
               queryParameters:
                   code:
                       displayName: code
-                      description: productCategory code.
+                      description: orderableDisplayCategory code.
                       type: string
                       required: false
                       repeat: false
@@ -662,10 +673,10 @@ resourceTypes:
                  "200":
                      body:
                        application/json:
-                          schema: productCategoryArray
+                          schema: orderableDisplayCategoryArray
                  "404":
 
-  /orderableProducts:
+  /orderables:
       displayName: Orderable Product
       get:
           is: [ secured ]
@@ -674,7 +685,7 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-                        schema: orderableProductArray
+                        schema: orderableArray
       /{id}:
           uriParameters:
               id:
@@ -684,13 +695,16 @@ resourceTypes:
                   repeat: false
           get:
               is: [ secured ]
-              description: Get chosen orderable product.
+              description: Get chosen orderable orderable.
               responses:
                   "200":
                       body:
                         application/json:
-                            schema: orderableProduct
+                            schema: orderable
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /tradeItems:
       displayName: Trade Item
@@ -703,16 +717,16 @@ resourceTypes:
                     application/json:
                         schema: tradeItem
 
-  /globalProducts:
-      displayName: Global Product
+  /CommodityTypes:
+      displayName: Commodity Type
       put:
           is: [ secured ]
-          description: Create or update a Global Product.
+          description: Create or update a Commodity Type.
           responses:
               "200":
                   body:
                     application/json:
-                        schema: globalProduct
+                        schema: commodityType
       /{id}/tradeItems:
           uriParameters:
               id:
@@ -722,7 +736,7 @@ resourceTypes:
                   repeat: false
           get:
               is: [ secured ]
-              description: Get a list of Trade Item UUIDs that may fulfill for the given Global Product.
+              description: Get a list of Trade Item UUIDs that may fulfill for the given Commodity Type.
               responses:
                   "200":
                       body:
@@ -731,7 +745,7 @@ resourceTypes:
                   "404":
           put:
               is: [ secured ]
-              description: Update the list of Trade Item UUIDs that may fulfill for the given Global Product.
+              description: Update the list of Trade Item UUIDs that may fulfill for the given Commodity Type.
               body:
                   application/json:
                       schema: uuidArray
@@ -809,7 +823,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen processingSchedule.
+              description: "[AVOID USING] Completely removes processing schedule. This action is not recoverable."
               responses:
                   "204":
                   "403":
@@ -817,6 +831,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -830,6 +847,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing processingSchedule.
@@ -876,10 +896,13 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen supplyLine.
+              description: "[AVOID USING] Completely removes supply line. This action is not recoverable."
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -889,6 +912,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing supplyLine.
@@ -899,6 +925,10 @@ resourceTypes:
                       body:
                         application/json:
                   "400":
+                  "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
       /search:
           get:
               is: [ secured ]
@@ -962,6 +992,10 @@ resourceTypes:
               "200":
                   body:
                     application/json:
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       put:
           is: [ secured ]
           description: Create or update user.
@@ -977,6 +1011,10 @@ resourceTypes:
               "500":
                   body:
                     application/json:
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{userId}:
           uriParameters:
               userId:
@@ -986,13 +1024,20 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen user.
+              description: "[AVOID USING] Completely removes user. This action is not recoverable."
               responses:
                   "204":
                   "400":
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen user.
@@ -1001,6 +1046,13 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           /roleAssignments:
               get:
                   is: [ secured ]
@@ -1011,6 +1063,13 @@ resourceTypes:
                             application/json:
                               schema: detailedRoleAssignmentDtoArray
                       "404":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /hasRight:
               get:
                   is: [ secured ]
@@ -1050,6 +1109,10 @@ resourceTypes:
                             application/json:
                               schema: errorResponse
                       "404":
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /programs:
               is: [ secured ]
               displayName: User supervised programs
@@ -1069,6 +1132,10 @@ resourceTypes:
                           body:
                             application/json:
                       "404":
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /supervisedFacilities:
               is: [ secured ]
               displayName: User supervised facilities
@@ -1097,6 +1164,13 @@ resourceTypes:
                             application/json:
                               schema: errorResponse
                       "404":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /fulfillmentFacilities:
               is: [ secured ]
               displayName: User fulfilled facilities
@@ -1120,6 +1194,10 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
                       "404":
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
       /search:
               post:
                   is: [ secured ]
@@ -1128,10 +1206,14 @@ resourceTypes:
                       application/json:
                         schema: userQueryDto
                   responses:
-                      200:
+                      "200":
                           body:
                             application/json:
                                 schema: userArray
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
 
   /facilities:
       displayName: Facility
@@ -1175,7 +1257,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen facility.
+              description: "[AVOID USING] Completely removes facility. This action is not recoverable."
               responses:
                   "204":
                   "403":
@@ -1183,6 +1265,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen facility.
@@ -1196,6 +1281,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing facility.
@@ -1235,7 +1323,7 @@ resourceTypes:
                       required: false
                       repeat: false
                   fullSupply:
-                      displayName: Full-supply product
+                      displayName: Full-supply orderable
                       type: boolean
                       required: true
                       repeat: false
@@ -1347,10 +1435,13 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen facilityType.
+              description: "[AVOID USING] Completely removes facility type. This action is not recoverable."
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
                   403:
                       body:
@@ -1364,6 +1455,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   403:
                       body:
                         application/json:
@@ -1414,10 +1508,13 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen program.
+              description: "[AVOID USING] Completely removes program. This action is not recoverable."
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -1427,6 +1524,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing program.
@@ -1487,10 +1587,13 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen Stock Adjustment Reason.
+              description: "[AVOID USING] Completely removes stock adjustment reason. This action is not recoverable."
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -1501,6 +1604,9 @@ resourceTypes:
                         application/json:
                           schema: stockAdjustmentReason
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing Stock Adjustment Reason.
@@ -1561,7 +1667,8 @@ resourceTypes:
                         schema: localizedErrorResponse
                 "404":
                     body:
-                       application/json:
+                      application/json:
+                        schema: localizedErrorResponse
       /{id}:
             uriParameters:
               id:
@@ -1580,7 +1687,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     403:
                         body:
                           application/json:
@@ -1594,19 +1702,21 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     403:
                         body:
                           application/json:
                             schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Updates Facility Operators with given id from database.
+                description: "[AVOID USING] Completely removes facility operator. This action is  not recoverable."
                 responses:
                     "204":
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
                         body:
                             application/json:
@@ -1653,7 +1763,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen geographicZone.
+              description: "[AVOID USING] Completely removes geographic zone. This action is not recoverable."
               responses:
                   "204":
                   "403":
@@ -1661,6 +1771,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen geographicZone.
@@ -1674,6 +1787,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing geographicZone.
@@ -1721,10 +1837,13 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: Delete chosen geographicLevel.
+              description: "[AVOID USING] Completely removes geographic level. This action is not recoverable."
               responses:
                   "204":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "409":
           get:
               is: [ secured ]
@@ -1734,6 +1853,9 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing geographicLevel.
@@ -1777,7 +1899,8 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen facilityTypeApprovedProduct.
@@ -1787,15 +1910,17 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen facilityTypeApprovedProduct.
+                description: "[AVOID USING] Completely removes facility type approved product. This action is not recoverable."
                 responses:
                     "204":
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
                         body:
                             application/json:
@@ -1814,6 +1939,10 @@ resourceTypes:
                 "500":
                     body:
                         application/json:
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       get:
             is: [ secured ]
             description: Get all supervisoryNodes.
@@ -1823,7 +1952,13 @@ resourceTypes:
                         application/json:
                 "404":
                     body:
-                       application/json:
+                      application/json:
+                        schema: localizedErrorResponse
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
+
       /{id}:
             uriParameters:
               id:
@@ -1842,7 +1977,12 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen supervisoryNode.
@@ -1852,18 +1992,60 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen supervisoryNode.
+                description: "[AVOID USING] Completely removes supervisory node. This action is not recoverable."
                 responses:
                     "204":
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
                         body:
                             application/json:
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
+            /supervisingUsers:
+                  get:
+                      is: [ secured ]
+                      description: Get supervising users based on the provided parameters.
+                      queryParameters:
+                          rightId:
+                                  displayName: Right ID
+                                  type: string
+                                  required: true
+                                  repeat: false
+                          programId:
+                                  displayName: Program ID
+                                  type: string
+                                  required: true
+                                  repeat: false
+                      responses:
+                          "200":
+                              body:
+                                application/json:
+                                    schema: userArray
+                          "400":
+                              body:
+                                application/json:
+                                  schema: localizedErrorResponse
+                          "403":
+                              body:
+                                application/json:
+                                  schema: localizedErrorResponse
+                          "404":
+                              body:
+                                application/json:
+                                  schema: localizedErrorResponse
       /search:
             get:
                 is: [ secured ]
@@ -1889,6 +2071,13 @@ resourceTypes:
                           application/json:
                             schema: errorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
   /roles:
       displayName: Role
       post:
@@ -1963,9 +2152,12 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen role.
+                description: "[AVOID USING] Completely removes role. This action is not recoverable."
                 responses:
                     "204":
                     "400":
@@ -1976,6 +2168,9 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
 
   /rights:
       displayName: Right
@@ -2029,9 +2224,12 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen right.
+                description: "[AVOID USING] Completely removes right. This action is not recoverable."
                 responses:
                     "204":
                     "403":
@@ -2039,6 +2237,9 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
       /search:
           get:
               is: [ secured ]
@@ -2059,6 +2260,9 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /requisitionGroups:
       displayName: Requisition Group
@@ -2074,6 +2278,10 @@ resourceTypes:
                 "500":
                     body:
                         application/json:
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       get:
             is: [ secured ]
             description: Get all requisitionGroups.
@@ -2082,6 +2290,10 @@ resourceTypes:
                     body:
                         application/json:
                 "404":
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       /{id}:
             uriParameters:
               id:
@@ -2100,7 +2312,12 @@ resourceTypes:
                             application/json:
                     "404":
                         body:
-                            application/json:
+                          application/json:
+                            schema: localizedErrorResponse
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen requisitionGroup.
@@ -2109,13 +2326,27 @@ resourceTypes:
                         body:
                             application/json:
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: Delete chosen requisitionGroup.
+                description: "[AVOID USING] Completely removes requisition group. This action is not recoverable."
                 responses:
                     "204":
                     "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
                     "409":
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
 
   /currencySettings:
       displayName: Currency settings
@@ -2126,4 +2357,4 @@ resourceTypes:
                 "200":
                     body:
                         application/json:
-                          schema: currencySettingDto
+                          schema: currencySettingsDto

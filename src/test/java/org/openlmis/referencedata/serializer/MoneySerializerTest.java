@@ -30,7 +30,5 @@ public class MoneySerializerTest {
     jsonGenerator.flush();
 
     assertEquals("10.00", jsonWriter.toString());
-
   }
-
 }

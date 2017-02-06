@@ -9,6 +9,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
@@ -24,10 +25,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import lombok.NoArgsConstructor;
-
 import java.util.Set;
 import java.util.UUID;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Controller
@@ -72,10 +73,7 @@ public class RoleController extends BaseController {
     LOGGER.debug("Getting role");
     Role role = roleRepository.findOne(roleId);
     if (role == null) {
-      LOGGER.error("Role to get does not exist");
-      return ResponseEntity
-          .notFound()
-          .build();
+      throw new NotFoundException(RoleMessageKeys.ERROR_NOT_FOUND);
     }
 
     return ResponseEntity
@@ -152,16 +150,11 @@ public class RoleController extends BaseController {
 
     Role storedRole = roleRepository.findOne(roleId);
     if (storedRole == null) {
-      LOGGER.error("Role to delete does not exist");
-      return ResponseEntity
-          .notFound()
-          .build();
+      throw new NotFoundException(RoleMessageKeys.ERROR_NOT_FOUND);
     }
-
 
     LOGGER.debug("Deleting role");
     roleRepository.delete(roleId);
-
 
     return ResponseEntity
         .noContent()
