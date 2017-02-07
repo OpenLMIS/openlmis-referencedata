@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script populates the database with demo data for presentational and testing purposes.
 # It searches for json files in given directory and inserts the contained records into the database.
@@ -6,7 +6,7 @@
 
 DIRECTORY=${1}
 GENERATOR=${2}
-OUTPUT_DIR=${DIRECTORY}/../build/demo-data
+OUTPUT_DIR=${DIRECTORY}/../build/resources/main/db/starter
 
 # Get list of JSON files in current directory
 FILES=`find ${DIRECTORY} -name "*.json"`
@@ -16,9 +16,23 @@ ${GENERATOR} ${FILES}
 
 # Prepend and append conditional return so SQL file only runs once
 # Also prepend starter SQL file because Flyway only likes one afterMigrate.sql file
-cat ${DIRECTORY}/demo_sql_header.txt ${DIRECTORY}/../src/main/resources/db/starter/afterMigrate.sql input.sql ${DIRECTORY}/demo_sql_footer.txt > result.sql
+CAT_ARGS=()
 
-mkdir ${OUTPUT_DIR}
+# this small function add path to the given file ($1) only if the file exist.
+function addCatArg {
+  if [ -f $1 ]; then
+    CAT_ARGS+=($1)
+  fi
+}
+
+addCatArg ${DIRECTORY}/demo_sql_header.txt
+addCatArg ${DIRECTORY}/../src/main/resources/db/starter/afterMigrate.sql
+addCatArg input.sql
+addCatArg ${DIRECTORY}/demo_sql_footer.txt
+
+cat ${CAT_ARGS[@]} > result.sql
+
+mkdir -p ${OUTPUT_DIR}
 mv result.sql ${OUTPUT_DIR}/afterMigrate.sql
 rm input.sql
 

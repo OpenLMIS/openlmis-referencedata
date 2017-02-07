@@ -44,7 +44,7 @@ public class TradeItemRepositoryIntegrationTest extends
     repository.save(forFulfillment);
     TradeItem tradeItemOther = generateInstance();
     repository.save(tradeItemOther);
-    assertEquals(3, repository.count());
+    assertEquals(6, repository.count());
 
     // save the commodity type with the trade items
     CommodityType ibuprofen = CommodityType.newCommodityType(

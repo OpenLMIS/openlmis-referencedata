@@ -8,8 +8,6 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.ZonedDateTime;
-
 public class ProcessingScheduleRepositoryIntegrationTest
       extends BaseCrudRepositoryIntegrationTest<ProcessingSchedule> {
 
@@ -36,7 +34,7 @@ public class ProcessingScheduleRepositoryIntegrationTest
     repository.save(getExampleSchedule());
     Iterable<ProcessingSchedule> result = repository.findAll();
     int size = Lists.newArrayList(result).size();
-    Assert.assertEquals(2, size);
+    Assert.assertEquals(7, size);
   }
 
   @Test
@@ -48,10 +46,6 @@ public class ProcessingScheduleRepositoryIntegrationTest
 
     scheduleFromRepo.setDescription(newDescription);
     repository.save(scheduleFromRepo);
-    ZonedDateTime savingDateTime = scheduleFromRepo.getModifiedDate();
-    iterable = repository.findAll();
-    scheduleFromRepo = iterable.iterator().next();
-    Assert.assertTrue(savingDateTime.isBefore(scheduleFromRepo.getModifiedDate()));
     Assert.assertEquals(newDescription, scheduleFromRepo.getDescription());
   }
 

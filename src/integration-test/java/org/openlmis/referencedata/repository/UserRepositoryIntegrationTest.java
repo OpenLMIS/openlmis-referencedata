@@ -211,8 +211,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Program program = new Program("P1");
     programRepository.save(program);
 
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", generateFacility());
-    supervisoryNodeRepository.save(supervisoryNode);
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode("SN1");
 
     User supervisingUser = repository.findOneByUsername("user1");
     supervisingUser.assignRoles(new SupervisionRoleAssignment(role, supervisingUser, program,

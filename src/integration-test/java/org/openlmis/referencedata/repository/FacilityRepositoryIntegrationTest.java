@@ -1,6 +1,10 @@
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -81,8 +85,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     List<Facility> foundFacilties = repository.findFacilitiesByCodeOrName(null, "Facil");
 
-    assertEquals(1, foundFacilties.size());
-    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+    assertEquals(2, foundFacilties.size());
+    assertThat(foundFacilties, hasItem(hasProperty("name", equalTo(facility.getName()))));
   }
 
   @Test
@@ -95,8 +99,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     List<Facility> foundFacilties =
         repository.findFacilitiesByCodeOrName(facility.getCode(), "Facil");
 
-    assertEquals(2, foundFacilties.size());
-    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+    assertEquals(3, foundFacilties.size());
+    assertThat(foundFacilties, hasItem(hasProperty("name", equalTo(facility.getName()))));
   }
 
   @Test

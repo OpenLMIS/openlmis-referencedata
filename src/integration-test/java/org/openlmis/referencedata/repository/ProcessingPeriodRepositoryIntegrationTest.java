@@ -1,5 +1,8 @@
 package org.openlmis.referencedata.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,9 +14,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ProcessingPeriodRepositoryIntegrationTest
       extends BaseCrudRepositoryIntegrationTest<ProcessingPeriod> {
@@ -136,7 +136,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
     List<ProcessingPeriod> receivedPeriods =
             periodRepository.searchPeriods(null, periods.get(1).getStartDate());
 
-    assertEquals(4, receivedPeriods.size());
+    assertEquals(7, receivedPeriods.size());
     for (ProcessingPeriod period : receivedPeriods) {
       assertTrue(
               period.getStartDate().isBefore(periods.get(0).getStartDate()));
@@ -158,6 +158,6 @@ public class ProcessingPeriodRepositoryIntegrationTest
     List<ProcessingPeriod> receivedPeriods =
             periodRepository.searchPeriods(null, null);
 
-    assertEquals(periods.size(), receivedPeriods.size());
+    assertEquals(24, receivedPeriods.size());
   }
 }
