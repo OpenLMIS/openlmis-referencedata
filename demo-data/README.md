@@ -190,6 +190,15 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
   * users:
     * administrator
 
+Other users with no roles:
+  * admin (this admin account is built into the bootstrap data)
+
+Passwords for these user accounts come from the
+[Authentication Service's demo data](https://github.com/OpenLMIS/openlmis-auth/tree/master/demo-data).
+
+Rights themselves come from the bootstrap data,
+[bootstrap.sql](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/bootstrap.sql).
+
 ## Supervisory Nodes and Supply Lines
 
 Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json, referencedata.requisition_groups.json
@@ -212,12 +221,3 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
   * supply lines:
       * WH02/South Warehouse
   * facility: DH01/Balaka District Hospital
-
-Other users with no roles:
-  * admin (this admin account is built into the bootstrap data)
-
-Passwords for these user accounts come from the
-[Authentication Service's demo data](https://github.com/OpenLMIS/openlmis-auth/tree/master/demo-data).
-
-Rights themselves come from the bootstrap data,
-[bootstrap.sql](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/bootstrap.sql).
