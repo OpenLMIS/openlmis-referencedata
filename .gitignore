@@ -3,11 +3,12 @@
 *.ipr
 *.iws
 .gradle/
-node_modules/
 build/
 out/
 .idea/
+gradle/
+gradlew*
 .env
 .tx/
+node_modules/
 demo-data/*.sql
-node_modules
