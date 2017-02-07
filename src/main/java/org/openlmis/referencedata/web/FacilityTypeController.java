@@ -13,14 +13,18 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
 @Controller
+@Transactional
 public class FacilityTypeController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityTypeController.class);
@@ -32,16 +36,18 @@ public class FacilityTypeController extends BaseController {
    * Allows creating new facilityType. If the id is specified, it will be ignored.
    *
    * @param facilityType A facilityType bound to the request body
-   * @return ResponseEntity containing the created facilityType
+   * @return the created facilityType
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.POST)
-  public ResponseEntity<FacilityType> createFacilityType(@RequestBody FacilityType facilityType) {
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public FacilityType createFacilityType(@RequestBody FacilityType facilityType) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     LOGGER.debug("Creating new facility type");
     facilityType.setId(null);
     facilityTypeRepository.save(facilityType);
     LOGGER.debug("Creating new facility type with id: " + facilityType.getId());
-    return new ResponseEntity<>(facilityType, HttpStatus.CREATED);
+    return facilityType;
   }
 
   /**
@@ -50,10 +56,11 @@ public class FacilityTypeController extends BaseController {
    * @return FacilityTypes.
    */
   @RequestMapping(value = "/facilityTypes", method = RequestMethod.GET)
-  public ResponseEntity<Iterable<FacilityType>> getAllFacilityTypes() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Iterable<FacilityType> getAllFacilityTypes() {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    Iterable<FacilityType> facilityTypes = facilityTypeRepository.findAll();
-    return new ResponseEntity<>(facilityTypes, HttpStatus.OK);
+    return facilityTypeRepository.findAll();
   }
 
   /**
@@ -61,7 +68,7 @@ public class FacilityTypeController extends BaseController {
    *
    * @param facilityType   A facilityType bound to the request body
    * @param facilityTypeId UUID of facilityType which we want to update
-   * @return ResponseEntity containing the updated facilityType
+   * @return the updated facilityType
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.PUT)
   public ResponseEntity<FacilityType> updateFacilityType(
@@ -91,7 +98,7 @@ public class FacilityTypeController extends BaseController {
    * Get chosen facilityType.
    *
    * @param facilityTypeId UUID of facilityType which we want to get
-   * @return FacilityType.
+   * @return the FacilityType.
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.GET)
   public ResponseEntity<FacilityType> getFacilityType(@PathVariable("id") UUID facilityTypeId) {
@@ -108,7 +115,7 @@ public class FacilityTypeController extends BaseController {
    * Allows deleting facilityType.
    *
    * @param facilityTypeId UUID of facilityType which we want to delete
-   * @return ResponseEntity containing the HTTP Status
+   * @return the ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {

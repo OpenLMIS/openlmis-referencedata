@@ -8,16 +8,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
 @Controller
+@Transactional
 public class FacilityTypeApprovedProductController extends BaseController {
 
   private static final Logger LOGGER =
@@ -29,51 +32,57 @@ public class FacilityTypeApprovedProductController extends BaseController {
   /**
    * Allows creating new facilityTypeApprovedProduct.
    *
-   * @param facilityTypeApprovedProduct A facilityTypeApprovedProduct bound to the request body
-   * @return ResponseEntity containing the created facilityTypeApprovedProduct
+   * @param facilityTypeApprovedProduct A facilityTypeApprovedProduct bound to the request body.
+   * @return the created facilityTypeApprovedProduct.
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.POST)
-  public ResponseEntity<FacilityTypeApprovedProduct> createFacilityTypeApprovedProduct(
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public FacilityTypeApprovedProduct createFacilityTypeApprovedProduct(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct) {
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
     // Ignore provided id
     facilityTypeApprovedProduct.setId(null);
     repository.save(facilityTypeApprovedProduct);
-    return new ResponseEntity<>(facilityTypeApprovedProduct, HttpStatus.CREATED);
+    return facilityTypeApprovedProduct;
   }
 
   /**
    * Allows updating facilityTypeApprovedProduct.
    *
-   * @param facilityTypeApprovedProduct A facilityTypeApprovedProduct bound to the request body
+   * @param facilityTypeApprovedProduct A facilityTypeApprovedProduct bound to the request body.
    * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct
-   *                                      which we want to update
-   * @return ResponseEntity containing the updated facilityTypeApprovedProduct
+   *                                      which we want to update.
+   * @return the updated facilityTypeApprovedProduct.
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<FacilityTypeApprovedProduct> updateFacilityTypeApprovedProduct(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public FacilityTypeApprovedProduct updateFacilityTypeApprovedProduct(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     LOGGER.debug("Updating facilityTypeApprovedProduct");
     repository.save(facilityTypeApprovedProduct);
-    return new ResponseEntity<>(facilityTypeApprovedProduct, HttpStatus.OK);
+    return facilityTypeApprovedProduct;
   }
 
   /**
    * Get chosen facilityTypeApprovedProduct.
    *
    * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct which we want to get
-   * @return FacilityTypeApprovedProduct.
+   * @return the FacilityTypeApprovedProduct.
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.GET)
-  public ResponseEntity<FacilityTypeApprovedProduct> getFacilityTypeApprovedProduct(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public FacilityTypeApprovedProduct getFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
           repository.findOne(facilityTypeApprovedProductId);
     if (facilityTypeApprovedProduct == null) {
       throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return new ResponseEntity<>(facilityTypeApprovedProduct, HttpStatus.OK);
+      return facilityTypeApprovedProduct;
     }
   }
 
@@ -81,11 +90,11 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * Allows deleting facilityTypeApprovedProduct.
    *
    * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct
-   *                                      which we want to delete
-   * @return ResponseEntity containing the HTTP Status
+   *                                      which we want to delete.
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity deleteFacilityTypeApprovedProduct(
+  @ResponseStatus(HttpStatus.OK)
+  public void deleteFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
           repository.findOne(facilityTypeApprovedProductId);
@@ -93,7 +102,6 @@ public class FacilityTypeApprovedProductController extends BaseController {
       throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     } else {
       repository.delete(facilityTypeApprovedProduct);
-      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 }

@@ -14,22 +14,26 @@ import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.NoArgsConstructor;
-
 @NoArgsConstructor
 @Controller
+@Transactional
 public class RightController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RightController.class);
@@ -44,29 +48,30 @@ public class RightController extends BaseController {
   /**
    * Get all rights in the system.
    *
-   * @return all rights in the system
+   * @return all rights in the system.
    */
   @RequestMapping(value = "/rights", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllRights() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<RightDto> getAllRights() {
     
     rightService.checkRootAccess();
 
     LOGGER.debug("Getting all rights");
     Set<Right> rights = Sets.newHashSet(rightRepository.findAll());
-    Set<RightDto> rightDtos = rights.stream().map(this::exportToDto).collect(toSet());
-
-    return ResponseEntity
-        .ok(rightDtos);
+    return rights.stream().map(this::exportToDto).collect(toSet());
   }
 
   /**
    * Get chosen right.
    *
-   * @param rightId id of the right to get
-   * @return right
+   * @param rightId id of the right to get.
+   * @return the right.
    */
   @RequestMapping(value = "/rights/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getRight(@PathVariable("id") UUID rightId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public RightDto getRight(@PathVariable("id") UUID rightId) {
     
     rightService.checkRootAccess();
 
@@ -75,8 +80,7 @@ public class RightController extends BaseController {
     if (right == null) {
       throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return ResponseEntity
-          .ok(exportToDto(right));
+      return exportToDto(right);
     }
   }
 
@@ -84,11 +88,13 @@ public class RightController extends BaseController {
    * Save a right using the provided right DTO. If the right does not exist, will create one. If it
    * does exist, will update it.
    *
-   * @param rightDto provided right DTO
-   * @return the saved right
+   * @param rightDto provided right DTO.
+   * @return the saved right.
    */
   @RequestMapping(value = "/rights", method = RequestMethod.PUT)
-  public ResponseEntity<?> saveRight(@RequestBody RightDto rightDto) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public RightDto saveRight(@RequestBody RightDto rightDto) {
 
     rightService.checkRootAccess();
 
@@ -118,19 +124,17 @@ public class RightController extends BaseController {
 
     LOGGER.debug("Saved right with id: " + rightToSave.getId());
 
-    return ResponseEntity
-        .ok()
-        .body(exportToDto(rightToSave));
+    return exportToDto(rightToSave);
   }
 
   /**
    * Delete an existing right.
    *
-   * @param rightId id of the right to delete
-   * @return no content
+   * @param rightId id of the right to delete.
    */
   @RequestMapping(value = "/rights/{rightId}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteRight(@PathVariable("rightId") UUID rightId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteRight(@PathVariable("rightId") UUID rightId) {
 
     rightService.checkRootAccess();
 
@@ -141,20 +145,18 @@ public class RightController extends BaseController {
 
     LOGGER.debug("Deleting right");
     rightRepository.delete(rightId);
-
-    return ResponseEntity
-        .noContent()
-        .build();
   }
 
   /**
    * Find a right by its name.
    *
-   * @param name the name of the right to find
-   * @return right
+   * @param name the name of the right to find.
+   * @return the right.
    */
   @RequestMapping(value = "/rights/search", method = RequestMethod.GET)
-  public ResponseEntity<?> findRightByName(@RequestParam("name") String name) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<RightDto> findRightByName(@RequestParam("name") String name) {
 
     rightService.checkRootAccess();
 
@@ -164,8 +166,7 @@ public class RightController extends BaseController {
     }
 
     LOGGER.debug("Right found, returning");
-    return ResponseEntity
-        .ok(Sets.newHashSet(exportToDto(foundRight)));
+    return Sets.newHashSet(exportToDto(foundRight));
   }
 
   private RightDto exportToDto(Right right) {

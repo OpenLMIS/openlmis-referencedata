@@ -9,16 +9,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
 @Controller
+@Transactional
 public class FacilityOperatorController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityOperatorController.class);
@@ -30,17 +33,19 @@ public class FacilityOperatorController extends BaseController {
    * Allows creating new facilityOperators.
    *
    * @param facilityOperator A facilityOperator bound to the request body.
-   * @return ResponseEntity containing the created facilityOperator.
+   * @return the created facilityOperator.
    */
   @RequestMapping(value = "/facilityOperators", method = RequestMethod.POST)
-  public ResponseEntity<FacilityOperator> createFacilityOperator(
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public FacilityOperator createFacilityOperator(
       @RequestBody FacilityOperator facilityOperator) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     LOGGER.debug("Creating new facility operator");
     // Ignore provided id
     facilityOperator.setId(null);
     facilityOperatorRepository.save(facilityOperator);
-    return new ResponseEntity<>(facilityOperator, HttpStatus.CREATED);
+    return facilityOperator;
   }
 
   /**
@@ -49,65 +54,70 @@ public class FacilityOperatorController extends BaseController {
    * @return facilityOperators.
    */
   @RequestMapping(value = "/facilityOperators", method = RequestMethod.GET)
-  public ResponseEntity<Iterable<FacilityOperator>> getAllFacilityOperators() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Iterable<FacilityOperator> getAllFacilityOperators() {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     Iterable<FacilityOperator> facilityOperators = facilityOperatorRepository.findAll();
     if (facilityOperators == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return new ResponseEntity<>(facilityOperators, HttpStatus.OK);
+      return facilityOperators;
     }
   }
 
   /**
    * Allows updating facilityOperator.
    *
-   * @param facilityOperator   A facilityOperator bound to the request body
-   * @param facilityOperatorId UUID of facilityOperator which we want to update
-   * @return ResponseEntity containing the updated facilityOperator
+   * @param facilityOperator   A facilityOperator bound to the request body.
+   * @param facilityOperatorId UUID of facilityOperator which we want to update.
+   * @return the updated facilityOperator.
    */
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<FacilityOperator> updateFacilityOperator(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public FacilityOperator updateFacilityOperator(
       @RequestBody FacilityOperator facilityOperator, @PathVariable("id") UUID facilityOperatorId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     LOGGER.debug("Updating facility operator");
     facilityOperatorRepository.save(facilityOperator);
-    return new ResponseEntity<>(facilityOperator, HttpStatus.OK);
+    return facilityOperator;
   }
 
   /**
    * Get chosen facilityOperator.
    *
-   * @param facilityOperatorId UUID of facilityOperator whose we want to get
-   * @return facilityOperator.
+   * @param facilityOperatorId UUID of facilityOperator whose we want to get.
+   * @return the facilityOperator.
    */
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.GET)
-  public ResponseEntity<FacilityOperator> getFacilityOperators(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public FacilityOperator getFacilityOperators(
       @PathVariable("id") UUID facilityOperatorId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
     if (facilityOperator == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return new ResponseEntity<>(facilityOperator, HttpStatus.OK);
+      return facilityOperator;
     }
   }
 
   /**
    * Allows deleting facilityOperator.
    *
-   * @param facilityOperatorId UUID of facilityOperator whose we want to delete
-   * @return ResponseEntity containing the HTTP Status
+   * @param facilityOperatorId UUID of facilityOperator whose we want to delete.
    */
   @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity deleteFacilityOperators(@PathVariable("id") UUID facilityOperatorId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteFacilityOperators(@PathVariable("id") UUID facilityOperatorId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
     if (facilityOperator == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
     } else {
       facilityOperatorRepository.delete(facilityOperator);
-      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 }

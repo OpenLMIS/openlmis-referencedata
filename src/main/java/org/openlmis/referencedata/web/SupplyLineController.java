@@ -19,19 +19,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Controller
+@Transactional
 public class SupplyLineController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupplyLineController.class);
@@ -54,26 +57,30 @@ public class SupplyLineController extends BaseController {
   /**
    * Allows creating new supplyLines. If the id is specified, it will be ignored.
    *
-   * @param supplyLineDto A supplyLine bound to the request body
-   * @return ResponseEntity containing the created supplyLine
+   * @param supplyLineDto A supplyLine bound to the request body.
+   * @return the created supplyLine.
    */
   @RequestMapping(value = "/supplyLines", method = RequestMethod.POST)
-  public ResponseEntity<?> createSupplyLine(@RequestBody SupplyLineDto supplyLineDto) {
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public SupplyLineDto createSupplyLine(@RequestBody SupplyLineDto supplyLineDto) {
     LOGGER.debug("Creating new supplyLine");
     supplyLineDto.setId(null);
     SupplyLine supplyLine = SupplyLine.newSupplyLine(supplyLineDto);
     supplyLineRepository.save(supplyLine);
     LOGGER.debug("Created new supplyLine with id: " + supplyLine.getId());
-    return new ResponseEntity<>(exportToDto(supplyLine), HttpStatus.CREATED);
+    return exportToDto(supplyLine);
   }
 
   /**
    * Get all supplyLines.
    *
-   * @return SupplyLineDtos.
+   * @return the SupplyLineDtos.
    */
   @RequestMapping(value = "/supplyLines", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllSupplyLines() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<SupplyLineDto> getAllSupplyLines() {
     Iterable<SupplyLine> supplyLines = supplyLineRepository.findAll();
     List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
 
@@ -81,19 +88,21 @@ public class SupplyLineController extends BaseController {
       supplyLineDtos.add(exportToDto(supplyLine));
     }
 
-    return new ResponseEntity<>(supplyLineDtos, HttpStatus.OK);
+    return supplyLineDtos;
   }
 
   /**
    * Allows updating supplyLines.
    *
-   * @param supplyLineDto A supplyLineDto bound to the request body
-   * @param supplyLineId  UUID of supplyLine which we want to update
-   * @return ResponseEntity containing the updated supplyLine
+   * @param supplyLineDto A supplyLineDto bound to the request body.
+   * @param supplyLineId  UUID of supplyLine which we want to update.
+   * @return the updated supplyLine.
    */
   @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateSupplyLine(@RequestBody SupplyLineDto supplyLineDto,
-                                            @PathVariable("id") UUID supplyLineId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public SupplyLineDto updateSupplyLine(@RequestBody SupplyLineDto supplyLineDto,
+                                        @PathVariable("id") UUID supplyLineId) {
 
     SupplyLine supplyLineToUpdate = supplyLineRepository.findOne(supplyLineId);
     if (supplyLineToUpdate == null) {
@@ -107,22 +116,24 @@ public class SupplyLineController extends BaseController {
     supplyLineRepository.save(supplyLineToUpdate);
 
     LOGGER.debug("Saved supplyLine with id: " + supplyLineToUpdate.getId());
-    return new ResponseEntity<>(exportToDto(supplyLineToUpdate), HttpStatus.OK);
+    return exportToDto(supplyLineToUpdate);
   }
 
   /**
    * Get chosen supplyLine.
    *
-   * @param supplyLineId UUID of supplyLine which we want to get
-   * @return SupplyLine.
+   * @param supplyLineId UUID of supplyLine which we want to get.
+   * @return the SupplyLine.
    */
   @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getSupplyLine(@PathVariable("id") UUID supplyLineId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public SupplyLineDto getSupplyLine(@PathVariable("id") UUID supplyLineId) {
     SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
     if (supplyLine == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return new ResponseEntity<>(exportToDto(supplyLine), HttpStatus.OK);
+      return exportToDto(supplyLine);
     }
   }
 
@@ -130,28 +141,29 @@ public class SupplyLineController extends BaseController {
    * Allows deleting supplyLine.
    *
    * @param supplyLineId UUID of supplyLine which we want to delete
-   * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteSupplyLine(@PathVariable("id") UUID supplyLineId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteSupplyLine(@PathVariable("id") UUID supplyLineId) {
     SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
     if (supplyLine == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     } else {
       supplyLineRepository.delete(supplyLine);
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
 
   /**
-   * Returns all Supply Lines with matched parameters.
+   * Returns all supply lines with matched parameters.
    *
    * @param programDto         program of searched Supply Lines.
    * @param supervisoryNodeDto supervisory node of searched Supply Lines.
-   * @return ResponseEntity with list of all Supply Lines matching provided parameters.
+   * @return a list of all Supply Lines matching provided parameters.
    */
   @RequestMapping(value = "/supplyLines/search", method = RequestMethod.GET)
-  public ResponseEntity<?> searchSupplyLines(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<SupplyLineDto> searchSupplyLines(
       @RequestParam(value = "program") ProgramDto programDto,
       @RequestParam(value = "supervisoryNode") SupervisoryNodeDto supervisoryNodeDto) {
     Program program = Program.newProgram(programDto);
@@ -164,7 +176,7 @@ public class SupplyLineController extends BaseController {
       supplyLineDtos.add(exportToDto(supplyLine));
     }
 
-    return new ResponseEntity<>(supplyLineDtos, HttpStatus.OK);
+    return supplyLineDtos;
   }
 
   /**
@@ -172,10 +184,12 @@ public class SupplyLineController extends BaseController {
    *
    * @param programId         program of searched Supply Lines.
    * @param supervisoryNodeId supervisory node of searched Supply Lines.
-   * @return ResponseEntity with list of all Supply Lines matching provided parameters.
+   * @return a list of all Supply Lines matching provided parameters.
    */
   @RequestMapping(value = "/supplyLines/searchByUUID", method = RequestMethod.GET)
-  public ResponseEntity<?> searchSupplyLinesByUuid(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<SupplyLineSimpleDto> searchSupplyLinesByUuid(
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId", required = false) UUID supervisoryNodeId,
       @RequestParam(value = "supplyingFacilityId", required = false) UUID supplyingFacilityId) {
@@ -199,7 +213,7 @@ public class SupplyLineController extends BaseController {
       result.add(supplyLineSimpleDto);
     }
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return result;
   }
 
   private SupplyLineDto exportToDto(SupplyLine supplyLine) {

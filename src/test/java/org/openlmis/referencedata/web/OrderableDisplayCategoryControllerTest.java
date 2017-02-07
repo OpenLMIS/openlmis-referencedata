@@ -1,8 +1,6 @@
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -15,8 +13,6 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Set;
 
@@ -67,13 +63,10 @@ public class OrderableDisplayCategoryControllerTest {
     preparePostOrPut();
 
     //when
-    ResponseEntity responseEntity = controller.getAllOrderableDisplayCategories();
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<OrderableDisplayCategory> categories =
-        (Set<OrderableDisplayCategory>) responseEntity.getBody();
+    Iterable<OrderableDisplayCategory> categories =
+        controller.getAllOrderableDisplayCategories();
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(expected, categories);
   }
 }

@@ -3,11 +3,6 @@ package org.openlmis.referencedata.web;
 import static java.util.stream.Collectors.toSet;
 import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
@@ -37,13 +32,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Controller
+@Transactional
 public class SupervisoryNodeController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupervisoryNodeController.class);
@@ -72,11 +77,13 @@ public class SupervisoryNodeController extends BaseController {
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
    *
-   * @param supervisoryNodeDto A supervisoryNodeDto bound to the request body
-   * @return ResponseEntity containing the created supervisoryNode
+   * @param supervisoryNodeDto A supervisoryNodeDto bound to the request body.
+   * @return the created supervisoryNode.
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.POST)
-  public ResponseEntity<SupervisoryNodeDto> createSupervisoryNode(
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public SupervisoryNodeDto createSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto) {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
@@ -85,16 +92,18 @@ public class SupervisoryNodeController extends BaseController {
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
     supervisoryNodeRepository.save(supervisoryNode);
     LOGGER.debug("Created new supervisoryNode with id: " + supervisoryNode.getId());
-    return new ResponseEntity<>(exportToDto(supervisoryNode), HttpStatus.CREATED);
+    return exportToDto(supervisoryNode);
   }
 
   /**
    * Get all supervisoryNodes.
    *
-   * @return SupervisoryNodeDtos.
+   * @return the SupervisoryNodeDtos.
    */
   @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.GET)
-  public ResponseEntity<List<SupervisoryNodeDto>> getAllSupervisoryNodes() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<SupervisoryNodeDto> getAllSupervisoryNodes() {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
     Iterable<SupervisoryNode> supervisoryNodes = supervisoryNodeRepository.findAll();
@@ -104,17 +113,19 @@ public class SupervisoryNodeController extends BaseController {
       supervisoryNodeDtos.add(exportToDto(supervisoryNode));
     }
 
-    return new ResponseEntity<>(supervisoryNodeDtos, HttpStatus.OK);
+    return supervisoryNodeDtos;
   }
 
   /**
    * Get chosen supervisoryNode.
    *
-   * @param supervisoryNodeId UUID of supervisoryNode whose we want to get
-   * @return SupervisoryNode.
+   * @param supervisoryNodeId UUID of the supervisoryNode whose we want to get.
+   * @return the SupervisoryNode.
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.GET)
-  public ResponseEntity<SupervisoryNodeDto> getSupervisoryNode(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public SupervisoryNodeDto getSupervisoryNode(
       @PathVariable("id") UUID supervisoryNodeId) {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
@@ -122,19 +133,21 @@ public class SupervisoryNodeController extends BaseController {
     if (supervisoryNode == null) {
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return new ResponseEntity<>(exportToDto(supervisoryNode), HttpStatus.OK);
+      return exportToDto(supervisoryNode);
     }
   }
 
   /**
    * Allows updating supervisoryNode.
    *
-   * @param supervisoryNodeDto A supervisoryNodeDto bound to the request body
-   * @param supervisoryNodeId UUID of supervisoryNode which we want to update
-   * @return ResponseEntity containing the updated supervisoryNode
+   * @param supervisoryNodeDto A supervisoryNodeDto bound to the request body.
+   * @param supervisoryNodeId UUID of the supervisoryNode which we want to update.
+   * @return the updated supervisoryNode.
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<SupervisoryNodeDto> updateSupervisoryNode(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public SupervisoryNodeDto updateSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto,
       @PathVariable("id") UUID supervisoryNodeId) {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
@@ -151,14 +164,13 @@ public class SupervisoryNodeController extends BaseController {
     supervisoryNodeRepository.save(supervisoryNodeToUpdate);
 
     LOGGER.debug("Updated supervisoryNode with id: " + supervisoryNodeId);
-    return new ResponseEntity<>(exportToDto(supervisoryNodeToUpdate), HttpStatus.OK);
+    return exportToDto(supervisoryNodeToUpdate);
   }
 
   /**
    * Allows deleting supervisoryNode.
    *
-   * @param supervisoryNodeId UUID of supervisoryNode whose we want to delete
-   * @return ResponseEntity containing the HTTP Status
+   * @param supervisoryNodeId UUID of supervisoryNode whose we want to delete.
    */
   @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteSupervisoryNode(@PathVariable("id") UUID supervisoryNodeId) {
@@ -176,12 +188,14 @@ public class SupervisoryNodeController extends BaseController {
   /**
    * Find supervising users by right and program.
    *
-   * @param rightId UUID of right that user has
-   * @param programId UUID of program
-   * @return Found users
+   * @param rightId UUID of right that user has.
+   * @param programId UUID of program.
+   * @return the found users.
    */
   @RequestMapping(value = "/supervisoryNodes/{id}/supervisingUsers", method = RequestMethod.GET)
-  public ResponseEntity<Set<UserDto>> findSupervisingUsers(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<UserDto> findSupervisingUsers(
       @PathVariable("id") UUID supervisoryNodeId,
       @RequestParam("rightId") UUID rightId,
       @RequestParam("programId") UUID programId) {
@@ -206,18 +220,20 @@ public class SupervisoryNodeController extends BaseController {
     Set<User> supervisingUsers = userRepository.findSupervisingUsersBy(right, supervisoryNode,
         program);
 
-    return ResponseEntity.ok(supervisingUsers.stream().map(this::exportToDto).collect(toSet()));
+    return supervisingUsers.stream().map(this::exportToDto).collect(toSet());
   }
 
   /**
    * Searching for supervisoryNode with given parameters.
    *
-   * @param programId UUID of RequisitionGroup program by which we want to search
-   * @param facilityId UUID of RequisitionGroup facility by which we want to search
-   * @return Found supervisoryNode
+   * @param programId UUID of RequisitionGroup program by which we want to search.
+   * @param facilityId UUID of RequisitionGroup facility by which we want to search.
+   * @return the found supervisoryNode.
    */
   @RequestMapping(value = "/supervisoryNodes/search", method = RequestMethod.GET)
-  public ResponseEntity<List<SupervisoryNodeDto>> findByRequisitionGroupFacilityAndProgram(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<SupervisoryNodeDto> findByRequisitionGroupFacilityAndProgram(
       @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
@@ -242,7 +258,7 @@ public class SupervisoryNodeController extends BaseController {
     }
 
     SupervisoryNode result = foundGroup.getRequisitionGroup().getSupervisoryNode();
-    return ResponseEntity.ok(Collections.singletonList(exportToDto(result)));
+    return Collections.singletonList(exportToDto(result));
   }
 
   private SupervisoryNodeDto exportToDto(SupervisoryNode supervisoryNode) {

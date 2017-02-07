@@ -28,13 +28,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +48,7 @@ import java.util.stream.StreamSupport;
 
 
 @Controller
+@Transactional
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityController extends BaseController {
 
@@ -70,11 +73,13 @@ public class FacilityController extends BaseController {
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
    *
-   * @param facilityDto A facility bound to the request body
-   * @return ResponseEntity containing the created facility
+   * @param facilityDto A facility bound to the request body.
+   * @return created facility.
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
-  public ResponseEntity<FacilityDto> createFacility(@RequestBody FacilityDto facilityDto) {
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public FacilityDto createFacility(@RequestBody FacilityDto facilityDto) {
 
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
@@ -90,7 +95,7 @@ public class FacilityController extends BaseController {
 
     newFacility = facilityRepository.save(newFacility);
     LOGGER.debug("Created new facility with id: ", facilityDto.getId());
-    return new ResponseEntity<>(toDto(newFacility), HttpStatus.CREATED);
+    return toDto(newFacility);
   }
 
   /**
@@ -99,26 +104,27 @@ public class FacilityController extends BaseController {
    * @return Facilities.
    */
   @RequestMapping(value = "/facilities", method = RequestMethod.GET)
-  public ResponseEntity<List<FacilityDto>> getAllFacilities() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<FacilityDto> getAllFacilities() {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    Iterable<Facility> facilities = facilityRepository.findAll();
-    return ok(facilities);
+    return toDto(facilityRepository.findAll());
   }
 
 
   /**
    * Get the audit information related to facilities.
-   *
-   * @param author The author of the changes which should be returned.
+   *  @param author The author of the changes which should be returned.
    *               If null or empty, changes are returned regardless of author.
    * @param changedPropertyName The name of the property about which changes should be returned.
    *               If null or empty, changes associated with any and all properties are returned.
    * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
    */
   @RequestMapping(value = "/facilities/{id}/auditLog", method = RequestMethod.GET)
-  public ResponseEntity<?> getFacilitiesAuditLog(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public String getFacilitiesAuditLog(
           @PathVariable("id") UUID id,
           @RequestParam(name = "author", required = false, defaultValue = "") String author,
           @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
@@ -136,22 +142,21 @@ public class FacilityController extends BaseController {
       throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
     }
 
-    String auditData = getAuditLog(Facility.class, id, author,
-                                        changedPropertyName, page, returnJson);
-
-    return ResponseEntity.status(HttpStatus.OK).body(auditData);
+    return getAuditLog(Facility.class, id, author, changedPropertyName, page, returnJson);
   }
 
 
   /**
    * Allows updating facilities.
    *
-   * @param facilityDto A facility bound to the request body
-   * @param facilityId  UUID of facility which we want to update
-   * @return ResponseEntity containing the updated facility
+   * @param facilityDto A facility bound to the request body.
+   * @param facilityId UUID of facility which we want to update.
+   * @return the updated facility.
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<FacilityDto> saveFacility(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public FacilityDto saveFacility(
       @RequestBody FacilityDto facilityDto, @PathVariable("id") UUID facilityId) {
 
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
@@ -167,7 +172,7 @@ public class FacilityController extends BaseController {
     facilityToSave = facilityRepository.save(facilityToSave);
 
     LOGGER.debug("Saved facility with id: " + facilityToSave.getId());
-    return ok(facilityToSave);
+    return toDto(facilityToSave);
   }
 
   /**
@@ -177,7 +182,9 @@ public class FacilityController extends BaseController {
    * @return Facility.
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.GET)
-  public ResponseEntity getFacility(@PathVariable("id") UUID facilityId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public FacilityDto getFacility(@PathVariable("id") UUID facilityId) {
     
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
@@ -185,7 +192,7 @@ public class FacilityController extends BaseController {
     if (facility == null) {
       throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return ok(facility);
+      return toDto(facility);
     }
   }
 
@@ -199,7 +206,9 @@ public class FacilityController extends BaseController {
    * @return collection of approved products
    */
   @RequestMapping(value = "/facilities/{id}/approvedProducts")
-  public ResponseEntity<List<ApprovedProductDto>> getApprovedProducts(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<ApprovedProductDto> getApprovedProducts(
       @PathVariable("id") UUID facilityId,
       @RequestParam(required = false, value = "programId") UUID programId,
       @RequestParam(value = "fullSupply") boolean fullSupply) {
@@ -213,17 +222,17 @@ public class FacilityController extends BaseController {
     Collection<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
         .searchProducts(facilityId, programId, fullSupply);
 
-    return ResponseEntity.ok(toDto(products));
+    return toDto(products);
   }
 
   /**
    * Allows deleting facility.
    *
    * @param facilityId UUID of facility which we want to delete
-   * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/facilities/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity deleteFacility(@PathVariable("id") UUID facilityId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteFacility(@PathVariable("id") UUID facilityId) {
 
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
@@ -232,19 +241,20 @@ public class FacilityController extends BaseController {
       throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
     } else {
       facilityRepository.delete(facility);
-      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 
   /**
    * Retrieves all available supplying facilities for program and supervisory node.
    *
-   * @param programId         program to filter facilities
-   * @param supervisoryNodeId supervisoryNode to filter facilities
-   * @return ResponseEntity containing matched facilities
+   * @param programId         program to filter facilities.
+   * @param supervisoryNodeId supervisoryNode to filter facilities.
+   * @return matched facilities.
    */
   @RequestMapping(value = "/facilities/supplying", method = RequestMethod.GET)
-  public ResponseEntity<List<FacilityDto>> getSupplyingDepots(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<FacilityDto> getSupplyingDepots(
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
@@ -264,7 +274,7 @@ public class FacilityController extends BaseController {
     List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, supervisoryNode);
     List<Facility> facilities = supplyLines.stream()
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
-    return ok(facilities);
+    return toDto(facilities);
   }
 
   /**
@@ -276,7 +286,9 @@ public class FacilityController extends BaseController {
    * @return List of wanted Facilities.
    */
   @RequestMapping(value = "/facilities/search", method = RequestMethod.GET)
-  public ResponseEntity<List<FacilityDto>> findFacilitiesWithSimilarCodeOrName(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<FacilityDto> findFacilitiesWithSimilarCodeOrName(
       @RequestParam(value = "code", required = false) String code,
       @RequestParam(value = "name", required = false) String name) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
@@ -286,15 +298,7 @@ public class FacilityController extends BaseController {
           FacilityMessageKeys.ERROR_SEARCH_CODE_NULL_AND_NAME_NULL);
     }
     List<Facility> foundFacilities = facilityRepository.findFacilitiesByCodeOrName(code, name);
-    return ok(foundFacilities);
-  }
-
-  private ResponseEntity<FacilityDto> ok(Facility facility) {
-    return new ResponseEntity<>(toDto(facility), HttpStatus.OK);
-  }
-
-  private ResponseEntity<List<FacilityDto>> ok(Iterable<Facility> facilities) {
-    return new ResponseEntity<>(toDto(facilities), HttpStatus.OK);
+    return toDto(foundFacilities);
   }
 
   private FacilityDto toDto(Facility facility) {

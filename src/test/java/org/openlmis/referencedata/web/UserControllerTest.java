@@ -29,6 +29,7 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -42,8 +43,6 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.validation.BindingResult;
@@ -170,12 +169,9 @@ public class UserControllerTest {
     when(repository.findAll()).thenReturn(users);
 
     //when
-    ResponseEntity responseEntity = controller.getAllUsers();
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<UserDto> userDtos = (Set<UserDto>) responseEntity.getBody();
+    Set<UserDto> userDtos = controller.getAllUsers();
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(expectedUserDtos, userDtos);
   }
 
@@ -185,12 +181,9 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
-    ResponseEntity responseEntity = controller.getUser(userId);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    UserDto userDto = (UserDto) responseEntity.getBody();
+    UserDto userDto = controller.getUser(userId);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, userDto);
   }
 
@@ -207,12 +200,9 @@ public class UserControllerTest {
     user1.export(expectedUserDto);
 
     //when
-    ResponseEntity responseEntity = controller.getUser(userId);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    UserDto userDto = (UserDto) responseEntity.getBody();
+    UserDto userDto = controller.getUser(userId);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(expectedUserDto, userDto);
   }
 
@@ -222,7 +212,7 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    controller.getUser(userId).getStatusCode();
+    controller.getUser(userId);
   }
 
   @Test
@@ -240,10 +230,9 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    HttpStatus httpStatus = controller.saveUser(user1Dto, result, auth).getStatusCode();
+    controller.saveUser(user1Dto, result, auth);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     verify(service).save(user1, ACCESS_TOKEN);
   }
 
@@ -260,10 +249,9 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    HttpStatus httpStatus = controller.saveUser(user1Dto, result, auth).getStatusCode();
+    controller.saveUser(user1Dto, result, auth);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     verify(service).save(user1, ACCESS_TOKEN);
   }
 
@@ -281,7 +269,7 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn("49c1e712-da50-4428-ae39-2d0409bd8059");
 
     //when
-    controller.saveUser(user1Dto, result, auth).getStatusCode();
+    controller.saveUser(user1Dto, result, auth);
   }
 
   @Test
@@ -302,12 +290,9 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
     verify(service).save(user1, ACCESS_TOKEN);
   }
@@ -333,12 +318,9 @@ public class UserControllerTest {
 
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
     verify(service).save(user1, ACCESS_TOKEN);
   }
@@ -365,12 +347,9 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
     verify(service).save(user1, ACCESS_TOKEN);
   }
@@ -395,12 +374,9 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
     verify(service).save(user1, ACCESS_TOKEN);
   }
@@ -425,12 +401,9 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
     verify(service).save(user1, ACCESS_TOKEN);
   }
@@ -450,12 +423,9 @@ public class UserControllerTest {
     when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    ResponseEntity responseEntity = controller.saveUser(user1Dto, result, auth);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    UserDto savedUserDto = (UserDto) responseEntity.getBody();
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(user1Dto, savedUserDto);
     verify(service).save(user1, ACCESS_TOKEN);
   }
@@ -466,10 +436,9 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
-    HttpStatus httpStatus = controller.deleteUser(userId).getStatusCode();
+    controller.deleteUser(userId);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.NO_CONTENT));
     verify(repository).delete(userId);
   }
 
@@ -479,7 +448,7 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    controller.deleteUser(userId).getStatusCode();
+    controller.deleteUser(userId);
   }
 
   @Test(expected = NotFoundException.class)
@@ -505,13 +474,10 @@ public class UserControllerTest {
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(homeFacility);
 
     //when
-    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
+    ResultDto<Boolean> booleanResultDto = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
         UUID.randomUUID(), UUID.randomUUID(), null);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    ResultDto<Boolean> booleanResultDto = (ResultDto) responseEntity.getBody();
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertTrue(booleanResultDto.getResult());
   }
 
@@ -525,13 +491,10 @@ public class UserControllerTest {
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(warehouse1);
 
     //when
-    ResponseEntity responseEntity = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
+    ResultDto<Boolean> booleanResultDto = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
         null, null, UUID.randomUUID());
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    ResultDto<Boolean> booleanResultDto = (ResultDto) responseEntity.getBody();
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertFalse(booleanResultDto.getResult());
   }
 
@@ -551,12 +514,9 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
-    ResponseEntity responseEntity = controller.getUserPrograms(userId, true);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<Program> homeFacilityPrograms = (Set<Program>) responseEntity.getBody();
+    Set<Program> homeFacilityPrograms = controller.getUserPrograms(userId, true);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertThat(homeFacilityPrograms.size(), is(1));
     assertTrue(homeFacilityPrograms.contains(program1));
   }
@@ -569,12 +529,9 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
-    ResponseEntity responseEntity = controller.getUserPrograms(userId, false);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<Program> supervisoryPrograms = (Set<Program>) responseEntity.getBody();
+    Set<Program> supervisoryPrograms = controller.getUserPrograms(userId, false);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertThat(supervisoryPrograms.size(), is(1));
     assertTrue(supervisoryPrograms.contains(program1));
   }
@@ -594,8 +551,7 @@ public class UserControllerTest {
     when(rightRepository.findOne(rightId)).thenReturn(fulfillmentRight1);
 
     //when
-    ResponseEntity responseEntity = controller.getUserFulfillmentFacilities(userId, rightId);
-    Set<Facility> facilities = (Set<Facility>) responseEntity.getBody();
+    Set<FacilityDto> facilities = controller.getUserFulfillmentFacilities(userId, rightId);
 
     //then
     assertThat(facilities.size(), is(1));

@@ -1,8 +1,6 @@
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -21,8 +19,6 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Set;
 import java.util.UUID;
@@ -87,12 +83,9 @@ public class RoleControllerTest {
     when(repository.findAll()).thenReturn(roles);
 
     //when
-    ResponseEntity responseEntity = controller.getAllRoles();
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    Set<RoleDto> roleDtos = (Set<RoleDto>) responseEntity.getBody();
+    Set<RoleDto> roleDtos = controller.getAllRoles();
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(expectedRoleDtos, roleDtos);
   }
 
@@ -102,12 +95,9 @@ public class RoleControllerTest {
     when(repository.findOne(roleId)).thenReturn(role1);
 
     //when
-    ResponseEntity responseEntity = controller.getRole(roleId);
-    HttpStatus httpStatus = responseEntity.getStatusCode();
-    RoleDto roleDto = (RoleDto) responseEntity.getBody();
+    RoleDto roleDto = controller.getRole(roleId);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     assertEquals(role1Dto, roleDto);
   }
 
@@ -117,7 +107,7 @@ public class RoleControllerTest {
     when(repository.findOne(roleId)).thenReturn(null);
 
     //when
-    controller.getRole(roleId).getStatusCode();
+    controller.getRole(roleId);
   }
 
   @Test
@@ -128,10 +118,9 @@ public class RoleControllerTest {
     when(repository.findFirstByName(role1Name)).thenReturn(null);
 
     //when
-    HttpStatus httpStatus = controller.createRole(role1Dto).getStatusCode();
+    controller.createRole(role1Dto);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.CREATED));
     verify(repository).save(role1);
   }
 
@@ -141,7 +130,7 @@ public class RoleControllerTest {
     preparePostOrPut();
 
     //when
-    controller.createRole(role1Dto).getStatusCode();
+    controller.createRole(role1Dto);
   }
 
   @Test
@@ -153,10 +142,9 @@ public class RoleControllerTest {
     Role updatedRole1 = Role.newRole(role1Dto);
 
     //when
-    HttpStatus httpStatus = controller.updateRole(roleId, role1Dto).getStatusCode();
+    controller.updateRole(roleId, role1Dto);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     verify(repository).save(updatedRole1);
   }
 
@@ -170,10 +158,9 @@ public class RoleControllerTest {
     Role updatedRole1 = Role.newRole(role1Dto);
 
     //when
-    HttpStatus httpStatus = controller.updateRole(roleId, role1Dto).getStatusCode();
+    controller.updateRole(roleId, role1Dto);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     verify(repository).save(updatedRole1);
   }
 
@@ -190,10 +177,9 @@ public class RoleControllerTest {
     updatedRole1.export(updatedRole1Dto);
 
     //when
-    HttpStatus httpStatus = controller.updateRole(roleId, updatedRole1Dto).getStatusCode();
+    controller.updateRole(roleId, updatedRole1Dto);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     verify(repository).save(updatedRole1);
   }
 
@@ -210,10 +196,9 @@ public class RoleControllerTest {
     updatedRole1.export(updatedRole1Dto);
 
     //when
-    HttpStatus httpStatus = controller.updateRole(roleId, updatedRole1Dto).getStatusCode();
+    controller.updateRole(roleId, updatedRole1Dto);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     verify(repository).save(updatedRole1);
   }
 
@@ -227,10 +212,9 @@ public class RoleControllerTest {
     updatedRole1.export(updatedRole1Dto);
 
     //when
-    HttpStatus httpStatus = controller.updateRole(roleId, updatedRole1Dto).getStatusCode();
+    controller.updateRole(roleId, updatedRole1Dto);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.OK));
     verify(repository).save(updatedRole1);
   }
 
@@ -240,10 +224,9 @@ public class RoleControllerTest {
     when(repository.findOne(roleId)).thenReturn(role1);
 
     //when
-    HttpStatus httpStatus = controller.deleteRole(roleId).getStatusCode();
+    controller.deleteRole(roleId);
 
     //then
-    assertThat(httpStatus, is(HttpStatus.NO_CONTENT));
     verify(repository).delete(roleId);
   }
 
@@ -253,6 +236,6 @@ public class RoleControllerTest {
     when(repository.findOne(roleId)).thenReturn(null);
 
     //when
-    controller.deleteRole(roleId).getStatusCode();
+    controller.deleteRole(roleId);
   }
 }

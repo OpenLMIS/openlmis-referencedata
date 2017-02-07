@@ -1,7 +1,10 @@
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import com.google.common.collect.Sets;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -43,10 +46,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
@@ -56,8 +59,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.validation.Valid;
+import lombok.NoArgsConstructor;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -66,12 +72,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import javax.validation.Valid;
 
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 @Controller
+@Transactional
 public class UserController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -129,9 +135,11 @@ public class UserController extends BaseController {
    * Custom endpoint for creating and updating users and their roles.
    */
   @RequestMapping(value = "/users", method = RequestMethod.PUT)
-  public ResponseEntity<?> saveUser(@RequestBody @Valid UserDto userDto,
-                                    BindingResult bindingResult,
-                                    OAuth2Authentication auth) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserDto saveUser(@RequestBody @Valid UserDto userDto,
+                          BindingResult bindingResult,
+                          OAuth2Authentication auth) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
@@ -170,7 +178,7 @@ public class UserController extends BaseController {
 
       userService.save(userToSave, token);
 
-      return ResponseEntity.ok(exportUserToDto(userToSave));
+      return exportUserToDto(userToSave);
 
     } catch (ExternalApiException ex) {
       throw new InternalErrorException(UserMessageKeys.ERROR_SAVING, ex);
@@ -180,28 +188,29 @@ public class UserController extends BaseController {
   /**
    * Get all users and their roles.
    *
-   * @return Users.
+   * @return the Users.
    */
   @RequestMapping(value = "/users", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllUsers() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<UserDto> getAllUsers() {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     LOGGER.debug("Getting all users");
     Set<User> users = Sets.newHashSet(userRepository.findAll());
-    Set<UserDto> userDtos = users.stream().map(this::exportUserToDto).collect(toSet());
-
-    return ResponseEntity
-        .ok(userDtos);
+    return users.stream().map(this::exportUserToDto).collect(toSet());
   }
 
   /**
    * Get chosen user and role.
    *
-   * @param userId UUID of user whose we want to get
-   * @return User.
+   * @param userId UUID of user whose we want to get.
+   * @return the User.
    */
   @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
-  public ResponseEntity<?> getUser(@PathVariable("userId") UUID userId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserDto getUser(@PathVariable("userId") UUID userId) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     LOGGER.debug("Getting user");
@@ -210,19 +219,20 @@ public class UserController extends BaseController {
       LOGGER.error("User to get does not exist");
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return ResponseEntity
-          .ok(exportUserToDto(user));
+      return exportUserToDto(user);
     }
   }
 
   /**
    * Get all rights and roles of the specified user.
    *
-   * @param userId UUID of the user to retrieve
-   * @return a set of user role assignments
+   * @param userId UUID of the user to retrieve.
+   * @return a set of user role assignments.
    */
   @RequestMapping(value = "/users/{userId}/roleAssignments", method = RequestMethod.GET)
-  public ResponseEntity<?> getUserRightsAndRoles(@PathVariable("userId") UUID userId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<DetailedRoleAssignmentDto> getUserRightsAndRoles(@PathVariable("userId") UUID userId) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = userRepository.findOne(userId);
@@ -230,7 +240,7 @@ public class UserController extends BaseController {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
       Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
-      return ResponseEntity.ok(exportRoleAssignmentsToDtos(roleAssignments));
+      return exportRoleAssignmentsToDtos(roleAssignments);
     }
   }
 
@@ -238,10 +248,11 @@ public class UserController extends BaseController {
    * Allows deleting user.
    *
    * @param userId UUID of user whose we want to delete
-   * @return ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseBody
+  public void deleteUser(@PathVariable("userId") UUID userId) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = userRepository.findOne(userId);
@@ -249,9 +260,6 @@ public class UserController extends BaseController {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
       userRepository.delete(userId);
-      return ResponseEntity
-          .noContent()
-          .build();
     }
   }
 
@@ -260,17 +268,18 @@ public class UserController extends BaseController {
    *
    * @param queryMap request parameters (username, firstName, lastName, homeFacility, active,
    *                 verified, loginRestricted) and JSON extraData.
-   * @return ResponseEntity with list of all Users matching provided parameters and OK httpStatus.
+   * @return a list of all Users matching provided parameters.
    */
   @RequestMapping(value = "/users/search", method = RequestMethod.POST)
-  public ResponseEntity<?> searchUsers(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<UserDto> searchUsers(
       @RequestBody Map<String, Object> queryMap) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     List<User> result = userService.searchUsers(queryMap);
 
-    return ResponseEntity
-        .ok(exportUsersToDtos(result));
+    return exportUsersToDtos(result);
   }
 
 
@@ -285,7 +294,9 @@ public class UserController extends BaseController {
    * @return if successful, true or false depending on if user has the right
    */
   @RequestMapping(value = "/users/{userId}/hasRight", method = RequestMethod.GET)
-  public ResponseEntity<?> checkIfUserHasRight(@PathVariable(USER_ID) UUID userId,
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public ResultDto<Boolean> checkIfUserHasRight(@PathVariable(USER_ID) UUID userId,
                                                @RequestParam(value = "rightId") UUID rightId,
                                                @RequestParam(value = "programId",
                                                    required = false) UUID programId,
@@ -321,9 +332,7 @@ public class UserController extends BaseController {
 
     boolean hasRight = user.hasRight(rightQuery);
 
-    return ResponseEntity
-        .ok()
-        .body(new ResultDto<>(hasRight));
+    return new ResultDto<>(hasRight);
   }
 
   /**
@@ -332,23 +341,18 @@ public class UserController extends BaseController {
    * @param userId          id of user to get programs
    * @param forHomeFacility true to get home facility programs, false to get supervised programs;
    *                        default value is true
-   * @return set of programs
+   * @return a set of programs
    */
   @RequestMapping(value = "/users/{userId}/programs", method = RequestMethod.GET)
-  public ResponseEntity<Set<Program>> getUserPrograms(@PathVariable(USER_ID) UUID userId,
-                                                      @RequestParam(value = "forHomeFacility",
-                                                          required = false,
-                                                          defaultValue = "true")
-                                                            boolean forHomeFacility) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<Program> getUserPrograms(@PathVariable(USER_ID) UUID userId,
+                  @RequestParam(value = "forHomeFacility", required = false, defaultValue = "true")
+                    boolean forHomeFacility) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = validateUser(userId);
-    Set<Program> programs = forHomeFacility
-        ? user.getHomeFacilityPrograms() : user.getSupervisedPrograms();
-
-    return ResponseEntity
-        .ok()
-        .body(programs);
+    return forHomeFacility ? user.getHomeFacilityPrograms() : user.getSupervisedPrograms();
   }
 
   /**
@@ -357,10 +361,12 @@ public class UserController extends BaseController {
    * @param userId    id of user to get supervised facilities
    * @param rightId   right to check
    * @param programId program to check
-   * @return set of supervised facilities
+   * @return a set of supervised facilities
    */
   @RequestMapping(value = "/users/{userId}/supervisedFacilities", method = RequestMethod.GET)
-  public ResponseEntity<Set<FacilityDto>> getUserSupervisedFacilities(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<FacilityDto> getUserSupervisedFacilities(
       @PathVariable(USER_ID) UUID userId,
       @RequestParam(value = "rightId") UUID rightId,
       @RequestParam(value = "programId") UUID programId) {
@@ -378,19 +384,19 @@ public class UserController extends BaseController {
             new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId)));
 
     Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
-    return ResponseEntity
-        .ok()
-        .body(facilitiesToDto(supervisedFacilities));
+    return facilitiesToDto(supervisedFacilities);
   }
 
   /**
    * Get all the facilities that the user has fulfillment rights for.
    *
    * @param userId id of user to get fulfillment facilities
-   * @return set of fulfillment facilities
+   * @return a set of fulfillment facilities
    */
   @RequestMapping(value = "/users/{userId}/fulfillmentFacilities", method = RequestMethod.GET)
-  public ResponseEntity<Set<FacilityDto>> getUserFulfillmentFacilities(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<FacilityDto> getUserFulfillmentFacilities(
       @PathVariable(USER_ID) UUID userId,
       @RequestParam(value = "rightId") UUID rightId) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
@@ -402,16 +408,16 @@ public class UserController extends BaseController {
 
     Set<Facility> facilities = user.getFulfillmentFacilities(right);
 
-    return ResponseEntity
-        .ok()
-        .body(facilitiesToDto(facilities));
+    return facilitiesToDto(facilities);
   }
 
   /**
    * Resets a user's password.
    */
   @RequestMapping(value = "/users/passwordReset", method = RequestMethod.POST)
-  public ResponseEntity<?> passwordReset(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public void passwordReset(
       @RequestBody @Valid PasswordResetRequest passwordResetRequest,
       BindingResult bindingResult, OAuth2Authentication auth) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
@@ -425,8 +431,6 @@ public class UserController extends BaseController {
 
     try {
       userService.passwordReset(passwordResetRequest, token);
-
-      return new ResponseEntity<>(HttpStatus.OK);
     } catch (ExternalApiException ex) {
       throw new InternalErrorException(UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_FAILED, ex);
     }
@@ -436,7 +440,8 @@ public class UserController extends BaseController {
    * Changes user's password if valid reset token is provided.
    */
   @RequestMapping(value = "/users/changePassword", method = RequestMethod.POST)
-  public ResponseEntity changePassword(
+  @ResponseStatus(HttpStatus.OK)
+  public void changePassword(
       @RequestBody @Valid PasswordChangeRequest passwordChangeRequest, BindingResult bindingResult,
       OAuth2Authentication auth) {
     OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
@@ -448,7 +453,6 @@ public class UserController extends BaseController {
 
     try {
       userService.changePassword(passwordChangeRequest, token);
-      return new ResponseEntity(HttpStatus.OK);
     } catch (ExternalApiException ex) {
       throw new InternalErrorException(UserMessageKeys.ERROR_EXTERNAL_CHANGE_PASSWORD_FAILED, ex);
     }

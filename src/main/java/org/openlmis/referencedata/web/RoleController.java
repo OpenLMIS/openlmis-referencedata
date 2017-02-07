@@ -18,20 +18,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.NoArgsConstructor;
-
 @NoArgsConstructor
 @Controller
+@Transactional
 public class RoleController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
@@ -45,29 +48,29 @@ public class RoleController extends BaseController {
   /**
    * Get all roles in the system.
    *
-   * @return all roles in the system
+   * @return all roles in the system.
    */
   @RequestMapping(value = "/roles", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllRoles() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<RoleDto> getAllRoles() {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
 
     LOGGER.debug("Getting all roles");
     Set<Role> roles = Sets.newHashSet(roleRepository.findAll());
-    Set<RoleDto> roleDtos = roles.stream().map(this::exportToDto).collect(toSet());
-
-    return ResponseEntity
-        .ok()
-        .body(roleDtos);
+    return roles.stream().map(this::exportToDto).collect(toSet());
   }
 
   /**
    * Get specified role in the system.
    *
-   * @param roleId id of the role to get
-   * @return specified role
+   * @param roleId id of the role to get.
+   * @return the specified role.
    */
   @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.GET)
-  public ResponseEntity<?> getRole(@PathVariable("roleId") UUID roleId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public RoleDto getRole(@PathVariable("roleId") UUID roleId) {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
 
     LOGGER.debug("Getting role");
@@ -76,19 +79,19 @@ public class RoleController extends BaseController {
       throw new NotFoundException(RoleMessageKeys.ERROR_NOT_FOUND);
     }
 
-    return ResponseEntity
-        .ok()
-        .body(exportToDto(role));
+    return exportToDto(role);
   }
 
   /**
    * Create a new role using the provided role DTO.
    *
-   * @param roleDto role DTO with which to create the role
-   * @return if successful, the new role; otherwise an HTTP error
+   * @param roleDto a role DTO with which to create the role.
+   * @return the new role.
    */
   @RequestMapping(value = "/roles", method = RequestMethod.POST)
-  public ResponseEntity<?> createRole(@RequestBody RoleDto roleDto) {
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public RoleDto createRole(@RequestBody RoleDto roleDto) {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
     Role storedRole = roleRepository.findFirstByName(roleDto.getName());
@@ -105,22 +108,22 @@ public class RoleController extends BaseController {
 
     LOGGER.debug("Saved new role with id: " + newRole.getId());
 
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(exportToDto(newRole));
+    return exportToDto(newRole);
   }
 
   /**
    * Update an existing role using the provided role DTO. Note, if the role does not exist, will
    * create one.
    *
-   * @param roleId  id of the role to update
-   * @param roleDto provided role DTO
-   * @return if successful, the updated role; otherwise an HTTP error
+   * @param roleId  id of the role to update.
+   * @param roleDto provided role DTO.
+   * @return the updated role.
    */
   @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateRole(@PathVariable("roleId") UUID roleId,
-                                      @RequestBody RoleDto roleDto) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public RoleDto updateRole(@PathVariable("roleId") UUID roleId,
+                            @RequestBody RoleDto roleDto) {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
     Role roleToSave;
@@ -133,19 +136,17 @@ public class RoleController extends BaseController {
 
     LOGGER.debug("Saved role with id: " + roleToSave.getId());
 
-    return ResponseEntity
-        .ok()
-        .body(exportToDto(roleToSave));
+    return exportToDto(roleToSave);
   }
 
   /**
    * Delete an existing role.
    *
-   * @param roleId id of the role to delete
-   * @return no content
+   * @param roleId id of the role to delete.
    */
   @RequestMapping(value = "/roles/{roleId}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteRole(@PathVariable("roleId") UUID roleId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteRole(@PathVariable("roleId") UUID roleId) {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
     Role storedRole = roleRepository.findOne(roleId);
@@ -155,10 +156,6 @@ public class RoleController extends BaseController {
 
     LOGGER.debug("Deleting role");
     roleRepository.delete(roleId);
-
-    return ResponseEntity
-        .noContent()
-        .build();
   }
 
   private RoleDto exportToDto(Role role) {

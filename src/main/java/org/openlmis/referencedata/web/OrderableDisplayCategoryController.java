@@ -13,19 +13,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
 @Controller
+@Transactional
 public class OrderableDisplayCategoryController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
@@ -37,32 +40,34 @@ public class OrderableDisplayCategoryController extends BaseController {
   /**
    * Constructor for controller unit testing.
    *
-   * @param repository      a OrderableDisplayCategoryRepository
+   * @param repository the OrderableDisplayCategoryRepository.
    */
   public OrderableDisplayCategoryController(OrderableDisplayCategoryRepository repository) {
     this.orderableDisplayCategoryRepository = Objects.requireNonNull(repository);
   }
 
   /**
-   * Get all orderableDisplayCategories.
+   * Get all OrderableDisplayCategories.
    *
-   * @return OrderableDisplayCategories.
+   * @return the OrderableDisplayCategories.
    */
   @RequestMapping(value = "/orderableDisplayCategories", method = RequestMethod.GET)
-  public ResponseEntity<Iterable<OrderableDisplayCategory>> getAllOrderableDisplayCategories() {
-    Iterable<OrderableDisplayCategory> orderableDisplayCategories =
-        orderableDisplayCategoryRepository.findAll();
-    return new ResponseEntity<>(orderableDisplayCategories, HttpStatus.OK);
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Iterable<OrderableDisplayCategory> getAllOrderableDisplayCategories() {
+    return orderableDisplayCategoryRepository.findAll();
   }
 
   /**
    * Create a {@link OrderableDisplayCategory}.
    *
-   * @param orderableDisplayCategory A orderableDisplayCategory bound to the request body
-   * @return ResponseEntity containing the created orderableDisplayCategory with id.
+   * @param orderableDisplayCategory a OrderableDisplayCategory bound to the request body.
+   * @return the created OrderableDisplayCategory with id.
    */
   @RequestMapping(value = "/orderableDisplayCategories", method = RequestMethod.POST)
-  public ResponseEntity<OrderableDisplayCategory> createOrderableDisplayCategory(
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public OrderableDisplayCategory createOrderableDisplayCategory(
       @RequestBody OrderableDisplayCategory orderableDisplayCategory) {
     OrderableDisplayCategory found =
         orderableDisplayCategoryRepository.findByCode(orderableDisplayCategory.getCode());
@@ -73,19 +78,21 @@ public class OrderableDisplayCategoryController extends BaseController {
     }
 
     orderableDisplayCategoryRepository.save(found);
-    return new ResponseEntity<>(found, HttpStatus.CREATED);
+    return found;
   }
 
   /**
    * Updates the given {@link OrderableDisplayCategory}.
    * Uses the ID given to base it's update and ignores the code given.
    *
-   * @param orderableDisplayCategory   A orderableDisplayCategory bound to the request body
-   * @param orderableDisplayCategoryId UUID of orderableDisplayCategory which we want to update
-   * @return ResponseEntity containing the updated orderableDisplayCategory
+   * @param orderableDisplayCategory   An OrderableDisplayCategory bound to the request body.
+   * @param orderableDisplayCategoryId UUID of the OrderableDisplayCategory which we want to update.
+   * @return the updated OrderableDisplayCategory.
    */
   @RequestMapping(value = "/orderableDisplayCategories/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<OrderableDisplayCategory> updateOrderableDisplayCategory(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public OrderableDisplayCategory updateOrderableDisplayCategory(
       @RequestBody OrderableDisplayCategory orderableDisplayCategory,
       @PathVariable("id") UUID orderableDisplayCategoryId) {
     LOGGER.debug("Updating orderableDisplayCategory with id: " + orderableDisplayCategoryId);
@@ -101,35 +108,37 @@ public class OrderableDisplayCategoryController extends BaseController {
     orderableDisplayCategoryRepository.save(orderableDisplayCategoryToUpdate);
 
     LOGGER.debug("Updated orderableDisplayCategory with id: " + orderableDisplayCategoryId);
-    return new ResponseEntity<>(orderableDisplayCategoryToUpdate, HttpStatus.OK);
+    return orderableDisplayCategoryToUpdate;
   }
 
   /**
-   * Get chosen orderableDisplayCategory.
+   * Get chosen OrderableDisplayCategory.
    *
-   * @param orderableDisplayCategoryId UUID of orderableDisplayCategory which we want to get
-   * @return OrderableDisplayCategory.
+   * @param orderableDisplayCategoryId UUID of the OrderableDisplayCategory which we want to get.
+   * @return the OrderableDisplayCategory.
    */
   @RequestMapping(value = "/orderableDisplayCategories/{id}", method = RequestMethod.GET)
-  public ResponseEntity<OrderableDisplayCategory> getOrderableDisplayCategory(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public OrderableDisplayCategory getOrderableDisplayCategory(
       @PathVariable("id") UUID orderableDisplayCategoryId) {
     OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository.findOne(
         orderableDisplayCategoryId);
     if (orderableDisplayCategory == null) {
       throw new NotFoundException(OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return new ResponseEntity<>(orderableDisplayCategory, HttpStatus.OK);
+      return orderableDisplayCategory;
     }
   }
 
   /**
-   * Allows deleting orderableDisplayCategory.
+   * Allows deleting OrderableDisplayCategory.
    *
-   * @param orderableDisplayCategoryId UUID of orderableDisplayCategory which we want to delete
-   * @return ResponseEntity containing the HTTP Status
+   * @param orderableDisplayCategoryId UUID of the OrderableDisplayCategory which we want to delete
    */
   @RequestMapping(value = "/orderableDisplayCategories/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity deleteOrderableDisplayCategory(
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteOrderableDisplayCategory(
       @PathVariable("id") UUID orderableDisplayCategoryId) {
     OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository.findOne(
         orderableDisplayCategoryId);
@@ -143,18 +152,19 @@ public class OrderableDisplayCategoryController extends BaseController {
             OrderableDisplayCategoryMessageKeys.ERROR_DELETING_WITH_ID,
             orderableDisplayCategoryId), ex);
       }
-      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 
   /**
    * Finds OrderableDisplayCategories matching all of provided parameters.
    *
-   * @param codeParam code of orderableDisplayCategory.
-   * @return ResponseEntity with list of all OrderableDisplayCategories matching provided parameters
+   * @param codeParam a code of the OrderableDisplayCategory.
+   * @return a list of all OrderableDisplayCategories matching provided parameters.
    */
   @RequestMapping(value = "/orderableDisplayCategories/search", method = RequestMethod.GET)
-  public ResponseEntity<Iterable<OrderableDisplayCategory>> searchOrderableDisplayCategories(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Iterable<OrderableDisplayCategory> searchOrderableDisplayCategories(
       @RequestParam(value = "code", required = false) String codeParam) {
 
     if (codeParam != null) {
@@ -163,11 +173,9 @@ public class OrderableDisplayCategoryController extends BaseController {
       if (null == orderableDisplayCategory) {
         throw new NotFoundException(OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND);
       }
-      return ResponseEntity.ok(Collections.singletonList(orderableDisplayCategory));
+      return Collections.singletonList(orderableDisplayCategory);
     } else {
-      Iterable<OrderableDisplayCategory> orderableDisplayCategories =
-          orderableDisplayCategoryRepository.findAll();
-      return ResponseEntity.ok(orderableDisplayCategories);
+      return orderableDisplayCategoryRepository.findAll();
     }
   }
 }

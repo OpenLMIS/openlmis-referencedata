@@ -27,14 +27,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Controller
+@Transactional
 public class ProcessingPeriodController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPeriodController.class);
@@ -67,15 +70,16 @@ public class ProcessingPeriodController extends BaseController {
   private FacilityRepository facilityRepository;
 
   /**
-   * Finds processingPeriods matching all of provided parameters.
+   * Finds ProcessingPeriod matching all of provided parameters.
    *
    * @param programId  program of searched ProcessingPeriods.
    * @param facilityId facility of searched ProcessingPeriods.
-   * @return ResponseEntity with list of all ProcessingPeriods matching provided parameters and OK
-   *         httpStatus.
+   * @return a list of all ProcessingPeriods matching provided parameters.
    */
   @RequestMapping(value = "/processingPeriods/search", method = RequestMethod.GET)
-  public ResponseEntity<?> searchProcessingPeriods(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<ProcessingPeriodDto> searchProcessingPeriods(
       @RequestParam(value = "programId", required = true) UUID programId,
       @RequestParam(value = "facilityId", required = true) UUID facilityId) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
@@ -96,7 +100,7 @@ public class ProcessingPeriodController extends BaseController {
       periods = periodService.filterPeriods(program, facility);
     }
 
-    return ResponseEntity.ok(exportToDtos(periods));
+    return exportToDtos(periods);
   }
 
   /**
@@ -104,10 +108,12 @@ public class ProcessingPeriodController extends BaseController {
    *
    * @param periodDto     processing period DTO with which to create the processing period
    * @param bindingResult Object used for validation.
-   * @return if successful, the new processing period; otherwise an HTTP error
+   * @return the new processing period.
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.POST)
-  public ResponseEntity<?> createProcessingPeriod(
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public ProcessingPeriodDto createProcessingPeriod(
       @RequestBody ProcessingPeriodDto periodDto, BindingResult bindingResult) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod newPeriod = ProcessingPeriod.newPeriod(periodDto);
@@ -116,108 +122,114 @@ public class ProcessingPeriodController extends BaseController {
     if (bindingResult.getErrorCount() == 0) {
       periodRepository.save(newPeriod);
 
-      return ResponseEntity.status(HttpStatus.CREATED).body(exportToDto(newPeriod));
+      return exportToDto(newPeriod);
     } else {
       throw new ValidationMessageException(bindingResult.getAllErrors().get(0).getDefaultMessage());
     }
   }
 
   /**
-   * Get all processingPeriods.
+   * Get all ProcessingPeriods.
    *
-   * @return ProcessingPeriods.
+   * @return the ProcessingPeriods.
    */
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllProcessingPeriods() {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<ProcessingPeriodDto> getAllProcessingPeriods() {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     Set<ProcessingPeriod> processingPeriods = Sets.newHashSet(periodRepository.findAll());
-    Set<ProcessingPeriodDto> periodDtos = processingPeriods.stream()
+    return processingPeriods.stream()
         .map(this::exportToDto).collect(toSet());
-
-    return ResponseEntity.ok(periodDtos);
   }
 
   /**
-   * Update an existing processingPeriod using the provided processingPeriod DTO. Note, if the role
+   * Update an existing ProcessingPeriod using the provided ProcessingPeriodDto. Note, if the role
    * does not exist, will create one.
    *
-   * @param periodId  id of the processingPeriod to update
-   * @param periodDto provided processingPeriod DTO
-   * @return if successful, the updated role; otherwise an HTTP error
+   * @param periodDto provided processing period DTO.
+   * @param periodId  id of the ProcessingPeriod to update.
+   * @return the updated role.
    */
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
-                                                  @PathVariable("id") UUID periodId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public ProcessingPeriodDto updateProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
+                                                    @PathVariable("id") UUID periodId) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     LOGGER.debug("Updating processingPeriod");
     ProcessingPeriod updatedProcessingPeriod = ProcessingPeriod.newPeriod(periodDto);
     updatedProcessingPeriod.setId(periodId);
     periodRepository.save(updatedProcessingPeriod);
-    return ResponseEntity
-        .ok(exportToDto(updatedProcessingPeriod));
+    return exportToDto(updatedProcessingPeriod);
   }
 
   /**
-   * Get chosen processingPeriod.
+   * Get chosen ProcessingPeriodDto.
    *
-   * @param periodId UUID of processingPeriod which we want to get
-   * @return ProcessingPeriod.
+   * @param periodId UUID of the ProcessingPeriodDto which we want to get
+   * @return the ProcessingPeriod.
    */
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.GET)
-  public ResponseEntity<?> getProcessingPeriod(@PathVariable("id") UUID periodId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public ProcessingPeriodDto getProcessingPeriod(@PathVariable("id") UUID periodId) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
       throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return ResponseEntity.ok(exportToDto(period));
+      return exportToDto(period);
     }
   }
 
   /**
-   * Allows deleting processingPeriod.
+   * Allows deleting ProcessingPeriodDto.
    *
-   * @param periodId UUID of processingPeriod which we want to delete
-   * @return ResponseEntity containing the HTTP Status
+   * @param periodId UUID of the ProcessingPeriodDto which we want to delete
    */
   @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteProcessingPeriod(@PathVariable("id") UUID periodId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteProcessingPeriod(@PathVariable("id") UUID periodId) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
       throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
     } else {
       periodRepository.delete(period);
-      return ResponseEntity.noContent().build();
     }
   }
 
   /**
-   * Returns total difference between start date and end date from given processingPeriod rounded to
+   * Returns total difference between start date and end date from given ProcessingPeriod rounded to
    * whole months.
    *
-   * @param periodId UUID of given processingPeriod.
+   * @param periodId UUID of given ProcessingPeriod.
    * @return String which contains number of months.
    */
   @RequestMapping(value = "/processingPeriods/{id}/duration", method = RequestMethod.GET)
-  public ResponseEntity<?> getDuration(@PathVariable("id") UUID periodId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public ResultDto<Integer> getDuration(@PathVariable("id") UUID periodId) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingPeriod period = periodRepository.findOne(periodId);
 
     LOGGER.debug("Returning total number of months of processingPeriod");
 
-    return ResponseEntity.ok(new ResultDto<>(period.getDurationInMonths()));
+    return new ResultDto<>(period.getDurationInMonths());
   }
 
   /**
    * Returns chosen ProcessingPeriods.
    *
-   * @param processingScheduleId processingSchedule of searched ProcessingPeriods.
+   * @param processingScheduleId processing schedule of searched ProcessingPeriods.
    * @param startDate            which day shall ProcessingPeriod start.
-   * @return List of ProcessingPeriods.
+   * @return a list of ProcessingPeriods.
    */
   @RequestMapping(value = "/processingPeriods/searchByScheduleAndDate", method = RequestMethod.GET)
-  public ResponseEntity<?> searchPeriodsByUuuidAndDate(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<ProcessingPeriodDto> searchPeriodsByUuuidAndDate(
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
@@ -235,7 +247,7 @@ public class ProcessingPeriodController extends BaseController {
       periods = periodService.searchPeriods(processingSchedule, startDate);
     }
 
-    return ResponseEntity.ok(exportToDtos(periods));
+    return exportToDtos(periods);
   }
 
   private ProcessingPeriodDto exportToDto(ProcessingPeriod period) {
