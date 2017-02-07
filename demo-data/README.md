@@ -196,8 +196,8 @@ Other users with no roles:
 Passwords for these user accounts come from the
 [Authentication Service's demo data](https://github.com/OpenLMIS/openlmis-auth/tree/master/demo-data).
 
-Rights themselves come from the bootstrap data,
-[bootstrap.sql](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/bootstrap.sql).
+Rights themselves come from the 
+[bootstrap data](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/db/migration/20170206205310272__initial_bootstrap_data.sql).
 
 ## Supervisory Nodes and Supply Lines
 
