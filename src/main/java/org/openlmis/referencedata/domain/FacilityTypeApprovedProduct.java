@@ -32,12 +32,12 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   @Column(nullable = false)
   @Getter
   @Setter
-  private Double maxStock;
+  private Double maxPeriodsOfStock;
 
   @Column
   @Getter
   @Setter
-  private Double minStock;
+  private Double minPeriodsOfStock;
 
   @Column
   @Getter
@@ -52,8 +52,8 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setProgramOrderable(programOrderable);
-    exporter.setMaxStock(maxStock);
-    exporter.setMinStock(minStock);
+    exporter.setMaxPeriodsOfStock(maxPeriodsOfStock);
+    exporter.setMinPeriodsOfStock(minPeriodsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
   }
 
@@ -62,9 +62,9 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
 
     void setProgramOrderable(ProgramOrderable programOrderable);
 
-    void setMaxStock(Double maxStock);
+    void setMaxPeriodsOfStock(Double maxPeriodsOfStock);
 
-    void setMinStock(Double minStock);
+    void setMinPeriodsOfStock(Double minPeriodsOfStock);
 
     void setEmergencyOrderPoint(Double emergencyOrderPoint);
   }
@@ -74,9 +74,9 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
 
     ProgramOrderable.Importer getProgramOrderable();
 
-    Double getMaxStock();
+    Double getMaxPeriodsOfStock();
 
-    Double getMinStock();
+    Double getMinPeriodsOfStock();
 
     Double getEmergencyOrderPoint();
   }

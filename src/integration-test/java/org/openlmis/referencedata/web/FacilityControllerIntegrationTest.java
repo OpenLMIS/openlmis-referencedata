@@ -776,8 +776,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setProgramOrderable(programOrderable);
     ftap.setId(UUID.randomUUID());
-    ftap.setMinStock(1d);
-    ftap.setMaxStock(3d);
+    ftap.setMinPeriodsOfStock(1d);
+    ftap.setMaxPeriodsOfStock(3d);
     ftap.setFacilityType(generateFacilityType());
     ftap.setEmergencyOrderPoint(1d);
     List<FacilityTypeApprovedProduct> products = new ArrayList<>();
