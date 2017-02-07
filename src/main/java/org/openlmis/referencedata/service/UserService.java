@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-
 @Service
 public class UserService {
 
@@ -48,18 +46,9 @@ public class UserService {
   @Autowired
   private ExposedMessageSource messageSource;
 
-  private String virtualHostBaseUrl;
+  private String baseUrl = System.getenv("BASE_URL");
 
   private ObjectMapper mapper = new ObjectMapper();
-
-  /**
-   * Initialize service object.
-   */
-  @PostConstruct
-  public void init() {
-    String virtualHost = Optional.ofNullable(System.getenv("VIRTUAL_HOST")).orElse("localhost");
-    virtualHostBaseUrl = "http://" + virtualHost;
-  }
 
   /**
    * Method returns all users with matched parameters.
@@ -137,7 +126,7 @@ public class UserService {
     userRequest.setEmail(user.getEmail());
     userRequest.setReferenceDataUserId(user.getId());
 
-    String url = virtualHostBaseUrl + "/api/users/auth?access_token=" + token;
+    String url = baseUrl + "/api/users/auth?access_token=" + token;
     RestTemplate restTemplate = new RestTemplate();
 
     restTemplate.postForObject(url, userRequest, Object.class);
@@ -148,7 +137,7 @@ public class UserService {
    */
   public void passwordReset(PasswordResetRequest passwordResetRequest, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/auth/passwordReset?access_token=" + token;
+      String url = baseUrl + "/api/users/auth/passwordReset?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, passwordResetRequest, String.class);
@@ -164,7 +153,7 @@ public class UserService {
    */
   public void changePassword(PasswordChangeRequest passwordChangeRequest, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/auth/changePassword?access_token=" + token;
+      String url = baseUrl + "/api/users/auth/changePassword?access_token=" + token;
 
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.postForObject(url, passwordChangeRequest, String.class);
@@ -187,7 +176,7 @@ public class UserService {
 
     //TODO: This address needs to be changed when reset password page will be done
     String[] msgArgs = {user.getFirstName(), user.getLastName(),
-        user.getUsername(), virtualHostBaseUrl + "reset-password.html" + "/username/"
+        user.getUsername(), baseUrl + "reset-password.html" + "/username/"
         + user.getUsername() + "/token/" + token};
     String mailBody = messageSource.getMessage(SystemMessageKeys.PASSWORD_RESET_EMAIL_BODY,
         msgArgs, LocaleContextHolder.getLocale());
@@ -199,7 +188,7 @@ public class UserService {
 
   private UUID createPasswordResetToken(UUID userId, String token) {
     try {
-      String url = virtualHostBaseUrl + "/api/users/auth/passwordResetToken?userId=" + userId
+      String url = baseUrl + "/api/users/auth/passwordResetToken?userId=" + userId
           + "&access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
@@ -214,7 +203,7 @@ public class UserService {
     try {
       NotificationRequest request = new NotificationRequest(from, to, subject, content, null);
 
-      String url = virtualHostBaseUrl + "/api/notification?access_token=" + token;
+      String url = baseUrl + "/api/notification?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
 
       restTemplate.postForObject(url, request, Object.class);
