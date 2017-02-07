@@ -204,8 +204,8 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
 2. SN1.1/FP Approval sub point
   * requisition group: RGFP2
     * program: Family Planning
+  * facility: DH01/Balaka District Hospital
   * parent: SN1/FP Approval point
-    * facility: DH01/Balaka District Hospital
 3. SN2/EM Approval point
   * requisition group: RGEM1
     * program: Essential Meds
