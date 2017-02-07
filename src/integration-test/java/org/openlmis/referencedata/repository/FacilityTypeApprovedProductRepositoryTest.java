@@ -71,7 +71,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private GeographicZone geographicZone;
   private Facility facility;
 
-  private static final double maxMonthsOfStockDelta = 1e-15;
+  private static final double maxPeriodsOfStockDelta = 1e-15;
 
   @Before
   public void setUp() {
@@ -102,7 +102,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     orderableNonFullSupply = CommodityType.newCommodityType(
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     programOrderableNonFullSupply = ProgramOrderable.createNew(program, orderableDisplayCategory,
-        orderableNonFullSupply, 0, true, false, 0, 0,
+        orderableNonFullSupply, 0, true, false, 0,
         Money.of(currencyUnit, 0), currencyUnit);
     orderableNonFullSupply.addToProgram(programOrderableNonFullSupply);
     orderableRepository.save(orderableNonFullSupply);
@@ -138,11 +138,11 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ftapRepository.save(generateInstance());
     Iterable<FacilityTypeApprovedProduct> all = ftapRepository.findAll();
     FacilityTypeApprovedProduct ftap = all.iterator().next();
-    ftap.setMaxMonthsOfStock(10.00);
+    ftap.setMaxPeriodsOfStock(10.00);
     ftap.setFacilityType(facilityType2);
     ftapRepository.save(ftap);
     Assert.assertEquals("newFacilityType", ftap.getFacilityType().getCode());
-    Assert.assertEquals(10.00, ftap.getMaxMonthsOfStock(), maxMonthsOfStockDelta);
+    Assert.assertEquals(10.00, ftap.getMaxPeriodsOfStock(), maxPeriodsOfStockDelta);
   }
 
   @Test
@@ -221,7 +221,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ftap.setFacilityType(facilityType);
     ftap.setProgramOrderable(
         fullSupply ? programOrderableFullSupply : programOrderableNonFullSupply);
-    ftap.setMaxMonthsOfStock(12.00);
+    ftap.setMaxPeriodsOfStock(12.00);
     return ftap;
   }
 

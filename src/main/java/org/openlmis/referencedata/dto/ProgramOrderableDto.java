@@ -39,9 +39,7 @@ public class ProgramOrderableDto extends BaseDto
 
   private int displayOrder;
 
-  private int maxMonthsOfStock;
-
-  private Integer dosesPerMonth;
+  private Integer dosesPerPatient;
 
   @JsonSerialize(using = MoneySerializer.class)
   @JsonDeserialize(using = MoneyDeserializer.class)

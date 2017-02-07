@@ -770,14 +770,14 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     orderable.setId(UUID.randomUUID());
     CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
     ProgramOrderable programOrderable = ProgramOrderable.createNew(program, category,
-        orderable, 0, true, false, 0, 0, Money.of(currencyUnit, 0),
+        orderable, 0, true, false, 0, Money.of(currencyUnit, 0),
         currencyUnit);
     programOrderable.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setProgramOrderable(programOrderable);
     ftap.setId(UUID.randomUUID());
-    ftap.setMinMonthsOfStock(1d);
-    ftap.setMaxMonthsOfStock(3d);
+    ftap.setMinPeriodsOfStock(1d);
+    ftap.setMaxPeriodsOfStock(3d);
     ftap.setFacilityType(generateFacilityType());
     ftap.setEmergencyOrderPoint(1d);
     List<FacilityTypeApprovedProduct> products = new ArrayList<>();

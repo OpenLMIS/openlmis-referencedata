@@ -13,9 +13,9 @@ public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedP
 
   private ProgramOrderableDto programOrderable;
 
-  private Double maxMonthsOfStock;
+  private Double maxPeriodsOfStock;
 
-  private Double minMonthsOfStock;
+  private Double minPeriodsOfStock;
 
   private Double emergencyOrderPoint;
 
