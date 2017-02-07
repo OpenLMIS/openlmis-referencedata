@@ -80,7 +80,7 @@ public class User extends BaseEntity {
   @Column(columnDefinition = "boolean DEFAULT true")
   @Getter
   @Setter
-  private boolean allowNotify;
+  private Boolean allowNotify;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @Getter
@@ -116,7 +116,7 @@ public class User extends BaseEntity {
     active = importer.isActive();
     loginRestricted = importer.isLoginRestricted();
     if (importer.getAllowNotify() == null) {
-      allowNotify = true;
+      allowNotify = Boolean.TRUE;
     } else {
       allowNotify = importer.getAllowNotify();
     }
@@ -125,7 +125,7 @@ public class User extends BaseEntity {
 
   User(UUID id, String username, String firstName, String lastName, String email, String timezone,
        Facility homeFacility, boolean active, boolean verified, boolean loginRestricted,
-       boolean allowNotify, Map<String, String> extraData) {
+       Boolean allowNotify, Map<String, String> extraData) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;
