@@ -20,6 +20,8 @@ public class CurrencySettingsController extends BaseController {
   public CurrencySettingsDto getCurrencySettings() {
 
     return new CurrencySettingsDto(CurrencyConfig.CURRENCY_CODE, CurrencyConfig.CURRENCY_SYMBOL,
-        CurrencyConfig.CURRENCY_SYMBOL_SIDE, CurrencyConfig.CURRENCY_DECIMAL_PLACES);
+        CurrencyConfig.CURRENCY_SYMBOL_SIDE, CurrencyConfig.CURRENCY_DECIMAL_PLACES,
+        CurrencyConfig.GROUPING_SEPARATOR, CurrencyConfig.GROUPING_SIZE,
+        CurrencyConfig.DECIMAL_SEPARATOR);
   }
 }

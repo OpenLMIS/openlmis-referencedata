@@ -16,4 +16,10 @@ public class CurrencySettingsDto {
   private String currencySymbolSide;
 
   private int currencyDecimalPlaces;
+
+  private String groupingSeparator;
+
+  private int groupingSize;
+
+  private String decimalSeparator;
 }
