@@ -21,7 +21,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -81,7 +80,7 @@ public class User extends BaseEntity {
   @Column(columnDefinition = "boolean DEFAULT true")
   @Getter
   @Setter
-  private Boolean allowNotify;
+  private boolean allowNotify;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @Getter
@@ -101,13 +100,6 @@ public class User extends BaseEntity {
   @Getter
   private Set<Program> supervisedPrograms = new HashSet<>();
 
-  @PrePersist
-  private void prePersist() {
-    if (allowNotify == null ) {
-      setAllowNotify(Boolean.TRUE);
-    }
-  }
-
   private User(Importer importer) {
     id = importer.getId();
     username = importer.getUsername();
@@ -123,13 +115,17 @@ public class User extends BaseEntity {
     verified = importer.isVerified();
     active = importer.isActive();
     loginRestricted = importer.isLoginRestricted();
-    allowNotify = importer.getAllowNotify();
+    if (importer.getAllowNotify() == null) {
+      allowNotify = true;
+    } else {
+      allowNotify = importer.getAllowNotify();
+    }
     extraData = importer.getExtraData();
   }
 
   User(UUID id, String username, String firstName, String lastName, String email, String timezone,
        Facility homeFacility, boolean active, boolean verified, boolean loginRestricted,
-       Boolean allowNotify, Map<String, String> extraData) {
+       boolean allowNotify, Map<String, String> extraData) {
     this.id = id;
     this.username = username;
     this.firstName = firstName;

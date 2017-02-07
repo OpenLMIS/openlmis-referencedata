@@ -119,5 +119,4 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
   public int hashCode() {
     return Objects.hash(username);
   }
-
 }

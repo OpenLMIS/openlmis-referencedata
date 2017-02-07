@@ -16,13 +16,14 @@ public class UserBuilder {
   private boolean active;
   private boolean verified;
   private boolean loginRestricted;
-  private Boolean allowNotify;
+  private boolean allowNotify;
   private Map<String, String> extraData;
 
   private UserBuilder() {
     this.homeFacility = null;
     this.active = false;
     this.verified = false;
+    this.allowNotify = true;
   }
 
   /**
@@ -78,6 +79,6 @@ public class UserBuilder {
 
   public User createUser() {
     return new User(id, username, firstName, lastName, email, timezone, homeFacility, active,
-        verified, loginRestricted, allowNotify,extraData);
+        verified, loginRestricted, allowNotify, extraData);
   }
 }
