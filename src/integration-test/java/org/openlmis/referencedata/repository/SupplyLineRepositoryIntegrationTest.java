@@ -86,7 +86,7 @@ public class SupplyLineRepositoryIntegrationTest
     List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
             null, null, null);
 
-    Assert.assertEquals(8, receivedSupplyLines.size());
+    Assert.assertEquals(5, receivedSupplyLines.size());
   }
 
   @Test

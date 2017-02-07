@@ -6,7 +6,7 @@
 
 DIRECTORY=${1}
 GENERATOR=${2}
-OUTPUT_DIR=${DIRECTORY}/../build/resources/main/db/starter
+OUTPUT_DIR=${DIRECTORY}/../build/demo-data
 
 # Get list of JSON files in current directory
 FILES=`find ${DIRECTORY} -name "*.json"`

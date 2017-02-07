@@ -92,7 +92,7 @@ public class ProgramOrderableRepositoryIntegrationTest
     List<ProgramOrderable> receivedProgramOrderables =
             programOrderableRepository.searchProgramOrderables(null);
 
-    Assert.assertEquals(36, receivedProgramOrderables.size());
+    Assert.assertEquals(programOrderables.size(), receivedProgramOrderables.size());
   }
 
   @Test

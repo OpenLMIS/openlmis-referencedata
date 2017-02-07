@@ -1,9 +1,7 @@
 package org.openlmis.referencedata.repository;
 
-import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -68,8 +66,8 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
 
     List<Program> foundPrograms = repository.findProgramsByName("Program");
 
-    assertEquals(2, foundPrograms.size());
-    assertThat(foundPrograms, hasItem(program));
+    assertEquals(1, foundPrograms.size());
+    assertEquals(program, foundPrograms.get(0));
   }
 
   @Test

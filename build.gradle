@@ -221,10 +221,6 @@ processResources {
 
 apply from: "registration.gradle"
 
-compileJava {
-    dependsOn demoDataSeed
-}
-
 assemble {
     dependsOn ramlToHtml
     dependsOn ramlToSwagger
