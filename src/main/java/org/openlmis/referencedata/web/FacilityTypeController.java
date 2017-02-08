@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,7 +70,9 @@ public class FacilityTypeController extends BaseController {
    * @return the updated facilityType
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.PUT)
-  public ResponseEntity<FacilityType> updateFacilityType(
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public FacilityType updateFacilityType(
       @RequestBody FacilityType facilityType, @PathVariable("id") UUID facilityTypeId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
@@ -88,7 +89,7 @@ public class FacilityTypeController extends BaseController {
       facilityTypeRepository.save(facilityTypeToUpdate);
 
       LOGGER.debug("Updating facility type with id: " + facilityTypeToUpdate.getId());
-      return new ResponseEntity<>(facilityTypeToUpdate, HttpStatus.OK);
+      return facilityTypeToUpdate;
     } catch (DataIntegrityViolationException ex) {
       throw new IntegrityViolationException(FacilityTypeMessageKeys.ERROR_SAVING_WITH_ID, ex);
     }
@@ -101,13 +102,15 @@ public class FacilityTypeController extends BaseController {
    * @return the FacilityType.
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.GET)
-  public ResponseEntity<FacilityType> getFacilityType(@PathVariable("id") UUID facilityTypeId) {
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public FacilityType getFacilityType(@PathVariable("id") UUID facilityTypeId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
     if (facilityType == null) {
       throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return new ResponseEntity<>(facilityType, HttpStatus.OK);
+      return facilityType;
     }
   }
 
@@ -115,10 +118,10 @@ public class FacilityTypeController extends BaseController {
    * Allows deleting facilityType.
    *
    * @param facilityTypeId UUID of facilityType which we want to delete
-   * @return the ResponseEntity containing the HTTP Status
    */
   @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
     if (facilityType == null) {
@@ -129,8 +132,6 @@ public class FacilityTypeController extends BaseController {
       } catch (DataIntegrityViolationException ex) {
         throw new IntegrityViolationException(FacilityTypeMessageKeys.ERROR_DELETING_WITH_ID, ex);
       }
-
-      return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
   }
 }

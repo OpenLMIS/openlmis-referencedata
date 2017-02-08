@@ -120,6 +120,7 @@ public class FacilityController extends BaseController {
    * @param changedPropertyName The name of the property about which changes should be returned.
    *               If null or empty, changes associated with any and all properties are returned.
    * @param page A Pageable object that allows client to optionally add "page" (page number)
+   *             and "size" (page size) query parameters to the request.
    */
   @RequestMapping(value = "/facilities/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
