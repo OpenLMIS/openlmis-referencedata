@@ -19,8 +19,6 @@ CREATE TABLE facilities (
 );
 
 
-ALTER TABLE facilities OWNER TO postgres;
-
 --
 -- Name: facility_operators; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -33,8 +31,6 @@ CREATE TABLE facility_operators (
     name text
 );
 
-
-ALTER TABLE facility_operators OWNER TO postgres;
 
 --
 -- Name: facility_type_approved_products; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -50,8 +46,6 @@ CREATE TABLE facility_type_approved_products (
 );
 
 
-ALTER TABLE facility_type_approved_products OWNER TO postgres;
-
 --
 -- Name: facility_types; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -66,8 +60,6 @@ CREATE TABLE facility_types (
 );
 
 
-ALTER TABLE facility_types OWNER TO postgres;
-
 --
 -- Name: geographic_levels; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -79,8 +71,6 @@ CREATE TABLE geographic_levels (
     name text
 );
 
-
-ALTER TABLE geographic_levels OWNER TO postgres;
 
 --
 -- Name: geographic_zones; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -97,8 +87,6 @@ CREATE TABLE geographic_zones (
 );
 
 
-ALTER TABLE geographic_zones OWNER TO postgres;
-
 --
 -- Name: orderable_display_categories; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -110,8 +98,6 @@ CREATE TABLE orderable_display_categories (
     displayorder integer NOT NULL
 );
 
-
-ALTER TABLE orderable_display_categories OWNER TO postgres;
 
 --
 -- Name: orderables; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -132,8 +118,6 @@ CREATE TABLE orderables (
 );
 
 
-ALTER TABLE orderables OWNER TO postgres;
-
 --
 -- Name: processing_periods; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -148,8 +132,6 @@ CREATE TABLE processing_periods (
 );
 
 
-ALTER TABLE processing_periods OWNER TO postgres;
-
 --
 -- Name: processing_schedules; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -162,8 +144,6 @@ CREATE TABLE processing_schedules (
     name text NOT NULL
 );
 
-
-ALTER TABLE processing_schedules OWNER TO postgres;
 
 --
 -- Name: program_orderables; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -183,8 +163,6 @@ CREATE TABLE program_orderables (
 );
 
 
-ALTER TABLE program_orderables OWNER TO postgres;
-
 --
 -- Name: programs; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -200,8 +178,6 @@ CREATE TABLE programs (
 );
 
 
-ALTER TABLE programs OWNER TO postgres;
-
 --
 -- Name: requisition_group_members; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -211,8 +187,6 @@ CREATE TABLE requisition_group_members (
     facilityid uuid NOT NULL
 );
 
-
-ALTER TABLE requisition_group_members OWNER TO postgres;
 
 --
 -- Name: requisition_group_program_schedules; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -228,8 +202,6 @@ CREATE TABLE requisition_group_program_schedules (
 );
 
 
-ALTER TABLE requisition_group_program_schedules OWNER TO postgres;
-
 --
 -- Name: requisition_groups; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -243,8 +215,6 @@ CREATE TABLE requisition_groups (
 );
 
 
-ALTER TABLE requisition_groups OWNER TO postgres;
-
 --
 -- Name: right_attachments; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -254,8 +224,6 @@ CREATE TABLE right_attachments (
     attachmentid uuid NOT NULL
 );
 
-
-ALTER TABLE right_attachments OWNER TO postgres;
 
 --
 -- Name: rights; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -268,8 +236,6 @@ CREATE TABLE rights (
     type text NOT NULL
 );
 
-
-ALTER TABLE rights OWNER TO postgres;
 
 --
 -- Name: role_assignments; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -286,8 +252,6 @@ CREATE TABLE role_assignments (
 );
 
 
-ALTER TABLE role_assignments OWNER TO postgres;
-
 --
 -- Name: role_rights; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -297,8 +261,6 @@ CREATE TABLE role_rights (
     rightid uuid NOT NULL
 );
 
-
-ALTER TABLE role_rights OWNER TO postgres;
 
 --
 -- Name: roles; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -310,8 +272,6 @@ CREATE TABLE roles (
     name text NOT NULL
 );
 
-
-ALTER TABLE roles OWNER TO postgres;
 
 --
 -- Name: stock_adjustment_reasons; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -327,8 +287,6 @@ CREATE TABLE stock_adjustment_reasons (
 );
 
 
-ALTER TABLE stock_adjustment_reasons OWNER TO postgres;
-
 --
 -- Name: supervisory_nodes; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -343,8 +301,6 @@ CREATE TABLE supervisory_nodes (
 );
 
 
-ALTER TABLE supervisory_nodes OWNER TO postgres;
-
 --
 -- Name: supply_lines; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -358,8 +314,6 @@ CREATE TABLE supply_lines (
 );
 
 
-ALTER TABLE supply_lines OWNER TO postgres;
-
 --
 -- Name: supported_programs; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
 --
@@ -372,8 +326,6 @@ CREATE TABLE supported_programs (
     programid uuid NOT NULL
 );
 
-
-ALTER TABLE supported_programs OWNER TO postgres;
 
 --
 -- Name: users; Type: TABLE; Schema: referencedata; Owner: postgres; Tablespace: 
@@ -394,8 +346,6 @@ CREATE TABLE users (
     homefacilityid uuid
 );
 
-
-ALTER TABLE users OWNER TO postgres;
 
 --
 -- Name: facilities_pkey; Type: CONSTRAINT; Schema: referencedata; Owner: postgres; Tablespace: 
