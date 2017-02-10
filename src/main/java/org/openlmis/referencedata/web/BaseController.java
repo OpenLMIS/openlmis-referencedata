@@ -6,21 +6,14 @@ import org.javers.core.changelog.SimpleTextChangeLog;
 import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
 import org.javers.repository.jql.QueryBuilder;
-import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.util.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
-import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequestMapping("/api")
 public abstract class BaseController {
@@ -29,30 +22,7 @@ public abstract class BaseController {
   RightService rightService;
 
   @Autowired
-  private ExposedMessageSource messageSource;
-
-  @Autowired
   private Javers javers;
-
-
-  protected Map<String, String> getErrors(Errors errors) {
-    return errors
-        .getFieldErrors()
-        .stream()
-        .collect(Collectors.toMap(FieldError::getField,f -> messageSource.getMessage(
-            f.getDefaultMessage(), f.getArguments(), LocaleContextHolder.getLocale()))
-        );
-  }
-
-  protected ErrorResponse buildErrorResponse(String messageKey) {
-    return buildErrorResponse(messageKey, null);
-  }
-
-  protected ErrorResponse buildErrorResponse(String messageKey, Object[] errorArgs) {
-    return new ErrorResponse(messageKey,
-        messageSource.getMessage(messageKey, errorArgs, LocaleContextHolder.getLocale()));
-  }
-
 
   /**
    * <p>
