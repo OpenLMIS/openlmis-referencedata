@@ -134,7 +134,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     assertEquals(0, foundFacilties.size());
   }
 
-  private void searchFacilityAndCheckResults(String code, String name, Facility facility, int expectedSize) {
+  private void searchFacilityAndCheckResults(String code, String name,
+                                             Facility facility, int expectedSize) {
     List<Facility> foundFacilties = repository.findFacilitiesByCodeOrName(code, name);
 
     assertEquals(expectedSize, foundFacilties.size());
