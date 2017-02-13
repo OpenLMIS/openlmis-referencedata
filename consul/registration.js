@@ -353,8 +353,51 @@ function CommandLineResolver() {
       util.format(templates.formatted, formatMessage, errorMessage) : errorMessage;
   }
 
+  function getServices(consulHost, consulPort) {
+    var result;
+
+    var settings = {
+      host: consulHost,
+      port: consulPort,
+      path: '/v1/catalog/services',
+      method: 'GET'
+    }
+
+    var request = http.request(settings, function(response) {
+      response.on('data', function (chunk) {
+        result = chunk;
+      });
+    });
+
+    request.end();
+
+    while(!result) {
+      deasync.runLoopOnce();
+    }
+
+    return result;
+  }
+
+  function awaitConsul(consulHost, consulPort) {
+    var services;
+
+    for (var i = 0; i < 10; i++) {
+      sleep(1000);
+
+      services = JSON.parse(getServices(consulHost, consulPort));
+
+      // Checks whether consul service has already registered
+      if (services.consul) {
+        break;
+      }
+    }
+  }
+
   var consulHost = process.env.CONSUL_HOST || 'consul';
   var consulPort = process.env.CONSUL_PORT || '8500';
+
+  awaitConsul(consulHost, consulPort);
+
   var registration = new RegistrationService(consulHost, consulPort);
 
   try {
