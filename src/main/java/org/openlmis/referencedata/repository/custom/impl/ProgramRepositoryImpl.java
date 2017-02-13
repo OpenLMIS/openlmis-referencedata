@@ -33,7 +33,7 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
       predicate = builder.and(
           predicate,
           builder.like(
-              root.get("name"), "%" + name + "%"));
+                  builder.upper(root.get("name")), "%" + name.toUpperCase() + "%"));
     }
     query.where(predicate);
     return entityManager.createQuery(query).getResultList();

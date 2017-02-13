@@ -34,11 +34,13 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     Predicate predicate = builder.disjunction();
 
     if (code != null) {
-      predicate = builder.or(predicate, builder.like(root.get("code"), "%" + code + "%"));
+      predicate = builder.or(predicate,
+          builder.like(builder.upper(root.get("code")), "%" + code.toUpperCase() + "%"));
     }
 
     if (name != null) {
-      predicate = builder.or(predicate, builder.like(root.get("name"), "%" + name + "%"));
+      predicate = builder.or(predicate,
+          builder.like(builder.upper(root.get("name")), "%" + name.toUpperCase() + "%"));
     }
 
     query.where(predicate);
