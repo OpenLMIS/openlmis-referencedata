@@ -84,6 +84,11 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
 
     assertEquals(1, foundPrograms.size());
     assertEquals(program, foundPrograms.get(0));
+
+    foundPrograms = repository.findProgramsByName("ProGRam");
+
+    assertEquals(1, foundPrograms.size());
+    assertEquals(program, foundPrograms.get(0));
   }
 
   @Test
