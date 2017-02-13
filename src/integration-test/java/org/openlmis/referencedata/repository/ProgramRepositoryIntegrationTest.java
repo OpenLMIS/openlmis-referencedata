@@ -71,6 +71,22 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
   }
 
   @Test
+  public void shouldFindBySimilarNameIgnoringCase() {
+    Program program = this.generateInstance();
+    repository.save(program);
+
+    List<Program> foundPrograms = repository.findProgramsByName("PROGRAM");
+
+    assertEquals(1, foundPrograms.size());
+    assertEquals(program, foundPrograms.get(0));
+
+    foundPrograms = repository.findProgramsByName("program");
+
+    assertEquals(1, foundPrograms.size());
+    assertEquals(program, foundPrograms.get(0));
+  }
+
+  @Test
   public void shouldNotFindByIncorrectSimilarName() {
     Program program = this.generateInstance();
     repository.save(program);

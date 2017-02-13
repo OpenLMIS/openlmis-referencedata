@@ -75,11 +75,44 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
+  public void shouldFindFacilitiesWithSimilarCodeIgnoringCase() {
+    Facility facility = generateInstance();
+    repository.save(facility);
+
+    List<Facility> foundFacilties =
+            repository.findFacilitiesByCodeOrName(facility.getCode().toUpperCase(), null);
+
+    assertEquals(1, foundFacilties.size());
+    assertEquals(facility.getCode(), foundFacilties.get(0).getCode());
+
+    foundFacilties = repository.findFacilitiesByCodeOrName(facility.getCode().toLowerCase(), null);
+
+    assertEquals(1, foundFacilties.size());
+    assertEquals(facility.getCode(), foundFacilties.get(0).getCode());
+  }
+
+  @Test
   public void shouldFindFacilitiesWithSimilarName() {
     Facility facility = generateInstance();
     repository.save(facility);
 
     List<Facility> foundFacilties = repository.findFacilitiesByCodeOrName(null, "Facil");
+
+    assertEquals(1, foundFacilties.size());
+    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarNameIgnoringCase() {
+    Facility facility = generateInstance();
+    repository.save(facility);
+
+    List<Facility> foundFacilties = repository.findFacilitiesByCodeOrName(null, "facil");
+
+    assertEquals(1, foundFacilties.size());
+    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+
+    foundFacilties = repository.findFacilitiesByCodeOrName(null, "FACIL");
 
     assertEquals(1, foundFacilties.size());
     assertEquals(facility.getName(), foundFacilties.get(0).getName());
@@ -94,6 +127,26 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     List<Facility> foundFacilties =
         repository.findFacilitiesByCodeOrName(facility.getCode(), "Facil");
+
+    assertEquals(2, foundFacilties.size());
+    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarCodeOrNameIgnoringCase() {
+    Facility facility = generateInstance();
+    repository.save(facility);
+    Facility facility1 = generateInstance();
+    repository.save(facility1);
+
+    List<Facility> foundFacilties =
+            repository.findFacilitiesByCodeOrName(facility.getCode().toLowerCase(), "facil");
+
+    assertEquals(2, foundFacilties.size());
+    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+
+    foundFacilties =
+            repository.findFacilitiesByCodeOrName(facility.getCode().toUpperCase(), "FACIL");
 
     assertEquals(2, foundFacilties.size());
     assertEquals(facility.getName(), foundFacilties.get(0).getName());

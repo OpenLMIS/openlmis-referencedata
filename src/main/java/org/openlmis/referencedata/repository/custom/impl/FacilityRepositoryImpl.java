@@ -21,6 +21,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
   /**
    * This method is supposed to retrieve all Facilities with facilityCode similar to
    * code parameter or facilityName similar to name parameter.
+   * Method is ignoring case for facility code and name.
    * To find all wanted Facilities we use criteria query and like operator.
    *
    * @param code Part of wanted code.

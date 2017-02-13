@@ -18,6 +18,7 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
 
   /**
    * This method is supposed to retrieve all Programs with programName similar to name parameter.
+   * Method is ignoring case for program name.
    * To find all wanted Programs we use criteria query and like operator.
    *
    * @param name Part of wanted program name.
