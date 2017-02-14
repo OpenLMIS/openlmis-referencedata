@@ -3,6 +3,7 @@
 title: OpenLMIS Reference Data API
 version: "@version@"
 baseUri: "@baseUrl@"
+protocols: [ HTTP, HTTPS ]
 
 documentation:
     - title: Getting Started
