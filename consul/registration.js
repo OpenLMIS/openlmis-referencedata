@@ -169,7 +169,7 @@ function RegistrationService(host, port) {
   self.consulPort = port;
   self.filename = '.consul_service_id~';
 
-  self.registrator = new ServiceConsulRegistrator(self.consulHost, self.consulPort);;
+  self.registrator = new ServiceConsulRegistrator(self.consulHost, self.consulPort);
   self.parser = new ServiceRAMLParser();
 
   self.register = function(args) {
@@ -353,50 +353,38 @@ function CommandLineResolver() {
       util.format(templates.formatted, formatMessage, errorMessage) : errorMessage;
   }
 
-  function getServices(consulHost, consulPort) {
+  function awaitConsul(consulHost, consulPort) {
     var result;
 
     var settings = {
       host: consulHost,
       port: consulPort,
-      path: '/v1/catalog/services',
-      method: 'GET'
+      path: '/v1/catalog/services'
     }
 
-    var request = http.request(settings, function(response) {
-      response.on('data', function (chunk) {
-        result = chunk;
-      });
-    });
-
-    request.end();
-
-    while(!result) {
-      deasync.runLoopOnce();
-    }
-
-    return result;
-  }
-
-  function awaitConsul(consulHost, consulPort) {
-    var services;
-
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 5; i++) {
       sleep(1000);
+      var request = http.get(settings, function(response) {
+        result = response;
+      });
 
-      services = JSON.parse(getServices(consulHost, consulPort));
+      while(!result) {
+        deasync.runLoopOnce();
+      }
 
-      // Checks whether consul service has already registered
-      if (services.consul) {
-        break;
+      if (result.statusCode === 200) {
+        return true;
       }
     }
+    return false;
   }
 
   var consulHost = process.env.CONSUL_HOST || 'consul';
   var consulPort = process.env.CONSUL_PORT || '8500';
 
-  awaitConsul(consulHost, consulPort);
+  if (!awaitConsul(consulHost, consulPort)) {
+    throw new Error("The Consul service has not started up properly.");
+  }
 
   var registration = new RegistrationService(consulHost, consulPort);
 
