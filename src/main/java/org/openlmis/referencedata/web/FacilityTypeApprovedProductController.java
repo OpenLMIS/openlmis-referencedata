@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_PRODUCT_MANAGE;
+
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
@@ -55,6 +57,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @ResponseBody
   public FacilityTypeApprovedProduct createFacilityTypeApprovedProduct(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct) {
+    rightService.checkAdminRight(FACILITY_APPROVED_PRODUCT_MANAGE);
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
     // Ignore provided id
     facilityTypeApprovedProduct.setId(null);
@@ -76,6 +79,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
   public FacilityTypeApprovedProduct updateFacilityTypeApprovedProduct(
         @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
+    rightService.checkAdminRight(FACILITY_APPROVED_PRODUCT_MANAGE);
     LOGGER.debug("Updating facilityTypeApprovedProduct");
     repository.save(facilityTypeApprovedProduct);
     return facilityTypeApprovedProduct;
@@ -92,6 +96,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @ResponseBody
   public FacilityTypeApprovedProduct getFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
+    rightService.checkAdminRight(FACILITY_APPROVED_PRODUCT_MANAGE);
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
           repository.findOne(facilityTypeApprovedProductId);
     if (facilityTypeApprovedProduct == null) {
@@ -111,6 +116,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   public void deleteFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
+    rightService.checkAdminRight(FACILITY_APPROVED_PRODUCT_MANAGE);
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
           repository.findOne(facilityTypeApprovedProductId);
     if (facilityTypeApprovedProduct == null) {

@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_PRODUCT_MANAGE;
 
 import org.joda.money.CurrencyUnit;
 import org.junit.Ignore;
@@ -106,6 +107,23 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   }
 
   @Test
+  public void shouldReturn403IfUserHasNoRightToDeleteFacilityTypeApprovedProduct() {
+    mockUserHasNoRight(FACILITY_APPROVED_PRODUCT_MANAGE);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPostFacilityTypeApprovedProduct() {
 
     FacilityTypeApprovedProduct response = restAssured
@@ -121,6 +139,24 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     assertEquals(facilityTypeAppProd, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturn403WhenUserHasNoRightsToPostFacilityTypeApprovedProduct() {
+    mockUserHasNoRight(FACILITY_APPROVED_PRODUCT_MANAGE);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(facilityTypeAppProd)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract().as(FacilityTypeApprovedProduct.class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+
   }
 
   @Test
@@ -147,6 +183,24 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   }
 
   @Test
+  public void shouldReturn403WhenUserHasNoRightsToPutFacilityTypeApprovedProduct() {
+    mockUserHasNoRight(FACILITY_APPROVED_PRODUCT_MANAGE);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .body(facilityTypeAppProd)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract().as(FacilityTypeApprovedProduct.class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetFacilityTypeApprovedProduct() {
 
     given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
@@ -163,6 +217,23 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .extract().as(FacilityTypeApprovedProduct.class);
 
     assertEquals(facilityTypeAppProd, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturn403WhenUserHasNoRightsToGetFacilityTypeApprovedProduct() {
+    mockUserHasNoRight(FACILITY_APPROVED_PRODUCT_MANAGE);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract().as(FacilityTypeApprovedProduct.class);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
