@@ -201,7 +201,7 @@ public class UserService {
 
   private void sendMail(String from, String to, String subject, String content, String token) {
     try {
-      NotificationRequest request = new NotificationRequest(from, to, subject, content, null);
+      NotificationRequest request = new NotificationRequest(from, to, subject, content);
 
       String url = baseUrl + "/api/notification?access_token=" + token;
       RestTemplate restTemplate = new RestTemplate();
