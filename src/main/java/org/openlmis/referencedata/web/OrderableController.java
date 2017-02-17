@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,11 +32,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+
 @RestController
 public class OrderableController extends BaseController {
 
   @Autowired
   private OrderableRepository repository;
+
+  @Autowired
+  private RightService rightService;
 
   /**
    * Finds all orderables.
@@ -43,6 +49,8 @@ public class OrderableController extends BaseController {
    */
   @RequestMapping("/orderables")
   public List<Orderable> findAll() {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     List<Orderable> allOrderables = new ArrayList<>();
     for (Orderable product:repository.findAll()) {
       allOrderables.add(product);
@@ -59,6 +67,8 @@ public class OrderableController extends BaseController {
   @RequestMapping(value = "/orderables/{id}", method = RequestMethod.GET)
   public ResponseEntity<Orderable> getChosenOrderable(
       @PathVariable("id") UUID productId) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     Orderable orderable = repository.findOne(productId);
     if (orderable == null) {
       throw new NotFoundException(OrderableMessageKeys.NOT_FOUND);

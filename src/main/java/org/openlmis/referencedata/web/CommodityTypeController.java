@@ -23,6 +23,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
@@ -40,6 +41,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+
 @RestController
 public class CommodityTypeController extends BaseController {
   @Autowired
@@ -51,6 +54,9 @@ public class CommodityTypeController extends BaseController {
   @Autowired
   private OrderableRepository repository;
 
+  @Autowired
+  private RightService rightService;
+
   /**
    * Add or update a commodity type
    * @param commodityType the commodity type to add or update.
@@ -58,6 +64,8 @@ public class CommodityTypeController extends BaseController {
   @Transactional
   @RequestMapping(value = "/commodityTypes", method = RequestMethod.PUT)
   public CommodityType createOrUpdate(@RequestBody CommodityType commodityType) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     // if it already exists, update or fail if not already a CommodityType
     Orderable storedProduct = repository.findByProductCode(commodityType.getProductCode());
     if (null != storedProduct) {
@@ -80,6 +88,7 @@ public class CommodityTypeController extends BaseController {
   @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.PUT)
   public ResponseEntity<?> updateTradeItemAssociations(@PathVariable("id") UUID commodityTypeId,
                                           @RequestBody Set<UUID> tradeItemIds) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     // ensure trade item list isn't null
     if (null == tradeItemIds) {
@@ -119,6 +128,8 @@ public class CommodityTypeController extends BaseController {
   @Transactional
   @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.GET)
   public ResponseEntity<?> getTradeItems(@PathVariable("id") UUID commodityTypeId) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     // ensure commodity type exists
     CommodityType commodityType = commodityTypeRepository.findOne(commodityTypeId);
     if (null == commodityType) {

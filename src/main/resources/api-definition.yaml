@@ -604,6 +604,10 @@ resourceTypes:
                 "400":
                     body:
                         application/json:
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       get:
             is: [ secured ]
             description: Get all orderableDisplayCategories.
@@ -615,6 +619,10 @@ resourceTypes:
                 "404":
                     body:
                        application/json:
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
       /{id}:
             uriParameters:
               id:
@@ -636,6 +644,10 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen orderableDisplayCategory.
@@ -647,6 +659,10 @@ resourceTypes:
                     "404":
                         body:
                             application/json:
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: "[AVOID USING] Completely removes display category. This action is not recoverable."
@@ -659,6 +675,10 @@ resourceTypes:
                     "409":
                         body:
                             application/json:
+                    "403":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
       /search:
           get:
               is: [ secured ]
@@ -671,11 +691,15 @@ resourceTypes:
                       required: false
                       repeat: false
               responses:
-                 "200":
-                     body:
-                       application/json:
+                  "200":
+                      body:
+                        application/json:
                           schema: orderableDisplayCategoryArray
-                 "404":
+                  "404":
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /orderables:
       displayName: Orderable Product
@@ -687,6 +711,10 @@ resourceTypes:
                   body:
                     application/json:
                         schema: orderableArray
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -706,6 +734,10 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /tradeItems:
       displayName: Trade Item
@@ -717,6 +749,10 @@ resourceTypes:
                   body:
                     application/json:
                         schema: tradeItem
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
 
   /CommodityTypes:
       displayName: Commodity Type
@@ -728,6 +764,10 @@ resourceTypes:
                   body:
                     application/json:
                         schema: commodityType
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{id}/tradeItems:
           uriParameters:
               id:
@@ -744,6 +784,10 @@ resourceTypes:
                         application/json:
                           schema: uuidArray
                   "404":
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update the list of Trade Item UUIDs that may fulfill for the given Commodity Type.
@@ -754,6 +798,10 @@ resourceTypes:
                   "200":
                   "400":
                   "404":
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /processingSchedules:
       displayName: Processing Schedule

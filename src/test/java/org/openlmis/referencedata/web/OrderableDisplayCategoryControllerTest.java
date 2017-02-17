@@ -23,19 +23,26 @@ import com.google.common.collect.Sets;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
+import org.openlmis.referencedata.service.RightService;
 
 import java.util.Set;
 
+@SuppressWarnings({"PMD.UnusedPrivateField"})
 public class OrderableDisplayCategoryControllerTest {
 
   @Mock
   private OrderableDisplayCategoryRepository repository;
 
+  @Mock
+  private RightService rightService;
+
+  @InjectMocks
   private OrderableDisplayCategoryController controller;
 
   private OrderableDisplayCategory categoryA;
@@ -50,7 +57,6 @@ public class OrderableDisplayCategoryControllerTest {
    */
   public OrderableDisplayCategoryControllerTest() {
     initMocks(this);
-    controller = new OrderableDisplayCategoryController(repository);
 
     codeA = Code.code("A");
     displayA = new OrderedDisplayValue("A-Analgesics", 1);

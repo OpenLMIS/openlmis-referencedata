@@ -21,6 +21,7 @@ import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.OrderableDisplayCategoryMessageKeys;
 import org.slf4j.Logger;
@@ -39,8 +40,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.UUID;
+
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 @Controller
 @Transactional
@@ -52,14 +54,8 @@ public class OrderableDisplayCategoryController extends BaseController {
   @Autowired
   private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
-  /**
-   * Constructor for controller unit testing.
-   *
-   * @param repository the OrderableDisplayCategoryRepository.
-   */
-  public OrderableDisplayCategoryController(OrderableDisplayCategoryRepository repository) {
-    this.orderableDisplayCategoryRepository = Objects.requireNonNull(repository);
-  }
+  @Autowired
+  private RightService rightService;
 
   /**
    * Get all OrderableDisplayCategories.
@@ -70,6 +66,8 @@ public class OrderableDisplayCategoryController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<OrderableDisplayCategory> getAllOrderableDisplayCategories() {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     return orderableDisplayCategoryRepository.findAll();
   }
 
@@ -84,6 +82,8 @@ public class OrderableDisplayCategoryController extends BaseController {
   @ResponseBody
   public OrderableDisplayCategory createOrderableDisplayCategory(
       @RequestBody OrderableDisplayCategory orderableDisplayCategory) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     OrderableDisplayCategory found =
         orderableDisplayCategoryRepository.findByCode(orderableDisplayCategory.getCode());
     if (null != found) {
@@ -110,6 +110,7 @@ public class OrderableDisplayCategoryController extends BaseController {
   public OrderableDisplayCategory updateOrderableDisplayCategory(
       @RequestBody OrderableDisplayCategory orderableDisplayCategory,
       @PathVariable("id") UUID orderableDisplayCategoryId) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
     LOGGER.debug("Updating orderableDisplayCategory with id: " + orderableDisplayCategoryId);
 
     OrderableDisplayCategory orderableDisplayCategoryToUpdate =
@@ -137,6 +138,8 @@ public class OrderableDisplayCategoryController extends BaseController {
   @ResponseBody
   public OrderableDisplayCategory getOrderableDisplayCategory(
       @PathVariable("id") UUID orderableDisplayCategoryId) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository.findOne(
         orderableDisplayCategoryId);
     if (orderableDisplayCategory == null) {
@@ -155,6 +158,8 @@ public class OrderableDisplayCategoryController extends BaseController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteOrderableDisplayCategory(
       @PathVariable("id") UUID orderableDisplayCategoryId) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository.findOne(
         orderableDisplayCategoryId);
     if (orderableDisplayCategory == null) {
@@ -181,6 +186,7 @@ public class OrderableDisplayCategoryController extends BaseController {
   @ResponseBody
   public Iterable<OrderableDisplayCategory> searchOrderableDisplayCategories(
       @RequestParam(value = "code", required = false) String codeParam) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     if (codeParam != null) {
       OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository

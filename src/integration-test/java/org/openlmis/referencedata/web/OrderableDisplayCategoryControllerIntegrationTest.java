@@ -19,7 +19,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.hamcrest.Matchers.equalTo;
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
@@ -35,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/orderableDisplayCategories";
@@ -61,6 +65,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
   @Test
   public void shouldFindOrderableDisplayCategoriesByCode() {
+    mockUserHasRight(ORDERABLES_MANAGE);
 
     given(orderableDisplayCategoryRepository.findByCode(any(Code.class))).willReturn(
         orderableDisplayCategory);
@@ -82,6 +87,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
   @Test
   public void shouldFindAllOrderableDisplayCategories() {
+    mockUserHasRight(ORDERABLES_MANAGE);
 
     Iterable<OrderableDisplayCategory> searchResult =
         Collections.singletonList(orderableDisplayCategory);
@@ -100,6 +106,28 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Test
+  public void shouldRejectSerachOrderableDisplayCategoriesIfUserHasNoRight() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    Iterable<OrderableDisplayCategory> searchResult =
+        Collections.singletonList(orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findAll()).willReturn(searchResult);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
   private OrderableDisplayCategory generateOrderableDisplayCategory() {
     Integer instanceNumber = generateInstanceNumber();
     OrderableDisplayCategory orderableDisplayCategory = OrderableDisplayCategory.createNew(
@@ -115,6 +143,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
   @Test
   public void shouldDeleteOrderableDisplayCategory() {
+    mockUserHasRight(ORDERABLES_MANAGE);
 
     given(orderableDisplayCategoryRepository.findOne(
         orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
@@ -133,7 +162,31 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   }
 
   @Test
+  public void shouldRejectDeleteOrderableDisplayCategoryIfUserHasNoRight() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    given(orderableDisplayCategoryRepository.findOne(
+        orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", orderableDisplayCategoryId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPostOrderableDisplayCategory() {
+    mockUserHasRight(ORDERABLES_MANAGE);
 
     OrderableDisplayCategory response = restAssured
         .given()
@@ -151,7 +204,28 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   }
 
   @Test
+  public void shouldRejectPostOrderableDisplayCategoryIfUserHasNoRight() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(orderableDisplayCategory)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPutWithIdOrderableDisplayCategory() {
+    mockUserHasRight(ORDERABLES_MANAGE);
 
     given(orderableDisplayCategoryRepository.findOne(
         orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
@@ -173,7 +247,32 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   }
 
   @Test
+  public void shouldRejectPutOrderableDisplayCategoryIfUserHasNoRight() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    given(orderableDisplayCategoryRepository.findOne(
+        orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", orderableDisplayCategoryId)
+        .body(orderableDisplayCategory)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetAllOrderableDisplayCategories() {
+    mockUserHasRight(ORDERABLES_MANAGE);
 
     List<OrderableDisplayCategory> storedOrderableDisplayCategories = Arrays.asList(
         orderableDisplayCategory, generateOrderableDisplayCategory());
@@ -195,7 +294,32 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   }
 
   @Test
+  public void shouldRejectGetAllOrderableDisplayCategoriesIfUserHasNoRight() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    List<OrderableDisplayCategory> storedOrderableDisplayCategories = Arrays.asList(
+        orderableDisplayCategory, generateOrderableDisplayCategory());
+    given(orderableDisplayCategoryRepository.findAll()).willReturn(
+        storedOrderableDisplayCategories);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetOrderableDisplayCategory() {
+    mockUserHasRight(ORDERABLES_MANAGE);
 
     given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategoryId)).willReturn(
         orderableDisplayCategory);
@@ -212,6 +336,34 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .extract().as(OrderableDisplayCategory.class);
 
     assertEquals(orderableDisplayCategory, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetOrderableDisplayCategoryIfUserHasNoRight() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategoryId)).willReturn(
+        orderableDisplayCategory);
+
+    List<OrderableDisplayCategory> storedOrderableDisplayCategories = Arrays.asList(
+        orderableDisplayCategory, generateOrderableDisplayCategory());
+    given(orderableDisplayCategoryRepository.findAll()).willReturn(
+        storedOrderableDisplayCategories);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", orderableDisplayCategoryId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }
