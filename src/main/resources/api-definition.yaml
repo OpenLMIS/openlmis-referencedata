@@ -924,6 +924,10 @@ resourceTypes:
                   body:
                     application/json:
               "404":
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new supplyLine.
@@ -936,6 +940,10 @@ resourceTypes:
               "400":
                   body:
                     application/json:
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -953,6 +961,10 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "409":
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
           get:
               is: [ secured ]
               description: Get chosen supplyLine.
@@ -961,6 +973,10 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  "403":
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -975,6 +991,10 @@ resourceTypes:
                         application/json:
                   "400":
                   "404":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  "403":
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1001,6 +1021,10 @@ resourceTypes:
                         application/json:
                   "404":
                   "500":
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
       /searchByUUID:
           get:
@@ -1031,6 +1055,10 @@ resourceTypes:
                         application/json:
                   "404":
                   "500":
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
 
   /users:
       displayName: User

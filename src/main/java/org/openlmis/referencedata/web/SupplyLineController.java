@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.openlmis.referencedata.domain.RightName.SUPPLY_LINES_MANAGE;
+
 @Controller
 @Transactional
 public class SupplyLineController extends BaseController {
@@ -79,7 +81,9 @@ public class SupplyLineController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public SupplyLineDto createSupplyLine(@RequestBody SupplyLineDto supplyLineDto) {
+    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
     LOGGER.debug("Creating new supplyLine");
+
     supplyLineDto.setId(null);
     SupplyLine supplyLine = SupplyLine.newSupplyLine(supplyLineDto);
     supplyLineRepository.save(supplyLine);
@@ -96,6 +100,8 @@ public class SupplyLineController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<SupplyLineDto> getAllSupplyLines() {
+    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
+
     Iterable<SupplyLine> supplyLines = supplyLineRepository.findAll();
     List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
 
@@ -118,6 +124,7 @@ public class SupplyLineController extends BaseController {
   @ResponseBody
   public SupplyLineDto updateSupplyLine(@RequestBody SupplyLineDto supplyLineDto,
                                         @PathVariable("id") UUID supplyLineId) {
+    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
     SupplyLine supplyLineToUpdate = supplyLineRepository.findOne(supplyLineId);
     if (supplyLineToUpdate == null) {
@@ -144,6 +151,8 @@ public class SupplyLineController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public SupplyLineDto getSupplyLine(@PathVariable("id") UUID supplyLineId) {
+    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
+
     SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
     if (supplyLine == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
@@ -160,6 +169,8 @@ public class SupplyLineController extends BaseController {
   @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteSupplyLine(@PathVariable("id") UUID supplyLineId) {
+    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
+
     SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
     if (supplyLine == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
@@ -181,6 +192,8 @@ public class SupplyLineController extends BaseController {
   public List<SupplyLineDto> searchSupplyLines(
       @RequestParam(value = "program") ProgramDto programDto,
       @RequestParam(value = "supervisoryNode") SupervisoryNodeDto supervisoryNodeDto) {
+    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
+
     Program program = Program.newProgram(programDto);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
     List<SupplyLine> result = supplyLineService.searchSupplyLines(program, supervisoryNode);
@@ -208,6 +221,8 @@ public class SupplyLineController extends BaseController {
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId", required = false) UUID supervisoryNodeId,
       @RequestParam(value = "supplyingFacilityId", required = false) UUID supplyingFacilityId) {
+    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
+
     Program program = programRepository.findOne(programId);
     SupervisoryNode supervisoryNode = null != supervisoryNodeId
         ? supervisoryNodeRepository.findOne(supervisoryNodeId)

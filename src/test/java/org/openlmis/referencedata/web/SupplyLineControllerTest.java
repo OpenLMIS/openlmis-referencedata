@@ -30,10 +30,12 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.SupplyLineService;
 
 import java.util.UUID;
 
+@SuppressWarnings({"PMD.UnusedPrivateField"})
 public class SupplyLineControllerTest {
 
   @Mock
@@ -56,6 +58,9 @@ public class SupplyLineControllerTest {
 
   @Mock
   private Facility supplyingFacility;
+
+  @Mock
+  private RightService rightService;
 
   @InjectMocks
   private SupplyLineController supplyLineController = new SupplyLineController();
