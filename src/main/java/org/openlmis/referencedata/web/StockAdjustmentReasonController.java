@@ -66,8 +66,7 @@ public class StockAdjustmentReasonController extends BaseController {
     LOGGER.debug("Creating new stockAdjustmentReason");
     // Ignore provided id
     stockAdjustmentReason.setId(null);
-    stockAdjustmentReasonRepository.save(stockAdjustmentReason);
-    return stockAdjustmentReason;
+    return stockAdjustmentReasonRepository.save(stockAdjustmentReason);
   }
 
   /**

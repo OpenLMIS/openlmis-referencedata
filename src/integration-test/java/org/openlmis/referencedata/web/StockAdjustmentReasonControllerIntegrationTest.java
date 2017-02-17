@@ -32,8 +32,11 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.STOCK_ADJUSTMENT_REASONS_MANAGE;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -48,12 +51,20 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
   private StockAdjustmentReason reason;
   private UUID reasonId;
+  private Program program;
 
   /**
    * Constructor for tests.
    */
   public StockAdjustmentReasonControllerIntegrationTest() {
-    Program program = new Program("test");
+    program = new Program("test");
+    program.setName("name");
+    program.setDescription("desc");
+    program.setId(UUID.randomUUID());
+    program.setActive(true);
+    program.setPeriodsSkippable(false);
+    program.setShowNonFullSupplyTab(false);
+
     reason = new StockAdjustmentReason(program, "reasonName", "description", true, 1);
     reasonId = UUID.randomUUID();
     reason.setId(reasonId);
@@ -104,6 +115,8 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
   public void shouldPostStockAdjustmentReason() {
     mockUserHasRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
+    when(stockAdjustmentReasonRepository.save(any(StockAdjustmentReason.class))).thenReturn(reason);
+
     StockAdjustmentReason response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -115,6 +128,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
         .statusCode(201)
         .extract().as(StockAdjustmentReason.class);
 
+    assertNotNull(response.getId());
     assertEquals(reason.getProgram(), response.getProgram());
     assertEquals(reason.getName(), response.getName());
     assertEquals(reason.getDescription(), response.getDescription());
@@ -192,9 +206,9 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
   public void shouldGetAllStockAdjustmentReasons() {
     mockUserHasRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
-    Program program = new Program("test2");
     StockAdjustmentReason anotherReason = new StockAdjustmentReason(
         program, "reason2", "description", true, 1);
+    anotherReason.setId(UUID.randomUUID());
 
     List<StockAdjustmentReason> storedStockAdjustmentReasons =
         Arrays.asList(reason, anotherReason);
