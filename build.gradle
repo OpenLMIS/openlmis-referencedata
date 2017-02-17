@@ -138,7 +138,7 @@ task generateMigration << {
 
 task demoDataSeed(type:Exec) {
     executable "./demo-data/demo_seed.sh"
-    args "./demo-data", "node ./demo-data/seed_generator.js"
+    args "demo-data", "build/demo-data", "demo-data/generator.js"
 }
 
 task checkApiIsRaml(type:Exec) {

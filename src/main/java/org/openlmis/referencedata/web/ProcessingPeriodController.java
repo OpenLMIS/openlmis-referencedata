@@ -244,7 +244,7 @@ public class ProcessingPeriodController extends BaseController {
   @RequestMapping(value = "/processingPeriods/searchByScheduleAndDate", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<ProcessingPeriodDto> searchPeriodsByUuuidAndDate(
+  public List<ProcessingPeriodDto> searchPeriodsByUuidAndDate(
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
