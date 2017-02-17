@@ -33,6 +33,7 @@ import org.flywaydb.core.Flyway;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.boot.sql.JaversProperties;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
+import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.ProgramOrderableBuilder;
 import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
@@ -46,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -59,6 +61,7 @@ import java.util.Objects;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
 @ImportResource("applicationContext.xml")
+@EntityScan(basePackageClasses = BaseEntity.class, basePackages = "org.openlmis.util.converter")
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class Application {
 

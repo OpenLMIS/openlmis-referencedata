@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +25,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -54,13 +51,11 @@ public class ProcessingPeriod extends BaseEntity {
   @Setter
   private String description;
 
-  @Convert(converter = LocalDatePersistenceConverter.class)
   @Column(nullable = false)
   @Getter
   @Setter
   private LocalDate startDate;
 
-  @Convert(converter = LocalDatePersistenceConverter.class)
   @Column(nullable = false)
   @Getter
   @Setter

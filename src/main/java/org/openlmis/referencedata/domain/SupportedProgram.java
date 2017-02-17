@@ -18,8 +18,6 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,7 +27,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -56,7 +53,6 @@ public class SupportedProgram extends BaseEntity {
   @Column(nullable = false)
   private Boolean active;
 
-  @Convert(converter = LocalDatePersistenceConverter.class)
   private LocalDate startDate;
 
   private SupportedProgram(Facility facility, Program program, boolean active) {

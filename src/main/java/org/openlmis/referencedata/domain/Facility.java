@@ -19,11 +19,10 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.openlmis.referencedata.util.LocalDatePersistenceConverter;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.javers.core.metamodel.annotation.TypeName;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -33,7 +32,6 @@ import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -89,12 +87,10 @@ public class Facility extends BaseEntity {
 
   @Getter
   @Setter
-  @Convert(converter = LocalDatePersistenceConverter.class)
   private LocalDate goLiveDate;
 
   @Getter
   @Setter
-  @Convert(converter = LocalDatePersistenceConverter.class)
   private LocalDate goDownDate;
 
   @Column(columnDefinition = TEXT)
