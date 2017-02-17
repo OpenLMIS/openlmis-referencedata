@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Stock Adjustment Reason",
+  "description": "A single stockAdjustmentReason",
+  "properties": {
+    "name": { "type": "string", "title": "name" },
+    "description": { "type": "string", "title": "description" },
+    "additive": { "type": "boolean", "title": "additive" },
+    "displayOrder": { "type": "integer", "title": "displayOrder" }
+  },
+  "required": ["name", "description"]
+}

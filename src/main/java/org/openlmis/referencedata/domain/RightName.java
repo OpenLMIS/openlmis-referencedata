@@ -27,4 +27,5 @@ public class RightName {
   public static final String REQUISITION_GROUPS_MANAGE = "REQUISITION_GROUPS_MANAGE";
   public static final String ORDERABLES_MANAGE = "ORDERABLES_MANAGE";
   public static final String SUPPLY_LINES_MANAGE = "SUPPLY_LINES_MANAGE";
+  public static final String STOCK_ADJUSTMENT_REASONS_MANAGE = "STOCK_ADJUSTMENT_REASONS_MANAGE";
 }

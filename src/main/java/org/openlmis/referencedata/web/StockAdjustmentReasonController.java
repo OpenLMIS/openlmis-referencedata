@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.List;
 import java.util.UUID;
 
+import static org.openlmis.referencedata.domain.RightName.STOCK_ADJUSTMENT_REASONS_MANAGE;
+
 @Controller
 @Transactional
 public class StockAdjustmentReasonController extends BaseController {
@@ -59,6 +61,8 @@ public class StockAdjustmentReasonController extends BaseController {
   @ResponseBody
   public StockAdjustmentReason createStockAdjustmentReason(
           @RequestBody StockAdjustmentReason stockAdjustmentReason) {
+    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+
     LOGGER.debug("Creating new stockAdjustmentReason");
     // Ignore provided id
     stockAdjustmentReason.setId(null);
@@ -75,6 +79,8 @@ public class StockAdjustmentReasonController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<StockAdjustmentReason> getAllStockAdjustmentReasons() {
+    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+
     Iterable<StockAdjustmentReason> stockAdjustmentReasons =
             stockAdjustmentReasonRepository.findAll();
     if (stockAdjustmentReasons == null) {
@@ -95,6 +101,8 @@ public class StockAdjustmentReasonController extends BaseController {
   @ResponseBody
   public StockAdjustmentReason getChosenStockAdjustmentReason(
           @PathVariable("id") UUID stockAdjustmentReasonId) {
+    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+
     StockAdjustmentReason stockAdjustmentReason =
             stockAdjustmentReasonRepository.findOne(stockAdjustmentReasonId);
     if (stockAdjustmentReason == null) {
@@ -114,6 +122,8 @@ public class StockAdjustmentReasonController extends BaseController {
   @ResponseBody
   public void deleteStockAdjustmentReason(
           @PathVariable("id") UUID stockAdjustmentReasonId) {
+    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+
     StockAdjustmentReason stockAdjustmentReason =
             stockAdjustmentReasonRepository.findOne(stockAdjustmentReasonId);
     if (stockAdjustmentReason == null) {
@@ -134,6 +144,8 @@ public class StockAdjustmentReasonController extends BaseController {
   public StockAdjustmentReason updateStockAdjustmentReason(
           @PathVariable("id") UUID stockAdjustmentReasonId,
           @RequestBody StockAdjustmentReason stockAdjustmentReason) {
+    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+
     if (stockAdjustmentReason == null || stockAdjustmentReasonId == null) {
       LOGGER.debug("Update failed - stockAdjustmentReason id not specified");
       throw new ValidationMessageException(StockAdjustmentReasonMessageKeys.ERROR_ID_NULL);
@@ -163,8 +175,10 @@ public class StockAdjustmentReasonController extends BaseController {
   @RequestMapping(value = "/stockAdjustmentReasons/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<StockAdjustmentReason> findStockAdjustmentReasonsByName(
+  public List<StockAdjustmentReason> findStockAdjustmentReasonsByProgramId(
           @RequestParam("program") UUID programId) {
+    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+
     return stockAdjustmentReasonRepository.findByProgramId(programId);
   }
 }
