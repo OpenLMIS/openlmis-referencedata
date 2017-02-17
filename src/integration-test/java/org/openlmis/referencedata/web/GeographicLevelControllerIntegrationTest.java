@@ -15,10 +15,13 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -49,6 +52,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldDeleteGeographicLevel() {
+    mockUserHasRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
 
@@ -66,7 +70,30 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectDeleteGeographicLevelIfUserHasNoRight() {
+    mockUserHasNoRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", geographicLevelId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPostGeographicLevel() {
+    mockUserHasRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     GeographicLevel response = restAssured
         .given()
@@ -84,7 +111,28 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectPostGeographicLevelIfUserHasNoRight() {
+    mockUserHasNoRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(geographicLevel)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPutGeographicLevel() {
+    mockUserHasRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     geographicLevel.setName("OpenLMIS");
     given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
@@ -107,7 +155,32 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectPutGeographicLevelIfUserHasNoRight() {
+    mockUserHasNoRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    geographicLevel.setName("OpenLMIS");
+    given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", geographicLevelId)
+        .body(geographicLevel)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetAllGeographicLevels() {
+    mockUserHasRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     List<GeographicLevel> storedGeographicLevels = Arrays.asList(geographicLevel,
         new GeographicLevel("GL2", 2));
@@ -128,7 +201,31 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectGetAllGeographicLevelsIfUserHasNoRight() {
+    mockUserHasNoRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    List<GeographicLevel> storedGeographicLevels = Arrays.asList(geographicLevel,
+        new GeographicLevel("GL2", 2));
+    given(geographicLevelRepository.findAll()).willReturn(storedGeographicLevels);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetGeographicLevel() {
+    mockUserHasRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
 
@@ -144,6 +241,26 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
         .extract().as(GeographicLevel.class);
 
     assertEquals(geographicLevel, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetGeographicLevelIfUserHasNoRight() {
+    mockUserHasNoRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", geographicLevelId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

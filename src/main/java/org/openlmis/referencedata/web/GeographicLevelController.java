@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
+import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
+
 @Controller
 @Transactional
 public class GeographicLevelController extends BaseController {
@@ -54,6 +56,8 @@ public class GeographicLevelController extends BaseController {
   @ResponseBody
   public GeographicLevel createGeographicLevel(
       @RequestBody GeographicLevel geographicLevel) {
+    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
     LOGGER.debug("Creating new geographicLevel");
     // Ignore provided id
     geographicLevel.setId(null);
@@ -70,6 +74,8 @@ public class GeographicLevelController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<GeographicLevel> getAllGeographicLevel() {
+    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
     Iterable<GeographicLevel> geographicLevels = geographicLevelRepository.findAll();
     if (geographicLevels == null) {
       throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
@@ -90,6 +96,8 @@ public class GeographicLevelController extends BaseController {
   @ResponseBody
   public GeographicLevel updateGeographicLevel(
       @RequestBody GeographicLevel geographicLevel, @PathVariable("id") UUID geographicLevelId) {
+    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
     LOGGER.debug("Updating geographicLevel");
     geographicLevelRepository.save(geographicLevel);
     return geographicLevel;
@@ -106,6 +114,8 @@ public class GeographicLevelController extends BaseController {
   @ResponseBody
   public GeographicLevel getGeographicLevel(
       @PathVariable("id") UUID geographicLevelId) {
+    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
     GeographicLevel geographicLevel = geographicLevelRepository.findOne(geographicLevelId);
     if (geographicLevel == null) {
       throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
@@ -123,6 +133,8 @@ public class GeographicLevelController extends BaseController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteGeographicLevel(
       @PathVariable("id") UUID geographicLevelId) {
+    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
     GeographicLevel geographicLevel = geographicLevelRepository.findOne(geographicLevelId);
     if (geographicLevel == null) {
       throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
