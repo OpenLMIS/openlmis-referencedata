@@ -35,10 +35,18 @@ public class GeographicZoneDto extends BaseDto implements
   private Integer catchmentPopulation;
   private Double latitude;
   private Double longitude;
+  private GeographicZoneDto parent;
 
   @Override
   public void setLevel(GeographicLevel level) {
     this.level = new GeographicLevelDto();
     level.export(this.level);
   }
+
+  @Override
+  public void setParent(GeographicZone parent) {
+    this.parent = new GeographicZoneDto();
+    parent.export(this.parent);
+  }
+
 }

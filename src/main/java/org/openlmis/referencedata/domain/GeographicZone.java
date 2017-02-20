@@ -49,11 +49,11 @@ public class GeographicZone extends BaseEntity {
   @Setter
   private GeographicLevel level;
 
-  //@ManyToOne TODO: re-enable this at some point, similar to SupervisoryNode
-  //@JoinColumn(name = "parentid")
-  //@Getter
-  //@Setter
-  //private GeographicZone parent;
+  @ManyToOne
+  @JoinColumn(name = "parentid")
+  @Getter
+  @Setter
+  private GeographicZone parent;
 
   @Getter
   @Setter
@@ -107,6 +107,10 @@ public class GeographicZone extends BaseEntity {
       geographicZone.setLevel(GeographicLevel.newGeographicLevel(importer.getLevel()));
     }
 
+    if (null != importer.getParent()) {
+      geographicZone.setParent(newGeographicZone(importer.getParent()));
+    }
+
     geographicZone.setCatchmentPopulation(importer.getCatchmentPopulation());
     geographicZone.setLatitude(importer.getLatitude());
     geographicZone.setLongitude(importer.getLongitude());
@@ -126,6 +130,10 @@ public class GeographicZone extends BaseEntity {
 
     if (null != level) {
       exporter.setLevel(level);
+    }
+
+    if (null != parent) {
+      exporter.setParent(parent);
     }
 
     exporter.setCatchmentPopulation(catchmentPopulation);
@@ -149,6 +157,8 @@ public class GeographicZone extends BaseEntity {
 
     void setLongitude(Double longitude);
 
+    void setParent(GeographicZone parent);
+
   }
 
   public interface Importer {
@@ -166,6 +176,8 @@ public class GeographicZone extends BaseEntity {
     Double getLatitude();
 
     Double getLongitude();
+
+    Importer getParent();
 
   }
 }

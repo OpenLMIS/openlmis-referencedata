@@ -15,7 +15,13 @@
 
 package org.openlmis.referencedata.web;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -30,16 +36,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
 public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -49,33 +50,52 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   @MockBean
   private GeographicZoneRepository geographicZoneRepository;
 
-  private GeographicLevel geographicLevel;
-  private GeographicZone geographicZone;
-  private GeographicZone geographicZone2;
-  private UUID geographicZoneId;
+  private GeographicLevel countryLevel;
+  private GeographicLevel regionLevel;
+  private GeographicLevel districtLevel;
+  
+  private GeographicZone countryZone;
+  private GeographicZone regionZone;
+  private GeographicZone districtZone;
 
   /**
    * Constructor for tests.
    */
   public GeographicZoneControllerIntegrationTest() {
-    geographicLevel = new GeographicLevel("GL1", 1);
-    geographicLevel.setId(UUID.randomUUID());
-    geographicLevel.setName("district");
-    geographicZoneId = UUID.randomUUID();
+    countryLevel = new GeographicLevel("Country", 1);
+    countryLevel.setId(UUID.randomUUID());
+    countryLevel.setName("Country");
 
-    geographicZone = new GeographicZone("GZ1", geographicLevel);
-    geographicZone.setId(geographicZoneId);
-    geographicZone.setName("1");
-    geographicZone.setCatchmentPopulation(100);
-    geographicZone.setLongitude(56.19);
-    geographicZone.setLatitude(33.15);
+    regionLevel = new GeographicLevel("Region", 1);
+    regionLevel.setId(UUID.randomUUID());
+    regionLevel.setName("Region");
 
-    geographicZone2 = new GeographicZone("GZ2", geographicLevel);
-    geographicZone2.setId(UUID.randomUUID());
-    geographicZone2.setName("2");
-    geographicZone2.setCatchmentPopulation(400);
-    geographicZone2.setLongitude(41.76);
-    geographicZone2.setLatitude(68.55);
+    districtLevel = new GeographicLevel("District", 1);
+    districtLevel.setId(UUID.randomUUID());
+    districtLevel.setName("District");
+    
+    countryZone = new GeographicZone("TC", countryLevel);
+    countryZone.setId(UUID.randomUUID());
+    countryZone.setName("Test Country");
+    countryZone.setCatchmentPopulation(100);
+    countryZone.setLongitude(56.19);
+    countryZone.setLatitude(33.15);
+
+    regionZone = new GeographicZone("TR", regionLevel);
+    regionZone.setId(UUID.randomUUID());
+    regionZone.setName("Test Region");
+    regionZone.setCatchmentPopulation(400);
+    regionZone.setLongitude(41.76);
+    regionZone.setLatitude(68.55);
+    regionZone.setParent(countryZone);
+
+    districtZone = new GeographicZone("TD", districtLevel);
+    districtZone.setId(UUID.randomUUID());
+    districtZone.setName("Test District");
+    districtZone.setCatchmentPopulation(400);
+    districtZone.setLongitude(41.76);
+    districtZone.setLatitude(68.55);
+    districtZone.setParent(regionZone);
   }
 
   @Test
@@ -83,13 +103,13 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
-    given(geographicZoneRepository.findOne(geographicZoneId)).willReturn(geographicZone);
+    given(geographicZoneRepository.findOne(countryZone.getId())).willReturn(countryZone);
 
     restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", geographicZoneId)
+        .pathParam("id", countryZone.getId())
         .when()
         .delete(ID_URL)
         .then()
@@ -103,20 +123,20 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
-    when(geographicZoneRepository.save(geographicZone)).thenReturn(geographicZone);
+    when(geographicZoneRepository.save(countryZone)).thenReturn(countryZone);
 
     GeographicZone response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(geographicZone)
+        .body(countryZone)
         .when()
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
         .extract().as(GeographicZone.class);
 
-    assertEquals(geographicZone, response);
+    assertEquals(countryZone, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -125,21 +145,21 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
-    when(geographicZoneRepository.save(geographicZone)).thenReturn(geographicZone);
+    when(geographicZoneRepository.save(countryZone)).thenReturn(countryZone);
 
     GeographicZone response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", geographicZoneId)
-        .body(geographicZone)
+        .pathParam("id", countryZone.getId())
+        .body(countryZone)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
         .extract().as(GeographicZone.class);
 
-    assertEquals(geographicZone, response);
+    assertEquals(countryZone, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -149,7 +169,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    List<GeographicZone> geographicZones = Arrays.asList(geographicZone, geographicZone2);
+    List<GeographicZone> geographicZones = Arrays.asList(countryZone, regionZone, districtZone);
     Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
 
     int pageNumber = 0;
@@ -181,20 +201,20 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    given(geographicZoneRepository.findOne(geographicZoneId)).willReturn(geographicZone);
+    given(geographicZoneRepository.findOne(countryZone.getId())).willReturn(countryZone);
 
     GeographicZone response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", geographicZoneId)
+        .pathParam("id", countryZone.getId())
         .when()
         .get(ID_URL)
         .then()
         .statusCode(200)
         .extract().as(GeographicZone.class);
 
-    assertEquals(geographicZone, response);
+    assertEquals(countryZone, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -209,7 +229,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", geographicZoneId)
+        .pathParam("id", countryZone.getId())
         .when()
         .get(ID_URL)
         .then()
@@ -248,8 +268,8 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", geographicZoneId)
-        .body(geographicZone)
+        .pathParam("id", countryZone.getId())
+        .body(countryZone)
         .when()
         .put(ID_URL)
         .then()
@@ -269,7 +289,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", geographicZoneId)
+        .pathParam("id", countryZone.getId())
         .when()
         .delete(ID_URL)
         .then()
@@ -289,7 +309,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(geographicZone)
+        .body(countryZone)
         .when()
         .post(RESOURCE_URL)
         .then()

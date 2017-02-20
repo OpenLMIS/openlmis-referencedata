@@ -15,6 +15,11 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertThat;
+
 import org.junit.Before;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
@@ -24,29 +29,68 @@ public class GeographicZoneRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<GeographicZone> {
 
   @Autowired
-  GeographicLevelRepository geographicLevelRepository;
+  private GeographicLevelRepository geographicLevelRepository;
 
   @Autowired
-  GeographicZoneRepository repository;
+  private GeographicZoneRepository repository;
 
+  private GeographicLevel countryLevel = new GeographicLevel("country", 1);
+  private GeographicLevel regionLevel = new GeographicLevel("region", 2);
+  private GeographicLevel districtLevel = new GeographicLevel("district", 3);
+
+  private GeographicZone countryZone;
+  private GeographicZone regionZone;
+  private GeographicZone districtZone;
+
+  @Override
   GeographicZoneRepository getRepository() {
     return this.repository;
   }
 
-  private GeographicLevel level = new GeographicLevel();
-
   @Before
   public void setUp() {
-    level.setCode("GeographicZoneRepositoryIntegrationTest");
-    level.setLevelNumber(1);
-    geographicLevelRepository.save(level);
+    geographicLevelRepository.save(countryLevel);
+    geographicLevelRepository.save(regionLevel);
+    geographicLevelRepository.save(districtLevel);
   }
 
+  @Override
   GeographicZone generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
-    GeographicZone zone = new GeographicZone();
-    zone.setCode(String.valueOf(instanceNumber));
-    zone.setLevel(level);
-    return zone;
+    countryZone = new GeographicZone();
+    countryZone.setCode("C" + this.getNextInstanceNumber());
+    countryZone.setLevel(countryLevel);
+
+    repository.save(countryZone);
+
+    regionZone = new GeographicZone();
+    regionZone.setCode("R" + this.getNextInstanceNumber());
+    regionZone.setLevel(regionLevel);
+    regionZone.setParent(countryZone);
+
+    repository.save(regionZone);
+
+    districtZone = new GeographicZone();
+    districtZone.setCode("D" + this.getNextInstanceNumber());
+    districtZone.setLevel(districtLevel);
+    districtZone.setParent(regionZone);
+
+    return districtZone;
+  }
+
+  @Override
+  protected void assertInstance(GeographicZone district) {
+    super.assertInstance(district);
+
+    assertThat(district.getCode(), startsWith("D"));
+    assertThat(district.getLevel().getLevelNumber(), is(3));
+    assertThat(district.getParent().getId(), is(regionZone.getId()));
+
+    assertThat(district.getParent().getCode(), startsWith("R"));
+    assertThat(district.getParent().getLevel().getLevelNumber(), is(2));
+    assertThat(district.getParent().getParent().getId(), is(countryZone.getId()));
+
+    assertThat(district.getParent().getParent().getCode(), startsWith("C"));
+    assertThat(district.getParent().getParent().getLevel().getLevelNumber(), is(1));
+    assertThat(district.getParent().getParent().getParent(), is(nullValue()));
   }
 }
