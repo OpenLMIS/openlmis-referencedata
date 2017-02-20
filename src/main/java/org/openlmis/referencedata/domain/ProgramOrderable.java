@@ -16,8 +16,14 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import org.hibernate.annotations.Parameter;
@@ -44,6 +50,7 @@ import javax.persistence.Table;
 @Table(name = "program_orderables", schema = "referencedata")
 @NoArgsConstructor
 @JsonSerialize(using = ProgramOrderable.ProgramOrderableSerializer.class)
+@JsonDeserialize(using = ProgramOrderableDeserializer.class)
 public class ProgramOrderable extends BaseEntity {
 
   @ManyToOne

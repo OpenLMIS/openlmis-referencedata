@@ -18,11 +18,13 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_PRODUCT_MANAGE;
+import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
 import org.joda.money.CurrencyUnit;
-import org.junit.Ignore;
+import org.joda.money.Money;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -34,6 +36,9 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -41,7 +46,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.UUID;
 
-@Ignore
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
@@ -50,12 +55,22 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @MockBean
   private FacilityTypeApprovedProductRepository repository;
 
+  @MockBean
+  private ProgramRepository programRepository;
+
+  @MockBean
+  private OrderableRepository orderableRepository;
+
+  @MockBean
+  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
+
   private Program program;
   private Orderable orderable;
   private FacilityType facilityType1;
   private ProgramOrderable programOrderable;
   private FacilityTypeApprovedProduct facilityTypeAppProd;
   private UUID facilityTypeAppProdId;
+  private OrderableDisplayCategory orderableDisplayCategory;
 
   /**
    * Constructor for tests.
@@ -66,7 +81,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     program.setPeriodsSkippable(true);
     program.setId(UUID.randomUUID());
 
-    OrderableDisplayCategory orderableDisplayCategory = OrderableDisplayCategory.createNew(
+    orderableDisplayCategory = OrderableDisplayCategory.createNew(
         Code.code("orderableDisplayCategoryCode"),
         new OrderedDisplayValue("orderableDisplayCategoryName", 1));
     orderableDisplayCategory.setId(UUID.randomUUID());
@@ -108,7 +123,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturn403IfUserHasNoRightToDeleteFacilityTypeApprovedProduct() {
-    mockUserHasNoRight(FACILITY_APPROVED_PRODUCT_MANAGE);
+    mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured
         .given()
@@ -125,6 +140,11 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldPostFacilityTypeApprovedProduct() {
+
+    given(programRepository.findOne(program.getId())).willReturn(program);
+    given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
+    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId())).willReturn(
+        orderableDisplayCategory);
 
     FacilityTypeApprovedProduct response = restAssured
         .given()
@@ -143,7 +163,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturn403WhenUserHasNoRightsToPostFacilityTypeApprovedProduct() {
-    mockUserHasNoRight(FACILITY_APPROVED_PRODUCT_MANAGE);
+    mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -152,8 +172,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .post(RESOURCE_URL)
         .then()
-        .statusCode(403)
-        .extract().as(FacilityTypeApprovedProduct.class);
+        .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
 
@@ -164,6 +183,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     facilityTypeAppProd.setMaxPeriodsOfStock(9.00);
     given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
+    given(programRepository.findOne(program.getId())).willReturn(program);
+    given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
+    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId())).willReturn(
+        orderableDisplayCategory);
 
     FacilityTypeApprovedProduct response = restAssured
         .given()
@@ -184,7 +207,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturn403WhenUserHasNoRightsToPutFacilityTypeApprovedProduct() {
-    mockUserHasNoRight(FACILITY_APPROVED_PRODUCT_MANAGE);
+    mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -194,8 +217,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .put(ID_URL)
         .then()
-        .statusCode(403)
-        .extract().as(FacilityTypeApprovedProduct.class);
+        .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -204,6 +226,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   public void shouldGetFacilityTypeApprovedProduct() {
 
     given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
+    given(programRepository.findOne(program.getId())).willReturn(program);
+    given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
+    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId())).willReturn(
+        orderableDisplayCategory);
 
     FacilityTypeApprovedProduct response = restAssured
         .given()
@@ -222,7 +248,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturn403WhenUserHasNoRightsToGetFacilityTypeApprovedProduct() {
-    mockUserHasNoRight(FACILITY_APPROVED_PRODUCT_MANAGE);
+    mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -231,8 +257,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .get(ID_URL)
         .then()
-        .statusCode(403)
-        .extract().as(FacilityTypeApprovedProduct.class);
+        .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

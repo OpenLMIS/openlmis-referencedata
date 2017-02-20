@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.web;
 
 
+import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -228,7 +230,7 @@ public class FacilityController extends BaseController {
       @PathVariable("id") UUID facilityId,
       @RequestParam(required = false, value = "programId") UUID programId,
       @RequestParam(value = "fullSupply") boolean fullSupply) {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {

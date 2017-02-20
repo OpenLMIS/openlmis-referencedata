@@ -346,7 +346,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectGetApprovedProductsRequestIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     String messageKey = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
