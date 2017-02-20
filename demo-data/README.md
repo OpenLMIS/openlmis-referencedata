@@ -63,10 +63,43 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
 
 Defined in referencedata.geographic_levels.json and referencedata.geographic_zones.json.
 
-1. Country - Mal/Malawi
-2. Region - Mal-So/Southern Region
-3. District - M-So-Bal/Balaka District
-4. City - M-So-Bal-Bal/Balaka
+1. Country
+  * Malawi/Malawi
+2. Region
+  * Malawi-Central/Central Region
+  * Malawi-Northern/Northern Region
+  * Malawi-Southern/Southern Region
+3. District
+  * Malawi-Central-Dedza/Dedza District
+  * Malawi-Central-Dowa/Dowa District
+  * Malawi-Central-Kasungu/Kasungu District
+  * Malawi-Central-Lilongwe/Lilongwe District
+  * Malawi-Central-Mchinji/Mchinji District
+  * Malawi-Central-Nkhotakota/Nkhotakota District
+  * Malawi-Central-Ntcheu/Ntcheu District
+  * Malawi-Central-Ntchisi/Ntchisi District
+  * Malawi-Central-Salima/Salima District
+  * Malawi-Northern-Chitipa/Chitipa District
+  * Malawi-Northern-Karonga/Karonga District
+  * Malawi-Northern-Likoma/Likoma District
+  * Malawi-Northern-Mzimba/Mzimba District
+  * Malawi-Northern-Nkhata Bay/Nkhata Bay District
+  * Malawi-Northern-Rumphi/Rumphi District
+  * Malawi-Southern-Balaka/Balaka District
+  * Malawi-Southern-Blantyre/Blantyre District
+  * Malawi-Southern-Chikwawa/Chikwawa District
+  * Malawi-Southern-Chiradzulu/Chiradzulu District
+  * Malawi-Southern-Machinga/Machinga District
+  * Malawi-Southern-Mangochi/Mangochi District
+  * Malawi-Southern-Mulanje/Mulanje District
+  * Malawi-Southern-Mwanza/Mwanza District
+  * Malawi-Southern-Nsanje/Nsanje District
+  * Malawi-Southern-Thyolo/Thyolo District
+  * Malawi-Southern-Phalombe/Phalombe District
+  * Malawi-Southern-Zomba/Zomba District
+  * Malawi-Southern-Neno/Neno District
+4. City
+  * Malawi-Southern-Balaka-Balaka/Balaka
 
 ## Programs and Products
 
