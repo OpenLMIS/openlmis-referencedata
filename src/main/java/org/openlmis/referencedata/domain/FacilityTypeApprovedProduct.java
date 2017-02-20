@@ -72,6 +72,47 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
   }
 
+  @Override
+  public boolean equals(Object other) {
+
+    if (this == other) {
+      return true;
+    }
+    if (other == null || getClass() != other.getClass()) {
+      return false;
+    }
+
+    FacilityTypeApprovedProduct otherFacility = (FacilityTypeApprovedProduct) other;
+
+    if (!facilityType.equals(otherFacility.facilityType)) {
+      return false;
+    }
+    if (!programOrderable.equals(otherFacility.programOrderable)) {
+      return false;
+    }
+    if (!maxPeriodsOfStock.equals(otherFacility.maxPeriodsOfStock)) {
+      return false;
+    }
+    if (minPeriodsOfStock != null ? !minPeriodsOfStock.equals(otherFacility.minPeriodsOfStock) :
+        otherFacility.minPeriodsOfStock != null) {
+      return false;
+    }
+    return emergencyOrderPoint != null ? emergencyOrderPoint.equals(
+        otherFacility.emergencyOrderPoint) : otherFacility.emergencyOrderPoint == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = facilityType.hashCode();
+    result = 31 * result + programOrderable.hashCode();
+    result = 31 * result + maxPeriodsOfStock.hashCode();
+    result = 31 * result + (minPeriodsOfStock != null ? minPeriodsOfStock.hashCode() : 0);
+    result = 31 * result + (emergencyOrderPoint != null ? emergencyOrderPoint.hashCode() : 0);
+    return result;
+  }
+
+
   public interface Exporter {
     void setId(UUID id);
 

@@ -18,13 +18,10 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
 import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.FacilityType;
