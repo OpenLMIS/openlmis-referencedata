@@ -28,6 +28,7 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -36,19 +37,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/geographicZones";
+  private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
 
   @MockBean
   private GeographicZoneRepository geographicZoneRepository;
+
+  @MockBean
+  private GeographicLevelRepository geographicLevelRepository;
 
   private GeographicLevel countryLevel;
   private GeographicLevel regionLevel;
@@ -196,6 +202,43 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   }
 
   @Test
+  public void shouldFindGeographicZonesByParentAndLevel() {
+    // given
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
+    Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
+    PageRequest pageRequest = new PageRequest(0, 100);
+
+    given(geographicZoneRepository.findOne(regionZone.getId())).willReturn(regionZone);
+    given(geographicLevelRepository.findOne(districtLevel.getId())).willReturn(districtLevel);
+    given(geographicZoneRepository.findByParentAndLevel(regionZone, districtLevel, pageRequest))
+        .willReturn(geographicZonesPage);
+
+    // when
+    Page<GeographicZone> response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("page", pageRequest.getPageNumber())
+        .queryParam("size", pageRequest.getPageSize())
+        .queryParam("level", districtLevel.getId())
+        .queryParam("parent", regionZone.getId())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    // then
+    assertEquals(geographicZones.size(), response.getContent().size());
+    assertEquals(geographicZones.size(), response.getNumberOfElements());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetGeographicZone() {
     doNothing()
         .when(rightService)
@@ -251,6 +294,29 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void searchShouldReturnForbiddenOnUnauthorizedToken() {
+    doThrow(new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("page", 0)
+        .queryParam("size", 100)
+        .queryParam("level", districtLevel.getId())
+        .queryParam("parent", regionZone.getId())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(SEARCH_URL)
         .then()
         .statusCode(403);
 

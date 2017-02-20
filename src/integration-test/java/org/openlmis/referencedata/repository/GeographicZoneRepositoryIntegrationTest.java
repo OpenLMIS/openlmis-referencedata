@@ -18,12 +18,16 @@ package org.openlmis.referencedata.repository;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 public class GeographicZoneRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<GeographicZone> {
@@ -75,6 +79,20 @@ public class GeographicZoneRepositoryIntegrationTest
     districtZone.setParent(regionZone);
 
     return districtZone;
+  }
+
+  @Test
+  public void shouldFindByParentAndLevel() {
+    // given
+    generateInstance();
+
+    // when
+    Page<GeographicZone> zones = repository.findByParentAndLevel(
+        regionZone.getParent(), regionZone.getLevel(), new PageRequest(0, 100));
+
+    // then
+    assertEquals(1, zones.getNumberOfElements());
+    assertEquals(regionZone.getId(), zones.getContent().get(0).getId());
   }
 
   @Override

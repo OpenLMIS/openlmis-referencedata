@@ -15,10 +15,14 @@
 
 package org.openlmis.referencedata.web;
 
+import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -45,6 +50,9 @@ public class GeographicZoneController extends BaseController {
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private GeographicLevelRepository geographicLevelRepository;
 
   /**
    * Allows creating new geographicZones.
@@ -134,5 +142,34 @@ public class GeographicZoneController extends BaseController {
     } else {
       geographicZoneRepository.delete(geographicZone);
     }
+  }
+
+  /**
+   * Retrieves all Geographic Zones matching given parameters.
+   *
+   * @param parentId ID of parent geographic zone.
+   * @param levelId ID of parent geographic level.
+   * @return List of matched geographic zones.
+   */
+  @RequestMapping(value = "/geographicZones/search", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Page<GeographicZone> findFacilitiesWithSimilarCodeOrName(
+      @RequestParam(value = "parent", required = false) UUID parentId,
+      @RequestParam(value = "level", required = false) UUID levelId,
+      Pageable pageable) {
+    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    GeographicZone parent = geographicZoneRepository.findOne(parentId);
+    if (parent == null) {
+      throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    GeographicLevel level = geographicLevelRepository.findOne(levelId);
+    if (level == null) {
+      throw new ValidationMessageException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    return geographicZoneRepository.findByParentAndLevel(parent, level, pageable);
   }
 }
