@@ -19,44 +19,44 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
   * zone: Balaka (City)
   * this is the home facility for _administrator_, _srmanager2_ and _smanager2_ users
   * this facility is in the requisition group RGFP1 and RGEM1
-2. DH01/Balaka District Hospital
+2. HF01/Kankao Health Facility
+  * programs: Family Planning and Essential Meds
+  * operated by: moh/Ministry of Health
+  * zone: Southern Region
+  * this is the home facility for _srmanager4_ and _smanager4_ users
+  * this facility is in the requisition group RGEM1 and RGFP2
+3. HC02/Nandumbo Health Center
+  * type: Health Center
+  * programs: Family Planning
+  * operated by: moh/Ministry of Health
+  * zone: Southern Region
+  * this is the home facility for _srmanager1_ and _smanager1_ users
+  * this facility is in the requisition group RGFP1
+4. HC03/Kalembo Health Center
+  * type: Health Center
+  * programs: Essential Meds
+  * operated by: moh/Ministry of Health
+  * zone: Southern Region
+  * this is the home facility for _srmanager3_ and _smanager3_ users
+  * this facility is in the requisition group RGEM1
+5. DH01/Balaka District Hospital
   * type: District Hospital
   * programs: Family Planning and Essential Meds
   * operated by: moh/Ministry of Health
   * zone: Balaka District
   * this is the home facility for the _dsrmanager_ user
   * this facility is in the requisition group RGEM1 and RGFP2
-3. W01/CMST Warehouse
+6. W01/Ntcheu District Warehouse
   * type: Warehouse
   * programs: Family Planning
   * operated by: moh/Ministry of Health
-  * zone: Southern Region
+  * zone: Ntcheu District
   * this is the home facility for _devadmin_ and _wclerk1_ users
-4. HF01/Kankao Health Facility
-  * programs: Family Planning and Essential Meds
-  * operated by: moh/Ministry of Health
-  * zone: Malawi
-  * this is the home facility for _srmanager4_ and _smanager4_ users
-  * this facility is in the requisition group RGEM1 and RGFP2
-5. HC02/Nandumbo Health Center
-  * type: Health Center
-  * programs: Family Planning
-  * operated by: moh/Ministry of Health
-  * zone: Malawi
-  * this is the home facility for _srmanager1_ and _smanager1_ users
-  * this facility is in the requisition group RGFP1
-6. HC03/Kalembo Health Center
-  * type: Health Center
-  * programs: Essential Meds
-  * operated by: moh/Ministry of Health
-  * zone: Malawi
-  * this is the home facility for _srmanager3_ and _smanager3_ users
-  * this facility is in the requisition group RGEM1
-7. WH02/South Warehouse
+7. WH02/Balaka District Warehouse
   * type: Warehouse
   * programs: Family Planning and Essential Meds
   * operated by: moh/Ministry of Health
-  * zone: Malawi
+  * zone: Balaka District
   * this is the home facility for _wclerk2_ user
 
 ## Geographic Levels and Zones
