@@ -26,7 +26,6 @@ import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -229,28 +228,6 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
   }
 
   @Test
-  public void shouldRejectGetAllStockAdjustmentReasonsIfUserHasNoRight() {
-    mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
-
-    List<StockAdjustmentReason> storedStockAdjustmentReasons = Collections.singletonList(reason);
-    given(stockAdjustmentReasonRepository.findAll()).willReturn(storedStockAdjustmentReasons);
-
-    String messageKey = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldGetStockAdjustmentReason() {
     mockUserHasRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
@@ -268,28 +245,6 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
         .extract().as(StockAdjustmentReason.class);
 
     assertEquals(reasonId, response.getId());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectGetStockAdjustmentReasonIfUserHasNoRight() {
-    mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
-
-    given(stockAdjustmentReasonRepository.findOne(reasonId)).willReturn(reason);
-
-    String messageKey = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", reasonId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -316,29 +271,6 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
     List<StockAdjustmentReason> foundStockAdjustmentReason = Arrays.asList(response);
     assertEquals(1, foundStockAdjustmentReason.size());
     assertEquals(reasonId, foundStockAdjustmentReason.get(0).getId());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectFindStockAdjustmentReasonsIfUserHasNoRight() {
-    mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
-
-    UUID programId = UUID.randomUUID();
-    given(stockAdjustmentReasonRepository.findByProgramId(programId))
-        .willReturn(new ArrayList<>());
-
-    String messageKey = restAssured.given()
-        .queryParam("program", programId)
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(FIND_BY_PROGRAM_ID_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

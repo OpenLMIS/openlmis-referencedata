@@ -78,8 +78,6 @@ public class StockAdjustmentReasonController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<StockAdjustmentReason> getAllStockAdjustmentReasons() {
-    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
-
     Iterable<StockAdjustmentReason> stockAdjustmentReasons =
             stockAdjustmentReasonRepository.findAll();
     if (stockAdjustmentReasons == null) {
@@ -100,8 +98,6 @@ public class StockAdjustmentReasonController extends BaseController {
   @ResponseBody
   public StockAdjustmentReason getChosenStockAdjustmentReason(
           @PathVariable("id") UUID stockAdjustmentReasonId) {
-    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
-
     StockAdjustmentReason stockAdjustmentReason =
             stockAdjustmentReasonRepository.findOne(stockAdjustmentReasonId);
     if (stockAdjustmentReason == null) {
@@ -176,8 +172,6 @@ public class StockAdjustmentReasonController extends BaseController {
   @ResponseBody
   public List<StockAdjustmentReason> findStockAdjustmentReasonsByProgramId(
           @RequestParam("program") UUID programId) {
-    rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
-
     return stockAdjustmentReasonRepository.findByProgramId(programId);
   }
 }
