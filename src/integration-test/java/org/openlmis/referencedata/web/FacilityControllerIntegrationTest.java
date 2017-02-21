@@ -54,6 +54,7 @@ import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
@@ -61,16 +62,17 @@ import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -81,8 +83,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
-  private static final String FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME =
-      RESOURCE_URL + "/search";
+  private static final String SEARCH_FACILITIES = RESOURCE_URL + "/search";
 
   @MockBean
   private FacilityRepository facilityRepository;
@@ -92,6 +93,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private ProgramRepository programRepository;
+
+  @MockBean
+  private GeographicZoneRepository geographicZoneRepository;
 
   @MockBean
   private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
@@ -245,14 +249,14 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     String similarCode = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityRepository.findFacilitiesByCodeOrName(similarCode, null))
+    given(facilityRepository.search(similarCode, null, null))
         .willReturn(listToReturn);
 
     FacilityDto[] response = restAssured.given()
         .queryParam("code", similarCode)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
-        .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
+        .get(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
         .extract().as(FacilityDto[].class);
@@ -270,7 +274,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .queryParam("code", "Facility")
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
-        .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
+        .get(SEARCH_FACILITIES)
         .then()
         .statusCode(403)
         .extract()
@@ -287,14 +291,14 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     String similarName = "Facility";
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityRepository.findFacilitiesByCodeOrName(null, similarName))
+    given(facilityRepository.search(null, similarName, null))
         .willReturn(listToReturn);
 
     FacilityDto[] response = restAssured.given()
         .queryParam("name", similarName)
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
-        .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
+        .get(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
         .extract().as(FacilityDto[].class);
@@ -302,6 +306,54 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     List<FacilityDto> facilities = Arrays.asList(response);
     assertEquals(1, facilities.size());
     assertEquals(facility.getName(), facilities.get(0).getName());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenSearchingFacilitiesByNonExistentGeographicZone() {
+    // given
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
+
+    // when
+    restAssured.given()
+        .queryParam("zone", UUID.randomUUID())
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SEARCH_FACILITIES)
+        .then()
+        .statusCode(400);
+
+    // then
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindFacilitiesByGeographicZone() {
+    // given
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    List<Facility> listToReturn = Collections.singletonList(facility);
+    GeographicZone zone = facility.getGeographicZone();
+    UUID zoneId = zone.getId();
+
+    given(geographicZoneRepository.findOne(zoneId)).willReturn(zone);
+    given(facilityRepository.search(null, null, zone)).willReturn(listToReturn);
+
+    // when
+    FacilityDto[] response = restAssured.given()
+        .queryParam("zone", zone.getId())
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(SEARCH_FACILITIES)
+        .then()
+        .statusCode(200)
+        .extract().as(FacilityDto[].class);
+
+    // then
+    List<FacilityDto> facilities = Arrays.asList(response);
+    assertEquals(1, facilities.size());
+    assertEquals(facility.getId(), facilities.get(0).getId());
   }
 
   @Test
@@ -313,7 +365,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .queryParam("name", "NotSimilarName")
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
-        .get(FIND_FACILITIES_WITH_SIMILAR_CODE_OR_NAME)
+        .get(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
         .extract().as(Facility[].class);
@@ -761,6 +813,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     GeographicLevel geographicLevel = new GeographicLevel();
     geographicLevel.setCode("GeographicLevel " + generateInstanceNumber());
     geographicLevel.setLevelNumber(1);
+    geographicLevel.setId(UUID.randomUUID());
     return geographicLevel;
   }
 
@@ -768,6 +821,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     GeographicZone geographicZone = new GeographicZone();
     geographicZone.setCode("GeographicZone " + generateInstanceNumber());
     geographicZone.setLevel(geographicLevel);
+    geographicZone.setId(UUID.randomUUID());
     return geographicZone;
   }
 

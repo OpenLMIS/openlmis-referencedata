@@ -21,6 +21,7 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -33,11 +34,13 @@ import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
@@ -76,6 +79,9 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
+
+  @Autowired
+  private GeographicZoneRepository geographicZoneRepository;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -306,16 +312,26 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<FacilityDto> findFacilitiesWithSimilarCodeOrName(
+  public List<FacilityDto> searchFacilities(
       @RequestParam(value = "code", required = false) String code,
-      @RequestParam(value = "name", required = false) String name) {
+      @RequestParam(value = "name", required = false) String name,
+      @RequestParam(value = "zone", required = false) UUID zoneId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    if (code == null && name == null) {
-      throw new ValidationMessageException(
-          FacilityMessageKeys.ERROR_SEARCH_CODE_NULL_AND_NAME_NULL);
+    GeographicZone zone = null;
+    if (zoneId == null) {
+      if (code == null && name == null) {
+        throw new ValidationMessageException(
+            FacilityMessageKeys.ERROR_SEARCH_CODE_NULL_AND_NAME_NULL);
+      }
+    } else {
+      zone = geographicZoneRepository.findOne(zoneId);
+      if (zone == null) {
+        throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
+      }
     }
-    List<Facility> foundFacilities = facilityRepository.findFacilitiesByCodeOrName(code, name);
+
+    List<Facility> foundFacilities = facilityRepository.search(code, name, zone);
     return toDto(foundFacilities);
   }
 

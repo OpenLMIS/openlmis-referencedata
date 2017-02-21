@@ -154,7 +154,7 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = "/geographicZones/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<GeographicZone> findFacilitiesWithSimilarCodeOrName(
+  public Page<GeographicZone> searchGeographicZones(
       @RequestParam(value = "parent", required = false) UUID parentId,
       @RequestParam(value = "level", required = false) UUID levelId,
       Pageable pageable) {

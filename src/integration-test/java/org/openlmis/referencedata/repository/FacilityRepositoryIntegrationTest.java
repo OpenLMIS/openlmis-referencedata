@@ -47,19 +47,19 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   private FacilityType facilityType = new FacilityType();
   private GeographicZone geographicZone = new GeographicZone();
+  private GeographicLevel geographicLevel = new GeographicLevel();
 
   @Before
   public void setUp() {
     this.facilityType.setCode("FacilityRepositoryIntegrationTest");
     facilityTypeRepository.save(this.facilityType);
 
-    GeographicLevel level = new GeographicLevel();
-    level.setCode("FacilityRepositoryIntegrationTest");
-    level.setLevelNumber(1);
-    geographicLevelRepository.save(level);
+    geographicLevel.setCode("FacilityRepositoryIntegrationTest");
+    geographicLevel.setLevelNumber(1);
+    geographicLevelRepository.save(geographicLevel);
 
     this.geographicZone.setCode("FacilityRepositoryIntegrationTest");
-    this.geographicZone.setLevel(level);
+    this.geographicZone.setLevel(geographicLevel);
     geographicZoneRepository.save(geographicZone);
   }
 
@@ -143,20 +143,42 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility = generateInstance();
     repository.save(facility);
 
-    List<Facility> foundFacilties =
-        repository.findFacilitiesByCodeOrName("Ogorek", "Pomidor");
+    List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null);
 
     assertEquals(0, foundFacilties.size());
   }
 
-  private void searchFacilityAndCheckResults(String code, String name,
-                                             Facility facility, int expectedSize) {
-    List<Facility> foundFacilties = repository.findFacilitiesByCodeOrName(code, name);
+  @Test
+  public void shouldFindFacilitiesByGeographicZone() {
+    // given
+    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
+    validZone = geographicZoneRepository.save(validZone);
+
+    Facility validFacility = generateInstance();
+    validFacility.setGeographicZone(validZone);
+    repository.save(validFacility);
+
+    GeographicZone invalidZone = new GeographicZone("invalidZone", geographicLevel);
+    invalidZone = geographicZoneRepository.save(invalidZone);
+
+    Facility invalidFacility = generateInstance();
+    invalidFacility.setGeographicZone(invalidZone);
+    repository.save(invalidFacility);
+
+    // when
+    List<Facility> foundFacilties = repository.search(null, null, validZone);
+
+    // then
+    assertEquals(1, foundFacilties.size());
+    assertEquals(validFacility.getId(), foundFacilties.get(0).getId());
+  }
+
+  private void searchFacilityAndCheckResults(
+      String code, String name, Facility facility, int expectedSize) {
+    List<Facility> foundFacilties = repository.search(code, name, null);
 
     assertEquals(expectedSize, foundFacilties.size());
 
     assertEquals(facility.getName(), foundFacilties.get(0).getName());
   }
-
-
 }

@@ -1451,11 +1451,20 @@ resourceTypes:
                       type: string
                       required: false
                       repeat: false
+                  zone:
+                      displayName: geographic zone
+                      type: string
+                      required: false
+                      repeat: false
               responses:
                 200:
                     body:
                       application/json:
                           schema: facilityArray
+                400:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
                 403:
                     body:
                       application/json:
