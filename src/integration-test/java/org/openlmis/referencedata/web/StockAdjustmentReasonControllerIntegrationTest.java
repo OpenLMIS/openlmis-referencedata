@@ -203,7 +203,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
   @Test
   public void shouldGetAllStockAdjustmentReasons() {
-    mockUserHasRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+    mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
     StockAdjustmentReason anotherReason = new StockAdjustmentReason(
         program, "reason2", "description", true, 1);
@@ -229,7 +229,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
   @Test
   public void shouldGetStockAdjustmentReason() {
-    mockUserHasRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+    mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
     given(stockAdjustmentReasonRepository.findOne(reasonId)).willReturn(reason);
 
@@ -250,7 +250,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
   @Test
   public void shouldFindStockAdjustmentReasonsByProgramId() {
-    mockUserHasRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
+    mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
     UUID programId = UUID.randomUUID();
     List<StockAdjustmentReason> listToReturn = new ArrayList<>();
