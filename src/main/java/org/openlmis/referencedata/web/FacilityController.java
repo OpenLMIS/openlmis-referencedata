@@ -372,7 +372,8 @@ public class FacilityController extends BaseController {
         throw new ValidationMessageException(ProgramMessageKeys.ERROR_CODE_OR_ID_REQUIRED);
       }
       if (program == null) {
-        LOGGER.debug("Program does not exist: ", dto.getCode());
+        LOGGER.debug("Program does not exist: ",
+            dto.getCode() == null ? dto.getId() : dto.getCode());
         return false;
       }
       SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
