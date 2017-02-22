@@ -22,7 +22,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
 import org.javers.repository.jql.QueryBuilder;
 import org.openlmis.referencedata.service.RightService;
-import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.util.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
