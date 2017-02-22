@@ -363,7 +363,14 @@ public class FacilityController extends BaseController {
   private boolean addSupportedProgramsToFacility(Set<SupportedProgramDto> supportedProgramDtos,
                                                  Facility facility) {
     for (SupportedProgramDto dto : supportedProgramDtos) {
-      Program program = programRepository.findByCode(Code.code(dto.getCode()));
+      Program program;
+      if ( dto.getCode() != null ) {
+        program = programRepository.findByCode(Code.code(dto.getCode()));
+      } else if ( dto.getId() != null) {
+        program = programRepository.findOne(dto.getId());
+      } else {
+        throw new ValidationMessageException(ProgramMessageKeys.ERROR_CODE_OR_ID_REQUIRED);
+      }
       if (program == null) {
         LOGGER.debug("Program does not exist: ", dto.getCode());
         return false;

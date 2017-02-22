@@ -21,4 +21,5 @@ public abstract class ProgramMessageKeys extends MessageKeys {
   public static final String ERROR_ID_NULL = join(ERROR, ID, NULL);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
+  public static final String ERROR_CODE_OR_ID_REQUIRED = join(ERROR, ID, CODE, NULL);
 }
