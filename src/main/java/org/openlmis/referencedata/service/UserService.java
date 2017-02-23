@@ -198,7 +198,7 @@ public class UserService {
     String mailSubject = messageSource.getMessage(SystemMessageKeys.ACCOUNT_CREATED_EMAIL_SUBJECT,
         new String[]{}, LocaleContextHolder.getLocale());
 
-    sendMail("notification", user.getEmail(), mailSubject, mailBody, authToken);
+    sendMail("noreply@openlmis.org", user.getEmail(), mailSubject, mailBody, authToken);
   }
 
   private UUID createPasswordResetToken(UUID userId, String token) {
