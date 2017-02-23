@@ -28,4 +28,6 @@ public interface GeographicLevelRepository extends
 
   @Override
   <S extends GeographicLevel> Iterable<S> save(Iterable<S> entities);
+
+  <S extends GeographicLevel> S findByLevelNumber(Integer levelNumber);
 }

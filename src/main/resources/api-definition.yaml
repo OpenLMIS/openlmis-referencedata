@@ -1914,9 +1914,9 @@ resourceTypes:
                           type: string
                           required: false
                           repeat: false
-                  level:
+                  levelNumber:
                           displayName: level
-                          type: string
+                          type: integer
                           required: false
                           repeat: false
               responses:

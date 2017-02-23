@@ -34,4 +34,7 @@ public interface GeographicZoneRepository extends
 
   Page<GeographicZone> findByParentAndLevel(
       GeographicZone parent, GeographicLevel level, Pageable pageable);
+
+  Page<GeographicZone> findByLevel(
+      GeographicLevel level, Pageable pageable);
 }

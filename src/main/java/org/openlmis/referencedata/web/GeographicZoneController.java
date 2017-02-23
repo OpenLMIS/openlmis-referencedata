@@ -148,7 +148,7 @@ public class GeographicZoneController extends BaseController {
    * Retrieves all Geographic Zones matching given parameters.
    *
    * @param parentId ID of parent geographic zone.
-   * @param levelId ID of parent geographic level.
+   * @param levelNumber geographic level number.
    * @return List of matched geographic zones.
    */
   @RequestMapping(value = "/geographicZones/search", method = RequestMethod.GET)
@@ -156,20 +156,27 @@ public class GeographicZoneController extends BaseController {
   @ResponseBody
   public Page<GeographicZone> searchGeographicZones(
       @RequestParam(value = "parent", required = false) UUID parentId,
-      @RequestParam(value = "level", required = false) UUID levelId,
+      @RequestParam(value = "levelNumber", required = false) Integer levelNumber,
       Pageable pageable) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    GeographicZone parent = geographicZoneRepository.findOne(parentId);
-    if (parent == null) {
-      throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    GeographicLevel level = geographicLevelRepository.findOne(levelId);
-    if (level == null) {
+    GeographicZone parent = null != parentId
+        ? geographicZoneRepository.findOne(parentId)
+        : null;
+    if (parentId != null && parent == null) {
       throw new ValidationMessageException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
     }
 
+    GeographicLevel level = null != levelNumber
+        ? geographicLevelRepository.findByLevelNumber(levelNumber)
+        : null;
+    if (levelNumber != null && level == null) {
+      throw new ValidationMessageException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    if (parent == null) {
+      return geographicZoneRepository.findByLevel(level, pageable);
+    }
     return geographicZoneRepository.findByParentAndLevel(parent, level, pageable);
   }
 }

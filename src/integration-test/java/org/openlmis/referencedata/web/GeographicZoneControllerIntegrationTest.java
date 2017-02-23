@@ -44,11 +44,17 @@ import java.util.UUID;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String PAGE = "page";
+  private static final String SIZE = "size";
+  private static final Integer PAGE_NUMBER = 0;
+  //Neither 0 nor Integer.MAX_VALUE work in this context
+  private static final Integer PAGE_SIZE = 1000;
 
   @MockBean
   private GeographicZoneRepository geographicZoneRepository;
@@ -178,17 +184,14 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     List<GeographicZone> geographicZones = Arrays.asList(countryZone, regionZone, districtZone);
     Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
 
-    int pageNumber = 0;
-    int pageSize = 1000; //Neither 0 nor Integer.MAX_VALUE work in this context
-
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(PAGE_NUMBER, PAGE_SIZE);
     given(geographicZoneRepository.findAll(pageRequest)).willReturn(geographicZonesPage);
 
     Page<GeographicZone> response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("page", pageNumber)
-        .queryParam("size", pageSize)
+        .queryParam(PAGE, PAGE_NUMBER)
+        .queryParam(SIZE, PAGE_SIZE)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -210,10 +213,11 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
     Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
-    PageRequest pageRequest = new PageRequest(0, 100);
+    PageRequest pageRequest = new PageRequest(PAGE_NUMBER, PAGE_SIZE);
 
     given(geographicZoneRepository.findOne(regionZone.getId())).willReturn(regionZone);
-    given(geographicLevelRepository.findOne(districtLevel.getId())).willReturn(districtLevel);
+    given(geographicLevelRepository.findByLevelNumber(districtLevel.getLevelNumber()))
+        .willReturn(districtLevel);
     given(geographicZoneRepository.findByParentAndLevel(regionZone, districtLevel, pageRequest))
         .willReturn(geographicZonesPage);
 
@@ -221,10 +225,46 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     Page<GeographicZone> response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("page", pageRequest.getPageNumber())
-        .queryParam("size", pageRequest.getPageSize())
-        .queryParam("level", districtLevel.getId())
+        .queryParam(PAGE, PAGE_NUMBER)
+        .queryParam(SIZE, PAGE_SIZE)
+        .queryParam("levelNumber", districtLevel.getLevelNumber())
         .queryParam("parent", regionZone.getId())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    // then
+    assertEquals(geographicZones.size(), response.getContent().size());
+    assertEquals(geographicZones.size(), response.getNumberOfElements());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindGeographicZonesByLevel() {
+    // given
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
+    List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
+    Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
+    PageRequest pageRequest = new PageRequest(PAGE_NUMBER, PAGE_SIZE);
+
+    given(geographicLevelRepository.findByLevelNumber(districtLevel.getLevelNumber()))
+        .willReturn(districtLevel);
+    given(geographicZoneRepository.findByLevel(districtLevel, pageRequest))
+        .willReturn(geographicZonesPage);
+
+    // when
+    Page<GeographicZone> response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(PAGE, PAGE_NUMBER)
+        .queryParam(SIZE, PAGE_SIZE)
+        .queryParam("levelNumber", districtLevel.getLevelNumber())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(SEARCH_URL)
@@ -310,9 +350,9 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam("page", 0)
-        .queryParam("size", 100)
-        .queryParam("level", districtLevel.getId())
+        .queryParam(PAGE, PAGE_NUMBER)
+        .queryParam(SIZE, PAGE_SIZE)
+        .queryParam("levelNumber", districtLevel.getLevelNumber())
         .queryParam("parent", regionZone.getId())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
