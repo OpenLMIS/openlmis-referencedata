@@ -13,6 +13,6 @@ services:
     env_file: .env
 
   log:
-    image: openlmis/rsyslog
+    image: openlmis/rsyslog:1
     volumes:
       - '../logs/referencedata:/var/log'
