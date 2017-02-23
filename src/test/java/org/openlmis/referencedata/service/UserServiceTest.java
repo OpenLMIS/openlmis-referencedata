@@ -280,7 +280,7 @@ public class UserServiceTest {
 
     verify(restTemplate).postForObject(anyString(), isA(AuthUserRequest.class), eq(Object.class));
 
-    NotificationRequest request = new NotificationRequest("notification", user.getEmail(),
+    NotificationRequest request = new NotificationRequest("noreply@openlmis.org", user.getEmail(),
         mailSubject, mailBody);
 
     verify(restTemplate).postForObject(contains("notification?access_token=" + AUTH_TOKEN),
