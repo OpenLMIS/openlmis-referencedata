@@ -27,6 +27,7 @@ import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.service.UserService.MAIL_ADDRESS;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -280,7 +281,7 @@ public class UserServiceTest {
 
     verify(restTemplate).postForObject(anyString(), isA(AuthUserRequest.class), eq(Object.class));
 
-    NotificationRequest request = new NotificationRequest("noreply@openlmis.org", user.getEmail(),
+    NotificationRequest request = new NotificationRequest(MAIL_ADDRESS, user.getEmail(),
         mailSubject, mailBody);
 
     verify(restTemplate).postForObject(contains("notification?access_token=" + AUTH_TOKEN),

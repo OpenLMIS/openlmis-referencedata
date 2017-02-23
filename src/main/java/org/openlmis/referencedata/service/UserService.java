@@ -62,7 +62,9 @@ public class UserService {
   private ExposedMessageSource messageSource;
 
   private String baseUrl = System.getenv("BASE_URL");
-
+  static final String MAIL_ADDRESS = Optional.ofNullable(System.getenv("MAIL_ADDRESS"))
+      .orElse("noreply@openlmis.org");
+  
   private ObjectMapper mapper = new ObjectMapper();
 
   /**
@@ -198,7 +200,7 @@ public class UserService {
     String mailSubject = messageSource.getMessage(SystemMessageKeys.ACCOUNT_CREATED_EMAIL_SUBJECT,
         new String[]{}, LocaleContextHolder.getLocale());
 
-    sendMail("noreply@openlmis.org", user.getEmail(), mailSubject, mailBody, authToken);
+    sendMail(MAIL_ADDRESS, user.getEmail(), mailSubject, mailBody, authToken);
   }
 
   private UUID createPasswordResetToken(UUID userId, String token) {
