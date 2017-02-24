@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.flywaydb.core.Flyway;
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
 import org.javers.core.diff.ListCompareAlgorithm;
@@ -29,7 +30,6 @@ import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
-import org.flywaydb.core.Flyway;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.boot.sql.JaversProperties;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
@@ -51,8 +51,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
@@ -129,6 +129,8 @@ public class Application {
             .withSchema(preferredSchema)
             .build();
 
+    JaVersDateProvider customDateProvider = new JaVersDateProvider();
+
     return TransactionalJaversBuilder
             .javers()
             .withTxManager(transactionManager)
@@ -142,6 +144,7 @@ public class Application {
             .withPrettyPrint(javersProperties.isPrettyPrint())
             .withTypeSafeValues(javersProperties.isTypeSafeValues())
             .withPackagesToScan(javersProperties.getPackagesToScan())
+            .withDateTimeProvider(customDateProvider)
             .build();
   }
 

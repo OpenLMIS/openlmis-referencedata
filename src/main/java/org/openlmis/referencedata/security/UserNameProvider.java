@@ -36,7 +36,7 @@ public class UserNameProvider implements AuthorProvider {
 
     try {
       User user = (User) auth.getPrincipal();
-      return user.getUsername();
+      return user.getId().toString();
     } catch (Exception ex) {
       return "unknown user";
     }
