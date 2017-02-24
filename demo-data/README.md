@@ -46,7 +46,7 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
   * zone: Balaka District
   * this is the home facility for the _dsrmanager_ user
   * this facility is in the requisition group RGEM1 and RGFP2
-6. W01/Ntcheu District Warehouse
+6. WH01/Ntcheu District Warehouse
   * type: Warehouse
   * programs: Family Planning
   * operated by: moh/Ministry of Health
@@ -208,18 +208,45 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
   * rights:
     * Requisition View
     * Requisition Convert to Order
+    * PoDs Manage
   * users:
-    * administrator - has this role for WH01/CMST Warehouse and WH02/South Warehouse
-    * wclerk1 - has this role for WH01/CMST Warehouse
-    * wclerk2 - has this role for WH02/South Warehouse
-6. Admin
+    * administrator - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
+    * wclerk1 - has this role for WH01/Ntcheu District Warehouse
+    * wclerk2 - has this role for WH02/Balaka District Warehouse
+6. Delivery Approver
   * rights:
-    * Facilities manage
-    * Geographic zones manage
-    * Supervisory nodes manage
-    * Products manage
-    * Requisition templates manage
-    * Stock card templates manage
+    * PoDs Manage
+  * users:
+    * srmanager1, srmanager2, srmanager4 - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
+    * srmanager3 - has this role for WH02/Balaka District Warehouse
+7. Stock Manager
+  * rights:
+    * Stock Event Create
+  * users:
+    * _no users are assigned this role yet_
+8. Requisition Viewer
+  * rights:
+    * Requisition View
+  * users:
+    * wclerk1 - has this role for Family Planning
+    * wclerk2 - has this role for Family Planning & Essential Meds
+9. System Administrator
+  * rights:
+    * Facilities Manage
+    * Facilities Approved Orderables Manage
+    * Geographic Zones Manage
+    * Orderables Manage
+    * Processing Schedules Manage
+    * Products Manage
+    * Requisition Groups Manage
+    * Requisition Templates Manage
+    * Stock Adjustment Reasons Manage
+    * Stock Card Templates Manage
+    * Supervisory Nodes Manage
+    * Supply Lines Manage
+    * System Settings Manage
+    * Users Manage
+    * User Roles Manage
   * users:
     * administrator
 
@@ -240,8 +267,8 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
   * requisition group: RGFP1
     * program: Family Planning
   * supply lines:
-    * WH01/CMST Warehouse
-    * WH02/South Warehouse
+    * WH01/Ntcheu District Warehouse
+    * WH02/Balaka District Warehouse
   * facility: HC01/Comfort Health Clinic
 2. SN1.1/FP Approval sub point
   * requisition group: RGFP2
