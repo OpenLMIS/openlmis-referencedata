@@ -17,10 +17,9 @@ package org.openlmis.referencedata.repository;
 
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface GeographicZoneRepository extends
@@ -32,9 +31,7 @@ public interface GeographicZoneRepository extends
   @Override
   <S extends GeographicZone> Iterable<S> save(Iterable<S> entities);
 
-  Page<GeographicZone> findByParentAndLevel(
-      GeographicZone parent, GeographicLevel level, Pageable pageable);
+  List<GeographicZone> findByParentAndLevel(GeographicZone parent, GeographicLevel level);
 
-  Page<GeographicZone> findByLevel(
-      GeographicLevel level, Pageable pageable);
+  List<GeographicZone> findByLevel(GeographicLevel level);
 }

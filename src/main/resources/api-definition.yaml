@@ -89,6 +89,12 @@ schemas:
 
   - geographicZone: !include schemas/geographicZone.json
 
+  - geographicZoneArray: |
+      {
+         "type": "array",
+         "items": { "type": "object", "$ref": "schemas/geographicZone.json" }
+      }
+
   - geographicZonePage: !include schemas/geographicZonePage.json
 
   - commodityType: |
@@ -1923,7 +1929,7 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
-                          schema: geographicZonePage
+                          schema: geographicZoneArray
                   "403":
                       body:
                         application/json:

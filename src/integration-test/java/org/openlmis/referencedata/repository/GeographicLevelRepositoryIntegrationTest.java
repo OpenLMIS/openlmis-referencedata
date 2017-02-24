@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,5 +38,18 @@ public class GeographicLevelRepositoryIntegrationTest
     level.setCode(String.valueOf(instanceNumber));
     level.setLevelNumber(instanceNumber);
     return level;
+  }
+
+  @Test
+  public void shouldByLevelNumber() {
+    // given
+    GeographicLevel level = repository.save(generateInstance());
+
+    // when
+    GeographicLevel result = repository.findByLevelNumber(level.getLevelNumber());
+
+    // then
+    assertNotNull(result);
+    assertEquals(level.getId(), result.getId());
   }
 }

@@ -22,6 +22,7 @@ import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -154,29 +156,30 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = "/geographicZones/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<GeographicZone> searchGeographicZones(
+  public List<GeographicZone> searchGeographicZones(
       @RequestParam(value = "parent", required = false) UUID parentId,
-      @RequestParam(value = "levelNumber", required = false) Integer levelNumber,
-      Pageable pageable) {
+      @RequestParam(value = "levelNumber", required = false) Integer levelNumber) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     GeographicZone parent = null != parentId
         ? geographicZoneRepository.findOne(parentId)
         : null;
     if (parentId != null && parent == null) {
-      throw new ValidationMessageException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
+      throw new ValidationMessageException(
+          new Message(GeographicZoneMessageKeys.ERROR_NOT_FOUND_WITH_ID, parentId));
     }
 
     GeographicLevel level = null != levelNumber
         ? geographicLevelRepository.findByLevelNumber(levelNumber)
         : null;
     if (levelNumber != null && level == null) {
-      throw new ValidationMessageException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
+      throw new ValidationMessageException(
+          new Message(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER, levelNumber));
     }
 
     if (parent == null) {
-      return geographicZoneRepository.findByLevel(level, pageable);
+      return geographicZoneRepository.findByLevel(level);
     }
-    return geographicZoneRepository.findByParentAndLevel(parent, level, pageable);
+    return geographicZoneRepository.findByParentAndLevel(parent, level);
   }
 }

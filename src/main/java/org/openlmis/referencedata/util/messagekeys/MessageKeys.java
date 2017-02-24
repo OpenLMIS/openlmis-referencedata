@@ -38,6 +38,7 @@ public abstract class MessageKeys {
   protected static final String SEARCH = "search";
   protected static final String FAILED = "failed";
   protected static final String SAVING = "saving";
+  protected static final String NUMBER = "number";
   protected static final String EMPTY = "empty";
   protected static final String RESET = "reset";
   protected static final String WRONG = "wrong";
@@ -55,6 +56,7 @@ public abstract class MessageKeys {
   protected static final String PROGRAM = "program";
   protected static final String PRODUCT = "product";
   protected static final String FACILITY = "facility";
+  protected static final String ORDERABLE = "orderable";
   protected static final String TRADE_ITEM = "tradeItem";
   protected static final String SUPPLY_LINE = "supplyLine";
   protected static final String FACILITY_TYPE = "facilityType";
@@ -62,13 +64,12 @@ public abstract class MessageKeys {
   protected static final String GEOGRAPHIC_ZONE = "geographicZone";
   protected static final String GEOGRAPHIC_LEVEL = "geographicLevel";
   protected static final String SUPERVISORY_NODE = "supervisoryNode";
-  protected static final String ORDERABLE_DISPLAY_CATEGORY = "orderableDisplayCategory";
-  protected static final String ORDERABLE = "orderable";
   protected static final String FACILITY_OPERATOR = "facilityOperator";
   protected static final String PROCESSING_PERIOD = "processingPeriod";
   protected static final String PROCESSING_SCHEDULE = "processingSchedule";
   protected static final String ORDERED_DISPLAY_VALUE = "orderedDisplayValue";
   protected static final String STOCK_ADJUSTMENT_REASON = "stockAdjustmentReason";
+  protected static final String ORDERABLE_DISPLAY_CATEGORY = "orderableDisplayCategory";
   protected static final String FACILITY_TYPE_APPROVED_PRODUCT = "facilityTypeApprovedProduct";
 
   // Common to subclasses

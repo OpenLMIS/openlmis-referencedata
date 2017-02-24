@@ -212,17 +212,15 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
-    Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
-    PageRequest pageRequest = new PageRequest(PAGE_NUMBER, PAGE_SIZE);
 
     given(geographicZoneRepository.findOne(regionZone.getId())).willReturn(regionZone);
     given(geographicLevelRepository.findByLevelNumber(districtLevel.getLevelNumber()))
         .willReturn(districtLevel);
-    given(geographicZoneRepository.findByParentAndLevel(regionZone, districtLevel, pageRequest))
-        .willReturn(geographicZonesPage);
+    given(geographicZoneRepository.findByParentAndLevel(regionZone, districtLevel))
+        .willReturn(geographicZones);
 
     // when
-    Page<GeographicZone> response = restAssured
+    GeographicZone[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam(PAGE, PAGE_NUMBER)
@@ -234,11 +232,11 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .get(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(GeographicZone[].class);
 
     // then
-    assertEquals(geographicZones.size(), response.getContent().size());
-    assertEquals(geographicZones.size(), response.getNumberOfElements());
+    List<GeographicZone> result = Arrays.asList(response);
+    assertEquals(geographicZones.size(), result.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -250,16 +248,13 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
-    Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
-    PageRequest pageRequest = new PageRequest(PAGE_NUMBER, PAGE_SIZE);
 
     given(geographicLevelRepository.findByLevelNumber(districtLevel.getLevelNumber()))
         .willReturn(districtLevel);
-    given(geographicZoneRepository.findByLevel(districtLevel, pageRequest))
-        .willReturn(geographicZonesPage);
+    given(geographicZoneRepository.findByLevel(districtLevel)).willReturn(geographicZones);
 
     // when
-    Page<GeographicZone> response = restAssured
+    GeographicZone[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam(PAGE, PAGE_NUMBER)
@@ -270,11 +265,11 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .get(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(GeographicZone[].class);
 
     // then
-    assertEquals(geographicZones.size(), response.getContent().size());
-    assertEquals(geographicZones.size(), response.getNumberOfElements());
+    List<GeographicZone> result = Arrays.asList(response);
+    assertEquals(geographicZones.size(), result.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
