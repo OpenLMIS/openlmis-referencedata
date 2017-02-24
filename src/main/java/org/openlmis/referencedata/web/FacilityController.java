@@ -37,6 +37,7 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
@@ -91,6 +92,9 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private SupplyLineService supplyLineService;
+
+  @Autowired
+  private GeographicZoneService geographicZoneService;
 
 
   /**
@@ -315,7 +319,8 @@ public class FacilityController extends BaseController {
   public List<FacilityDto> searchFacilities(
       @RequestParam(value = "code", required = false) String code,
       @RequestParam(value = "name", required = false) String name,
-      @RequestParam(value = "zone", required = false) UUID zoneId) {
+      @RequestParam(value = "zone", required = false) UUID zoneId,
+      @RequestParam(value = "recurse", required = false, defaultValue = "false") boolean recurse) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     GeographicZone zone = null;
@@ -331,7 +336,14 @@ public class FacilityController extends BaseController {
       }
     }
 
-    List<Facility> foundFacilities = facilityRepository.search(code, name, zone);
+    Collection<Facility> foundFacilities;
+    if (recurse) {
+      Collection<GeographicZone> zones = geographicZoneService.getAllZonesInHierarchy(zone);
+      foundFacilities = facilityRepository.search(zones);
+    } else {
+      foundFacilities = facilityRepository.search(code, name, zone);
+    }
+
     return toDto(foundFacilities);
   }
 

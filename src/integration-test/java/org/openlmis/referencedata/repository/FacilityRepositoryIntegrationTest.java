@@ -25,8 +25,10 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
 
   @Autowired
@@ -167,6 +169,24 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     List<Facility> foundFacilties = repository.search(null, null, validZone);
+
+    // then
+    assertEquals(1, foundFacilties.size());
+    assertEquals(validFacility.getId(), foundFacilties.get(0).getId());
+  }
+
+  @Test
+  public void shouldFindFacilitiesByMultipleGeographicZones() {
+    // given
+    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
+    validZone = geographicZoneRepository.save(validZone);
+
+    Facility validFacility = generateInstance();
+    validFacility.setGeographicZone(validZone);
+    repository.save(validFacility);
+
+    // when
+    List<Facility> foundFacilties = repository.search(Collections.singletonList(validZone));
 
     // then
     assertEquals(1, foundFacilties.size());

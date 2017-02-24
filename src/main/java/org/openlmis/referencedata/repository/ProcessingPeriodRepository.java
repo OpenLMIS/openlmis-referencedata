@@ -25,5 +25,4 @@ public interface ProcessingPeriodRepository extends
     PagingAndSortingRepository<ProcessingPeriod, UUID>,
     ProcessingPeriodRepositoryCustom {
 
-  ProcessingPeriod findFirst1ByOrderByEndDateDesc();
 }
