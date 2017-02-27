@@ -338,8 +338,11 @@ public class FacilityController extends BaseController {
 
     Collection<Facility> foundFacilities;
     if (recurse) {
-      Collection<GeographicZone> zones = geographicZoneService.getAllZonesInHierarchy(zone);
-      foundFacilities = facilityRepository.search(zones);
+      foundFacilities = new ArrayList<>();
+      Collection<GeographicZone> foundZones = geographicZoneService.getAllZonesInHierarchy(zone);
+      for (GeographicZone foundZone : foundZones) {
+        foundFacilities.addAll(facilityRepository.search(null, null, foundZone));
+      }
     } else {
       foundFacilities = facilityRepository.search(code, name, zone);
     }

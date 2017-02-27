@@ -19,7 +19,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -68,26 +67,6 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       } else {
         predicate = builder.and(predicate, builder.equal(root.get(GEOGRAPHIC_ZONE), zone));
       }
-    }
-
-    query.where(predicate);
-    return entityManager.createQuery(query).getResultList();
-  }
-
-  /**
-   * Retrieve all facilities within given geographic zones.
-   *
-   * @param zones Geographic zones to match facility location.
-   * @return List of matched facilities.
-   */
-  public List<Facility> search(Collection<GeographicZone> zones) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Facility> query = builder.createQuery(Facility.class);
-    Root<Facility> root = query.from(Facility.class);
-    Predicate predicate = builder.disjunction();
-
-    if (zones != null) {
-      predicate = builder.or(predicate, root.get(GEOGRAPHIC_ZONE).in(zones));
     }
 
     query.where(predicate);
