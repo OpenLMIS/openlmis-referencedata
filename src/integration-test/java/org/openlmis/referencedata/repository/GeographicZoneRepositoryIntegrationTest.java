@@ -96,6 +96,19 @@ public class GeographicZoneRepositoryIntegrationTest
   }
 
   @Test
+  public void shouldFindByParent() {
+    // given
+    generateInstance();
+
+    // when
+    List<GeographicZone> zones = repository.findByParent(regionZone.getParent());
+
+    // then
+    assertEquals(1, zones.size());
+    assertEquals(regionZone.getId(), zones.get(0).getId());
+  }
+
+  @Test
   public void shouldFindByLevel() {
     // given
     generateInstance();
