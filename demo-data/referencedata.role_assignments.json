@@ -143,6 +143,13 @@
     "role": {"id": "185db8f7-ee35-44d0-8b40-6de12489ae77"}
   },
   {
+    "id": "c471972e-15c5-44ea-abcc-4f597697f408",
+    "type": "supervision",
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "c994d1ea-47f7-435d-9d4d-42fb54197698" },
+    "role": {"id": "d8ff49b1-96e7-4710-9511-289f490f7577"}
+  },
+  {
     "id": "3f794ae3-cabb-4f10-a3c6-70f5cb8b16d9",
     "type": "supervision",
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
