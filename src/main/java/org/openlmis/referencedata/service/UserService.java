@@ -191,10 +191,8 @@ public class UserService {
   private void sendResetPasswordEmail(User user, String authToken) {
     UUID token = createPasswordResetToken(user.getId(), authToken);
 
-    //TODO: This address needs to be changed when reset password page will be done
     String[] msgArgs = {user.getFirstName(), user.getLastName(),
-        user.getUsername(), baseUrl + "reset-password.html" + "/username/"
-        + user.getUsername() + "/token/" + token};
+        baseUrl + "/#!/resetPassword/" + token};
     String mailBody = messageSource.getMessage(SystemMessageKeys.PASSWORD_RESET_EMAIL_BODY,
         msgArgs, LocaleContextHolder.getLocale());
     String mailSubject = messageSource.getMessage(SystemMessageKeys.ACCOUNT_CREATED_EMAIL_SUBJECT,
