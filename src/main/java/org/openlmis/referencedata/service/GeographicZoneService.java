@@ -36,7 +36,7 @@ public class GeographicZoneService {
    * @return collection with all descendant zones.
    */
   public Collection<GeographicZone> getAllZonesInHierarchy(GeographicZone root) {
-    Collection<GeographicZone> children = geographicZoneRepository.findByParentAndLevel(root, null);
+    Collection<GeographicZone> children = geographicZoneRepository.findByParent(root);
     Collection<GeographicZone> result = new ArrayList<>(children);
 
     for (GeographicZone zone : children) {

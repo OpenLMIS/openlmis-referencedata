@@ -33,5 +33,7 @@ public interface GeographicZoneRepository extends
 
   List<GeographicZone> findByParentAndLevel(GeographicZone parent, GeographicLevel level);
 
+  List<GeographicZone> findByParent(GeographicZone parent);
+
   List<GeographicZone> findByLevel(GeographicLevel level);
 }

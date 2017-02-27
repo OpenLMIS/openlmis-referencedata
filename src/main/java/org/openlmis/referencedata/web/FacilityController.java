@@ -336,15 +336,16 @@ public class FacilityController extends BaseController {
       }
     }
 
-    Collection<Facility> foundFacilities;
+    Collection<Facility> foundFacilities = new ArrayList<>();
     if (recurse) {
-      foundFacilities = new ArrayList<>();
       Collection<GeographicZone> foundZones = geographicZoneService.getAllZonesInHierarchy(zone);
+      foundZones.add(zone);
+
       for (GeographicZone foundZone : foundZones) {
         foundFacilities.addAll(facilityRepository.search(null, null, foundZone));
       }
     } else {
-      foundFacilities = facilityRepository.search(code, name, zone);
+      foundFacilities.addAll(facilityRepository.search(code, name, zone));
     }
 
     return toDto(foundFacilities);
