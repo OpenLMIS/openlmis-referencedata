@@ -16,9 +16,6 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
-import com.google.common.collect.Sets;
 
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
@@ -34,6 +31,7 @@ import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
+import org.openlmis.referencedata.util.ProcessingPeriodDtoComparator;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.slf4j.Logger;
@@ -56,7 +54,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -151,11 +148,19 @@ public class ProcessingPeriodController extends BaseController {
   @RequestMapping(value = "/processingPeriods", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Set<ProcessingPeriodDto> getAllProcessingPeriods() {
+  public List<ProcessingPeriodDto> getAllProcessingPeriods(
+      @RequestParam(value = "sort", required = false) String sort)  {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    Set<ProcessingPeriod> processingPeriods = Sets.newHashSet(periodRepository.findAll());
-    return processingPeriods.stream()
-        .map(this::exportToDto).collect(toSet());
+    List<ProcessingPeriodDto> periodDtos = new ArrayList<>();
+
+    Iterable<ProcessingPeriod> processingPeriods = periodRepository.findAll();
+    processingPeriods.forEach(period -> periodDtos.add(exportToDto(period)));
+
+    if (sort != null) {
+      periodDtos.sort(new ProcessingPeriodDtoComparator(sort));
+    }
+
+    return periodDtos;
   }
 
   /**

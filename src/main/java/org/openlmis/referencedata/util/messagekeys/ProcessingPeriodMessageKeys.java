@@ -32,4 +32,5 @@ public abstract class ProcessingPeriodMessageKeys extends MessageKeys {
       join(ERROR, END_DATE, "before", START_DATE);
   public static final String ERROR_GAP_BETWEEN_LAST_END_DATE_AND_START_DATE =
       join(ERROR, "gap", "between", "lastEndDate", AND, START_DATE);
+  public static final String ERROR_INVALID_SORTING_COLUMN = join(ERROR, "invalidSortingColumn");
 }
