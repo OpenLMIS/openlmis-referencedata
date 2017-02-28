@@ -119,7 +119,7 @@ INSERT INTO rights (id, description, name, type) VALUES ('35cf256f-1b28-41ad-84f
 INSERT INTO rights (id, description, name, type) VALUES ('60561639-4f94-4371-a5b5-ba95ecf7627f', NULL, 'REPORT_TEMPLATES_EDIT', 'REPORTS');
 INSERT INTO rights (id, description, name, type) VALUES ('7b2da074-b754-4e49-bad3-2520651e5107', NULL, 'ORDERS_VIEW', 'ORDER_FULFILLMENT');
 INSERT INTO rights (id, description, name, type) VALUES ('60580166-ab1c-464a-8401-08384efc57b7', NULL, 'ORDERS_EDIT', 'ORDER_FULFILLMENT');
-INSERT INTO rights (id, description, name, type) VALUES ('94ae9da9-3d66-465e-9b1f-572c705e5d7f', NULL, 'STOCK_EVENT_CREATE', 'STOCK_MANAGEMENT');
+INSERT INTO rights (id, description, name, type) VALUES ('94ae9da9-3d66-465e-9b1f-572c705e5d7f', NULL, 'STOCK_EVENT_CREATE', 'SUPERVISION');
 
 
 --
