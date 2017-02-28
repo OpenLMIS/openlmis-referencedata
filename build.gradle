@@ -48,7 +48,7 @@ dependencies {
     compile 'org.webjars:swagger-ui:2.2.6'
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'org.flywaydb:flyway-core:4.0.3'
-    compile 'org.openlmis:openlmis-service-util:3.0.0-SNAPSHOT'
+    compile 'org.openlmis:openlmis-service-util:3.0.0'
     compile 'org.joda:joda-money:0.12'
     compile 'org.jadira.usertype:usertype.core:5.0.0.GA'
 
