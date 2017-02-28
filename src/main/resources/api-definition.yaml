@@ -749,7 +749,7 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
 
-  /CommodityTypes:
+  /commodityTypes:
       displayName: Commodity Type
       put:
           is: [ secured ]
