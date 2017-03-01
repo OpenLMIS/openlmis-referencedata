@@ -106,7 +106,7 @@ INSERT INTO rights (id, description, name, type) VALUES ('8816edba-b8a9-11e6-80f
 
 INSERT INTO rights (id, description, name, type) VALUES ('4bed4f40-36b5-42a7-94c9-0fd3d4252374', NULL, 'STOCK_CARD_TEMPLATES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('a25803c0-1ee7-4595-8e63-d4eb56df05c2', NULL, 'STOCK_SOURCES_VIEW', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('69e50f15-2124-461a-9c8f-0f964fe7197b', NULL, 'STOCK_DESTINATION_VIEW', 'GENERAL_ADMIN');
+INSERT INTO rights (id, description, name, type) VALUES ('69e50f15-2124-461a-9c8f-0f964fe7197b', NULL, 'STOCK_DESTINATIONS_VIEW', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('8973115f-81f7-4020-931c-a62209c2a963', NULL, 'STOCK_CARD_LINE_ITEM_REASONS_VIEW', 'GENERAL_ADMIN');
 
 INSERT INTO rights (id, description, name, type) VALUES ('ebad51c3-f7c3-4fab-97e1-839973b045d4', NULL, 'USER_ROLES_MANAGE', 'GENERAL_ADMIN');
