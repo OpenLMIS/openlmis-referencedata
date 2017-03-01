@@ -296,6 +296,26 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
     ProcessingPeriodDto[] response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(ProcessingPeriodDto[].class);
+
+    List<ProcessingPeriodDto> periods = Arrays.asList(response);
+    assertEquals(3, periods.size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAllPeriodsSortedByStartDate() {
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
+    given(periodRepository.findAll()).willReturn(storedPeriods);
+
+    ProcessingPeriodDto[] response = restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
         .queryParam("sort", "startDate")
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -309,6 +329,24 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     assertEquals(firstPeriod.getStartDate(), periods.get(0).getStartDate());
     assertEquals(secondPeriod.getStartDate(), periods.get(1).getStartDate());
     assertEquals(thirdPeriod.getStartDate(), periods.get(2).getStartDate());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRespondWithBadRequestWhenInvalidSortProperty() {
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
+    given(periodRepository.findAll()).willReturn(storedPeriods);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("sort", "invalid")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

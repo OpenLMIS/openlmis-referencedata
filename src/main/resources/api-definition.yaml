@@ -437,6 +437,9 @@ resourceTypes:
                   required: false
                   repeat: false
           responses:
+              "400":
+                  body:
+                    application/json:
               "200":
                   body:
                     application/json:
