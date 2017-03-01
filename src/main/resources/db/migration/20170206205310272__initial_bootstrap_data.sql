@@ -103,22 +103,32 @@ INSERT INTO rights (id, description, name, type) VALUES ('4e731cf7-854f-4af7-9ea
 INSERT INTO rights (id, description, name, type) VALUES ('5c4b3b9b-713e-4b9a-8c58-7efcd2954512', NULL, 'SUPERVISORY_NODES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('fb6a0053-6254-4b41-8028-bf91421f90dd', NULL, 'PRODUCTS_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('8816edba-b8a9-11e6-80f5-76304dec7eb7', NULL, 'REQUISITION_TEMPLATES_MANAGE', 'GENERAL_ADMIN');
+
 INSERT INTO rights (id, description, name, type) VALUES ('4bed4f40-36b5-42a7-94c9-0fd3d4252374', NULL, 'STOCK_CARD_TEMPLATES_MANAGE', 'GENERAL_ADMIN');
+INSERT INTO rights (id, description, name, type) VALUES ('a25803c0-1ee7-4595-8e63-d4eb56df05c2', NULL, 'STOCK_SOURCES_MANAGE', 'GENERAL_ADMIN');
+INSERT INTO rights (id, description, name, type) VALUES ('69e50f15-2124-461a-9c8f-0f964fe7197b', NULL, 'STOCK_DESTINATION_MANAGE', 'GENERAL_ADMIN');
+INSERT INTO rights (id, description, name, type) VALUES ('8973115f-81f7-4020-931c-a62209c2a963', NULL, 'STOCK_CARD_LINE_ITEM_REASONS_MANAGE', 'GENERAL_ADMIN');
+
 INSERT INTO rights (id, description, name, type) VALUES ('ebad51c3-f7c3-4fab-97e1-839973b045d4', NULL, 'USER_ROLES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('42791f7a-84a1-470b-bc3c-4160bc99f13c', NULL, 'PROCESSING_SCHEDULES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('3687ea98-8a1e-4347-984c-3fd97d072066', NULL, 'USERS_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('c996d0c6-4f7d-46b5-a376-6f93a3071cb0', NULL, 'REQUISITION_GROUPS_MANAGE', 'GENERAL_ADMIN');
+
 INSERT INTO rights (id, description, name, type) VALUES ('9ade922b-3523-4582-bef4-a47701f7df14', NULL, 'REQUISITION_CREATE', 'SUPERVISION');
 INSERT INTO rights (id, description, name, type) VALUES ('bffa2de2-dc2a-47dd-b126-6501748ac3fc', NULL, 'REQUISITION_APPROVE', 'SUPERVISION');
 INSERT INTO rights (id, description, name, type) VALUES ('feb4c0b8-f6d2-4289-b29d-811c1d0b2863', NULL, 'REQUISITION_AUTHORIZE', 'SUPERVISION');
 INSERT INTO rights (id, description, name, type) VALUES ('c3eb5df0-c3ac-4e70-a978-02827462f60e', NULL, 'REQUISITION_DELETE', 'SUPERVISION');
 INSERT INTO rights (id, description, name, type) VALUES ('e101d2b8-6a0f-4af6-a5de-a9576b4ebc50', NULL, 'REQUISITION_VIEW', 'SUPERVISION');
+
 INSERT INTO rights (id, description, name, type) VALUES ('65626c3d-513f-4255-93fd-808709860594', NULL, 'ORDERS_TRANSFER', 'ORDER_FULFILLMENT');
 INSERT INTO rights (id, description, name, type) VALUES ('24df2715-850c-4336-b650-90eb78c544bf', NULL, 'PODS_MANAGE', 'ORDER_FULFILLMENT');
+
 INSERT INTO rights (id, description, name, type) VALUES ('35cf256f-1b28-41ad-84f5-99c158083dfc', NULL, 'REPORTS_VIEW', 'REPORTS');
 INSERT INTO rights (id, description, name, type) VALUES ('60561639-4f94-4371-a5b5-ba95ecf7627f', NULL, 'REPORT_TEMPLATES_EDIT', 'REPORTS');
+
 INSERT INTO rights (id, description, name, type) VALUES ('7b2da074-b754-4e49-bad3-2520651e5107', NULL, 'ORDERS_VIEW', 'ORDER_FULFILLMENT');
 INSERT INTO rights (id, description, name, type) VALUES ('60580166-ab1c-464a-8401-08384efc57b7', NULL, 'ORDERS_EDIT', 'ORDER_FULFILLMENT');
+
 INSERT INTO rights (id, description, name, type) VALUES ('94ae9da9-3d66-465e-9b1f-572c705e5d7f', NULL, 'STOCK_EVENT_CREATE', 'SUPERVISION');
 
 
@@ -155,7 +165,12 @@ INSERT INTO referencedata.role_assignments (type, id, roleid, userid, warehousei
 
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', 'e96017ff-af8c-4313-a070-caa70465c949');
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '8816edba-b8a9-11e6-80f5-76304dec7eb7');
+
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '4bed4f40-36b5-42a7-94c9-0fd3d4252374');
+INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', 'a25803c0-1ee7-4595-8e63-d4eb56df05c2');
+INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '69e50f15-2124-461a-9c8f-0f964fe7197b');
+INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '8973115f-81f7-4020-931c-a62209c2a963');
+
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '4e731cf7-854f-4af7-9ea4-bd5d8ed7bb22');
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', 'ebad51c3-f7c3-4fab-97e1-839973b045d4');
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '5c4b3b9b-713e-4b9a-8c58-7efcd2954512');
