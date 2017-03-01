@@ -430,6 +430,12 @@ resourceTypes:
       get:
           is: [ secured ]
           description: Get all periods.
+          queryParameters:
+              sort:
+                  displayName: sort
+                  type: string
+                  required: false
+                  repeat: false
           responses:
               "200":
                   body:

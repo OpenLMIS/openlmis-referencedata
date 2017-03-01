@@ -47,13 +47,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
 
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -90,6 +90,8 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   private ProcessingPeriod firstPeriod;
   private ProcessingPeriod secondPeriod;
+  private ProcessingPeriod thirdPeriod;
+
   private ProcessingSchedule schedule;
   private RequisitionGroupProgramSchedule requisitionGroupProgramSchedule;
 
@@ -107,6 +109,8 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         LocalDate.of(2016, 1, 1), LocalDate.of(2016, 2, 1));
     secondPeriod = ProcessingPeriod.newPeriod("P2", schedule,
         LocalDate.of(2016, 2, 2), LocalDate.of(2016, 3, 2));
+    thirdPeriod = ProcessingPeriod.newPeriod("P3", schedule,
+        LocalDate.of(2016, 3, 3), LocalDate.of(2016, 4, 3));
     requisitionGroupProgramSchedule = generateRequisitionGroupProgramSchedule();
     firstPeriodId = UUID.randomUUID();
     programId = UUID.randomUUID();
@@ -287,11 +291,12 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldGetAllPeriods() {
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod);
+    Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
     ProcessingPeriodDto[] response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("sort", "startDate")
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -300,7 +305,10 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .extract().as(ProcessingPeriodDto[].class);
 
     List<ProcessingPeriodDto> periods = Arrays.asList(response);
-    assertEquals(periods.size(), 2);
+    assertEquals(3, periods.size());
+    assertEquals(firstPeriod.getStartDate(), periods.get(0).getStartDate());
+    assertEquals(secondPeriod.getStartDate(), periods.get(1).getStartDate());
+    assertEquals(thirdPeriod.getStartDate(), periods.get(2).getStartDate());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
