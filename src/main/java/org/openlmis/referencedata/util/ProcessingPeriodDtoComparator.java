@@ -19,12 +19,10 @@ import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 
+import lombok.AllArgsConstructor;
+
 import java.util.Comparator;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 @AllArgsConstructor
 public class ProcessingPeriodDtoComparator implements Comparator<ProcessingPeriodDto> {
 
@@ -32,14 +30,11 @@ public class ProcessingPeriodDtoComparator implements Comparator<ProcessingPerio
 
   @Override
   public int compare(ProcessingPeriodDto o1, ProcessingPeriodDto o2) {
-    switch (compareCondition) {
-      case "startDate": {
-        return o1.getStartDate().compareTo(o2.getStartDate());
-      }
-      default: {
-        throw new ValidationMessageException(new Message(
-            ProcessingPeriodMessageKeys.ERROR_INVALID_SORTING_COLUMN, compareCondition));
-      }
+    if ("startDate".equals(compareCondition)) {
+      return o1.getStartDate().compareTo(o2.getStartDate());
+    } else {
+      throw new ValidationMessageException(new Message(
+          ProcessingPeriodMessageKeys.ERROR_INVALID_SORTING_COLUMN, compareCondition));
     }
   }
 }
