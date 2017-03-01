@@ -64,18 +64,6 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     geographicZoneRepository.save(geographicZone);
   }
 
-  Facility generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
-    Facility facility = new Facility("F" + instanceNumber);
-    facility.setType(this.facilityType);
-    facility.setGeographicZone(this.geographicZone);
-    facility.setName("Facility #" + instanceNumber);
-    facility.setDescription("Test facility");
-    facility.setActive(true);
-    facility.setEnabled(true);
-    return facility;
-  }
-
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
     Facility facility = generateInstance();
@@ -172,6 +160,48 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // then
     assertEquals(1, foundFacilties.size());
     assertEquals(validFacility.getId(), foundFacilties.get(0).getId());
+  }
+
+  @Test
+  public void shouldFindFacilitiesByCodeOrNameAndGeographicZone() {
+    // given
+    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
+    validZone = geographicZoneRepository.save(validZone);
+
+    Facility facilityWithCodeAndName = generateInstance();
+    facilityWithCodeAndName.setGeographicZone(validZone);
+    repository.save(facilityWithCodeAndName);
+
+    Facility facilityWithCode = generateInstance();
+    facilityWithCode.setGeographicZone(validZone);
+    repository.save(facilityWithCode);
+
+    // when
+    List<Facility> foundFacilties = repository
+        .search(facilityWithCodeAndName.getCode(), "Facility", validZone);
+
+    // then
+    assertEquals(2, foundFacilties.size());
+    assertEquals(facilityWithCodeAndName.getId(), foundFacilties.get(0).getId());
+    assertEquals(facilityWithCode.getId(), foundFacilties.get(1).getId());
+  }
+
+  @Override
+  Facility generateInstance() {
+    int instanceNumber = this.getNextInstanceNumber();
+    Facility facility = generateInstanceWithRequiredFields(geographicZone, "F" + instanceNumber);
+    facility.setName("Facility #" + instanceNumber);
+    facility.setDescription("Test facility");
+    return facility;
+  }
+
+  private Facility generateInstanceWithRequiredFields(GeographicZone zone, String code) {
+    Facility secondFacility = new Facility(code);
+    secondFacility.setGeographicZone(zone);
+    secondFacility.setActive(true);
+    secondFacility.setEnabled(true);
+    secondFacility.setType(this.facilityType);
+    return secondFacility;
   }
 
   private void searchFacilityAndCheckResults(

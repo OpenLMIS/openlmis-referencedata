@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
@@ -161,24 +164,29 @@ public class GeographicZoneController extends BaseController {
       @RequestParam(value = "levelNumber", required = false) Integer levelNumber) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    GeographicZone parent = null != parentId
-        ? geographicZoneRepository.findOne(parentId)
-        : null;
-    if (parentId != null && parent == null) {
-      throw new ValidationMessageException(
-          new Message(GeographicZoneMessageKeys.ERROR_NOT_FOUND_WITH_ID, parentId));
+    GeographicZone parent = null;
+    if (isNotTrue(isNull(parentId))) {
+      parent = geographicZoneRepository.findOne(parentId);
+      if (isNull(parent)) {
+        throw new ValidationMessageException(
+            new Message(GeographicZoneMessageKeys.ERROR_NOT_FOUND_WITH_ID, parentId));
+      }
     }
 
-    GeographicLevel level = null != levelNumber
-        ? geographicLevelRepository.findByLevelNumber(levelNumber)
-        : null;
-    if (levelNumber != null && level == null) {
-      throw new ValidationMessageException(
-          new Message(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER, levelNumber));
+    GeographicLevel level = null;
+    if (isNotTrue(isNull(levelNumber))) {
+      level = geographicLevelRepository.findByLevelNumber(levelNumber);
+      if (isNull(level)) {
+        throw new ValidationMessageException(
+            new Message(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER, levelNumber));
+      }
     }
 
-    if (parent == null) {
+    if (isNull(parent)) {
       return geographicZoneRepository.findByLevel(level);
+    }
+    if (isNull(level)) {
+      return geographicZoneRepository.findByParent(parent);
     }
     return geographicZoneRepository.findByParentAndLevel(parent, level);
   }

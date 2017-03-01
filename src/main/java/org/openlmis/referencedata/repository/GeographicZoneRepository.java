@@ -22,8 +22,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface GeographicZoneRepository extends
-    PagingAndSortingRepository<GeographicZone, UUID> {
+public interface GeographicZoneRepository extends PagingAndSortingRepository<GeographicZone, UUID> {
 
   @Override
   <S extends GeographicZone> S save(S entity);

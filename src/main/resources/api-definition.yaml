@@ -1939,6 +1939,9 @@ resourceTypes:
                       body:
                         application/json:
                           schema: geographicZoneArray
+                  "400":
+                      body:
+                        application/json:
                   "403":
                       body:
                         application/json:
