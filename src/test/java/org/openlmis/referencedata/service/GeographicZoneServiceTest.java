@@ -40,50 +40,50 @@ public class GeographicZoneServiceTest {
   private GeographicZone parent;
 
   @Mock
-  private GeographicZone children;
+  private GeographicZone child;
 
   @Mock
-  private GeographicZone secondChildren;
+  private GeographicZone secondChild;
 
   @Mock
-  private GeographicZone childrenOfChildren;
+  private GeographicZone childOfChild;
 
   @InjectMocks
   private GeographicZoneService geographicZoneService;
 
   @Test
-  public void shouldRetrieveOneDescendant() {
+  public void shouldRetrieveOneDescendantWhenParentHasOneChild() {
     when(geographicZoneRepository.findByParent(parent))
-        .thenReturn(Collections.singletonList(children));
+        .thenReturn(Collections.singletonList(child));
 
     Collection<GeographicZone> allZonesInHierarchy =
         geographicZoneService.getAllZonesInHierarchy(parent);
 
-    assertEquals(Collections.singletonList(children), allZonesInHierarchy);
+    assertEquals(Collections.singletonList(child), allZonesInHierarchy);
   }
 
   @Test
-  public void shouldRetrieveManyDescendantsWhenTheChildrenHasAChildren() {
+  public void shouldRetrieveManyDescendantsWhenTheChildHasAChild() {
     when(geographicZoneRepository.findByParent(parent))
-        .thenReturn(Collections.singletonList(children));
-    when(geographicZoneRepository.findByParent(children))
-        .thenReturn(Collections.singletonList(childrenOfChildren));
+        .thenReturn(Collections.singletonList(child));
+    when(geographicZoneRepository.findByParent(child))
+        .thenReturn(Collections.singletonList(childOfChild));
 
     Collection<GeographicZone> allZonesInHierarchy =
         geographicZoneService.getAllZonesInHierarchy(parent);
 
-    assertEquals(Arrays.asList(children, childrenOfChildren), allZonesInHierarchy);
+    assertEquals(Arrays.asList(child, childOfChild), allZonesInHierarchy);
   }
 
   @Test
   public void shouldRetrieveManyDescendantsWhenParentHasManyChildren() {
     when(geographicZoneRepository.findByParent(parent))
-        .thenReturn(Arrays.asList(children, secondChildren));
+        .thenReturn(Arrays.asList(child, secondChild));
 
     Collection<GeographicZone> allZonesInHierarchy =
         geographicZoneService.getAllZonesInHierarchy(parent);
 
-    assertEquals(Arrays.asList(children, secondChildren), allZonesInHierarchy);
+    assertEquals(Arrays.asList(child, secondChild), allZonesInHierarchy);
   }
 
   @Test
