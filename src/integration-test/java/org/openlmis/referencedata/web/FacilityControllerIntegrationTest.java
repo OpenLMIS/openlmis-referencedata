@@ -804,6 +804,39 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Test
+  public void putShouldReturnBadRequestForNullSupportedProgram() {
+    testPutBadRequestForSupportedPrograms(null);
+  }
+
+  @Test
+  public void putShouldReturnBadRequestForEmptySupportedProgram() {
+    testPutBadRequestForSupportedPrograms(Collections.emptySet());
+  }
+
+  private void testPutBadRequestForSupportedPrograms(Set<SupportedProgram> programs) {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    FacilityDto facilityDto = new FacilityDto();
+    facility.export(facilityDto);
+
+    facilityDto.setSupportedPrograms(programs);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(facilityDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
   private SupplyLine generateSupplyLine() {
     SupplyLine supplyLine = new SupplyLine();
     supplyLine.setProgram(program);

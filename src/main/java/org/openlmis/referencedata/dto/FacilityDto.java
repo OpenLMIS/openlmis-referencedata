@@ -80,14 +80,16 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
 
   @Override
   public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
-    this.supportedPrograms = supportedPrograms
-        .stream()
-        .map(supportedProgram -> {
-          SupportedProgramDto supportedProgramDto = new SupportedProgramDto();
-          supportedProgram.export(supportedProgramDto);
+    if (supportedPrograms != null) {
+      this.supportedPrograms = supportedPrograms
+          .stream()
+          .map(supportedProgram -> {
+            SupportedProgramDto supportedProgramDto = new SupportedProgramDto();
+            supportedProgram.export(supportedProgramDto);
 
-          return supportedProgramDto;
-        })
-        .collect(Collectors.toSet());
+            return supportedProgramDto;
+          })
+          .collect(Collectors.toSet());
+    }
   }
 }

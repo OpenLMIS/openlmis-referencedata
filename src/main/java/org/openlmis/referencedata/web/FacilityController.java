@@ -51,6 +51,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -114,11 +115,7 @@ public class FacilityController extends BaseController {
     facilityDto.setId(null);
     Facility newFacility = Facility.newFacility(facilityDto);
 
-    boolean addSuccessful = addSupportedProgramsToFacility(
-        facilityDto.getSupportedPrograms(), newFacility);
-    if (!addSuccessful) {
-      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
-    }
+    addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(), newFacility);
 
     newFacility = facilityRepository.save(newFacility);
     LOGGER.debug("Created new facility with id: ", facilityDto.getId());
@@ -192,11 +189,7 @@ public class FacilityController extends BaseController {
     Facility facilityToSave = Facility.newFacility(facilityDto);
     facilityToSave.setId(facilityId);
 
-    boolean addSuccessful = addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(),
-        facilityToSave);
-    if (!addSuccessful) {
-      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
-    }
+    addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(), facilityToSave);
     facilityToSave = facilityRepository.save(facilityToSave);
 
     LOGGER.debug("Saved facility with id: " + facilityToSave.getId());
@@ -376,8 +369,13 @@ public class FacilityController extends BaseController {
     return productDtos;
   }
 
-  private boolean addSupportedProgramsToFacility(Set<SupportedProgramDto> supportedProgramDtos,
+  private void addSupportedProgramsToFacility(Set<SupportedProgramDto> supportedProgramDtos,
                                                  Facility facility) {
+    if (CollectionUtils.isEmpty(supportedProgramDtos)) {
+      throw new ValidationMessageException(
+          FacilityMessageKeys.ERROR_SUPPORTED_PROGRAMS_REQUIRED);
+    }
+
     for (SupportedProgramDto dto : supportedProgramDtos) {
       Program program;
       if ( dto.getCode() != null ) {
@@ -388,15 +386,11 @@ public class FacilityController extends BaseController {
         throw new ValidationMessageException(ProgramMessageKeys.ERROR_CODE_OR_ID_REQUIRED);
       }
       if (program == null) {
-        LOGGER.debug("Program does not exist: ",
-            dto.getCode() == null ? dto.getId() : dto.getCode());
-        return false;
+        throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
       }
       SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
           program, dto.isSupportActive(), dto.getSupportStartDate());
       facility.addSupportedProgram(supportedProgram);
     }
-
-    return true;
   }
 }

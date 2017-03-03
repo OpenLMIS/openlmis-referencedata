@@ -71,6 +71,7 @@ public abstract class MessageKeys {
   protected static final String STOCK_ADJUSTMENT_REASON = "stockAdjustmentReason";
   protected static final String ORDERABLE_DISPLAY_CATEGORY = "orderableDisplayCategory";
   protected static final String FACILITY_TYPE_APPROVED_PRODUCT = "facilityTypeApprovedProduct";
+  protected static final String SUPPORTED_PROGRAMS = "supportedPrograms";
 
   // Common to subclasses
   protected static final String EMAIL = "email";
