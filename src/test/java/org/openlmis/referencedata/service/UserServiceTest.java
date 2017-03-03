@@ -233,6 +233,7 @@ public class UserServiceTest {
   @Test
   public void shouldSaveRequisitionAndAuthUsers() throws Exception {
     when(userRepository.save(user)).thenReturn(user);
+    when(userRepository.findOne(user.getId())).thenReturn(user);
 
     RestTemplate restTemplate = mock(RestTemplate.class);
     whenNew(RestTemplate.class).withNoArguments().thenReturn(restTemplate);
@@ -291,6 +292,7 @@ public class UserServiceTest {
   @Test
   public void shouldNotSendResetPasswordEmailWhenUserIsUpdated() throws Exception {
     when(userRepository.save(user)).thenReturn(user);
+    when(userRepository.findOne(user.getId())).thenReturn(user);
 
     RestTemplate restTemplate = mock(RestTemplate.class);
     whenNew(RestTemplate.class).withNoArguments().thenReturn(restTemplate);

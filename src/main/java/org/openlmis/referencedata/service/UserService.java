@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.service;
 
+import static java.util.Objects.isNull;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -127,7 +129,7 @@ public class UserService {
   @Transactional
   public void save(User user, String token) {
     boolean isNewUser = false;
-    if (user.getId() == null) {
+    if (isNull(user.getId()) || isNull(userRepository.findOne(user.getId()))) {
       isNewUser = true;
     }
     userRepository.save(user);
