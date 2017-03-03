@@ -805,12 +805,12 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void putShouldReturnBadRequestForNullSupportedProgram() {
+  public void putShouldReturnBadRequestForNullSupportedPrograms() {
     testPutBadRequestForSupportedPrograms(null);
   }
 
   @Test
-  public void putShouldReturnBadRequestForEmptySupportedProgram() {
+  public void putShouldReturnBadRequestForEmptySupportedPrograms() {
     testPutBadRequestForSupportedPrograms(Collections.emptySet());
   }
 
