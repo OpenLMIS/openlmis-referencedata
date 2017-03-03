@@ -15,18 +15,24 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.validate.ProgramValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +53,9 @@ public class ProgramController extends BaseController {
   @Autowired
   private ProgramRepository programRepository;
 
+  @Autowired
+  private ProgramValidator validator;
+
   /**
    * Allows creating a new programs.
    *
@@ -56,12 +65,19 @@ public class ProgramController extends BaseController {
   @RequestMapping(value = "/programs", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Program createProgram(@RequestBody Program program) {
+  public Program createProgram(@RequestBody ProgramDto program,
+                               BindingResult bindingResult) {
+    validator.validate(program, bindingResult);
+    if (bindingResult.getErrorCount() > 0) {
+      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
+    }
+
     LOGGER.debug("Creating new program");
     // Ignore provided id
+    Program newProgram = Program.newProgram(program);
     program.setId(null);
-    programRepository.save(program);
-    return program;
+    programRepository.save(newProgram);
+    return newProgram;
   }
 
   /**
@@ -123,22 +139,35 @@ public class ProgramController extends BaseController {
   @RequestMapping(value = "/programs/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Program updateProgram(
-      @PathVariable("id") UUID programId, @RequestBody Program program) {
-    if (program == null || programId == null) {
+  public Program updateProgram(@PathVariable("id") UUID id,
+                               @RequestBody ProgramDto program,
+                               BindingResult bindingResult) {
+    if (program == null || id == null) {
       LOGGER.debug("Update failed - program id not specified");
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_ID_NULL);
     }
 
-    Program storedProgram = programRepository.findOne(programId);
+    Program storedProgram = programRepository.findOne(id);
     if (storedProgram == null) {
-      LOGGER.warn("Update failed - program with id: {} not found", programId);
+      LOGGER.warn("Update failed - program with id: {} not found", id);
       throw new ValidationMessageException(
-          new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
+          new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, id));
+    }
+    if (isNotTrue(storedProgram.getCode().equals(Code.code(program.getCode())))) {
+      throw new ValidationMessageException(
+          new Message(ProgramMessageKeys.ERROR_CODE_IS_INVARIABLE, id));
     }
 
-    programRepository.save(program);
-    return program;
+    validator.validate(program, bindingResult);
+    if (bindingResult.getErrorCount() > 0) {
+      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
+    }
+
+    Program updatedProgram = Program.newProgram(program);
+
+
+    programRepository.save(updatedProgram);
+    return updatedProgram;
   }
 
 

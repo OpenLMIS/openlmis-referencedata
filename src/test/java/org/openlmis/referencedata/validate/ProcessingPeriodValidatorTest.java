@@ -36,7 +36,7 @@ import org.springframework.validation.Validator;
 import java.time.LocalDate;
 import java.util.Collections;
 
-public class ProcessingPeriodValidatorTest extends BaseValidatorTest {
+public class ProcessingPeriodValidatorTest extends ValidatorTestUtils {
 
   @Mock
   private ProcessingPeriodService processingPeriodService;

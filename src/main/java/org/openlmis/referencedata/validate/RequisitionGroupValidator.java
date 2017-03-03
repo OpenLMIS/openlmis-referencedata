@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * A validator for {@link RequisitionGroupBaseDto} object.
  */
 @Component
-public class RequisitionGroupValidator implements Validator {
+public class RequisitionGroupValidator implements BaseValidator {
 
   // RequisitionGroup fields
   static final String CODE = "code";
@@ -177,17 +177,4 @@ public class RequisitionGroupValidator implements Validator {
       }
     }
   }
-
-  private void rejectIfEmpty(Errors errors, String field, String message) {
-    ValidationUtils.rejectIfEmpty(errors, field, message, message);
-  }
-
-  private void rejectIfEmptyOrWhitespace(Errors errors, String field, String message) {
-    ValidationUtils.rejectIfEmptyOrWhitespace(errors, field, message, message);
-  }
-
-  private void rejectValue(Errors errors, String field, String message) {
-    errors.rejectValue(field, message, message);
-  }
-
 }

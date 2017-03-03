@@ -13,18 +13,23 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.util.messagekeys;
+package org.openlmis.referencedata.validate;
 
-public abstract class ProgramMessageKeys extends MessageKeys {
-  private static final String ERROR = join(SERVICE_ERROR, PROGRAM);
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
-  public static final String ERROR_NULL = join(ERROR, NULL);
+import org.springframework.validation.Errors;
 
-  public static final String ERROR_ID_NULL = join(ERROR, ID, NULL);
-  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
-  public static final String ERROR_CODE_OR_ID_REQUIRED = join(ERROR, ID, CODE, NULL);
-  public static final String ERROR_CODE_REQUIRED = join(ERROR, CODE, REQUIRED);
-  public static final String ERROR_CODE_DUPLICATED = join(ERROR, CODE, DUPLICATED);
-  public static final String ERROR_CODE_IS_INVARIABLE = join(ERROR, CODE, IS_INVARIABLE);
+public abstract class ValidatorTestUtils {
+
+  protected void assertErrorMessage(Errors errors, String field, String expectedMessage) {
+    assertThat("There is no errors for field: " + field, errors.hasFieldErrors(field), is(true));
+
+    boolean match = errors.getFieldErrors(field)
+        .stream()
+        .anyMatch(e -> e.getField().equals(field) && e.getDefaultMessage().equals(expectedMessage));
+
+    assertThat("There is no error with default message: " + expectedMessage, match, is(true));
+  }
+
 }

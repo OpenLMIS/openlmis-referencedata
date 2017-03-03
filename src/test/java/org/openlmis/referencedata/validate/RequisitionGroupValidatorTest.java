@@ -55,7 +55,7 @@ import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class RequisitionGroupValidatorTest extends BaseValidatorTest {
+public class RequisitionGroupValidatorTest extends ValidatorTestUtils {
 
   @Mock
   private SupervisoryNodeRepository supervisoryNodes;

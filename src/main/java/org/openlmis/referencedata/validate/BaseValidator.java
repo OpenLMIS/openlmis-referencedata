@@ -16,20 +16,20 @@
 package org.openlmis.referencedata.validate;
 
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.Validator;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+interface BaseValidator extends Validator {
 
-public abstract class BaseValidatorTest {
-
-  protected void assertErrorMessage(Errors errors, String field, String expectedMessage) {
-    assertThat("There is no errors for field: " + field, errors.hasFieldErrors(field), is(true));
-
-    boolean match = errors.getFieldErrors(field)
-        .stream()
-        .anyMatch(e -> e.getField().equals(field) && e.getDefaultMessage().equals(expectedMessage));
-
-    assertThat("There is no error with default message: " + expectedMessage, match, is(true));
+  default void rejectIfEmpty(Errors errors, String field, String message) {
+    ValidationUtils.rejectIfEmpty(errors, field, message, message);
   }
 
+  default void rejectIfEmptyOrWhitespace(Errors errors, String field, String message) {
+    ValidationUtils.rejectIfEmptyOrWhitespace(errors, field, message, message);
+  }
+
+  default void rejectValue(Errors errors, String field, String message) {
+    errors.rejectValue(field, message, message);
+  }
 }

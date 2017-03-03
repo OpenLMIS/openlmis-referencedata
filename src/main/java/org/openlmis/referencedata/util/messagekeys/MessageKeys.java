@@ -48,6 +48,7 @@ public abstract class MessageKeys {
   protected static final String CODE = "code";
   protected static final String AND = "and";
   protected static final String ID = "id";
+  protected static final String IS_INVARIABLE = "isInvariable";
 
   // Entities
   protected static final String USER = "user";

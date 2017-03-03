@@ -40,7 +40,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class RequisitionGroupValidatorParameterizedTest extends BaseValidatorTest {
+public class RequisitionGroupValidatorParameterizedTest extends ValidatorTestUtils {
 
   @Mock
   private SupervisoryNodeRepository supervisoryNodes;
