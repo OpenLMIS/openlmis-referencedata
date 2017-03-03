@@ -16,9 +16,11 @@
 package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class CommodityTypeMessageKeys extends MessageKeys {
-  private static final String ERROR = join(COMMODITY_TYPE, SERVICE_ERROR);
+  private static final String ERROR = join(SERVICE_ERROR, COMMODITY_TYPE);
   private static final String TRADE_ITEMS = "tradeItems";
+  private static final String PRODUCT_NOT_A_COMMODITY_TYPE = "productNotACommodityType";
 
+  public static final String ERROR_NOT_A_COMMODITY_TYPE = join(ERROR, PRODUCT_NOT_A_COMMODITY_TYPE);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_TRADE_ITEMS_NULL = join(ERROR, TRADE_ITEMS, NULL);
 }

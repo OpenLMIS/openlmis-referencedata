@@ -69,7 +69,13 @@ public class CommodityTypeController extends BaseController {
     // if it already exists, update or fail if not already a CommodityType
     Orderable storedProduct = repository.findByProductCode(commodityType.getProductCode());
     if (null != storedProduct) {
-      commodityType.setId(storedProduct.getId());
+      UUID productId = storedProduct.getId();
+      if (null != commodityTypeRepository.findOne(productId)) {
+        commodityType.setId(productId);
+      } else {
+        throw new ValidationMessageException(new Message(
+            CommodityTypeMessageKeys.ERROR_NOT_A_COMMODITY_TYPE, commodityType.getProductCode()));
+      }
     }
 
     repository.save(commodityType);
