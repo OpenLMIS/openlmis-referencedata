@@ -155,7 +155,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldReturnBadRequestIfThereAreValidationErrors() {
+  public void shouldReturnBadRequestIfThereAreValidationErrorsWhenPostingPeriod() {
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     doAnswer(invocation -> {
@@ -171,6 +171,30 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .body(secondPeriod)
         .when()
         .post(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestIfThereAreValidationErrorsWhenPuttingPeriod() {
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
+    doAnswer(invocation -> {
+      Object[] args = invocation.getArguments();
+      Errors errors = (Errors) args[1];
+      errors.reject("testReject", "rejectMessage");
+      return null;
+    }).when(validator).validate(anyObject(), any(Errors.class));
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", UUID.randomUUID())
+        .body(secondPeriod)
+        .when()
+        .put(ID_URL)
         .then()
         .statusCode(400);
 

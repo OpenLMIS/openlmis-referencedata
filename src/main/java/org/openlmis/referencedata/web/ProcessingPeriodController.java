@@ -175,13 +175,19 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ProcessingPeriodDto updateProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
-                                                    @PathVariable("id") UUID periodId) {
+                                                    @PathVariable("id") UUID periodId,
+                                                    BindingResult bindingResult) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     LOGGER.debug("Updating processingPeriod");
     ProcessingPeriod updatedProcessingPeriod = ProcessingPeriod.newPeriod(periodDto);
-    updatedProcessingPeriod.setId(periodId);
-    periodRepository.save(updatedProcessingPeriod);
-    return exportToDto(updatedProcessingPeriod);
+    validator.validate(updatedProcessingPeriod, bindingResult);
+    if (bindingResult.getErrorCount() == 0) {
+      updatedProcessingPeriod.setId(periodId);
+      periodRepository.save(updatedProcessingPeriod);
+      return exportToDto(updatedProcessingPeriod);
+    } else {
+      throw new ValidationMessageException(bindingResult.getAllErrors().get(0).getDefaultMessage());
+    }
   }
 
   /**

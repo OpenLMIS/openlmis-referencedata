@@ -510,6 +510,8 @@ resourceTypes:
                       body:
                         application/json:
                   "400":
+                      body:
+                        application/json:
                   "403":
                       body:
                         application/json:
