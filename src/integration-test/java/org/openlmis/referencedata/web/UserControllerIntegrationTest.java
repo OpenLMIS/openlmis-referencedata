@@ -15,9 +15,12 @@
 
 package org.openlmis.referencedata.web;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,8 +34,8 @@ import com.google.common.collect.Sets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.jayway.restassured.response.Response;
+
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -728,6 +731,37 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
 
     removeAuthUserByUsername(authUser.getUsername());
+  }
+
+  @Test
+  public void shouldCreateUserWhenThereIsErrorWithNotificationService() {
+    wireMockRule.stubFor(post(urlPathEqualTo("/api/notification"))
+        .willReturn(aResponse().withStatus(500)));
+
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    User user = generateUser();
+
+    UserDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(user)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto.class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertNotNull(response);
+
+    assertEquals(user.getUsername(), response.getUsername());
+    assertEquals(user.getFirstName(), response.getFirstName());
+    assertEquals(user.getLastName(), response.getLastName());
+    assertEquals(user.getEmail(), response.getEmail());
+    assertEquals(user.getHomeFacility().getId(), response.getHomeFacility().getId());
+    assertEquals(user.isActive(), response.isActive());
+    assertEquals(user.isVerified(), response.isVerified());
   }
 
   //TODO: This test should be updated when example email will be added to notification module

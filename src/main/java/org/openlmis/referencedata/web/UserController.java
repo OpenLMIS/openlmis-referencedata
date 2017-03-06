@@ -157,9 +157,6 @@ public class UserController extends BaseController {
                           OAuth2Authentication auth) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
-    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
-    String token = details.getTokenValue();
-
     if (bindingResult.hasErrors()) {
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
@@ -174,30 +171,25 @@ public class UserController extends BaseController {
         userDto.setHomeFacility(homeFacility);
       }
     }
+    User userToSave = User.newUser(userDto);
 
-    try {
+    Set<RoleAssignmentDto> roleAssignmentDtos = userDto.getRoleAssignments();
+    if (roleAssignmentDtos != null) {
 
-      User userToSave = User.newUser(userDto);
-
-      Set<RoleAssignmentDto> roleAssignmentDtos = userDto.getRoleAssignments();
-      if (roleAssignmentDtos != null) {
-
-        boolean foundNullRoleId = roleAssignmentDtos.stream().anyMatch(
-            roleAssignmentDto -> roleAssignmentDto.getRoleId() == null);
-        if (foundNullRoleId) {
-          throw new ValidationMessageException(UserMessageKeys.ERROR_ROLE_ID_NULL);
-        }
-
-        assignRolesToUser(roleAssignmentDtos, userToSave);
+      boolean foundNullRoleId = roleAssignmentDtos.stream().anyMatch(
+          roleAssignmentDto -> roleAssignmentDto.getRoleId() == null);
+      if (foundNullRoleId) {
+        throw new ValidationMessageException(UserMessageKeys.ERROR_ROLE_ID_NULL);
       }
 
-      userService.save(userToSave, token);
-
-      return exportUserToDto(userToSave);
-
-    } catch (ExternalApiException ex) {
-      throw new InternalErrorException(UserMessageKeys.ERROR_SAVING, ex);
+      assignRolesToUser(roleAssignmentDtos, userToSave);
     }
+
+    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
+    String token = details.getTokenValue();
+    userService.save(userToSave, token);
+
+    return exportUserToDto(userToSave);
   }
 
   /**

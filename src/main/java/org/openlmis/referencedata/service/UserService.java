@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -126,7 +125,6 @@ public class UserService {
   /**
    * Creating or updating users.
    */
-  @Transactional
   public void save(User user, String token) {
     boolean isNewUser = false;
     if (isNull(user.getId()) || isNull(userRepository.findOne(user.getId()))) {
@@ -135,7 +133,11 @@ public class UserService {
     userRepository.save(user);
     saveAuthUser(user, token);
     if (isNewUser) {
-      sendResetPasswordEmail(user, token);
+      try {
+        sendResetPasswordEmail(user, token);
+      } catch (ExternalApiException ex) {
+        LOGGER.warn("Reset password email could not be send", ex);
+      }
     }
   }
 
