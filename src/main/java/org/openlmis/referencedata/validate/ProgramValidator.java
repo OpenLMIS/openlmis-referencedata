@@ -68,7 +68,6 @@ public class ProgramValidator implements BaseValidator {
    *
    * @param target the object that is to be validated (never {@code null})
    * @param errors contextual state about the validation process (never {@code null})
-   * @throws NullPointerException if any method parameter is null.
    * @see ValidationUtils
    */
   @Override
