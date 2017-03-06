@@ -26,6 +26,7 @@ import static org.openlmis.referencedata.validate.RequisitionGroupValidator.DESC
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.MEMBER_FACILITIES;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE;
+import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import com.google.common.collect.Sets;
 
@@ -55,7 +56,7 @@ import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class RequisitionGroupValidatorTest extends ValidatorTestUtils {
+public class RequisitionGroupValidatorTest {
 
   @Mock
   private SupervisoryNodeRepository supervisoryNodes;

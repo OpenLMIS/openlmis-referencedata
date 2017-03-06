@@ -19,6 +19,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
+import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +41,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class RequisitionGroupValidatorParameterizedTest extends ValidatorTestUtils {
+public class RequisitionGroupValidatorParameterizedTest {
 
   @Mock
   private SupervisoryNodeRepository supervisoryNodes;

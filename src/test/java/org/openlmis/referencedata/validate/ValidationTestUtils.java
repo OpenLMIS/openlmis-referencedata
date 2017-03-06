@@ -20,9 +20,9 @@ import static org.junit.Assert.assertThat;
 
 import org.springframework.validation.Errors;
 
-public abstract class ValidatorTestUtils {
+class ValidationTestUtils {
 
-  protected void assertErrorMessage(Errors errors, String field, String expectedMessage) {
+  static void assertErrorMessage(Errors errors, String field, String expectedMessage) {
     assertThat("There is no errors for field: " + field, errors.hasFieldErrors(field), is(true));
 
     boolean match = errors.getFieldErrors(field)

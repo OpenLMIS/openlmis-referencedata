@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.validate.ProgramValidator.CODE;
+import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +41,7 @@ import org.springframework.validation.Validator;
 import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProgramValidatorTest extends ValidatorTestUtils {
+public class ProgramValidatorTest {
 
   @Mock
   private ProgramRepository programRepository;
