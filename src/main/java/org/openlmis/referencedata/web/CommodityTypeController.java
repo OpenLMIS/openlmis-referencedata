@@ -120,6 +120,7 @@ public class CommodityTypeController extends BaseController {
 
     // update commodity type with new trade item association
     commodityType.setTradeItems(tradeItems);
+    commodityTypeRepository.save(commodityType);
 
     return ResponseEntity.ok().build();
   }

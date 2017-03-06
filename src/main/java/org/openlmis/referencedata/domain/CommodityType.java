@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
@@ -107,5 +108,10 @@ public final class CommodityType extends Orderable {
     this.tradeItems.forEach(tradeItem -> tradeItem.assignCommodityType(null));
     this.tradeItems.clear();
     tradeItems.forEach(tradeItem -> addTradeItem(tradeItem));
+  }
+
+  @JsonIgnore
+  public Set<TradeItem> getTradeItems() {
+    return tradeItems;
   }
 }

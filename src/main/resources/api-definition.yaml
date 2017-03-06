@@ -97,21 +97,7 @@ schemas:
 
   - geographicZonePage: !include schemas/geographicZonePage.json
 
-  - commodityType: |
-        {   "type": "object",
-            "$schema": "http://json-schema.org/draft-03/schema",
-            "title": "Commodity Type",
-            "description": "A single commodityType",
-            "properties": {
-                "id": { "type": "string", "required": false, "title": "id" },
-                "productCode": { "type": "string", "required": true, "title": "productCode" },
-                "name": { "type": "string", "required": true, "title": "name" },
-                "description": { "type": "string", "required": true, "title": "description" },
-                "packSize": { "type": "integer", "required": true, "title": "packSize" },
-                "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
-                "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" }
-            }
-        }
+  - commodityType:  !include schemas/commodityType.json
 
   - orderable: !include schemas/orderable.json
 
@@ -278,7 +264,8 @@ schemas:
   - uuidArray: |
       {
           "type": "array",
-          "items": { "type": "string", "required": true, "title": "id" }
+          "items": { "type": "string", "title": "id" },
+          "required": ["/"]
       }
 
   - auditLogEntry: !include schemas/auditLogEntry.json
@@ -765,11 +752,18 @@ resourceTypes:
       put:
           is: [ secured ]
           description: Create or update a Commodity Type.
+          body:
+            application/json:
+                schema: commodityType
           responses:
               "200":
                   body:
                     application/json:
                         schema: commodityType
+              "400":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
               "403":
                   body:
                     application/json:
@@ -803,6 +797,9 @@ resourceTypes:
               responses:
                   "200":
                   "400":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "404":
                   "403":
                       body:

@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Commodity Type",
+  "description": "A single commodityType",
+  "properties": {
+    "id": { "type": "string", "title": "id" },
+    "productCode": { "type": "string", "title": "productCode" },
+    "name": { "type": "string", "title": "name" },
+    "description": { "type": "string", "title": "description" },
+    "packSize": { "type": "integer", "title": "packSize" },
+    "packRoundingThreshold": { "type": "integer", "title": "packRoundingThreshold" },
+    "roundToZero": { "type": "boolean", "title": "roundToZero" }
+  },
+  "required": [
+    "productCode",
+    "name",
+    "description",
+    "packSize",
+    "packRoundingThreshold",
+    "roundToZero"
+  ]
+}
