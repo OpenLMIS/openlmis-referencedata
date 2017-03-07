@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.openlmis.referencedata.domain.CommodityType;
@@ -58,10 +59,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   private CommodityType commodityType;
   private UUID commodityTypeId;
 
-  /**
-   * Constructor for tests.
-   */
-  public CommodityTypeControllerIntegrationTest() {
+  @Before
+  public void setUp() {
     commodityType = CommodityType.newCommodityType("code", UNIT, "name", "desc", 0, 0, false);
     commodityTypeId = UUID.randomUUID();
     commodityType.setId(commodityTypeId);

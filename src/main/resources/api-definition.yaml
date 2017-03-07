@@ -264,8 +264,7 @@ schemas:
   - uuidArray: |
       {
           "type": "array",
-          "items": { "type": "string", "title": "id" },
-          "required": ["/"]
+          "items": { "type": "string", "title": "id" }
       }
 
   - auditLogEntry: !include schemas/auditLogEntry.json
