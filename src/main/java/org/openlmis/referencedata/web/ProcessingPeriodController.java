@@ -179,9 +179,9 @@ public class ProcessingPeriodController extends BaseController {
                                                     BindingResult bindingResult) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     LOGGER.debug("Updating processingPeriod");
-    ProcessingPeriod updatedProcessingPeriod = ProcessingPeriod.newPeriod(periodDto);
-    validator.validate(updatedProcessingPeriod, bindingResult);
+    validator.validate(periodDto, bindingResult);
     if (bindingResult.getErrorCount() == 0) {
+      ProcessingPeriod updatedProcessingPeriod = ProcessingPeriod.newPeriod(periodDto);
       updatedProcessingPeriod.setId(periodId);
       periodRepository.save(updatedProcessingPeriod);
       return exportToDto(updatedProcessingPeriod);

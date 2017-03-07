@@ -180,6 +180,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldReturnBadRequestIfThereAreValidationErrorsWhenPuttingPeriod() {
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    given(periodRepository.findOne(secondPeriod.getId())).willReturn(secondPeriod);
 
     doAnswer(invocation -> {
       Object[] args = invocation.getArguments();

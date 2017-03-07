@@ -16,20 +16,25 @@
 package org.openlmis.referencedata.validate;
 
 import org.openlmis.referencedata.domain.ProcessingPeriod;
+import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
-import org.springframework.validation.Validator;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
-public class ProcessingPeriodValidator implements Validator {
+public class ProcessingPeriodValidator implements BaseValidator {
+  private static final String START_DATE = "startDate";
+  private static final String END_DATE = "endDate";
 
   @Autowired
   private ProcessingPeriodService periodService;
+
+  @Autowired
+  private ProcessingPeriodRepository processingPeriodRepository;
 
   @Override
   public boolean supports(Class<?> clazz) {
@@ -38,13 +43,25 @@ public class ProcessingPeriodValidator implements Validator {
 
   @Override
   public void validate(Object obj, Errors err) {
-    ValidationUtils.rejectIfEmpty(err, "startDate", "startDate.empty",
-        ProcessingPeriodMessageKeys.ERROR_START_DATE_NULL);
-    ValidationUtils.rejectIfEmpty(err, "endDate", "endDate.empty",
-        ProcessingPeriodMessageKeys.ERROR_END_DATE_NULL);
+    rejectIfEmpty(err, START_DATE, ProcessingPeriodMessageKeys.ERROR_START_DATE_NULL);
+    rejectIfEmpty(err, END_DATE, ProcessingPeriodMessageKeys.ERROR_END_DATE_NULL);
 
     if (!err.hasErrors()) {
       ProcessingPeriod period = (ProcessingPeriod) obj;
+      UUID periodId = period.getId();
+      if (periodId != null) {
+        ProcessingPeriod existingPeriod = processingPeriodRepository.findOne(periodId);
+        if (existingPeriod != null) {
+          rejectIfValueChanged(err, period.getProcessingSchedule(),
+              existingPeriod.getProcessingSchedule(), "processingSchedule");
+          rejectIfValueChanged(err, period.getStartDate(),
+              existingPeriod.getStartDate(), "startDate");
+          rejectIfValueChanged(err, period.getEndDate(),
+              existingPeriod.getEndDate(), "endDate");
+          rejectIfValueChanged(err, period.getDurationInMonths(),
+              existingPeriod.getDurationInMonths(), "durationInMonths");
+        }
+      }
       List<ProcessingPeriod> periodList = periodService
               .searchPeriods(period.getProcessingSchedule(), null);
 
@@ -55,16 +72,20 @@ public class ProcessingPeriodValidator implements Validator {
         if (!periodList.isEmpty()) {
           LocalDate lastEndDate = periodList.get(periodList.size() - 1).getEndDate();
           if (!startDate.equals(lastEndDate.plusDays(1))) {
-            err.rejectValue("startDate", "{gap.between.lastEndDate.and.startDate.validation.error}",
+            rejectValue(err, START_DATE,
                 ProcessingPeriodMessageKeys.ERROR_GAP_BETWEEN_LAST_END_DATE_AND_START_DATE);
           }
         }
       } else {
-        err.rejectValue("startDate", "{startDate.after.endDate.validation.error}",
-            ProcessingPeriodMessageKeys.ERROR_START_DATE_AFTER_END_DATE);
-        err.rejectValue("endDate", "{startDate.after.endDate.validation.error}",
-            ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
+        rejectValue(err, START_DATE, ProcessingPeriodMessageKeys.ERROR_START_DATE_AFTER_END_DATE);
+        rejectValue(err, END_DATE, ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
       }
+    }
+  }
+
+  private void rejectIfValueChanged(Errors errors, Object value, Object savedValue, String field) {
+    if (value != null && savedValue != null && !savedValue.equals(value)) {
+      rejectValue(errors, field, ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
     }
   }
 }
