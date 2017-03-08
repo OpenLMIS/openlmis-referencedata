@@ -108,6 +108,7 @@ INSERT INTO rights (id, description, name, type) VALUES ('4bed4f40-36b5-42a7-94c
 INSERT INTO rights (id, description, name, type) VALUES ('a25803c0-1ee7-4595-8e63-d4eb56df05c2', NULL, 'STOCK_SOURCES_VIEW', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('1f917f8c-ab2d-4b5f-b8ca-efb0c13cf6b0', NULL, 'STOCK_SOURCES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('69e50f15-2124-461a-9c8f-0f964fe7197b', NULL, 'STOCK_DESTINATIONS_VIEW', 'GENERAL_ADMIN');
+INSERT INTO rights (id, description, name, type) VALUES ('985a8039-a6a6-4a7b-844a-6d4591e77e1d', NULL, 'STOCK_DESTINATIONS_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('8973115f-81f7-4020-931c-a62209c2a963', NULL, 'STOCK_CARD_LINE_ITEM_REASONS_VIEW', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('17651f6d-39f3-41b6-adc8-4e3d901ac42c', NULL, 'STOCK_CARD_LINE_ITEM_REASONS_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('f76125b6-87e3-491d-aa5c-6f61b3cd88b7', NULL, 'ORGANIZATIONS_MANAGE', 'GENERAL_ADMIN');
@@ -172,6 +173,7 @@ INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-1
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '4bed4f40-36b5-42a7-94c9-0fd3d4252374');
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', 'a25803c0-1ee7-4595-8e63-d4eb56df05c2');
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '1f917f8c-ab2d-4b5f-b8ca-efb0c13cf6b0');
+INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '985a8039-a6a6-4a7b-844a-6d4591e77e1d');
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '69e50f15-2124-461a-9c8f-0f964fe7197b');
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '8973115f-81f7-4020-931c-a62209c2a963');
 INSERT INTO referencedata.role_rights (roleid, rightid) VALUES ('a439c5de-b8aa-11e6-80f5-76304dec7eb7', '17651f6d-39f3-41b6-adc8-4e3d901ac42c');
