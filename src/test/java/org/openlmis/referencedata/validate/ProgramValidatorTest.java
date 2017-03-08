@@ -37,7 +37,6 @@ import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
 import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -103,16 +102,6 @@ public class ProgramValidatorTest {
 
     validator.validate(programDto, errors);
     assertErrorMessage(errors, CODE, ProgramMessageKeys.ERROR_CODE_DUPLICATED);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void shouldThrowNullPointerExceptionWhenTargetIsNull() {
-    validator.validate(null, errors);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void shouldThrowNullPointerExceptionWhenErrorsIsNull() {
-    validator.validate(programDto, null);
   }
 
   @Test
