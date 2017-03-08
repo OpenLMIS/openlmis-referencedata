@@ -19,6 +19,7 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ValidationMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
@@ -85,7 +86,7 @@ public class ProcessingPeriodValidator implements BaseValidator {
 
   private void rejectIfValueChanged(Errors errors, Object value, Object savedValue, String field) {
     if (value != null && savedValue != null && !savedValue.equals(value)) {
-      rejectValue(errors, field, ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
+      rejectValue(errors, field, ValidationMessageKeys.ERROR_IS_INVARIANT, field);
     }
   }
 }

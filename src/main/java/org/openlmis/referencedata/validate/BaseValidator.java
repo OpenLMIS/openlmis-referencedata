@@ -32,4 +32,8 @@ interface BaseValidator extends Validator {
   default void rejectValue(Errors errors, String field, String message) {
     errors.rejectValue(field, message, message);
   }
+
+  default void rejectValue(Errors errors, String field, String message, String... parameters) {
+    errors.rejectValue(field, message, parameters, message);
+  }
 }

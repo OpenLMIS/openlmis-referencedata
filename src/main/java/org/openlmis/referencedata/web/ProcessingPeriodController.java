@@ -31,6 +31,7 @@ import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.ProcessingPeriodDtoComparator;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
@@ -43,6 +44,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -136,7 +138,8 @@ public class ProcessingPeriodController extends BaseController {
 
       return exportToDto(newPeriod);
     } else {
-      throw new ValidationMessageException(bindingResult.getAllErrors().get(0).getDefaultMessage());
+      ObjectError error = bindingResult.getAllErrors().get(0);
+      throw new ValidationMessageException(new Message(error.getCode(), error.getArguments()));
     }
   }
 
@@ -186,7 +189,8 @@ public class ProcessingPeriodController extends BaseController {
       periodRepository.save(updatedProcessingPeriod);
       return exportToDto(updatedProcessingPeriod);
     } else {
-      throw new ValidationMessageException(bindingResult.getAllErrors().get(0).getDefaultMessage());
+      ObjectError error = bindingResult.getAllErrors().get(0);
+      throw new ValidationMessageException(new Message(error.getCode(), error.getArguments()));
     }
   }
 
