@@ -75,7 +75,7 @@ public class ProgramController extends BaseController {
     LOGGER.debug("Creating new program");
     // Ignore provided id
     Program newProgram = Program.newProgram(program);
-    program.setId(null);
+    newProgram.setId(null);
     programRepository.save(newProgram);
     return newProgram;
   }
