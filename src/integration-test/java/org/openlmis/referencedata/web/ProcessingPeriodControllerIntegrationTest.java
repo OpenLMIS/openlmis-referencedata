@@ -50,6 +50,7 @@ import org.springframework.validation.Errors;
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -477,9 +478,11 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   private ProcessingSchedule generateSchedule() {
     ProcessingSchedule schedule = new ProcessingSchedule();
+    schedule.setId(UUID.randomUUID());
     schedule.setCode("S" + generateInstanceNumber());
     schedule.setName("schedule");
     schedule.setDescription("Test schedule");
+    schedule.setModifiedDate(ZonedDateTime.now());
     return schedule;
   }
 

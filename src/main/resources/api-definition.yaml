@@ -108,20 +108,12 @@ schemas:
 
       }
 
-  - processingPeriod: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "Processing Period",
-          "description": "A single processingPeriod",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "processingSchedule": { "type": "object", "$ref": "#/schemas/processingSchedule", "required": true, "title": "processingSchedule" },
-              "name": { "type": "string", "required": true, "title": "name" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "startDate": { "type": "string", "required": true, "title": "startDate" },
-              "endDate": { "type": "string", "required": true, "title": "endDate" },
-              "durationInMonths": { "type": "integer", "required": false, "title": "durationInMonths" }
-          }
+  - processingPeriod: !include schemas/processingPeriod.json
+
+  - processingPeriodArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/processingPeriod.json" }
       }
 
   - orderableDisplayCategory: !include schemas/orderableDisplayCategory.json
@@ -426,9 +418,11 @@ resourceTypes:
               "400":
                   body:
                     application/json:
+                      schema: localizedErrorResponse
               "200":
                   body:
                     application/json:
+                      schema: processingPeriodArray
               "403":
                   body:
                     application/json:
@@ -446,6 +440,7 @@ resourceTypes:
               "400":
                   body:
                     application/json:
+                      schema: localizedErrorResponse
               "403":
                   body:
                     application/json:
@@ -478,6 +473,7 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
+                          schema: processingPeriod
                   "403":
                       body:
                         application/json:
@@ -495,9 +491,11 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
+                          schema: processingPeriod
                   "400":
                       body:
                         application/json:
+                          schema: localizedErrorResponse
                   "403":
                       body:
                         application/json:
@@ -546,6 +544,7 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
+                          schema: processingPeriodArray
                   "403":
                       body:
                         application/json:
@@ -572,6 +571,7 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
+                          schema: processingPeriodArray
                   "403":
                       body:
                         application/json:
