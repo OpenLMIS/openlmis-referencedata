@@ -21,6 +21,7 @@ import static org.mockito.BDDMockito.given;
 
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -42,6 +43,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   private ProgramRepository programRepository;
 
   private Program program;
+  private ProgramDto programDto = new ProgramDto();
   private UUID programId;
 
   /**
@@ -50,6 +52,8 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public ProgramControllerIntegrationTest() {
     program = new Program("code");
     program.setName("Program name");
+    program.export(programDto);
+
     programId = UUID.randomUUID();
   }
 
@@ -78,7 +82,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(program)
+        .body(programDto)
         .when()
         .post(RESOURCE_URL)
         .then()
@@ -90,9 +94,26 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldReturnBadRequestWhenPostWithDuplicatedCode() {
+
+    given(programRepository.findByCode(program.getCode())).willReturn(program);
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(programDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPutProgram() {
 
-    program.setDescription("OpenLMIS");
+    programDto.setDescription("OpenLMIS");
     given(programRepository.findOne(programId)).willReturn(program);
 
     Program response = restAssured
@@ -100,7 +121,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", programId)
-        .body(program)
+        .body(programDto)
         .when()
         .put(ID_URL)
         .then()
@@ -109,6 +130,27 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertEquals(program, response);
     assertEquals("OpenLMIS", response.getDescription());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenPutWithDuplicatedCode() {
+
+    program.setId(UUID.randomUUID());
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRepository.findByCode(program.getCode())).willReturn(program);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .body(programDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(400);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

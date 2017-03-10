@@ -1625,6 +1625,8 @@ resourceTypes:
                       body:
                         application/json:
                   "400":
+                      body:
+                        application/json:
       /search:
           get:
               is: [ secured ]

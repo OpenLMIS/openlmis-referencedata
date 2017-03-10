@@ -67,6 +67,7 @@ public class ProgramController extends BaseController {
   @ResponseBody
   public Program createProgram(@RequestBody ProgramDto program,
                                BindingResult bindingResult) {
+    program.setId(null);
     validator.validate(program, bindingResult);
     if (bindingResult.getErrorCount() > 0) {
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
@@ -75,7 +76,6 @@ public class ProgramController extends BaseController {
     LOGGER.debug("Creating new program");
     // Ignore provided id
     Program newProgram = Program.newProgram(program);
-    newProgram.setId(null);
     programRepository.save(newProgram);
     return newProgram;
   }
