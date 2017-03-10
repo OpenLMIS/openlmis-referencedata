@@ -1587,6 +1587,7 @@ resourceTypes:
               "400":
                   body:
                     application/json:
+                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -1627,6 +1628,7 @@ resourceTypes:
                   "400":
                       body:
                         application/json:
+                          schema: localizedErrorResponse
       /search:
           get:
               is: [ secured ]
