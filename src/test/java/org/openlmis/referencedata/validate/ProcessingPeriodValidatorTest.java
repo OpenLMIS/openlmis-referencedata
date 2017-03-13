@@ -28,14 +28,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ValidationMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.UUID;
 
 public class ProcessingPeriodValidatorTest {
 
@@ -48,8 +51,14 @@ public class ProcessingPeriodValidatorTest {
   @Mock
   private ProcessingPeriod previousPeriod;
 
+  @Mock
+  private ProcessingPeriodRepository processingPeriodRepository;
+
   @InjectMocks
   private Validator validator = new ProcessingPeriodValidator();
+
+  private static final String START_DATE = "startDate";
+  private static final String END_DATE = "endDate";
 
   private ProcessingPeriod processingPeriod;
   private Errors errors;
@@ -57,12 +66,7 @@ public class ProcessingPeriodValidatorTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    processingPeriod = new ProcessingPeriod();
-    processingPeriod.setName("Processing Period 1");
-    processingPeriod.setDescription("This is a test processing period.");
-    processingPeriod.setStartDate(LocalDate.of(2016, 6, 1));
-    processingPeriod.setEndDate(LocalDate.of(2016, 6, 30));
-    processingPeriod.setProcessingSchedule(processingSchedule);
+    processingPeriod = initiateProcessingPeriod();
 
     errors = new BeanPropertyBindingResult(processingPeriod, "processingPeriod");
   }
@@ -75,7 +79,7 @@ public class ProcessingPeriodValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
-    assertErrorMessage(errors, "startDate", ProcessingPeriodMessageKeys.ERROR_START_DATE_NULL);
+    assertErrorMessage(errors, START_DATE, ProcessingPeriodMessageKeys.ERROR_START_DATE_NULL);
   }
 
   @Test
@@ -86,7 +90,7 @@ public class ProcessingPeriodValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
-    assertErrorMessage(errors, "endDate", ProcessingPeriodMessageKeys.ERROR_END_DATE_NULL);
+    assertErrorMessage(errors, END_DATE, ProcessingPeriodMessageKeys.ERROR_END_DATE_NULL);
   }
 
   @Test
@@ -97,10 +101,47 @@ public class ProcessingPeriodValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(2, errors.getErrorCount());
-    assertErrorMessage(errors, "startDate",
+    assertErrorMessage(errors, START_DATE,
         ProcessingPeriodMessageKeys.ERROR_START_DATE_AFTER_END_DATE);
-    assertErrorMessage(errors, "endDate",
+    assertErrorMessage(errors, END_DATE,
         ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
+  }
+
+  @Test
+  public void shouldAcceptIfUpdatingExistingPeriod() {
+    processingPeriod.setId(UUID.randomUUID());
+
+    ProcessingPeriod savedProcessingPeriod = initiateProcessingPeriod();
+    savedProcessingPeriod.setName("name");
+    savedProcessingPeriod.setDescription("desc");
+
+    when(processingPeriodRepository.findOne(processingPeriod.getId()))
+        .thenReturn(savedProcessingPeriod);
+
+    validator.validate(processingPeriod, errors);
+
+    assertFalse(errors.hasErrors());
+  }
+
+  @Test
+  public void shouldRejectPeriodIfInvariantChanged() {
+    processingPeriod.setId(UUID.randomUUID());
+    processingPeriod.setStartDate(LocalDate.now());
+    processingPeriod.setEndDate(LocalDate.MAX);
+    processingPeriod.setProcessingSchedule(new ProcessingSchedule());
+
+    ProcessingPeriod savedProcessingPeriod = initiateProcessingPeriod();
+    when(processingPeriodRepository.findOne(processingPeriod.getId()))
+        .thenReturn(savedProcessingPeriod);
+
+    validator.validate(processingPeriod, errors);
+
+    assertTrue(errors.hasErrors());
+    assertEquals(4, errors.getErrorCount());
+    assertErrorMessage(errors, START_DATE, ValidationMessageKeys.ERROR_IS_INVARIANT);
+    assertErrorMessage(errors, END_DATE, ValidationMessageKeys.ERROR_IS_INVARIANT);
+    assertErrorMessage(errors, "processingSchedule", ValidationMessageKeys.ERROR_IS_INVARIANT);
+    assertErrorMessage(errors, "durationInMonths", ValidationMessageKeys.ERROR_IS_INVARIANT);
   }
 
   @Test
@@ -113,7 +154,7 @@ public class ProcessingPeriodValidatorTest {
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
-    assertErrorMessage(errors, "startDate",
+    assertErrorMessage(errors, START_DATE,
         ProcessingPeriodMessageKeys.ERROR_GAP_BETWEEN_LAST_END_DATE_AND_START_DATE);
   }
 
@@ -122,5 +163,15 @@ public class ProcessingPeriodValidatorTest {
     validator.validate(processingPeriod, errors);
 
     assertFalse(errors.hasErrors());
+  }
+
+  private ProcessingPeriod initiateProcessingPeriod() {
+    ProcessingPeriod processingPeriod = new ProcessingPeriod();
+    processingPeriod.setName("Processing Period 1");
+    processingPeriod.setDescription("This is a test processing period.");
+    processingPeriod.setStartDate(LocalDate.of(2016, 6, 1));
+    processingPeriod.setEndDate(LocalDate.of(2016, 6, 30));
+    processingPeriod.setProcessingSchedule(processingSchedule);
+    return processingPeriod;
   }
 }

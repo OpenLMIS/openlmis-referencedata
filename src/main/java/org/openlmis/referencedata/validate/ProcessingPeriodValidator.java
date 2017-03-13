@@ -50,18 +50,17 @@ public class ProcessingPeriodValidator implements BaseValidator {
     if (!err.hasErrors()) {
       ProcessingPeriod period = (ProcessingPeriod) obj;
       UUID periodId = period.getId();
-      if (periodId != null) {
-        ProcessingPeriod existingPeriod = processingPeriodRepository.findOne(periodId);
-        if (existingPeriod != null) {
-          rejectIfValueChanged(err, period.getProcessingSchedule(),
-              existingPeriod.getProcessingSchedule(), "processingSchedule");
-          rejectIfValueChanged(err, period.getStartDate(),
-              existingPeriod.getStartDate(), "startDate");
-          rejectIfValueChanged(err, period.getEndDate(),
-              existingPeriod.getEndDate(), "endDate");
-          rejectIfValueChanged(err, period.getDurationInMonths(),
-              existingPeriod.getDurationInMonths(), "durationInMonths");
-        }
+      ProcessingPeriod existingPeriod = (periodId != null)
+          ? processingPeriodRepository.findOne(periodId) : null;
+      if (existingPeriod != null) {
+        rejectIfValueChanged(err, period.getProcessingSchedule(),
+            existingPeriod.getProcessingSchedule(), "processingSchedule");
+        rejectIfValueChanged(err, period.getStartDate(),
+            existingPeriod.getStartDate(), "startDate");
+        rejectIfValueChanged(err, period.getEndDate(),
+            existingPeriod.getEndDate(), "endDate");
+        rejectIfValueChanged(err, period.getDurationInMonths(),
+            existingPeriod.getDurationInMonths(), "durationInMonths");
       }
       List<ProcessingPeriod> periodList = periodService
               .searchPeriods(period.getProcessingSchedule(), null);
@@ -70,7 +69,7 @@ public class ProcessingPeriodValidator implements BaseValidator {
       LocalDate endDate = period.getEndDate();
 
       if (endDate.isAfter(startDate)) {
-        if (!periodList.isEmpty()) {
+        if (!periodList.isEmpty() && existingPeriod == null) {
           LocalDate lastEndDate = periodList.get(periodList.size() - 1).getEndDate();
           if (!startDate.equals(lastEndDate.plusDays(1))) {
             rejectValue(err, START_DATE,
