@@ -89,14 +89,16 @@ public class RightService {
         return;
       }
 
-      if (user.hasRight(
+      if (rightName != null && user.hasRight(
           new RightQuery(Right.newRight(rightName, RightType.GENERAL_ADMIN)))) {
         return;
       }
     }
 
     // at this point, token is unauthorized
-    throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
+    throw new UnauthorizedException(
+        (rightName != null) ? new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName)
+        : new Message(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC));
   }
 
   /**
