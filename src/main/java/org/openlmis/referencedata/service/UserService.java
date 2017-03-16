@@ -15,20 +15,27 @@
 
 package org.openlmis.referencedata.service;
 
+import static java.util.Objects.isNull;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.ExternalApiException;
+import org.openlmis.referencedata.i18n.ExposedMessageSource;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.util.AuthUserRequest;
+import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
+import org.openlmis.util.NotificationRequest;
 import org.openlmis.util.PasswordChangeRequest;
 import org.openlmis.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -51,6 +58,9 @@ public class UserService {
   
   @Autowired
   private FacilityRepository facilityRepository;
+
+  @Autowired
+  private ExposedMessageSource messageSource;
 
   private String baseUrl = System.getenv("BASE_URL");
   static final String MAIL_ADDRESS = Optional.ofNullable(System.getenv("MAIL_ADDRESS"))
@@ -113,6 +123,37 @@ public class UserService {
   }
 
   /**
+   * Creating or updating users.
+   */
+  public void save(User user, String token) {
+    boolean isNewUser = false;
+    if (isNull(user.getId()) || isNull(userRepository.findOne(user.getId()))) {
+      isNewUser = true;
+    }
+    userRepository.save(user);
+    saveAuthUser(user, token);
+    if (isNewUser) {
+      try {
+        sendResetPasswordEmail(user, token);
+      } catch (ExternalApiException ex) {
+        LOGGER.warn("Reset password email could not be send", ex);
+      }
+    }
+  }
+
+  private void saveAuthUser(User user, String token) {
+    AuthUserRequest userRequest = new AuthUserRequest();
+    userRequest.setUsername(user.getUsername());
+    userRequest.setEmail(user.getEmail());
+    userRequest.setReferenceDataUserId(user.getId());
+
+    String url = baseUrl + "/api/users/auth?access_token=" + token;
+    RestTemplate restTemplate = new RestTemplate();
+
+    restTemplate.postForObject(url, userRequest, Object.class);
+  }
+
+  /**
    * Resets a user's password.
    */
   public void passwordReset(PasswordResetRequest passwordResetRequest, String token) {
@@ -149,5 +190,45 @@ public class UserService {
     User user = userRepository.findOneByUsername(username);
     user.setVerified(true);
     userRepository.save(user);
+  }
+
+  private void sendResetPasswordEmail(User user, String authToken) {
+    UUID token = createPasswordResetToken(user.getId(), authToken);
+
+    String[] msgArgs = {user.getFirstName(), user.getLastName(),
+        baseUrl + "/#!/resetPassword/" + token};
+    String mailBody = messageSource.getMessage(SystemMessageKeys.PASSWORD_RESET_EMAIL_BODY,
+        msgArgs, LocaleContextHolder.getLocale());
+    String mailSubject = messageSource.getMessage(SystemMessageKeys.ACCOUNT_CREATED_EMAIL_SUBJECT,
+        new String[]{}, LocaleContextHolder.getLocale());
+
+    sendMail(MAIL_ADDRESS, user.getEmail(), mailSubject, mailBody, authToken);
+  }
+
+  private UUID createPasswordResetToken(UUID userId, String token) {
+    try {
+      String url = baseUrl + "/api/users/auth/passwordResetToken?userId=" + userId
+          + "&access_token=" + token;
+      RestTemplate restTemplate = new RestTemplate();
+
+      return restTemplate.postForObject(url, null, UUID.class);
+    } catch (RestClientException ex) {
+      throw new ExternalApiException(
+          UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_CREATE_TOKEN_FAILED, ex);
+    }
+  }
+
+  private void sendMail(String from, String to, String subject, String content, String token) {
+    try {
+      NotificationRequest request = new NotificationRequest(from, to, subject, content);
+
+      String url = baseUrl + "/api/notification?access_token=" + token;
+      RestTemplate restTemplate = new RestTemplate();
+
+      restTemplate.postForObject(url, request, Object.class);
+    } catch (RestClientException ex) {
+      throw new ExternalApiException(
+          UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_SEND_MESSAGE_FAILED, ex);
+    }
   }
 }

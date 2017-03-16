@@ -18,6 +18,8 @@ package org.openlmis.referencedata.util.messagekeys;
 public abstract class UserMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, USER);
   private static final String RIGHTS = "rights";
+  private static final String CREATE_TOKEN = "createToken";
+  private static final String SEND_MESSAGE = "sendMessage";
   private static final String ASSIGNED_ROLE = "assignedRole";
   private static final String HOME_FACILITY = "homeFacility";
   private static final String RESET_PASSWORD = "resetPassword";
@@ -33,6 +35,10 @@ public abstract class UserMessageKeys extends MessageKeys {
       join(ERROR, PROGRAM, WITHOUT, FACILITY);
   public static final String ERROR_ASSIGNED_ROLE_RIGHTS_EMPTY =
       join(ERROR, ASSIGNED_ROLE, RIGHTS, EMPTY);
+  public static final String ERROR_EXTERNAL_RESET_PASSWORD_CREATE_TOKEN_FAILED =
+      join(ERROR, EXTERNAL, RESET_PASSWORD, CREATE_TOKEN, FAILED);
+  public static final String ERROR_EXTERNAL_RESET_PASSWORD_SEND_MESSAGE_FAILED =
+      join(ERROR, EXTERNAL, RESET_PASSWORD, SEND_MESSAGE, FAILED);
   public static final String ERROR_EXTERNAL_CHANGE_PASSWORD_FAILED =
       join(ERROR, EXTERNAL, CHANGE_PASSWORD, FAILED);
   public static final String ERROR_EXTERNAL_RESET_PASSWORD_FAILED =

@@ -58,6 +58,8 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.validation.BindingResult;
 
 import java.util.Set;
@@ -237,12 +239,16 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(null);
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    controller.saveUser(user1Dto, result);
+    controller.saveUser(user1Dto, result, auth);
 
     //then
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -252,12 +258,16 @@ public class UserControllerTest {
 
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    controller.saveUser(user1Dto, result);
+    controller.saveUser(user1Dto, result, auth);
 
     //then
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -268,9 +278,13 @@ public class UserControllerTest {
     user1Dto.setRoleAssignments(Sets.newHashSet(new RoleAssignmentDto()));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn("49c1e712-da50-4428-ae39-2d0409bd8059");
 
     //when
-    controller.saveUser(user1Dto, result);
+    controller.saveUser(user1Dto, result, auth);
   }
 
   @Test
@@ -285,13 +299,17 @@ public class UserControllerTest {
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    UserDto savedUserDto = controller.saveUser(user1Dto, result);
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -308,14 +326,18 @@ public class UserControllerTest {
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
 
     //when
-    UserDto savedUserDto = controller.saveUser(user1Dto, result);
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -334,13 +356,17 @@ public class UserControllerTest {
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    UserDto savedUserDto = controller.saveUser(user1Dto, result);
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -357,13 +383,17 @@ public class UserControllerTest {
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    UserDto savedUserDto = controller.saveUser(user1Dto, result);
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -380,13 +410,17 @@ public class UserControllerTest {
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    UserDto savedUserDto = controller.saveUser(user1Dto, result);
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test
@@ -398,13 +432,17 @@ public class UserControllerTest {
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
+    OAuth2Authentication auth = mock(OAuth2Authentication.class);
+    OAuth2AuthenticationDetails details = mock(OAuth2AuthenticationDetails.class);
+    when(auth.getDetails()).thenReturn(details);
+    when(details.getTokenValue()).thenReturn(ACCESS_TOKEN);
 
     //when
-    UserDto savedUserDto = controller.saveUser(user1Dto, result);
+    UserDto savedUserDto = controller.saveUser(user1Dto, result, auth);
 
     //then
     assertEquals(user1Dto, savedUserDto);
-    verify(repository).save(user1);
+    verify(service).save(user1, ACCESS_TOKEN);
   }
 
   @Test

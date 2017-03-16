@@ -153,8 +153,9 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public UserDto saveUser(@RequestBody @Valid UserDto userDto,
-                          BindingResult bindingResult) {
-    rightService.checkAdminRight(null, true);
+                          BindingResult bindingResult,
+                          OAuth2Authentication auth) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     if (bindingResult.hasErrors()) {
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
@@ -183,7 +184,10 @@ public class UserController extends BaseController {
 
       assignRolesToUser(roleAssignmentDtos, userToSave);
     }
-    userRepository.save(userToSave);
+
+    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
+    String token = details.getTokenValue();
+    userService.save(userToSave, token);
 
     return exportUserToDto(userToSave);
   }

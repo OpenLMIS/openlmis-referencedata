@@ -194,7 +194,6 @@ public abstract class BaseWebIntegrationTest {
     UnauthorizedException exception = new UnauthorizedException(message);
 
     doThrow(exception).when(rightService).checkAdminRight(rightName);
-    doThrow(exception).when(rightService).checkAdminRight(eq(rightName), anyBoolean());
     doThrow(exception).when(rightService).checkAdminRight(eq(rightName), anyBoolean(), any());
     if (userId != null) {
       doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), eq(userId));
