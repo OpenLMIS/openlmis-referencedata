@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -51,6 +51,7 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
@@ -59,6 +60,8 @@ import org.openlmis.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -76,8 +79,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -280,13 +281,14 @@ public class UserController extends BaseController {
   @RequestMapping(value = "/users/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<UserDto> searchUsers(
-      @RequestBody Map<String, Object> queryMap) {
+  public Page<UserDto> searchUsers(
+      @RequestBody Map<String, Object> queryMap, Pageable pageable) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     List<User> result = userService.searchUsers(queryMap);
+    List<UserDto> dtoList = exportUsersToDtos(result);
 
-    return exportUsersToDtos(result);
+    return Pagination.getPage(dtoList, pageable);
   }
 
 
