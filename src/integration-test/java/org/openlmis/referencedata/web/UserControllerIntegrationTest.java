@@ -29,16 +29,16 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.response.Response;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -80,6 +80,8 @@ import org.openlmis.util.PasswordResetRequest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -650,9 +652,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(userService.searchUsers(queryMap)).willReturn(singletonList(user1));
 
-    PageImplRepresentation<UserDto> response = new PageImplRepresentation<>();
-
-    response = restAssured
+    UserDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -661,10 +661,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(response.getClass());
+        .extract().as(UserDto[].class);
 
-    List<UserDto> responseList = response.getContent();
-    assertEquals(1, responseList.size());
+    assertEquals(1, response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

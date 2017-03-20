@@ -1279,7 +1279,7 @@ resourceTypes:
                               schema: localizedErrorResponse
       /search:
               post:
-                  is: [ secured, paginated ]
+                  is: [ secured ]
                   description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs."
                   body:
                       application/json:
@@ -1288,6 +1288,7 @@ resourceTypes:
                       "200":
                           body:
                             application/json:
+                                schema: userArray
                       "403":
                           body:
                             application/json:
