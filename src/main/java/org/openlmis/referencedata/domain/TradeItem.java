@@ -42,8 +42,9 @@ import lombok.NoArgsConstructor;
 @DiscriminatorValue("TRADE_ITEM")
 @NoArgsConstructor
 public final class TradeItem extends Orderable {
+
   @JsonProperty
-  private String manufacturer;
+  private String manufacturerOfTradeItem;
 
   @ManyToOne
   private CommodityType commodityType;
@@ -56,7 +57,7 @@ public final class TradeItem extends Orderable {
 
   @Override
   public String getDescription() {
-    return manufacturer;
+    return manufacturerOfTradeItem;
   }
 
   /**

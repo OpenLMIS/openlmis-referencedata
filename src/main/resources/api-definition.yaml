@@ -170,7 +170,7 @@ schemas:
                 "netContent": { "type": "integer", "required": false, "title": "netContent" },
                 "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
                 "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
-                "manufacturer": { "type": "string", "required": false, "title": "manufacturer" }
+                "manufacturerOfTradeItem": { "type": "string", "required": false, "title": "manufacturerOfTradeItem" }
             }
         }
 
