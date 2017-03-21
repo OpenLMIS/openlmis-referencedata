@@ -12,17 +12,17 @@
       "type": "string",
       "title": "orderableId"
     },
-    "orderableName": {
+    "orderableFullProductName": {
       "type": "string",
-      "title": "orderableName"
+      "title": "orderableFullProductName"
     },
     "orderableCode": {
       "type": "string",
       "title": "orderableCode"
     },
-    "orderablePackSize": {
+    "orderableNetContent": {
       "type": "number",
-      "title": "orderablePackSize"
+      "title": "orderableNetContent"
     },
     "orderableDisplayCategoryId": {
       "type": "string",
@@ -59,8 +59,8 @@
   },
   "required": [
     "orderableId",
-    "orderableName",
-    "orderablePackSize",
+    "orderableFullProductName",
+    "orderableNetContent",
     "orderableDisplayCategoryId",
     "orderableCategoryDisplayName",
     "orderableCategoryDisplayOrder",

@@ -114,7 +114,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .extract().as(CommodityType.class);
 
     assertEquals(commodityType, response);
-    assertEquals(updatedCommodityType.getName(), response.getName());
+    assertEquals(updatedCommodityType.getFullProductName(), response.getFullProductName());
     assertEquals(updatedCommodityType.getDescription(), response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

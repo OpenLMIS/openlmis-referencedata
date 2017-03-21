@@ -166,8 +166,8 @@ schemas:
             "properties": {
                 "id": { "type": "string", "required": false, "title": "id" },
                 "productCode": { "type": "string", "required": true, "title": "productCode" },
-                "name": { "type": "string", "required": false, "title": "name" },
-                "packSize": { "type": "integer", "required": false, "title": "packSize" },
+                "fullProductName": { "type": "string", "required": false, "title": "fullProductName" },
+                "netContent": { "type": "integer", "required": false, "title": "netContent" },
                 "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
                 "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
                 "manufacturer": { "type": "string", "required": false, "title": "manufacturer" }

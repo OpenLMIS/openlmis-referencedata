@@ -6,17 +6,17 @@
   "properties": {
     "id": { "type": "string", "title": "id" },
     "productCode": { "type": "string", "title": "productCode" },
-    "name": { "type": "string", "title": "name" },
+    "fullProductName": { "type": "string", "title": "fullProductName" },
     "description": { "type": "string", "title": "description" },
-    "packSize": { "type": "integer", "title": "packSize" },
+    "netContent": { "type": "integer", "title": "netContent" },
     "packRoundingThreshold": { "type": "integer", "title": "packRoundingThreshold" },
     "roundToZero": { "type": "boolean", "title": "roundToZero" }
   },
   "required": [
     "productCode",
-    "name",
+    "fullProductName",
     "description",
-    "packSize",
+    "netContent",
     "packRoundingThreshold",
     "roundToZero"
   ]

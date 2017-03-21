@@ -51,11 +51,11 @@ public abstract class Orderable extends BaseEntity {
   @Embedded
   private Dispensable dispensable;
 
-  private String name;
+  private String fullProductName;
 
   @JsonProperty
   @Getter(AccessLevel.PACKAGE)
-  private long packSize;
+  private long netContent;
 
   @JsonProperty
   private long packRoundingThreshold;
@@ -67,12 +67,12 @@ public abstract class Orderable extends BaseEntity {
       fetch = FetchType.EAGER)
   private Set<ProgramOrderable> programOrderables;
 
-  protected Orderable(Code productCode, Dispensable dispensable, String name, long packSize,
-                      long packRoundingThreshold, boolean roundToZero) {
+  protected Orderable(Code productCode, Dispensable dispensable, String fullProductName,
+                      long netContent, long packRoundingThreshold, boolean roundToZero) {
     this.productCode = productCode;
     this.dispensable = dispensable;
-    this.name = name;
-    this.packSize = packSize;
+    this.fullProductName = fullProductName;
+    this.netContent = netContent;
     this.packRoundingThreshold = packRoundingThreshold;
     this.roundToZero = roundToZero;
     this.programOrderables = new LinkedHashSet<>();
@@ -101,8 +101,8 @@ public abstract class Orderable extends BaseEntity {
    * @return this product's name.
    */
   @JsonProperty
-  public final String getName() {
-    return name;
+  public final String getFullProductName() {
+    return fullProductName;
   }
 
   /**
@@ -162,12 +162,12 @@ public abstract class Orderable extends BaseEntity {
    * @return the number of packs that should be ordered.
    */
   public long packsToOrder(long dispensingUnits) {
-    if (dispensingUnits <= 0 || packSize == 0) {
+    if (dispensingUnits <= 0 || netContent == 0) {
       return 0;
     }
 
-    long packsToOrder = dispensingUnits / packSize;
-    long remainderQuantity = dispensingUnits % packSize;
+    long packsToOrder = dispensingUnits / netContent;
+    long remainderQuantity = dispensingUnits % netContent;
 
     if (remainderQuantity > 0 && remainderQuantity > packRoundingThreshold) {
       packsToOrder += 1;

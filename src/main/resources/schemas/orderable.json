@@ -12,13 +12,13 @@
       "type": "string",
       "title": "productCode"
     },
-    "name": {
+    "fullProductName": {
       "type": "string",
-      "title": "name"
+      "title": "fullProductName"
     },
-    "packSize": {
+    "netContent": {
       "type": "number",
-      "title": "packSize"
+      "title": "netContent"
     },
     "packRoundingThreshold": {
       "type": "integer",

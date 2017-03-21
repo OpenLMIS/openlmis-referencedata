@@ -142,7 +142,7 @@ public class OrderableTest {
   }
 
   @Test
-  public void shouldReturnZeroPacksToOrderIfPackSizeIsZero() {
+  public void shouldReturnZeroPacksToOrderIfNetContentIsZero() {
     Orderable product =
         CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test5", 0, 7, true);
 
@@ -162,7 +162,7 @@ public class OrderableTest {
   }
 
   @Test
-  public void shouldReturnZeroPackToOrderIfOrderQuantityIsOneAndRoundToZeroTrueWithPackSizeTen() {
+  public void shouldReturnZeroPackToOrderIfOrderQuantityIsOneAndRoundToZeroTrueWithNetContentTen() {
     Orderable product =
         CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test7", 10, 7, true);
 
@@ -173,11 +173,11 @@ public class OrderableTest {
 
   @Test
   public void shouldNotRoundUpWhenEqualToThreshold() {
-    final int packSize = 100;
+    final int netContent = 100;
     final int roundingThreshold = 50;
 
     Orderable product = CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN,
-            "test8", packSize, roundingThreshold, false);
+            "test8", netContent, roundingThreshold, false);
 
     long packsToOrder = product.packsToOrder(250);
     assertEquals(2, packsToOrder);

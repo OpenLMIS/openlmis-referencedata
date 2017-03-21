@@ -222,9 +222,9 @@ public class ProgramOrderable extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setOrderableId(product.getId());
-    exporter.setOrderableName(product.getName());
+    exporter.setOrderableFullProductName(product.getFullProductName());
     exporter.setOrderableCode(product.getProductCode());
-    exporter.setOrderablePackSize(product.getPackSize());
+    exporter.setOrderableNetContent(product.getNetContent());
     exporter.setOrderableDisplayCategoryId(orderableDisplayCategory.getId());
     exporter.setOrderableCategoryDisplayName(
         orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
@@ -245,11 +245,11 @@ public class ProgramOrderable extends BaseEntity {
 
     void setOrderableId(UUID productId);
 
-    void setOrderableName(String productName);
+    void setOrderableFullProductName(String fullProductName);
 
     void setOrderableCode(Code productCode);
 
-    void setOrderablePackSize(Long packSize);
+    void setOrderableNetContent(Long netContent);
 
     void setOrderableDisplayCategoryId(UUID orderableDisplayCategoryId);
 
@@ -271,11 +271,11 @@ public class ProgramOrderable extends BaseEntity {
   public interface Importer {
     UUID getId();
 
-    String getOrderableName();
+    String getOrderableFullProductName();
 
     Code getOrderableCode();
 
-    Long getOrderablePackSize();
+    Long getOrderableNetContent();
 
     UUID getOrderableDisplayCategoryId();
 

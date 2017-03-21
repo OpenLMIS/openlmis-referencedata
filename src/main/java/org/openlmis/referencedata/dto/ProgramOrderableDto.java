@@ -36,11 +36,11 @@ public class ProgramOrderableDto extends BaseDto
 
   private UUID orderableId;
 
-  private String orderableName;
+  private String orderableFullProductName;
 
   private Code orderableCode;
 
-  private Long orderablePackSize;
+  private Long orderableNetContent;
 
   private UUID orderableDisplayCategoryId;
 

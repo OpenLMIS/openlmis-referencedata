@@ -40,9 +40,10 @@ public final class CommodityType extends Orderable {
   @OneToMany(mappedBy = "commodityType")
   private Set<TradeItem> tradeItems;
 
-  private CommodityType(Code productCode, Dispensable dispensable, String name, long packSize,
-                        long packRoundingThreshold, boolean roundToZero) {
-    super(productCode, dispensable, name, packSize, packRoundingThreshold, roundToZero);
+  private CommodityType(Code productCode, Dispensable dispensable, String fullProductName,
+                        long netContent, long packRoundingThreshold, boolean roundToZero) {
+    super(productCode, dispensable, fullProductName, netContent, packRoundingThreshold,
+          roundToZero);
     tradeItems = new HashSet<>();
   }
 
@@ -50,26 +51,27 @@ public final class CommodityType extends Orderable {
    * Create a new commodity type.
    *
    * @param productCode a unique product code
-   * @param name name of product
+   * @param fullProductName fullProductName of product
    * @param description the description to display in ordering, fulfilling, etc
-   * @param packSize    the number of dispensing units in the pack
+   * @param netContent    the number of dispensing units in the pack
    * @param packRoundingThreshold determines how number of packs is rounded
    * @param roundToZero determines if number of packs can be rounded to zero
    * @return a new CommodityType
    */
   @JsonCreator
-  public static CommodityType newCommodityType(@JsonProperty("productCode") String productCode,
-                                               @JsonProperty("dispensingUnit")
-                                                   String dispensingUnit,
-                                               @JsonProperty("name") String name,
-                                               @JsonProperty("description") String description,
-                                               @JsonProperty("packSize") long packSize,
-                                               @JsonProperty("packRoundingThreshold")
-                                                     long packRoundingThreshold,
-                                               @JsonProperty("roundToZero") boolean roundToZero) {
+  public static CommodityType newCommodityType(
+      @JsonProperty("productCode") String productCode,
+      @JsonProperty("dispensingUnit")
+         String dispensingUnit,
+      @JsonProperty("fullProductName") String fullProductName,
+      @JsonProperty("description") String description,
+      @JsonProperty("netContent") long netContent,
+      @JsonProperty("packRoundingThreshold")
+           long packRoundingThreshold,
+      @JsonProperty("roundToZero") boolean roundToZero) {
     Code code = Code.code(productCode);
     Dispensable dispensable = Dispensable.createNew(dispensingUnit);
-    CommodityType commodityType = new CommodityType(code, dispensable, name, packSize,
+    CommodityType commodityType = new CommodityType(code, dispensable, fullProductName, netContent,
         packRoundingThreshold, roundToZero);
     commodityType.description = description;
     return commodityType;

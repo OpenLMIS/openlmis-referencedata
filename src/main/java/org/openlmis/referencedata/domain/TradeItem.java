@@ -48,9 +48,10 @@ public final class TradeItem extends Orderable {
   @ManyToOne
   private CommodityType commodityType;
 
-  private TradeItem(Code productCode, Dispensable dispensable, String name, long packSize,
-                    long packRoundingThreshold, boolean roundToZero) {
-    super(productCode, dispensable, name, packSize, packRoundingThreshold, roundToZero);
+  private TradeItem(Code productCode, Dispensable dispensable, String fullProductName,
+                    long netContent, long packRoundingThreshold, boolean roundToZero) {
+    super(productCode, dispensable, fullProductName, netContent, packRoundingThreshold,
+          roundToZero);
   }
 
   @Override
@@ -72,8 +73,8 @@ public final class TradeItem extends Orderable {
   /**
    * Factory method to create a new trade item.
    * @param productCode a unique product code
-   * @param name name of product
-   * @param packSize the # of dispensing units contained
+   * @param fullProductName fullProductName of product
+   * @param netContent the # of dispensing units contained
    * @param packRoundingThreshold determines how number of packs is rounded
    * @param roundToZero determines if number of packs can be rounded to zero
    * @return a new trade item or armageddon if failure
@@ -81,14 +82,14 @@ public final class TradeItem extends Orderable {
   @JsonCreator
   public static TradeItem newTradeItem(@JsonProperty("productCode") String productCode,
                                        @JsonProperty("dispensingUnit") String dispensingUnit,
-                                       @JsonProperty("name") String name,
-                                       @JsonProperty("packSize") long packSize,
+                                       @JsonProperty("fullProductName") String fullProductName,
+                                       @JsonProperty("netContent") long netContent,
                                        @JsonProperty("packRoundingThreshold")
                                              long packRoundingThreshold,
                                        @JsonProperty("roundToZero") boolean roundToZero) {
     Code code = Code.code(productCode);
     Dispensable dispensable = Dispensable.createNew(dispensingUnit);
-    return new TradeItem(code, dispensable, name, packSize,
+    return new TradeItem(code, dispensable, fullProductName, netContent,
         packRoundingThreshold, roundToZero);
   }
 
