@@ -1294,6 +1294,22 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
 
+              /page:
+                    post:
+                        is: [ secured, paginated ]
+                        description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs. Return users with pagination."
+                        body:
+                            application/json:
+                              schema: userQueryDto
+                        responses:
+                            "200":
+                                body:
+                                  application/json:
+                            "403":
+                                body:
+                                  application/json:
+                                    schema: localizedErrorResponse
+
   /facilities:
       displayName: Facility
       get:
