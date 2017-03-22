@@ -22,6 +22,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -29,16 +30,16 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.jayway.restassured.response.Response;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -81,8 +82,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,6 +95,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/users";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
+  private static final String SEARCH_WITH_PAGINATION_URL = SEARCH_URL + "/page";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ROLE_ASSIGNMENTS_URL = ID_URL + "/roleAssignments";
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
@@ -105,6 +105,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESET_PASSWORD_URL = RESOURCE_URL + "/passwordReset";
   private static final String CHANGE_PASSWORD_URL = RESOURCE_URL + "/changePassword";
   private static final String USERNAME = "username";
+  private static final String TIMEZONE = "UTC";
   private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
   private static final String FULFILLMENT_RIGHT_NAME = "fulfillmentRight";
   private static final String PROGRAM1_CODE = "P1";
@@ -668,6 +669,43 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldFindUsersWithPagination() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    Map<String, Object> queryMap = new HashMap<>();
+    queryMap.put(TIMEZONE, user1.getTimezone());
+
+    User user2 = generateUser();
+    user2.setId(UUID.randomUUID());
+    assignUserRoles(user2);
+
+    given(userService.searchUsers(queryMap)).willReturn(Arrays.asList(user1, user2));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .queryParam("page", 0)
+        .queryParam("size", 1)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(queryMap)
+        .when()
+        .post(SEARCH_WITH_PAGINATION_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(2, response.getTotalElements());
+    assertEquals(2, response.getTotalPages());
+    assertEquals(1, response.getNumberOfElements());
+    assertEquals(1, response.getSize());
+    assertEquals(0, response.getNumber());
+    assertTrue(response.isFirst());
+    assertFalse(response.isLast());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldRejectFindUsersIfUserHasNoRight() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
@@ -1110,7 +1148,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         "Ala" + instanceNumber,
         "ma" + instanceNumber,
         instanceNumber + "@mail.com")
-        .setTimezone("UTC")
+        .setTimezone(TIMEZONE)
         .setHomeFacility(homeFacility)
         .setVerified(true)
         .setActive(true)
