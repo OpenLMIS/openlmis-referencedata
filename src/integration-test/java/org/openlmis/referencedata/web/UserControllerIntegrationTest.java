@@ -107,7 +107,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String USERNAME = "username";
   private static final String TIMEZONE = "UTC";
   private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
-  private static final String FULFILLMENT_RIGHT_NAME = "fulfillmentRight";
   private static final String PROGRAM1_CODE = "P1";
   private static final String PROGRAM2_CODE = "P2";
   private static final String SUPERVISORY_NODE_CODE = "SN1";

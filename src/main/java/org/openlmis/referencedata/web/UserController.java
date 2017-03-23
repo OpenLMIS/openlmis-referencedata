@@ -39,8 +39,6 @@ import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.exception.ExternalApiException;
-import org.openlmis.referencedata.exception.InternalErrorException;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -55,8 +53,6 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
-import org.openlmis.util.PasswordChangeRequest;
-import org.openlmis.util.PasswordResetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +60,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -154,8 +148,7 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public UserDto saveUser(@RequestBody @Valid UserDto userDto,
-                          BindingResult bindingResult,
-                          OAuth2Authentication auth) {
+                          BindingResult bindingResult) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     if (bindingResult.hasErrors()) {
@@ -185,10 +178,7 @@ public class UserController extends BaseController {
 
       assignRolesToUser(roleAssignmentDtos, userToSave);
     }
-
-    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
-    String token = details.getTokenValue();
-    userService.save(userToSave, token);
+    userRepository.save(userToSave);
 
     return exportUserToDto(userToSave);
   }
@@ -436,53 +426,6 @@ public class UserController extends BaseController {
     Set<Facility> facilities = user.getFulfillmentFacilities(right);
 
     return facilitiesToDto(facilities);
-  }
-
-  /**
-   * Resets a user's password.
-   */
-  @RequestMapping(value = "/users/passwordReset", method = RequestMethod.POST)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public void passwordReset(
-      @RequestBody @Valid PasswordResetRequest passwordResetRequest,
-      BindingResult bindingResult, OAuth2Authentication auth) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-
-    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
-    String token = details.getTokenValue();
-
-    if (bindingResult.hasErrors()) {
-      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
-    }
-
-    try {
-      userService.passwordReset(passwordResetRequest, token);
-    } catch (ExternalApiException ex) {
-      throw new InternalErrorException(UserMessageKeys.ERROR_EXTERNAL_RESET_PASSWORD_FAILED, ex);
-    }
-  }
-
-  /**
-   * Changes user's password if valid reset token is provided.
-   */
-  @RequestMapping(value = "/users/changePassword", method = RequestMethod.POST)
-  @ResponseStatus(HttpStatus.OK)
-  public void changePassword(
-      @RequestBody @Valid PasswordChangeRequest passwordChangeRequest, BindingResult bindingResult,
-      OAuth2Authentication auth) {
-    OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
-    String token = details.getTokenValue();
-
-    if (bindingResult.hasErrors()) {
-      throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
-    }
-
-    try {
-      userService.changePassword(passwordChangeRequest, token);
-    } catch (ExternalApiException ex) {
-      throw new InternalErrorException(UserMessageKeys.ERROR_EXTERNAL_CHANGE_PASSWORD_FAILED, ex);
-    }
   }
 
   private User validateUser(UUID userId) {
