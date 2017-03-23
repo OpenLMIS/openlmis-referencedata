@@ -112,6 +112,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.getUsername(),
         user.getFirstName(),
         user.getLastName(),
+        user.getEmail(),
         user.getHomeFacility(),
         user.isActive(),
         user.isVerified(),
@@ -142,10 +143,11 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   @Test
-  public void searchUsersWithAllParametersNullShouldReturnAnEmptyList() {
-    List<User> receivedUsers = repository.searchUsers(null, null, null, null, null, null, null);
+  public void searchUsersWithAllParametersNullShouldReturnAllUsers() {
+    List<User> receivedUsers = repository.searchUsers(
+            null, null, null, null, null, null, null, null);
 
-    assertEquals(0, receivedUsers.size());
+    assertEquals(6, receivedUsers.size());
   }
 
   @Test
@@ -155,6 +157,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         null,
         user.getFirstName(),
         user.getLastName(),
+        null,
         user.getHomeFacility(),
         null,
         null,

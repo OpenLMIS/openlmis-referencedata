@@ -22,6 +22,7 @@ import java.util.List;
 
 public interface UserRepositoryCustom {
 
-  List<User> searchUsers(String username, String firstName, String lastName, Facility homeFacility,
-                         Boolean active, Boolean verified, Boolean loginRestricted);
+  List<User> searchUsers(String username, String firstName, String lastName, String email,
+                         Facility homeFacility, Boolean active, Boolean verified,
+                         Boolean loginRestricted);
 }

@@ -20,7 +20,6 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -49,10 +48,10 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
    * @return List of users
    */
   public List<User> searchUsers(String username, String firstName, String lastName,
-                                Facility homeFacility, Boolean active, Boolean verified,
-                                Boolean loginRestricted) {
-    return searchUsers(username, firstName, lastName, homeFacility, active, verified,
-                        loginRestricted, null);
+                                String email, Facility homeFacility, Boolean active,
+                                Boolean verified, Boolean loginRestricted) {
+    return searchUsers(username, firstName, lastName, email, homeFacility, active,
+                        verified, loginRestricted, null);
   }
 
   /**
@@ -69,13 +68,9 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
    * @return List of users
    */
   public List<User> searchUsers(String username, String firstName, String lastName,
-                                Facility homeFacility, Boolean active, Boolean verified,
-                                Boolean loginRestricted, Pageable pageable) {
-    if (username == null && firstName == null && lastName == null && homeFacility == null
-            && active == null && verified == null && loginRestricted == null) {
-      return new ArrayList<>();
-    }
-
+                                String email, Facility homeFacility, Boolean active,
+                                Boolean verified, Boolean loginRestricted,
+                                Pageable pageable) {
 
     int pageNumber = 0;
     int pageSize = 0;
@@ -88,13 +83,14 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     CriteriaQuery<User> query = builder.createQuery(User.class);
     Root<User> root = query.from(User.class);
     Predicate predicate = builder.conjunction();
-    predicate = addFilter(predicate, builder, root, "username", username);
-    predicate = addFilter(predicate, builder, root, "firstName", firstName);
-    predicate = addFilter(predicate, builder, root, "lastName", lastName);
-    predicate = addFilter(predicate, builder, root, "homeFacility", homeFacility);
-    predicate = addFilter(predicate, builder, root, "active", active);
-    predicate = addFilter(predicate, builder, root, "verified", verified);
-    predicate = addFilter(predicate, builder, root, "loginRestricted", loginRestricted);
+    predicate = addEqualsFilter(predicate, builder, root, "username", username);
+    predicate = addLikeFilter(predicate, builder, root, "firstName", firstName);
+    predicate = addLikeFilter(predicate, builder, root, "lastName", lastName);
+    predicate = addLikeFilter(predicate, builder, root, "email", email);
+    predicate = addEqualsFilter(predicate, builder, root, "homeFacility", homeFacility);
+    predicate = addEqualsFilter(predicate, builder, root, "active", active);
+    predicate = addEqualsFilter(predicate, builder, root, "verified", verified);
+    predicate = addEqualsFilter(predicate, builder, root, "loginRestricted", loginRestricted);
     query.where(predicate);
     return entityManager.createQuery(query).setMaxResults(pageSize)
                         .setFirstResult(pageNumber * pageSize)
@@ -102,7 +98,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   }
 
 
-  private Predicate addFilter(Predicate predicate, CriteriaBuilder builder, Root root,
+  private Predicate addEqualsFilter(Predicate predicate, CriteriaBuilder builder, Root root,
                               String filterKey, Object filterValue) {
     if (filterValue != null) {
       return builder.and(
@@ -113,4 +109,17 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
       return predicate;
     }
   }
+
+  private Predicate addLikeFilter(Predicate predicate, CriteriaBuilder builder, Root root,
+                                  String filterKey, String filterValue) {
+    if (filterValue != null) {
+      return builder.and(
+              predicate,
+              builder.like(
+                  builder.upper(root.get(filterKey)), "%" + filterValue.toUpperCase() + "%"));
+    } else {
+      return predicate;
+    }
+  }
+
 }

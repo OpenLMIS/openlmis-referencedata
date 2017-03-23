@@ -77,29 +77,24 @@ public class UserService {
    */
   public List<User> searchUsers(Map<String, Object> queryMap) {
 
-    if (queryMap == null || queryMap.isEmpty()) {
-      return Collections.emptyList();
-    }
-
     List<User> foundUsers = null;
 
     Map<String, Object> regularQueryMap = new HashMap<>(queryMap);
     Map<String, String> extraData = (Map<String, String>) regularQueryMap.remove("extraData");
 
-    if (!regularQueryMap.isEmpty()) {
-      if (queryMap.containsKey("homeFacilityId")) {
-        queryMap.put("homeFacility", facilityRepository.findOne(
-            (UUID) queryMap.get("homeFacilityId")));
-      }
-      foundUsers = new ArrayList<>(userRepository.searchUsers(
-          (String) queryMap.get("username"),
-          (String) queryMap.get("firstName"),
-          (String) queryMap.get("lastName"),
-          (Facility) queryMap.get("homeFacility"),
-          (Boolean) queryMap.get("active"),
-          (Boolean) queryMap.get("verified"),
-          (Boolean) queryMap.get("loginRestricted")));
+    if (queryMap.containsKey("homeFacilityId")) {
+      queryMap.put("homeFacility", facilityRepository.findOne(
+          (UUID) queryMap.get("homeFacilityId")));
     }
+    foundUsers = new ArrayList<>(userRepository.searchUsers(
+        (String) queryMap.get("username"),
+        (String) queryMap.get("firstName"),
+        (String) queryMap.get("lastName"),
+        (String) queryMap.get("email"),
+        (Facility) queryMap.get("homeFacility"),
+        (Boolean) queryMap.get("active"),
+        (Boolean) queryMap.get("verified"),
+        (Boolean) queryMap.get("loginRestricted")));
 
     if (extraData != null && !extraData.isEmpty()) {
 
