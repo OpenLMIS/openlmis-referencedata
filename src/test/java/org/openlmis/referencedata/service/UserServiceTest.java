@@ -188,8 +188,8 @@ public class UserServiceTest {
     assertTrue(receivedUsers.contains(user2));
   }
 
-  /*@Test
-  public void searchUsersShouldNotDoRegularSearchIfNoParameters() {
+  @Test
+  public void shouldSearchUsersWithExtraData() {
     when(userRepository.findByExtraData(extraDataString))
         .thenReturn(Arrays.asList(user, user2));
 
@@ -200,16 +200,7 @@ public class UserServiceTest {
     assertEquals(2, receivedUsers.size());
     assertTrue(receivedUsers.contains(user));
     assertTrue(receivedUsers.contains(user2));
-    verify(userRepository, never()).searchUsers(
-        any(String.class),
-        any(String.class),
-        any(String.class),
-        any(String.class),
-        any(Facility.class),
-        any(Boolean.class),
-        any(Boolean.class),
-        any(Boolean.class));
-  }*/
+  }
 
   @Test
   public void searchUsersShouldNotSearchExtraDataIfParameterIsNullOrEmpty() {

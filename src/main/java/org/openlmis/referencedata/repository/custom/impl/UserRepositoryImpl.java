@@ -35,12 +35,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   private EntityManager entityManager;
 
   /**
-   * Method returns all users with matched parameters. If all parameters are null, returns an 
-   * empty list.
+   * Method returns all users with matched parameters.
+   * If all parameters are null, returns all users.
    *
    * @param username        username of user.
    * @param firstName       firstName of user.
    * @param lastName        lastName of user.
+   * @param email           email of user.
    * @param homeFacility    homeFacility of user.
    * @param active          is the account activated.
    * @param verified        is the account verified.
@@ -55,12 +56,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   }
 
   /**
-   * Method returns all users with matched parameters. If all parameters are null, returns an
-   * empty list.
+   * Method returns all users with matched parameters.
+   * If all parameters are null, returns all users.
    *
    * @param username        username of user.
    * @param firstName       firstName of user.
    * @param lastName        lastName of user.
+   * @param email           email of user.
    * @param homeFacility    homeFacility of user.
    * @param active          is the account activated.
    * @param verified        is the account verified.

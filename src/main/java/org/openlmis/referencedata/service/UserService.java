@@ -71,13 +71,11 @@ public class UserService {
   /**
    * Method returns all users with matched parameters.
    *
-   * @param queryMap request parameters (username, firstName, lastName, homeFacility, active,
-   *                 verified, loginRestricted) and JSON extraData.
+   * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
+   *                 active, verified, loginRestricted) and JSON extraData.
    * @return List of users
    */
   public List<User> searchUsers(Map<String, Object> queryMap) {
-
-    List<User> foundUsers = null;
 
     Map<String, Object> regularQueryMap = new HashMap<>(queryMap);
     Map<String, String> extraData = (Map<String, String>) regularQueryMap.remove("extraData");
@@ -86,7 +84,7 @@ public class UserService {
       queryMap.put("homeFacility", facilityRepository.findOne(
           (UUID) queryMap.get("homeFacilityId")));
     }
-    foundUsers = new ArrayList<>(userRepository.searchUsers(
+    List<User> foundUsers = new ArrayList<>(userRepository.searchUsers(
         (String) queryMap.get("username"),
         (String) queryMap.get("firstName"),
         (String) queryMap.get("lastName"),
@@ -103,7 +101,7 @@ public class UserService {
         extraDataString = mapper.writeValueAsString(extraData);
         List<User> extraDataUsers = userRepository.findByExtraData(extraDataString);
 
-        if (foundUsers != null) {
+        if (foundUsers != null && !foundUsers.isEmpty()) {
           // intersection between two lists
           foundUsers.retainAll(extraDataUsers);
         } else {
