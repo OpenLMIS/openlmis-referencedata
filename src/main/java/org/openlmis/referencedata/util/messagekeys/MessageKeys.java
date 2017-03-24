@@ -49,6 +49,7 @@ public abstract class MessageKeys {
   protected static final String AND = "and";
   protected static final String ID = "id";
   protected static final String IS_INVARIABLE = "isInvariable";
+  protected static final String USERNAME = "username";
 
   // Entities
   protected static final String USER = "user";
@@ -83,6 +84,8 @@ public abstract class MessageKeys {
   protected static final String PROGRAM_REPOSITORY = "programRepository";
   protected static final String ORDERABLE_DISPLAY_CATEGORY_REPOSITORY =
       "orderableDisplayCategoryRepository";
+  protected static final String FIRSTNAME = "firstName";
+  protected static final String LASTNAME = "lastName";
 
   protected static String join(String... params) {
     return String.join(DELIMITER, Arrays.asList(params));

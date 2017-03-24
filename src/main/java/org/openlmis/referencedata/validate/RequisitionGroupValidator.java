@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.validate;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
@@ -24,15 +22,12 @@ import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.ValidationMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -92,7 +87,7 @@ public class RequisitionGroupValidator implements BaseValidator {
    */
   @Override
   public void validate(Object target, Errors errors) {
-    verifyArguments(target, errors);
+    verifyArguments(target, errors, RequisitionGroupMessageKeys.ERROR_NULL);
 
     RequisitionGroupBaseDto group = (RequisitionGroupBaseDto) target;
 
@@ -105,13 +100,6 @@ public class RequisitionGroupValidator implements BaseValidator {
           .orElse(Collections.emptySet()).stream().map(facility -> (FacilityDto) facility)
           .collect(Collectors.toList()), errors);
     }
-  }
-
-  private void verifyArguments(Object target, Errors errors) {
-    Message targetMessage = new Message(RequisitionGroupMessageKeys.ERROR_NULL);
-    Message errorsMessage = new Message(ValidationMessageKeys.ERROR_CONTEXTUAL_STATE_NULL);
-    checkNotNull(target, targetMessage.toString());
-    checkNotNull(errors, errorsMessage.toString());
   }
 
   private void verifyProperties(RequisitionGroupBaseDto group, Errors errors) {

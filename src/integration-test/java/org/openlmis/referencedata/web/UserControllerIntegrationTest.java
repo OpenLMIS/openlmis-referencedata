@@ -29,6 +29,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_EMAIL_DUPLICATED;
+import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_EMAIL_REQUIRED;
+import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_FIRSTNAME_REQUIRED;
+import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_LASTNAME_REQUIRED;
+import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_DUPLICATED;
+import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -360,6 +366,102 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutUserIfEmailIsInUse() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    User user = new User();
+    user.setId(UUID.randomUUID());
+    given(userRepository.findOneByEmail(user1.getEmail())).willReturn(user);
+
+    String messageKey = putUser(null)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_EMAIL_DUPLICATED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutUserIfUsernameIsInUse() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    User user = new User();
+    user.setId(UUID.randomUUID());
+    given(userRepository.findOneByUsername(user1.getUsername())).willReturn(user);
+
+    String messageKey = putUser(null)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_USERNAME_DUPLICATED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutUserIfUsernameIsNull() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    user1.setUsername(null);
+    String messageKey = putUser(null)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_USERNAME_REQUIRED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutUserIfEmailIsNull() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    user1.setEmail(null);
+    String messageKey = putUser(null)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_EMAIL_REQUIRED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutUserIfFirstNameIsNull() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    user1.setFirstName(null);
+    String messageKey = putUser(null)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_FIRSTNAME_REQUIRED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutUserIfLastNameIsNull() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    user1.setLastName(null);
+    String messageKey = putUser(null)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_LASTNAME_REQUIRED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

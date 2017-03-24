@@ -53,6 +53,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
+import org.openlmis.referencedata.validate.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -81,7 +81,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.validation.Valid;
 
 @NoArgsConstructor
@@ -117,6 +116,9 @@ public class UserController extends BaseController {
   @Autowired
   private Validator validator;
 
+  @Autowired
+  private UserValidator userValidator;
+
   @InitBinder
   protected void initBinder(WebDataBinder binder) {
     binder.setValidator(this.validator);
@@ -151,6 +153,7 @@ public class UserController extends BaseController {
                           BindingResult bindingResult) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
+    userValidator.validate(userDto, bindingResult);
     if (bindingResult.hasErrors()) {
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }

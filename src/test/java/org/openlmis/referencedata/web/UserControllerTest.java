@@ -58,6 +58,7 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.validate.UserValidator;
 import org.springframework.validation.BindingResult;
 
 import java.util.Set;
@@ -91,6 +92,9 @@ public class UserControllerTest {
 
   @Mock
   private RightService rightService;
+
+  @Mock
+  private UserValidator validator;
 
   @InjectMocks
   private UserController controller = new UserController();

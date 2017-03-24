@@ -15,9 +15,6 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -26,6 +23,9 @@ import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public interface UserRepository extends
     PagingAndSortingRepository<User, UUID>,
@@ -38,6 +38,8 @@ public interface UserRepository extends
   <S extends User> Iterable<S> save(Iterable<S> entities);
 
   User findOneByUsername(@Param("username") String username);
+
+  User findOneByEmail(@Param("email") String email);
 
   @Query(value = "SELECT u.*"
       + " FROM referencedata.users u"

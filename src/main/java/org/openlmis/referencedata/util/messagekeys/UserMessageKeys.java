@@ -23,6 +23,7 @@ public abstract class UserMessageKeys extends MessageKeys {
   private static final String RESET_PASSWORD = "resetPassword";
   private static final String CHANGE_PASSWORD = "changePassword";
 
+  public static final String ERROR_NULL = join(ERROR, NULL);
   public static final String ERROR_ROLE_ID_NULL = join(ERROR, ROLE, ID, NULL);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
@@ -37,4 +38,10 @@ public abstract class UserMessageKeys extends MessageKeys {
       join(ERROR, EXTERNAL, CHANGE_PASSWORD, FAILED);
   public static final String ERROR_EXTERNAL_RESET_PASSWORD_FAILED =
       join(ERROR, EXTERNAL, RESET_PASSWORD, FAILED);
+  public static final String ERROR_USERNAME_REQUIRED = join(ERROR, USERNAME, REQUIRED);
+  public static final String ERROR_EMAIL_REQUIRED = join(ERROR, EMAIL, REQUIRED);
+  public static final String ERROR_FIRSTNAME_REQUIRED = join(ERROR, FIRSTNAME, REQUIRED);
+  public static final String ERROR_LASTNAME_REQUIRED = join(ERROR, LASTNAME, REQUIRED);
+  public static final String ERROR_USERNAME_DUPLICATED = join(ERROR, USERNAME, DUPLICATED);
+  public static final String ERROR_EMAIL_DUPLICATED = join(ERROR, EMAIL, DUPLICATED);
 }

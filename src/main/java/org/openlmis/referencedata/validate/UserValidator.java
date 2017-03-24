@@ -15,11 +15,11 @@
 
 package org.openlmis.referencedata.validate;
 
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -28,38 +28,35 @@ import org.springframework.validation.Validator;
 import java.util.UUID;
 
 /**
- * A validator for {@link org.openlmis.referencedata.dto.ProgramDto} object.
+ * A validator for {@link ProgramDto} object.
  */
 @Component
-public class ProgramValidator implements BaseValidator {
+public class UserValidator implements BaseValidator {
 
-  // Program fields
-  static final String CODE = "code";
+  // User fields
+  static final String USERNAME = "username";
+  static final String EMAIL = "email";
+  static final String FIRSTNAME = "firstName";
+  static final String LASTNAME = "lastName";
 
   @Autowired
-  private ProgramRepository programRepository;
+  private UserRepository userRepository;
 
   /**
    * Checks if the given class definition is supported.
    *
    * @param clazz the {@link Class} that this {@link Validator} is being asked if it can {@link
    *              #validate(Object, Errors) validate}
-   * @return true if {@code clazz} is equal to {@link ProgramDto} class definition.
+   * @return true if {@code clazz} is equal to {@link UserDto} class definition.
    *     Otherwise false.
    */
   @Override
   public boolean supports(Class<?> clazz) {
-    return ProgramDto.class.equals(clazz);
+    return UserDto.class.equals(clazz);
   }
 
   /**
-   * Validates the {@code target} object, which must be an instance of
-   * {@link ProgramDto} class.
-   * <p>Firstly, the method checks if the target object has a value in {@code code} and {@code name}
-   * properties. For those two properties the value cannot be {@code null}, empty or
-   * contains only whitespaces.</p>
-   * <p>If there are no errors, the method checks if the {@code code} property in the target
-   * object is unique.</p>
+   * Validates the {@code target} object, which must be an instance of {@link UserDto} class.
    *
    * @param target the object that is to be validated (never {@code null})
    * @param errors contextual state about the validation process (never {@code null})
@@ -67,28 +64,38 @@ public class ProgramValidator implements BaseValidator {
    */
   @Override
   public void validate(Object target, Errors errors) {
-    verifyArguments(target, errors, ProgramMessageKeys.ERROR_NULL);
-
-    ProgramDto program = (ProgramDto) target;
+    verifyArguments(target, errors, UserMessageKeys.ERROR_NULL);
 
     verifyProperties(errors);
-
     if (!errors.hasErrors()) {
-      verifyCode(program.getId(), Code.code(program.getCode()), errors);
+      UserDto user = (UserDto) target;
+      verifyUsername(user.getId(), user.getUsername(), errors);
+      verifyEmail(user.getId(), user.getEmail(), errors);
     }
   }
 
   private void verifyProperties(Errors errors) {
-    // the code is required
-    rejectIfEmptyOrWhitespace(errors, CODE, ProgramMessageKeys.ERROR_CODE_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, FIRSTNAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, LASTNAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
   }
 
-  private void verifyCode(UUID id, Code code, Errors errors) {
-    // program code cannot be duplicated
-    Program db = programRepository.findByCode(code);
+  private void verifyUsername(UUID id, String username, Errors errors) {
+    // user name cannot be duplicated
+    User db = userRepository.findOneByUsername(username);
 
     if (null != db && (null == id || !id.equals(db.getId()))) {
-      rejectValue(errors, CODE, ProgramMessageKeys.ERROR_CODE_DUPLICATED);
+      rejectValue(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_DUPLICATED);
+    }
+  }
+
+  private void verifyEmail(UUID id, String email, Errors errors) {
+    // user email cannot be duplicated
+    User db = userRepository.findOneByEmail(email);
+
+    if (null != db && (null == id || !id.equals(db.getId()))) {
+      rejectValue(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_DUPLICATED);
     }
   }
 }

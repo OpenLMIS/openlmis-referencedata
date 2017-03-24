@@ -1086,7 +1086,8 @@ resourceTypes:
                     application/json:
               "400":
                   body:
-                    text/plain:
+                    application/json:
+                      schema: localizedErrorResponse
               "500":
                   body:
                     application/json:
