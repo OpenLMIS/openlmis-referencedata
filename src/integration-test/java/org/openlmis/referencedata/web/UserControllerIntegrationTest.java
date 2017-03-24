@@ -15,9 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
@@ -25,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
@@ -44,7 +40,6 @@ import com.google.common.collect.Sets;
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
@@ -82,12 +77,8 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
-import org.openlmis.referencedata.util.AuthUserRequest;
-import org.openlmis.util.PasswordChangeRequest;
-import org.openlmis.util.PasswordResetRequest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -109,8 +100,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAMS_URL = ID_URL + "/programs";
   private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
   private static final String FULFILLMENT_FACILITIES_URL = ID_URL + "/fulfillmentFacilities";
-  private static final String RESET_PASSWORD_URL = RESOURCE_URL + "/passwordReset";
-  private static final String CHANGE_PASSWORD_URL = RESOURCE_URL + "/changePassword";
   private static final String USERNAME = "username";
   private static final String TIMEZONE = "UTC";
   private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
@@ -119,7 +108,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SUPERVISORY_NODE_CODE = "SN1";
   private static final String WAREHOUSE_CODE = "W1";
   private static final String HOME_FACILITY_CODE = "HF1";
-  private static final String USER_API_STRING = "/api/users";
   private static final String RIGHT_ID_STRING = "rightId";
   private static final String PROGRAM_ID_STRING = "programId";
 
@@ -846,11 +834,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   /**
-   * Creating requisition and auth users.
+   * Creating users.
    */
-  @Ignore
   @Test
-  public void shouldCreateRequisitionAndAuthUsers() {
+  public void shouldCreateUser() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User user = generateUser();
 
@@ -864,48 +851,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(200)
         .extract().as(User.class);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertNotNull(response);
-
-    User savedUser = userRepository.findOne(response.getId());
-    assertNotNull(savedUser);
-
-    assertEquals(user.getUsername(), savedUser.getUsername());
-    assertEquals(user.getFirstName(), savedUser.getFirstName());
-    assertEquals(user.getLastName(), savedUser.getLastName());
-    assertEquals(user.getEmail(), savedUser.getEmail());
-    assertEquals(user.getHomeFacility().getId(), savedUser.getHomeFacility().getId());
-    assertEquals(user.isActive(), savedUser.isActive());
-    assertEquals(user.isVerified(), savedUser.isVerified());
-
-    AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
-    assertNotNull(authUser);
-
-    assertEquals(savedUser.getEmail(), authUser.getEmail());
-    assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
-
-    removeAuthUserByUsername(authUser.getUsername());
-  }
-
-  @Test
-  public void shouldCreateUserWhenThereIsErrorWithNotificationService() {
-    wireMockRule.stubFor(post(urlPathEqualTo("/api/notification"))
-        .willReturn(aResponse().withStatus(500)));
-
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    User user = generateUser();
-
-    UserDto response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(user)
-        .when()
-        .put(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(UserDto.class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertNotNull(response);
@@ -919,123 +864,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.isVerified(), response.isVerified());
   }
 
-  //TODO: This test should be updated when example email will be added to notification module
-  @Ignore
   @Test
-  public void shouldCreateRequisitionAndAuthUsersAndSendResetPasswordEmail() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    User user = generateUser();
-
-    User response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(user)
-        .when()
-        .post(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(User.class);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertNotNull(response);
-
-    User savedUser = userRepository.findOne(response.getId());
-    assertNotNull(savedUser);
-
-    assertEquals(user.getUsername(), savedUser.getUsername());
-    assertEquals(user.getFirstName(), savedUser.getFirstName());
-    assertEquals(user.getLastName(), savedUser.getLastName());
-    assertEquals(user.getEmail(), savedUser.getEmail());
-    assertEquals(user.getHomeFacility().getId(), savedUser.getHomeFacility().getId());
-    assertEquals(user.isActive(), savedUser.isActive());
-    assertEquals(user.isVerified(), savedUser.isVerified());
-
-    AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
-    assertNotNull(authUser);
-
-    assertEquals(savedUser.getEmail(), authUser.getEmail());
-    assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
-
-    removeAuthUserByUsername(authUser.getUsername());
-  }
-
-  @Ignore
-  @Test
-  public void shouldResetPassword() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    User savedUser = createUser();
-    saveAuthUser(savedUser);
-
-    AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
-    assertNotNull(authUser);
-
-    assertNull(authUser.getPassword());
-
-    PasswordResetRequest passwordResetRequest =
-        new PasswordResetRequest(savedUser.getUsername(), "test12345");
-
-    restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(passwordResetRequest)
-        .when()
-        .post(RESET_PASSWORD_URL)
-        .then()
-        .statusCode(200);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-
-    authUser = getAutUserByUsername(savedUser.getUsername());
-    assertNotNull(authUser);
-
-    assertNotNull(authUser.getPassword());
-
-    removeAuthUserByUsername(authUser.getUsername());
-  }
-
-  @Ignore
-  @Test
-  public void shouldChangePasswordIfValidResetTokenIsProvided() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    User savedUser = createUser();
-    saveAuthUser(savedUser);
-
-    AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
-    assertNotNull(authUser);
-
-    assertNull(authUser.getPassword());
-
-    UUID tokenId = passwordResetToken(authUser.getReferenceDataUserId());
-    PasswordChangeRequest passwordChangeRequest =
-        new PasswordChangeRequest(tokenId, authUser.getUsername(), "test12345");
-
-    restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(passwordChangeRequest)
-        .when()
-        .post(CHANGE_PASSWORD_URL)
-        .then()
-        .statusCode(200);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-
-    authUser = getAutUserByUsername(savedUser.getUsername());
-    assertNotNull(authUser);
-
-    assertNotNull(authUser.getPassword());
-
-    removeAuthUserByUsername(authUser.getUsername());
-  }
-
-
-  //need to be ignored atm
-  @Ignore
-  @Test
-  public void shouldUpdateRequisitionAndAuthUsers() {
+  public void shouldUpdateUser() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     User newUser = generateUser();
     UserDto newUserDto = new UserDto();
@@ -1054,24 +884,16 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertNotNull(user);
 
-    User savedUser = userRepository.findOne(user.getId());
-    assertNotNull(savedUser);
-
-    user.setEmail(generateInstanceNumber() + "@mail.com");
-    assertNotEquals(user.getEmail(), savedUser.getEmail());
-
-    AuthUserRequest authUser = getAutUserByUsername(savedUser.getUsername());
-    assertNotNull(authUser);
-
-    assertEquals(savedUser.getEmail(), authUser.getEmail());
-    assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
+    String newEmail = generateInstanceNumber() + "@mail.com";
+    assertNotEquals(newEmail, user.getEmail());
+    user.setEmail(newEmail);
 
     User response = restAssured
         .given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(user)
         .when()
-        .post(RESOURCE_URL)
+        .put(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(User.class);
@@ -1079,24 +901,13 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertNotNull(response);
 
-    savedUser = userRepository.findOne(user.getId());
-    assertNotNull(savedUser);
-
-    assertEquals(user.getUsername(), savedUser.getUsername());
-    assertEquals(user.getFirstName(), savedUser.getFirstName());
-    assertEquals(user.getLastName(), savedUser.getLastName());
-    assertEquals(user.getEmail(), savedUser.getEmail());
-    assertEquals(user.getHomeFacility(), savedUser.getHomeFacility());
-    assertEquals(user.isActive(), savedUser.isActive());
-    assertEquals(user.isVerified(), savedUser.isVerified());
-
-    authUser = getAutUserByUsername(savedUser.getUsername());
-    assertNotNull(authUser);
-
-    assertEquals(savedUser.getEmail(), authUser.getEmail());
-    assertEquals(savedUser.getId(), authUser.getReferenceDataUserId());
-
-    removeAuthUserByUsername(authUser.getUsername());
+    assertEquals(user.getUsername(), response.getUsername());
+    assertEquals(user.getFirstName(), response.getFirstName());
+    assertEquals(user.getLastName(), response.getLastName());
+    assertEquals(user.getEmail(), response.getEmail());
+    assertEquals(user.getHomeFacility().getCode(), response.getHomeFacility().getCode());
+    assertEquals(user.isActive(), response.isActive());
+    assertEquals(user.isVerified(), response.isVerified());
   }
 
   private Response getUser() {
@@ -1211,51 +1022,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .pathParam("id", userId)
         .when()
         .get(FULFILLMENT_FACILITIES_URL);
-  }
-
-  private void saveAuthUser(User user) {
-    AuthUserRequest userRequest = new AuthUserRequest();
-    userRequest.setUsername(user.getUsername());
-    userRequest.setEmail(user.getEmail());
-    userRequest.setReferenceDataUserId(user.getId());
-
-    final String url = baseUri + "?access_token=" + getToken();
-    RestTemplate restTemplate = new RestTemplate();
-
-    restTemplate.postForObject(url, userRequest, Object.class);
-  }
-
-  private UUID passwordResetToken(UUID referenceDataUserId) {
-    final String url = baseUri + USER_API_STRING + "/passwordResetToken?userId="
-        + referenceDataUserId + "&access_token=" + getToken();
-    RestTemplate restTemplate = new RestTemplate();
-
-    return restTemplate.postForObject(url, null, UUID.class);
-  }
-
-  private AuthUserRequest getAutUserByUsername(String username) {
-    final String url = baseUri + USER_API_STRING + "/search/findOneByUsername?username=" + username
-        + "&access_token=" + getToken();
-
-    RestTemplate restTemplate = new RestTemplate();
-    return restTemplate.getForObject(url, AuthUserRequest.class);
-  }
-
-  private void removeAuthUserByUsername(String username) {
-    String url = baseUri + USER_API_STRING + "/search/findOneByUsername?username=" + username
-        + "&access_token=" + getToken();
-
-    RestTemplate restTemplate = new RestTemplate();
-    Map map = restTemplate.getForObject(url, Map.class);
-    String href = ((String) ((Map) ((Map) map.get("_links")).get("self")).get("href"));
-    String id = href.split("users/")[1];
-
-    url = baseUri + USER_API_STRING + id + "?access_token=" + getToken();
-    restTemplate.delete(url);
-  }
-
-  private User createUser() {
-    return userRepository.save(generateUser());
   }
 
   private User generateUser() {
