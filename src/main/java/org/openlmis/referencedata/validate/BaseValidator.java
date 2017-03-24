@@ -43,8 +43,8 @@ interface BaseValidator extends Validator {
 
   default void verifyArguments(Object target, Errors errors, String errorNull) {
     Message targetMessage = new Message(errorNull);
-    Message errorsMessage = new Message(ValidationMessageKeys.ERROR_CONTEXTUAL_STATE_NULL);
     checkNotNull(target, targetMessage.toString());
+    Message errorsMessage = new Message(ValidationMessageKeys.ERROR_CONTEXTUAL_STATE_NULL);
     checkNotNull(errors, errorsMessage.toString());
   }
 

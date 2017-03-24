@@ -15,8 +15,8 @@
 
 package org.openlmis.referencedata.validate;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -67,10 +67,10 @@ public class UserValidatorTest {
   }
 
   @Test
-  public void shouldNotFindErrors() throws Exception {
+  public void shouldNotFindErrorsWhenUserIsValid() throws Exception {
     validator.validate(userDto, errors);
 
-    assertThat(errors.getErrorCount(), is(equalTo(0)));
+    assertEquals(0, errors.getErrorCount());
   }
 
   @Test
@@ -130,7 +130,7 @@ public class UserValidatorTest {
   }
 
   @Test
-  public void shouldRejectWhenUsernameIsInvalid() {
+  public void shouldRejectWhenUsernameContainsWhitespace() {
     userDto.setUsername("user name");
 
     validator.validate(userDto, errors);

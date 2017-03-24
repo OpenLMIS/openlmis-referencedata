@@ -83,7 +83,7 @@ public class UserValidator implements BaseValidator {
 
   private void verifyUsername(UUID id, String username, Errors errors) {
     // user name cannot contains invalid characters
-    if (!username.matches("[A-Za-z0-9_]+")) {
+    if (!username.matches("\\w+")) {
       rejectValue(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_INVALID);
     }
 
