@@ -34,6 +34,7 @@ import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_FIRSTNAME_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_LASTNAME_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_DUPLICATED;
+import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_INVALID;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -417,6 +418,21 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(ERROR_USERNAME_REQUIRED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutUserIfUsernameIsInvalid() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    user1.setUsername("bad:name");
+    String messageKey = putUser(null)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_USERNAME_INVALID)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
