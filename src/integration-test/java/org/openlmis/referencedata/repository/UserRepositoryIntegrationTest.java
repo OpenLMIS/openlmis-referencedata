@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
@@ -175,6 +176,31 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
           user.getHomeFacility().getId(),
           receivedUser.getHomeFacility().getId());
     }
+  }
+
+  @Test
+  public void testSearchUsersOnlyByEmail() {
+    User user1 = cloneUser(users.get(0));
+    user1.setEmail("user1@mail.com");
+    repository.save(user1);
+    User user2 = cloneUser(users.get(0));
+    user2.setEmail("user2@mail.com");
+    repository.save(user2);
+
+    List<User> receivedUsers = repository.searchUsers(
+        null,
+        null,
+        null,
+        "user",
+        null,
+        null,
+        null,
+        null);
+
+    assertEquals(2, receivedUsers.size());
+
+    assertTrue(receivedUsers.contains(user1));
+    assertTrue(receivedUsers.contains(user2));
   }
 
   @Test

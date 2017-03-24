@@ -265,10 +265,16 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Returns all users with matched parameters
+   * Returns all users with matched parameters.
    *
-   * @param queryMap request parameters (username, firstName, lastName, homeFacility, active,
-   *                 verified, loginRestricted) and JSON extraData.
+   * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
+   *                 active, verified, loginRestricted) and JSON extraData.
+   *
+   *                 For firstName, lastName, email: finds any values that have entered
+   *                 string value in any position of searched field. Not case sensitive.
+   *
+   *                 Other fields: entered string value must equal to searched value.
+   *
    * @return a list of all Users matching provided parameters.
    */
   @RequestMapping(value = "/users/search", method = RequestMethod.POST)
@@ -286,9 +292,17 @@ public class UserController extends BaseController {
   /**
    * Returns all users with matched parameters and with pagination.
    *
-   * @param queryMap request parameters (username, firstName, lastName, homeFacility, active,
-   *                 verified, loginRestricted) and JSON extraData.
-   * @return a list of all Users matching provided parameters.
+   * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
+   *                 active, verified, loginRestricted) and JSON extraData.
+   *
+   *                 For firstName, lastName, email: finds any values that have entered
+   *                 string value in any position of searched field. Not case sensitive.
+   *
+   *                 Other fields: entered string value must equal to searched value.
+   *
+   * @param pageable Pageable object that allows client to optionally add "page" (page number)
+   *                 and "size" (page size) query parameters to the request.
+   * @return a Page of all Users matching provided parameters.
    */
   @RequestMapping(value = "/users/search/page", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)

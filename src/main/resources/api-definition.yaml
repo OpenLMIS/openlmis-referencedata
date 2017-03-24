@@ -1281,7 +1281,7 @@ resourceTypes:
       /search:
               post:
                   is: [ secured ]
-                  description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs."
+                  description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs. For firstName, lastName, email: finds any values that have entered string value in any position of searched field. Not case sensitive. Other fields: entered string value must equal to searched value."
                   body:
                       application/json:
                         schema: userQueryDto
@@ -1298,7 +1298,7 @@ resourceTypes:
               /page:
                     post:
                         is: [ secured, paginated ]
-                        description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs. Return users with pagination."
+                        description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs. Return users with pagination. For firstName, lastName, email: finds any values that have entered string value in any position of searched field. Not case sensitive. Other fields: entered string value must equal to searched value."
                         body:
                             application/json:
                               schema: userQueryDto
