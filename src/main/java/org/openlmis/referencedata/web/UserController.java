@@ -294,10 +294,8 @@ public class UserController extends BaseController {
    *
    * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
    *                 active, verified, loginRestricted) and JSON extraData.
-   *
-   *                 For firstName, lastName, email: finds any values that have entered
-   *                 string value in any position of searched field. Not case sensitive.
-   *
+   *                 For firstName, lastName, email: matches values that equal or contain
+   *                 the searched value. Case insensitive.
    *                 Other fields: entered string value must equal to searched value.
    *
    * @param pageable Pageable object that allows client to optionally add "page" (page number)

@@ -58,8 +58,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   /**
    * Method returns all users with matched parameters.
    * If all parameters are null, returns all users.
-   * For firstName, lastName, email: finds any values that have entered
-   * string value in any position of searched field. Not case sensitive.
+   * For firstName, lastName, email: matches values that equal or contain
+   * the searched value. Case insensitive.
    * Other fields: entered string value must equal to searched value.
    *
    * @param username        username of user.
