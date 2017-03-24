@@ -136,7 +136,7 @@ INSERT INTO rights (id, description, name, type) VALUES ('60580166-ab1c-464a-840
 INSERT INTO rights (id, description, name, type) VALUES ('94ae9da9-3d66-465e-9b1f-572c705e5d7f', NULL, 'STOCK_EVENT_CREATE', 'SUPERVISION');
 INSERT INTO rights (id, description, name, type) VALUES ('6fb013fe-d878-43e9-bff0-fa5431e62c34', NULL, 'STOCK_INVENTORIES_EDIT', 'SUPERVISION');
 INSERT INTO rights (id, description, name, type) VALUES ('7b41c10e-5489-47a9-8a68-69ae74b8a4cf', NULL, 'STOCK_ADJUST', 'SUPERVISION');
-
+INSERT INTO rights (id, description, name, type) VALUES ('31cce55f-284b-4922-81bb-d8a9edc4c623', NULL, 'STOCK_CARDS_VIEW', 'SUPERVISION');
 
 --
 -- Data for Name: right_attachments; Type: TABLE DATA; Schema: referencedata; Owner: postgres
