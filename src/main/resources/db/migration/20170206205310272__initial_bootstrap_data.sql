@@ -135,6 +135,7 @@ INSERT INTO rights (id, description, name, type) VALUES ('60580166-ab1c-464a-840
 
 INSERT INTO rights (id, description, name, type) VALUES ('94ae9da9-3d66-465e-9b1f-572c705e5d7f', NULL, 'STOCK_EVENT_CREATE', 'SUPERVISION');
 INSERT INTO rights (id, description, name, type) VALUES ('6831dad9-50fb-4f66-9dec-9861a053082', NULL, 'STOCK_INVENTORIES_EDIT', 'SUPERVISION');
+INSERT INTO rights (id, description, name, type) VALUES ('7b41c10e-5489-47a9-8a68-69ae74b8a4cf', NULL, 'STOCK_ADJUST', 'SUPERVISION');
 
 
 --
