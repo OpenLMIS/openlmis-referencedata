@@ -182,6 +182,8 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/user.json" }
       }
 
+  - userPage: !include schemas/userPage.json
+
   - userQueryDto: !include schemas/userQueryDto.json
 
   - detailedRoleAssignmentDto: !include schemas/detailedRoleAssignmentDto.json
@@ -1280,8 +1282,9 @@ resourceTypes:
                               schema: localizedErrorResponse
       /search:
               post:
-                  is: [ secured ]
-                  description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs. For firstName, lastName, email: matches values that equal or contain the searched value. Case insensitive. Other fields: entered string value must equal to searched value."
+                  is: [ secured, paginated ]
+                  description: "Search users, matching all parameters specified. Searching is
+                  done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs. Return users with pagination. For firstName, lastName, email: matches values that equal or contain the searched value. Case insensitive. Other fields: entered string value must equal to searched value."
                   body:
                       application/json:
                         schema: userQueryDto
@@ -1289,27 +1292,11 @@ resourceTypes:
                       "200":
                           body:
                             application/json:
-                                schema: userArray
+                                schema: userPage
                       "403":
                           body:
                             application/json:
                               schema: localizedErrorResponse
-
-              /page:
-                    post:
-                        is: [ secured, paginated ]
-                        description: "Search users, matching all parameters specified. Searching is done in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs. Return users with pagination. For firstName, lastName, email: matches values that equal or contain the searched value. Case insensitive. Other fields: entered string value must equal to searched value."
-                        body:
-                            application/json:
-                              schema: userQueryDto
-                        responses:
-                            "200":
-                                body:
-                                  application/json:
-                            "403":
-                                body:
-                                  application/json:
-                                    schema: localizedErrorResponse
 
   /facilities:
       displayName: Facility

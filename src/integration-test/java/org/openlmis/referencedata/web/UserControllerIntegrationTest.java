@@ -93,7 +93,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/users";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
-  private static final String SEARCH_WITH_PAGINATION_URL = SEARCH_URL + "/page";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ROLE_ASSIGNMENTS_URL = ID_URL + "/roleAssignments";
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
@@ -758,7 +757,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(userService.searchUsers(queryMap)).willReturn(singletonList(user1));
 
-    UserDto[] response = restAssured
+    PageImplRepresentation response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -767,14 +766,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(UserDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    assertEquals(1, response.length);
+    assertEquals(1, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldFindUsersWithPagination() {
+  public void shouldPaginateFindUsers() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     Map<String, Object> queryMap = new HashMap<>();
@@ -794,7 +793,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(queryMap)
         .when()
-        .post(SEARCH_WITH_PAGINATION_URL)
+        .post(SEARCH_URL)
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
