@@ -26,14 +26,12 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -116,13 +114,6 @@ public class Facility extends BaseEntity {
   @Setter
   private Set<SupportedProgram> supportedPrograms = new HashSet<>();
 
-
-  @Column(name = "extradata", columnDefinition = "jsonb")
-  @Convert(converter = ExtraDataConverter.class)
-  @Getter
-  @Setter
-  private Map<String, String> extraData;
-
   private Facility() {
 
   }
@@ -177,7 +168,6 @@ public class Facility extends BaseEntity {
       facility.setOperator(FacilityOperator.newFacilityOperator(importer.getOperator()));
     }
 
-    facility.setExtraData(importer.getExtraData());
     facility.setActive(importer.getActive());
     facility.setGoLiveDate(importer.getGoLiveDate());
     facility.setGoDownDate(importer.getGoDownDate());
@@ -225,8 +215,6 @@ public class Facility extends BaseEntity {
     if (null != supportedPrograms) {
       exporter.setSupportedPrograms(supportedPrograms);
     }
-
-    exporter.setExtraData(extraData);
   }
 
   public interface Exporter {
@@ -259,7 +247,6 @@ public class Facility extends BaseEntity {
 
     void setSupportedPrograms(Set<SupportedProgram> supportedPrograms);
 
-    void setExtraData(Map<String, String> extraData);
   }
 
   public interface Importer {
@@ -289,7 +276,5 @@ public class Facility extends BaseEntity {
     Boolean getEnabled();
 
     Boolean getOpenLmisAccessible();
-
-    Map<String, String> getExtraData();
   }
 }

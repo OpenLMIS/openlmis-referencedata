@@ -1,1 +1,0 @@
-ALTER TABLE facilities ADD COLUMN extradata jsonb;
