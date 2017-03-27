@@ -51,6 +51,7 @@ public abstract class MessageKeys {
   protected static final String IS_INVARIABLE = "isInvariable";
   protected static final String USERNAME = "username";
   protected static final String INVALID = "invalid";
+  protected static final String LACKS_PARAMETERS = "lacksParameters";
 
   // Entities
   protected static final String USER = "user";

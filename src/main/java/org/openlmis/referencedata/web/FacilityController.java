@@ -21,7 +21,6 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -37,11 +36,11 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
@@ -63,6 +62,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -96,6 +96,9 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private GeographicZoneService geographicZoneService;
+
+  @Autowired
+  private FacilityService facilityService;
 
 
   /**
@@ -299,47 +302,19 @@ public class FacilityController extends BaseController {
   }
 
   /**
-   * Retrieves all Facilities with facilitCode similar to code parameter or facilityName similar to
+   * Retrieves all Facilities with facilityCode similar to code parameter or facilityName similar to
    * name parameter.
    *
-   * @param code Part of wanted facility code.
-   * @param name Part of wanted facility name.
+   * @param queryParams request parameters (code, name, zone, recurse) and JSON extraData.
    * @return List of wanted Facilities.
    */
-  @RequestMapping(value = "/facilities/search", method = RequestMethod.GET)
+  @RequestMapping(value = "/facilities/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<FacilityDto> searchFacilities(
-      @RequestParam(value = "code", required = false) String code,
-      @RequestParam(value = "name", required = false) String name,
-      @RequestParam(value = "zone", required = false) UUID zoneId,
-      @RequestParam(value = "recurse", required = false, defaultValue = "false") boolean recurse) {
+  public List<FacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    GeographicZone zone = null;
-    if (zoneId == null) {
-      if (code == null && name == null) {
-        throw new ValidationMessageException(
-            FacilityMessageKeys.ERROR_SEARCH_CODE_NULL_AND_NAME_NULL);
-      }
-    } else {
-      zone = geographicZoneRepository.findOne(zoneId);
-      if (zone == null) {
-        throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
-      }
-    }
-
-    Collection<Facility> foundFacilities = new ArrayList<>();
-    if (recurse) {
-      Collection<GeographicZone> foundZones = geographicZoneService.getAllZonesInHierarchy(zone);
-      foundZones.add(zone);
-
-      for (GeographicZone foundZone : foundZones) {
-        foundFacilities.addAll(facilityRepository.search(null, null, foundZone));
-      }
-    } else {
-      foundFacilities.addAll(facilityRepository.search(code, name, zone));
-    }
+    List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
 
     return toDto(foundFacilities);
   }
