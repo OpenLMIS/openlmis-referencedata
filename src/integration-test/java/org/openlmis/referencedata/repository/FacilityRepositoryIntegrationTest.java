@@ -17,6 +17,9 @@ package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -25,7 +28,9 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
@@ -49,6 +54,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   private FacilityType facilityType = new FacilityType();
   private GeographicZone geographicZone = new GeographicZone();
   private GeographicLevel geographicLevel = new GeographicLevel();
+
+  private ObjectMapper mapper = new ObjectMapper();
 
   @Before
   public void setUp() {
@@ -184,6 +191,35 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     assertEquals(2, foundFacilties.size());
     assertEquals(facilityWithCodeAndName.getId(), foundFacilties.get(0).getId());
     assertEquals(facilityWithCode.getId(), foundFacilties.get(1).getId());
+  }
+
+  public void shouldFindFacilitiesUsingExtraData() throws JsonProcessingException {
+    // given
+    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
+    validZone = geographicZoneRepository.save(validZone);
+
+    Map<String, String> extraDataRural = new HashMap<>();
+    extraDataRural.put("type", "rural");
+
+    Facility facility = generateInstance();
+    facility.setGeographicZone(validZone);
+    facility.setExtraData(extraDataRural);
+    repository.save(facility);
+
+    Map<String, String> extraDataUrban = new HashMap<>();
+    extraDataUrban.put("type", "urban");
+
+    Facility facility2 = generateInstance();
+    facility2.setGeographicZone(validZone);
+    facility2.setExtraData(extraDataUrban);
+    repository.save(facility2);
+
+    // when
+    String extraDataJson = mapper.writeValueAsString(extraDataRural);
+    List<Facility> foundFacilties = repository.findByExtraData(extraDataJson);
+
+    assertEquals(1, foundFacilties.size());
+    assertEquals("rural", foundFacilties.get(0).getExtraData().get("type"));
   }
 
   @Override
