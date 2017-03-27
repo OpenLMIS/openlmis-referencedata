@@ -108,7 +108,7 @@ INSERT INTO rights (id, description, name, type) VALUES ('4bed4f40-36b5-42a7-94c
 INSERT INTO rights (id, description, name, type) VALUES ('1f917f8c-ab2d-4b5f-b8ca-efb0c13cf6b0', NULL, 'STOCK_SOURCES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('985a8039-a6a6-4a7b-844a-6d4591e77e1d', NULL, 'STOCK_DESTINATIONS_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('17651f6d-39f3-41b6-adc8-4e3d901ac42c', NULL, 'STOCK_CARD_LINE_ITEM_REASONS_MANAGE', 'GENERAL_ADMIN');
-INSERT INTO rights (id, description, name, type) VALUES ('f76125b6-87e3-491d-aa5c-6f61b3cd88b7', NULL, 'ORGANIZATIONS_MANAGE', 'GENERAL_ADMIN');
+INSERT INTO rights (id, description, name, type) VALUES ('f76125b6-87e3-491d-aa5c-6f61b3cd88b7', NULL, 'STOCK_ORGANIZATIONS_MANAGE', 'GENERAL_ADMIN');
 
 INSERT INTO rights (id, description, name, type) VALUES ('ebad51c3-f7c3-4fab-97e1-839973b045d4', NULL, 'USER_ROLES_MANAGE', 'GENERAL_ADMIN');
 INSERT INTO rights (id, description, name, type) VALUES ('42791f7a-84a1-470b-bc3c-4160bc99f13c', NULL, 'PROCESSING_SCHEDULES_MANAGE', 'GENERAL_ADMIN');
