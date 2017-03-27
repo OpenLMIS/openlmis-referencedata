@@ -29,7 +29,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -52,7 +51,6 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
   private String comment;
   private Boolean enabled;
   private Boolean openLmisAccessible;
-  private Map<String, String> extraData;
 
   @Getter
   private Set<SupportedProgramDto> supportedPrograms;

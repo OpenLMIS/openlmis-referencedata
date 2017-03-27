@@ -73,8 +73,6 @@ schemas:
 
       }
 
-  - facilityQueryDto: !include schemas/facilityQueryDto.json
-
   - facilityOperator: !include schemas/facilityOperator.json
 
   - facilityType: !include schemas/facilityType.json
@@ -1456,12 +1454,25 @@ resourceTypes:
                 500:
 
       /search:
-          post:
+          get:
               is: [ secured ]
               description: Returns a list of facilities.
-              body:
-                application/json:
-                  schema: facilityQueryDto
+              queryParameters:
+                  code:
+                      displayName: code
+                      type: string
+                      required: false
+                      repeat: false
+                  name:
+                      displayName: name
+                      type: string
+                      required: false
+                      repeat: false
+                  zone:
+                      displayName: geographic zone
+                      type: string
+                      required: false
+                      repeat: false
               responses:
                 200:
                     body:

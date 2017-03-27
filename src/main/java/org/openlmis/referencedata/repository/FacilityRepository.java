@@ -15,14 +15,11 @@
 
 package org.openlmis.referencedata.repository;
 
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 
-import java.util.List;
 import java.util.UUID;
 
 @JaversSpringDataAuditable
@@ -34,13 +31,6 @@ public interface FacilityRepository
 
   @Override
   <S extends Facility> Iterable<S> save(Iterable<S> entities);
-
-  @Query(value = "SELECT f.*"
-      + " FROM referencedata.facilities f"
-      + " WHERE f.extradata @> (:extraData)\\:\\:jsonb",
-      nativeQuery = true
-  )
-  List<Facility> findByExtraData(@Param("extraData") String extraData);
   
   Facility findFirstByCode(String code);
 }
