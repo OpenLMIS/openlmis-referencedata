@@ -275,44 +275,21 @@ public class UserController extends BaseController {
    *
    *                 Other fields: entered string value must equal to searched value.
    *
+   * @param pageable Pageable object that allows client to optionally add "page" (page number)
+   *                 and "size" (page size) query parameters to the request.
    * @return a list of all Users matching provided parameters.
    */
   @RequestMapping(value = "/users/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<UserDto> searchUsers(
-      @RequestBody Map<String, Object> queryMap) {
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-
-    List<User> result = userService.searchUsers(queryMap);
-
-    return exportUsersToDtos(result);
-  }
-
-  /**
-   * Returns all users with matched parameters and with pagination.
-   *
-   * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
-   *                 active, verified, loginRestricted) and JSON extraData.
-   *                 For firstName, lastName, email: matches values that equal or contain
-   *                 the searched value. Case insensitive.
-   *                 Other fields: entered string value must equal to searched value.
-   *
-   * @param pageable Pageable object that allows client to optionally add "page" (page number)
-   *                 and "size" (page size) query parameters to the request.
-   * @return a Page of all Users matching provided parameters.
-   */
-  @RequestMapping(value = "/users/search/page", method = RequestMethod.POST)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Page<UserDto> searchUsersWithPagination(
+  public Page<UserDto> searchUsers(
       @RequestBody Map<String, Object> queryMap, Pageable pageable) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     List<User> result = userService.searchUsers(queryMap);
-    List<UserDto> dtoList = exportUsersToDtos(result);
+    List<UserDto> userDtos = exportUsersToDtos(result);
 
-    return Pagination.getPage(dtoList, pageable);
+    return Pagination.getPage(userDtos, pageable);
   }
 
   /**
