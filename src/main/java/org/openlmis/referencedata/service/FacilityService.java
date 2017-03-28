@@ -78,8 +78,8 @@ public class FacilityService {
     String name = (String) queryMap.get(NAME);
     UUID zoneId = queryMap.get(ZONE_ID) != null
         ? UUID.fromString(queryMap.get(ZONE_ID).toString()) : null;
-    Boolean recurse = queryMap.get(RECURSE) != null
-        ? Boolean.valueOf(queryMap.get(RECURSE).toString()) : null;
+    boolean recurse = queryMap.get(RECURSE) != null
+        && Boolean.valueOf(queryMap.get(RECURSE).toString());
 
     GeographicZone zone = null;
     if (zoneId == null) {
@@ -103,10 +103,10 @@ public class FacilityService {
   }
 
   private List<Facility> findFacilitiesBasedOnZone(GeographicZone zone, String code, String name,
-      Boolean recurse) {
+      boolean recurse) {
     List<Facility> foundFacilities = new ArrayList<>();
 
-    if (recurse != null && recurse) {
+    if (recurse) {
       Collection<GeographicZone> foundZones = geographicZoneService.getAllZonesInHierarchy(zone);
       foundZones.add(zone);
 
