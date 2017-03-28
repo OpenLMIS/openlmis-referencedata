@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -52,12 +53,13 @@ import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.service.GeographicZoneService;
+import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -69,6 +71,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,10 +88,12 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String SEARCH_FACILITIES = RESOURCE_URL + "/search";
-  private static final String ZONE = "zone";
 
   @MockBean
   private FacilityRepository facilityRepository;
+
+  @MockBean
+  private FacilityService facilityService;
 
   @MockBean
   private SupplyLineService supplyLineService;
@@ -98,9 +103,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private GeographicZoneRepository geographicZoneRepository;
-
-  @MockBean
-  private GeographicZoneService geographicZoneService;
 
   @MockBean
   private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
@@ -168,7 +170,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldRejectGetSupplingRequestIfUserHasNoRight() {
+  public void shouldRejectGetSupplyingRequestIfUserHasNoRight() {
     mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     int searchedFacilitiesAmt = 3;
@@ -252,16 +254,20 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String similarCode = "Facility";
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("code", similarCode);
+
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityRepository.search(similarCode, null, null))
+    given(facilityService.searchFacilities(requestBody))
         .willReturn(listToReturn);
 
     FacilityDto[] response = restAssured.given()
-        .queryParam("code", similarCode)
         .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .get(SEARCH_FACILITIES)
+        .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
         .extract().as(FacilityDto[].class);
@@ -276,10 +282,11 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured.given()
-        .queryParam("code", "Facility")
         .queryParam(ACCESS_TOKEN, getToken())
+        .body(new HashMap<>())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .get(SEARCH_FACILITIES)
+        .post(SEARCH_FACILITIES)
         .then()
         .statusCode(403)
         .extract()
@@ -294,16 +301,20 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String similarName = "Facility";
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("name", similarName);
+
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityRepository.search(null, similarName, null))
+    given(facilityService.searchFacilities(requestBody))
         .willReturn(listToReturn);
 
     FacilityDto[] response = restAssured.given()
-        .queryParam("name", similarName)
         .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .get(SEARCH_FACILITIES)
+        .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
         .extract().as(FacilityDto[].class);
@@ -314,98 +325,41 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldReturnBadRequestWhenSearchingFacilitiesByNonExistentGeographicZone() {
+  public void shouldReturnBadRequestWhenSearchThrowsException() {
     // given
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityService.searchFacilities(anyMap())).willThrow(
+        new ValidationMessageException("somethingWrong"));
 
     // when
     restAssured.given()
-        .queryParam(ZONE, UUID.randomUUID())
         .queryParam(ACCESS_TOKEN, getToken())
+        .body(new HashMap<>())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .get(SEARCH_FACILITIES)
+        .post(SEARCH_FACILITIES)
         .then()
         .statusCode(400);
 
     // then
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnBadRequestWhenSearchingFacilitiesWithoutCodeNameAndZoneInParam() {
-    // given
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    // when
-    restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .when()
-        .get(SEARCH_FACILITIES)
-        .then()
-        .statusCode(400);
-
-    // then
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldFindFacilitiesByGeographicZone() {
-    // given
-    GeographicZone zone = facility.getGeographicZone();
-    mockForFindByZones(zone);
-
-    // when
-    FacilityDto[] response = restAssured.given()
-        .queryParam(ZONE, zone.getId())
-        .queryParam(ACCESS_TOKEN, getToken())
-        .when()
-        .get(SEARCH_FACILITIES)
-        .then()
-        .statusCode(200)
-        .extract().as(FacilityDto[].class);
-
-    // then
-    List<FacilityDto> facilities = Arrays.asList(response);
-    assertEquals(1, facilities.size());
-    assertEquals(facility.getId(), facilities.get(0).getId());
-  }
-
-  @Test
-  public void shouldFindFacilitiesByMultipleGeographicZones() {
-    // given
-    GeographicZone zone = facility.getGeographicZone();
-    mockForFindByZones(zone);
-    given(geographicZoneService.getAllZonesInHierarchy(zone))
-        .willReturn(new ArrayList<>(Arrays.asList(zone, zone)));
-
-    // when
-    FacilityDto[] response = restAssured.given()
-        .queryParam(ZONE, zone.getId())
-        .queryParam("recurse", true)
-        .queryParam(ACCESS_TOKEN, getToken())
-        .when()
-        .get(SEARCH_FACILITIES)
-        .then()
-        .statusCode(200)
-        .extract().as(FacilityDto[].class);
-
-    // then
-    List<FacilityDto> facilities = Arrays.asList(response);
-    assertEquals(3, facilities.size());
   }
 
   @Test
   public void shouldNotFindFacilitiesWithIncorrectCodeAndName() {
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("code", "IncorrectCode");
+    requestBody.put("name", "NotSimilarName");
+
     Facility[] response = restAssured.given()
-        .queryParam("code", "IncorrectCode")
-        .queryParam("name", "NotSimilarName")
         .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .get(SEARCH_FACILITIES)
+        .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
         .extract().as(Facility[].class);
