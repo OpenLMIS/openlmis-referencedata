@@ -881,16 +881,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     return products;
   }
 
-  private void mockForFindByZones(GeographicZone zone) {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    List<Facility> listToReturn = Collections.singletonList(facility);
-    UUID zoneId = zone.getId();
-
-    given(geographicZoneRepository.findOne(zoneId)).willReturn(zone);
-    given(facilityRepository.search(null, null, zone)).willReturn(listToReturn);
-  }
-
   private Integer generateInstanceNumber() {
     currentInstanceNumber += 1;
     return currentInstanceNumber;
