@@ -96,6 +96,18 @@ public class FacilityServiceTest {
     facilityService.searchFacilities(searchParams);
   }
 
+  @Test
+  public void shouldOnlyThrowValidationExceptionIfQueryMapCantBeParsed() {
+    when(facilityRepository.findAll()).thenReturn(facilityList);
+
+    Map<String, Object> searchParams = new HashMap<>();
+    searchParams.put(CODE, "-1");
+    searchParams.put(NAME, "-1");
+    searchParams.put(ZONE_ID, "a");
+    searchParams.put(RECURSE, "a");
+    facilityService.searchFacilities(searchParams);
+  }
+
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfGeographicZoneDoesntExist() {
     when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(null);

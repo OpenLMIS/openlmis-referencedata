@@ -80,7 +80,7 @@ public class FacilityService {
     Optional<UUID> zoneId = UuidUtil.fromString(MapUtils.getObject(queryMap,
         ZONE_ID,
         "").toString());
-    Boolean recurse = MapUtils.getBoolean(queryMap, RECURSE);
+    boolean recurse = MapUtils.getBooleanValue(queryMap, RECURSE);
 
     // validate query parameters
     if (StringUtils.isEmpty(code)
