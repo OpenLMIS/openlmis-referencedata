@@ -56,6 +56,7 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.FacilityService;
@@ -99,6 +100,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private ProgramRepository programRepository;
+
+  @MockBean
+  private GeographicZoneRepository geographicZoneRepository;
 
   @MockBean
   private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;

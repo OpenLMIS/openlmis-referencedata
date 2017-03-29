@@ -47,7 +47,7 @@ public class FacilityServiceTest {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
-  private static final String ZONE = "zone";
+  private static final String ZONE_ID = "zoneId";
   private static final String RECURSE = "recurse";
 
   @Mock
@@ -101,7 +101,7 @@ public class FacilityServiceTest {
     when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(null);
 
     Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(ZONE, UUID.randomUUID());
+    searchParams.put(ZONE_ID, UUID.randomUUID());
     facilityService.searchFacilities(searchParams);
   }
 
@@ -130,7 +130,7 @@ public class FacilityServiceTest {
     params.put(RECURSE, true);
     params.put(CODE, code);
     params.put(NAME, name);
-    params.put(ZONE, zoneUuid);
+    params.put(ZONE_ID, zoneUuid);
 
     final List<Facility> actual = facilityService.searchFacilities(params);
 
@@ -156,7 +156,7 @@ public class FacilityServiceTest {
     params.put(RECURSE, false);
     params.put(CODE, code);
     params.put(NAME, name);
-    params.put(ZONE, zoneUuid);
+    params.put(ZONE_ID, zoneUuid);
 
     List<Facility> actual = facilityService.searchFacilities(params);
 
@@ -188,7 +188,7 @@ public class FacilityServiceTest {
     params.put(RECURSE, true);
     params.put(CODE, code);
     params.put(NAME, name);
-    params.put(ZONE, zoneUuid);
+    params.put(ZONE_ID, zoneUuid);
     params.put("extraData", extraData);
 
     List<Facility> actual = facilityService.searchFacilities(params);
