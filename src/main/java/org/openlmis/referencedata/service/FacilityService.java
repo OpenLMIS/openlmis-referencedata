@@ -20,11 +20,14 @@ import com.google.common.collect.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.collections4.MapUtils;
+import org.jadira.usertype.spi.utils.lang.StringUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.Logger;
@@ -70,25 +73,30 @@ public class FacilityService {
    */
   public List<Facility> searchFacilities(Map<String, Object> queryMap) {
 
-    if (queryMap == null || queryMap.isEmpty()) {
+    if ( MapUtils.isEmpty(queryMap) ) {
       return Lists.newArrayList(facilityRepository.findAll());
     }
 
-    String code = (String) queryMap.get(CODE);
-    String name = (String) queryMap.get(NAME);
-    UUID zoneId = queryMap.get(ZONE_ID) != null
-        ? UUID.fromString(queryMap.get(ZONE_ID).toString()) : null;
-    boolean recurse = queryMap.get(RECURSE) != null
-        && Boolean.valueOf(queryMap.get(RECURSE).toString());
+    String code = MapUtils.getString(queryMap, CODE, null);
+    String name = MapUtils.getString(queryMap, NAME, null);
+    Optional<UUID> zoneId = UuidUtil.fromString(MapUtils.getObject(queryMap,
+        ZONE_ID,
+        "").toString());
+    Boolean recurse = MapUtils.getBoolean(queryMap, RECURSE);
 
+    // validate query parameters
+    if (StringUtils.isEmpty(code)
+        && StringUtils.isEmpty(name)
+        && false == zoneId.isPresent() ) {
+
+      throw new ValidationMessageException(
+          FacilityMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
+    }
+
+    // find zone if given
     GeographicZone zone = null;
-    if (zoneId == null) {
-      if (code == null && name == null) {
-        throw new ValidationMessageException(
-            FacilityMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
-      }
-    } else {
-      zone = geographicZoneRepository.findOne(zoneId);
+    if (zoneId.isPresent()) {
+      zone = geographicZoneRepository.findOne(zoneId.get());
       if (zone == null) {
         throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
       }
@@ -142,4 +150,6 @@ public class FacilityService {
 
     return foundFacilities;
   }
+
+
 }
