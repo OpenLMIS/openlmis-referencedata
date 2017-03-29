@@ -47,7 +47,7 @@ public class FacilityService {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
-  private static final String ZONE = "zone";
+  private static final String ZONE_ID = "zoneId";
   private static final String RECURSE = "recurse";
   private static final String EXTRA_DATA = "extraData";
 
@@ -76,8 +76,8 @@ public class FacilityService {
 
     String code = (String) queryMap.get(CODE);
     String name = (String) queryMap.get(NAME);
-    UUID zoneId = queryMap.get(ZONE) != null
-        ? UUID.fromString(queryMap.get(ZONE).toString()) : null;
+    UUID zoneId = queryMap.get(ZONE_ID) != null
+        ? UUID.fromString(queryMap.get(ZONE_ID).toString()) : null;
     boolean recurse = queryMap.get(RECURSE) != null
         && Boolean.valueOf(queryMap.get(RECURSE).toString());
 
