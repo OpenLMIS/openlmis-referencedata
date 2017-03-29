@@ -62,7 +62,7 @@ public class UserService {
 
     if (queryMap.containsKey("homeFacilityId")) {
       queryMap.put("homeFacility", facilityRepository.findOne(
-          (UUID) queryMap.get("homeFacilityId")));
+          UUID.fromString((String) queryMap.get("homeFacilityId"))));
     }
     List<User> foundUsers = new ArrayList<>(userRepository.searchUsers(
         (String) queryMap.get("username"),
