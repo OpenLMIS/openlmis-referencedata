@@ -15,13 +15,11 @@
 
 package org.openlmis.referencedata.service;
 
-import com.google.common.collect.Lists;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.collections4.MapUtils;
-import org.jadira.usertype.spi.utils.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.exception.ValidationMessageException;
