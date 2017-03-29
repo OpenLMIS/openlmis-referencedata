@@ -1457,7 +1457,7 @@ resourceTypes:
       /search:
           post:
               is: [ secured ]
-              description: Returns a list of facilities.
+              description: Returns a list of facilities given either a Zone, a Name, or a Code. The recurse option should be given when a zone is also given, and it means that the search should also include all children of the given zone.
               body:
                 application/json:
                   schema: facilityQueryDto

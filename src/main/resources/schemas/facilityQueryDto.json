@@ -14,7 +14,7 @@
     },
     "zone": {
       "type": "string",
-      "title": "zone"
+      "title": "zoneId"
     },
     "extraData": {
       "type": "object",
