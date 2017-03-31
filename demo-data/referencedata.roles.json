@@ -1,38 +1,47 @@
 [
   {
     "id": "185db8f7-ee35-44d0-8b40-6de12489ae77",
-    "name": "Storeroom Manager"
+    "name": "Storeroom Manager",
+    "description": "Can create, view and delete requisition."
   },
   {
     "id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec",
-    "name": "Store Manager"
+    "name": "Store Manager",
+    "description": "Can view, authorize and delete requisitions."
   },
   {
     "id": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d",
-    "name": "District Storeroom Manager"
+    "name": "District Storeroom Manager",
+    "description": "Can view and approve requisitions."
   },
   {
     "id": "d30a2fbb-51d9-49ad-90fe-fb405470a439",
-    "name": "Program Supervisor"
+    "name": "Program Supervisor",
+    "description": "Can view and approve requisitions."
   },
   {
     "id": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
-    "name": "Warehouse Clerk"
+    "name": "Warehouse Clerk",
+    "description": "Can view and edit orders and manage proof of deliveries."
   },
   {
     "id": "2fef03c4-8854-4dc8-b126-007f5e2afcc1",
-    "name": "Reporting Personnel"
+    "name": "Reporting Personnel",
+    "description": "Can view reports and edit report templates."
   },
   {
     "id": "d8ff49b1-96e7-4710-9511-289f490f7577",
-    "name": "Stock Manager"
+    "name": "Stock Manager",
+    "description": "Can view stock cards, edit stock inventories and adjust stock."
   },
   {
     "id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0",
-    "name": "Delivery Approver"
+    "name": "Delivery Approver",
+    "description": "Can manage proof of deliveries."
   },
   {
     "id": "201a4f3a-a299-4f5e-8c11-b21a3dbc2ceb",
-    "name": "Requisition Viewer"
+    "name": "Requisition Viewer",
+    "description": "Can view requisitions."
   }
 ]
