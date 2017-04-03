@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toSet;
 import com.google.common.collect.Sets;
 
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -69,8 +70,8 @@ public class RightController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Set<RightDto> getAllRights() {
-    
-    rightService.checkRootAccess();
+
+    rightService.checkAdminRight(RightName.RIGHTS_VIEW);
 
     LOGGER.debug("Getting all rights");
     Set<Right> rights = Sets.newHashSet(rightRepository.findAll());
@@ -173,7 +174,7 @@ public class RightController extends BaseController {
   @ResponseBody
   public Set<RightDto> findRightByName(@RequestParam("name") String name) {
 
-    rightService.checkRootAccess();
+    rightService.checkAdminRight(RightName.RIGHTS_VIEW);
 
     Right foundRight = rightRepository.findFirstByName(name);
     if (foundRight == null) {

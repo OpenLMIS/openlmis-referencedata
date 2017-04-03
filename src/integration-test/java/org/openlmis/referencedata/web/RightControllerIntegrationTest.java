@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -67,6 +68,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAllShouldGetAllRights() {
+    mockUserHasRight(RightName.RIGHTS_VIEW);
 
     Set<Right> storedRights = Sets.newHashSet(right, attachment,
         Right.newRight("right2", RightType.SUPERVISION));
@@ -88,6 +90,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAllShouldReturnForbiddenForUnauthorizedToken() {
+    mockUserHasNoRight(RightName.RIGHTS_VIEW);
 
     restAssured
         .given()
@@ -283,6 +286,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void searchShouldFindRightByName() {
+    mockUserHasRight(RightName.RIGHTS_VIEW);
 
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(right);
 
@@ -304,6 +308,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void searchShouldReturnForbiddenForUnauthorizedToken() {
+    mockUserHasNoRight(RightName.RIGHTS_VIEW);
 
     restAssured
         .given()
@@ -319,6 +324,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void searchShouldReturnNotFoundForNonExistingRight() {
+    mockUserHasRight(RightName.RIGHTS_VIEW);
 
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(null);
 
