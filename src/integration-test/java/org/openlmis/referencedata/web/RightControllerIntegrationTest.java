@@ -34,10 +34,12 @@ import org.springframework.http.MediaType;
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/rights";
@@ -45,6 +47,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String RIGHT_NAME = "right";
   private static final String ATTACHMENT_NAME = "attachment";
+  private static final RightType RIGHT_TYPE = RightType.GENERAL_ADMIN;
 
   @MockBean
   private RightRepository rightRepository;
@@ -285,15 +288,17 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void searchShouldFindRightByName() {
+  public void searchShouldFindRightByNameAndType() {
     mockUserHasRight(RightName.RIGHTS_VIEW);
 
-    given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(right);
+    given(rightRepository.searchRights(RIGHT_NAME, RIGHT_TYPE)).willReturn(
+            Collections.singletonList(right));
 
     RightDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getClientToken())
         .queryParam("name", RIGHT_NAME)
+        .queryParam("type", RIGHT_TYPE.toString())
         .when()
         .get(SEARCH_URL)
         .then()
@@ -323,19 +328,17 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void searchShouldReturnNotFoundForNonExistingRight() {
+  public void searchShouldReturnBadRequestForInvalidType() {
     mockUserHasRight(RightName.RIGHTS_VIEW);
 
-    given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(null);
-
     restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
-        .queryParam("name", RIGHT_NAME)
-        .when()
-        .get(SEARCH_URL)
-        .then()
-        .statusCode(404);
+            .given()
+            .queryParam(ACCESS_TOKEN, getClientToken())
+            .queryParam("type", "INVALID_TYPE")
+            .when()
+            .get(SEARCH_URL)
+            .then()
+            .statusCode(400);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

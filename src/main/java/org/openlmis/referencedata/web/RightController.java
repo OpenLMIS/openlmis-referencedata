@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -43,9 +44,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @NoArgsConstructor
 @Controller
@@ -164,30 +169,47 @@ public class RightController extends BaseController {
   }
 
   /**
-   * Find a right by its name.
-   *
-   * @param name the name of the right to find.
-   * @return the right.
+   * Finds rights matching all of the provided parameters.
    */
   @RequestMapping(value = "/rights/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Set<RightDto> findRightByName(@RequestParam("name") String name) {
+  public Set<RightDto> searchRights(
+          @RequestParam(value = "name", required = false) String name,
+          @RequestParam(value = "type", required = false) String type) {
 
     rightService.checkAdminRight(RightName.RIGHTS_VIEW);
 
-    Right foundRight = rightRepository.findFirstByName(name);
-    if (foundRight == null) {
-      throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
-    }
+    RightType rightType = null;
+    if (type != null) {
+      try {
+        rightType = RightType.valueOf(type);
+      } catch (IllegalArgumentException ex) {
+        String rightNames = String.join(", ", Stream.of(RightType.values())
+                .map(RightType::name)
+                .collect(Collectors.toSet()));
 
-    LOGGER.debug("Right found, returning");
-    return Sets.newHashSet(exportToDto(foundRight));
+        throw new ValidationMessageException(new Message(RightMessageKeys.ERROR_TYPE_INVALID,
+                rightNames, ex));
+      }
+    }
+    List<Right> foundRights = rightRepository.searchRights(name, rightType);
+    return Sets.newHashSet(exportToDtos(foundRights));
   }
 
   private RightDto exportToDto(Right right) {
     RightDto rightDto = new RightDto();
     right.export(rightDto);
     return rightDto;
+  }
+
+  private List<RightDto> exportToDtos(List<Right> rights) {
+    List<RightDto> rightDtos = new ArrayList<>();
+    for (Right right : rights) {
+      RightDto rightDto = new RightDto();
+      right.export(rightDto);
+      rightDtos.add(rightDto);
+    }
+    return rightDtos;
   }
 }

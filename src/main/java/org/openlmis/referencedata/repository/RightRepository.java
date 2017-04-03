@@ -16,11 +16,12 @@
 package org.openlmis.referencedata.repository;
 
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.repository.custom.RightRepositoryCustom;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.UUID;
 
-public interface RightRepository extends PagingAndSortingRepository<Right, UUID> {
-
+public interface RightRepository extends PagingAndSortingRepository<Right, UUID>,
+        RightRepositoryCustom {
   Right findFirstByName(String name);
 }

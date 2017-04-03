@@ -29,6 +29,9 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class RightRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<Right> {
 
@@ -67,6 +70,46 @@ public class RightRepositoryIntegrationTest
 
     //then
     assertEquals(right2, foundRight);
+  }
+
+  @Test
+  public void shouldFindRight() {
+    //given
+    String nameToFind = right2.getName();
+    RightType typeToFind = right2.getType();
+
+    //when
+    List<List<Right>> rightResults = Arrays.asList(
+        repository.searchRights(nameToFind, typeToFind),
+        repository.searchRights(null, typeToFind),
+        repository.searchRights(nameToFind, null)
+    );
+
+    //then
+    assertEquals(3, rightResults.size());
+    assertTrue(rightResults.stream().allMatch(result -> result.contains(right2)));
+  }
+
+  @Test
+  public void shouldNotFindRightIfIncorrectParametersAreProvided() {
+    //given
+    String actualName = right2.getName();
+    String anotherName = "some other name";
+    RightType actualType = right2.getType();
+    RightType anotherType = RightType.SUPERVISION;
+
+    //when
+    List<List<Right>> rightResults = Arrays.asList(
+        repository.searchRights(actualName, anotherType),
+        repository.searchRights(anotherName, anotherType),
+        repository.searchRights(anotherName, actualType),
+        repository.searchRights(anotherName, null),
+        repository.searchRights(null, anotherType)
+    );
+
+    //then
+    assertEquals(5, rightResults.size());
+    assertTrue(rightResults.stream().noneMatch(result -> result.contains(right2)));
   }
 
   @Test

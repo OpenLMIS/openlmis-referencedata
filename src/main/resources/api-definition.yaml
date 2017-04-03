@@ -2419,13 +2419,22 @@ resourceTypes:
                   name:
                       displayName: Name of the right to find
                       type: string
-                      required: true
+                      required: false
+                      repeat: false
+                  type:
+                      displayName: Type of the right to find
+                      type: string
+                      required: false
                       repeat: false
               responses:
                   "200":
                       body:
                         application/json:
                           schema: rightArray
+                  "400":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "403":
                       body:
                         application/json:

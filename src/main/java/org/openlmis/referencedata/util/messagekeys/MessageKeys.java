@@ -45,6 +45,7 @@ public abstract class MessageKeys {
   protected static final String WITH = "with";
   protected static final String NULL = "null";
   protected static final String NAME = "name";
+  protected static final String TYPE = "type";
   protected static final String CODE = "code";
   protected static final String AND = "and";
   protected static final String ID = "id";
