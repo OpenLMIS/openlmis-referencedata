@@ -34,6 +34,9 @@ import com.jayway.restassured.config.RestAssuredConfig;
 
 import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
@@ -70,7 +73,7 @@ public abstract class BaseWebIntegrationTest {
 
   protected static final String RAML_ASSERT_MESSAGE =
       "HTTP request/response should match RAML definition.";
-  
+
   static final String MESSAGE_KEY = "messageKey";
 
   protected RestAssuredClient restAssured;
@@ -200,4 +203,22 @@ public abstract class BaseWebIntegrationTest {
     }
   }
 
+  static class SaveAnswer<T extends BaseEntity> implements Answer<T> {
+
+    @Override
+    public T answer(InvocationOnMock invocation) throws Throwable {
+      T obj = (T) invocation.getArguments()[0];
+
+      if (null == obj) {
+        return null;
+      }
+
+      if (null == obj.getId()) {
+        obj.setId(UUID.randomUUID());
+      }
+
+      return obj;
+    }
+
+  }
 }
