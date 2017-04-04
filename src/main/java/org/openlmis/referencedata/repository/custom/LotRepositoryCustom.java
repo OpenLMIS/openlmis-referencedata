@@ -13,13 +13,13 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.repository.custom;
 
 import org.openlmis.referencedata.domain.Lot;
-import org.openlmis.referencedata.repository.custom.LotRepositoryCustom;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import java.util.UUID;
+import org.openlmis.referencedata.domain.TradeItem;
+import java.time.ZonedDateTime;
+import java.util.List;
 
-public interface LotRepository
-    extends PagingAndSortingRepository<Lot, UUID>, LotRepositoryCustom {
+public interface LotRepositoryCustom {
+  List<Lot> search(TradeItem item, ZonedDateTime expirationDate, String code);
 }

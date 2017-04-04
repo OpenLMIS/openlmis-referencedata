@@ -41,6 +41,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/lots";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SEARCH_URL = RESOURCE_URL + "/search";
 
   @MockBean
   private TradeItemRepository tradeItemRepository;
@@ -144,6 +145,21 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
             .body(lot)
             .when()
             .put(ID_URL)
+            .then()
+            .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectSearchLotsIfUserHasNoRight() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    restAssured
+            .given()
+            .queryParam(ACCESS_TOKEN, getToken())
+            .when()
+            .get(SEARCH_URL)
             .then()
             .statusCode(403);
 

@@ -275,6 +275,12 @@ schemas:
 
   - lot: !include schemas/lot.json
 
+  - lotArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/lot.json" }
+      }
+
 traits:
     - secured:
           queryParameters:
@@ -2586,3 +2592,32 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
+      /search:
+          get:
+              is: [ secured ]
+              description: Find lots with matched parameters.
+              queryParameters:
+                  tradeIdemId:
+                          displayName: tradeIdem
+                          type: string
+                          required: false
+                          repeat: false
+                  expirationDate:
+                          displayName: expirationDate
+                          type: string
+                          required: false
+                          repeat: false
+                  lotCode:
+                          displayName: lotCode
+                          type: string
+                          required: false
+                          repeat: false
+              responses:
+                  "200":
+                      body:
+                        application/json:
+                          schema: lotArray
+                  "403":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse

@@ -15,12 +15,17 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.validate.LotValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +34,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
-
-import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 @Controller
 @Transactional
@@ -98,5 +104,31 @@ public class LotController extends BaseController {
     LOGGER.debug("Updating Lot");
     lotRepository.save(lot);
     return lot;
+  }
+
+  /**
+   * Retrieves all Lots matching given parameters.
+   *
+   * @return List of matched Lots.
+   */
+  @GetMapping("/lots/search")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<Lot> searchLots(
+      @RequestParam(value = "tradeIdemId", required = false) UUID tradeIdemId,
+      @RequestParam(value = "expirationDate", required = false) ZonedDateTime expirationDate,
+      @RequestParam(value = "lotCode", required = false) String lotCode) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    TradeItem tradeItem = null;
+    if (isNotTrue(isNull(tradeIdemId))) {
+      tradeItem = tradeItemRepository.findOne(tradeIdemId);
+      if (isNull(tradeItem)) {
+        throw new ValidationMessageException(
+            new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, tradeIdemId));
+      }
+    }
+
+    return lotRepository.search(tradeItem, expirationDate, lotCode);
   }
 }

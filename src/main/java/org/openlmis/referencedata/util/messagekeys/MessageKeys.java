@@ -55,6 +55,7 @@ public abstract class MessageKeys {
   protected static final String LACKS_PARAMETERS = "lacksParameters";
 
   // Entities
+  protected static final String LOT = "lot";
   protected static final String USER = "user";
   protected static final String ROLE = "role";
   protected static final String RIGHT = "right";
@@ -77,7 +78,6 @@ public abstract class MessageKeys {
   protected static final String ORDERABLE_DISPLAY_CATEGORY = "orderableDisplayCategory";
   protected static final String FACILITY_TYPE_APPROVED_PRODUCT = "facilityTypeApprovedProduct";
   protected static final String SUPPORTED_PROGRAMS = "supportedPrograms";
-  protected static final String LOT = "lot";
 
   // Common to subclasses
   protected static final String EMAIL = "email";
