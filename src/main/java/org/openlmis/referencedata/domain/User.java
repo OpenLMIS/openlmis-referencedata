@@ -61,7 +61,7 @@ public class User extends BaseEntity {
   @Setter
   private String lastName;
 
-  @Column(nullable = false, unique = true)
+  @Column(unique = true)
   @Getter
   @Setter
   private String email;

@@ -17,12 +17,13 @@ package org.openlmis.referencedata.validate;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.validate.UserValidator.EMAIL;
-import static org.openlmis.referencedata.validate.UserValidator.FIRSTNAME;
-import static org.openlmis.referencedata.validate.UserValidator.LASTNAME;
+import static org.openlmis.referencedata.validate.UserValidator.FIRST_NAME;
+import static org.openlmis.referencedata.validate.UserValidator.LAST_NAME;
 import static org.openlmis.referencedata.validate.UserValidator.USERNAME;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
@@ -39,6 +40,7 @@ import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
 import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -177,12 +179,12 @@ public class UserValidatorTest {
   }
 
   @Test
-  public void shouldRejectWhenEmailIsNull() {
+  public void shouldNotRejectWhenEmailIsNull() {
     userDto.setEmail(null);
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_REQUIRED);
+    assertFalse(errors.hasFieldErrors(EMAIL));
   }
 
   @Test
@@ -191,7 +193,7 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_REQUIRED);
+    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
   }
 
   @Test
@@ -200,7 +202,7 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_REQUIRED);
+    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
   }
 
   @Test
@@ -209,7 +211,7 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, FIRSTNAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
+    assertErrorMessage(errors, FIRST_NAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
   }
 
   @Test
@@ -218,7 +220,7 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, FIRSTNAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
+    assertErrorMessage(errors, FIRST_NAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
   }
 
   @Test
@@ -227,7 +229,7 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, FIRSTNAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
+    assertErrorMessage(errors, FIRST_NAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
   }
 
   @Test
@@ -236,7 +238,7 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, LASTNAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
+    assertErrorMessage(errors, LAST_NAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
   }
 
   @Test
@@ -245,7 +247,7 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, LASTNAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
+    assertErrorMessage(errors, LAST_NAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
   }
 
   @Test
@@ -254,6 +256,6 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertErrorMessage(errors, LASTNAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
+    assertErrorMessage(errors, LAST_NAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
   }
 }

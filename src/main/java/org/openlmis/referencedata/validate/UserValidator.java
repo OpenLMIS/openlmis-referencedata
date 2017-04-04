@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+
 import java.util.UUID;
 
 /**
@@ -36,8 +37,8 @@ public class UserValidator implements BaseValidator {
   // User fields
   static final String USERNAME = "username";
   static final String EMAIL = "email";
-  static final String FIRSTNAME = "firstName";
-  static final String LASTNAME = "lastName";
+  static final String FIRST_NAME = "firstName";
+  static final String LAST_NAME = "lastName";
 
   @Autowired
   private UserRepository userRepository;
@@ -66,19 +67,25 @@ public class UserValidator implements BaseValidator {
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors, UserMessageKeys.ERROR_NULL);
 
-    verifyProperties(errors);
+    rejectEmptyValues(errors);
     if (!errors.hasErrors()) {
       UserDto user = (UserDto) target;
       verifyUsername(user.getId(), user.getUsername(), errors);
-      verifyEmail(user.getId(), user.getEmail(), errors);
+
+      if (user.getEmail() != null) {
+        verifyEmail(user.getId(), user.getEmail(), errors);
+      }
     }
   }
 
-  private void verifyProperties(Errors errors) {
+  private void rejectEmptyValues(Errors errors) {
     rejectIfEmptyOrWhitespace(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_REQUIRED);
-    rejectIfEmptyOrWhitespace(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_REQUIRED);
-    rejectIfEmptyOrWhitespace(errors, FIRSTNAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
-    rejectIfEmptyOrWhitespace(errors, LASTNAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, FIRST_NAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, LAST_NAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
+
+    if (errors.getFieldValue(EMAIL) != null) {
+      rejectIfEmptyOrWhitespace(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
+    }
   }
 
   private void verifyUsername(UUID id, String username, Errors errors) {

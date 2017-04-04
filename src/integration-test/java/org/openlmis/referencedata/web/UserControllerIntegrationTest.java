@@ -26,19 +26,19 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_EMAIL_DUPLICATED;
-import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_EMAIL_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_FIRSTNAME_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_LASTNAME_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_DUPLICATED;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_INVALID;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.response.Response;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -87,6 +87,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateField"})
 public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -424,17 +426,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldRejectPutUserIfEmailIsNull() {
+  public void shouldNotRejectPutUserIfEmailIsNull() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setEmail(null);
-    String messageKey = putUser(null)
+    putUser(null)
         .then()
-        .statusCode(400)
-        .extract()
-        .path(MESSAGE_KEY);
+        .statusCode(200);
 
-    assertThat(messageKey, Matchers.is(equalTo(ERROR_EMAIL_REQUIRED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
