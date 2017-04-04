@@ -73,6 +73,8 @@ public class LotController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Lot updateLot(@RequestBody Lot lot, @PathVariable("id") UUID lotId) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     LOGGER.debug("Updating Lot");
     lotRepository.save(lot);
     return lot;
