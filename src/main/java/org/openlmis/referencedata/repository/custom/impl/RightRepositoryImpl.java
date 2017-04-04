@@ -38,7 +38,7 @@ public class RightRepositoryImpl implements RightRepositoryCustom {
    *
    * @param name name of right.
    * @param type type of right.
-   * @return List of users
+   * @return List of rights
    */
   public List<Right> searchRights(String name, RightType type) {
 
