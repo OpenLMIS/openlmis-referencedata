@@ -273,6 +273,8 @@ schemas:
 
   - currencySettingsDto: !include schemas/currencySettingsDto.json
 
+  - lot: !include schemas/lot.json
+
 traits:
     - secured:
           queryParameters:
@@ -2538,3 +2540,23 @@ resourceTypes:
                     body:
                         application/json:
                           schema: currencySettingsDto
+
+  /lots:
+      displayName: Lot
+      post:
+            is: [ secured ]
+            description: Create new lot.
+            body:
+                application/json:
+            responses:
+                "201":
+                    body:
+                        application/json:
+                          schema: lot
+                "500":
+                    body:
+                        application/json:
+                "403":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
