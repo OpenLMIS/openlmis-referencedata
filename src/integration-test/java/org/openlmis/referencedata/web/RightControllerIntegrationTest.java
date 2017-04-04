@@ -61,8 +61,8 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
    * Constructor for test class.
    */
   public RightControllerIntegrationTest() {
-    right = Right.newRight(RIGHT_NAME, RightType.GENERAL_ADMIN);
-    attachment = Right.newRight(ATTACHMENT_NAME, RightType.GENERAL_ADMIN);
+    right = Right.newRight(RIGHT_NAME, RIGHT_TYPE);
+    attachment = Right.newRight(ATTACHMENT_NAME, RIGHT_TYPE);
     right.attach(attachment);
     rightDto = new RightDto();
     right.export(rightDto);
@@ -122,7 +122,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(RightDto.class);
 
     assertEquals(RIGHT_NAME, response.getName());
-    assertEquals(RightType.GENERAL_ADMIN, response.getType());
+    assertEquals(RIGHT_TYPE, response.getType());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -177,7 +177,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(RightDto.class);
 
     assertEquals(RIGHT_NAME, response.getName());
-    assertEquals(RightType.GENERAL_ADMIN, response.getType());
+    assertEquals(RIGHT_TYPE, response.getType());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -200,7 +200,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(RightDto.class);
 
     assertEquals(RIGHT_NAME, response.getName());
-    assertEquals(RightType.GENERAL_ADMIN, response.getType());
+    assertEquals(RIGHT_TYPE, response.getType());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -307,7 +307,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto rightDto = response[0];
     assertEquals(RIGHT_NAME, rightDto.getName());
-    assertEquals(RightType.GENERAL_ADMIN, rightDto.getType());
+    assertEquals(RIGHT_TYPE, rightDto.getType());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
