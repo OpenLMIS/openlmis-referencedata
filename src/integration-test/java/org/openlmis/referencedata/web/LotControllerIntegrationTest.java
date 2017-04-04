@@ -35,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -67,6 +68,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldCreateNewLot() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
     Lot response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -80,6 +83,23 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertNotNull(response.getId());
     assertLotsEqual(lot, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectCreateNewLotIfUserHasNoRight() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    restAssured
+            .given()
+            .queryParam(ACCESS_TOKEN, getToken())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(lot)
+            .when()
+            .post(RESOURCE_URL)
+            .then()
+            .statusCode(403);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

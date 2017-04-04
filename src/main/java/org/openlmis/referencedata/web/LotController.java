@@ -32,6 +32,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+
 @Controller
 @Transactional
 public class LotController extends BaseController {
@@ -51,6 +53,8 @@ public class LotController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public Lot createLot(@RequestBody Lot lot) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
     LOGGER.debug("Creating new Lot");
     // Ignore provided id
     lot.setId(null);
