@@ -38,7 +38,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
     compile 'org.javers:javers-spring-boot-starter-sql:2.8.1'
     compile "org.projectlombok:lombok:1.16.8"
-    compile "org.postgresql:postgresql:9.4.1208"
+    compile "org.postgresql:postgresql:42.0.0"
     compile "com.github.tomakehurst:wiremock:1.58"
     compile "org.springframework:spring-test"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
