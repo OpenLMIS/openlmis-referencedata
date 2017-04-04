@@ -44,8 +44,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -193,8 +192,8 @@ public class RightController extends BaseController {
                 rightNames, ex));
       }
     }
-    List<Right> foundRights = rightRepository.searchRights(name, rightType);
-    return Sets.newHashSet(exportToDtos(foundRights));
+    Set<Right> foundRights = rightRepository.searchRights(name, rightType);
+    return exportToDtos(foundRights);
   }
 
   private RightDto exportToDto(Right right) {
@@ -203,8 +202,8 @@ public class RightController extends BaseController {
     return rightDto;
   }
 
-  private List<RightDto> exportToDtos(List<Right> rights) {
-    List<RightDto> rightDtos = new ArrayList<>();
+  private Set<RightDto> exportToDtos(Set<Right> rights) {
+    Set<RightDto> rightDtos = new HashSet<>();
     for (Right right : rights) {
       RightDto rightDto = new RightDto();
       right.export(rightDto);

@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class RightRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<Right> {
@@ -79,7 +80,7 @@ public class RightRepositoryIntegrationTest
     RightType typeToFind = right2.getType();
 
     //when
-    List<List<Right>> rightResults = Arrays.asList(
+    List<Set<Right>> rightResults = Arrays.asList(
         repository.searchRights(nameToFind, typeToFind),
         repository.searchRights(null, typeToFind),
         repository.searchRights(nameToFind, null)
@@ -99,7 +100,7 @@ public class RightRepositoryIntegrationTest
     RightType anotherType = RightType.SUPERVISION;
 
     //when
-    List<List<Right>> rightResults = Arrays.asList(
+    List<Set<Right>> rightResults = Arrays.asList(
         repository.searchRights(actualName, anotherType),
         repository.searchRights(anotherName, anotherType),
         repository.searchRights(anotherName, actualType),

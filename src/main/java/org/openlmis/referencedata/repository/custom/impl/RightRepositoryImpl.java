@@ -25,7 +25,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RightRepositoryImpl implements RightRepositoryCustom {
 
@@ -38,9 +40,9 @@ public class RightRepositoryImpl implements RightRepositoryCustom {
    *
    * @param name name of right.
    * @param type type of right.
-   * @return List of rights
+   * @return Set of rights
    */
-  public List<Right> searchRights(String name, RightType type) {
+  public Set<Right> searchRights(String name, RightType type) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Right> query = builder.createQuery(Right.class);
@@ -49,7 +51,8 @@ public class RightRepositoryImpl implements RightRepositoryCustom {
     predicate = addEqualsFilter(predicate, builder, root, "name", name);
     predicate = addEqualsFilter(predicate, builder, root, "type", type);
     query.where(predicate);
-    return entityManager.createQuery(query).getResultList();
+    List<Right> results = entityManager.createQuery(query).getResultList();
+    return new HashSet<>(results);
   }
 
   private Predicate addEqualsFilter(Predicate predicate, CriteriaBuilder builder, Root root,

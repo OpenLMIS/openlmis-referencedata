@@ -18,9 +18,9 @@ package org.openlmis.referencedata.repository.custom;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 
-import java.util.List;
+import java.util.Set;
 
 public interface RightRepositoryCustom {
 
-  List<Right> searchRights(String name, RightType type);
+  Set<Right> searchRights(String name, RightType type);
 }

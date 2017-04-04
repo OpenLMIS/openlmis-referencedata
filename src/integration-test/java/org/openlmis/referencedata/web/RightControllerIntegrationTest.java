@@ -292,7 +292,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.RIGHTS_VIEW);
 
     given(rightRepository.searchRights(RIGHT_NAME, RIGHT_TYPE)).willReturn(
-            Collections.singletonList(right));
+            Collections.singleton(right));
 
     RightDto[] response = restAssured
         .given()
