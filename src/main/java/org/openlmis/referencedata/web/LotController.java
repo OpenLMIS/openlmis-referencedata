@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,6 +54,22 @@ public class LotController extends BaseController {
     LOGGER.debug("Creating new Lot");
     // Ignore provided id
     lot.setId(null);
+    lotRepository.save(lot);
+    return lot;
+  }
+
+  /**
+   * Allows updating Lots.
+   *
+   * @param lot   a Lot bound to the request body.
+   * @param lotId the UUID of Lot which we want to update.
+   * @return the updated Lot.
+   */
+  @RequestMapping(value = "/lots/{id}", method = RequestMethod.PUT)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Lot updateLot(@RequestBody Lot lot, @PathVariable("id") UUID lotId) {
+    LOGGER.debug("Updating Lot");
     lotRepository.save(lot);
     return lot;
   }
