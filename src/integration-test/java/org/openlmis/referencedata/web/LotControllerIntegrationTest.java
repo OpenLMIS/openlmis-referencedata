@@ -39,6 +39,7 @@ import static org.mockito.Mockito.when;
 public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/lots";
+  private static final String ID_URL = RESOURCE_URL + "/{id}";
 
   @MockBean
   private TradeItemRepository tradeItemRepository;
@@ -47,10 +48,13 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   private LotRepository lotRepository;
 
   private Lot lot;
+  private UUID lotId;
 
   @Before
   public void setUp() {
     lot = new Lot();
+    lotId = UUID.randomUUID();
+    lot.setId(lotId);
     lot.setLotCode("code");
     lot.setTradeItem(mockTradeItem());
     lot.setExpirationDate(ZonedDateTime.now());
@@ -75,12 +79,43 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(Lot.class);
 
     assertNotNull(response.getId());
-    assertEquals(lot.getLotCode(), response.getLotCode());
-    assertEquals(lot.isActive(), response.isActive());
-    assertEquals(lot.getTradeItem(), response.getTradeItem());
-    assertTrue(lot.getExpirationDate().isEqual(response.getExpirationDate()));
-    assertTrue(lot.getManufactureDate().isEqual(response.getManufactureDate()));
+    assertLotsEqual(lot, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldUpdateLot() {
+    Lot updatedLot = new Lot();
+    updatedLot.setId(lotId);
+    updatedLot.setLotCode("updatedCode");
+    updatedLot.setActive(false);
+    updatedLot.setTradeItem(mockTradeItem());
+    updatedLot.setExpirationDate(ZonedDateTime.now().minusDays(1));
+    updatedLot.setManufactureDate(ZonedDateTime.now().minusDays(1));
+
+    Lot response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", lotId)
+        .body(updatedLot)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Lot.class);
+
+    assertEquals(lotId, response.getId());
+    assertLotsEqual(updatedLot, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private void assertLotsEqual(Lot expected, Lot actual) {
+    assertEquals(expected.getLotCode(), actual.getLotCode());
+    assertEquals(expected.isActive(), actual.isActive());
+    assertEquals(expected.getTradeItem(), actual.getTradeItem());
+    assertTrue(expected.getExpirationDate().isEqual(actual.getExpirationDate()));
+    assertTrue(expected.getManufactureDate().isEqual(actual.getManufactureDate()));
   }
 
   private TradeItem mockTradeItem() {
