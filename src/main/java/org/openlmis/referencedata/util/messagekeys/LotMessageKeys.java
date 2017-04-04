@@ -20,6 +20,7 @@ public abstract class LotMessageKeys extends MessageKeys {
   private static final String LOT_CODE = "lotCode";
 
   public static final String ERROR_NULL = join(ERROR, NULL);
+  public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR, NOT_FOUND, WITH, ID);
   public static final String ERROR_LOT_CODE_REQUIRED = join(ERROR, LOT_CODE, REQUIRED);
   public static final String ERROR_TRADE_ITEM_REQUIRED = join(ERROR, TRADE_ITEM, REQUIRED);
 }

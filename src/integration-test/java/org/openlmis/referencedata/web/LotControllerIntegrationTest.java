@@ -108,6 +108,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldUpdateLot() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
+    when(lotRepository.findOne(lotId)).thenReturn(lot);
+
     Lot updatedLot = new Lot();
     updatedLot.setId(lotId);
     updatedLot.setLotCode("updatedCode");
@@ -134,8 +136,30 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldReturnNotFoundIfUpdatedLotDoesNotExist() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    when(lotRepository.findOne(lotId)).thenReturn(null);
+
+    restAssured
+            .given()
+            .queryParam(ACCESS_TOKEN, getToken())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", lotId)
+            .body(lot)
+            .when()
+            .put(ID_URL)
+            .then()
+            .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldRejectUpdateLotIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    when(lotRepository.findOne(lotId)).thenReturn(lot);
 
     restAssured
             .given()

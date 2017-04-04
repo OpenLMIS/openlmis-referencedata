@@ -21,10 +21,12 @@ import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.validate.LotValidator;
 import org.slf4j.Logger;
@@ -81,7 +83,7 @@ public class LotController extends BaseController {
 
     LOGGER.debug("Creating new Lot");
     lot.setId(null);
-    lotRepository.save(lot);
+    lot = lotRepository.save(lot);
     return lot;
   }
 
@@ -99,8 +101,20 @@ public class LotController extends BaseController {
                        BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
+    // ensure lot exists
+    Lot existingLot = lotRepository.findOne(lotId);
+    if (null == existingLot) {
+      throw new NotFoundException(new Message(LotMessageKeys.ERROR_NOT_FOUND_WITH_ID, lotId));
+    }
+
+    validator.validate(lot, bindingResult);
+    if (bindingResult.getErrorCount() > 0) {
+      throw new ValidationMessageException(new Message(bindingResult.getFieldError().getCode(),
+              bindingResult.getFieldError().getArguments()));
+    }
+
     LOGGER.debug("Updating Lot");
-    lotRepository.save(lot);
+    lot = lotRepository.save(lot);
     return lot;
   }
 
