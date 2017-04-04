@@ -13,15 +13,39 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.util.messagekeys;
+package org.openlmis.referencedata.dto;
 
-public abstract class LotMessageKeys extends MessageKeys {
-  private static final String ERROR = join(SERVICE_ERROR, LOT);
-  private static final String LOT_CODE = "lotCode";
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.openlmis.referencedata.domain.Lot;
 
-  public static final String ERROR_NULL = join(ERROR, NULL);
-  public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR, NOT_FOUND, WITH, ID);
-  public static final String ERROR_LOT_CODE_REQUIRED = join(ERROR, LOT_CODE, REQUIRED);
-  public static final String ERROR_TRADE_ITEM_REQUIRED = join(ERROR, TRADE_ITEM, REQUIRED);
-  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
+import java.util.Objects;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
+
+  private String lotCode;
+  private boolean active;
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof LotDto)) {
+      return false;
+    }
+    LotDto lotDto = (LotDto) obj;
+    return Objects.equals(lotCode, lotDto.lotCode);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(lotCode);
+  }
 }

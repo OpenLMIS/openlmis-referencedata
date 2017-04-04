@@ -17,7 +17,11 @@ package org.openlmis.referencedata.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.ZonedDateTime;
+import java.util.Objects;
+import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,4 +50,48 @@ public class Lot extends BaseEntity {
 
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   private boolean active;
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setLotCode(lotCode);
+    exporter.setActive(active);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof Lot)) {
+      return false;
+    }
+    Lot lot = (Lot) obj;
+    return Objects.equals(lotCode, lot.lotCode);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(lotCode);
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setLotCode(String lotCode);
+
+    void setActive(boolean active);
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    String getLotCode();
+
+    boolean isActive();
+  }
 }

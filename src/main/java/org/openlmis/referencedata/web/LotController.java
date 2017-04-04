@@ -21,6 +21,7 @@ import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -119,6 +121,26 @@ public class LotController extends BaseController {
   }
 
   /**
+   * Get chosen lot.
+   *
+   * @param lotId UUID of the lot to get.
+   * @return chosen Lot.
+   */
+  @RequestMapping(value = "/lots/{id}", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public LotDto getLot(@PathVariable("id") UUID lotId) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    Lot lot = lotRepository.findOne(lotId);
+    if (lot == null) {
+      throw new NotFoundException(LotMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    return exportToDto(lot);
+  }
+
+  /**
    * Retrieves all Lots matching given parameters.
    *
    * @return List of matched Lots.
@@ -142,5 +164,11 @@ public class LotController extends BaseController {
     }
 
     return lotRepository.search(tradeItem, expirationDate, lotCode);
+  }
+
+  private LotDto exportToDto(Lot lot) {
+    LotDto lotDto = new LotDto();
+    lot.export(lotDto);
+    return lotDto;
   }
 }
