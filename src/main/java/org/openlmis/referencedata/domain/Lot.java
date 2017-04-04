@@ -18,6 +18,7 @@ package org.openlmis.referencedata.domain;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.ZonedDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -39,7 +40,7 @@ public class Lot extends BaseEntity {
   @Column(columnDefinition = "timestamp with time zone")
   private ZonedDateTime manufactureDate;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.REFRESH)
   @JoinColumn(nullable = false, name = "tradeitemid")
   private TradeItem tradeItem;
 

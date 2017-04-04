@@ -81,8 +81,6 @@ public class LotController extends BaseController {
 
     LOGGER.debug("Creating new Lot");
     lot.setId(null);
-    TradeItem tradeItem = tradeItemRepository.findOne(lot.getTradeItem().getId());
-    lot.setTradeItem(tradeItem);
     lotRepository.save(lot);
     return lot;
   }
