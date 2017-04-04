@@ -16,13 +16,19 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.Lot;
+import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
+import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.validate.LotValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +49,12 @@ public class LotController extends BaseController {
   @Autowired
   private LotRepository lotRepository;
 
+  @Autowired
+  private TradeItemRepository tradeItemRepository;
+
+  @Autowired
+  private LotValidator validator;
+
   /**
    * Allows creating new Lots.
    *
@@ -52,12 +64,19 @@ public class LotController extends BaseController {
   @RequestMapping(value = "/lots", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Lot createLot(@RequestBody Lot lot) {
+  public Lot createLot(@RequestBody Lot lot, BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
+    validator.validate(lot, bindingResult);
+    if (bindingResult.getErrorCount() > 0) {
+      throw new ValidationMessageException(new Message(bindingResult.getFieldError().getCode(),
+              bindingResult.getFieldError().getArguments()));
+    }
+
     LOGGER.debug("Creating new Lot");
-    // Ignore provided id
     lot.setId(null);
+    TradeItem tradeItem = tradeItemRepository.findOne(lot.getTradeItem().getId());
+    lot.setTradeItem(tradeItem);
     lotRepository.save(lot);
     return lot;
   }
@@ -72,7 +91,8 @@ public class LotController extends BaseController {
   @RequestMapping(value = "/lots/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Lot updateLot(@RequestBody Lot lot, @PathVariable("id") UUID lotId) {
+  public Lot updateLot(@RequestBody Lot lot, @PathVariable("id") UUID lotId,
+                       BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     LOGGER.debug("Updating Lot");

@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.validate;
 
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
@@ -29,7 +28,7 @@ import org.springframework.validation.Validator;
 import java.util.UUID;
 
 /**
- * A validator for {@link ProgramDto} object.
+ * A validator for {@link UserDto} object.
  */
 @Component
 public class UserValidator implements BaseValidator {
