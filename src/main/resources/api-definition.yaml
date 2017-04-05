@@ -275,10 +275,12 @@ schemas:
 
   - lot: !include schemas/lot.json
 
+  - lotDto: !include schemas/lotDto.json
+
   - lotArray: |
       {
           "type": "array",
-          "items": { "type": "object", "$ref": "schemas/lot.json" }
+          "items": { "type": "object", "$ref": "schemas/lotDto.json" }
       }
 
 traits:
@@ -2598,6 +2600,7 @@ resourceTypes:
                     "200":
                         body:
                           application/json:
+                            schema: lotDto
                     "403":
                         body:
                           application/json:

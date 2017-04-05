@@ -1,8 +1,8 @@
 {
   "type": "object",
   "$schema": "http://json-schema.org/draft-04/schema",
-  "title": "Lot",
-  "description": "A single lot",
+  "title": "Lot DTO",
+  "description": "A single lot DTO",
   "properties": {
     "id": {
       "type": "string",
@@ -20,9 +20,9 @@
       "type": "string",
       "title": "manufactureDate"
     },
-    "tradeItem": {
-      "type": "object",
-      "title": "tradeItem"
+    "tradeItemId": {
+      "type": "string",
+      "title": "tradeItemId"
     },
     "active": {
       "type": "boolean",
@@ -31,7 +31,7 @@
   },
   "required": [
     "lotCode",
-    "tradeItem",
+    "tradeItemId",
     "active"
   ]
 }

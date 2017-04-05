@@ -137,7 +137,6 @@ public class LotController extends BaseController {
     if (lot == null) {
       throw new NotFoundException(LotMessageKeys.ERROR_NOT_FOUND);
     }
-
     return exportToDto(lot);
   }
 

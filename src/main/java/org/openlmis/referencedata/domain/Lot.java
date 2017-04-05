@@ -59,7 +59,14 @@ public class Lot extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setLotCode(lotCode);
+    exporter.setTradeItem(tradeItem);
     exporter.setActive(active);
+    if (expirationDate != null) {
+      exporter.setExpirationDate(expirationDate);
+    }
+    if (manufactureDate != null) {
+      exporter.setManufactureDate(manufactureDate);
+    }
   }
 
   @Override
@@ -85,6 +92,12 @@ public class Lot extends BaseEntity {
     void setLotCode(String lotCode);
 
     void setActive(boolean active);
+
+    void setTradeItem(TradeItem tradeItem);
+
+    void setExpirationDate(ZonedDateTime expirationDate);
+
+    void setManufactureDate(ZonedDateTime manufactureDate);
   }
 
   public interface Importer {
@@ -93,5 +106,11 @@ public class Lot extends BaseEntity {
     String getLotCode();
 
     boolean isActive();
+
+    UUID getTradeItem();
+
+    ZonedDateTime getExpirationDate();
+
+    ZonedDateTime getManufactureDate();
   }
 }
