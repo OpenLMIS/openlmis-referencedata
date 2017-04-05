@@ -61,7 +61,7 @@ public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
   }
 
   @Override
-  public UUID getTradeItem() {
+  public UUID getTradeItemId() {
     return tradeItemId;
   }
 }

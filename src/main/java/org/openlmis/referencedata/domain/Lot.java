@@ -107,7 +107,7 @@ public class Lot extends BaseEntity {
 
     boolean isActive();
 
-    UUID getTradeItem();
+    UUID getTradeItemId();
 
     ZonedDateTime getExpirationDate();
 
