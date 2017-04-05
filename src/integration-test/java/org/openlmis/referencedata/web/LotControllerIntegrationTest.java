@@ -38,6 +38,7 @@ import org.springframework.http.MediaType;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/lots";
