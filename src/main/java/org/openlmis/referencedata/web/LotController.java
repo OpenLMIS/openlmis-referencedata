@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -148,7 +149,7 @@ public class LotController extends BaseController {
   @GetMapping("/lots/search")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<Lot> searchLots(
+  public List<LotDto> searchLots(
       @RequestParam(value = "tradeIdemId", required = false) UUID tradeIdemId,
       @RequestParam(value = "expirationDate", required = false) ZonedDateTime expirationDate,
       @RequestParam(value = "lotCode", required = false) String lotCode) {
@@ -163,12 +164,20 @@ public class LotController extends BaseController {
       }
     }
 
-    return lotRepository.search(tradeItem, expirationDate, lotCode);
+    return exportToDtos(lotRepository.search(tradeItem, expirationDate, lotCode));
   }
 
   private LotDto exportToDto(Lot lot) {
     LotDto lotDto = new LotDto();
     lot.export(lotDto);
     return lotDto;
+  }
+
+  private List<LotDto> exportToDtos(List<Lot> lots) {
+    List<LotDto> lotsDto = new ArrayList<>(lots.size());
+    for (Lot lot : lots) {
+      lotsDto.add(exportToDto(lot));
+    }
+    return lotsDto;
   }
 }
