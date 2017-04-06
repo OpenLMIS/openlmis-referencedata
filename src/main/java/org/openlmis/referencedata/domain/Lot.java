@@ -81,7 +81,7 @@ public class Lot extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setLotCode(lotCode);
-    exporter.setTradeItem(tradeItem);
+    exporter.setTradeItemId(tradeItem.getId());
     exporter.setActive(active);
     if (expirationDate != null) {
       exporter.setExpirationDate(expirationDate);
@@ -115,7 +115,7 @@ public class Lot extends BaseEntity {
 
     void setActive(boolean active);
 
-    void setTradeItem(TradeItem tradeItem);
+    void setTradeItemId(UUID tradeItemId);
 
     void setExpirationDate(ZonedDateTime expirationDate);
 

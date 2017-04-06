@@ -15,14 +15,20 @@
 
 package org.openlmis.referencedata.validate;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.validate.LotValidator.LOT_CODE;
+import static org.openlmis.referencedata.validate.LotValidator.TRADE_ITEM_ID;
+import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
@@ -32,12 +38,6 @@ import org.springframework.validation.Validator;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.validate.LotValidator.LOT_CODE;
-import static org.openlmis.referencedata.validate.LotValidator.TRADE_ITEM;
-import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("PMD.TooManyMethods")
@@ -49,77 +49,76 @@ public class LotValidatorTest {
   @InjectMocks
   private Validator validator = new LotValidator();
 
-  private Lot lot;
+  private LotDto lotDto;
   private Errors errors;
 
   @Before
   public void setUp() throws Exception {
-    lot = new Lot();
-    lot.setLotCode("code");
-    lot.setExpirationDate(ZonedDateTime.now());
-    lot.setManufactureDate(ZonedDateTime.now());
-    lot.setActive(true);
-    lot.setId(UUID.randomUUID());
+    lotDto = new LotDto();
+    lotDto.setLotCode("code");
+    lotDto.setExpirationDate(ZonedDateTime.now());
+    lotDto.setManufactureDate(ZonedDateTime.now());
+    lotDto.setActive(true);
+    lotDto.setId(UUID.randomUUID());
 
-    TradeItem tradeItem = TradeItem.newTradeItem("code", "unit",
-            null, 0, 0, false);
+    TradeItem tradeItem = TradeItem.newTradeItem("code", "unit", null, 0, 0, false);
     tradeItem.setId(UUID.randomUUID());
-    lot.setTradeItem(tradeItem);
+    lotDto.setTradeItemId(tradeItem.getId());
 
     when(tradeItemRepository.findOne(tradeItem.getId())).thenReturn(tradeItem);
 
-    errors = new BeanPropertyBindingResult(lot, "lot");
+    errors = new BeanPropertyBindingResult(lotDto, "lotDto");
   }
 
   @Test
   public void shouldNotFindErrorsWhenLotIsValid() throws Exception {
-    validator.validate(lot, errors);
+    validator.validate(lotDto, errors);
 
     assertEquals(0, errors.getErrorCount());
   }
 
   @Test
   public void shouldRejectWhenLotCodeIsNull() {
-    lot.setLotCode(null);
+    lotDto.setLotCode(null);
 
-    validator.validate(lot, errors);
+    validator.validate(lotDto, errors);
 
     assertErrorMessage(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_REQUIRED);
   }
 
   @Test
   public void shouldRejectWhenLotCodeIsEmpty() {
-    lot.setLotCode("");
+    lotDto.setLotCode("");
 
-    validator.validate(lot, errors);
+    validator.validate(lotDto, errors);
 
     assertErrorMessage(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_REQUIRED);
   }
 
   @Test
   public void shouldRejectWhenLotCodeIsWhitespace() {
-    lot.setLotCode(" ");
+    lotDto.setLotCode(" ");
 
-    validator.validate(lot, errors);
+    validator.validate(lotDto, errors);
 
     assertErrorMessage(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_REQUIRED);
   }
 
   @Test
   public void shouldRejectWhenTradeItemIsNull() {
-    lot.setTradeItem(null);
+    lotDto.setTradeItemId(null);
 
-    validator.validate(lot, errors);
+    validator.validate(lotDto, errors);
 
-    assertErrorMessage(errors, TRADE_ITEM, LotMessageKeys.ERROR_TRADE_ITEM_REQUIRED);
+    assertErrorMessage(errors, TRADE_ITEM_ID, LotMessageKeys.ERROR_TRADE_ITEM_REQUIRED);
   }
 
   @Test
   public void shouldRejectWhenTradeItemDoesNotExist() {
-    when(tradeItemRepository.findOne(lot.getTradeItem().getId())).thenReturn(null);
+    when(tradeItemRepository.findOne(lotDto.getTradeItemId())).thenReturn(null);
 
-    validator.validate(lot, errors);
+    validator.validate(lotDto, errors);
 
-    assertErrorMessage(errors, TRADE_ITEM, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID);
+    assertErrorMessage(errors, TRADE_ITEM_ID, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID);
   }
 }

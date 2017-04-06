@@ -37,7 +37,7 @@ public class LotValidator implements BaseValidator {
 
   // Lot fields
   static final String LOT_CODE = "lotCode";
-  static final String TRADE_ITEM = "tradeItem";
+  static final String TRADE_ITEM_ID = "tradeItemId";
 
   @Autowired
   private TradeItemRepository tradeItemRepository;
@@ -47,7 +47,7 @@ public class LotValidator implements BaseValidator {
    *
    * @param clazz the {@link Class} that this {@link Validator} is being asked if it can {@link
    *              #validate(Object, Errors) validate}
-   * @return true if {@code clazz} is equal to {@link Lot} class definition.
+   * @return true if {@code clazz} is equal to {@link LotDto} class definition.
    *     Otherwise false.
    */
   @Override
@@ -76,12 +76,12 @@ public class LotValidator implements BaseValidator {
   private void verifyTradeItem(LotDto lot, Errors errors) {
     UUID tradeItemId = lot.getTradeItemId();
     if (tradeItemId == null) {
-      rejectValue(errors, TRADE_ITEM, LotMessageKeys.ERROR_TRADE_ITEM_REQUIRED);
+      rejectValue(errors, TRADE_ITEM_ID, LotMessageKeys.ERROR_TRADE_ITEM_REQUIRED);
     } else {
       TradeItem tradeItem =
           (tradeItemId == null) ? null : tradeItemRepository.findOne(tradeItemId);
       if (tradeItem == null) {
-        rejectValue(errors, TRADE_ITEM, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID,
+        rejectValue(errors, TRADE_ITEM_ID, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID,
                 String.valueOf(tradeItemId));
       }
     }

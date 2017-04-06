@@ -20,7 +20,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.openlmis.referencedata.domain.Lot;
-import org.openlmis.referencedata.domain.TradeItem;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -53,15 +52,5 @@ public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
   @Override
   public int hashCode() {
     return Objects.hash(lotCode);
-  }
-
-  @Override
-  public void setTradeItem(TradeItem tradeItem) {
-    this.tradeItemId = tradeItem.getId();
-  }
-
-  @Override
-  public UUID getTradeItemId() {
-    return tradeItemId;
   }
 }
