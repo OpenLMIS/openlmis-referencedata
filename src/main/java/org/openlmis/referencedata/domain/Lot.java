@@ -52,6 +52,28 @@ public class Lot extends BaseEntity {
   private boolean active;
 
   /**
+   * Creates new lot object based on data from {@link Importer} and tradeItem argument.
+   *
+   * @param importer instance of {@link Importer}
+   * @param tradeItem tradeItem to set.
+   * @return new instance of facility.
+   */
+  public static Lot newLot(Importer importer, TradeItem tradeItem) {
+    Lot lot = new Lot();
+    lot.setId(importer.getId());
+    lot.setLotCode(importer.getLotCode());
+    lot.setActive(importer.isActive());
+    if (importer.getExpirationDate() != null) {
+      lot.setExpirationDate(importer.getExpirationDate());
+    }
+    if (importer.getManufactureDate() != null) {
+      lot.setManufactureDate(importer.getManufactureDate());
+    }
+    lot.setTradeItem(tradeItem);
+    return lot;
+  }
+
+  /**
    * Export this object to the specified exporter (DTO).
    *
    * @param exporter exporter to export to

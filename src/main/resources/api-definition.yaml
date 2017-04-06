@@ -2556,14 +2556,19 @@ resourceTypes:
             description: Create new lot.
             body:
                 application/json:
+                  schema: lotDto
             responses:
                 "201":
                     body:
                         application/json:
-                          schema: lot
+                          schema: lotDto
                 "500":
                     body:
                         application/json:
+                "400":
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
                 "403":
                     body:
                       application/json:
@@ -2580,19 +2585,24 @@ resourceTypes:
                 description: Update existing lot.
                 body:
                     application/json:
-                      schema: lot
+                      schema: lotDto
                 responses:
                     "200":
                         body:
-                            application/json:
-                              schema: lot
-                    "404":
+                          application/json:
+                            schema: lotDto
+                    "400":
                         body:
                           application/json:
                             schema: localizedErrorResponse
                     "403":
                         body:
                           application/json:
+                            schema: localizedErrorResponse
+                    "404":
+                        body:
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen lot.

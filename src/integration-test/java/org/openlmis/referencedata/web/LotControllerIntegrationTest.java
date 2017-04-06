@@ -38,6 +38,7 @@ import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -57,6 +58,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private Lot lot;
   private UUID lotId;
+  LotDto lotDto;
 
   @Before
   public void setUp() {
@@ -69,6 +71,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     lot.setManufactureDate(ZonedDateTime.now());
     lot.setActive(true);
 
+    lotDto = new LotDto();
+    lot.export(lotDto);
     given(lotRepository.save(any(Lot.class)))
             .willAnswer(new SaveAnswer<Lot>());
   }
@@ -77,19 +81,23 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewLot() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    Lot response = restAssured
+    LotDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(lot)
+        .body(lotDto)
         .when()
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .extract().as(Lot.class);
+        .extract().as(LotDto.class);
 
     assertNotNull(response.getId());
-    assertLotsEqual(lot, response);
+    assertEquals(lotDto.getLotCode(), response.getLotCode());
+    assertEquals(lotDto.isActive(), response.isActive());
+    assertEquals(lotDto.getTradeItemId(), response.getTradeItemId());
+    assertTrue(lotDto.getExpirationDate().isEqual(response.getExpirationDate()));
+    assertTrue(lotDto.getManufactureDate().isEqual(response.getManufactureDate()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -101,7 +109,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
             .given()
             .queryParam(ACCESS_TOKEN, getToken())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(lot)
+            .body(lotDto)
             .when()
             .post(RESOURCE_URL)
             .then()
@@ -113,38 +121,32 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldUpdateLot() {
     mockUserHasRight(ORDERABLES_MANAGE);
-
     when(lotRepository.findOne(lotId)).thenReturn(lot);
 
-    Lot updatedLot = new Lot();
-    updatedLot.setId(lotId);
-    updatedLot.setLotCode("updatedCode");
-    updatedLot.setActive(false);
-    updatedLot.setTradeItem(mockTradeItem());
-    updatedLot.setExpirationDate(ZonedDateTime.now().minusDays(1));
-    updatedLot.setManufactureDate(ZonedDateTime.now().minusDays(1));
-
-    Lot response = restAssured
+    LotDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", lotId)
-        .body(updatedLot)
+        .body(lotDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(Lot.class);
+        .extract().as(LotDto.class);
 
-    assertEquals(lotId, response.getId());
-    assertLotsEqual(updatedLot, response);
+    assertEquals(lotDto.getId(), response.getId());
+    assertEquals(lotDto.getLotCode(), response.getLotCode());
+    assertEquals(lotDto.isActive(), response.isActive());
+    assertEquals(lotDto.getTradeItemId(), response.getTradeItemId());
+    assertTrue(lotDto.getExpirationDate().isEqual(response.getExpirationDate()));
+    assertTrue(lotDto.getManufactureDate().isEqual(response.getManufactureDate()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldReturnNotFoundIfUpdatedLotDoesNotExist() {
     mockUserHasRight(ORDERABLES_MANAGE);
-
     when(lotRepository.findOne(lotId)).thenReturn(null);
 
     restAssured
@@ -152,7 +154,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
             .queryParam(ACCESS_TOKEN, getToken())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .pathParam("id", lotId)
-            .body(lot)
+            .body(lotDto)
             .when()
             .put(ID_URL)
             .then()
@@ -164,7 +166,6 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRejectUpdateLotIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
-
     when(lotRepository.findOne(lotId)).thenReturn(lot);
 
     restAssured
@@ -172,7 +173,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
             .queryParam(ACCESS_TOKEN, getToken())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .pathParam("id", lotId)
-            .body(lot)
+            .body(lotDto)
             .when()
             .put(ID_URL)
             .then()
@@ -277,14 +278,6 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  private void assertLotsEqual(Lot expected, Lot actual) {
-    assertEquals(expected.getLotCode(), actual.getLotCode());
-    assertEquals(expected.isActive(), actual.isActive());
-    assertEquals(expected.getTradeItem(), actual.getTradeItem());
-    assertTrue(expected.getExpirationDate().isEqual(actual.getExpirationDate()));
-    assertTrue(expected.getManufactureDate().isEqual(actual.getManufactureDate()));
   }
 
   private TradeItem mockTradeItem() {

@@ -17,6 +17,7 @@ package org.openlmis.referencedata.validate;
 
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
@@ -29,7 +30,7 @@ import org.springframework.validation.Validator;
 import java.util.UUID;
 
 /**
- * A validator for {@link Lot} object.
+ * A validator for {@link LotDto} object.
  */
 @Component
 public class LotValidator implements BaseValidator {
@@ -51,7 +52,7 @@ public class LotValidator implements BaseValidator {
    */
   @Override
   public boolean supports(Class<?> clazz) {
-    return Lot.class.equals(clazz);
+    return LotDto.class.equals(clazz);
   }
 
   /**
@@ -67,18 +68,18 @@ public class LotValidator implements BaseValidator {
     rejectIfEmptyOrWhitespace(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_REQUIRED);
 
     if (!errors.hasErrors()) {
-      Lot lot = (Lot) target;
-      verifyTradeItem(lot, errors);
+      LotDto lotDto = (LotDto) target;
+      verifyTradeItem(lotDto, errors);
     }
   }
 
-  private void verifyTradeItem(Lot lot, Errors errors) {
-    TradeItem tradeItem = lot.getTradeItem();
-    if (tradeItem == null) {
+  private void verifyTradeItem(LotDto lot, Errors errors) {
+    UUID tradeItemId = lot.getTradeItemId();
+    if (tradeItemId == null) {
       rejectValue(errors, TRADE_ITEM, LotMessageKeys.ERROR_TRADE_ITEM_REQUIRED);
     } else {
-      UUID tradeItemId = tradeItem.getId();
-      tradeItem = (tradeItemId == null) ? null : tradeItemRepository.findOne(tradeItemId);
+      TradeItem tradeItem =
+          (tradeItemId == null) ? null : tradeItemRepository.findOne(tradeItemId);
       if (tradeItem == null) {
         rejectValue(errors, TRADE_ITEM, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID,
                 String.valueOf(tradeItemId));

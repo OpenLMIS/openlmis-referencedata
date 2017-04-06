@@ -73,56 +73,59 @@ public class LotController extends BaseController {
   /**
    * Allows creating new Lots.
    *
-   * @param lot a Lot bound to the request body.
-   * @return the created Lot.
+   * @param lotDto a LotDto bound to the request body.
+   * @return the created LotDto.
    */
   @RequestMapping(value = "/lots", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Lot createLot(@RequestBody Lot lot, BindingResult bindingResult) {
+  public LotDto createLot(@RequestBody LotDto lotDto, BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
-    validator.validate(lot, bindingResult);
+    validator.validate(lotDto, bindingResult);
     if (bindingResult.getErrorCount() > 0) {
       throw new ValidationMessageException(new Message(bindingResult.getFieldError().getCode(),
               bindingResult.getFieldError().getArguments()));
     }
+    TradeItem tradeItem = tradeItemRepository.findOne(lotDto.getTradeItemId());
+    Lot lotToSave = Lot.newLot(lotDto, tradeItem);
+    lotToSave.setId(null);
 
     LOGGER.debug("Creating new Lot");
-    lot.setId(null);
-    lot = lotRepository.save(lot);
-    return lot;
+    lotToSave = lotRepository.save(lotToSave);
+    return exportToDto(lotToSave);
   }
 
   /**
    * Allows updating Lots.
    *
-   * @param lot   a Lot bound to the request body.
+   * @param lotDto   a LotDto bound to the request body.
    * @param lotId the UUID of Lot which we want to update.
-   * @return the updated Lot.
+   * @return the updated LotDto.
    */
   @RequestMapping(value = "/lots/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Lot updateLot(@RequestBody Lot lot, @PathVariable("id") UUID lotId,
+  public LotDto updateLot(@RequestBody LotDto lotDto, @PathVariable("id") UUID lotId,
                        BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
-    // ensure lot exists
     Lot existingLot = lotRepository.findOne(lotId);
-    if (null == existingLot) {
+    if (existingLot == null) {
       throw new NotFoundException(new Message(LotMessageKeys.ERROR_NOT_FOUND_WITH_ID, lotId));
     }
-
-    validator.validate(lot, bindingResult);
+    validator.validate(lotDto, bindingResult);
     if (bindingResult.getErrorCount() > 0) {
       throw new ValidationMessageException(new Message(bindingResult.getFieldError().getCode(),
-              bindingResult.getFieldError().getArguments()));
+          bindingResult.getFieldError().getArguments()));
     }
+    TradeItem tradeItem = tradeItemRepository.findOne(lotDto.getTradeItemId());
+    Lot lotToSave = Lot.newLot(lotDto, tradeItem);
+    lotToSave.setId(lotId);
 
     LOGGER.debug("Updating Lot");
-    lot = lotRepository.save(lot);
-    return lot;
+    lotToSave = lotRepository.save(lotToSave);
+    return exportToDto(lotToSave);
   }
 
   /**
