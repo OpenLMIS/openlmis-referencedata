@@ -31,7 +31,6 @@
   },
   "required": [
     "lotCode",
-    "tradeItem",
-    "active"
+    "tradeItem"
   ]
 }
