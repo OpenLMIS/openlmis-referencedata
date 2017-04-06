@@ -15,18 +15,22 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
@@ -34,8 +38,8 @@ import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
@@ -174,6 +178,30 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
             .then()
             .statusCode(403);
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindLots() throws JsonProcessingException {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    given(lotRepository.search(any(TradeItem.class), any(ZonedDateTime.class), anyString()))
+        .willReturn(singletonList(lot));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("tradeIdemId", lot.getTradeItem().getId())
+        .queryParam("lotCode", lot.getLotCode())
+        .queryParam("expirationDate",
+            lot.getExpirationDate().format(DateTimeFormatter.ISO_DATE_TIME))
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

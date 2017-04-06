@@ -27,12 +27,16 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.validate.LotValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -148,10 +152,12 @@ public class LotController extends BaseController {
   @GetMapping("/lots/search")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<LotDto> searchLots(
+  public Page<LotDto> searchLots(
       @RequestParam(value = "tradeIdemId", required = false) UUID tradeIdemId,
-      @RequestParam(value = "expirationDate", required = false) ZonedDateTime expirationDate,
-      @RequestParam(value = "lotCode", required = false) String lotCode) {
+      @RequestParam(value = "expirationDate", required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime expirationDate,
+      @RequestParam(value = "lotCode", required = false) String lotCode,
+      Pageable pageable) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     TradeItem tradeItem = null;
@@ -163,7 +169,11 @@ public class LotController extends BaseController {
       }
     }
 
-    return exportToDtos(lotRepository.search(tradeItem, expirationDate, lotCode));
+    List<LotDto> foundLotDtos =
+        exportToDtos(lotRepository.search(tradeItem, expirationDate, lotCode));
+
+    return Pagination.getPage(foundLotDtos, pageable);
+
   }
 
   private LotDto exportToDto(Lot lot) {

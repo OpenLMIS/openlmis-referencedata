@@ -2611,7 +2611,7 @@ resourceTypes:
                             schema: localizedErrorResponse
       /search:
           get:
-              is: [ secured ]
+              is: [ secured, paginated]
               description: Find lots with matched parameters.
               queryParameters:
                   tradeIdemId:
@@ -2633,7 +2633,6 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
-                          schema: lotArray
                   "403":
                       body:
                         application/json:
