@@ -53,6 +53,7 @@ public abstract class MessageKeys {
   protected static final String USERNAME = "username";
   protected static final String INVALID = "invalid";
   protected static final String LACKS_PARAMETERS = "lacksParameters";
+  protected static final String MUST_BE_UNIQUE = "mustBeUnique";
 
   // Entities
   protected static final String LOT = "lot";

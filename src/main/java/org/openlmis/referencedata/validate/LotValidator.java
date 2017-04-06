@@ -18,6 +18,7 @@ package org.openlmis.referencedata.validate;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
+import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
@@ -27,6 +28,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,13 +44,15 @@ public class LotValidator implements BaseValidator {
   @Autowired
   private TradeItemRepository tradeItemRepository;
 
+  @Autowired
+  private LotRepository lotRepository;
+
   /**
    * Checks if the given class definition is supported.
    *
    * @param clazz the {@link Class} that this {@link Validator} is being asked if it can {@link
    *              #validate(Object, Errors) validate}
-   * @return true if {@code clazz} is equal to {@link LotDto} class definition.
-   *     Otherwise false.
+   * @return true if {@code clazz} is equal to {@link LotDto} class definition. Otherwise false.
    */
   @Override
   public boolean supports(Class<?> clazz) {
@@ -70,6 +74,14 @@ public class LotValidator implements BaseValidator {
     if (!errors.hasErrors()) {
       LotDto lotDto = (LotDto) target;
       verifyTradeItem(lotDto, errors);
+      verifyCode(lotDto, errors);
+    }
+  }
+
+  private void verifyCode(LotDto lot, Errors errors) {
+    List<Lot> lots = lotRepository.search(null, null, lot.getLotCode());
+    if (!lots.isEmpty()) {
+      rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE);
     }
   }
 
@@ -78,11 +90,10 @@ public class LotValidator implements BaseValidator {
     if (tradeItemId == null) {
       rejectValue(errors, TRADE_ITEM_ID, LotMessageKeys.ERROR_TRADE_ITEM_REQUIRED);
     } else {
-      TradeItem tradeItem =
-          (tradeItemId == null) ? null : tradeItemRepository.findOne(tradeItemId);
+      TradeItem tradeItem = tradeItemRepository.findOne(tradeItemId);
       if (tradeItem == null) {
         rejectValue(errors, TRADE_ITEM_ID, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID,
-                String.valueOf(tradeItemId));
+            String.valueOf(tradeItemId));
       }
     }
   }

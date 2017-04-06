@@ -750,6 +750,9 @@ resourceTypes:
       put:
           is: [ secured ]
           description: Create or update a Trade Item.
+          body:
+            application/json:
+              schema: tradeItem
           responses:
               "200":
                   body:

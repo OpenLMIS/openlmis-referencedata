@@ -24,4 +24,5 @@ public abstract class LotMessageKeys extends MessageKeys {
   public static final String ERROR_LOT_CODE_REQUIRED = join(ERROR, LOT_CODE, REQUIRED);
   public static final String ERROR_TRADE_ITEM_REQUIRED = join(ERROR, TRADE_ITEM, REQUIRED);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
+  public static final String ERROR_LOT_CODE_MUST_BE_UNIQUE = join(ERROR, LOT_CODE, MUST_BE_UNIQUE);
 }

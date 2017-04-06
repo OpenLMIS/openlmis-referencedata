@@ -27,8 +27,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
+import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
@@ -37,6 +39,8 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -45,6 +49,9 @@ public class LotValidatorTest {
 
   @Mock
   private TradeItemRepository tradeItemRepository;
+
+  @Mock
+  private LotRepository lotRepository;
 
   @InjectMocks
   private Validator validator = new LotValidator();
@@ -102,6 +109,19 @@ public class LotValidatorTest {
     validator.validate(lotDto, errors);
 
     assertErrorMessage(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_REQUIRED);
+  }
+
+  @Test
+  public void shouldRejectWhenLotCodeAlreadyExist() {
+    Lot lot = new Lot();
+    lot.setLotCode("code");
+    List<Lot> lots = new ArrayList<>();
+    lots.add(lot);
+    when(lotRepository.search(null, null, lotDto.getLotCode())).thenReturn(lots);
+
+    validator.validate(lotDto, errors);
+
+    assertErrorMessage(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE);
   }
 
   @Test
