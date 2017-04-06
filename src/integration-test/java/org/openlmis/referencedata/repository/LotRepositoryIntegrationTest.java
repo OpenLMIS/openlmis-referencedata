@@ -86,6 +86,21 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   }
 
   @Test
+  public void shouldFindLotsByAllParameters() {
+    Lot instanceOne = generateInstance();
+    instanceOne.setLotCode("code #Instance2");
+    lotRepository.save(instanceOne);
+    Lot instanceTwo = generateInstance();
+    instanceTwo.setExpirationDate(ZonedDateTime.now());
+    lotRepository.save(instanceTwo);
+    lotRepository.save(generateInstance());
+
+    List<Lot> lots = lotRepository.search(tradeItem, instanceTwo.getExpirationDate(), "instance2");
+
+    Assert.assertEquals(3, lots.size());
+  }
+
+  @Test
   public void shouldNotFindLots() {
     lotRepository.save(generateInstance());
 
