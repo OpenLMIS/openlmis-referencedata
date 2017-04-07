@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.Lot;
@@ -49,7 +48,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -150,6 +148,10 @@ public class LotController extends BaseController {
   /**
    * Retrieves all Lots matching given parameters.
    *
+   * @param tradeIdemId UUID of trade item associated with Lot.
+   * @param expirationDate Lot expiration date.
+   * @param lotCode Lot code.
+   * @param pageable Pageable object that allows client to optionally add "page" (page number).
    * @return List of matched Lots.
    */
   @GetMapping("/lots/search")
@@ -164,7 +166,7 @@ public class LotController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     TradeItem tradeItem = null;
-    if (isNotTrue(isNull(tradeIdemId))) {
+    if (null != tradeIdemId) {
       tradeItem = tradeItemRepository.findOne(tradeIdemId);
       if (isNull(tradeItem)) {
         throw new ValidationMessageException(

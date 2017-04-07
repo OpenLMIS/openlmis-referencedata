@@ -2646,6 +2646,10 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
+                  "400":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "403":
                       body:
                         application/json:

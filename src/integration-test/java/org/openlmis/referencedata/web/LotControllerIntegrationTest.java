@@ -39,9 +39,9 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -227,6 +227,27 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(PageImplRepresentation.class);
 
     assertEquals(1, response.getContent().size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenTradeItemNotFound() throws JsonProcessingException {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    when(tradeItemRepository.findOne(any(UUID.class))).thenReturn(null);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam("tradeIdemId", lot.getTradeItem().getId())
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
