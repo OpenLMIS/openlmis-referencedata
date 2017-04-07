@@ -68,7 +68,7 @@ public class LotValidatorTest {
     lotDto.setActive(true);
     lotDto.setId(UUID.randomUUID());
 
-    TradeItem tradeItem = TradeItem.newTradeItem("code", "unit", null, 0, 0, false);
+    TradeItem tradeItem = TradeItem.newTradeItem("code2", "unit", null, 0, 0, false);
     tradeItem.setId(UUID.randomUUID());
     lotDto.setTradeItemId(tradeItem.getId());
 
@@ -115,13 +115,30 @@ public class LotValidatorTest {
   public void shouldRejectWhenLotCodeAlreadyExist() {
     Lot lot = new Lot();
     lot.setLotCode("code");
+    lot.setId(UUID.randomUUID());
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
+
     when(lotRepository.search(null, null, lotDto.getLotCode())).thenReturn(lots);
 
     validator.validate(lotDto, errors);
 
     assertErrorMessage(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE);
+  }
+
+  @Test
+  public void shouldNotFindErrorsWhenLotCodeAlreadyExistButIsTheSameLot() throws Exception {
+    Lot lot = new Lot();
+    lot.setLotCode("code");
+    lot.setId(lotDto.getId());
+    List<Lot> lots = new ArrayList<>();
+    lots.add(lot);
+
+    when(lotRepository.search(null, null, lotDto.getLotCode())).thenReturn(lots);
+
+    validator.validate(lotDto, errors);
+
+    assertEquals(0, errors.getErrorCount());
   }
 
   @Test

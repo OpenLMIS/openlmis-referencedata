@@ -147,6 +147,9 @@ public class LotController extends BaseController {
 
   /**
    * Retrieves all Lots matching given parameters.
+   * For lotCode: finds any values that have entered string value
+   * in any position of searched field. Not case sensitive.
+   * Other fields: entered string value must equal to searched value.
    *
    * @param tradeIdemId UUID of trade item associated with Lot.
    * @param expirationDate Lot expiration date.

@@ -30,6 +30,7 @@ import org.springframework.validation.Validator;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * A validator for {@link LotDto} object.
@@ -79,7 +80,10 @@ public class LotValidator implements BaseValidator {
   }
 
   private void verifyCode(LotDto lot, Errors errors) {
-    List<Lot> lots = lotRepository.search(null, null, lot.getLotCode());
+    List<Lot> lots = lotRepository.search(null, null, lot.getLotCode())
+        .stream()
+        .filter(l -> !l.getId().equals(lot.getId()))
+        .collect(Collectors.toList());
     if (!lots.isEmpty()) {
       rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE);
     }
