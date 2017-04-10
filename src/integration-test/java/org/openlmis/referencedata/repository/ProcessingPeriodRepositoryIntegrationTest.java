@@ -15,20 +15,19 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ProcessingPeriodRepositoryIntegrationTest
       extends BaseCrudRepositoryIntegrationTest<ProcessingPeriod> {
@@ -174,5 +173,19 @@ public class ProcessingPeriodRepositoryIntegrationTest
             periodRepository.searchPeriods(null, null);
 
     assertEquals(periods.size(), receivedPeriods.size());
+  }
+
+  @Test
+  public void shouldReturnCorrectLocalDate() {
+    LocalDate dt = LocalDate.now();
+
+    ProcessingPeriod entity = generateInstance();
+    entity.setStartDate(dt);
+    periodRepository.save(entity);
+
+    List<ProcessingPeriod> periods = periodRepository.searchPeriods(null, dt);
+
+    assertEquals(1, periods.size());
+    assertEquals(dt, periods.get(0).getStartDate());
   }
 }

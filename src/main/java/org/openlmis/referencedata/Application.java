@@ -61,7 +61,7 @@ import java.util.Objects;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
 @ImportResource("applicationContext.xml")
-@EntityScan(basePackageClasses = BaseEntity.class, basePackages = "org.openlmis.util.converter")
+@EntityScan(basePackageClasses = BaseEntity.class)
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class Application {
 

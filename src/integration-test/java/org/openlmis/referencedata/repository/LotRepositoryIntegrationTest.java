@@ -15,11 +15,14 @@
 
 package org.openlmis.referencedata.repository;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -64,7 +67,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
     List<Lot> lots = lotRepository.search(null, null, "code");
 
-    Assert.assertEquals(1, lots.size());
+    assertEquals(1, lots.size());
   }
 
   @Test
@@ -73,7 +76,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
     List<Lot> lots = lotRepository.search(null, now, null);
 
-    Assert.assertEquals(1, lots.size());
+    assertEquals(1, lots.size());
   }
 
   @Test
@@ -82,7 +85,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
     List<Lot> lots = lotRepository.search(tradeItem, null, null);
 
-    Assert.assertEquals(1, lots.size());
+    assertEquals(1, lots.size());
   }
 
   @Test
@@ -97,7 +100,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
     List<Lot> lots = lotRepository.search(tradeItem, instanceTwo.getExpirationDate(), "instance2");
 
-    Assert.assertEquals(3, lots.size());
+    assertEquals(3, lots.size());
   }
 
   @Test
@@ -106,7 +109,20 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
     List<Lot> lots = lotRepository.search(null, null, null);
 
-    Assert.assertEquals(0, lots.size());
+    assertEquals(0, lots.size());
   }
 
+  @Test
+  public void shouldReturnCorrectZonedDateTime() {
+    ZonedDateTime dt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("UTC"));
+
+    Lot entity = generateInstance();
+    entity.setExpirationDate(dt);
+    lotRepository.save(entity);
+
+    List<Lot> lots = lotRepository.search(null, dt, null);
+
+    assertEquals(1, lots.size());
+    assertEquals(dt, lots.get(0).getExpirationDate());
+  }
 }

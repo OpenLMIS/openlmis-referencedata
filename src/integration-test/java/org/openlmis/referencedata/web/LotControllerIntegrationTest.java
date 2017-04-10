@@ -42,6 +42,9 @@ import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -101,6 +104,29 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(lotDto.getTradeItemId(), response.getTradeItemId());
     assertTrue(lotDto.getExpirationDate().isEqual(response.getExpirationDate()));
     assertTrue(lotDto.getManufactureDate().isEqual(response.getManufactureDate()));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldCreateWithZonedDateTimeInUtc() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+    LocalDateTime now = LocalDateTime.now();
+    lot.setExpirationDate(ZonedDateTime.of(now, ZoneId.of("+05:00")));
+    lot.export(lotDto);
+
+    LotDto response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(lotDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(201)
+        .extract().as(LotDto.class);
+
+    assertEquals(now.minusHours(5), response.getExpirationDate().toLocalDateTime());
+    assertEquals(ZoneOffset.UTC, response.getExpirationDate().getOffset());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
