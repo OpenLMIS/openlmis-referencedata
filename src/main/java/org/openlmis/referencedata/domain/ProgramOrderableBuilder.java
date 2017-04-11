@@ -15,14 +15,15 @@
 
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.serializer.MoneyDeserializer;
 import org.openlmis.referencedata.util.messagekeys.ProgramOrderableBuilderMessageKeys;
-
 import java.util.Objects;
 import java.util.UUID;
 
@@ -43,6 +44,7 @@ public class ProgramOrderableBuilder {
   private UUID orderableDisplayCategoryId;
   private boolean fullSupply;
   private int displayOrder;
+  @JsonDeserialize(using = MoneyDeserializer.class)
   private Money pricePerPack;
 
   private ProgramOrderableBuilder() {

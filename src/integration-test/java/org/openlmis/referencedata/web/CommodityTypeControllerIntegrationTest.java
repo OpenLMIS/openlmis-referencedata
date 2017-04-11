@@ -15,23 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.openlmis.referencedata.domain.CommodityType;
-import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.repository.CommodityTypeRepository;
-import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.repository.TradeItemRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -40,6 +23,32 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import org.openlmis.referencedata.domain.OrderedDisplayValue;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.repository.CommodityTypeRepository;
+import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/commodityTypes";
@@ -55,6 +64,12 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
   @MockBean
   private TradeItemRepository tradeItemRepository;
+
+  @MockBean
+  private ProgramRepository programReposiroty;
+
+  @MockBean
+  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
   private CommodityType commodityType;
   private UUID commodityTypeId;
@@ -73,6 +88,31 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     given(orderableRepository.findByProductCode(commodityType.getProductCode()))
         .willReturn(null);
+
+    CommodityType response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(commodityType)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(CommodityType.class);
+
+    assertEquals(commodityType, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldCreateNewCommodityTypeWithProgramOrderable() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    given(orderableRepository.findByProductCode(commodityType.getProductCode()))
+        .willReturn(null);
+
+    ProgramOrderable programOrderable = mockProgramOrderable();
+    commodityType.addToProgram(programOrderable);
 
     CommodityType response = restAssured
         .given()
@@ -264,6 +304,29 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private ProgramOrderable mockProgramOrderable() {
+    Program program = mockProgram();
+    OrderableDisplayCategory category = mockOrderableDisplayCategory();
+    return ProgramOrderable.createNew(
+        program, category, commodityType, 1, false, false, 1,
+        Money.of(CurrencyUnit.USD, 10.0), CurrencyUnit.USD);
+  }
+
+  private Program mockProgram() {
+    Program program = new Program("programCode");
+    program.setId(UUID.randomUUID());
+    when(programReposiroty.findOne(program.getId())).thenReturn(program);
+    return program;
+  }
+
+  private OrderableDisplayCategory mockOrderableDisplayCategory() {
+    OrderableDisplayCategory category = OrderableDisplayCategory.createNew(
+        Code.code("categoryCode"), new OrderedDisplayValue("name", 1));
+    category.setId(UUID.randomUUID());
+    when(orderableDisplayCategoryRepository.findOne(category.getId())).thenReturn(category);
+    return category;
   }
 
   private TradeItem mockTradeItem() {
