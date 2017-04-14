@@ -15,12 +15,12 @@
 
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -30,7 +30,22 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "facility_type_approved_products", schema = "referencedata")
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class FacilityTypeApprovedProduct extends BaseEntity {
+
+  @ManyToOne
+  @JoinColumn(name = "orderableId", nullable = false)
+  @Getter
+  @Setter
+  // @palbecki TODO: deserializer should not be part of the domain
+  @JsonDeserialize(using = OrderableDeserializer.class)
+  private Orderable orderable;
+
+  @ManyToOne
+  @JoinColumn(name = "programId", nullable = false)
+  @Getter
+  @Setter
+  private Program program;
 
   @ManyToOne
   @JoinColumn(name = "facilityTypeId", nullable = false)
@@ -38,26 +53,41 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   @Setter
   private FacilityType facilityType;
 
-  @ManyToOne
-  @JoinColumn(name = "programOrderableId", nullable = false)
-  @Getter
-  @Setter
-  private ProgramOrderable programOrderable;
-
   @Column(nullable = false)
   @Getter
   @Setter
   private Double maxPeriodsOfStock;
 
-  @Column
   @Getter
   @Setter
   private Double minPeriodsOfStock;
 
-  @Column
   @Getter
   @Setter
   private Double emergencyOrderPoint;
+
+  /**
+   * Creates new FacilityTypeApprovedProduct based on data
+   * from {@link FacilityTypeApprovedProduct.Importer}
+   *
+   * @param importer instance of {@link FacilityTypeApprovedProduct.Importer}
+   * @return new instance of FacilityTypeApprovedProduct.
+   */
+  public static FacilityTypeApprovedProduct newFacilityTypeApprovedProduct(Importer importer) {
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
+    ftap.setId(importer.getId());
+    ftap.setMaxPeriodsOfStock(importer.getMaxPeriodsOfStock());
+    ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
+    ftap.setEmergencyOrderPoint(importer.getEmergencyOrderPoint());
+    ftap.setOrderable(importer.getOrderable());
+    if (null != importer.getProgram()) {
+      ftap.setProgram(Program.newProgram(importer.getProgram()));
+    }
+    if (null != importer.getFacilityType()) {
+      ftap.setFacilityType(FacilityType.newFacilityType(importer.getFacilityType()));
+    }
+    return ftap;
+  }
 
   /**
    * Export this object to the specified exporter (DTO).
@@ -66,74 +96,43 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
-    exporter.setProgramOrderable(programOrderable);
     exporter.setMaxPeriodsOfStock(maxPeriodsOfStock);
     exporter.setMinPeriodsOfStock(minPeriodsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
+    exporter.setOrderable(orderable);
+    exporter.setProgram(program);
+    exporter.setFacilityType(facilityType);
   }
-
-  @Override
-  public boolean equals(Object other) {
-
-    if (this == other) {
-      return true;
-    }
-    if (other == null || getClass() != other.getClass()) {
-      return false;
-    }
-
-    FacilityTypeApprovedProduct otherFacility = (FacilityTypeApprovedProduct) other;
-
-    if (!facilityType.equals(otherFacility.facilityType)) {
-      return false;
-    }
-    if (!programOrderable.equals(otherFacility.programOrderable)) {
-      return false;
-    }
-    if (!maxPeriodsOfStock.equals(otherFacility.maxPeriodsOfStock)) {
-      return false;
-    }
-    if (minPeriodsOfStock != null ? !minPeriodsOfStock.equals(otherFacility.minPeriodsOfStock) :
-        otherFacility.minPeriodsOfStock != null) {
-      return false;
-    }
-    return emergencyOrderPoint != null ? emergencyOrderPoint.equals(
-        otherFacility.emergencyOrderPoint) : otherFacility.emergencyOrderPoint == null;
-
-  }
-
-  @Override
-  public int hashCode() {
-    int result = facilityType.hashCode();
-    result = 31 * result + programOrderable.hashCode();
-    result = 31 * result + maxPeriodsOfStock.hashCode();
-    result = 31 * result + (minPeriodsOfStock != null ? minPeriodsOfStock.hashCode() : 0);
-    result = 31 * result + (emergencyOrderPoint != null ? emergencyOrderPoint.hashCode() : 0);
-    return result;
-  }
-
 
   public interface Exporter {
     void setId(UUID id);
-
-    void setProgramOrderable(ProgramOrderable programOrderable);
 
     void setMaxPeriodsOfStock(Double maxPeriodsOfStock);
 
     void setMinPeriodsOfStock(Double minPeriodsOfStock);
 
     void setEmergencyOrderPoint(Double emergencyOrderPoint);
+
+    void setOrderable(Orderable orderable);
+
+    void setProgram(Program program);
+
+    void setFacilityType(FacilityType facilityType);
   }
 
   public interface Importer {
     UUID getId();
-
-    ProgramOrderable.Importer getProgramOrderable();
 
     Double getMaxPeriodsOfStock();
 
     Double getMinPeriodsOfStock();
 
     Double getEmergencyOrderPoint();
+
+    Orderable getOrderable();
+
+    Program.Importer getProgram();
+
+    FacilityType.Importer getFacilityType();
   }
 }

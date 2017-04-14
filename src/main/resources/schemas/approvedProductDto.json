@@ -8,10 +8,20 @@
       "type": "string",
       "title": "id"
     },
-    "programOrderable": {
+    "program": {
       "type": "object",
-      "$ref": "programOrderableDto.json",
-      "title": "programOrderable"
+      "$ref": "program.json",
+      "title": "program"
+    },
+    "orderable": {
+      "type": "object",
+      "$ref": "orderable.json",
+      "title": "orderable"
+    },
+    "facilityType": {
+      "type": "object",
+      "$ref": "facilityType.json",
+      "title": "facilityType"
     },
     "maxPeriodsOfStock": {
       "type": "number",
@@ -26,5 +36,5 @@
       "title": "emergencyOrderPoint"
     }
   },
-  "required": ["id", "programOrderable", "maxPeriodsOfStock"]
+  "required": ["id", "program", "orderable", "facilityType", "maxPeriodsOfStock"]
 }
