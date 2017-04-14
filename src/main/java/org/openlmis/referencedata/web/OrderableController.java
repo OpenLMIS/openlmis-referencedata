@@ -15,21 +15,24 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
-
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 @RestController
 public class OrderableController extends BaseController {
@@ -37,11 +40,14 @@ public class OrderableController extends BaseController {
   @Autowired
   private OrderableRepository repository;
 
+  @Autowired
+  private RightService rightService;
+
   /**
    * Finds all orderables.
    * @return a list of orderables
    */
-  @GetMapping("/orderables")
+  @RequestMapping("/orderables")
   public List<Orderable> findAll() {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
@@ -58,7 +64,7 @@ public class OrderableController extends BaseController {
    * @param productId id of the chosen product
    * @return chosen product
    */
-  @GetMapping(value = "/orderables/{id}")
+  @RequestMapping(value = "/orderables/{id}", method = RequestMethod.GET)
   public ResponseEntity<Orderable> getChosenOrderable(
       @PathVariable("id") UUID productId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);

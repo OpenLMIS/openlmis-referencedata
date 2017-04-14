@@ -29,10 +29,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.hamcrest.Matchers;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
@@ -43,6 +46,7 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
@@ -52,6 +56,7 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.FacilityService;
@@ -59,6 +64,9 @@ import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,6 +100,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private ProgramRepository programRepository;
+
+  @MockBean
+  private GeographicZoneRepository geographicZoneRepository;
 
   @MockBean
   private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
@@ -853,9 +864,13 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     Orderable orderable = CommodityType.newCommodityType(
         "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
     orderable.setId(UUID.randomUUID());
+    CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
+    ProgramOrderable programOrderable = ProgramOrderable.createNew(program, category,
+        orderable, 0, true, false, 0, Money.of(currencyUnit, 0),
+        currencyUnit);
+    programOrderable.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
-    ftap.setProgram(program);
-    ftap.setOrderable(orderable);
+    ftap.setProgramOrderable(programOrderable);
     ftap.setId(UUID.randomUUID());
     ftap.setMinPeriodsOfStock(1d);
     ftap.setMaxPeriodsOfStock(3d);
@@ -864,6 +879,16 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     List<FacilityTypeApprovedProduct> products = new ArrayList<>();
     products.add(ftap);
     return products;
+  }
+
+  private void mockForFindByZones(GeographicZone zone) {
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    List<Facility> listToReturn = Collections.singletonList(facility);
+    UUID zoneId = zone.getId();
+
+    given(geographicZoneRepository.findOne(zoneId)).willReturn(zone);
+    given(facilityRepository.search(null, null, zone)).willReturn(listToReturn);
   }
 
   private Integer generateInstanceNumber() {

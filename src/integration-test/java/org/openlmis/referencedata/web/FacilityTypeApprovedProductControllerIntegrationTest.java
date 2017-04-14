@@ -18,26 +18,29 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-import org.junit.Before;
+import org.joda.money.CurrencyUnit;
 import org.junit.Test;
+import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -61,12 +64,15 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private Program program;
   private Orderable orderable;
   private FacilityType facilityType1;
+  private ProgramOrderable programOrderable;
   private FacilityTypeApprovedProduct facilityTypeAppProd;
   private UUID facilityTypeAppProdId;
   private OrderableDisplayCategory orderableDisplayCategory;
 
-  @Before
-  public void setUp() {
+  /**
+   * Constructor for tests.
+   */
+  public FacilityTypeApprovedProductControllerIntegrationTest() {
 
     program = new Program("programCode");
     program.setPeriodsSkippable(true);
@@ -80,18 +86,18 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderable = CommodityType.newCommodityType("abcd", "each", "Abcd", "test", 10, 5, false);
     orderable.setId(UUID.randomUUID());
 
+    programOrderable = ProgramOrderable.createNew(program, orderableDisplayCategory, orderable,
+        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
+
+
     facilityType1 = new FacilityType("facilityType1");
 
     facilityTypeAppProd = new FacilityTypeApprovedProduct();
     facilityTypeAppProd.setId(facilityTypeAppProdId);
     facilityTypeAppProd.setFacilityType(facilityType1);
-    facilityTypeAppProd.setProgram(program);
-    facilityTypeAppProd.setOrderable(orderable);
+    facilityTypeAppProd.setProgramOrderable(programOrderable);
     facilityTypeAppProd.setMaxPeriodsOfStock(6.00);
     facilityTypeAppProdId = UUID.randomUUID();
-
-    given(repository.save(any(FacilityTypeApprovedProduct.class)))
-        .willAnswer(new SaveAnswer<FacilityTypeApprovedProduct>());
   }
 
   @Test
