@@ -17,11 +17,9 @@ package org.openlmis.referencedata.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,11 +36,9 @@ public class Lot extends BaseEntity {
   @Column(nullable = false, unique = true, columnDefinition = "text")
   private String lotCode;
 
-  @Column(columnDefinition = "timestamp with time zone")
-  private ZonedDateTime expirationDate;
+  private LocalDate expirationDate;
 
-  @Column(columnDefinition = "timestamp with time zone")
-  private ZonedDateTime manufactureDate;
+  private LocalDate manufactureDate;
 
   @ManyToOne(cascade = CascadeType.REFRESH)
   @JoinColumn(nullable = false, name = "tradeitemid")
@@ -117,9 +113,9 @@ public class Lot extends BaseEntity {
 
     void setTradeItemId(UUID tradeItemId);
 
-    void setExpirationDate(ZonedDateTime expirationDate);
+    void setExpirationDate(LocalDate expirationDate);
 
-    void setManufactureDate(ZonedDateTime manufactureDate);
+    void setManufactureDate(LocalDate manufactureDate);
   }
 
   public interface Importer {
@@ -131,8 +127,8 @@ public class Lot extends BaseEntity {
 
     UUID getTradeItemId();
 
-    ZonedDateTime getExpirationDate();
+    LocalDate getExpirationDate();
 
-    ZonedDateTime getManufactureDate();
+    LocalDate getManufactureDate();
   }
 }

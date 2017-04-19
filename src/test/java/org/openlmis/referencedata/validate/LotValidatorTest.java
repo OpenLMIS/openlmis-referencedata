@@ -37,8 +37,7 @@ import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,8 +62,8 @@ public class LotValidatorTest {
   public void setUp() throws Exception {
     lotDto = new LotDto();
     lotDto.setLotCode("code");
-    lotDto.setExpirationDate(ZonedDateTime.now());
-    lotDto.setManufactureDate(ZonedDateTime.now());
+    lotDto.setExpirationDate(LocalDate.now());
+    lotDto.setManufactureDate(LocalDate.now());
     lotDto.setActive(true);
     lotDto.setId(UUID.randomUUID());
 

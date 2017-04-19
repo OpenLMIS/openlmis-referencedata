@@ -2,32 +2,32 @@
   {
     "id": "35c81bde-e975-4603-ab3b-5ae1dafe9d33",
     "lotCode": "LC0001",
-    "expirationDate": "2017-06-30T16:00:00",
-    "manufactureDate": "2016-06-30T16:00:00",
+    "expirationDate": "2017-06-30",
+    "manufactureDate": "2016-06-30",
     "tradeitemid": "2400e410-b8dd-4954-b1c0-80d8a8e785fc",
     "active": "true"
   },
   {
     "id": "639f0bc5-0372-4a0e-9a9d-b0144ceb0474",
     "lotCode": "LC0002",
-    "expirationDate": "2017-08-20T16:00:00",
-    "manufactureDate": "2016-08-20T16:00:00",
+    "expirationDate": "2017-08-20",
+    "manufactureDate": "2016-08-20",
     "tradeitemid": "103396e1-f5e4-4754-bb7b-1c799097dfea",
     "active": "true"
   },
   {
     "id": "cb0e7132-e364-4143-a996-0c2cbc740bb0",
     "lotCode": "LC0003",
-    "expirationDate": "2018-01-01T14:00:00",
-    "manufactureDate": "2017-01-10T14:00:00",
+    "expirationDate": "2018-01-01",
+    "manufactureDate": "2017-01-10",
     "tradeitemid": "bac90734-6e58-426e-849b-331286ec77d2",
     "active": "true"
   },
   {
     "id": "d5703c4f-82fd-4fac-8214-ed2eb1094f1a",
     "lotCode": "LC0004",
-    "expirationDate": "2018-01-01T16:00:00",
-    "manufactureDate": "2017-02-01T16:00:00",
+    "expirationDate": "2018-01-01",
+    "manufactureDate": "2017-02-01",
     "tradeitemid": "2400e410-b8dd-4954-b1c0-80d8a8e785fc",
     "active": "true"
   }

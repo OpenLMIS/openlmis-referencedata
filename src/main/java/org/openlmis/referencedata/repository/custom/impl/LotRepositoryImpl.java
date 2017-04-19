@@ -18,7 +18,7 @@ package org.openlmis.referencedata.repository.custom.impl;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.custom.LotRepositoryCustom;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -42,7 +42,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
    * @param lotCode Part of wanted code.
    * @return List of Facilities matching the parameters.
    */
-  public List<Lot> search(TradeItem item, ZonedDateTime expirationDate, String lotCode) {
+  public List<Lot> search(TradeItem item, LocalDate expirationDate, String lotCode) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Lot> query = builder.createQuery(Lot.class);
     Root<Lot> root = query.from(Lot.class);

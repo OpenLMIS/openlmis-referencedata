@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -163,7 +163,7 @@ public class LotController extends BaseController {
   public Page<LotDto> searchLots(
       @RequestParam(value = "tradeIdemId", required = false) UUID tradeIdemId,
       @RequestParam(value = "expirationDate", required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime expirationDate,
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationDate,
       @RequestParam(value = "lotCode", required = false) String lotCode,
       Pageable pageable) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);

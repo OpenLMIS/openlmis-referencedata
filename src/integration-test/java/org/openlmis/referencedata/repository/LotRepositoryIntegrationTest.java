@@ -21,9 +21,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +42,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   }
 
   private TradeItem tradeItem;
-  private ZonedDateTime now = ZonedDateTime.now();
+  private LocalDate now = LocalDate.now();
 
   @Override
   Lot generateInstance() {
@@ -94,7 +92,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     instanceOne.setLotCode("code #Instance2");
     lotRepository.save(instanceOne);
     Lot instanceTwo = generateInstance();
-    instanceTwo.setExpirationDate(ZonedDateTime.now());
+    instanceTwo.setExpirationDate(LocalDate.now());
     lotRepository.save(instanceTwo);
     lotRepository.save(generateInstance());
 
@@ -113,16 +111,16 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   }
 
   @Test
-  public void shouldReturnCorrectZonedDateTime() {
-    ZonedDateTime dt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("UTC"));
+  public void shouldReturnCorrectDate() {
+    LocalDate date = LocalDate.now();
 
     Lot entity = generateInstance();
-    entity.setExpirationDate(dt);
+    entity.setExpirationDate(date);
     lotRepository.save(entity);
 
-    List<Lot> lots = lotRepository.search(null, dt, null);
+    List<Lot> lots = lotRepository.search(null, date, null);
 
     assertEquals(1, lots.size());
-    assertEquals(dt, lots.get(0).getExpirationDate());
+    assertEquals(date, lots.get(0).getExpirationDate());
   }
 }

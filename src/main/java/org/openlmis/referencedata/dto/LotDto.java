@@ -20,8 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.openlmis.referencedata.domain.Lot;
-
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -34,8 +33,8 @@ public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
   private String lotCode;
   private boolean active;
   private UUID tradeItemId;
-  private ZonedDateTime expirationDate;
-  private ZonedDateTime manufactureDate;
+  private LocalDate expirationDate;
+  private LocalDate manufactureDate;
 
   @Override
   public boolean equals(Object obj) {

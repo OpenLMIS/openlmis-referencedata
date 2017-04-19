@@ -17,9 +17,9 @@ package org.openlmis.referencedata.repository.custom;
 
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface LotRepositoryCustom {
-  List<Lot> search(TradeItem item, ZonedDateTime expirationDate, String code);
+  List<Lot> search(TradeItem item, LocalDate expirationDate, String code);
 }
