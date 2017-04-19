@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
@@ -33,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.UUID;
 
 @Controller
@@ -49,26 +49,28 @@ public class FacilityTypeApprovedProductController extends BaseController {
   /**
    * Allows creating new facilityTypeApprovedProduct.
    *
-   * @param facilityTypeApprovedProduct A facilityTypeApprovedProduct bound to the request body.
+   * @param approvedProductDto A facilityTypeApprovedProduct bound to the request body.
    * @return the created facilityTypeApprovedProduct.
    */
   @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public FacilityTypeApprovedProduct createFacilityTypeApprovedProduct(
-        @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct) {
+  public ApprovedProductDto createFacilityTypeApprovedProduct(
+        @RequestBody ApprovedProductDto approvedProductDto) {
     rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
+    FacilityTypeApprovedProduct facilityTypeApprovedProduct =
+        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
     // Ignore provided id
     facilityTypeApprovedProduct.setId(null);
-    repository.save(facilityTypeApprovedProduct);
-    return facilityTypeApprovedProduct;
+    FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
+    return toDto(save);
   }
 
   /**
    * Allows updating facilityTypeApprovedProduct.
    *
-   * @param facilityTypeApprovedProduct A facilityTypeApprovedProduct bound to the request body.
+   * @param approvedProductDto A facilityTypeApprovedProduct bound to the request body.
    * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct
    *                                      which we want to update.
    * @return the updated facilityTypeApprovedProduct.
@@ -76,13 +78,15 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public FacilityTypeApprovedProduct updateFacilityTypeApprovedProduct(
-        @RequestBody FacilityTypeApprovedProduct facilityTypeApprovedProduct,
+  public ApprovedProductDto updateFacilityTypeApprovedProduct(
+        @RequestBody ApprovedProductDto approvedProductDto,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
     LOGGER.debug("Updating facilityTypeApprovedProduct");
-    repository.save(facilityTypeApprovedProduct);
-    return facilityTypeApprovedProduct;
+    FacilityTypeApprovedProduct facilityTypeApprovedProduct =
+        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
+    FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
+    return toDto(save);
   }
 
   /**
@@ -94,7 +98,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public FacilityTypeApprovedProduct getFacilityTypeApprovedProduct(
+  public ApprovedProductDto getFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
@@ -102,7 +106,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
     if (facilityTypeApprovedProduct == null) {
       throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return facilityTypeApprovedProduct;
+      return toDto(facilityTypeApprovedProduct);
     }
   }
 
@@ -124,5 +128,11 @@ public class FacilityTypeApprovedProductController extends BaseController {
     } else {
       repository.delete(facilityTypeApprovedProduct);
     }
+  }
+
+  private ApprovedProductDto toDto(FacilityTypeApprovedProduct prod) {
+    ApprovedProductDto productDto = new ApprovedProductDto();
+    prod.export(productDto);
+    return productDto;
   }
 }

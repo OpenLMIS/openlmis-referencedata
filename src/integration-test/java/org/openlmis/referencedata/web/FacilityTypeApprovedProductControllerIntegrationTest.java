@@ -18,29 +18,27 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
-import org.joda.money.CurrencyUnit;
+import guru.nidi.ramltester.junit.RamlMatchers;
+import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -64,15 +62,13 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private Program program;
   private Orderable orderable;
   private FacilityType facilityType1;
-  private ProgramOrderable programOrderable;
   private FacilityTypeApprovedProduct facilityTypeAppProd;
+  private ApprovedProductDto ftapDto;
   private UUID facilityTypeAppProdId;
   private OrderableDisplayCategory orderableDisplayCategory;
 
-  /**
-   * Constructor for tests.
-   */
-  public FacilityTypeApprovedProductControllerIntegrationTest() {
+  @Before
+  public void setUp() {
 
     program = new Program("programCode");
     program.setPeriodsSkippable(true);
@@ -86,18 +82,21 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderable = CommodityType.newCommodityType("abcd", "each", "Abcd", "test", 10, 5, false);
     orderable.setId(UUID.randomUUID());
 
-    programOrderable = ProgramOrderable.createNew(program, orderableDisplayCategory, orderable,
-        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
-
-
     facilityType1 = new FacilityType("facilityType1");
 
     facilityTypeAppProd = new FacilityTypeApprovedProduct();
     facilityTypeAppProd.setId(facilityTypeAppProdId);
     facilityTypeAppProd.setFacilityType(facilityType1);
-    facilityTypeAppProd.setProgramOrderable(programOrderable);
+    facilityTypeAppProd.setProgram(program);
+    facilityTypeAppProd.setOrderable(orderable);
     facilityTypeAppProd.setMaxPeriodsOfStock(6.00);
     facilityTypeAppProdId = UUID.randomUUID();
+
+    ftapDto = new ApprovedProductDto();
+    facilityTypeAppProd.export(ftapDto);
+
+    given(repository.save(any(FacilityTypeApprovedProduct.class)))
+        .willAnswer(new SaveAnswer<FacilityTypeApprovedProduct>());
   }
 
   @Test
@@ -140,21 +139,21 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     given(programRepository.findOne(program.getId())).willReturn(program);
     given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
-    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId())).willReturn(
-        orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
+        .willReturn(orderableDisplayCategory);
 
-    FacilityTypeApprovedProduct response = restAssured
+    ApprovedProductDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(facilityTypeAppProd)
+        .body(ftapDto)
         .when()
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .extract().as(FacilityTypeApprovedProduct.class);
+        .extract().as(ApprovedProductDto.class);
 
-    assertEquals(facilityTypeAppProd, response);
+    ftapEquals(ftapDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -165,7 +164,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(facilityTypeAppProd)
+        .body(ftapDto)
         .when()
         .post(RESOURCE_URL)
         .then()
@@ -179,25 +178,27 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   public void shouldPutFacilityTypeApprovedProduct() {
 
     facilityTypeAppProd.setMaxPeriodsOfStock(9.00);
+    ftapDto.setId(UUID.randomUUID());
+    facilityTypeAppProd.export(ftapDto);
     given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
     given(programRepository.findOne(program.getId())).willReturn(program);
     given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
-    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId())).willReturn(
-        orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
+        .willReturn(orderableDisplayCategory);
 
-    FacilityTypeApprovedProduct response = restAssured
+    ApprovedProductDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
-        .body(facilityTypeAppProd)
+        .body(ftapDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(FacilityTypeApprovedProduct.class);
+        .extract().as(ApprovedProductDto.class);
 
-    assertEquals(facilityTypeAppProd, response);
+    ftapEquals(ftapDto, response);
     assertEquals(9.00, response.getMaxPeriodsOfStock(), 0.00);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -210,7 +211,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
-        .body(facilityTypeAppProd)
+        .body(ftapDto)
         .when()
         .put(ID_URL)
         .then()
@@ -225,10 +226,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
     given(programRepository.findOne(program.getId())).willReturn(program);
     given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
-    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId())).willReturn(
-        orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
+        .willReturn(orderableDisplayCategory);
 
-    FacilityTypeApprovedProduct response = restAssured
+    ApprovedProductDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -237,9 +238,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .get(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(FacilityTypeApprovedProduct.class);
+        .extract().as(ApprovedProductDto.class);
 
-    assertEquals(facilityTypeAppProd, response);
+    assertEquals(ftapDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -257,6 +258,18 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private void ftapEquals(ApprovedProductDto expected, ApprovedProductDto response) {
+    if (expected.getId() != null) {
+      assertEquals(expected.getId(), response.getId());
+    }
+    assertEquals(expected.getEmergencyOrderPoint(), response.getEmergencyOrderPoint());
+    assertEquals(expected.getMaxPeriodsOfStock(), response.getMaxPeriodsOfStock());
+    assertEquals(expected.getMinPeriodsOfStock(), response.getMinPeriodsOfStock());
+    assertEquals(expected.getFacilityType(), response.getFacilityType());
+    assertEquals(expected.getOrderable(), response.getOrderable());
+    assertEquals(expected.getProgram(), response.getProgram());
   }
 
 }

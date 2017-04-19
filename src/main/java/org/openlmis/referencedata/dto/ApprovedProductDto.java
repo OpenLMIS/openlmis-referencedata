@@ -15,18 +15,26 @@
 
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.ProgramOrderable;
-
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.OrderableDeserializer;
+import org.openlmis.referencedata.domain.Program;
 
 @Getter
 @Setter
 public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedProduct.Exporter,
     FacilityTypeApprovedProduct.Importer {
 
-  private ProgramOrderableDto programOrderable;
+  @JsonDeserialize(using = OrderableDeserializer.class)
+  private Orderable orderable;
+
+  private ProgramDto program;
+
+  private FacilityTypeDto facilityType;
 
   private Double maxPeriodsOfStock;
 
@@ -35,8 +43,14 @@ public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedP
   private Double emergencyOrderPoint;
 
   @Override
-  public void setProgramOrderable(ProgramOrderable programOrderable) {
-    this.programOrderable = new ProgramOrderableDto();
-    programOrderable.export(this.programOrderable);
+  public void setProgram(Program program) {
+    this.program = new ProgramDto();
+    program.export(this.program);
+  }
+
+  @Override
+  public void setFacilityType(FacilityType facilityType) {
+    this.facilityType = new FacilityTypeDto();
+    facilityType.export(this.facilityType);
   }
 }
