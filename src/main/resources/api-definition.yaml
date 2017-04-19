@@ -2556,7 +2556,7 @@ resourceTypes:
       displayName: Lot
       post:
             is: [ secured ]
-            description: Create new lot.
+            description: Create new lot. This endpoint is experimental.
             body:
                 application/json:
                   schema: lotDto
@@ -2585,7 +2585,7 @@ resourceTypes:
                   repeat: false
             put:
                 is: [ secured ]
-                description: Update existing lot.
+                description: Update existing lot. This endpoint is experimental.
                 body:
                     application/json:
                       schema: lotDto
@@ -2608,7 +2608,7 @@ resourceTypes:
                             schema: localizedErrorResponse
             get:
                 is: [ secured ]
-                description: Get chosen lot.
+                description: Get chosen lot. This endpoint is experimental.
                 responses:
                     "200":
                         body:
@@ -2625,7 +2625,7 @@ resourceTypes:
       /search:
           get:
               is: [ secured, paginated]
-              description: Find lots with matched parameters.
+              description: Find lots with matched parameters. This endpoint is experimental.
               queryParameters:
                   tradeIdemId:
                           displayName: tradeIdem
