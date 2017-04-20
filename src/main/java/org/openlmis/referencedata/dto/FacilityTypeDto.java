@@ -15,12 +15,11 @@
 
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.FacilityType;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.openlmis.referencedata.domain.FacilityType;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,4 +32,19 @@ public class FacilityTypeDto extends BaseDto
   private String description;
   private Integer displayOrder;
   private Boolean active;
+
+  /**
+   * Creates new facilityTypeDto based on given {@link FacilityType}.
+   *
+   * @param program instance of FacilityType
+   * @return new instance of FacilityTypeDto.
+   */
+  public static FacilityTypeDto newInstance(FacilityType program) {
+    if (program == null) {
+      return null;
+    }
+    FacilityTypeDto facilityTypeDto = new FacilityTypeDto();
+    program.export(facilityTypeDto);
+    return facilityTypeDto;
+  }
 }

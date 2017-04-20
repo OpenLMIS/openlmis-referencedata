@@ -15,13 +15,11 @@
 
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.Program;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.openlmis.referencedata.domain.Program;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -38,5 +36,20 @@ public class ProgramDto extends BaseDto implements Program.Exporter, Program.Imp
 
   public ProgramDto(UUID id) {
     setId(id);
+  }
+
+  /**
+   * Creates new programDto based on given {@link Program}.
+   *
+   * @param program instance of Program
+   * @return new instance of ProgramDto.
+   */
+  public static ProgramDto newInstance(Program program) {
+    if (program == null) {
+      return null;
+    }
+    ProgramDto programDto = new ProgramDto();
+    program.export(programDto);
+    return programDto;
   }
 }

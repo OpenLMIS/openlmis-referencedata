@@ -19,6 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.openlmis.referencedata.dto.FacilityTypeDto;
+import org.openlmis.referencedata.dto.ProgramDto;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -97,8 +99,8 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     exporter.setMinPeriodsOfStock(minPeriodsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
     exporter.setOrderable(orderable);
-    exporter.setProgram(program);
-    exporter.setFacilityType(facilityType);
+    exporter.setProgram(ProgramDto.newInstance(program));
+    exporter.setFacilityType(FacilityTypeDto.newInstance(facilityType));
   }
 
   public interface Exporter {
@@ -112,9 +114,9 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
 
     void setOrderable(Orderable orderable);
 
-    void setProgram(Program program);
+    void setProgram(ProgramDto program);
 
-    void setFacilityType(FacilityType facilityType);
+    void setFacilityType(FacilityTypeDto facilityType);
   }
 
   public interface Importer {
