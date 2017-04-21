@@ -15,11 +15,11 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.apache.commons.lang3.BooleanUtils.isFalse;
+
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -126,7 +126,10 @@ public class Program extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setId(id);
-    exporter.setCode(code.toString());
+    String codeString = this.code.toString();
+    if (isFalse(codeString.isEmpty())) {
+      exporter.setCode(codeString);
+    }
     exporter.setName(name);
     exporter.setDescription(description);
     exporter.setActive(active);
