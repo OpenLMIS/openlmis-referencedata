@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
@@ -42,11 +41,11 @@ public class TradeItemController extends BaseController {
 
   /**
    * Create or update a trade item.
+   *
    * @return the trade item that was created or updated.
    */
   @Transactional
   @RequestMapping(value = "/tradeItems", method = RequestMethod.PUT)
-  @ResponseBody
   public TradeItem createOrUpdate(@RequestBody TradeItem tradeItem) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
@@ -63,13 +62,13 @@ public class TradeItemController extends BaseController {
   /**
    * Retrieves trade items. Allows searching by classification id, either using a full
    * or a partial match.
+   *
    * @param classificationId the classification id to search by
    * @param fullMatch true to search by a full match, false to search by partial match
    * @return a list of matching trade items
    */
   @Transactional
   @RequestMapping(value = "/tradeItems", method = RequestMethod.GET)
-  @ResponseBody
   public Iterable<TradeItem> retrieveTradeItems(
       @RequestParam(required = false) String classificationId,
       @RequestParam(required = false, defaultValue = "false") boolean fullMatch) {

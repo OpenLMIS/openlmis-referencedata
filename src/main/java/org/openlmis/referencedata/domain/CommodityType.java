@@ -121,6 +121,7 @@ public final class CommodityType extends Orderable {
   /**
    * Validates and assigns a parent to this commodity type.
    * No cycles in the hierarchy are allowed.
+   *
    * @param parent the parent to assign
    */
   public void assignParent(CommodityType parent) {
