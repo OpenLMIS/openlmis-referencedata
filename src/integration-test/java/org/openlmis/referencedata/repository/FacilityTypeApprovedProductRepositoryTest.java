@@ -45,6 +45,8 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
 
   private static final double MAX_PERIODS_OF_STOCK_DELTA = 1e-15;
+  private static final String CLASSIFICATION_SYS = "cSys";
+  private static final String CLASSIFICATION_SYS_ID = "cSysId";
 
   @Autowired
   private FacilityTypeApprovedProductRepository ftapRepository;
@@ -100,7 +102,8 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
 
     orderableFullSupply = CommodityType.newCommodityType(
-        "ibuprofen", "each", "Ibuprofen", "testDesc", 10, 5, false);
+        "ibuprofen", "each", "Ibuprofen", "testDesc", 10, 5, false,
+        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
     CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
         .createNew(program, orderableDisplayCategory,orderableFullSupply, currencyUnit);
@@ -109,7 +112,8 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
 
     orderableNonFullSupply = CommodityType.newCommodityType(
-        "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
+        "gloves", "pair", "Gloves", "testDesc", 6, 3, false,
+        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
     ProgramOrderable programOrderableNonFullSupply = ProgramOrderable.createNew(
         program, orderableDisplayCategory, orderableNonFullSupply, 0, true, false, 0,
         Money.of(currencyUnit, 0), currencyUnit);

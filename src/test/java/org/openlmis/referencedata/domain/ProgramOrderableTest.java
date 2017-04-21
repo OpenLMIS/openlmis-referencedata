@@ -32,7 +32,8 @@ public class ProgramOrderableTest {
     em = new Program("EM");
     testCat = OrderableDisplayCategory.createNew(Code.code("test"));
     ibuprofen =
-        CommodityType.newCommodityType("ibuprofen", "each", "Ibuprofen", "NSAID", 20, 10, false);
+        CommodityType.newCommodityType("ibuprofen", "each", "Ibuprofen", "NSAID", 20, 10, false,
+            "cSys", "cId");
   }
 
   @Test

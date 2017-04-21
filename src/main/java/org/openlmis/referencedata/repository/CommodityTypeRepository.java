@@ -15,10 +15,14 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Orderable;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.UUID;
 
 public interface CommodityTypeRepository extends CrudRepository<CommodityType, UUID> {
+
+  <S extends Orderable> S findByProductCode(Code code);
 }

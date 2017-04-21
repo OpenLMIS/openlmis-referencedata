@@ -15,15 +15,19 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -41,11 +45,14 @@ import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import java.util.Arrays;
-import java.util.HashSet;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -55,6 +62,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String TRADE_ITEMS_URL = ID_URL + "/tradeItems";
   private static final String UNIT = "unit";
+  private static final String CLASSIFICATION_SYS = "cSys";
+  private static final String CLASSIFICATION_SYS_ID = "cSysId";
 
   @MockBean
   private CommodityTypeRepository commodityTypeRepository;
@@ -76,10 +85,13 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Before
   public void setUp() {
-    commodityType = CommodityType.newCommodityType("code", UNIT, "name", "desc", 0, 0, false);
+    commodityType = CommodityType.newCommodityType("code", UNIT, "name", "desc", 0, 0, false,
+        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
     commodityTypeId = UUID.randomUUID();
     commodityType.setId(commodityTypeId);
-    commodityType.setTradeItems(new HashSet<>());
+
+    when(commodityTypeRepository.save(any(CommodityType.class))).thenAnswer(
+        invocation -> invocation.getArguments()[0]);
   }
 
   @Test
@@ -139,7 +151,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .willReturn(commodityType);
 
     CommodityType updatedCommodityType = CommodityType.newCommodityType(
-        "code", UNIT, "update", "test", 0, 0, false);
+        "code", UNIT, "update", "test", 0, 0, false,
+        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
     updatedCommodityType.setId(commodityTypeId);
 
     CommodityType response = restAssured
@@ -167,7 +180,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .willReturn(commodityType);
 
     CommodityType updatedCommodityType = CommodityType.newCommodityType(
-        "code", UNIT, "update", "test", 0, 0, false);
+        "code", UNIT, "update", "test", 0, 0, false,
+        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
     updatedCommodityType.setId(commodityTypeId);
 
     restAssured
@@ -211,10 +225,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
-    List<UUID> tradeItemIds = Arrays.asList(tradeItem.getId(), anotherTradeItem.getId());
-
-    ArgumentCaptor<CommodityType> argumentCaptor
-        = ArgumentCaptor.forClass(CommodityType.class);
+    List<UUID> tradeItemIds = asList(tradeItem.getId(), anotherTradeItem.getId());
 
     restAssured
         .given()
@@ -227,10 +238,12 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .then()
         .statusCode(200);
 
-    verify(commodityTypeRepository).save(argumentCaptor.capture());
-    CommodityType savedCommodityType = argumentCaptor.getValue();
-    assertEquals(2, savedCommodityType.getTradeItems().size());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    ArgumentCaptor<Set> captor = ArgumentCaptor.forClass(Set.class);
+    verify(tradeItemRepository).save(captor.capture());
+
+    Set<TradeItem> itemsToUpdate = captor.getValue();
+    assertThat(itemsToUpdate, hasSize(2));
+    assertThat(itemsToUpdate, hasItems(tradeItem, anotherTradeItem));
   }
 
   @Test
@@ -241,7 +254,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
-    List<UUID> tradeItemIds = Arrays.asList(tradeItem.getId(), anotherTradeItem.getId());
+    List<UUID> tradeItemIds = asList(tradeItem.getId(), anotherTradeItem.getId());
 
     restAssured
         .given()
@@ -266,8 +279,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
 
-    given(tradeItemRepository.findForCommodityType(commodityType))
-        .willReturn(Arrays.asList(tradeItem, anotherTradeItem));
+    given(tradeItemRepository.findByClassificationId(CLASSIFICATION_SYS_ID))
+        .willReturn(asList(tradeItem, anotherTradeItem));
 
     UUID[] response = restAssured
         .given()
@@ -279,7 +292,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .then()
         .statusCode(200)
         .extract().as(UUID[].class);
-    List<UUID> uuids = Arrays.asList(response);
+    List<UUID> uuids = asList(response);
 
     assertEquals(2, uuids.size());
     assertTrue(uuids.contains(tradeItem.getId()));
@@ -304,6 +317,62 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldCreateCommodityTypeWithParent() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    UUID parentId = UUID.randomUUID();
+    CommodityType parent = CommodityType.newCommodityType("XXX", "each", "parentProd",
+        "desc", 10, 2, true, CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    parent.setId(parentId);
+    commodityType.assignParent(parent);
+
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
+    given(commodityTypeRepository.findOne(parentId))
+        .willReturn(parent);
+
+    CommodityType response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(commodityType)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(CommodityType.class);
+
+    assertEquals(commodityType, response);
+    assertEquals(commodityType.getParent().getId(), response.getParent().getId());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestIfParentNotFound() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    UUID parentId = UUID.randomUUID();
+    CommodityType parent = CommodityType.newCommodityType("XXX", "each", "parentProd",
+        "desc", 10, 2, true, CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    parent.setId(parentId);
+    commodityType.assignParent(parent);
+
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(commodityType)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(400)
+        .content("messageKey", is(CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND));
   }
 
   private ProgramOrderable mockProgramOrderable() {

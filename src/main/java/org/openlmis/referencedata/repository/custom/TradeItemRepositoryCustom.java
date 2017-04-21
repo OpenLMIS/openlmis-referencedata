@@ -13,30 +13,13 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.repository.custom;
 
-import org.openlmis.referencedata.domain.CommodityType;
-import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.TradeItem;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
+public interface TradeItemRepositoryCustom {
 
-import java.util.UUID;
+  Iterable<TradeItem> findByClassificationId(String classificationId);
 
-public class OrderableIntegrationTest
-    extends BaseCrudRepositoryIntegrationTest<Orderable> {
-
-  @Autowired
-  private OrderableRepository repository;
-
-  @Override
-  CrudRepository<Orderable, UUID> getRepository() {
-    return repository;
-  }
-
-  @Override
-  Orderable generateInstance() {
-    return CommodityType.newCommodityType("abcd", "each", "Abcd", "test", 10, 5, false,
-        "cSys", "cSysId");
-  }
+  Iterable<TradeItem> findByClassificationIdLike(String classificationId);
 }

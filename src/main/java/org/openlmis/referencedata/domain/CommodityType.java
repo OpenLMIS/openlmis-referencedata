@@ -17,13 +17,24 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 /**
@@ -34,17 +45,35 @@ import javax.persistence.OneToMany;
 @Entity
 @DiscriminatorValue("COMMODITY_TYPE")
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public final class CommodityType extends Orderable {
   private String description;
 
-  @OneToMany(mappedBy = "commodityType")
-  private Set<TradeItem> tradeItems;
+  @Getter
+  private String classificationSystem;
+
+  @Getter
+  private String classificationId;
+
+  @Getter
+  @ManyToOne
+  @JoinColumn(columnDefinition = "parentid")
+  private CommodityType parent;
+
+  @Getter
+  @Setter
+  @OneToMany(mappedBy = "parent")
+  @JsonIgnore
+  private List<CommodityType> children;
 
   private CommodityType(Code productCode, Dispensable dispensable, String fullProductName,
-                        long netContent, long packRoundingThreshold, boolean roundToZero) {
+                        long netContent, long packRoundingThreshold, boolean roundToZero,
+                        String classificationSystem, String classificationId) {
     super(productCode, dispensable, fullProductName, netContent, packRoundingThreshold,
           roundToZero);
-    tradeItems = new HashSet<>();
+    this.classificationSystem = classificationSystem;
+    this.classificationId = classificationId;
+    this.children = new ArrayList<>();
   }
 
   /**
@@ -68,11 +97,13 @@ public final class CommodityType extends Orderable {
       @JsonProperty("netContent") long netContent,
       @JsonProperty("packRoundingThreshold")
            long packRoundingThreshold,
-      @JsonProperty("roundToZero") boolean roundToZero) {
+      @JsonProperty("roundToZero") boolean roundToZero,
+      @JsonProperty("classificationSystem") String classificationSystem,
+      @JsonProperty("classificationId") String classificationId) {
     Code code = Code.code(productCode);
     Dispensable dispensable = Dispensable.createNew(dispensingUnit);
     CommodityType commodityType = new CommodityType(code, dispensable, fullProductName, netContent,
-        packRoundingThreshold, roundToZero);
+        packRoundingThreshold, roundToZero, classificationSystem, classificationId);
     commodityType.description = description;
     return commodityType;
   }
@@ -88,32 +119,25 @@ public final class CommodityType extends Orderable {
   }
 
   /**
-   * Add a TradeItem that can be fulfilled for this CommodityType.
-   *
-   * @param tradeItem the trade item
-   * @return true if added, false if it's already added or was otherwise unable to add.
+   * Validates and assigns a parent to this commodity type.
+   * No cycles in the hierarchy are allowed.
+   * @param parent the parent to assign
    */
-  public boolean addTradeItem(TradeItem tradeItem) {
-    boolean added = tradeItems.add(tradeItem);
-    if (added) {
-      tradeItem.assignCommodityType(this);
+  public void assignParent(CommodityType parent) {
+    validateIsNotDescendant(parent);
+
+    this.parent = parent;
+    parent.children.add(this);
+  }
+
+  private void validateIsNotDescendant(CommodityType commodityType) {
+    for (CommodityType child : children) {
+      if (child.equals(commodityType)) {
+        throw new ValidationMessageException(new Message(
+            CommodityTypeMessageKeys.ERROR_PARENT_IS_DESCENDANT,
+            commodityType.getId(), id));
+      }
+      child.validateIsNotDescendant(commodityType);
     }
-
-    return added;
-  }
-
-  /**
-   * Sets the associated {@link TradeItem} that may fulfill for this.
-   * @param tradeItems the trade items.
-   */
-  public void setTradeItems(Set<TradeItem> tradeItems) {
-    this.tradeItems.forEach(tradeItem -> tradeItem.assignCommodityType(null));
-    this.tradeItems.clear();
-    tradeItems.forEach(tradeItem -> addTradeItem(tradeItem));
-  }
-
-  @JsonIgnore
-  public Set<TradeItem> getTradeItems() {
-    return tradeItems;
   }
 }

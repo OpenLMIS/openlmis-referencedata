@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
@@ -55,9 +56,11 @@ public abstract class Orderable extends BaseEntity {
   private long netContent;
 
   @JsonProperty
+  @Getter(AccessLevel.PACKAGE)
   private long packRoundingThreshold;
 
   @JsonProperty
+  @Getter(AccessLevel.PACKAGE)
   private boolean roundToZero;
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
@@ -199,11 +202,11 @@ public abstract class Orderable extends BaseEntity {
       return false;
     }
 
-    return ((Orderable) object).productCode.equals(this.productCode);
+    return Objects.equals(productCode, ((Orderable) object).productCode);
   }
 
   @Override
   public final int hashCode() {
-    return productCode.hashCode();
+    return Objects.hashCode(productCode);
   }
 }

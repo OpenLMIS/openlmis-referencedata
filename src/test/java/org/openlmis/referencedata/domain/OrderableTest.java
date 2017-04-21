@@ -33,6 +33,8 @@ import java.util.UUID;
 public class OrderableTest {
   private static final String IBUPROFEN = "ibuprofen";
   private static final String EACH = "each";
+  private static final String CLASSIFICATION_SYS = "cSys";
+  private static final String CLASSIFICATION_SYS_ID = "cSysId";
 
   private static Program em;
   private static Orderable ibuprofen;
@@ -40,7 +42,8 @@ public class OrderableTest {
   {
     em = new Program("EssMed");
     ibuprofen =
-        CommodityType.newCommodityType("ibuprofen", "each", "Ibuprofen", "test", 10, 5, false);
+        CommodityType.newCommodityType("ibuprofen", "each", "Ibuprofen", "test", 10, 5, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
 
     OrderableDisplayCategory testCat = OrderableDisplayCategory.createNew(Code.code("testcat"));
     ProgramOrderable ibuprofenInEm =
@@ -104,7 +107,8 @@ public class OrderableTest {
   @Test
   public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsSmallerThanRemainder() {
     Orderable product =
-        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test1", 10, 4, false);
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test1", 10, 4, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
 
     long packsToOrder = product.packsToOrder(26);
 
@@ -114,7 +118,8 @@ public class OrderableTest {
   @Test
   public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsGreaterThanRemainder() {
     Orderable product =
-        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test2", 10, 7, false);
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test2", 10, 7, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
 
     long packsToOrder = product.packsToOrder(26);
 
@@ -124,7 +129,8 @@ public class OrderableTest {
   @Test
   public void shouldCalculatePacksToOrderWhenCanRoundToZero() {
     Orderable product =
-        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test3", 10, 7, true);
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test3", 10, 7, true,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
 
     long packsToOrder = product.packsToOrder(6);
 
@@ -134,7 +140,8 @@ public class OrderableTest {
   @Test
   public void shouldCalculatePacksToOrderWhenCanNotRoundToZero() {
     Orderable product =
-        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test4", 10, 7, false);
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test4", 10, 7, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
 
     long packsToOrder = product.packsToOrder(6);
 
@@ -144,7 +151,8 @@ public class OrderableTest {
   @Test
   public void shouldReturnZeroPacksToOrderIfNetContentIsZero() {
     Orderable product =
-        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test5", 0, 7, true);
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test5", 0, 7, true,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
 
     long packsToOrder = product.packsToOrder(6);
 
@@ -154,7 +162,8 @@ public class OrderableTest {
   @Test
   public void shouldReturnZeroPacksToOrderIfOrderQuantityIsZero() {
     Orderable product =
-        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test6", 10, 7, false);
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test6", 10, 7, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
 
     long packsToOrder = product.packsToOrder(0);
 
@@ -164,7 +173,8 @@ public class OrderableTest {
   @Test
   public void shouldReturnZeroPackToOrderIfOrderQuantityIsOneAndRoundToZeroTrueWithNetContentTen() {
     Orderable product =
-        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test7", 10, 7, true);
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test7", 10, 7, true,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
 
     long packsToOrder = product.packsToOrder(1);
 
@@ -177,7 +187,8 @@ public class OrderableTest {
     final int roundingThreshold = 50;
 
     Orderable product = CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN,
-            "test8", netContent, roundingThreshold, false);
+            "test8", netContent, roundingThreshold, false, CLASSIFICATION_SYS,
+            CLASSIFICATION_SYS_ID);
 
     long packsToOrder = product.packsToOrder(250);
     assertEquals(2, packsToOrder);

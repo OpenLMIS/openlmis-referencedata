@@ -68,7 +68,7 @@ public class ProgramOrderableBuilderTest {
         orderableDisplayCategory.getId())).thenReturn(orderableDisplayCategory);
 
     orderable = CommodityType.newCommodityType("SuperCode123", "each",
-        "SuperName123", "SuperDescription", 10, 5, false);
+        "SuperName123", "SuperDescription", 10, 5, false, "cSys", "cSysId");
 
     programOrderableBuilder = new ProgramOrderableBuilder(program.getId());
     programOrderableBuilder.setProgramRepository(programRepository);

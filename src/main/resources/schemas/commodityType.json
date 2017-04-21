@@ -10,7 +10,10 @@
     "description": { "type": "string", "title": "description" },
     "netContent": { "type": "integer", "title": "netContent" },
     "packRoundingThreshold": { "type": "integer", "title": "packRoundingThreshold" },
-    "roundToZero": { "type": "boolean", "title": "roundToZero" }
+    "roundToZero": { "type": "boolean", "title": "roundToZero" },
+    "classificationSystem": { "type": "string", "title": "classificationSystem" },
+    "classificationId": { "type": "string", "title": "classificationId" },
+    "parent": { "type": "object", "$ref": "commodityType.json", "title": "parent" }
   },
   "required": [
     "productCode",

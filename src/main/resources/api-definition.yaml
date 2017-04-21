@@ -101,6 +101,15 @@ schemas:
 
   - commodityType:  !include schemas/commodityType.json
 
+  - tradeItem:  !include schemas/tradeItem.json
+
+  - tradeItemArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/tradeItem.json" }
+
+      }
+
   - orderable: !include schemas/orderable.json
 
   - orderableArray: |
@@ -159,22 +168,6 @@ schemas:
           "type": "array",
           "items": { "type": "object", "$ref": "schemas/processingSchedule.json" }
       }
-
-  - tradeItem: |
-        {   "type": "object",
-            "$schema": "http://json-schema.org/draft-03/schema",
-            "title": "Trade Item",
-            "description": "A single tradeItem",
-            "properties": {
-                "id": { "type": "string", "required": false, "title": "id" },
-                "productCode": { "type": "string", "required": true, "title": "productCode" },
-                "fullProductName": { "type": "string", "required": false, "title": "fullProductName" },
-                "netContent": { "type": "integer", "required": false, "title": "netContent" },
-                "packRoundingThreshold": { "type": "integer", "required": true, "title": "packRoundingThreshold" },
-                "roundToZero": { "type": "boolean", "required": true, "title": "roundToZero" },
-                "manufacturerOfTradeItem": { "type": "string", "required": false, "title": "manufacturerOfTradeItem" }
-            }
-        }
 
   - user: !include schemas/user.json
 
@@ -762,6 +755,30 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
+      get:
+          is: [ secured ]
+          description: Retrieve trade items. Optionally filter by the classification ID, either by full or partial match.
+          queryParameters:
+              classificationId:
+                      displayName: classificaitonID
+                      type: string
+                      required: false
+                      repeat: false
+              fullMatch:
+                      displayName: fullMatch
+                      type: boolean
+                      required: false
+                      repeat: false
+          responses:
+              "200":
+                  body:
+                    application/json:
+                      schema: tradeItemArray
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+
 
   /commodityTypes:
       displayName: Commodity Type

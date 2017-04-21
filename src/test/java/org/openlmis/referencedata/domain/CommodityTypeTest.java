@@ -15,33 +15,36 @@
 
 package org.openlmis.referencedata.domain;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 
 public class CommodityTypeTest {
   private static final String EACH = "each";
+  private static final String CLASSIFICATION_SYS = "cSys";
+  private static final String CLASSIFICATION_SYS_ID = "cSysId";
 
   private static CommodityType ibuprofen;
-  private static TradeItem advil;
-  private static TradeItem motrin;
 
-  {
+  private CommodityType child1;
+  private CommodityType child2;
+  private CommodityType grandChild1;
+  private CommodityType grandChild2;
+  private CommodityType grandChild3;
+
+  static {
     ibuprofen =
-        CommodityType.newCommodityType("ibuprofen", EACH, "Ibuprofen", "test desc", 10, 5, false);
-    advil = TradeItem.newTradeItem("advil", EACH, "Advil", 12, 6, false);
-    motrin = TradeItem.newTradeItem("motrin", EACH, "Motrin", 12, 6, false);
-    ibuprofen.addTradeItem(advil);
-    ibuprofen.addTradeItem(motrin);
+        CommodityType.newCommodityType("ibuprofen", EACH, "Ibuprofen", "test desc", 10, 5, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
   }
 
   @Test
   public void testCanFulfill() throws Exception {
     assertTrue(ibuprofen.canFulfill(ibuprofen));
-    assertFalse(ibuprofen.canFulfill(advil));
-    assertFalse(ibuprofen.canFulfill(motrin));
   }
 
   @Test
@@ -61,7 +64,54 @@ public class CommodityTypeTest {
     assertTrue(ibuprofen.equals(ibuprofen));
 
     CommodityType ibuprofenDupe =
-        CommodityType.newCommodityType("ibuprofen", EACH, "Ibuprofen", "dupe", 20, 10, false);
+        CommodityType.newCommodityType("ibuprofen", EACH, "Ibuprofen", "dupe", 20, 10, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
     assertEquals(ibuprofen.hashCode(), ibuprofenDupe.hashCode());
+  }
+
+  @Test
+  public void shouldAssignParent() {
+    setUpHierarchy();
+
+    assertEquals(ibuprofen, child1.getParent());
+    assertEquals(ibuprofen, child2.getParent());
+    assertEquals(child1, grandChild1.getParent());
+    assertEquals(child1, grandChild2.getParent());
+    assertEquals(child2, grandChild3.getParent());
+    assertEquals(asList(child1, child2), ibuprofen.getChildren());
+    assertEquals(asList(grandChild1, grandChild2), child1.getChildren());
+    assertEquals(singletonList(grandChild3), child2.getChildren());
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldNotAcceptDirectChildrenAsParent() {
+    setUpHierarchy();
+    ibuprofen.assignParent(child1);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldNotAcceptNonDirectDescendantsAsParent() {
+    setUpHierarchy();
+    ibuprofen.assignParent(grandChild1);
+  }
+
+  private void setUpHierarchy() {
+    child1 = generateCommodityType("child1");
+    child2 = generateCommodityType("child2");
+    grandChild1 = generateCommodityType("grand child1");
+    grandChild2 = generateCommodityType("grand child1");
+    grandChild3 = generateCommodityType("grand child3");
+
+    child1.assignParent(ibuprofen);
+    child2.assignParent(ibuprofen);
+
+    grandChild1.assignParent(child1);
+    grandChild2.assignParent(child1);
+    grandChild3.assignParent(child2);
+  }
+
+  private CommodityType generateCommodityType(String productCode) {
+    return CommodityType.newCommodityType(productCode, EACH, productCode, "XXX",
+        0, 0, false, "CS", "CID");
   }
 }

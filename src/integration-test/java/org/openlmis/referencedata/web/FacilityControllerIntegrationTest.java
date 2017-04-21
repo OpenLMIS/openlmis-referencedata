@@ -851,7 +851,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     OrderableDisplayCategory category = OrderableDisplayCategory.createNew(Code.code("gloves"));
     category.setId(UUID.randomUUID());
     Orderable orderable = CommodityType.newCommodityType(
-        "gloves", "pair", "Gloves", "testDesc", 6, 3, false);
+        "gloves", "pair", "Gloves", "testDesc", 6, 3, false, "cSys", "cSysId");
     orderable.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setProgram(program);

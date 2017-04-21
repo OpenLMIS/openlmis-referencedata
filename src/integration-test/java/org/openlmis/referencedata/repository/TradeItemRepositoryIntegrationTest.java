@@ -15,29 +15,29 @@
 
 package org.openlmis.referencedata.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 public class TradeItemRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<TradeItem> {
 
-  @Autowired
-  private TradeItemRepository repository;
+  private TradeItem tradeItem1;
+  private TradeItem tradeItem2;
+  private TradeItem tradeItem3;
 
   @Autowired
-  private CommodityTypeRepository commodityTypeRepository;
+  private TradeItemRepository repository;
 
   @Override
   CrudRepository<TradeItem, UUID> getRepository() {
@@ -51,26 +51,51 @@ public class TradeItemRepositoryIntegrationTest extends
   }
 
   @Test
-  public void findByCommodityTypeShouldReturnIds() {
-    // setup some trade items for the commodity type and some not
-    TradeItem tradeItem1 = generateInstance();
-    TradeItem tradeItem2 = generateInstance();
-    List<TradeItem> forFulfillment = Lists.newArrayList(tradeItem1, tradeItem2);
-    repository.save(forFulfillment);
-    TradeItem tradeItemOther = generateInstance();
-    repository.save(tradeItemOther);
-    assertEquals(3, repository.count());
+  public void shouldFindByExactClassificationId() {
+    setUpTradeItemsWithClassifications();
 
-    // save the commodity type with the trade items
-    CommodityType ibuprofen = CommodityType.newCommodityType(
-        "ibuprofen", "each", "Ibuprofen", "test", 1, 0, false);
-    ibuprofen.setTradeItems(Sets.newHashSet(forFulfillment));
-    commodityTypeRepository.save(ibuprofen);
+    Iterable<TradeItem> result = repository.findByClassificationId("CID1");
+    assertThat(result, iterableWithSize(2));
+    assertThat(result, hasItems(tradeItem1, tradeItem3));
 
-    // find the trade items for the commodity type above and ensure its right
-    List<TradeItem> foundTradeItems = repository.findForCommodityType(ibuprofen);
-    assertNotNull(foundTradeItems);
-    assertEquals(2, foundTradeItems.size());
-    assertTrue(foundTradeItems.containsAll(forFulfillment));
+    result = repository.findByClassificationId("CID2");
+    assertThat(result, iterableWithSize(1));
+    assertThat(result, hasItem(tradeItem1));
+
+    result = repository.findByClassificationId("XXX");
+    assertThat(result, emptyIterable());
+  }
+
+  @Test
+  public void shouldFindByMatchingClassificationId() {
+    setUpTradeItemsWithClassifications();
+
+    Iterable<TradeItem> result = repository.findByClassificationIdLike("CID");
+    assertThat(result, iterableWithSize(2));
+    assertThat(result, hasItems(tradeItem1, tradeItem3));
+
+    result = repository.findByClassificationIdLike("ID");
+    assertThat(result, iterableWithSize(3));
+    assertThat(result, hasItems(tradeItem1, tradeItem2, tradeItem3));
+
+    result = repository.findByClassificationIdLike("ID_3");
+    assertThat(result, iterableWithSize(1));
+    assertThat(result, hasItems(tradeItem2));
+
+    result = repository.findByClassificationIdLike("X");
+    assertThat(result, emptyIterable());
+  }
+
+  private void setUpTradeItemsWithClassifications() {
+    tradeItem1 = generateInstance();
+    tradeItem2 = generateInstance();
+    tradeItem3 = generateInstance();
+
+    tradeItem1.assignCommodityType("cSysOne", "CID1");
+    tradeItem1.assignCommodityType("cSysTwo", "CID2");
+    tradeItem2.assignCommodityType("cSysThree", "ID_3");
+    tradeItem3.assignCommodityType("cSysOne", "CID1");
+
+    repository.save(asList(tradeItem1, tradeItem2, tradeItem3));
   }
 }

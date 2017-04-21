@@ -1,0 +1,57 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Trade Item",
+  "description": "A single tradeItem",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "productCode": {
+      "type": "string",
+      "title": "productCode"
+    },
+    "fullProductName": {
+      "type": "string",
+      "title": "fullProductName"
+    },
+    "netContent": {
+      "type": "integer",
+      "title": "netContent"
+    },
+    "packRoundingThreshold": {
+      "type": "integer",
+      "title": "packRoundingThreshold"
+    },
+    "roundToZero": {
+      "type": "boolean",
+      "title": "roundToZero"
+    },
+    "manufacturerOfTradeItem": {
+      "type": "string",
+      "title": "manufacturerOfTradeItem"
+    },
+    "classifications": {
+      "type": "array",
+      "title": "classifications",
+      "items": {
+        "type": "object",
+        "$ref": "tradeItemClassification.json"
+      }
+    },
+    "programs": {
+      "type": "array",
+      "title": "programs",
+      "items": {
+        "type": "object",
+        "$ref": "programOrderable.json"
+      }
+    }
+  },
+  "required": [
+    "productCode",
+    "packRoundingThreshold",
+    "roundToZero"
+  ]
+}

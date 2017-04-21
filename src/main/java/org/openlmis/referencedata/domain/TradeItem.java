@@ -16,16 +16,23 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.ProductMessageKeys;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-
-import lombok.NoArgsConstructor;
+import javax.persistence.OneToMany;
 
 /**
  * TradeItems represent branded/produced/physical products.  A TradeItem is used for Product's that
@@ -41,18 +48,23 @@ import lombok.NoArgsConstructor;
 @Entity
 @DiscriminatorValue("TRADE_ITEM")
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public final class TradeItem extends Orderable {
 
   @JsonProperty
   private String manufacturerOfTradeItem;
 
-  @ManyToOne
-  private CommodityType commodityType;
+  @OneToMany(mappedBy = "tradeItem", cascade = CascadeType.ALL)
+  @JsonProperty
+  @Getter
+  @Setter
+  private List<TradeItemClassification> classifications;
 
   private TradeItem(Code productCode, Dispensable dispensable, String fullProductName,
                     long netContent, long packRoundingThreshold, boolean roundToZero) {
     super(productCode, dispensable, fullProductName, netContent, packRoundingThreshold,
           roundToZero);
+    classifications = new ArrayList<>();
   }
 
   @Override
@@ -68,7 +80,8 @@ public final class TradeItem extends Orderable {
    */
   @Override
   public boolean canFulfill(Orderable product) {
-    return this.equals(product) || hasCommodityType(product);
+    // TODO: OLMIS-1696
+    return this.equals(product);
   }
 
   /**
@@ -95,26 +108,45 @@ public final class TradeItem extends Orderable {
   }
 
   /**
-   * Assign a commodity type.
-   * @param commodityType the given commodity type, or null to un-assign.
+   * Assigns a commodity type to this trade item - will associate this trade item
+   * with the classification system of the provided commodity type.
+   * @param commodityType the commodity type to associate with
    */
-  void assignCommodityType(CommodityType commodityType) {
-    if (null == commodityType || hasSameDispensingUnit(commodityType)) {
-      this.commodityType = commodityType;
+  public void assignCommodityType(CommodityType commodityType) {
+    if (hasSameDispensingUnit(commodityType)) {
+      assignCommodityType(commodityType.getClassificationSystem(),
+          commodityType.getClassificationId());
     } else {
       throw new ValidationMessageException(ProductMessageKeys.ERROR_DISPENSING_UNITS_WRONG);
     }
   }
 
-  /*
-  returns true if we have a commodity type and the one given has the same product code,
-   false otherwise.
+  /**
+   * Assigns to the classification system and classification id.
+   * @param classificationSystem the classification system
+   * @param classificationId the id of the classification system.
    */
-  private boolean hasCommodityType(Orderable product) {
-    return null != commodityType && commodityType.equals(product);
+  public void assignCommodityType(String classificationSystem, String classificationId) {
+    TradeItemClassification existingClassification = findClassificationById(classificationId);
+
+    if (existingClassification == null) {
+      classifications.add(new TradeItemClassification(this, classificationSystem,
+          classificationId));
+    } else {
+      existingClassification.setClassificationSystem(classificationSystem);
+    }
   }
 
-  private boolean hasSameDispensingUnit(Orderable product) {
+  boolean hasSameDispensingUnit(Orderable product) {
     return this.getDispensable().equals(product.getDispensable());
+  }
+
+  TradeItemClassification findClassificationById(String classificationId) {
+    for (TradeItemClassification classification : classifications) {
+      if (classificationId.equals(classification.getClassificationId())) {
+        return classification;
+      }
+    }
+    return null;
   }
 }

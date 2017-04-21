@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
@@ -28,20 +30,19 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 @RestController
 public class CommodityTypeController extends BaseController {
@@ -63,36 +64,49 @@ public class CommodityTypeController extends BaseController {
    */
   @Transactional
   @RequestMapping(value = "/commodityTypes", method = RequestMethod.PUT)
+  @ResponseBody
   public CommodityType createOrUpdate(@RequestBody CommodityType commodityType) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     // if it already exists, update or fail if not already a CommodityType
-    Orderable storedProduct = repository.findByProductCode(commodityType.getProductCode());
+    Orderable storedProduct = repository.findByProductCode(
+        commodityType.getProductCode());
+
     if (null != storedProduct) {
       UUID productId = storedProduct.getId();
-      if (null != commodityTypeRepository.findOne(productId)) {
+      CommodityType storedCommodityType = commodityTypeRepository.findOne(productId);
+      if (null != storedCommodityType) {
         commodityType.setId(productId);
+        commodityType.setChildren(storedCommodityType.getChildren());
       } else {
         throw new ValidationMessageException(new Message(
             CommodityTypeMessageKeys.ERROR_NOT_A_COMMODITY_TYPE, commodityType.getProductCode()));
       }
     }
 
-    repository.save(commodityType);
-    return commodityType;
+    if (commodityType.getParent() != null) {
+      CommodityType parent = commodityTypeRepository.findOne(commodityType.getParent().getId());
+      if (parent == null) {
+        throw new ValidationMessageException(new Message(
+            CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND, commodityType.getParent()));
+      }
+      commodityType.assignParent(parent);
+    }
+
+    return commodityTypeRepository.save(commodityType);
   }
 
   /**
    * Update the {@link TradeItem} that may fulfill for a {@link CommodityType}.
    * @param commodityTypeId the CommodityType's persistence Id.
    * @param tradeItemIds the persistence id's of the TradeItems
-   * @return {@link org.springframework.http.HttpStatus#OK} if successful.
    * {@link org.springframework.http.HttpStatus#NOT_FOUND} if any of the given persistence ids
    *     are not found.
    */
   @Transactional
   @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateTradeItemAssociations(@PathVariable("id") UUID commodityTypeId,
+  @ResponseStatus(HttpStatus.OK)
+  public void updateTradeItemAssociations(@PathVariable("id") UUID commodityTypeId,
                                           @RequestBody Set<UUID> tradeItemIds) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
@@ -115,26 +129,25 @@ public class CommodityTypeController extends BaseController {
         throw new NotFoundException(new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, id));
       }
 
+      item.assignCommodityType(commodityType);
+
       tradeItems.add(item);
     }
 
-    // update commodity type with new trade item association
-    commodityType.setTradeItems(tradeItems);
-    commodityTypeRepository.save(commodityType);
-
-    return ResponseEntity.ok().build();
+    // update the trade items with new classifications
+    tradeItemRepository.save(tradeItems);
   }
 
   /**
    * Gets the TradeItem's persistence ids that may fulfill for the given CommodityType.
    * @param commodityTypeId persistence id of the CommodityType.
-   * @return {@link org.springframework.http.HttpStatus#OK} and a list of persistence ids for the
-   *      commodity type, or an empty list. {@link org.springframework.http.HttpStatus#NOT_FOUND} if
-   *      there's no commodity type for the id given.
+   * @return {@link org.springframework.http.HttpStatus#OK} and a set of persistence ids for the
+   *      commodity type, or an empty set.
    */
   @Transactional
+  @ResponseBody
   @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.GET)
-  public ResponseEntity<?> getTradeItems(@PathVariable("id") UUID commodityTypeId) {
+  public Set<UUID> getTradeItems(@PathVariable("id") UUID commodityTypeId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     // ensure commodity type exists
@@ -144,13 +157,13 @@ public class CommodityTypeController extends BaseController {
     }
 
     Set<UUID> ids = new HashSet<>();
-    List<TradeItem> items = tradeItemRepository.findForCommodityType(commodityType);
+    Iterable<TradeItem> items = tradeItemRepository.findByClassificationId(
+        commodityType.getClassificationId());
+
     for (TradeItem item : items) {
       ids.add(item.getId());
     }
 
-    return ResponseEntity
-        .ok()
-        .body(ids);
+    return ids;
   }
 }
