@@ -122,7 +122,6 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam("classificationId", CID)
         .queryParam("fullMatch", "true")
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -131,6 +130,34 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertArrayEquals(items.toArray(), response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldDenyAccessToUpdate() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(generateItem("code"))
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(403);
+  }
+
+  @Test
+  public void shouldDenyAccessToRetrieve() {
+    mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(403);
   }
 
   private TradeItem generateItem(String productCode) {
