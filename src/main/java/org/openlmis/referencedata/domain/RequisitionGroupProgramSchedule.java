@@ -73,7 +73,7 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
 
   private RequisitionGroupProgramSchedule(RequisitionGroup requisitionGroup, Program program,
                                           ProcessingSchedule schedule, boolean directDelivery) {
-    this.requisitionGroup = Objects.requireNonNull(requisitionGroup);
+    this.requisitionGroup = requisitionGroup;
     this.program = Objects.requireNonNull(program);
     this.processingSchedule = Objects.requireNonNull(schedule);
     this.directDelivery = directDelivery;

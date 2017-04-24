@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.javers.common.collections.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -33,6 +34,7 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,6 +42,8 @@ import java.util.List;
  */
 public class RequisitionGroupRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<RequisitionGroup> {
+
+  private static final String CODE = "code";
 
   @Autowired
   private RequisitionGroupRepository repository;
@@ -67,6 +71,8 @@ public class RequisitionGroupRepositoryIntegrationTest
 
   private SupervisoryNode supervisoryNode;
 
+  private Facility facility;
+
   RequisitionGroupRepository getRepository() {
     return repository;
   }
@@ -82,23 +88,21 @@ public class RequisitionGroupRepositoryIntegrationTest
 
   @Before
   public void setUp() {
-    final String code = "code";
-
     GeographicLevel geographicLevel = new GeographicLevel();
-    geographicLevel.setCode(code);
+    geographicLevel.setCode(CODE);
     geographicLevel.setLevelNumber(1);
     geographicLevelRepository.save(geographicLevel);
 
     GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode(code);
+    geographicZone.setCode(CODE);
     geographicZone.setLevel(geographicLevel);
     geographicZoneRepository.save(geographicZone);
 
     FacilityType facilityType = new FacilityType();
-    facilityType.setCode(code);
+    facilityType.setCode(CODE);
     facilityTypeRepository.save(facilityType);
 
-    Facility facility = new Facility(code);
+    facility = new Facility(CODE);
     facility.setType(facilityType);
     facility.setGeographicZone(geographicZone);
     facility.setActive(true);
@@ -106,7 +110,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     facilityRepository.save(facility);
 
     supervisoryNode = new SupervisoryNode();
-    supervisoryNode.setCode(code);
+    supervisoryNode.setCode(CODE);
     supervisoryNode.setFacility(facility);
     supervisoryNodeRepository.save(supervisoryNode);
   }
@@ -133,6 +137,31 @@ public class RequisitionGroupRepositoryIntegrationTest
     group = repository.save(group);
 
     assertEquals(0, group.getRequisitionGroupProgramSchedules().size());
+  }
+
+  @Test
+  public void shouldAddMemberFacilitiesToRequisitionGroup() {
+    RequisitionGroup group = prepareAndSaveRequisitionGroupAndSchedule();
+    group.setMemberFacilities(Sets.asSet(facility));
+    RequisitionGroup actual = repository.save(group);
+
+    assertNotNull(actual);
+    assertEquals(1, actual.getMemberFacilities().size());
+    assertEquals(CODE, actual.getMemberFacilities().iterator().next().getCode());
+  }
+
+  @Test
+  public void shouldRemoveMemberFacilitiesFromRequisitionGroup() {
+    RequisitionGroup group = prepareAndSaveRequisitionGroupAndSchedule();
+    group.setMemberFacilities(Sets.asSet(facility));
+    RequisitionGroup actual = repository.save(group);
+
+    assertEquals(1, actual.getMemberFacilities().size());
+
+    actual.setMemberFacilities(Collections.emptySet());
+    actual = repository.save(actual);
+
+    assertEquals(0, actual.getMemberFacilities().size());
   }
 
   private RequisitionGroup prepareAndSaveRequisitionGroupAndSchedule() {
