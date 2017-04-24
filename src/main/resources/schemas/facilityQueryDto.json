@@ -19,6 +19,14 @@
     "extraData": {
       "type": "object",
       "title": "extraData"
+    },
+    "page": {
+      "type": "integer",
+      "title": "page"
+    },
+    "size": {
+      "type": "integer",
+      "title": "size"
     }
   }
 }
