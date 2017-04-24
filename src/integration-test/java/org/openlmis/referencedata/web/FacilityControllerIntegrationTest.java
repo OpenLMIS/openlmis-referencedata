@@ -33,6 +33,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
@@ -64,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -251,7 +253,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityService.searchFacilities(requestBody))
         .willReturn(listToReturn);
 
-    FacilityDto[] response = restAssured.given()
+    PageImplRepresentation response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -259,11 +261,11 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
-        .extract().as(FacilityDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    List<FacilityDto> facilities = Arrays.asList(response);
-    assertEquals(1, facilities.size());
-    assertEquals(facility.getCode(), facilities.get(0).getCode());
+    Map<String, String> foundFacility = (LinkedHashMap) response.getContent().get(0);
+    assertEquals(1, response.getContent().size());
+    assertEquals(facility.getCode(), foundFacility.get("code"));
   }
 
   @Test
@@ -298,7 +300,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityService.searchFacilities(requestBody))
         .willReturn(listToReturn);
 
-    FacilityDto[] response = restAssured.given()
+    PageImplRepresentation response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -306,11 +308,11 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
-        .extract().as(FacilityDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    List<FacilityDto> facilities = Arrays.asList(response);
-    assertEquals(1, facilities.size());
-    assertEquals(facility.getName(), facilities.get(0).getName());
+    Map<String, String> foundFacility = (LinkedHashMap) response.getContent().get(0);
+    assertEquals(1, response.getContent().size());
+    assertEquals(facility.getName(), foundFacility.get("name"));
   }
 
   @Test
@@ -343,7 +345,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put("code", "IncorrectCode");
     requestBody.put("name", "NotSimilarName");
 
-    Facility[] response = restAssured.given()
+    PageImplRepresentation response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -351,10 +353,41 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
-        .extract().as(Facility[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    List<Facility> facilities = Arrays.asList(response);
-    assertEquals(0, facilities.size());
+    assertEquals(0, response.getContent().size());
+  }
+
+  @Test
+  public void shouldPaginateSearchFacilities() {
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    Map<String, Object> requestBody = new HashMap<>();
+
+    List<Facility> listToReturn = new ArrayList<>();
+    listToReturn.add(facility);
+    given(facilityService.searchFacilities(requestBody))
+            .willReturn(listToReturn);
+
+    PageImplRepresentation response = restAssured.given()
+            .queryParam("page", 0)
+            .queryParam("size", 1)
+            .queryParam(ACCESS_TOKEN, getToken())
+            .body(requestBody)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post(SEARCH_FACILITIES)
+            .then()
+            .statusCode(200)
+            .extract().as(PageImplRepresentation.class);
+
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(1, response.getTotalElements());
+    assertEquals(1, response.getTotalPages());
+    assertEquals(1, response.getNumberOfElements());
+    assertEquals(1, response.getSize());
+    assertEquals(0, response.getNumber());
   }
 
   @Test

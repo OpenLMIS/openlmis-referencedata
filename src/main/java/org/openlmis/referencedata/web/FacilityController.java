@@ -38,12 +38,14 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -298,17 +300,19 @@ public class FacilityController extends BaseController {
    * name parameter.
    *
    * @param queryParams request parameters (code, name, zone, recurse) and JSON extraData.
-   * @return List of wanted Facilities.
+   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @return List of wanted Facilities matching query parameters.
    */
   @RequestMapping(value = "/facilities/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<FacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams) {
+  public Page<FacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
+                                            Pageable pageable) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
-
-    return toDto(foundFacilities);
+    List<FacilityDto> facilityDtos = toDto(foundFacilities);
+    return Pagination.getPage(facilityDtos, pageable);
   }
 
   private FacilityDto toDto(Facility facility) {
