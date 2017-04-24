@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.RequisitionGroup;
-import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -71,7 +70,7 @@ public class RequisitionGroupController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public RequisitionGroupDto createRequisitionGroup(
-      @RequestBody RequisitionGroupBaseDto requisitionGroupDto, BindingResult bindingResult) {
+      @RequestBody RequisitionGroupDto requisitionGroupDto, BindingResult bindingResult) {
     rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
 
     LOGGER.debug("Creating new requisitionGroup");
@@ -139,7 +138,7 @@ public class RequisitionGroupController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public RequisitionGroupDto updateRequisitionGroup(
-      @RequestBody RequisitionGroupBaseDto requisitionGroupDto,
+      @RequestBody RequisitionGroupDto requisitionGroupDto,
       @PathVariable("id") UUID requisitionGroupId,
       BindingResult bindingResult) {
     rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);

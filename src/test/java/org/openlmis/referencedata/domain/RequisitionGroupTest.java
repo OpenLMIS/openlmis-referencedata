@@ -15,12 +15,15 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.dto.RequisitionGroupDto;
 
 import java.util.Collections;
 
@@ -36,6 +39,27 @@ public class RequisitionGroupTest {
     requisitionGroup.setRequisitionGroupProgramSchedules(Collections
         .singletonList(RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
             requisitionGroup, program, mock(ProcessingSchedule.class), false)));
+  }
+
+  @Test
+  public void shouldAssociateRequisitionGroupAndScheduleProperlyFromImporter() {
+    RequisitionGroupDto dto = new RequisitionGroupDto();
+    dto.setCode("RG1");
+    dto.setName("RequisitionGroup1");
+    dto.setSupervisoryNode(mock(SupervisoryNode.class));
+    RequisitionGroupProgramSchedule schedule = RequisitionGroupProgramSchedule
+        .newRequisitionGroupProgramSchedule(null, program, mock(ProcessingSchedule.class), false);
+    dto.setRequisitionGroupProgramSchedules(Collections.singletonList(schedule));
+
+    RequisitionGroup actual = RequisitionGroup.newRequisitionGroup(dto);
+
+    assertNotNull(actual);
+    assertNotNull(actual.getRequisitionGroupProgramSchedules());
+    assertEquals(1, actual.getRequisitionGroupProgramSchedules().size());
+    assertEquals("RG1", actual.getRequisitionGroupProgramSchedules().get(0).getRequisitionGroup()
+        .getCode());
+    assertEquals("RequisitionGroup1", actual.getRequisitionGroupProgramSchedules().get(0)
+        .getRequisitionGroup().getName());
   }
 
   @Test

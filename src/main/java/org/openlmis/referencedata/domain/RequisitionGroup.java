@@ -117,8 +117,10 @@ public class RequisitionGroup extends BaseEntity {
 
       for (RequisitionGroupProgramSchedule.Importer scheduleImporter :
           importer.getRequisitionGroupProgramSchedules()) {
-        requisitionGroupProgramSchedules.add(
-            RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(scheduleImporter));
+        RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule =
+            RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(scheduleImporter);
+        newRequisitionGroupProgramSchedule.setRequisitionGroup(newRequisitionGroup);
+        requisitionGroupProgramSchedules.add(newRequisitionGroupProgramSchedule);
       }
 
       newRequisitionGroup.requisitionGroupProgramSchedules = requisitionGroupProgramSchedules;
