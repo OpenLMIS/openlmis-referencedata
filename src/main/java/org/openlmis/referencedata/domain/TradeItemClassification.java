@@ -26,12 +26,16 @@ import lombok.Setter;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Represents a trade item identification using a classification system.
  */
 @Entity
-@Table(name = "trade_item_classifications", schema = "referencedata")
+@Table(name = "trade_item_classifications", schema = "referencedata",
+    uniqueConstraints = @UniqueConstraint(
+        name = "unq_trade_item_classifications_system",
+        columnNames = {"tradeitemid", "classificationsystem"}))
 @NoArgsConstructor
 @JsonIgnoreProperties({"id"})
 public class TradeItemClassification extends BaseEntity {

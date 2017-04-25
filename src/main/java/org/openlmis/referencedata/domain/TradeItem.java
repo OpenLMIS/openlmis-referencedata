@@ -24,9 +24,9 @@ import org.openlmis.referencedata.util.messagekeys.ProductMessageKeys;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -57,7 +57,6 @@ public final class TradeItem extends Orderable {
   @OneToMany(mappedBy = "tradeItem", cascade = CascadeType.ALL)
   @JsonProperty
   @Getter
-  @Setter
   private List<TradeItemClassification> classifications;
 
   private TradeItem(Code productCode, Dispensable dispensable, String fullProductName,
@@ -148,5 +147,25 @@ public final class TradeItem extends Orderable {
       }
     }
     return null;
+  }
+
+  /**
+   * Set classifications on this trade item and associate them, by setting
+   * their trade item relationship.
+   * @param classifications the classifications
+   */
+  public void setClassifications(List<TradeItemClassification> classifications) {
+    if (classifications != null) {
+      for (TradeItemClassification classification : classifications) {
+        classification.setTradeItem(this);
+      }
+      this.classifications = classifications;
+    } else {
+      this.classifications = new ArrayList<>();
+    }
+  }
+
+  private void validateNoDuplicateClassSystem(
+      Collection<TradeItemClassification> classifications) {
   }
 }

@@ -25,6 +25,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.UUID;
@@ -46,8 +47,13 @@ public class TradeItemRepositoryIntegrationTest extends
 
   @Override
   TradeItem generateInstance() {
-    return TradeItem.newTradeItem("advil" + getNextInstanceNumber(), "each",
+    TradeItem tradeItem = TradeItem.newTradeItem("advil" + getNextInstanceNumber(), "each",
         "Advil" + getNextInstanceNumber(), 10, 5, false);
+
+    tradeItem.assignCommodityType("classSys1", "MDV1");
+    tradeItem.assignCommodityType("classSys2", "MDV2");
+
+    return tradeItem;
   }
 
   @Test
@@ -84,6 +90,17 @@ public class TradeItemRepositoryIntegrationTest extends
 
     result = repository.findByClassificationIdLike("X");
     assertThat(result, emptyIterable());
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldNotAllowSameClassificationSystemForTradeItem() {
+    TradeItem tradeItem = generateInstance();
+    tradeItem.assignCommodityType("cxxx", "bb");
+    tradeItem.assignCommodityType("cxxx", "bb2");
+
+    repository.save(tradeItem);
+
+    repository.flush();
   }
 
   private void setUpTradeItemsWithClassifications() {
