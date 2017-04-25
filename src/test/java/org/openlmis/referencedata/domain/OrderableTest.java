@@ -31,169 +31,169 @@ import java.util.Set;
 import java.util.UUID;
 
 public class OrderableTest {
-  //  private static final String IBUPROFEN = "ibuprofen";
-  //  private static final String EACH = "each";
-  //  private static final String CLASSIFICATION_SYS = "cSys";
-  //  private static final String CLASSIFICATION_SYS_ID = "cSysId";
-  //
-  //  private static Program em;
-  //  private static Orderable ibuprofen;
-  //
-  //  {
-  //    em = new Program("EssMed");
-  //    ibuprofen =
-  //        CommodityType.newCommodityType("ibuprofen", "each", "Ibuprofen", "test", 10, 5, false,
-  //            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  //
-  //    OrderableDisplayCategory testCat = OrderableDisplayCategory.createNew(Code.code("testcat"));
-  //    ProgramOrderable ibuprofenInEm =
-  //        ProgramOrderable.createNew(em, testCat, ibuprofen, CurrencyUnit.USD);
-  //    ibuprofen.addToProgram(ibuprofenInEm);
-  //  }
-  //
-  //  @Test
-  //  public void shouldReplaceProgramOrderableOnEquals() {
-  //    OrderableDisplayCategory nsaidCat = OrderableDisplayCategory.createNew(Code.code("nsaid"));
-  //    ProgramOrderable ibuprofenInEmForNsaid =
-  //        ProgramOrderable.createNew(em, nsaidCat, ibuprofen, CurrencyUnit.USD);
-  //    ibuprofen.addToProgram(ibuprofenInEmForNsaid);
-  //
-  //    assertEquals(1, ibuprofen.getPrograms().size());
-  //    assertEquals(nsaidCat, ibuprofen.getProgramOrderable(em).getOrderableDisplayCategory());
-  //  }
-  //
-  //  @Test
-  //  public void setProgramsShouldRemoveOldItems() {
-  //    // dummy malaria program
-  //    Program malaria = new Program("malaria");
-  //
-  //    // dummy product categories
-  //    OrderableDisplayCategory nsaidCat = OrderableDisplayCategory.createNew(Code.code("nsaid"));
-  //    OrderableDisplayCategory painCat = OrderableDisplayCategory.createNew(Code.code("pain"));
-  //
-  //    // associate ibuprofen with 2 programs
-  //    ProgramOrderable ibuprofenInEmForNsaid =
-  //        ProgramOrderable.createNew(em, nsaidCat, ibuprofen, CurrencyUnit.USD);
-  //    ProgramOrderable ibuprofenInMalaria =
-  //        ProgramOrderable.createNew(malaria, painCat, ibuprofen, CurrencyUnit.USD);
-  //    ibuprofen.addToProgram(ibuprofenInEmForNsaid);
-  //    ibuprofen.addToProgram(ibuprofenInMalaria);
-  //
-  //    // mock program repo to return em program
-  //    UUID emUuid = UUID.fromString("f982f7c2-760b-11e6-8b77-86f30ca893d3");
-  //    ProgramRepository progRepo = mock(ProgramRepository.class);
-  //    when(progRepo.findOne(emUuid)).thenReturn(em);
-  //
-  //    // mock product category repo to return nsaid category
-  //    UUID nsaidCatUuid = UUID.fromString("f982f7c2-760b-11e6-8b77-86f30ca893ff");
-  //    OrderableDisplayCategoryRepository prodCatRepo = mock(OrderableDisplayCategoryRepository.class);
-  //    when(prodCatRepo.findOne(nsaidCatUuid)).thenReturn(nsaidCat);
-  //
-  //    // create a set with one builder for a link from ibuprofen to EM program
-  //    ProgramOrderableBuilder ibuprofenInEmBuilder = new ProgramOrderableBuilder(emUuid);
-  //    ibuprofenInEmBuilder.setProgramRepository(progRepo);
-  //    ibuprofenInEmBuilder.setOrderableDisplayCategoryRepository(prodCatRepo);
-  //    ibuprofenInEmBuilder.setProgramId(emUuid);
-  //    ibuprofenInEmBuilder.setOrderableDisplayCategoryId(nsaidCatUuid);
-  //    ibuprofenInEmBuilder.setPricePerPack(Money.of(CurrencyUnit.USD, 3.39));
-  //    Set<ProgramOrderableBuilder> ppBuilders = new HashSet<>();
-  //    ppBuilders.add(ibuprofenInEmBuilder);
-  //    ibuprofen.setPrograms(ppBuilders);
-  //
-  //    assertEquals(1, ibuprofen.getPrograms().size());
-  //    assertFalse(ibuprofen.getPrograms().contains(ibuprofenInMalaria));
-  //  }
-  //
-  //  @Test
-  //  public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsSmallerThanRemainder() {
-  //    Orderable product =
-  //        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test1", 10, 4, false,
-  //            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  //
-  //    long packsToOrder = product.packsToOrder(26);
-  //
-  //    assertEquals(3, packsToOrder);
-  //  }
-  //
-  //  @Test
-  //  public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsGreaterThanRemainder() {
-  //    Orderable product =
-  //        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test2", 10, 7, false,
-  //            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  //
-  //    long packsToOrder = product.packsToOrder(26);
-  //
-  //    assertEquals(2, packsToOrder);
-  //  }
-  //
-  //  @Test
-  //  public void shouldCalculatePacksToOrderWhenCanRoundToZero() {
-  //    Orderable product =
-  //        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test3", 10, 7, true,
-  //            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  //
-  //    long packsToOrder = product.packsToOrder(6);
-  //
-  //    assertEquals(0, packsToOrder);
-  //  }
-  //
-  //  @Test
-  //  public void shouldCalculatePacksToOrderWhenCanNotRoundToZero() {
-  //    Orderable product =
-  //        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test4", 10, 7, false,
-  //            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  //
-  //    long packsToOrder = product.packsToOrder(6);
-  //
-  //    assertEquals(1, packsToOrder);
-  //  }
-  //
-  //  @Test
-  //  public void shouldReturnZeroPacksToOrderIfNetContentIsZero() {
-  //    Orderable product =
-  //        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test5", 0, 7, true,
-  //            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  //
-  //    long packsToOrder = product.packsToOrder(6);
-  //
-  //    assertEquals(0, packsToOrder);
-  //  }
-  //
-  //  @Test
-  //  public void shouldReturnZeroPacksToOrderIfOrderQuantityIsZero() {
-  //    Orderable product =
-  //        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test6", 10, 7, false,
-  //            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  //
-  //    long packsToOrder = product.packsToOrder(0);
-  //
-  //    assertEquals(0, packsToOrder);
-  //  }
-  //
-  //  @Test
-  //  public void shouldReturnZeroPackToOrderIfOrderQuantityIsOneAndRoundToZeroTrueWithNetContentTen() {
-  //    Orderable product =
-  //        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test7", 10, 7, true,
-  //            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  //
-  //    long packsToOrder = product.packsToOrder(1);
-  //
-  //    assertEquals(0, packsToOrder);
-  //  }
-  //
-  //  @Test
-  //  public void shouldNotRoundUpWhenEqualToThreshold() {
-  //    final int netContent = 100;
-  //    final int roundingThreshold = 50;
-  //
-  //    Orderable product = CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN,
-  //            "test8", netContent, roundingThreshold, false, CLASSIFICATION_SYS,
-  //            CLASSIFICATION_SYS_ID);
-  //
-  //    long packsToOrder = product.packsToOrder(250);
-  //    assertEquals(2, packsToOrder);
-  //
-  //    packsToOrder = product.packsToOrder(251);
-  //    assertEquals(3, packsToOrder);
-  //  }
+  private static final String IBUPROFEN = "ibuprofen";
+  private static final String EACH = "each";
+  private static final String CLASSIFICATION_SYS = "cSys";
+  private static final String CLASSIFICATION_SYS_ID = "cSysId";
+
+  private static Program em;
+  private static Orderable ibuprofen;
+
+  {
+    em = new Program("EssMed");
+    ibuprofen =
+        CommodityType.newCommodityType("ibuprofen", "each", "Ibuprofen", "test", 10, 5, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+
+    OrderableDisplayCategory testCat = OrderableDisplayCategory.createNew(Code.code("testcat"));
+    ProgramOrderable ibuprofenInEm =
+        ProgramOrderable.createNew(em, testCat, ibuprofen, CurrencyUnit.USD);
+    ibuprofen.addToProgram(ibuprofenInEm);
+  }
+
+  @Test
+  public void shouldReplaceProgramOrderableOnEquals() {
+    OrderableDisplayCategory nsaidCat = OrderableDisplayCategory.createNew(Code.code("nsaid"));
+    ProgramOrderable ibuprofenInEmForNsaid =
+        ProgramOrderable.createNew(em, nsaidCat, ibuprofen, CurrencyUnit.USD);
+    ibuprofen.addToProgram(ibuprofenInEmForNsaid);
+
+    assertEquals(1, ibuprofen.getPrograms().size());
+    assertEquals(nsaidCat, ibuprofen.getProgramOrderable(em).getOrderableDisplayCategory());
+  }
+
+  @Test
+  public void setProgramsShouldRemoveOldItems() {
+    // dummy malaria program
+    Program malaria = new Program("malaria");
+
+    // dummy product categories
+    OrderableDisplayCategory nsaidCat = OrderableDisplayCategory.createNew(Code.code("nsaid"));
+    OrderableDisplayCategory painCat = OrderableDisplayCategory.createNew(Code.code("pain"));
+
+    // associate ibuprofen with 2 programs
+    ProgramOrderable ibuprofenInEmForNsaid =
+        ProgramOrderable.createNew(em, nsaidCat, ibuprofen, CurrencyUnit.USD);
+    ProgramOrderable ibuprofenInMalaria =
+        ProgramOrderable.createNew(malaria, painCat, ibuprofen, CurrencyUnit.USD);
+    ibuprofen.addToProgram(ibuprofenInEmForNsaid);
+    ibuprofen.addToProgram(ibuprofenInMalaria);
+
+    // mock program repo to return em program
+    UUID emUuid = UUID.fromString("f982f7c2-760b-11e6-8b77-86f30ca893d3");
+    ProgramRepository progRepo = mock(ProgramRepository.class);
+    when(progRepo.findOne(emUuid)).thenReturn(em);
+
+    // mock product category repo to return nsaid category
+    UUID nsaidCatUuid = UUID.fromString("f982f7c2-760b-11e6-8b77-86f30ca893ff");
+    OrderableDisplayCategoryRepository prodCatRepo = mock(OrderableDisplayCategoryRepository.class);
+    when(prodCatRepo.findOne(nsaidCatUuid)).thenReturn(nsaidCat);
+
+    // create a set with one builder for a link from ibuprofen to EM program
+    ProgramOrderableBuilder ibuprofenInEmBuilder = new ProgramOrderableBuilder(emUuid);
+    ibuprofenInEmBuilder.setProgramRepository(progRepo);
+    ibuprofenInEmBuilder.setOrderableDisplayCategoryRepository(prodCatRepo);
+    ibuprofenInEmBuilder.setProgramId(emUuid);
+    ibuprofenInEmBuilder.setOrderableDisplayCategoryId(nsaidCatUuid);
+    ibuprofenInEmBuilder.setPricePerPack(Money.of(CurrencyUnit.USD, 3.39));
+    Set<ProgramOrderableBuilder> ppBuilders = new HashSet<>();
+    ppBuilders.add(ibuprofenInEmBuilder);
+    ibuprofen.setPrograms(ppBuilders);
+
+    assertEquals(1, ibuprofen.getPrograms().size());
+    assertFalse(ibuprofen.getPrograms().contains(ibuprofenInMalaria));
+  }
+
+  @Test
+  public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsSmallerThanRemainder() {
+    Orderable product =
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test1", 10, 4, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+
+    long packsToOrder = product.packsToOrder(26);
+
+    assertEquals(3, packsToOrder);
+  }
+
+  @Test
+  public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsGreaterThanRemainder() {
+    Orderable product =
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test2", 10, 7, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+
+    long packsToOrder = product.packsToOrder(26);
+
+    assertEquals(2, packsToOrder);
+  }
+
+  @Test
+  public void shouldCalculatePacksToOrderWhenCanRoundToZero() {
+    Orderable product =
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test3", 10, 7, true,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+
+    long packsToOrder = product.packsToOrder(6);
+
+    assertEquals(0, packsToOrder);
+  }
+
+  @Test
+  public void shouldCalculatePacksToOrderWhenCanNotRoundToZero() {
+    Orderable product =
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test4", 10, 7, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+
+    long packsToOrder = product.packsToOrder(6);
+
+    assertEquals(1, packsToOrder);
+  }
+
+  @Test
+  public void shouldReturnZeroPacksToOrderIfNetContentIsZero() {
+    Orderable product =
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test5", 0, 7, true,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+
+    long packsToOrder = product.packsToOrder(6);
+
+    assertEquals(0, packsToOrder);
+  }
+
+  @Test
+  public void shouldReturnZeroPacksToOrderIfOrderQuantityIsZero() {
+    Orderable product =
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test6", 10, 7, false,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+
+    long packsToOrder = product.packsToOrder(0);
+
+    assertEquals(0, packsToOrder);
+  }
+
+  @Test
+  public void shouldReturnZeroPackToOrderIfOrderQuantityIsOneAndRoundToZeroTrueWithNetContentTen() {
+    Orderable product =
+        CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN, "test7", 10, 7, true,
+            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+
+    long packsToOrder = product.packsToOrder(1);
+
+    assertEquals(0, packsToOrder);
+  }
+
+  @Test
+  public void shouldNotRoundUpWhenEqualToThreshold() {
+    final int netContent = 100;
+    final int roundingThreshold = 50;
+
+    Orderable product = CommodityType.newCommodityType(IBUPROFEN, EACH, IBUPROFEN,
+            "test8", netContent, roundingThreshold, false, CLASSIFICATION_SYS,
+            CLASSIFICATION_SYS_ID);
+
+    long packsToOrder = product.packsToOrder(250);
+    assertEquals(2, packsToOrder);
+
+    packsToOrder = product.packsToOrder(251);
+    assertEquals(3, packsToOrder);
+  }
 }

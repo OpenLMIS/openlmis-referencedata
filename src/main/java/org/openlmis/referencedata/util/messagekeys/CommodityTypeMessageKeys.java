@@ -22,7 +22,6 @@ public abstract class CommodityTypeMessageKeys extends MessageKeys {
   private static final String PARENT = "parent";
   private static final String IS_DESCENDANT = "isDescendant";
 
-  public static final String ERROR_NULL = join(ERROR, NULL);
   public static final String ERROR_NOT_A_COMMODITY_TYPE = join(ERROR, PRODUCT_NOT_A_COMMODITY_TYPE);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_TRADE_ITEMS_NULL = join(ERROR, TRADE_ITEMS, NULL);

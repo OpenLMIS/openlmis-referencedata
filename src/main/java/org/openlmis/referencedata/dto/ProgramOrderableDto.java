@@ -15,27 +15,38 @@
 
 package org.openlmis.referencedata.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.joda.money.Money;
-import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.serializer.MoneyDeserializer;
 import org.openlmis.referencedata.serializer.MoneySerializer;
-import java.util.HashSet;
-import java.util.Set;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.UUID;
 
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProgramOrderableDto implements ProgramOrderable.Importer, ProgramOrderable.Exporter {
+public class ProgramOrderableDto extends BaseDto
+    implements ProgramOrderable.Exporter, ProgramOrderable.Importer {
 
-  private OrderableDisplayCategory orderableDisplayCategory;
+  private UUID orderableId;
 
-  private ProgramDto program;
+  private String orderableFullProductName;
+
+  private Code orderableCode;
+
+  private Long orderableNetContent;
+
+  private UUID orderableDisplayCategoryId;
+
+  private String orderableCategoryDisplayName;
+
+  private int orderableCategoryDisplayOrder;
 
   private boolean active;
 
@@ -49,33 +60,4 @@ public class ProgramOrderableDto implements ProgramOrderable.Importer, ProgramOr
   @JsonDeserialize(using = MoneyDeserializer.class)
   private Money pricePerPack;
 
-  /**
-   * Create new list of ProgramOrderableDto based on given list of {@link ProgramOrderable}
-   *
-   * @param programOrderables list of {@link ProgramOrderable}
-   * @return new list of ProgramOrderableDto.
-   */
-  public static Set<ProgramOrderableDto> newInstance(
-      Iterable<ProgramOrderable> programOrderables) {
-
-    Set<ProgramOrderableDto> programOrderableDtos = new HashSet<>();
-    programOrderables.forEach(po -> programOrderableDtos.add(newInstance(po)));
-    return programOrderableDtos;
-  }
-
-  /**
-   * Creates new instance based on given {@link ProgramOrderable}.
-   *
-   * @param po instance of ProgramOrderable
-   * @return new instance of ProgramOrderableDto.
-   */
-  public static ProgramOrderableDto newInstance(ProgramOrderable po) {
-    if (po == null) {
-      return null;
-    }
-    ProgramOrderableDto programDto = new ProgramOrderableDto();
-    po.export(programDto);
-
-    return programDto;
-  }
 }

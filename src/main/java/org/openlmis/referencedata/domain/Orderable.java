@@ -15,57 +15,51 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.google.common.collect.ImmutableMap;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.dto.ProgramOrderableDto;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapKeyColumn;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
  * Products that are Orderable by Program.  An Orderable represent any medical commodities
- * that may be ordered/requisitioned, typically by a {@link Program}. An Orderable must be
- * connected to either a {@link TradeItem} (a specific item by a manufacturer/brand owner) or to
- * a {@link CommodityType} (one category of medicines or commodities).
+ * that may be ordered/requisitioned, typically by a {@link Program}.
  */
 @Entity
+@DiscriminatorColumn(name = "Type")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "orderables", schema = "referencedata")
 @NoArgsConstructor
-public class Orderable extends BaseEntity {
-
+public abstract class Orderable extends BaseEntity {
   @Embedded
-  @Getter
   private Code productCode;
 
   @Embedded
-  @Getter(AccessLevel.PACKAGE)
   private Dispensable dispensable;
 
-  @Getter
   private String fullProductName;
 
+  @JsonProperty
   @Getter(AccessLevel.PACKAGE)
   private long netContent;
 
+  @JsonProperty
   @Getter(AccessLevel.PACKAGE)
   private long packRoundingThreshold;
 
+  @JsonProperty
   @Getter(AccessLevel.PACKAGE)
   private boolean roundToZero;
 
@@ -73,14 +67,74 @@ public class Orderable extends BaseEntity {
       fetch = FetchType.EAGER)
   private Set<ProgramOrderable> programOrderables;
 
-  @Getter(AccessLevel.PACKAGE)
-  @ElementCollection(fetch = FetchType.EAGER)
-  @MapKeyColumn(name = "key")
-  @Column(name = "value")
-  @CollectionTable(
-      name = "identifiers",
-      joinColumns = @JoinColumn(name = "orderableId"))
-  private Map<String, String> identifiers;
+  protected Orderable(Code productCode, Dispensable dispensable, String fullProductName,
+                      long netContent, long packRoundingThreshold, boolean roundToZero) {
+    this.productCode = productCode;
+    this.dispensable = dispensable;
+    this.fullProductName = fullProductName;
+    this.netContent = netContent;
+    this.packRoundingThreshold = packRoundingThreshold;
+    this.roundToZero = roundToZero;
+    this.programOrderables = new LinkedHashSet<>();
+  }
+
+  public boolean hasProgram() {
+    return null != programOrderables && 0 < programOrderables.size();
+  }
+
+  /**
+   * Return this orderable product's unique product code.
+   * @return a copy of this product's unique product code.
+   */
+  @JsonProperty
+  public final Code getProductCode() {
+    return productCode;
+  }
+
+  @JsonProperty
+  public final Dispensable getDispensable() {
+    return dispensable;
+  }
+
+  /**
+   * Return this orderable product's name.
+   * @return this product's name.
+   */
+  @JsonProperty
+  public final String getFullProductName() {
+    return fullProductName;
+  }
+
+  /**
+   * Adds product for ordering within a program.
+   * @param programOrderable the association to a {@link org.openlmis.referencedata.domain.Program}
+   * @return true if successful, false otherwise.
+   */
+  public final boolean addToProgram(ProgramOrderable programOrderable) {
+    if (programOrderables.contains(programOrderable)) {
+      programOrderables.remove(programOrderable);
+    }
+
+    return programOrderables.add(programOrderable);
+  }
+
+  @JsonProperty
+  protected final void setPrograms(Set<ProgramOrderableBuilder> ppBuilders) {
+    Set<ProgramOrderable> workProgProducts = new HashSet<>();
+
+    // add or modify associations
+    for (ProgramOrderableBuilder ppBuilder : ppBuilders) {
+      ProgramOrderable programOrderable = ppBuilder.createProgramOrderable(this);
+      workProgProducts.add(programOrderable);
+      addToProgram(programOrderable);
+    }
+    this.programOrderables.retainAll(workProgProducts); // remove old associations
+  }
+
+  @JsonProperty
+  protected final Set<ProgramOrderable> getPrograms() {
+    return programOrderables;
+  }
 
   /**
    * Get the association to a {@link Program}.
@@ -97,6 +151,9 @@ public class Orderable extends BaseEntity {
 
     return null;
   }
+
+  @JsonProperty
+  public abstract String getDescription();
 
   /**
    * Returns the number of packs to order. For this Orderable given a desired number of
@@ -124,6 +181,13 @@ public class Orderable extends BaseEntity {
   }
 
   /**
+   * Determines if product may be used to fulfill for the given product.
+   * @param product the product we'd like to fulfill for.
+   * @return true if this product can fulfill for the given product.  False otherwise.
+   */
+  public abstract boolean canFulfill(Orderable product);
+
+  /**
    * Determines equality based on product codes.
    * @param object another Orderable, ideally.
    * @return true if the two are semantically equal.  False otherwise.
@@ -145,88 +209,4 @@ public class Orderable extends BaseEntity {
   public final int hashCode() {
     return Objects.hashCode(productCode);
   }
-
-  /**
-   * Creates new instance based on data from {@link Importer}
-   *
-   * @param importer instance of {@link Importer}
-   * @return new instance of Orderable.
-   */
-  public static Orderable newInstance(Importer importer) {
-    Orderable orderable = new Orderable();
-    orderable.id = importer.getId();
-    orderable.productCode = importer.getProductCode();
-    orderable.dispensable = importer.getDispensable();
-    orderable.fullProductName = importer.getFullProductName();
-    orderable.netContent = importer.getNetContent();
-    orderable.packRoundingThreshold = importer.getPackRoundingThreshold();
-    orderable.roundToZero = importer.isRoundToZero();
-    orderable.programOrderables = new HashSet<>();
-
-    if (importer.getProgramOrderables() != null) {
-      importer.getProgramOrderables()
-          .forEach(po -> orderable.programOrderables.add(ProgramOrderable.newInstance(po)));
-    }
-    orderable.identifiers = ImmutableMap.copyOf(importer.getIdentifiers());
-
-    return orderable;
-  }
-
-  /**
-   * Export this object to the specified exporter (DTO).
-   *
-   * @param exporter exporter to export to
-   */
-  public void export(Exporter exporter) {
-    exporter.setId(id);
-    exporter.setProductCode(productCode);
-    exporter.setDispensable(dispensable);
-    exporter.setFullProductName(fullProductName);
-    exporter.setNetContent(netContent);
-    exporter.setPackRoundingThreshold(packRoundingThreshold);
-    exporter.setRoundToZero(roundToZero);
-    exporter.setProgramOrderables(ProgramOrderableDto.newInstance(programOrderables));
-    exporter.setIdentifiers(identifiers);
-  }
-
-  public interface Exporter {
-    void setId(UUID id);
-
-    void setProductCode(Code productCode);
-
-    void setDispensable(Dispensable dispensable);
-
-    void setFullProductName(String fullProductName);
-
-    void setNetContent(long netContent);
-
-    void setPackRoundingThreshold(long packRoundingThreshold);
-
-    void setRoundToZero(boolean roundToZero);
-
-    void setProgramOrderables(Set<ProgramOrderableDto> programOrderables);
-
-    void setIdentifiers(Map<String, String> identifiers);
-  }
-
-  public interface Importer {
-    UUID getId();
-
-    Code getProductCode();
-
-    Dispensable getDispensable();
-
-    String getFullProductName();
-
-    long getNetContent();
-
-    long getPackRoundingThreshold();
-
-    boolean isRoundToZero();
-
-    Set<ProgramOrderableDto> getProgramOrderables();
-
-    Map<String, String> getIdentifiers();
-  }
-
 }
