@@ -15,14 +15,10 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -37,23 +33,18 @@ import javax.persistence.UniqueConstraint;
         name = "unq_trade_item_classifications_system",
         columnNames = {"tradeitemid", "classificationsystem"}))
 @NoArgsConstructor
-@JsonIgnoreProperties({"id"})
+@EqualsAndHashCode(callSuper = false, exclude = {"tradeItem"})
 public class TradeItemClassification extends BaseEntity {
 
   @ManyToOne
-  @Getter
-  @Setter
-  @JsonIgnore
   private TradeItem tradeItem;
 
   @Getter
   @Setter
-  @JsonProperty
   private String classificationSystem;
 
   @Getter
   @Setter
-  @JsonProperty
   private String classificationId;
 
   /**

@@ -34,7 +34,7 @@ public class Dispensable {
     this.dispensingUnit = "";
   }
 
-  protected Dispensable(String dispensingUnit) {
+  private Dispensable(String dispensingUnit) {
     this.dispensingUnit = dispensingUnit.trim();
   }
 
@@ -61,7 +61,7 @@ public class Dispensable {
     return dispensingUnit;
   }
 
-  public static final Dispensable createNew(String dispensingUnit) {
+  public static Dispensable createNew(String dispensingUnit) {
     String correctDispensingUnit = (null == dispensingUnit) ? "" : dispensingUnit;
     return new Dispensable(correctDispensingUnit);
   }

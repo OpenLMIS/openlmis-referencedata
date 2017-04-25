@@ -15,27 +15,31 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.openlmis.referencedata.dto.CommodityTypeDto;
+import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import javax.persistence.DiscriminatorValue;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * CommodityTypes are generic commodities to simplify ordering and use.  A CommodityType doesn't
@@ -43,16 +47,25 @@ import javax.persistence.OneToMany;
  * refined categorization of products that may typically be ordered / exchanged for one another.
  */
 @Entity
-@DiscriminatorValue("COMMODITY_TYPE")
+@Table(name = "commodity_types", schema = "referencedata")
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public final class CommodityType extends Orderable {
-  private String description;
+@AllArgsConstructor
+@EqualsAndHashCode(of = "name", callSuper = false)
+public final class CommodityType extends BaseEntity {
+
+  @OneToMany(mappedBy = "commodityType", cascade = CascadeType.ALL, orphanRemoval = true,
+      fetch = FetchType.EAGER)
+  private Set<Orderable> orderables;
+
+  @Column(nullable = false)
+  private String name;
 
   @Getter
+  @Column(nullable = false)
   private String classificationSystem;
 
   @Getter
+  @Column(nullable = false)
   private String classificationId;
 
   @Getter
@@ -63,60 +76,7 @@ public final class CommodityType extends Orderable {
   @Getter
   @Setter
   @OneToMany(mappedBy = "parent")
-  @JsonIgnore
   private List<CommodityType> children;
-
-  private CommodityType(Code productCode, Dispensable dispensable, String fullProductName,
-                        long netContent, long packRoundingThreshold, boolean roundToZero,
-                        String classificationSystem, String classificationId) {
-    super(productCode, dispensable, fullProductName, netContent, packRoundingThreshold,
-          roundToZero);
-    this.classificationSystem = classificationSystem;
-    this.classificationId = classificationId;
-    this.children = new ArrayList<>();
-  }
-
-  /**
-   * Create a new commodity type.
-   *
-   * @param productCode a unique product code
-   * @param fullProductName fullProductName of product
-   * @param description the description to display in ordering, fulfilling, etc
-   * @param netContent    the number of dispensing units in the pack
-   * @param packRoundingThreshold determines how number of packs is rounded
-   * @param roundToZero determines if number of packs can be rounded to zero
-   * @return a new CommodityType
-   */
-  @JsonCreator
-  public static CommodityType newCommodityType(
-      @JsonProperty("productCode") String productCode,
-      @JsonProperty("dispensingUnit")
-         String dispensingUnit,
-      @JsonProperty("fullProductName") String fullProductName,
-      @JsonProperty("description") String description,
-      @JsonProperty("netContent") long netContent,
-      @JsonProperty("packRoundingThreshold")
-           long packRoundingThreshold,
-      @JsonProperty("roundToZero") boolean roundToZero,
-      @JsonProperty("classificationSystem") String classificationSystem,
-      @JsonProperty("classificationId") String classificationId) {
-    Code code = Code.code(productCode);
-    Dispensable dispensable = Dispensable.createNew(dispensingUnit);
-    CommodityType commodityType = new CommodityType(code, dispensable, fullProductName, netContent,
-        packRoundingThreshold, roundToZero, classificationSystem, classificationId);
-    commodityType.description = description;
-    return commodityType;
-  }
-
-  @Override
-  public String getDescription() {
-    return description;
-  }
-
-  @Override
-  public boolean canFulfill(Orderable product) {
-    return this.equals(product);
-  }
 
   /**
    * Validates and assigns a parent to this commodity type.
@@ -140,5 +100,73 @@ public final class CommodityType extends Orderable {
       }
       child.validateIsNotDescendant(commodityType);
     }
+  }
+
+  /**
+   * Creates new instance based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of TradeItem.
+   */
+  public static CommodityType newInstance(Importer importer) {
+    if (importer == null) {
+      return null;
+    }
+    CommodityType commodityType = new CommodityType();
+    commodityType.id = importer.getId();
+    commodityType.name = importer.getName();
+    commodityType.classificationSystem = importer.getClassificationSystem();
+    commodityType.classificationId = importer.getClassificationId();
+    commodityType.parent = CommodityType.newInstance(importer.getParent());
+    commodityType.children = new ArrayList<>();
+    commodityType.orderables = new HashSet<>();
+    if (importer.getOrderables() != null) {
+      importer.getOrderables()
+          .forEach(oe -> commodityType.orderables.add(Orderable.newInstance(oe)));
+    }
+
+    return commodityType;
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setName(name);
+    exporter.setClassificationSystem(classificationSystem);
+    exporter.setClassificationId(classificationId);
+    exporter.setParent(CommodityTypeDto.newInstance(parent));
+    exporter.setOrderables(OrderableDto.newInstance(orderables));
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    Set<OrderableDto> getOrderables();
+
+    String getName();
+
+    String getClassificationSystem();
+
+    String getClassificationId();
+
+    CommodityTypeDto getParent();
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setOrderables(Set<OrderableDto> orderables);
+
+    void setName(String name);
+
+    void setClassificationSystem(String classificationSystem);
+
+    void setClassificationId(String classificationId);
+
+    void setParent(CommodityTypeDto parent);
   }
 }

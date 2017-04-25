@@ -47,10 +47,9 @@ public class OrderableDisplayCategory extends BaseEntity {
   /**
    * Creates a new OrderableDisplayCategory.
    *
-   * @param code         this OrderableDisplayCategory's unique implementation code.
-   * @param displayValue the display values of this OrderableDisplayCategory.
-   * @return a new OrderableDisplayCategory.
-   * @throws NullPointerException if either parameter is null.
+   * @param code         this OrderableDisplayCategory's unique implementation code
+   *                     (never {@code null})
+   * @param displayValue the display values of this OrderableDisplayCategory (never {@code null})
    */
   protected OrderableDisplayCategory(Code code, OrderedDisplayValue displayValue) {
     Objects.requireNonNull(code);
@@ -60,7 +59,7 @@ public class OrderableDisplayCategory extends BaseEntity {
   }
 
   /**
-   * Update this from another.  Copies display values from the other OrderableDisplayCategory
+   * Update this from another. Copies display values from the other OrderableDisplayCategory
    * into this one.
    *
    * @param orderableDisplayCategory OrderableDisplayCategory to update from.
@@ -72,9 +71,9 @@ public class OrderableDisplayCategory extends BaseEntity {
   /**
    * Creates a new OrderableDisplayCategory.
    *
-   * @param orderableDisplayCategoryCode this OrderableDisplayCategory's unique implementation code.
+   * @param orderableDisplayCategoryCode this OrderableDisplayCategory's unique implementation code
+   *                                     (never {@code null})
    * @return a new OrderableDisplayCategory using default display value and order
-   * @throws NullPointerException if parameter is null.
    */
   public static OrderableDisplayCategory createNew(Code orderableDisplayCategoryCode) {
     return OrderableDisplayCategory.createNew(orderableDisplayCategoryCode,
@@ -84,10 +83,11 @@ public class OrderableDisplayCategory extends BaseEntity {
   /**
    * Creates a new OrderableDisplayCategory.
    *
-   * @param orderableDisplayCategoryCode this OrderableDisplayCategory's unique implementation code.
-   * @param displayValue        the display values of this OrderableDisplayCategory.
+   * @param orderableDisplayCategoryCode this OrderableDisplayCategory's unique implementation code
+   *                                     (never {@code null})
+   * @param displayValue        the display values of this OrderableDisplayCategory
+   *                            (never {@code null})
    * @return a new OrderableDisplayCategory.
-   * @throws NullPointerException if either parameter is null.
    */
   public static OrderableDisplayCategory createNew(Code orderableDisplayCategoryCode,
                                                    OrderedDisplayValue displayValue) {

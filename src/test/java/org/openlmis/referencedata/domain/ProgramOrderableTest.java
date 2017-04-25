@@ -19,10 +19,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.Sets;
 import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 
 public class ProgramOrderableTest {
+
+  private static final String IBUPROFEN = "ibuprofen";
+  private static final String EACH = "each";
 
   private static Orderable ibuprofen;
   private static Program em;
@@ -31,9 +35,8 @@ public class ProgramOrderableTest {
   {
     em = new Program("EM");
     testCat = OrderableDisplayCategory.createNew(Code.code("test"));
-    ibuprofen =
-        CommodityType.newCommodityType("ibuprofen", "each", "Ibuprofen", "NSAID", 20, 10, false,
-            "cSys", "cId");
+    ibuprofen = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
+        20, 10, false, null, null);
   }
 
   @Test

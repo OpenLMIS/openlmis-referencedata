@@ -15,24 +15,20 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import static javax.persistence.FetchType.EAGER;
 
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.messagekeys.ProductMessageKeys;
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import org.openlmis.referencedata.dto.OrderableDto;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
+import java.util.UUID;
 import javax.persistence.CascadeType;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * TradeItems represent branded/produced/physical products.  A TradeItem is used for Product's that
@@ -46,30 +42,19 @@ import javax.persistence.OneToMany;
  * </ul>
  */
 @Entity
-@DiscriminatorValue("TRADE_ITEM")
+@Table(name = "trade_items", schema = "referencedata")
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public final class TradeItem extends Orderable {
+@AllArgsConstructor
+public final class TradeItem extends BaseEntity {
 
-  @JsonProperty
+  @OneToMany(mappedBy = "tradeItem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = EAGER)
+  private Set<Orderable> orderables;
+
   private String manufacturerOfTradeItem;
 
   @OneToMany(mappedBy = "tradeItem", cascade = CascadeType.ALL)
-  @JsonProperty
   @Getter
   private List<TradeItemClassification> classifications;
-
-  private TradeItem(Code productCode, Dispensable dispensable, String fullProductName,
-                    long netContent, long packRoundingThreshold, boolean roundToZero) {
-    super(productCode, dispensable, fullProductName, netContent, packRoundingThreshold,
-          roundToZero);
-    classifications = new ArrayList<>();
-  }
-
-  @Override
-  public String getDescription() {
-    return manufacturerOfTradeItem;
-  }
 
   /**
    * A TradeItem can fulfill for the given product if the product is this trade item or if this
@@ -77,33 +62,18 @@ public final class TradeItem extends Orderable {
    * @param product the product we'd like to fulfill for.
    * @return true if we can fulfill for the given product, false otherwise.
    */
-  @Override
   public boolean canFulfill(Orderable product) {
-    // TODO: OLMIS-1696
-    return this.equals(product);
-  }
-
-  /**
-   * Factory method to create a new trade item.
-   * @param productCode a unique product code
-   * @param fullProductName fullProductName of product
-   * @param netContent the # of dispensing units contained
-   * @param packRoundingThreshold determines how number of packs is rounded
-   * @param roundToZero determines if number of packs can be rounded to zero
-   * @return a new trade item or armageddon if failure
-   */
-  @JsonCreator
-  public static TradeItem newTradeItem(@JsonProperty("productCode") String productCode,
-                                       @JsonProperty("dispensingUnit") String dispensingUnit,
-                                       @JsonProperty("fullProductName") String fullProductName,
-                                       @JsonProperty("netContent") long netContent,
-                                       @JsonProperty("packRoundingThreshold")
-                                             long packRoundingThreshold,
-                                       @JsonProperty("roundToZero") boolean roundToZero) {
-    Code code = Code.code(productCode);
-    Dispensable dispensable = Dispensable.createNew(dispensingUnit);
-    return new TradeItem(code, dispensable, fullProductName, netContent,
-        packRoundingThreshold, roundToZero);
+    for (Orderable orderable : orderables) {
+      if (orderable.getProductCode().equals(product.getProductCode())) {
+        return true;
+      }
+    }
+    for (TradeItemClassification classification : classifications) {
+      if (product.getIdentifiers().containsValue(classification.getClassificationId())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -112,12 +82,8 @@ public final class TradeItem extends Orderable {
    * @param commodityType the commodity type to associate with
    */
   public void assignCommodityType(CommodityType commodityType) {
-    if (hasSameDispensingUnit(commodityType)) {
-      assignCommodityType(commodityType.getClassificationSystem(),
-          commodityType.getClassificationId());
-    } else {
-      throw new ValidationMessageException(ProductMessageKeys.ERROR_DISPENSING_UNITS_WRONG);
-    }
+    assignCommodityType(commodityType.getClassificationSystem(),
+            commodityType.getClassificationId());
   }
 
   /**
@@ -136,10 +102,6 @@ public final class TradeItem extends Orderable {
     }
   }
 
-  boolean hasSameDispensingUnit(Orderable product) {
-    return this.getDispensable().equals(product.getDispensable());
-  }
-
   TradeItemClassification findClassificationById(String classificationId) {
     for (TradeItemClassification classification : classifications) {
       if (classificationId.equals(classification.getClassificationId())) {
@@ -149,23 +111,54 @@ public final class TradeItem extends Orderable {
     return null;
   }
 
-  /**
-   * Set classifications on this trade item and associate them, by setting
-   * their trade item relationship.
-   * @param classifications the classifications
+  /** Creates new instance based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of TradeItem.
    */
-  public void setClassifications(List<TradeItemClassification> classifications) {
-    if (classifications != null) {
-      for (TradeItemClassification classification : classifications) {
-        classification.setTradeItem(this);
-      }
-      this.classifications = classifications;
-    } else {
-      this.classifications = new ArrayList<>();
+  public static TradeItem newInstance(Importer importer) {
+    TradeItem tradeItem = new TradeItem();
+    tradeItem.id = importer.getId();
+    tradeItem.manufacturerOfTradeItem = importer.getManufacturerOfTradeItem();
+    tradeItem.classifications = importer.getClassifications();
+    tradeItem.orderables = new HashSet<>();
+    if (importer.getOrderables() != null) {
+      importer.getOrderables()
+          .forEach(oe -> tradeItem.orderables.add(Orderable.newInstance(oe)));
     }
+
+    return tradeItem;
   }
 
-  private void validateNoDuplicateClassSystem(
-      Collection<TradeItemClassification> classifications) {
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setId(id);
+    exporter.setManufacturerOfTradeItem(manufacturerOfTradeItem);
+    exporter.setClassifications(classifications);
+    exporter.setOrderables(OrderableDto.newInstance(orderables));
+  }
+
+  public interface Importer {
+    UUID getId();
+
+    Set<OrderableDto> getOrderables();
+
+    String getManufacturerOfTradeItem();
+
+    List<TradeItemClassification> getClassifications();
+  }
+
+  public interface Exporter {
+    void setId(UUID id);
+
+    void setOrderables(Set<OrderableDto> orderables);
+
+    void setManufacturerOfTradeItem(String manufacturerOfTradeItem);
+
+    void setClassifications(List<TradeItemClassification> classifications);
   }
 }

@@ -19,18 +19,25 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+import static org.openlmis.referencedata.dto.TradeItemDto.newInstance;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Dispensable;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.TradeItemDto;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -40,27 +47,26 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @MockBean
   private TradeItemRepository repository;
 
-
   @Test
   public void shouldCreateNewTradeItem() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
     TradeItem tradeItem = generateItem("item");
 
-    when(repository.save(tradeItem)).thenReturn(tradeItem);
+    when(repository.save(any(TradeItem.class))).thenAnswer(new SaveAnswer<TradeItem>());
 
-    TradeItem response = restAssured
+    TradeItemDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(tradeItem)
+        .body(newInstance(tradeItem))
         .when()
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(TradeItem.class);
+        .extract().as(TradeItemDto.class);
 
-    assertEquals(tradeItem, response);
+    assertEquals(newInstance(tradeItem), response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -72,7 +78,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(repository.findAll()).thenReturn(items);
 
-    TradeItem[] response = restAssured
+    TradeItemDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -80,9 +86,9 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(TradeItem[].class);
+        .extract().as(TradeItemDto[].class);
 
-    assertArrayEquals(items.toArray(), response);
+    assertArrayEquals(newInstance(items).toArray(), response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -94,7 +100,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(repository.findByClassificationIdLike(CID)).thenReturn(items);
 
-    TradeItem[] response = restAssured
+    TradeItemDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam("classificationId", CID)
@@ -103,9 +109,9 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(TradeItem[].class);
+        .extract().as(TradeItemDto[].class);
 
-    assertArrayEquals(items.toArray(), response);
+    assertArrayEquals(newInstance(items).toArray(), response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -117,7 +123,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(repository.findByClassificationId(CID)).thenReturn(items);
 
-    TradeItem[] response = restAssured
+    TradeItemDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam("classificationId", CID)
@@ -126,9 +132,9 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(TradeItem[].class);
+        .extract().as(TradeItemDto[].class);
 
-    assertArrayEquals(items.toArray(), response);
+    assertArrayEquals(newInstance(items).toArray(), response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -139,7 +145,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .body(generateItem("code"))
+        .body(generateItem("name"))
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .put(RESOURCE_URL)
@@ -160,8 +166,11 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(403);
   }
 
-  private TradeItem generateItem(String productCode) {
-    TradeItem tradeItem = TradeItem.newTradeItem(productCode, "each", productCode, 10, 20, false);
+  private TradeItem generateItem(String name) {
+    Orderable orderable = new Orderable(Code.code(name), Dispensable.createNew("each"), name,
+        10, 20, false, Collections.emptySet(), Collections.emptyMap());
+    orderable.setId(UUID.randomUUID());
+    TradeItem tradeItem = new TradeItem(Collections.singleton(orderable), name, new ArrayList<>());
     tradeItem.assignCommodityType("sys1", "sys1Id");
     tradeItem.assignCommodityType("sys2", "sys2Id");
     return tradeItem;

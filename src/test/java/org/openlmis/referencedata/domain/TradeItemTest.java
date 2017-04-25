@@ -15,54 +15,63 @@
 
 package org.openlmis.referencedata.domain;
 
+import static java.util.Arrays.asList;
+import static junit.framework.Assert.assertFalse;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class TradeItemTest {
-  private static TradeItem advil;
 
-  private static final String ADVIL_CODE = "advil";
+  private static final String IBUPROFEN_CODE = "ib";
+  private static final String IBUPROFEN_NAME = "Ibuprofen";
   private static final String ADVIL_NAME = "Advil";
+  private static final String CLASSIFICATION_ID = "some-id";
   private static final String CID1 = "CID1";
 
-  {
-    advil = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 10, 5, false);
+  private static final Map<String, String> identificators = new HashMap<>();
+
+  static {
+    identificators.put("key", CLASSIFICATION_ID);
+  }
+
+  private Orderable ibuprofen = new Orderable(Code.code(IBUPROFEN_CODE),
+          null, IBUPROFEN_NAME, 0, 0, false, null, identificators);
+
+  private TradeItem advil;
+
+  @Test
+  public void canFulfillWithOrderable() throws Exception {
+    advil = new TradeItem(new HashSet<>(), ADVIL_NAME, new ArrayList<>());
+    assertFalse(advil.canFulfill(ibuprofen));
+
+    advil = new TradeItem(new HashSet<>(asList(ibuprofen)), ADVIL_NAME, new ArrayList<>());
+    assertTrue(advil.canFulfill(ibuprofen));
   }
 
   @Test
-  public void testPacksToOrder() throws Exception {
-    assertEquals(0, advil.packsToOrder(-1));
-    assertEquals(0, advil.packsToOrder(0));
-    assertEquals(1, advil.packsToOrder(1));
-    assertEquals(1, advil.packsToOrder(10));
-    assertEquals(1, advil.packsToOrder(11));
-    assertEquals(1, advil.packsToOrder(15));
-    assertEquals(2, advil.packsToOrder(16));
-    assertEquals(2, advil.packsToOrder(17));
-  }
+  public void canFulfillWithClassification() throws Exception {
+    advil = new TradeItem(new HashSet<>(), ADVIL_NAME, new ArrayList<>());
+    assertFalse(advil.canFulfill(ibuprofen));
 
-  @Test
-  public void testCanFulfillWhenHasCommodityType() throws Exception {
-    assertTrue(advil.canFulfill(advil));
-  }
-
-  @Test
-  public void testEqualsAndHashCode() {
-    assertTrue(advil.equals(advil));
-
-    TradeItem advilDupe = TradeItem.newTradeItem(ADVIL_CODE, "each", ADVIL_NAME, 20, 10, false);
-    assertTrue(advil.equals(advilDupe));
-    assertEquals(advil.hashCode(), advilDupe.hashCode());
+    TradeItemClassification classification = new TradeItemClassification();
+    classification.setClassificationId(CLASSIFICATION_ID);
+    advil = new TradeItem(new HashSet<>(asList(ibuprofen)), ADVIL_NAME, new ArrayList<>());
+    assertTrue(advil.canFulfill(ibuprofen));
   }
 
   @Test
   public void shouldAssignClassifications() {
+    advil = new TradeItem(new HashSet<>(), ADVIL_NAME, new ArrayList<>());
+
     advil.assignCommodityType("csys", CID1);
     advil.assignCommodityType("test sys", "ID2");
 
