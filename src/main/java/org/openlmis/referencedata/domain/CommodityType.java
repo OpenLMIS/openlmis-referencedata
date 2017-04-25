@@ -15,24 +15,20 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
+import java.util.HashSet;
 import java.util.List;
-
-import javax.persistence.DiscriminatorValue;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -43,16 +39,21 @@ import javax.persistence.OneToMany;
  * refined categorization of products that may typically be ordered / exchanged for one another.
  */
 @Entity
-@DiscriminatorValue("COMMODITY_TYPE")
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public final class CommodityType extends Orderable {
-  private String description;
+public final class CommodityType extends BaseEntity {
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  private Set<Orderable> orderables;
+
+  @Column(nullable = false)
+  private String name;
 
   @Getter
+  @Column(nullable = false)
   private String classificationSystem;
 
   @Getter
+  @Column(nullable = false)
   private String classificationId;
 
   @Getter
@@ -65,58 +66,6 @@ public final class CommodityType extends Orderable {
   @OneToMany(mappedBy = "parent")
   @JsonIgnore
   private List<CommodityType> children;
-
-  private CommodityType(Code productCode, Dispensable dispensable, String fullProductName,
-                        long netContent, long packRoundingThreshold, boolean roundToZero,
-                        String classificationSystem, String classificationId) {
-    super(productCode, dispensable, fullProductName, netContent, packRoundingThreshold,
-          roundToZero);
-    this.classificationSystem = classificationSystem;
-    this.classificationId = classificationId;
-    this.children = new ArrayList<>();
-  }
-
-  /**
-   * Create a new commodity type.
-   *
-   * @param productCode a unique product code
-   * @param fullProductName fullProductName of product
-   * @param description the description to display in ordering, fulfilling, etc
-   * @param netContent    the number of dispensing units in the pack
-   * @param packRoundingThreshold determines how number of packs is rounded
-   * @param roundToZero determines if number of packs can be rounded to zero
-   * @return a new CommodityType
-   */
-  @JsonCreator
-  public static CommodityType newCommodityType(
-      @JsonProperty("productCode") String productCode,
-      @JsonProperty("dispensingUnit")
-         String dispensingUnit,
-      @JsonProperty("fullProductName") String fullProductName,
-      @JsonProperty("description") String description,
-      @JsonProperty("netContent") long netContent,
-      @JsonProperty("packRoundingThreshold")
-           long packRoundingThreshold,
-      @JsonProperty("roundToZero") boolean roundToZero,
-      @JsonProperty("classificationSystem") String classificationSystem,
-      @JsonProperty("classificationId") String classificationId) {
-    Code code = Code.code(productCode);
-    Dispensable dispensable = Dispensable.createNew(dispensingUnit);
-    CommodityType commodityType = new CommodityType(code, dispensable, fullProductName, netContent,
-        packRoundingThreshold, roundToZero, classificationSystem, classificationId);
-    commodityType.description = description;
-    return commodityType;
-  }
-
-  @Override
-  public String getDescription() {
-    return description;
-  }
-
-  @Override
-  public boolean canFulfill(Orderable product) {
-    return this.equals(product);
-  }
 
   /**
    * Validates and assigns a parent to this commodity type.
@@ -140,5 +89,23 @@ public final class CommodityType extends Orderable {
       }
       child.validateIsNotDescendant(commodityType);
     }
+  }
+
+  /**
+   * Creates new instance based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of TradeItem.
+   */
+  public static CommodityType newInstance(Importer importer) {
+    CommodityType commodityType = new CommodityType();
+
+    return commodityType;
+  }
+
+  public interface Importer {
+  }
+
+  public interface Exporter {
   }
 }

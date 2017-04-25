@@ -16,12 +16,13 @@
 package org.openlmis.referencedata.web;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.TradeItemDto;
 import org.openlmis.referencedata.repository.TradeItemRepository;
-import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.validate.TradeItemValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
+import java.util.Set;
+
 @RestController
 public class TradeItemController extends BaseController {
 
@@ -37,7 +40,7 @@ public class TradeItemController extends BaseController {
   private TradeItemRepository repository;
 
   @Autowired
-  private RightService rightService;
+  private TradeItemValidator validator;
 
   /**
    * Create or update a trade item.
@@ -46,16 +49,13 @@ public class TradeItemController extends BaseController {
    */
   @Transactional
   @RequestMapping(value = "/tradeItems", method = RequestMethod.PUT)
-  public TradeItem createOrUpdate(@RequestBody TradeItem tradeItem) {
+  public TradeItemDto createOrUpdate(@RequestBody TradeItemDto tradeItemDto,
+                                     BindingResult bindingResult) {
+    validator.validate(tradeItemDto, bindingResult);
+    TradeItem tradeItem = TradeItem.newInstance(tradeItemDto);
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
-    // if it already exists, update or fail if not already a CommodityType
-    Orderable storedProduct = repository.findByProductCode(tradeItem.getProductCode());
-    if ( null != storedProduct ) {
-      tradeItem.setId(storedProduct.getId());
-    }
-
-    return repository.save(tradeItem);
+    return TradeItemDto.newInstance(repository.save(tradeItem));
   }
 
 
@@ -69,7 +69,7 @@ public class TradeItemController extends BaseController {
    */
   @Transactional
   @RequestMapping(value = "/tradeItems", method = RequestMethod.GET)
-  public Iterable<TradeItem> retrieveTradeItems(
+  public Set<TradeItemDto> retrieveTradeItems(
       @RequestParam(required = false) String classificationId,
       @RequestParam(required = false, defaultValue = "false") boolean fullMatch) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
@@ -85,6 +85,6 @@ public class TradeItemController extends BaseController {
       }
     }
 
-    return result;
+    return TradeItemDto.newInstance(result);
   }
 }
