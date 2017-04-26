@@ -42,16 +42,12 @@ public class FacilityTypeApprovedProductRepositoryImpl
   @PersistenceContext
   private EntityManager entityManager;
 
-  private Predicate conjunctionPredicate;
-
-  private CriteriaBuilder builder;
-
   @Override
   public Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID programId,
                                                                 boolean fullSupply) {
     checkNotNull(facilityId);
 
-    builder = entityManager.getCriteriaBuilder();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<FacilityTypeApprovedProduct> query = builder.createQuery(
         FacilityTypeApprovedProduct.class
@@ -64,20 +60,26 @@ public class FacilityTypeApprovedProductRepositoryImpl
     Join<FacilityTypeApprovedProduct, FacilityType> ft = ftap.join("facilityType");
     Join<FacilityTypeApprovedProduct, Program> program = ftap.join("program");
 
-    conjunctionPredicate = builder.conjunction();
+    Predicate conjunctionPredicate = builder.conjunction();
     if (programId != null) {
-      addAndToPredicate(builder.equal(program.get("id"), programId));
+      conjunctionPredicate = builder.and(conjunctionPredicate,
+          builder.equal(program.get("id"), programId));
     }
-    addAndToPredicate(builder.equal(fft.get("id"), ft.get("id")));
-    addAndToPredicate(builder.equal(facility.get("id"), facilityId));
+    conjunctionPredicate = builder.and(conjunctionPredicate,
+        builder.equal(fft.get("id"), ft.get("id")));
+    conjunctionPredicate = builder.and(conjunctionPredicate,
+        builder.equal(facility.get("id"), facilityId));
 
     Join<FacilityTypeApprovedProduct, Orderable> orderable = ftap.join("orderable");
     Join<Orderable, Set<ProgramOrderable>> programOrderables =
         orderable.joinSet("programOrderables");
 
-    addAndToPredicate(builder.equal(programOrderables.get("fullSupply"), fullSupply));
-    addAndToPredicate(builder.isTrue(programOrderables.get("active")));
-    addAndToPredicate(builder.equal(programOrderables.get("program"), program));
+    conjunctionPredicate = builder.and(conjunctionPredicate,
+        builder.equal(programOrderables.get("fullSupply"), fullSupply));
+    conjunctionPredicate = builder.and(conjunctionPredicate,
+        builder.isTrue(programOrderables.get("active")));
+    conjunctionPredicate = builder.and(conjunctionPredicate,
+        builder.equal(programOrderables.get("program"), program));
 
     query.select(ftap);
     query.where(conjunctionPredicate);
@@ -93,9 +95,4 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
     return entityManager.createQuery(query).getResultList();
   }
-
-  private void addAndToPredicate(Predicate id) {
-    conjunctionPredicate = builder.and(conjunctionPredicate, id);
-  }
-
 }
