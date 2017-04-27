@@ -26,10 +26,11 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,6 +61,9 @@ import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -781,16 +785,16 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void putShouldReturnBadRequestForNullSupportedPrograms() {
-    testPutBadRequestForSupportedPrograms(null);
+  public void shouldSaveFacilityWithNullSupportedPrograms() {
+    testSaveForSupportedPrograms(null);
   }
 
   @Test
-  public void putShouldReturnBadRequestForEmptySupportedPrograms() {
-    testPutBadRequestForSupportedPrograms(Collections.emptySet());
+  public void shouldSaveFacilityWithEmptySupportedPrograms() {
+    testSaveForSupportedPrograms(Collections.emptySet());
   }
 
-  private void testPutBadRequestForSupportedPrograms(Set<SupportedProgram> programs) {
+  private void testSaveForSupportedPrograms(Set<SupportedProgram> programs) {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
@@ -798,6 +802,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     facility.export(facilityDto);
 
     facilityDto.setSupportedPrograms(programs);
+
+    when(facilityRepository.save(any(Facility.class))).thenReturn(facility);
 
     restAssured
         .given()
@@ -808,8 +814,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .when()
         .put(ID_URL)
         .then()
-        .statusCode(400);
+        .statusCode(200);
 
+    verify(facilityRepository).save(facility);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

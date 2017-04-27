@@ -50,7 +50,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -342,26 +341,23 @@ public class FacilityController extends BaseController {
 
   private void addSupportedProgramsToFacility(Set<SupportedProgramDto> supportedProgramDtos,
                                                  Facility facility) {
-    if (CollectionUtils.isEmpty(supportedProgramDtos)) {
-      throw new ValidationMessageException(
-          FacilityMessageKeys.ERROR_SUPPORTED_PROGRAMS_REQUIRED);
-    }
-
-    for (SupportedProgramDto dto : supportedProgramDtos) {
-      Program program;
-      if ( dto.getCode() != null ) {
-        program = programRepository.findByCode(Code.code(dto.getCode()));
-      } else if ( dto.getId() != null) {
-        program = programRepository.findOne(dto.getId());
-      } else {
-        throw new ValidationMessageException(ProgramMessageKeys.ERROR_CODE_OR_ID_REQUIRED);
+    if (supportedProgramDtos != null) {
+      for (SupportedProgramDto dto : supportedProgramDtos) {
+        Program program;
+        if (dto.getCode() != null) {
+          program = programRepository.findByCode(Code.code(dto.getCode()));
+        } else if (dto.getId() != null) {
+          program = programRepository.findOne(dto.getId());
+        } else {
+          throw new ValidationMessageException(ProgramMessageKeys.ERROR_CODE_OR_ID_REQUIRED);
+        }
+        if (program == null) {
+          throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
+        }
+        SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
+            program, dto.isSupportActive(), dto.getSupportStartDate());
+        facility.addSupportedProgram(supportedProgram);
       }
-      if (program == null) {
-        throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
-      }
-      SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
-          program, dto.isSupportActive(), dto.getSupportStartDate());
-      facility.addSupportedProgram(supportedProgram);
     }
   }
 }
