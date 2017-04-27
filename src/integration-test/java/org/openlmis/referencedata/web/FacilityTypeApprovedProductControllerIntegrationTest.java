@@ -15,13 +15,17 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -37,8 +41,13 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.util.LocalizedMessage;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -84,20 +93,24 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderable.setId(UUID.randomUUID());
 
     facilityType1 = new FacilityType("facilityType1");
+    facilityType1.setId(UUID.randomUUID());
 
+    facilityTypeAppProdId = UUID.randomUUID();
     facilityTypeAppProd = new FacilityTypeApprovedProduct();
     facilityTypeAppProd.setId(facilityTypeAppProdId);
     facilityTypeAppProd.setFacilityType(facilityType1);
     facilityTypeAppProd.setProgram(program);
     facilityTypeAppProd.setOrderable(orderable);
     facilityTypeAppProd.setMaxPeriodsOfStock(6.00);
-    facilityTypeAppProdId = UUID.randomUUID();
 
     ftapDto = new ApprovedProductDto();
     facilityTypeAppProd.export(ftapDto);
 
     given(repository.save(any(FacilityTypeApprovedProduct.class)))
         .willAnswer(new SaveAnswer<FacilityTypeApprovedProduct>());
+
+    // used in deserialization
+    given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
   }
 
   @Test
@@ -137,11 +150,11 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldPostFacilityTypeApprovedProduct() {
-
     given(programRepository.findOne(program.getId())).willReturn(program);
-    given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
     given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
         .willReturn(orderableDisplayCategory);
+
+    ftapDto.setId(null);
 
     ApprovedProductDto response = restAssured
         .given()
@@ -183,7 +196,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     facilityTypeAppProd.export(ftapDto);
     given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
     given(programRepository.findOne(program.getId())).willReturn(program);
-    given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
     given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
         .willReturn(orderableDisplayCategory);
 
@@ -226,7 +238,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     given(repository.findOne(facilityTypeAppProdId)).willReturn(facilityTypeAppProd);
     given(programRepository.findOne(program.getId())).willReturn(program);
-    given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
     given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
         .willReturn(orderableDisplayCategory);
 
@@ -259,6 +270,85 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestForDuplicateFtapPut() {
+    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    FacilityTypeApprovedProduct existingFtap =
+        mock(FacilityTypeApprovedProduct.class);
+    when(existingFtap.getId()).thenReturn(UUID.randomUUID());
+    when(repository.findByFacilityTypeIdAndOrderableIdAndProgramId(
+      facilityType1.getId(), orderable.getId(), program.getId()
+    )).thenReturn(existingFtap);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", ftapDto.getId())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(ftapDto)
+        .put(ID_URL)
+        .then()
+        .statusCode(400)
+        .content(LocalizedMessage.MESSAGE_KEY_FIELD,
+            equalTo(FacilityTypeApprovedProductMessageKeys.ERROR_DUPLICATED));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(),
+        RamlMatchers.hasNoViolations());
+    verify(repository, never()).save(any(FacilityTypeApprovedProduct.class));
+  }
+
+  @Test
+  public void shouldReturnBadRequestForDuplicateFtapPost() {
+    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    FacilityTypeApprovedProduct existingFtap =
+        mock(FacilityTypeApprovedProduct.class);
+    when(existingFtap.getId()).thenReturn(UUID.randomUUID());
+    when(repository.findByFacilityTypeIdAndOrderableIdAndProgramId(
+        facilityType1.getId(), orderable.getId(), program.getId()
+    )).thenReturn(existingFtap);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(ftapDto)
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(400)
+        .content(LocalizedMessage.MESSAGE_KEY_FIELD,
+            equalTo(FacilityTypeApprovedProductMessageKeys.ERROR_DUPLICATED));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(),
+        RamlMatchers.hasNoViolations());
+    verify(repository, never()).save(any(FacilityTypeApprovedProduct.class));
+  }
+
+  @Test
+  public void shouldUpdateExistingFtap() {
+    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    FacilityTypeApprovedProduct existingFtap =
+        mock(FacilityTypeApprovedProduct.class);
+    when(existingFtap.getId()).thenReturn(facilityTypeAppProdId);
+    when(repository.findByFacilityTypeIdAndOrderableIdAndProgramId(
+        facilityType1.getId(), orderable.getId(), program.getId()
+    )).thenReturn(existingFtap);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", ftapDto.getId())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(ftapDto)
+        .log().body()
+        .put(ID_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(),
+        RamlMatchers.hasNoViolations());
+    verify(repository).save(facilityTypeAppProd);
   }
 
   private void ftapEquals(ApprovedProductDto expected, ApprovedProductDto response) {

@@ -24,4 +24,8 @@ import java.util.UUID;
 public interface FacilityTypeApprovedProductRepository
     extends PagingAndSortingRepository<FacilityTypeApprovedProduct, UUID>,
     FacilityTypeApprovedProductRepositoryCustom {
+
+  FacilityTypeApprovedProduct findByFacilityTypeIdAndOrderableIdAndProgramId(
+      UUID facilityTypeId, UUID orderableId, UUID programId
+  );
 }

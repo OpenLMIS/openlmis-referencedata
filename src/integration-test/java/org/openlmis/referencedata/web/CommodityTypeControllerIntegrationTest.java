@@ -45,6 +45,7 @@ import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -372,7 +373,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .put(RESOURCE_URL)
         .then()
         .statusCode(400)
-        .content("messageKey", is(CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND));
+        .content(LocalizedMessage.MESSAGE_KEY_FIELD,
+            is(CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND));
   }
 
   private ProgramOrderable mockProgramOrderable() {

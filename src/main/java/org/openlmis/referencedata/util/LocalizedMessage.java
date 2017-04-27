@@ -22,6 +22,10 @@ import org.apache.commons.lang3.Validate;
  * Value class of a localized message.  Useful for JSON serialization, logging, etc...
  */
 public final class LocalizedMessage {
+
+  public static final String MESSAGE_KEY_FIELD = "messageKey";
+  public static final String MESSAGE_FIELD = "message";
+
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private String messageKey;
 

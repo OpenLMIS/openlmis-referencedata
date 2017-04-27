@@ -18,6 +18,7 @@ package org.openlmis.referencedata.repository;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -39,7 +40,12 @@ import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Collection;
+import java.util.UUID;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 
 public class FacilityTypeApprovedProductRepositoryTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
@@ -71,6 +77,9 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private EntityManager entityManager;
 
   private FacilityType facilityType;
 
@@ -211,19 +220,40 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Test
   public void shouldSkipFilteringWhenProgramIsNotProvided() {
-    ftapRepository.save(generateInstance());
-    ftapRepository.save(generateInstance());
+    ftapRepository.save(generateProduct(true));
 
     Collection<FacilityTypeApprovedProduct> list = ftapRepository
         .searchProducts(facility.getId(), null, true);
 
-    assertThat(list, hasSize(2));
+    assertThat(list, hasSize(1));
 
     FacilityTypeApprovedProduct ftap = list.iterator().next();
     assertFacilityTypeApprovedProduct(ftap);
 
     ftap = list.iterator().next();
     assertFacilityTypeApprovedProduct(ftap);
+  }
+
+  @Test
+  public void shouldFindByRelations() {
+    FacilityTypeApprovedProduct ftap = generateInstance();
+    ftap = ftapRepository.save(ftap);
+    UUID id = ftap.getId();
+
+    ftap = ftapRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
+        ftap.getFacilityType().getId(), ftap.getOrderable().getId(), ftap.getProgram().getId()
+    );
+
+    assertNotNull(ftap);
+    assertEquals(id, ftap.getId());
+  }
+
+  @Test(expected = PersistenceException.class)
+  public void shouldNotAllowDuplicates() {
+    ftapRepository.save(generateInstance());
+    ftapRepository.save(generateInstance());
+
+    entityManager.flush();
   }
 
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {

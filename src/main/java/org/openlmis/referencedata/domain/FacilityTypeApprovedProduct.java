@@ -15,21 +15,27 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.openlmis.referencedata.dto.FacilityTypeDto;
+import org.openlmis.referencedata.dto.ProgramDto;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.dto.FacilityTypeDto;
-import org.openlmis.referencedata.dto.ProgramDto;
+
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "facility_type_approved_products", schema = "referencedata")
+@Table(name = "facility_type_approved_products", schema = "referencedata",
+    uniqueConstraints = @UniqueConstraint(name = "unq_ftap",
+        columnNames = { "orderableId", "programId", "facilityTypeId" }))
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class FacilityTypeApprovedProduct extends BaseEntity {

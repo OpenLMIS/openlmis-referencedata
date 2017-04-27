@@ -20,6 +20,7 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.Objects;
 import java.util.UUID;
 
 @Controller
@@ -58,6 +61,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
   public ApprovedProductDto createFacilityTypeApprovedProduct(
         @RequestBody ApprovedProductDto approvedProductDto) {
     rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    validateFtapNotDuplicated(approvedProductDto);
+
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
         FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
@@ -82,9 +88,13 @@ public class FacilityTypeApprovedProductController extends BaseController {
         @RequestBody ApprovedProductDto approvedProductDto,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    validateFtapNotDuplicated(approvedProductDto);
+
     LOGGER.debug("Updating facilityTypeApprovedProduct");
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
         FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
+
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
     return toDto(save);
   }
@@ -134,5 +144,19 @@ public class FacilityTypeApprovedProductController extends BaseController {
     ApprovedProductDto productDto = new ApprovedProductDto();
     prod.export(productDto);
     return productDto;
+  }
+
+  private void validateFtapNotDuplicated(ApprovedProductDto approvedProductDto) {
+    FacilityTypeApprovedProduct existing = repository
+        .findByFacilityTypeIdAndOrderableIdAndProgramId(
+            approvedProductDto.getFacilityType().getId(),
+            approvedProductDto.getOrderable().getId(),
+            approvedProductDto.getProgram().getId());
+
+    if (existing != null
+        && !Objects.equals(existing.getId(), approvedProductDto.getId())) {
+      throw new ValidationMessageException(
+          FacilityTypeApprovedProductMessageKeys.ERROR_DUPLICATED);
+    }
   }
 }
