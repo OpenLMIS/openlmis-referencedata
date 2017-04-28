@@ -84,10 +84,12 @@ public class Orderable extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "commoditytypeid")
+  @Getter(AccessLevel.PRIVATE)
   private CommodityType commodityType;
 
   @ManyToOne
   @JoinColumn(name = "tradeitemid")
+  @Getter(AccessLevel.PRIVATE)
   private TradeItem tradeItem;
 
   /**
@@ -183,7 +185,8 @@ public class Orderable extends BaseEntity {
 
     if (importer.getProgramOrderables() != null) {
       importer.getProgramOrderables()
-          .forEach(po -> orderable.programOrderables.add(ProgramOrderable.newInstance(po)));
+          .forEach(po -> orderable
+              .programOrderables.add(ProgramOrderable.newInstance(po, orderable)));
     }
     if (importer.getIdentifiers() != null) {
       orderable.identifiers = ImmutableMap.copyOf(importer.getIdentifiers());

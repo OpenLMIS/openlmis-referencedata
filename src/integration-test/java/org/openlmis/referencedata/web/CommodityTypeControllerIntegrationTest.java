@@ -40,21 +40,20 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
-import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -68,6 +67,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   private static final String UNIT = "unit";
   private static final String CLASSIFICATION_SYS = "cSys";
   private static final String CLASSIFICATION_SYS_ID = "cSysId";
+  public static final String NAME = "name";
 
   @MockBean
   private CommodityTypeRepository commodityTypeRepository;
@@ -75,23 +75,17 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   @MockBean
   private TradeItemRepository tradeItemRepository;
 
-  @MockBean
-  private ProgramRepository programRepository;
-
-  @MockBean
-  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
-
   private CommodityTypeDto commodityType;
-  private UUID commodityTypeId;
+  private UUID commodityTypeId = UUID.randomUUID();
   private OrderableDto orderable;
 
   @Before
   public void setUp() {
-    orderable = new OrderableDto("code", UNIT, "name", 0, 0, false, Collections.emptySet(), null);
+    orderable = new OrderableDto("code", UNIT, NAME, 0, 0, false, Collections.emptySet(),
+        generateIdentifiers());
     orderable.setId(UUID.randomUUID());
-    commodityType = new CommodityTypeDto(Collections.singleton(orderable), "name",
+    commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
         CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null);
-    commodityTypeId = UUID.randomUUID();
 
     when(commodityTypeRepository.save(any(CommodityType.class)))
         .thenAnswer(new SaveAnswer<CommodityType>());
@@ -120,7 +114,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   @Test
   public void shouldCreateNewCommodityTypeWithProgramOrderable() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    ProgramOrderableDto programOrderable = mockProgramOrderable();
+    ProgramOrderableDto programOrderable = generateProgramOrderable();
     orderable.setProgramOrderables(Collections.singleton(programOrderable));
 
     CommodityTypeDto response = restAssured
@@ -292,7 +286,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     UUID parentId = UUID.randomUUID();
     CommodityTypeDto parent = generateParent(parentId);
-    commodityType = new CommodityTypeDto(Collections.singleton(orderable), "name",
+    commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
         CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, parent);
 
     commodityType.setId(commodityTypeId);
@@ -324,7 +318,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     UUID parentId = UUID.randomUUID();
     CommodityTypeDto parent = generateParent(parentId);
 
-    commodityType = new CommodityTypeDto(Collections.singleton(orderable), "name",
+    commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
         CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, parent);
     commodityType.setId(commodityTypeId);
     given(commodityTypeRepository.findOne(commodityTypeId))
@@ -343,6 +337,12 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
             is(CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND));
   }
 
+  private HashMap<String, String> generateIdentifiers() {
+    HashMap<String, String> identifiers = new HashMap<>();
+    identifiers.put(CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    return identifiers;
+  }
+
   private CommodityTypeDto generateParent(UUID parentId) {
     CommodityTypeDto parent = new CommodityTypeDto(Collections.emptySet(), "parentProd",
         CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null);
@@ -350,33 +350,31 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     return parent;
   }
 
-  private ProgramOrderableDto mockProgramOrderable() {
-    return new ProgramOrderableDto(mockOrderableDisplayCategory(), mockProgram(), false, false,
-        1, 1, Money.of(CurrencyUnit.USD, 10.0));
+  private ProgramOrderableDto generateProgramOrderable() {
+    return new ProgramOrderableDto(generateOrderableDisplayCategory(), generateProgram(), true,
+        true, 0, 1, Money.of(CurrencyUnit.USD, 10.0));
   }
 
-  private ProgramDto mockProgram() {
+  private ProgramDto generateProgram() {
     ProgramDto program = new ProgramDto();
     program.setCode("programCode");
     program.setId(UUID.randomUUID());
-    when(programRepository.findOne(program.getId())).thenReturn(Program.newProgram(program));
     return program;
   }
 
-  private OrderableDisplayCategory mockOrderableDisplayCategory() {
+  private OrderableDisplayCategory generateOrderableDisplayCategory() {
     OrderableDisplayCategory category = OrderableDisplayCategory.createNew(
-        Code.code("categoryCode"), new OrderedDisplayValue("name", 1));
+        Code.code("orderableDisplayCategoryCode"),
+        new OrderedDisplayValue("orderableDisplayCategoryName", 1));
     category.setId(UUID.randomUUID());
-    when(orderableDisplayCategoryRepository.findOne(category.getId())).thenReturn(category);
     return category;
   }
 
   private TradeItem mockTradeItem() {
     UUID id = UUID.randomUUID();
-    TradeItem tradeItem = new TradeItem(null, "manufacturer", null);
+    TradeItem tradeItem = new TradeItem(null, "manufacturer", new ArrayList<>());
     tradeItem.setId(id);
     when(tradeItemRepository.findOne(id)).thenReturn(tradeItem);
     return tradeItem;
   }
-
 }

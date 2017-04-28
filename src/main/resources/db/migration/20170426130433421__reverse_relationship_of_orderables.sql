@@ -8,14 +8,12 @@ ALTER TABLE orderables
     ADD COLUMN tradeitemid uuid;
 
 CREATE TABLE identifiers (
-    key character varying(255) NOT NULL PRIMARY KEY,
+    key character varying(255) NOT NULL,
     value character varying(255) NOT NULL,
-    orderableId uuid NOT NULL
+    orderableId uuid NOT NULL,
+    UNIQUE (key, orderableId),
+    FOREIGN KEY (orderableId) REFERENCES orderables(id)
 );
-
-ALTER TABLE ONLY identifiers
-    ADD CONSTRAINT identifiers_orderable_fkey FOREIGN KEY (orderableId)
-    REFERENCES orderables(id);
 
 CREATE TABLE commodity_types (
     id uuid PRIMARY KEY,

@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.dto.OrderableDto;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -120,7 +121,11 @@ public final class TradeItem extends BaseEntity {
     TradeItem tradeItem = new TradeItem();
     tradeItem.id = importer.getId();
     tradeItem.manufacturerOfTradeItem = importer.getManufacturerOfTradeItem();
-    tradeItem.classifications = importer.getClassifications();
+    if (importer.getClassifications() != null) {
+      tradeItem.classifications = importer.getClassifications();
+    } else {
+      tradeItem.classifications = new ArrayList<>();
+    }
     tradeItem.orderables = new HashSet<>();
     if (importer.getOrderables() != null) {
       importer.getOrderables()

@@ -36,7 +36,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode
 public class ProgramOrderableDto implements ProgramOrderable.Importer, ProgramOrderable.Exporter {
 
   private OrderableDisplayCategory orderableDisplayCategory;

@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,7 @@ import javax.persistence.UniqueConstraint;
 public class TradeItemClassification extends BaseEntity {
 
   @ManyToOne
+  @Getter(AccessLevel.PRIVATE)
   private TradeItem tradeItem;
 
   @Getter

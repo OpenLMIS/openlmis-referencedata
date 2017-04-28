@@ -23,11 +23,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Dispensable;
+import org.openlmis.referencedata.domain.Orderable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 
 public class CommodityTypeRepositoryIntegrationTest extends
@@ -43,8 +47,11 @@ public class CommodityTypeRepositoryIntegrationTest extends
 
   @Override
   CommodityType generateInstance() {
-    return new CommodityType(null, "Name" + getNextInstanceNumber(),
-            "cSys", "cId", null, new ArrayList<>());
+    Orderable orderable = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
+        "Gloves", 6, 3, false, Collections.emptySet(), Collections.emptyMap());
+
+    return new CommodityType(Collections.singleton(orderable),
+        "Name" + getNextInstanceNumber(), "cSys", "cId", null, new ArrayList<>());
   }
 
   @Test

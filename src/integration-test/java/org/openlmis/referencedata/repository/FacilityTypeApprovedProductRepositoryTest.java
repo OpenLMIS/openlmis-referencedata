@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -41,15 +40,12 @@ import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.UUID;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class FacilityTypeApprovedProductRepositoryTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
@@ -119,18 +115,18 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
 
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
-            .createNew(program, orderableDisplayCategory,orderableFullSupply, currencyUnit);
+            .createNew(program, orderableDisplayCategory, null, currencyUnit);
     orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
-            "Ibuprofen", 10, 5, false, new HashSet<>(Arrays.asList(programOrderableFullSupply)),
-            identifiers);
+        "Ibuprofen", 10, 5, false, Collections.singleton(programOrderableFullSupply), identifiers);
+    programOrderableFullSupply.setProduct(orderableFullSupply);
     orderableRepository.save(orderableFullSupply);
 
-    ProgramOrderable programOrderableNonFullSupply = ProgramOrderable.createNew(
-            program, orderableDisplayCategory, orderableNonFullSupply, 0, true, false, 0,
+    ProgramOrderable programOrderableNonFullSupply =
+        ProgramOrderable.createNew(program, orderableDisplayCategory, null, 0, true, false, 0,
             Money.of(currencyUnit, 0), currencyUnit);
-    orderableNonFullSupply = new Orderable(Code.code("gloves"),
-            Dispensable.createNew("pair"), "Gloves", 6, 3, false,
-            new HashSet<>(Arrays.asList(programOrderableNonFullSupply)), identifiers);
+    orderableNonFullSupply = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
+        "Gloves", 6, 3, false, Collections.singleton(programOrderableNonFullSupply), identifiers);
+    programOrderableNonFullSupply.setProduct(orderableNonFullSupply);
     orderableRepository.save(orderableNonFullSupply);
 
     GeographicLevel level = new GeographicLevel();

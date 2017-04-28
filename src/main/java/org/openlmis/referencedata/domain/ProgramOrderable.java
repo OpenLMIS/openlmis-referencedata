@@ -19,7 +19,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,11 +27,11 @@ import org.hibernate.annotations.Type;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.CurrencyConfig;
+import org.openlmis.referencedata.dto.ProgramDto;
+import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Objects;
-import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -52,7 +51,7 @@ public class ProgramOrderable extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "orderableId", nullable = false)
   @Getter
-  @Setter(AccessLevel.PACKAGE)
+  @Setter
   private Orderable product;
 
   private Integer dosesPerPatient;
@@ -217,7 +216,7 @@ public class ProgramOrderable extends BaseEntity {
    * @param importer instance of {@link Importer}
    * @return new instance of ProgramOrderable.
    */
-  public static ProgramOrderable newInstance(Importer importer) {
+  public static ProgramOrderable newInstance(Importer importer, Orderable orderable) {
     ProgramOrderable programOrderable = new ProgramOrderable();
     programOrderable.orderableDisplayCategory = importer.getOrderableDisplayCategory();
     programOrderable.active = importer.isActive();
@@ -226,6 +225,7 @@ public class ProgramOrderable extends BaseEntity {
     programOrderable.dosesPerPatient = importer.getDosesPerPatient();
     programOrderable.pricePerPack = importer.getPricePerPack();
     programOrderable.program = Program.newProgram(importer.getProgram());
+    programOrderable.product = orderable;
     return programOrderable;
   }
 

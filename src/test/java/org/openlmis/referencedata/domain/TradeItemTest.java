@@ -15,16 +15,16 @@
 
 package org.openlmis.referencedata.domain;
 
-import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertFalse;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,14 +37,14 @@ public class TradeItemTest {
   private static final String CLASSIFICATION_ID = "some-id";
   private static final String CID1 = "CID1";
 
-  private static final Map<String, String> identificators = new HashMap<>();
+  private static final Map<String, String> identifiers = new HashMap<>();
 
   static {
-    identificators.put("key", CLASSIFICATION_ID);
+    identifiers.put("key", CLASSIFICATION_ID);
   }
 
   private Orderable ibuprofen = new Orderable(Code.code(IBUPROFEN_CODE),
-          null, IBUPROFEN_NAME, 0, 0, false, null, identificators);
+          null, IBUPROFEN_NAME, 0, 0, false, null, identifiers);
 
   private TradeItem advil;
 
@@ -53,7 +53,7 @@ public class TradeItemTest {
     advil = new TradeItem(new HashSet<>(), ADVIL_NAME, new ArrayList<>());
     assertFalse(advil.canFulfill(ibuprofen));
 
-    advil = new TradeItem(new HashSet<>(asList(ibuprofen)), ADVIL_NAME, new ArrayList<>());
+    advil = new TradeItem(Collections.singleton(ibuprofen), ADVIL_NAME, new ArrayList<>());
     assertTrue(advil.canFulfill(ibuprofen));
   }
 
@@ -64,7 +64,8 @@ public class TradeItemTest {
 
     TradeItemClassification classification = new TradeItemClassification();
     classification.setClassificationId(CLASSIFICATION_ID);
-    advil = new TradeItem(new HashSet<>(asList(ibuprofen)), ADVIL_NAME, new ArrayList<>());
+    advil = new TradeItem(Collections.emptySet(), ADVIL_NAME,
+        Collections.singletonList(classification));
     assertTrue(advil.canFulfill(ibuprofen));
   }
 
@@ -77,12 +78,14 @@ public class TradeItemTest {
 
     assertThat(advil.getClassifications(), hasSize(2));
     TradeItemClassification classification = advil.findClassificationById(CID1);
+    assertNotNull(classification);
     assertThat(classification.getClassificationSystem(), is("csys"));
 
     advil.assignCommodityType("csys changed", CID1);
 
     assertThat(advil.getClassifications(), hasSize(2));
     classification = advil.findClassificationById(CID1);
+    assertNotNull(classification);
     assertThat(classification.getClassificationSystem(), is("csys changed"));
   }
 }
