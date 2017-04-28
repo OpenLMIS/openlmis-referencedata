@@ -21,11 +21,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import org.openlmis.referencedata.CurrencyConfig;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +35,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -74,8 +74,8 @@ public class ProgramOrderable extends BaseEntity {
 
   @Getter
   @Setter
-  @Type(type = "org.jadira.usertype.moneyandcurrency.joda.PersistentMoneyAmount",
-      parameters = {@Parameter(name = "currencyCode", value = CurrencyConfig.CURRENCY_CODE)})
+  @Columns(columns = {@Column(name = "pricePerPackCurrency"), @Column(name = "pricePerPackAmount")})
+  @Type(type = "org.jadira.usertype.moneyandcurrency.joda.PersistentMoneyAmountAndCurrency")
   private Money pricePerPack;
 
   private ProgramOrderable(Program program,

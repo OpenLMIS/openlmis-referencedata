@@ -13,12 +13,10 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.util.messagekeys;
 
-public final class CurrencyConfig {
+public abstract class ConfigurationSettingMessageKeys extends MessageKeys {
+  private static final String ERROR = join(CONFIGURATION_SETTING, PRODUCT);
 
-  public static final String CURRENCY_CODE = "USD";
-
-  private CurrencyConfig() {
-  }
+  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
 }

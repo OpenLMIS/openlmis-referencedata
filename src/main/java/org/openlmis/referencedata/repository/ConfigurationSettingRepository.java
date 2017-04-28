@@ -13,12 +13,11 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.repository;
 
-public final class CurrencyConfig {
+import org.openlmis.referencedata.domain.ConfigurationSetting;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-  public static final String CURRENCY_CODE = "USD";
-
-  private CurrencyConfig() {
-  }
+public interface ConfigurationSettingRepository
+    extends PagingAndSortingRepository<ConfigurationSetting, String> {
 }

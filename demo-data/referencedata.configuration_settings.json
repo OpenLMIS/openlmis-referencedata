@@ -1,0 +1,26 @@
+[
+  {
+    "key": "currency.code",
+    "value": "USD"
+  },
+  {
+    "key": "currency.symbol",
+    "value": "$"
+  },
+  {
+    "key": "currency.symbolSide",
+    "value": "left"
+  },
+  {
+    "key": "currency.groupingSeparator",
+    "value": ","
+  },
+  {
+    "key": "currency.groupingSize",
+    "value": "3"
+  },
+  {
+    "key": "currency.decimalSeparator",
+    "value": "."
+  }
+]

@@ -15,15 +15,27 @@
 
 package org.openlmis.referencedata.web;
 
-import org.openlmis.referencedata.CurrencyConfig;
+import org.joda.money.CurrencyUnit;
 import org.openlmis.referencedata.dto.CurrencySettingsDto;
+import org.openlmis.referencedata.service.ConfigurationSettingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import static org.openlmis.referencedata.util.ConfigurationSettingKeys.CURRENCY_CODE;
+import static org.openlmis.referencedata.util.ConfigurationSettingKeys.CURRENCY_DECIMAL_SEPARATOR;
+import static org.openlmis.referencedata.util.ConfigurationSettingKeys.CURRENCY_GROUPING_SEPARATOR;
+import static org.openlmis.referencedata.util.ConfigurationSettingKeys.CURRENCY_GROUPING_SIZE;
+import static org.openlmis.referencedata.util.ConfigurationSettingKeys.CURRENCY_SYMBOL;
+import static org.openlmis.referencedata.util.ConfigurationSettingKeys.CURRENCY_SYMBOL_SIDE;
+
 @Controller
 public class CurrencySettingsController extends BaseController {
+
+  @Autowired
+  private ConfigurationSettingService configurationSettingService;
 
   /**
    * Get currency settings.
@@ -33,10 +45,15 @@ public class CurrencySettingsController extends BaseController {
   @RequestMapping(value = "/currencySettings", method = RequestMethod.GET)
   @ResponseBody
   public CurrencySettingsDto getCurrencySettings() {
+    String code = configurationSettingService.getStringValue(CURRENCY_CODE);
+    int decimalPlaces = CurrencyUnit.of(code).getDecimalPlaces();
+    int groupingSize = Integer.valueOf(configurationSettingService.getStringValue(
+            CURRENCY_GROUPING_SIZE));
 
-    return new CurrencySettingsDto(CurrencyConfig.CURRENCY_CODE, CurrencyConfig.CURRENCY_SYMBOL,
-        CurrencyConfig.CURRENCY_SYMBOL_SIDE, CurrencyConfig.CURRENCY_DECIMAL_PLACES,
-        CurrencyConfig.GROUPING_SEPARATOR, CurrencyConfig.GROUPING_SIZE,
-        CurrencyConfig.DECIMAL_SEPARATOR);
+    return new CurrencySettingsDto(code,
+            configurationSettingService.getStringValue(CURRENCY_SYMBOL),
+            configurationSettingService.getStringValue(CURRENCY_SYMBOL_SIDE),
+            decimalPlaces, configurationSettingService.getStringValue(CURRENCY_GROUPING_SEPARATOR),
+            groupingSize, configurationSettingService.getStringValue(CURRENCY_DECIMAL_SEPARATOR));
   }
 }

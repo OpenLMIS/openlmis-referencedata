@@ -26,7 +26,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
@@ -113,7 +112,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     orderableFullSupply = CommodityType.newCommodityType(
         "ibuprofen", "each", "Ibuprofen", "testDesc", 10, 5, false,
         CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-    CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
+    CurrencyUnit currencyUnit = CurrencyUnit.of("USD");
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
         .createNew(program, orderableDisplayCategory,orderableFullSupply, currencyUnit);
     orderableFullSupply.addToProgram(programOrderableFullSupply);

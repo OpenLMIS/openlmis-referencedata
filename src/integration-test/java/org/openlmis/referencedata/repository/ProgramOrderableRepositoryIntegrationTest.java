@@ -22,7 +22,6 @@ import org.joda.money.Money;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
@@ -49,6 +48,8 @@ public class ProgramOrderableRepositoryIntegrationTest
   private OrderableRepository orderableRepository;
 
   private List<ProgramOrderable> programOrderables;
+  
+  private static final String CURRENCY_CODE = "USD";
 
   ProgramOrderableRepository getRepository() {
     return this.programOrderableRepository;
@@ -61,7 +62,7 @@ public class ProgramOrderableRepositoryIntegrationTest
         Code.code("testcat"));
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
     return ProgramOrderable.createNew(program, orderableDisplayCategory, commodityType,
-        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
+        CurrencyUnit.of(CURRENCY_CODE));
   }
 
   @Before
@@ -112,7 +113,7 @@ public class ProgramOrderableRepositoryIntegrationTest
 
   @Test
   public void shouldPersistWithMoney() {
-    Money pricePerPack = Money.of(CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE), 12.91);
+    Money pricePerPack = Money.of(CurrencyUnit.of(CURRENCY_CODE), 12.91);
 
     ProgramOrderable programOrderable = new ProgramOrderable();
     programOrderable.setPricePerPack(pricePerPack);
@@ -128,7 +129,7 @@ public class ProgramOrderableRepositoryIntegrationTest
     ProgramOrderable clonedProgramOrderable = ProgramOrderable.createNew(
         programOrderable.getProgram(), programOrderable.getOrderableDisplayCategory(),
         programOrderable.getProduct(),
-        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
+        CurrencyUnit.of(CURRENCY_CODE));
     programOrderableRepository.save(clonedProgramOrderable);
     return clonedProgramOrderable;
   }

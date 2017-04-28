@@ -13,12 +13,11 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.exception;
 
-public final class CurrencyConfig {
+public class ConfigurationSettingException extends Exception {
 
-  public static final String CURRENCY_CODE = "USD";
-
-  private CurrencyConfig() {
+  public ConfigurationSettingException(String message) {
+    super(message);
   }
 }

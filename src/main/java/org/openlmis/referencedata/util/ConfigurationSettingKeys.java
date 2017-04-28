@@ -13,12 +13,25 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.util;
 
-public final class CurrencyConfig {
+public abstract class ConfigurationSettingKeys {
 
-  public static final String CURRENCY_CODE = "USD";
+  public static final String CURRENCY_CODE
+          = "currency.code";
+  public static final String CURRENCY_SYMBOL
+          = "currency.symbol";
+  public static final String CURRENCY_SYMBOL_SIDE
+          = "currency.symbolSide";
+  public static final String CURRENCY_GROUPING_SEPARATOR
+          = "currency.groupingSeparator";
+  public static final String CURRENCY_GROUPING_SIZE
+          = "currency.groupingSize";
+  public static final String CURRENCY_DECIMAL_SEPARATOR
+          = "currency.decimalSeparator";
 
-  private CurrencyConfig() {
+  private ConfigurationSettingKeys() {
+    throw new UnsupportedOperationException();
   }
+
 }

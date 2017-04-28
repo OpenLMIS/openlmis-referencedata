@@ -13,12 +13,31 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.domain;
 
-public final class CurrencyConfig {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-  public static final String CURRENCY_CODE = "USD";
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-  private CurrencyConfig() {
-  }
+@Entity
+@Table(name = "configuration_settings")
+@NoArgsConstructor
+@AllArgsConstructor
+public class ConfigurationSetting {
+
+  @Id
+  @Getter
+  @Setter
+  private String key;
+
+  @Column(nullable = false, columnDefinition = "text")
+  @Getter
+  @Setter
+  private String value;
 }

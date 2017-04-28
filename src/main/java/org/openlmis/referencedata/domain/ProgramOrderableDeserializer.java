@@ -21,17 +21,19 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import org.openlmis.referencedata.CurrencyConfig;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.service.ConfigurationSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.UUID;
+
+import static org.openlmis.referencedata.util.ConfigurationSettingKeys.CURRENCY_CODE;
 
 @Component
 public class ProgramOrderableDeserializer extends StdDeserializer<ProgramOrderable> {
@@ -44,6 +46,9 @@ public class ProgramOrderableDeserializer extends StdDeserializer<ProgramOrderab
 
   @Autowired
   OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
+
+  @Autowired
+  private ConfigurationSettingService configurationSettingService;
 
   public ProgramOrderableDeserializer() {
     this(null);
@@ -73,11 +78,13 @@ public class ProgramOrderableDeserializer extends StdDeserializer<ProgramOrderab
     boolean fullSupply = node.get("fullSupply").asBoolean();
     int displayOrder = node.get("displayOrder").asInt();
 
-    Money pricePerPack = Money.of(CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE),
+    String code = configurationSettingService.getStringValue(CURRENCY_CODE);
+
+    Money pricePerPack = Money.of(CurrencyUnit.of(code),
         node.get("pricePerPack").asDouble());
 
     return ProgramOrderable.createNew(program, orderableDisplayCategory, orderable,
         dosesPerPatient, active, fullSupply, displayOrder, pricePerPack,
-        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
+        CurrencyUnit.of(code));
   }
 }
