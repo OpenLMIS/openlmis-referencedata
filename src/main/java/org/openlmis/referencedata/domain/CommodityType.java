@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -120,7 +121,9 @@ public final class CommodityType extends BaseEntity {
     commodityType.orderables = new HashSet<>();
     if (importer.getOrderables() != null) {
       importer.getOrderables()
-          .forEach(oe -> commodityType.orderables.add(Orderable.newInstance(oe)));
+          .forEach(oe -> commodityType.orderables.add(
+              Orderable.newInstance(oe, ImmutableMap.of(
+                  commodityType.classificationSystem, commodityType.classificationId))));
     }
 
     return commodityType;

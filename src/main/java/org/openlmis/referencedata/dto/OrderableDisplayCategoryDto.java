@@ -18,48 +18,39 @@ package org.openlmis.referencedata.dto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class TradeItemDto extends BaseDto implements TradeItem.Importer, TradeItem.Exporter {
+public class OrderableDisplayCategoryDto extends BaseDto implements
+    OrderableDisplayCategory.Exporter, OrderableDisplayCategory.Importer {
 
-  private Set<OrderableDto> orderables;
+  private String code;
 
-  private String manufacturerOfTradeItem;
+  private String displayName;
 
-  private List<TradeItemClassificationDto> classifications;
+  private Integer displayOrder;
 
   /**
-   * Create new list of TradeItemDto based on given list of {@link TradeItem}
-   *
-   * @param tradeItems list of {@link TradeItem}
-   * @return new list of TradeItemDto.
+   * Creates new set of OrderableDisplayCategoryDto based on
+   * {@link OrderableDisplayCategory} iterable.
    */
-  public static Set<TradeItemDto> newInstance(Iterable<TradeItem> tradeItems) {
-    Set<TradeItemDto> tradeItemDtos = new HashSet<>();
-    tradeItems.forEach(item -> tradeItemDtos.add(newInstance(item)));
-    return tradeItemDtos;
+  public static Set<OrderableDisplayCategoryDto> newInstance(
+      Iterable<OrderableDisplayCategory> iterable) {
+    Set<OrderableDisplayCategoryDto> categoryDtos = new HashSet<>();
+    iterable.forEach(i -> categoryDtos.add(newInstance(i)));
+    return categoryDtos;
   }
 
   /**
-   * Creates new instance based on given {@link TradeItem}.
-   *
-   * @param po instance of TradeItem.
-   * @return new instance of TradeItemDto.
+   * Creates new instance of OrderableDisplayCategoryDto based on {@link OrderableDisplayCategory}.
    */
-  public static TradeItemDto newInstance(TradeItem po) {
-    if (po == null) {
-      return null;
-    }
-    TradeItemDto tradeItemDto = new TradeItemDto();
-    po.export(tradeItemDto);
-
-    return tradeItemDto;
+  public static OrderableDisplayCategoryDto newInstance(OrderableDisplayCategory category) {
+    OrderableDisplayCategoryDto categoryDto = new OrderableDisplayCategoryDto();
+    category.export(categoryDto);
+    return categoryDto;
   }
-
 }

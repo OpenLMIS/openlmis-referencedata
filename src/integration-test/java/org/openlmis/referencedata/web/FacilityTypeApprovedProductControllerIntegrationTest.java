@@ -89,7 +89,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderableDisplayCategory.setId(UUID.randomUUID());
 
     HashMap<String, String> identificators = new HashMap<>();
-    identificators.put("cSys", "cSysId");
     orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
             "Abcd", 10, 5, false, Collections.emptySet(), identificators);
     orderable.setId(UUID.randomUUID());

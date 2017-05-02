@@ -29,7 +29,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"identifiers"})
 public class OrderableDto extends BaseDto implements Orderable.Importer, Orderable.Exporter {
 
   private String productCode;

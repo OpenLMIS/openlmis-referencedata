@@ -43,13 +43,14 @@ import java.util.UUID;
 @RestController
 public class CommodityTypeController extends BaseController {
   @Autowired
-  private CommodityTypeRepository commodityTypeRepository;
+  private CommodityTypeRepository repository;
 
   @Autowired
   private TradeItemRepository tradeItemRepository;
 
   /**
    * Add or update a commodity type
+   *
    * @param commodityTypeDto the commodity type to add or update.
    */
   @Transactional
@@ -60,14 +61,14 @@ public class CommodityTypeController extends BaseController {
 
     if (null != commodityType.getId()) {
       UUID productId = commodityType.getId();
-      CommodityType storedCommodityType = commodityTypeRepository.findOne(productId);
+      CommodityType storedCommodityType = repository.findOne(productId);
       if (null != storedCommodityType) {
         commodityType.setChildren(storedCommodityType.getChildren());
       }
     }
 
     if (commodityType.getParent() != null) {
-      CommodityType parent = commodityTypeRepository.findOne(commodityType.getParent().getId());
+      CommodityType parent = repository.findOne(commodityType.getParent().getId());
       if (parent == null) {
         throw new ValidationMessageException(new Message(
             CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND, commodityType.getParent()));
@@ -75,15 +76,16 @@ public class CommodityTypeController extends BaseController {
       commodityType.assignParent(parent);
     }
 
-    return CommodityTypeDto.newInstance(commodityTypeRepository.save(commodityType));
+    return CommodityTypeDto.newInstance(repository.save(commodityType));
   }
 
   /**
    * Update the {@link TradeItem} that may fulfill for a {@link CommodityType}.
+   *
    * @param commodityTypeId the CommodityType's persistence Id.
-   * @param tradeItemIds the persistence id's of the TradeItems
-   * {@link org.springframework.http.HttpStatus#NOT_FOUND} if any of the given persistence ids
-   *     are not found.
+   * @param tradeItemIds    the persistence id's of the TradeItems
+   *                        {@link org.springframework.http.HttpStatus#NOT_FOUND}
+   *                        if any of the given persistence ids are not found.
    */
   @Transactional
   @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.PUT)
@@ -98,7 +100,7 @@ public class CommodityTypeController extends BaseController {
     }
 
     // ensure commodity type exists
-    CommodityType commodityType = commodityTypeRepository.findOne(commodityTypeId);
+    CommodityType commodityType = repository.findOne(commodityTypeId);
     if (null == commodityType) {
       throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }
@@ -122,9 +124,10 @@ public class CommodityTypeController extends BaseController {
 
   /**
    * Gets the TradeItem's persistence ids that may fulfill for the given CommodityType.
+   *
    * @param commodityTypeId persistence id of the CommodityType.
    * @return {@link org.springframework.http.HttpStatus#OK} and a set of persistence ids for the
-   *      commodity type, or an empty set.
+   *     commodity type, or an empty set.
    */
   @Transactional
   @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.GET)
@@ -132,7 +135,7 @@ public class CommodityTypeController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     // ensure commodity type exists
-    CommodityType commodityType = commodityTypeRepository.findOne(commodityTypeId);
+    CommodityType commodityType = repository.findOne(commodityTypeId);
     if (null == commodityType) {
       throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }
@@ -146,5 +149,18 @@ public class CommodityTypeController extends BaseController {
     }
 
     return ids;
+  }
+
+  /**
+   * Retrieves all Commodity types.
+   */
+  @Transactional
+  @RequestMapping(value = "/commodityTypes", method = RequestMethod.GET)
+  public Set<CommodityTypeDto> retrieveAll() {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    Iterable<CommodityType> result = repository.findAll();
+
+    return CommodityTypeDto.newInstance(result);
   }
 }

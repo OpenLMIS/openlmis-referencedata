@@ -61,4 +61,35 @@ public class TradeItemClassification extends BaseEntity {
     this.classificationSystem = classificationSystem;
     this.classificationId = classificationId;
   }
+
+  /**
+   * Creates new instance of TradeItemClassification.
+   */
+  public static TradeItemClassification newInstance(Importer importer, TradeItem tradeItem) {
+    TradeItemClassification classification = new TradeItemClassification();
+    classification.classificationSystem = importer.getClassificationSystem();
+    classification.classificationId = importer.getClassificationId();
+    classification.tradeItem = tradeItem;
+    return classification;
+  }
+
+  /**
+   * Exports domain object to dto.
+   */
+  public void export(Exporter exporter) {
+    exporter.setClassificationId(classificationId);
+    exporter.setClassificationSystem(classificationSystem);
+  }
+
+  public interface Exporter {
+    void setClassificationSystem(String classificationSystem);
+
+    void setClassificationId(String classificationId);
+  }
+
+  public interface Importer {
+    String getClassificationSystem();
+
+    String getClassificationId();
+  }
 }

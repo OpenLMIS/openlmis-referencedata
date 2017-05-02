@@ -15,11 +15,11 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -73,7 +73,7 @@ public class Orderable extends BaseEntity {
       fetch = FetchType.EAGER)
   private Set<ProgramOrderable> programOrderables;
 
-  @Getter(AccessLevel.PACKAGE)
+  @Getter
   @ElementCollection(fetch = FetchType.EAGER)
   @MapKeyColumn(name = "key")
   @Column(name = "value")
@@ -173,6 +173,17 @@ public class Orderable extends BaseEntity {
    * @return new instance of Orderable.
    */
   public static Orderable newInstance(Importer importer) {
+    return newInstance(importer, null);
+  }
+
+  /**
+   * Creates new instance based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @param identifiers identifiers passed when creating Orderable
+   * @return new instance of Orderable.
+   */
+  public static Orderable newInstance(Importer importer, Map<String, String> identifiers) {
     Orderable orderable = new Orderable();
     orderable.id = importer.getId();
     orderable.productCode = Code.code(importer.getProductCode());
@@ -188,8 +199,9 @@ public class Orderable extends BaseEntity {
           .forEach(po -> orderable
               .programOrderables.add(ProgramOrderable.newInstance(po, orderable)));
     }
-    if (importer.getIdentifiers() != null) {
-      orderable.identifiers = ImmutableMap.copyOf(importer.getIdentifiers());
+    orderable.identifiers = new HashMap<>();
+    if (identifiers != null) {
+      orderable.identifiers.putAll(identifiers);
     }
 
     return orderable;
@@ -248,8 +260,6 @@ public class Orderable extends BaseEntity {
     boolean isRoundToZero();
 
     Set<ProgramOrderableDto> getProgramOrderables();
-
-    Map<String, String> getIdentifiers();
   }
 
 }

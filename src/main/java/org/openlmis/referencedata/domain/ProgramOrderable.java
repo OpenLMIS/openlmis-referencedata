@@ -27,8 +27,8 @@ import org.hibernate.annotations.Type;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.CurrencyConfig;
+import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
 import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -218,7 +218,8 @@ public class ProgramOrderable extends BaseEntity {
    */
   public static ProgramOrderable newInstance(Importer importer, Orderable orderable) {
     ProgramOrderable programOrderable = new ProgramOrderable();
-    programOrderable.orderableDisplayCategory = importer.getOrderableDisplayCategory();
+    programOrderable.orderableDisplayCategory =
+        OrderableDisplayCategory.newInstance(importer.getOrderableDisplayCategory());
     programOrderable.active = importer.isActive();
     programOrderable.fullSupply = importer.isFullSupply();
     programOrderable.displayOrder = importer.getDisplayOrder();
@@ -234,8 +235,9 @@ public class ProgramOrderable extends BaseEntity {
    *
    * @param exporter exporter to export to
    */
-  public void export(ProgramOrderableDto exporter) {
-    exporter.setOrderableDisplayCategory(orderableDisplayCategory);
+  public void export(Exporter exporter) {
+    exporter.setOrderableDisplayCategory(
+        OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory));
     exporter.setProgram(ProgramDto.newInstance(program));
     exporter.setActive(active);
     exporter.setFullSupply(fullSupply);
@@ -248,7 +250,7 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   public interface Exporter {
-    void setOrderableDisplayCategory(OrderableDisplayCategory category);
+    void setOrderableDisplayCategory(OrderableDisplayCategoryDto category);
 
     void setProgram(ProgramDto program);
 
@@ -264,7 +266,7 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   public interface Importer {
-    OrderableDisplayCategory getOrderableDisplayCategory();
+    OrderableDisplayCategoryDto getOrderableDisplayCategory();
 
     ProgramDto getProgram();
 

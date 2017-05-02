@@ -24,7 +24,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.joda.money.Money;
-import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.serializer.MoneyDeserializer;
 import org.openlmis.referencedata.serializer.MoneySerializer;
@@ -39,7 +38,7 @@ import java.util.Set;
 @EqualsAndHashCode
 public class ProgramOrderableDto implements ProgramOrderable.Importer, ProgramOrderable.Exporter {
 
-  private OrderableDisplayCategory orderableDisplayCategory;
+  private OrderableDisplayCategoryDto orderableDisplayCategory;
 
   private ProgramDto program;
 

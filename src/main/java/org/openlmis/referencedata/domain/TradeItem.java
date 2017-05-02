@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.TradeItemClassificationDto;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +38,7 @@ import javax.persistence.Table;
  * has one and only one manufacturer and is shipped in exactly one primary package.
  *
  * <p>TradeItem's also may:
- * <ul>
+ * <ul>tr
  *   <li>have a GlobalTradeItemNumber</li>
  *   <li>a MSRP</li>
  * </ul>
@@ -121,11 +122,13 @@ public final class TradeItem extends BaseEntity {
     TradeItem tradeItem = new TradeItem();
     tradeItem.id = importer.getId();
     tradeItem.manufacturerOfTradeItem = importer.getManufacturerOfTradeItem();
+    tradeItem.classifications = new ArrayList<>();
     if (importer.getClassifications() != null) {
-      tradeItem.classifications = importer.getClassifications();
-    } else {
-      tradeItem.classifications = new ArrayList<>();
+      importer.getClassifications().forEach(oe ->
+          tradeItem.classifications.add(TradeItemClassification.newInstance(oe, tradeItem)));
     }
+
+
     tradeItem.orderables = new HashSet<>();
     if (importer.getOrderables() != null) {
       importer.getOrderables()
@@ -143,7 +146,7 @@ public final class TradeItem extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setManufacturerOfTradeItem(manufacturerOfTradeItem);
-    exporter.setClassifications(classifications);
+    exporter.setClassifications(TradeItemClassificationDto.newInstance(classifications));
     exporter.setOrderables(OrderableDto.newInstance(orderables));
   }
 
@@ -154,7 +157,7 @@ public final class TradeItem extends BaseEntity {
 
     String getManufacturerOfTradeItem();
 
-    List<TradeItemClassification> getClassifications();
+    List<TradeItemClassificationDto> getClassifications();
   }
 
   public interface Exporter {
@@ -164,6 +167,6 @@ public final class TradeItem extends BaseEntity {
 
     void setManufacturerOfTradeItem(String manufacturerOfTradeItem);
 
-    void setClassifications(List<TradeItemClassification> classifications);
+    void setClassifications(List<TradeItemClassificationDto> classifications);
   }
 }

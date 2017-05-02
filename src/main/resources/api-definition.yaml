@@ -101,6 +101,12 @@ schemas:
 
   - commodityType:  !include schemas/commodityType.json
 
+  - commodityTypeArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/commodityType.json" }
+      }
+
   - tradeItem:  !include schemas/tradeItem.json
 
   - tradeItemArray: |
@@ -801,6 +807,19 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
+      get:
+          is: [ secured ]
+          description: Retrieve commodity types.
+          responses:
+              "200":
+                  body:
+                    application/json:
+                      schema: commodityTypeArray
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+
       /{id}/tradeItems:
           uriParameters:
               id:

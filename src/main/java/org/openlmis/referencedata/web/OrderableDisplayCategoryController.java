@@ -15,13 +15,15 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
-import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.OrderableDisplayCategoryMessageKeys;
 import org.slf4j.Logger;
@@ -38,11 +40,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.Collections;
 import java.util.UUID;
-
-import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 @Controller
 @Transactional
@@ -54,9 +53,6 @@ public class OrderableDisplayCategoryController extends BaseController {
   @Autowired
   private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
-  @Autowired
-  private RightService rightService;
-
   /**
    * Get all OrderableDisplayCategories.
    *
@@ -65,10 +61,10 @@ public class OrderableDisplayCategoryController extends BaseController {
   @RequestMapping(value = "/orderableDisplayCategories", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<OrderableDisplayCategory> getAllOrderableDisplayCategories() {
+  public Iterable<OrderableDisplayCategoryDto> getAllOrderableDisplayCategories() {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
-    return orderableDisplayCategoryRepository.findAll();
+    return OrderableDisplayCategoryDto.newInstance(orderableDisplayCategoryRepository.findAll());
   }
 
   /**
@@ -111,7 +107,7 @@ public class OrderableDisplayCategoryController extends BaseController {
       @RequestBody OrderableDisplayCategory orderableDisplayCategory,
       @PathVariable("id") UUID orderableDisplayCategoryId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
-    LOGGER.debug("Updating orderableDisplayCategory with id: " + orderableDisplayCategoryId);
+    LOGGER.debug("Updating orderableDisplayCategory with id: %s", orderableDisplayCategoryId);
 
     OrderableDisplayCategory orderableDisplayCategoryToUpdate =
         orderableDisplayCategoryRepository.findOne(orderableDisplayCategoryId);
@@ -123,7 +119,7 @@ public class OrderableDisplayCategoryController extends BaseController {
     orderableDisplayCategoryToUpdate.updateFrom(orderableDisplayCategory);
     orderableDisplayCategoryRepository.save(orderableDisplayCategoryToUpdate);
 
-    LOGGER.debug("Updated orderableDisplayCategory with id: " + orderableDisplayCategoryId);
+    LOGGER.debug("Updated orderableDisplayCategory with id: %s", orderableDisplayCategoryId);
     return orderableDisplayCategoryToUpdate;
   }
 
