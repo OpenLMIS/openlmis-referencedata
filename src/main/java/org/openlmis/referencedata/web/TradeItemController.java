@@ -53,6 +53,8 @@ public class TradeItemController extends BaseController {
                                      BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
     validator.validate(tradeItemDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
+
     TradeItem tradeItem = TradeItem.newInstance(tradeItemDto);
 
     return TradeItemDto.newInstance(repository.save(tradeItem));

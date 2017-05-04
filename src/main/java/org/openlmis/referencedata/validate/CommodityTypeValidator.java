@@ -52,5 +52,12 @@ public class CommodityTypeValidator implements BaseValidator {
   @Override
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors, CommodityTypeMessageKeys.ERROR_NULL);
+
+    rejectIfEmptyOrWhitespace(errors, "name",
+        CommodityTypeMessageKeys.ERROR_NAME_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, "classificationSystem",
+        CommodityTypeMessageKeys.ERROR_CLASSIFICATION_SYSTEM_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, "classificationId",
+        CommodityTypeMessageKeys.ERROR_CLASSIFICATION_ID_REQUIRED);
   }
 }

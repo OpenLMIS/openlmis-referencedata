@@ -28,7 +28,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.validate.CommodityTypeValidator;
-import org.openlmis.referencedata.validate.TradeItemValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +53,6 @@ public class CommodityTypeController extends BaseController {
   @Autowired
   private CommodityTypeValidator validator;
 
-
   /**
    * Add or update a commodity type
    *
@@ -66,6 +64,8 @@ public class CommodityTypeController extends BaseController {
                                          BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
     validator.validate(commodityTypeDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
+
     CommodityType commodityType = CommodityType.newInstance(commodityTypeDto);
 
     if (null != commodityType.getId()) {

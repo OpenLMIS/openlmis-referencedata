@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -30,9 +31,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.CommodityType.newInstance;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_CLASSIFICATION_ID_REQUIRED;
+import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_CLASSIFICATION_SYSTEM_REQUIRED;
+import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_NAME_REQUIRED;
 
 import com.google.common.collect.ImmutableMap;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import org.hamcrest.Matchers;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -149,6 +154,69 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     assertEquals(commodityType, response);
     assertNotNull(response.getId());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectCreateNewCommodityTypeIfNameIsEmpty() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    commodityType.setName("");
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(commodityType)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_NAME_REQUIRED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectCreateNewCommodityTypeIfClassificationSystemIsEmpty() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    commodityType.setClassificationSystem("");
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(commodityType)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_CLASSIFICATION_SYSTEM_REQUIRED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectCreateNewCommodityTypeIfClassificationIdIsEmpty() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    commodityType.setClassificationId("");
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(commodityType)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_CLASSIFICATION_ID_REQUIRED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
