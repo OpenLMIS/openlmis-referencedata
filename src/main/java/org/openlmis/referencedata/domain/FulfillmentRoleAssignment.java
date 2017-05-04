@@ -18,6 +18,7 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,8 +59,8 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   public FulfillmentRoleAssignment(Role role, User user, Facility warehouse) {
     this(role, user);
 
-    if (!warehouse.getType().getCode().equalsIgnoreCase("warehouse")) {
-      throw new ValidationMessageException( "referencedata.error.facility-type-must-be-warehouse" );
+    if (!warehouse.isWarehouse()) {
+      throw new ValidationMessageException(FacilityMessageKeys.ERROR_MUST_BE_WAREHOUSE);
     }
 
     this.warehouse = warehouse;
@@ -70,11 +71,11 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
     return singleton(RightType.ORDER_FULFILLMENT);
   }
 
-  @Override
   /**
    * Check if this role assignment has a right based on specified criteria. For fulfillment, check
    * also that the warehouse matches.
    */
+  @Override
   public boolean hasRight(RightQuery rightQuery) {
     boolean roleMatches = role.contains(rightQuery.getRight());
     boolean warehouseMatches = warehouse.equals(rightQuery.getWarehouse());

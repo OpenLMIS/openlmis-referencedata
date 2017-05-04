@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -31,6 +32,8 @@ public interface UserRepository extends
     PagingAndSortingRepository<User, UUID>,
     UserRepositoryCustom {
 
+  static String FROM = " FROM referencedata.users u";
+
   @Override
   <S extends User> S save(S entity);
 
@@ -42,14 +45,14 @@ public interface UserRepository extends
   User findOneByEmail(@Param("email") String email);
 
   @Query(value = "SELECT u.*"
-      + " FROM referencedata.users u"
+      + FROM
       + " WHERE u.extradata @> (:extraData)\\:\\:jsonb",
       nativeQuery = true
   )
   List<User> findByExtraData(@Param("extraData") String extraData);
 
   @Query(value = "SELECT DISTINCT u.*" 
-      + " FROM referencedata.users u" 
+      + FROM
       + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id" 
       + "   JOIN referencedata.roles r ON r.id = ra.roleid" 
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
@@ -60,4 +63,24 @@ public interface UserRepository extends
   Set<User> findSupervisingUsersBy(@Param("right") Right right,
       @Param("supervisoryNode") SupervisoryNode supervisoryNode,
       @Param("program") Program program);
+
+  @Query(value = "SELECT DISTINCT u.*"
+      + FROM
+      + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id"
+      + "   JOIN referencedata.roles r ON r.id = ra.roleid"
+      + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
+      + " WHERE rr.rightid = :right"
+      + "   AND ra.warehouseid = :warehouse",
+      nativeQuery = true)
+  Set<User> findUsersByFulfillmentRight(@Param("right") Right right,
+                        @Param("warehouse") Facility warehouse);
+
+  @Query(value = "SELECT DISTINCT u.*"
+      + FROM
+      + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id"
+      + "   JOIN referencedata.roles r ON r.id = ra.roleid"
+      + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
+      + " WHERE rr.rightid = :right",
+      nativeQuery = true)
+  Set<User> findUsersByDirectRight(@Param("right") Right right);
 }

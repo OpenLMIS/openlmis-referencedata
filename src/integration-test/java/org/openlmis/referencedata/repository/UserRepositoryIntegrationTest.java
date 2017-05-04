@@ -17,20 +17,32 @@ package org.openlmis.referencedata.repository;
 
 
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.openlmis.referencedata.domain.RightType.GENERAL_ADMIN;
+import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
+import static org.openlmis.referencedata.domain.RightType.REPORTS;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
@@ -49,6 +61,9 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   private static final String EXTRA_DATA_KEY = "color";
   private static final String EXTRA_DATA_VALUE = "orange";
   private static final int TOTAL_USERS = 5;
+
+  private static final String USER_1 = "user1";
+  private static final String USER_2 = "user2";
 
   @Autowired
   private UserRepository repository;
@@ -89,7 +104,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     int instanceNumber = this.getNextInstanceNumber();
     return new UserBuilder("user" + instanceNumber, "Test", "User", instanceNumber + "@mail.com")
         .setTimezone("UTC")
-        .setHomeFacility(generateFacility())
+        .setHomeFacility(generateFacility(instanceNumber))
         .setActive(true)
         .setVerified(true)
         .setLoginRestricted(false)
@@ -208,7 +223,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     //given
     Map<String, String> extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
     String extraDataJson = mapper.writeValueAsString(extraData);
-    User expectedUser = repository.findOneByUsername("user1");
+    User expectedUser = repository.findOneByUsername(USER_1);
     expectedUser.setExtraData(extraData);
     repository.save(expectedUser);
 
@@ -246,22 +261,14 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test
   public void findSupervisingUsersByShouldOnlyFindMatchingUsers() {
     //given
-    Right right = Right.newRight("right", SUPERVISION);
-    rightRepository.save(right);
+    Right right = newRight("right", SUPERVISION);
+    Role role = newRole("role", right);
+    Program program = newProgram("P1");
+    SupervisoryNode supervisoryNode = newSupervisoryNode("SN1", generateFacility(10));
 
-    Role role = Role.newRole("role", right);
-    roleRepository.save(role);
-
-    Program program = new Program("P1");
-    programRepository.save(program);
-
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", generateFacility());
-    supervisoryNodeRepository.save(supervisoryNode);
-
-    User supervisingUser = repository.findOneByUsername("user1");
-    supervisingUser.assignRoles(new SupervisionRoleAssignment(role, supervisingUser, program,
-        supervisoryNode));
-    repository.save(supervisingUser);
+    User supervisingUser = repository.findOneByUsername(USER_1);
+    supervisingUser = assignRoleToUser(supervisingUser,
+        new SupervisionRoleAssignment(role, supervisingUser, program, supervisoryNode));
 
     //when
     Set<User> supervisingUsers = repository.findSupervisingUsersBy(right, supervisoryNode, 
@@ -270,6 +277,68 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     //then
     assertEquals(1, supervisingUsers.size());
     assertEquals(supervisingUser, supervisingUsers.iterator().next());
+  }
+
+  @Test
+  public void shouldFindUsersByFulfillmentRights() {
+    //given
+    Right supervisionRight = newRight("supervisionRight", SUPERVISION);
+    Role supervisionRole = newRole("supervisionRole", supervisionRight);
+    Program program = newProgram("P1");
+    SupervisoryNode supervisoryNode = newSupervisoryNode("SN1", generateFacility(10));
+
+    User supervisingUser = repository.findOneByUsername(USER_1);
+    assignRoleToUser(supervisingUser, new SupervisionRoleAssignment(
+        supervisionRole, supervisingUser, program, supervisoryNode));
+
+    User supervisingUser2 = repository.findOneByUsername(USER_2);
+    assignRoleToUser(supervisingUser2, new SupervisionRoleAssignment(
+        supervisionRole, supervisingUser2, program, supervisoryNode));
+
+    Right fulfillmentRight = newRight("fulfillmentRight", ORDER_FULFILLMENT);
+    Role fulfillmentRole = newRole("fulfillmentRole", fulfillmentRight);
+    Facility warehouse = generateFacility(11, "warehouse") ;
+
+    User warehouseClerk = repository.findOneByUsername("user3");
+    warehouseClerk = assignRoleToUser(warehouseClerk,
+        new FulfillmentRoleAssignment(fulfillmentRole, warehouseClerk, warehouse));
+
+    User warehouseClerk2 = repository.findOneByUsername("user4");
+    warehouseClerk2 = assignRoleToUser(warehouseClerk2,
+        new FulfillmentRoleAssignment(fulfillmentRole, warehouseClerk2, warehouse));
+
+    // when
+    Set<User> users = repository.findUsersByFulfillmentRight(fulfillmentRight, warehouse);
+
+    // then
+    assertThat(users, hasSize(2));
+    assertThat(users, hasItems(warehouseClerk, warehouseClerk2));
+  }
+
+  @Test
+  public void shouldFindUsersByDirectRole() {
+    //given
+    Right reportRight = newRight("reportRight", REPORTS);
+    Role reportRole = newRole("reportRole", reportRight);
+    Right adminRight = newRight("adminRight", GENERAL_ADMIN);
+    Role adminRole = newRole("adminRole", adminRight);
+
+    User user1 = repository.findOneByUsername(USER_1);
+    User user2 = repository.findOneByUsername(USER_2);
+
+    user1.assignRoles(new DirectRoleAssignment(reportRole, user1),
+        new DirectRoleAssignment(adminRole, user1));
+    user2.assignRoles(new DirectRoleAssignment(reportRole, user2));
+
+    // when
+    Set<User> reportUsers = repository.findUsersByDirectRight(reportRight);
+    Set<User> adminUsers = repository.findUsersByDirectRight(adminRight);
+
+    // then
+    assertThat(reportUsers, hasSize(2));
+    assertThat(reportUsers, hasItems(user1, user2));
+    assertThat(adminUsers, hasSize(1));
+    assertThat(adminUsers, hasItem(user1));
   }
 
   private User cloneUser(User user) {
@@ -285,11 +354,15 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     return clonedUser;
   }
 
-  private Facility generateFacility() {
-    Integer instanceNumber = this.getNextInstanceNumber();
-    GeographicLevel geographicLevel = generateGeographicLevel();
-    GeographicZone geographicZone = generateGeographicZone(geographicLevel);
-    FacilityType facilityType = generateFacilityType();
+  private Facility generateFacility(int instanceNumber) {
+    return generateFacility(instanceNumber, "FacilityCode" + instanceNumber);
+  }
+
+  private Facility generateFacility(int instanceNumber, String type) {
+    GeographicLevel geographicLevel = generateGeographicLevel(instanceNumber);
+    GeographicZone geographicZone = generateGeographicZone(geographicLevel,
+        instanceNumber);
+    FacilityType facilityType = generateFacilityType(type);
     Facility facility = new Facility("FacilityCode" + instanceNumber);
     facility.setType(facilityType);
     facility.setGeographicZone(geographicZone);
@@ -301,26 +374,52 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     return facility;
   }
 
-  private GeographicLevel generateGeographicLevel() {
+  private GeographicLevel generateGeographicLevel(int instanceNumber) {
     GeographicLevel geographicLevel = new GeographicLevel();
-    geographicLevel.setCode("GeographicLevel" + this.getNextInstanceNumber());
+    geographicLevel.setCode("GeographicLevel" + instanceNumber);
     geographicLevel.setLevelNumber(1);
     geographicLevelRepository.save(geographicLevel);
     return geographicLevel;
   }
 
-  private GeographicZone generateGeographicZone(GeographicLevel geographicLevel) {
+  private GeographicZone generateGeographicZone(GeographicLevel geographicLevel,
+                                                int instanceNumber) {
     GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode("GeographicZone" + this.getNextInstanceNumber());
+    geographicZone.setCode("GeographicZone" + instanceNumber);
     geographicZone.setLevel(geographicLevel);
     geographicZoneRepository.save(geographicZone);
     return geographicZone;
   }
 
-  private FacilityType generateFacilityType() {
+  private FacilityType generateFacilityType(String type) {
     FacilityType facilityType = new FacilityType();
-    facilityType.setCode("FacilityType" + this.getNextInstanceNumber());
+    facilityType.setCode(type);
     facilityTypeRepository.save(facilityType);
     return facilityType;
+  }
+
+  private Right newRight(String name, RightType type) {
+    Right right = Right.newRight(name, type);
+    return rightRepository.save(right);
+  }
+
+  private Role newRole(String name, Right right) {
+    Role role = Role.newRole(name, right);
+    return roleRepository.save(role);
+  }
+
+  private Program newProgram(String code) {
+    Program program = new Program(code);
+    return programRepository.save(program);
+  }
+
+  private SupervisoryNode newSupervisoryNode(String code, Facility facility) {
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(code, facility);
+    return supervisoryNodeRepository.save(supervisoryNode);
+  }
+
+  private User assignRoleToUser(User user, RoleAssignment assignment) {
+    user.assignRoles(assignment);
+    return repository.save(user);
   }
 }

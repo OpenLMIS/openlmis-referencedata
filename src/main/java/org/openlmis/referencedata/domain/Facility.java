@@ -48,6 +48,7 @@ import javax.persistence.Table;
 public class Facility extends BaseEntity {
 
   public static final String TEXT = "text";
+  public static final String WAREHOUSE_CODE = "warehouse";
 
   @Column(nullable = false, unique = true, columnDefinition = TEXT)
   @Getter
@@ -227,6 +228,10 @@ public class Facility extends BaseEntity {
     }
 
     exporter.setExtraData(extraData);
+  }
+
+  public boolean isWarehouse() {
+    return WAREHOUSE_CODE.equalsIgnoreCase(getType().getCode());
   }
 
   public interface Exporter {

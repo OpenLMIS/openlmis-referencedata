@@ -16,9 +16,14 @@
 package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class FacilityMessageKeys extends MessageKeys {
+
+  private static final String MUST_BE_WAREHOUSE = "mustBeWarehouse";
   private static final String ERROR = join(SERVICE_ERROR, FACILITY);
+
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
   public static final String ERROR_SEARCH_LACKS_PARAMS =
       join(ERROR, SEARCH, LACKS_PARAMETERS);
+  public static final String ERROR_MUST_BE_WAREHOUSE =
+      join(ERROR, TYPE, MUST_BE_WAREHOUSE);
 }

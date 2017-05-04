@@ -15,7 +15,11 @@
 
 package org.openlmis.referencedata.web;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -25,6 +29,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_EMAIL_DUPLICATED;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_FIRSTNAME_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_LASTNAME_REQUIRED;
@@ -33,7 +40,6 @@ import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,6 +71,7 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -77,6 +84,7 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -87,6 +95,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
@@ -95,6 +104,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/users";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
+  private static final String RIGHT_SEARCH_URL = RESOURCE_URL + "/rightSearch";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ROLE_ASSIGNMENTS_URL = ID_URL + "/roleAssignments";
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
@@ -111,6 +121,13 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String HOME_FACILITY_CODE = "HF1";
   private static final String RIGHT_ID_STRING = "rightId";
   private static final String PROGRAM_ID_STRING = "programId";
+  private static final String SUPERVISORY_NODE_ID_STRING = "supervisoryNodeId";
+  private static final String WAREHOUSE_ID_STRING = "warehouseId";
+
+  private static final UUID RIGHT_ID = UUID.randomUUID();
+  private static final UUID SUPERVISORY_NODE_ID = UUID.randomUUID();
+  private static final UUID PROGRAM_ID = UUID.randomUUID();
+  private static final UUID WAREHOUSE_ID = UUID.randomUUID();
 
   @MockBean
   private UserRepository userRepository;
@@ -151,6 +168,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private ObjectMapper mapper = new ObjectMapper();
 
   private User user1;
+  private User user2;
   private UUID userId;
   private Facility homeFacility;
   private UUID homeFacilityId;
@@ -185,13 +203,16 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     user1 = generateUser();
     user1.setId(userId);
     assignUserRoles(user1);
+
+    user2 = generateUser();
+    user2.setId(UUID.randomUUID());
   }
 
   @Test
   public void shouldGetAllUsers() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    Set<User> storedUsers = Sets.newHashSet(user1, generateUser());
+    Set<User> storedUsers = newHashSet(user1, generateUser());
     given(userRepository.findAll()).willReturn(storedUsers);
 
     UserDto[] response = restAssured
@@ -203,7 +224,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(UserDto[].class);
 
-    List<UserDto> users = Arrays.asList(response);
+    List<UserDto> users = asList(response);
     assertThat(users.size(), is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -782,7 +803,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     user2.setId(UUID.randomUUID());
     assignUserRoles(user2);
 
-    given(userService.searchUsers(queryMap)).willReturn(Arrays.asList(user1, user2));
+    given(userService.searchUsers(queryMap)).willReturn(asList(user1, user2));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -906,6 +927,108 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.getHomeFacility().getCode(), response.getHomeFacility().getCode());
     assertEquals(user.isActive(), response.isActive());
     assertEquals(user.isVerified(), response.isVerified());
+  }
+
+  @Test
+  public void shouldSearchUsersByDirectRights() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    when(userService.rightSearch(RIGHT_ID, null, null, null))
+        .thenReturn(newHashSet(user1, user2));
+
+    UserDto[] users = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, RIGHT_ID)
+        .when()
+        .get(RIGHT_SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto[].class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertUsernames(users, user1.getUsername(), user2.getUsername());
+    verify(userService).rightSearch(RIGHT_ID, null, null, null);
+  }
+
+  @Test
+  public void shouldSearchUsersByFulfillmentRights() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    when(userService.rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID))
+      .thenReturn(newHashSet(user1, user2));
+
+    UserDto[] users = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, RIGHT_ID)
+        .queryParam(WAREHOUSE_ID_STRING, WAREHOUSE_ID)
+        .when()
+        .get(RIGHT_SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto[].class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertUsernames(users, user1.getUsername(), user2.getUsername());
+    verify(userService).rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID);
+  }
+
+  @Test
+  public void shouldSearchUsersBySupervisionRights() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    when(userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null))
+        .thenReturn(newHashSet(user1, user2));
+
+    UserDto[] users = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, RIGHT_ID)
+        .queryParam(SUPERVISORY_NODE_ID_STRING, SUPERVISORY_NODE_ID)
+        .queryParam(PROGRAM_ID_STRING, PROGRAM_ID)
+        .when()
+        .get(RIGHT_SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(UserDto[].class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertUsernames(users, user1.getUsername(), user2.getUsername());
+    verify(userService).rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
+  }
+
+  @Test
+  public void shouldReturnForbiddenForRightSearchIfUserHasNoRights() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, RIGHT_ID)
+        .when()
+        .get(RIGHT_SEARCH_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(userService);
+  }
+
+  @Test
+  public void shouldReturnBadRequestIfUserServiceThrowsException() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    when(userService.rightSearch(RIGHT_ID, null, null, null))
+        .thenThrow(new ValidationMessageException(RightMessageKeys.ERROR_NOT_FOUND));
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .queryParam(RIGHT_ID_STRING, RIGHT_ID)
+        .when()
+        .get(RIGHT_SEARCH_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verify(userService).rightSearch(RIGHT_ID, null, null, null);
   }
 
   private Response getUser() {
@@ -1099,7 +1222,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     supervisoryNode = SupervisoryNode.newSupervisoryNode(SUPERVISORY_NODE_CODE,
         generateFacility("F1"));
     RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);
-    supervisionGroup.setMemberFacilities(Sets.newHashSet(generateFacility("F2"),
+    supervisionGroup.setMemberFacilities(newHashSet(generateFacility("F2"),
         generateFacility("F3")));
     RequisitionGroupProgramSchedule supervisionGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
@@ -1145,5 +1268,13 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     }
 
     assertTrue(dtos.contains(actual));
+  }
+
+  private void assertUsernames(UserDto[] users, String... usernames) {
+    assertThat(users, arrayWithSize(usernames.length));
+    List<String> extractedNames = Arrays.stream(users)
+        .map(UserDto::getUsername)
+        .collect(Collectors.toList());
+    assertThat(extractedNames, containsInAnyOrder(usernames));
   }
 }

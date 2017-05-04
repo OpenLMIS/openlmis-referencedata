@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -74,6 +74,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import lombok.NoArgsConstructor;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -81,6 +84,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.validation.Valid;
 
 @NoArgsConstructor
@@ -420,6 +424,31 @@ public class UserController extends BaseController {
     return facilitiesToDto(facilities);
   }
 
+  /**
+   * Searches for users based having the specified right. The params are required
+   * based on the type of the right.
+   * @param rightId the ID of the right, always required
+   * @param programId the ID of the program, required for supervision rights
+   * @param supervisoryNodeId the ID of the supervisory node,
+   *                          required for supervision rights
+   * @param warehouseId the ID of the warehouse, required for fulfillment rights
+   * @return users with the right assigned, matching the criteria
+   */
+  @RequestMapping(value = "/users/rightSearch", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<UserDto> rightSearch(@RequestParam UUID rightId,
+                                   @RequestParam(required = false) UUID programId,
+                                   @RequestParam(required = false) UUID supervisoryNodeId,
+                                   @RequestParam(required = false) UUID warehouseId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+
+    Set<User> users = userService.rightSearch(rightId, programId,
+        supervisoryNodeId, warehouseId);
+
+    return exportUsersToDtos(users);
+  }
+
   private User validateUser(UUID userId) {
     User user = userRepository.findOne(userId);
     if (user == null) {
@@ -512,7 +541,7 @@ public class UserController extends BaseController {
     return userDto;
   }
 
-  private List<UserDto> exportUsersToDtos(List<User> users) {
+  private List<UserDto> exportUsersToDtos(Collection<User> users) {
     return users.stream().map(this::exportUserToDto).collect(toList());
   }
 

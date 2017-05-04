@@ -1347,6 +1347,48 @@ resourceTypes:
                           body:
                             application/json:
                               schema: localizedErrorResponse
+      /rightSearch:
+              get:
+                  is: [ secured ]
+                  description: "Search users that have the given right assigned. This searches for users with role assignments matching all the parameters based on their type. Takes additional parameters for fulfillment and supervisory rights."
+                  queryParameters:
+                      rightId:
+                          displayName: Right ID
+                          description: The right to search for.
+                          type: string
+                          required: true
+                          repeat: false
+                      programId:
+                          displayName: Program ID
+                          description: The program to search for - required only for supervision rights.
+                          type: string
+                          required: false
+                          repeat: false
+                      supervisoryNodeId:
+                          displayName: Supervisory Node ID
+                          description: The supervisory node to search for - required only for supervision rights.
+                          type: string
+                          required: false
+                          repeat: false
+                      warehouseId:
+                          displayName: Warehouse ID
+                          description: The warehouse to search for - required only for fulfillment rights.
+                          type: string
+                          required: false
+                          repeat: false
+                  responses:
+                      "200":
+                          body:
+                            application/json:
+                                schema: userArray
+                      "400":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
 
   /facilities:
       displayName: Facility
