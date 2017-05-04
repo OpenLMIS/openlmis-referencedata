@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
+import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -70,7 +71,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     given(orderableDisplayCategoryRepository.findByCode(any(Code.class))).willReturn(
         orderableDisplayCategory);
 
-    OrderableDisplayCategory[] response = restAssured
+    OrderableDisplayCategoryDto[] response = restAssured
         .given()
         .queryParam(CODE, orderableDisplayCategory.getCode())
         .queryParam(ACCESS_TOKEN, getToken())
@@ -78,10 +79,10 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .get(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(OrderableDisplayCategory[].class);
+        .extract().as(OrderableDisplayCategoryDto[].class);
 
     assertEquals(1, response.length);
-    assertEquals(orderableDisplayCategory, response[0]);
+    assertEquals(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory), response[0]);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -93,14 +94,14 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         Collections.singletonList(orderableDisplayCategory);
     given(orderableDisplayCategoryRepository.findAll()).willReturn(searchResult);
 
-    OrderableDisplayCategory[] response = restAssured
+    OrderableDisplayCategoryDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(OrderableDisplayCategory[].class);
+        .extract().as(OrderableDisplayCategoryDto[].class);
 
     assertEquals(1, response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -126,19 +127,6 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  private OrderableDisplayCategory generateOrderableDisplayCategory() {
-    Integer instanceNumber = generateInstanceNumber();
-    OrderableDisplayCategory orderableDisplayCategory = OrderableDisplayCategory.createNew(
-        Code.code("orderableDisplayCategoryCode" + instanceNumber),
-        new OrderedDisplayValue("orderableDisplayCategoryName" + instanceNumber, instanceNumber));
-    return orderableDisplayCategory;
-  }
-
-  private Integer generateInstanceNumber() {
-    currentInstanceNumber += 1;
-    return currentInstanceNumber;
   }
 
   @Test
@@ -188,18 +176,18 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   public void shouldPostOrderableDisplayCategory() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    OrderableDisplayCategory response = restAssured
+    OrderableDisplayCategoryDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(orderableDisplayCategory)
+        .body(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory))
         .when()
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .extract().as(OrderableDisplayCategory.class);
+        .extract().as(OrderableDisplayCategoryDto.class);
 
-    assertEquals(orderableDisplayCategory, response);
+    assertEquals(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory), response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -211,7 +199,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(orderableDisplayCategory)
+        .body(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory))
         .when()
         .post(RESOURCE_URL)
         .then()
@@ -230,19 +218,19 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     given(orderableDisplayCategoryRepository.findOne(
         orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
 
-    OrderableDisplayCategory response = restAssured
+    OrderableDisplayCategoryDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", orderableDisplayCategoryId)
-        .body(orderableDisplayCategory)
+        .body(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory))
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(OrderableDisplayCategory.class);
+        .extract().as(OrderableDisplayCategoryDto.class);
 
-    assertEquals(orderableDisplayCategory, response);
+    assertEquals(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory), response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -258,7 +246,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", orderableDisplayCategoryId)
-        .body(orderableDisplayCategory)
+        .body(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory))
         .when()
         .put(ID_URL)
         .then()
@@ -279,7 +267,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     given(orderableDisplayCategoryRepository.findAll()).willReturn(
         storedOrderableDisplayCategories);
 
-    OrderableDisplayCategory[] response = restAssured
+    OrderableDisplayCategoryDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -287,7 +275,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(OrderableDisplayCategory[].class);
+        .extract().as(OrderableDisplayCategoryDto[].class);
 
     assertEquals(storedOrderableDisplayCategories.size(), response.length);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -324,7 +312,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategoryId)).willReturn(
         orderableDisplayCategory);
 
-    OrderableDisplayCategory response = restAssured
+    OrderableDisplayCategoryDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -333,9 +321,9 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .get(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(OrderableDisplayCategory.class);
+        .extract().as(OrderableDisplayCategoryDto.class);
 
-    assertEquals(orderableDisplayCategory, response);
+    assertEquals(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory), response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -365,5 +353,17 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private OrderableDisplayCategory generateOrderableDisplayCategory() {
+    Integer instanceNumber = generateInstanceNumber();
+    return OrderableDisplayCategory.createNew(
+        Code.code("orderableDisplayCategoryCode" + instanceNumber),
+        new OrderedDisplayValue("orderableDisplayCategoryName" + instanceNumber, instanceNumber));
+  }
+
+  private Integer generateInstanceNumber() {
+    currentInstanceNumber += 1;
+    return currentInstanceNumber;
   }
 }

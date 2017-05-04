@@ -3,6 +3,7 @@ ALTER TABLE orderables
     DROP COLUMN type,
     DROP COLUMN classificationsystem,
     DROP COLUMN classificationid,
+    DROP COLUMN manufacturerOfTradeItem,
     DROP COLUMN parentid,
     ADD COLUMN commoditytypeid uuid,
     ADD COLUMN tradeitemid uuid;

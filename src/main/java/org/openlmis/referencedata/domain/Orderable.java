@@ -18,6 +18,7 @@ package org.openlmis.referencedata.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.openlmis.referencedata.dto.DispendableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -187,15 +188,15 @@ public class Orderable extends BaseEntity {
     Orderable orderable = new Orderable();
     orderable.id = importer.getId();
     orderable.productCode = Code.code(importer.getProductCode());
-    orderable.dispensable = Dispensable.createNew(importer.getDispensable());
+    orderable.dispensable = Dispensable.newInstance(importer.getDispensable());
     orderable.fullProductName = importer.getFullProductName();
     orderable.netContent = importer.getNetContent();
     orderable.packRoundingThreshold = importer.getPackRoundingThreshold();
     orderable.roundToZero = importer.isRoundToZero();
     orderable.programOrderables = new HashSet<>();
 
-    if (importer.getProgramOrderables() != null) {
-      importer.getProgramOrderables()
+    if (importer.getPrograms() != null) {
+      importer.getPrograms()
           .forEach(po -> orderable
               .programOrderables.add(ProgramOrderable.newInstance(po, orderable)));
     }
@@ -215,12 +216,12 @@ public class Orderable extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setProductCode(productCode.toString());
-    exporter.setDispensable(dispensable.toString());
+    exporter.setDispensable(DispendableDto.newInstance(dispensable));
     exporter.setFullProductName(fullProductName);
     exporter.setNetContent(netContent);
     exporter.setPackRoundingThreshold(packRoundingThreshold);
     exporter.setRoundToZero(roundToZero);
-    exporter.setProgramOrderables(ProgramOrderableDto.newInstance(programOrderables));
+    exporter.setPrograms(ProgramOrderableDto.newInstance(programOrderables));
     exporter.setIdentifiers(identifiers);
   }
 
@@ -229,7 +230,7 @@ public class Orderable extends BaseEntity {
 
     void setProductCode(String productCode);
 
-    void setDispensable(String dispensable);
+    void setDispensable(DispendableDto dispensable);
 
     void setFullProductName(String fullProductName);
 
@@ -239,7 +240,7 @@ public class Orderable extends BaseEntity {
 
     void setRoundToZero(boolean roundToZero);
 
-    void setProgramOrderables(Set<ProgramOrderableDto> programOrderables);
+    void setPrograms(Set<ProgramOrderableDto> programOrderables);
 
     void setIdentifiers(Map<String, String> identifiers);
   }
@@ -249,7 +250,7 @@ public class Orderable extends BaseEntity {
 
     String getProductCode();
 
-    String getDispensable();
+    DispendableDto getDispensable();
 
     String getFullProductName();
 
@@ -259,7 +260,7 @@ public class Orderable extends BaseEntity {
 
     boolean isRoundToZero();
 
-    Set<ProgramOrderableDto> getProgramOrderables();
+    Set<ProgramOrderableDto> getPrograms();
   }
 
 }

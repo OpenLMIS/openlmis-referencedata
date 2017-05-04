@@ -27,11 +27,10 @@ import org.hibernate.annotations.Type;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.CurrencyConfig;
-import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
-import org.openlmis.referencedata.dto.ProgramDto;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -219,13 +218,13 @@ public class ProgramOrderable extends BaseEntity {
   public static ProgramOrderable newInstance(Importer importer, Orderable orderable) {
     ProgramOrderable programOrderable = new ProgramOrderable();
     programOrderable.orderableDisplayCategory =
-        OrderableDisplayCategory.newInstance(importer.getOrderableDisplayCategory());
+        new OrderableDisplayCategory(importer.getOrderableDisplayCategoryId());
     programOrderable.active = importer.isActive();
     programOrderable.fullSupply = importer.isFullSupply();
     programOrderable.displayOrder = importer.getDisplayOrder();
     programOrderable.dosesPerPatient = importer.getDosesPerPatient();
     programOrderable.pricePerPack = importer.getPricePerPack();
-    programOrderable.program = Program.newProgram(importer.getProgram());
+    programOrderable.program = new Program(importer.getProgramId());
     programOrderable.product = orderable;
     return programOrderable;
   }
@@ -236,9 +235,15 @@ public class ProgramOrderable extends BaseEntity {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setOrderableDisplayCategory(
-        OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory));
-    exporter.setProgram(ProgramDto.newInstance(program));
+    exporter.setOrderableDisplayCategoryId(
+        orderableDisplayCategory.getId());
+    if (orderableDisplayCategory.getOrderedDisplayValue() != null) {
+      exporter.setOrderableCategoryDisplayName(
+          orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
+      exporter.setOrderableCategoryDisplayOrder(
+          orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder());
+    }
+    exporter.setProgramId(program.getId());
     exporter.setActive(active);
     exporter.setFullSupply(fullSupply);
     exporter.setDisplayOrder(displayOrder);
@@ -250,9 +255,13 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   public interface Exporter {
-    void setOrderableDisplayCategory(OrderableDisplayCategoryDto category);
+    void setProgramId(UUID program);
 
-    void setProgram(ProgramDto program);
+    void setOrderableDisplayCategoryId(UUID category);
+
+    void setOrderableCategoryDisplayName(String name);
+
+    void setOrderableCategoryDisplayOrder(Integer displayOrder);
 
     void setActive(boolean active);
 
@@ -266,9 +275,9 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   public interface Importer {
-    OrderableDisplayCategoryDto getOrderableDisplayCategory();
+    UUID getProgramId();
 
-    ProgramDto getProgram();
+    UUID getOrderableDisplayCategoryId();
 
     boolean isActive();
 

@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.domain;
 
 import lombok.Getter;
-
 import javax.persistence.Embeddable;
 
 /**
@@ -66,4 +65,30 @@ public class Dispensable {
     return new Dispensable(correctDispensingUnit);
   }
 
+  /**
+   * Creates new instance based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of Dispensable.
+   */
+  public static Dispensable newInstance(Importer importer) {
+    return new Dispensable(importer.getDispensingUnit());
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(Exporter exporter) {
+    exporter.setDispensingUnit(dispensingUnit);
+  }
+
+  public interface Exporter {
+    void setDispensingUnit(String dispensingUnit);
+  }
+
+  public interface Importer {
+    String getDispensingUnit();
+  }
 }

@@ -38,15 +38,11 @@ import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
-import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
-import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
+import org.openlmis.referencedata.dto.DispendableDto;
 import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
@@ -85,7 +81,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Before
   public void setUp() {
-    orderable = new OrderableDto("code", UNIT, NAME, 0, 0, false, Collections.emptySet(), null);
+    orderable = new OrderableDto("code", new DispendableDto(UNIT), NAME, 0, 0, false,
+        Collections.emptySet(), null);
     orderable.setId(UUID.randomUUID());
     commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
         CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null);
@@ -137,7 +134,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldCreateNewCommodityTypeWithProgramOrderable() {
     mockUserHasRight(ORDERABLES_MANAGE);
     ProgramOrderableDto programOrderable = generateProgramOrderable();
-    orderable.setProgramOrderables(Collections.singleton(programOrderable));
+    orderable.setPrograms(Collections.singleton(programOrderable));
 
     CommodityTypeDto response = restAssured
         .given()
@@ -183,8 +180,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldNotUpdateIdentifiers() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    orderable = new OrderableDto("code", UNIT, NAME, 0, 0, false, Collections.emptySet(),
-        ImmutableMap.of("badSys", "badId"));
+    orderable = new OrderableDto("code", new DispendableDto(UNIT), NAME, 0, 0, false,
+        Collections.emptySet(), ImmutableMap.of("badSys", "badId"));
     orderable.setId(UUID.randomUUID());
     commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
         CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null);
@@ -430,23 +427,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   }
 
   private ProgramOrderableDto generateProgramOrderable() {
-    return new ProgramOrderableDto(generateOrderableDisplayCategory(), generateProgram(), true,
-        true, 0, 1, Money.of(CurrencyUnit.USD, 10.0));
-  }
-
-  private ProgramDto generateProgram() {
-    ProgramDto program = new ProgramDto();
-    program.setCode("programCode");
-    program.setId(UUID.randomUUID());
-    return program;
-  }
-
-  private OrderableDisplayCategoryDto generateOrderableDisplayCategory() {
-    OrderableDisplayCategory category = OrderableDisplayCategory.createNew(
-        Code.code("orderableDisplayCategoryCode"),
-        new OrderedDisplayValue("orderableDisplayCategoryName", 1));
-    category.setId(UUID.randomUUID());
-    return OrderableDisplayCategoryDto.newInstance(category);
+    return new ProgramOrderableDto(UUID.randomUUID(), UUID.randomUUID(),
+        null, null, true, true, 0, 1, Money.of(CurrencyUnit.USD, 10.0));
   }
 
   private TradeItem mockTradeItem() {

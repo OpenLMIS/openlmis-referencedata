@@ -29,6 +29,7 @@ import org.openlmis.referencedata.serializer.MoneyDeserializer;
 import org.openlmis.referencedata.serializer.MoneySerializer;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -38,9 +39,13 @@ import java.util.Set;
 @EqualsAndHashCode
 public class ProgramOrderableDto implements ProgramOrderable.Importer, ProgramOrderable.Exporter {
 
-  private OrderableDisplayCategoryDto orderableDisplayCategory;
+  private UUID programId;
 
-  private ProgramDto program;
+  private UUID orderableDisplayCategoryId;
+
+  private String orderableCategoryDisplayName;
+
+  private Integer orderableCategoryDisplayOrder;
 
   private boolean active;
 

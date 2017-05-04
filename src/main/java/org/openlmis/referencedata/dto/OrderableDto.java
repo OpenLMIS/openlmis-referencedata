@@ -34,7 +34,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
 
   private String productCode;
 
-  private String dispensable;
+  private DispendableDto dispensable;
 
   private String fullProductName;
 
@@ -44,7 +44,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
 
   private boolean roundToZero;
 
-  private Set<ProgramOrderableDto> programOrderables;
+  private Set<ProgramOrderableDto> programs;
 
   private Map<String, String> identifiers;
 

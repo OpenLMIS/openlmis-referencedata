@@ -17,7 +17,6 @@ package org.openlmis.referencedata.domain;
 
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Getter;
 import java.util.Objects;
 import java.util.UUID;
@@ -41,6 +40,13 @@ public class OrderableDisplayCategory extends BaseEntity {
   private OrderedDisplayValue orderedDisplayValue;
 
   private OrderableDisplayCategory() {
+  }
+
+  /**
+   * Creates a new OrderableDisplayCategory with given id.
+   */
+  public OrderableDisplayCategory(UUID id) {
+    this.id = id;
   }
 
   /**
