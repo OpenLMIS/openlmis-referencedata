@@ -27,9 +27,12 @@ import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
+import org.openlmis.referencedata.validate.CommodityTypeValidator;
+import org.openlmis.referencedata.validate.TradeItemValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +51,10 @@ public class CommodityTypeController extends BaseController {
   @Autowired
   private TradeItemRepository tradeItemRepository;
 
+  @Autowired
+  private CommodityTypeValidator validator;
+
+
   /**
    * Add or update a commodity type
    *
@@ -55,9 +62,11 @@ public class CommodityTypeController extends BaseController {
    */
   @Transactional
   @RequestMapping(value = "/commodityTypes", method = RequestMethod.PUT)
-  public CommodityTypeDto createOrUpdate(@RequestBody CommodityTypeDto commodityTypeDto) {
-    CommodityType commodityType = CommodityType.newInstance(commodityTypeDto);
+  public CommodityTypeDto createOrUpdate(@RequestBody CommodityTypeDto commodityTypeDto,
+                                         BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
+    validator.validate(commodityTypeDto, bindingResult);
+    CommodityType commodityType = CommodityType.newInstance(commodityTypeDto);
 
     if (null != commodityType.getId()) {
       UUID productId = commodityType.getId();
