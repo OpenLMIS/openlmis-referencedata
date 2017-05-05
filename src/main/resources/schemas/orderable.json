@@ -33,7 +33,7 @@
       "title": "programs",
       "items": {
         "type": "object",
-        "$ref": "programOrderableDto.json"
+        "$ref": "programOrderable.json"
       },
       "uniqueItems": true
     }

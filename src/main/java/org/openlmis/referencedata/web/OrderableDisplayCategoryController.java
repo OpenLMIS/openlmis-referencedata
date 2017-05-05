@@ -15,16 +15,13 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
-import static org.openlmis.referencedata.dto.OrderableDisplayCategoryDto.newInstance;
-
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.OrderableDisplayCategoryMessageKeys;
 import org.slf4j.Logger;
@@ -41,8 +38,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
 import java.util.Collections;
 import java.util.UUID;
+
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 @Controller
 @Transactional
@@ -54,6 +54,9 @@ public class OrderableDisplayCategoryController extends BaseController {
   @Autowired
   private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
+  @Autowired
+  private RightService rightService;
+
   /**
    * Get all OrderableDisplayCategories.
    *
@@ -62,25 +65,23 @@ public class OrderableDisplayCategoryController extends BaseController {
   @RequestMapping(value = "/orderableDisplayCategories", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<OrderableDisplayCategoryDto> getAllOrderableDisplayCategories() {
+  public Iterable<OrderableDisplayCategory> getAllOrderableDisplayCategories() {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
-    return newInstance(orderableDisplayCategoryRepository.findAll());
+    return orderableDisplayCategoryRepository.findAll();
   }
 
   /**
    * Create a {@link OrderableDisplayCategory}.
    *
-   * @param orderableDisplayCategoryDto a OrderableDisplayCategory bound to the request body.
+   * @param orderableDisplayCategory a OrderableDisplayCategory bound to the request body.
    * @return the created OrderableDisplayCategory with id.
    */
   @RequestMapping(value = "/orderableDisplayCategories", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public OrderableDisplayCategoryDto createOrderableDisplayCategory(
-      @RequestBody OrderableDisplayCategoryDto orderableDisplayCategoryDto) {
-    OrderableDisplayCategory orderableDisplayCategory =
-        OrderableDisplayCategory.newInstance(orderableDisplayCategoryDto);
+  public OrderableDisplayCategory createOrderableDisplayCategory(
+      @RequestBody OrderableDisplayCategory orderableDisplayCategory) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     OrderableDisplayCategory found =
@@ -92,25 +93,25 @@ public class OrderableDisplayCategoryController extends BaseController {
     }
 
     orderableDisplayCategoryRepository.save(found);
-    return newInstance(found);
+    return found;
   }
 
   /**
    * Updates the given {@link OrderableDisplayCategory}.
    * Uses the ID given to base it's update and ignores the code given.
    *
-   * @param orderableDisplayCategoryDto   An OrderableDisplayCategory bound to the request body.
+   * @param orderableDisplayCategory   An OrderableDisplayCategory bound to the request body.
    * @param orderableDisplayCategoryId UUID of the OrderableDisplayCategory which we want to update.
    * @return the updated OrderableDisplayCategory.
    */
   @RequestMapping(value = "/orderableDisplayCategories/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public OrderableDisplayCategoryDto updateOrderableDisplayCategory(
-      @RequestBody OrderableDisplayCategoryDto orderableDisplayCategoryDto,
+  public OrderableDisplayCategory updateOrderableDisplayCategory(
+      @RequestBody OrderableDisplayCategory orderableDisplayCategory,
       @PathVariable("id") UUID orderableDisplayCategoryId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
-    LOGGER.debug("Updating orderableDisplayCategory with id: %s", orderableDisplayCategoryId);
+    LOGGER.debug("Updating orderableDisplayCategory with id: " + orderableDisplayCategoryId);
 
     OrderableDisplayCategory orderableDisplayCategoryToUpdate =
         orderableDisplayCategoryRepository.findOne(orderableDisplayCategoryId);
@@ -119,13 +120,11 @@ public class OrderableDisplayCategoryController extends BaseController {
       throw new ValidationMessageException(new Message(
           OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND_WITH_ID, orderableDisplayCategoryId));
     }
-    OrderableDisplayCategory orderableDisplayCategory =
-        OrderableDisplayCategory.newInstance(orderableDisplayCategoryDto);
     orderableDisplayCategoryToUpdate.updateFrom(orderableDisplayCategory);
     orderableDisplayCategoryRepository.save(orderableDisplayCategoryToUpdate);
 
-    LOGGER.debug("Updated orderableDisplayCategory with id: %s", orderableDisplayCategoryId);
-    return newInstance(orderableDisplayCategoryToUpdate);
+    LOGGER.debug("Updated orderableDisplayCategory with id: " + orderableDisplayCategoryId);
+    return orderableDisplayCategoryToUpdate;
   }
 
   /**
@@ -137,7 +136,7 @@ public class OrderableDisplayCategoryController extends BaseController {
   @RequestMapping(value = "/orderableDisplayCategories/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public OrderableDisplayCategoryDto getOrderableDisplayCategory(
+  public OrderableDisplayCategory getOrderableDisplayCategory(
       @PathVariable("id") UUID orderableDisplayCategoryId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
@@ -146,7 +145,7 @@ public class OrderableDisplayCategoryController extends BaseController {
     if (orderableDisplayCategory == null) {
       throw new NotFoundException(OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return newInstance(orderableDisplayCategory);
+      return orderableDisplayCategory;
     }
   }
 
@@ -185,7 +184,7 @@ public class OrderableDisplayCategoryController extends BaseController {
   @RequestMapping(value = "/orderableDisplayCategories/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<OrderableDisplayCategoryDto> searchOrderableDisplayCategories(
+  public Iterable<OrderableDisplayCategory> searchOrderableDisplayCategories(
       @RequestParam(value = "code", required = false) String codeParam) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
@@ -195,9 +194,9 @@ public class OrderableDisplayCategoryController extends BaseController {
       if (null == orderableDisplayCategory) {
         throw new NotFoundException(OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND);
       }
-      return Collections.singletonList(newInstance(orderableDisplayCategory));
+      return Collections.singletonList(orderableDisplayCategory);
     } else {
-      return newInstance(orderableDisplayCategoryRepository.findAll());
+      return orderableDisplayCategoryRepository.findAll();
     }
   }
 }

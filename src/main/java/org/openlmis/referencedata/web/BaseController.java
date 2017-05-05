@@ -21,13 +21,10 @@ import org.javers.core.changelog.SimpleTextChangeLog;
 import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
 import org.javers.repository.jql.QueryBuilder;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.service.RightService;
-import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -122,13 +119,6 @@ public abstract class BaseController {
   }
 
 
-  void throwValidationMessageExceptionIfErrors(BindingResult bindingResult) {
-    if (bindingResult.getErrorCount() > 0) {
-      throw new ValidationMessageException(new Message(bindingResult.getFieldError().getCode(),
-          bindingResult.getFieldError().getArguments()));
-    }
-  }
-
   /*
     Return JaVers changes for the specified type, optionally filtered by id, author, and property.
   */
@@ -164,4 +154,5 @@ public abstract class BaseController {
                                   .compareTo(o2.getCommitMetadata().get().getCommitDate()));
     return changes;
   }
+
 }

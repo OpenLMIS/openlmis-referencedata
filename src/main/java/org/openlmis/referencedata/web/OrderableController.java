@@ -18,17 +18,17 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -39,29 +39,27 @@ public class OrderableController extends BaseController {
 
   /**
    * Finds all orderables.
-   *
    * @return a list of orderables
    */
   @GetMapping("/orderables")
-  public Set<OrderableDto> findAll() {
+  public List<Orderable> findAll() {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     List<Orderable> allOrderables = new ArrayList<>();
-    for (Orderable product : repository.findAll()) {
+    for (Orderable product:repository.findAll()) {
       allOrderables.add(product);
     }
 
-    return OrderableDto.newInstance(allOrderables);
+    return allOrderables;
   }
 
   /**
    * Finds product with chosen id.
-   *
    * @param productId id of the chosen product
    * @return chosen product
    */
   @GetMapping("/orderables/{id}")
-  public OrderableDto getChosenOrderable(
+  public ResponseEntity<Orderable> getChosenOrderable(
       @PathVariable("id") UUID productId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
@@ -69,7 +67,7 @@ public class OrderableController extends BaseController {
     if (orderable == null) {
       throw new NotFoundException(OrderableMessageKeys.NOT_FOUND);
     } else {
-      return OrderableDto.newInstance(orderable);
+      return new ResponseEntity<>(orderable, HttpStatus.OK);
     }
   }
 

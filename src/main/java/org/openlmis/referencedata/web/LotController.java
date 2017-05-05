@@ -81,7 +81,10 @@ public class LotController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     validator.validate(lotDto, bindingResult);
-    throwValidationMessageExceptionIfErrors(bindingResult);
+    if (bindingResult.getErrorCount() > 0) {
+      throw new ValidationMessageException(new Message(bindingResult.getFieldError().getCode(),
+              bindingResult.getFieldError().getArguments()));
+    }
     TradeItem tradeItem = tradeItemRepository.findOne(lotDto.getTradeItemId());
     Lot lotToSave = Lot.newLot(lotDto, tradeItem);
     lotToSave.setId(null);
@@ -110,7 +113,10 @@ public class LotController extends BaseController {
       throw new NotFoundException(new Message(LotMessageKeys.ERROR_NOT_FOUND_WITH_ID, lotId));
     }
     validator.validate(lotDto, bindingResult);
-    throwValidationMessageExceptionIfErrors(bindingResult);
+    if (bindingResult.getErrorCount() > 0) {
+      throw new ValidationMessageException(new Message(bindingResult.getFieldError().getCode(),
+          bindingResult.getFieldError().getArguments()));
+    }
     TradeItem tradeItem = tradeItemRepository.findOne(lotDto.getTradeItemId());
     Lot lotToSave = Lot.newLot(lotDto, tradeItem);
     lotToSave.setId(lotId);

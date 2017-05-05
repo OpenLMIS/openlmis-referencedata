@@ -23,15 +23,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
-import org.openlmis.referencedata.domain.Dispensable;
-import org.openlmis.referencedata.domain.Orderable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.UUID;
 
 public class CommodityTypeRepositoryIntegrationTest extends
@@ -47,11 +42,8 @@ public class CommodityTypeRepositoryIntegrationTest extends
 
   @Override
   CommodityType generateInstance() {
-    Orderable orderable = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
-        "Gloves", 6, 3, false, Collections.emptySet(), Collections.emptyMap());
-
-    return new CommodityType(Collections.singleton(orderable),
-        "Name" + getNextInstanceNumber(), "cSys", "cId", null, new ArrayList<>());
+    return CommodityType.newCommodityType("Code" + getNextInstanceNumber(), "each",
+        "Name" + getNextInstanceNumber(), "desc", 10, 20, false, "cSys", "cId");
   }
 
   @Test
@@ -67,10 +59,10 @@ public class CommodityTypeRepositoryIntegrationTest extends
 
     repository.save(asList(commodityType, child, grandChild1, grandChild2));
 
-    commodityType = repository.findOne(commodityType.getId());
-    child = repository.findOne(child.getId());
-    grandChild1 = repository.findOne(grandChild1.getId());
-    grandChild2 = repository.findOne(grandChild2.getId());
+    commodityType = repository.findByProductCode(commodityType.getProductCode());
+    child = repository.findByProductCode(child.getProductCode());
+    grandChild1 = repository.findByProductCode(grandChild1.getProductCode());
+    grandChild2 = repository.findByProductCode(grandChild2.getProductCode());
 
     assertNull(commodityType.getParent());
     assertEquals(singletonList(child), commodityType.getChildren());

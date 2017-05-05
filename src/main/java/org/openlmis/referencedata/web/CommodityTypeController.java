@@ -18,26 +18,27 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
-import org.openlmis.referencedata.validate.CommodityTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -45,39 +46,44 @@ import java.util.UUID;
 @RestController
 public class CommodityTypeController extends BaseController {
   @Autowired
-  private CommodityTypeRepository repository;
+  private CommodityTypeRepository commodityTypeRepository;
 
   @Autowired
   private TradeItemRepository tradeItemRepository;
 
   @Autowired
-  private CommodityTypeValidator validator;
+  private OrderableRepository repository;
+
+  @Autowired
+  private RightService rightService;
 
   /**
    * Add or update a commodity type
-   *
-   * @param commodityTypeDto the commodity type to add or update.
+   * @param commodityType the commodity type to add or update.
    */
   @Transactional
   @RequestMapping(value = "/commodityTypes", method = RequestMethod.PUT)
-  public CommodityTypeDto createOrUpdate(@RequestBody CommodityTypeDto commodityTypeDto,
-                                         BindingResult bindingResult) {
+  public CommodityType createOrUpdate(@RequestBody CommodityType commodityType) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
-    validator.validate(commodityTypeDto, bindingResult);
-    throwValidationMessageExceptionIfErrors(bindingResult);
 
-    CommodityType commodityType = CommodityType.newInstance(commodityTypeDto);
+    // if it already exists, update or fail if not already a CommodityType
+    Orderable storedProduct = repository.findByProductCode(
+        commodityType.getProductCode());
 
-    if (null != commodityType.getId()) {
-      UUID productId = commodityType.getId();
-      CommodityType storedCommodityType = repository.findOne(productId);
+    if (null != storedProduct) {
+      UUID productId = storedProduct.getId();
+      CommodityType storedCommodityType = commodityTypeRepository.findOne(productId);
       if (null != storedCommodityType) {
+        commodityType.setId(productId);
         commodityType.setChildren(storedCommodityType.getChildren());
+      } else {
+        throw new ValidationMessageException(new Message(
+            CommodityTypeMessageKeys.ERROR_NOT_A_COMMODITY_TYPE, commodityType.getProductCode()));
       }
     }
 
     if (commodityType.getParent() != null) {
-      CommodityType parent = repository.findOne(commodityType.getParent().getId());
+      CommodityType parent = commodityTypeRepository.findOne(commodityType.getParent().getId());
       if (parent == null) {
         throw new ValidationMessageException(new Message(
             CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND, commodityType.getParent()));
@@ -85,16 +91,15 @@ public class CommodityTypeController extends BaseController {
       commodityType.assignParent(parent);
     }
 
-    return CommodityTypeDto.newInstance(repository.save(commodityType));
+    return commodityTypeRepository.save(commodityType);
   }
 
   /**
    * Update the {@link TradeItem} that may fulfill for a {@link CommodityType}.
-   *
    * @param commodityTypeId the CommodityType's persistence Id.
-   * @param tradeItemIds    the persistence id's of the TradeItems
-   *                        {@link org.springframework.http.HttpStatus#NOT_FOUND}
-   *                        if any of the given persistence ids are not found.
+   * @param tradeItemIds the persistence id's of the TradeItems
+   * {@link org.springframework.http.HttpStatus#NOT_FOUND} if any of the given persistence ids
+   *     are not found.
    */
   @Transactional
   @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.PUT)
@@ -109,7 +114,7 @@ public class CommodityTypeController extends BaseController {
     }
 
     // ensure commodity type exists
-    CommodityType commodityType = repository.findOne(commodityTypeId);
+    CommodityType commodityType = commodityTypeRepository.findOne(commodityTypeId);
     if (null == commodityType) {
       throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }
@@ -133,10 +138,9 @@ public class CommodityTypeController extends BaseController {
 
   /**
    * Gets the TradeItem's persistence ids that may fulfill for the given CommodityType.
-   *
    * @param commodityTypeId persistence id of the CommodityType.
    * @return {@link org.springframework.http.HttpStatus#OK} and a set of persistence ids for the
-   *     commodity type, or an empty set.
+   *      commodity type, or an empty set.
    */
   @Transactional
   @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.GET)
@@ -144,7 +148,7 @@ public class CommodityTypeController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     // ensure commodity type exists
-    CommodityType commodityType = repository.findOne(commodityTypeId);
+    CommodityType commodityType = commodityTypeRepository.findOne(commodityTypeId);
     if (null == commodityType) {
       throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }
@@ -158,18 +162,5 @@ public class CommodityTypeController extends BaseController {
     }
 
     return ids;
-  }
-
-  /**
-   * Retrieves all Commodity types.
-   */
-  @Transactional
-  @RequestMapping(value = "/commodityTypes", method = RequestMethod.GET)
-  public Set<CommodityTypeDto> retrieveAll() {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
-
-    Iterable<CommodityType> result = repository.findAll();
-
-    return CommodityTypeDto.newInstance(result);
   }
 }

@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +26,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false)
 public class ProgramDto extends BaseDto implements Program.Exporter, Program.Importer {
   private String code;
   private String name;

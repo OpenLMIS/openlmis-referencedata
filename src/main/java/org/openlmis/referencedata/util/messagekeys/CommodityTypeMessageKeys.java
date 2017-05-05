@@ -18,18 +18,13 @@ package org.openlmis.referencedata.util.messagekeys;
 public abstract class CommodityTypeMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, COMMODITY_TYPE);
   private static final String TRADE_ITEMS = "tradeItems";
+  private static final String PRODUCT_NOT_A_COMMODITY_TYPE = "productNotACommodityType";
   private static final String PARENT = "parent";
   private static final String IS_DESCENDANT = "isDescendant";
 
-  public static final String ERROR_NULL = join(ERROR, NULL);
+  public static final String ERROR_NOT_A_COMMODITY_TYPE = join(ERROR, PRODUCT_NOT_A_COMMODITY_TYPE);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_TRADE_ITEMS_NULL = join(ERROR, TRADE_ITEMS, NULL);
   public static final String ERROR_PARENT_IS_DESCENDANT = join(ERROR, PARENT, IS_DESCENDANT);
   public static final String ERROR_PARENT_NOT_FOUND = join(ERROR, PARENT, NOT_FOUND);
-  public static final String ERROR_NAME_REQUIRED = join(ERROR, NAME, REQUIRED);
-  public static final String ERROR_CLASSIFICATION_SYSTEM_REQUIRED =
-      join(ERROR, "classificationSystem", REQUIRED);
-  public static final String ERROR_CLASSIFICATION_ID_REQUIRED =
-      join(ERROR, "classificationId", REQUIRED);
-
 }

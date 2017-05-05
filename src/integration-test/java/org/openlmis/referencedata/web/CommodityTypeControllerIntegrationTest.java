@@ -16,49 +16,42 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.domain.CommodityType.newInstance;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
-import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_CLASSIFICATION_ID_REQUIRED;
-import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_CLASSIFICATION_SYSTEM_REQUIRED;
-import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_NAME_REQUIRED;
 
-import com.google.common.collect.ImmutableMap;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import org.hamcrest.Matchers;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import org.openlmis.referencedata.domain.OrderedDisplayValue;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.CommodityTypeDto;
-import org.openlmis.referencedata.dto.DispendableDto;
-import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
+import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -72,35 +65,44 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   private static final String UNIT = "unit";
   private static final String CLASSIFICATION_SYS = "cSys";
   private static final String CLASSIFICATION_SYS_ID = "cSysId";
-  public static final String NAME = "name";
 
   @MockBean
-  private CommodityTypeRepository repository;
+  private CommodityTypeRepository commodityTypeRepository;
+
+  @MockBean
+  private OrderableRepository orderableRepository;
 
   @MockBean
   private TradeItemRepository tradeItemRepository;
 
-  private CommodityTypeDto commodityType;
-  private UUID commodityTypeId = UUID.randomUUID();
-  private OrderableDto orderable;
+  @MockBean
+  private ProgramRepository programReposiroty;
+
+  @MockBean
+  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
+
+  private CommodityType commodityType;
+  private UUID commodityTypeId;
 
   @Before
   public void setUp() {
-    orderable = new OrderableDto("code", new DispendableDto(UNIT), NAME, 0, 0, false,
-        Collections.emptySet(), null);
-    orderable.setId(UUID.randomUUID());
-    commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
-        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null);
+    commodityType = CommodityType.newCommodityType("code", UNIT, "name", "desc", 0, 0, false,
+        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    commodityTypeId = UUID.randomUUID();
+    commodityType.setId(commodityTypeId);
 
-    when(repository.save(any(CommodityType.class)))
-        .thenAnswer(new SaveAnswer<CommodityType>());
+    when(commodityTypeRepository.save(any(CommodityType.class))).thenAnswer(
+        invocation -> invocation.getArguments()[0]);
   }
 
   @Test
   public void shouldCreateNewCommodityType() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    CommodityTypeDto response = restAssured
+    given(orderableRepository.findByProductCode(commodityType.getProductCode()))
+        .willReturn(null);
+
+    CommodityType response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -109,39 +111,23 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(CommodityTypeDto.class);
+        .extract().as(CommodityType.class);
 
     assertEquals(commodityType, response);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldPassIdentifiersToOrderables() {
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    CommodityTypeDto response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(commodityType)
-        .when()
-        .put(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(CommodityTypeDto.class);
-
-    OrderableDto[] retrieved = response.getOrderables().toArray(new OrderableDto[0]);
-    assertEquals(generateIdentifiers(), retrieved[0].getIdentifiers());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldCreateNewCommodityTypeWithProgramOrderable() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    ProgramOrderableDto programOrderable = generateProgramOrderable();
-    orderable.setPrograms(Collections.singleton(programOrderable));
 
-    CommodityTypeDto response = restAssured
+    given(orderableRepository.findByProductCode(commodityType.getProductCode()))
+        .willReturn(null);
+
+    ProgramOrderable programOrderable = mockProgramOrderable();
+    commodityType.addToProgram(programOrderable);
+
+    CommodityType response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -150,133 +136,74 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(CommodityTypeDto.class);
+        .extract().as(CommodityType.class);
 
     assertEquals(commodityType, response);
-    assertNotNull(response.getId());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectCreateNewCommodityTypeIfNameIsEmpty() {
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    commodityType.setName("");
-    String messageKey = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(commodityType)
-        .when()
-        .put(RESOURCE_URL)
-        .then()
-        .statusCode(400)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(ERROR_NAME_REQUIRED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectCreateNewCommodityTypeIfClassificationSystemIsEmpty() {
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    commodityType.setClassificationSystem("");
-    String messageKey = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(commodityType)
-        .when()
-        .put(RESOURCE_URL)
-        .then()
-        .statusCode(400)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(ERROR_CLASSIFICATION_SYSTEM_REQUIRED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectCreateNewCommodityTypeIfClassificationIdIsEmpty() {
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    commodityType.setClassificationId("");
-    String messageKey = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(commodityType)
-        .when()
-        .put(RESOURCE_URL)
-        .then()
-        .statusCode(400)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(ERROR_CLASSIFICATION_ID_REQUIRED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldUpdateCommodityType() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    commodityType.setId(commodityTypeId);
 
-    given(repository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(orderableRepository.findByProductCode(commodityType.getProductCode()))
+        .willReturn(commodityType);
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
 
-    CommodityTypeDto response = restAssured
+    CommodityType updatedCommodityType = CommodityType.newCommodityType(
+        "code", UNIT, "update", "test", 0, 0, false,
+        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    updatedCommodityType.setId(commodityTypeId);
+
+    CommodityType response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(commodityType)
+        .body(updatedCommodityType)
         .when()
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(CommodityTypeDto.class);
+        .extract().as(CommodityType.class);
 
     assertEquals(commodityType, response);
-    assertEquals(commodityType.getId(), response.getId());
+    assertEquals(updatedCommodityType.getFullProductName(), response.getFullProductName());
+    assertEquals(updatedCommodityType.getDescription(), response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldNotUpdateIdentifiers() {
+  public void shouldReturnBadRequestWhenUpdatingIfNotAlreadyACommodityType() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    orderable = new OrderableDto("code", new DispendableDto(UNIT), NAME, 0, 0, false,
-        Collections.emptySet(), ImmutableMap.of("badSys", "badId"));
-    orderable.setId(UUID.randomUUID());
-    commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
-        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null);
-    commodityType.setId(commodityTypeId);
+    given(orderableRepository.findByProductCode(commodityType.getProductCode()))
+        .willReturn(commodityType);
 
-    given(repository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    CommodityType updatedCommodityType = CommodityType.newCommodityType(
+        "code", UNIT, "update", "test", 0, 0, false,
+        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    updatedCommodityType.setId(commodityTypeId);
 
-    CommodityTypeDto response = restAssured
+    restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(commodityType)
+        .body(updatedCommodityType)
         .when()
         .put(RESOURCE_URL)
         .then()
-        .statusCode(200)
-        .extract().as(CommodityTypeDto.class);
+        .statusCode(400);
 
-    OrderableDto[] retrieved = response.getOrderables().toArray(new OrderableDto[0]);
-    assertEquals(generateIdentifiers(), retrieved[0].getIdentifiers());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldRejectPutCommodityTypeIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
+
+    given(orderableRepository.findByProductCode(commodityType.getProductCode()))
+        .willReturn(null);
 
     restAssured
         .given()
@@ -292,38 +219,10 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   }
 
   @Test
-  public void shouldRetrieveCommodityTypes() {
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    CommodityTypeDto commodityType2 = new CommodityTypeDto(Collections.singleton(orderable),
-        "name2", "csys2", "csysid2", null);
-
-    List<CommodityType> commodityTypes = Arrays.asList(
-        CommodityType.newInstance(commodityType),
-        CommodityType.newInstance(commodityType2));
-
-    when(repository.findAll()).thenReturn(commodityTypes);
-
-    CommodityTypeDto[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(CommodityTypeDto[].class);
-
-    assertArrayEquals(CommodityTypeDto.newInstance(commodityTypes).toArray(), response);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldUpdateTradeItemAssociations() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
 
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
@@ -351,9 +250,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   @Test
   public void shouldRejectUpdateTradeItemAssociationsIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
-    commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
 
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
@@ -376,9 +274,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   @Test
   public void shouldGetTradeItemAssociations() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
 
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
@@ -407,9 +304,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   @Test
   public void shouldRejectGetTradeItemAssociationsIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
-    commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
 
     restAssured
         .given()
@@ -429,17 +325,17 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     mockUserHasRight(ORDERABLES_MANAGE);
 
     UUID parentId = UUID.randomUUID();
-    CommodityTypeDto parent = generateParent(parentId);
-    commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
-        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, parent);
+    CommodityType parent = CommodityType.newCommodityType("XXX", "each", "parentProd",
+        "desc", 10, 2, true, CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    parent.setId(parentId);
+    commodityType.assignParent(parent);
 
-    commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
-    given(repository.findOne(parentId))
-        .willReturn(newInstance(parent));
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
+    given(commodityTypeRepository.findOne(parentId))
+        .willReturn(parent);
 
-    CommodityTypeDto response = restAssured
+    CommodityType response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -448,7 +344,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(CommodityTypeDto.class);
+        .extract().as(CommodityType.class);
 
     assertEquals(commodityType, response);
     assertEquals(commodityType.getParent().getId(), response.getParent().getId());
@@ -460,13 +356,13 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     mockUserHasRight(ORDERABLES_MANAGE);
 
     UUID parentId = UUID.randomUUID();
-    CommodityTypeDto parent = generateParent(parentId);
+    CommodityType parent = CommodityType.newCommodityType("XXX", "each", "parentProd",
+        "desc", 10, 2, true, CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    parent.setId(parentId);
+    commodityType.assignParent(parent);
 
-    commodityType = new CommodityTypeDto(Collections.singleton(orderable), NAME,
-        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, parent);
-    commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findOne(commodityTypeId))
+        .willReturn(commodityType);
 
     restAssured
         .given()
@@ -481,29 +377,36 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
             is(CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND));
   }
 
-  private HashMap<String, String> generateIdentifiers() {
-    HashMap<String, String> identifiers = new HashMap<>();
-    identifiers.put(CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-    return identifiers;
+  private ProgramOrderable mockProgramOrderable() {
+    Program program = mockProgram();
+    OrderableDisplayCategory category = mockOrderableDisplayCategory();
+    return ProgramOrderable.createNew(
+        program, category, commodityType, 1, false, false, 1,
+        Money.of(CurrencyUnit.USD, 10.0), CurrencyUnit.USD);
   }
 
-  private CommodityTypeDto generateParent(UUID parentId) {
-    CommodityTypeDto parent = new CommodityTypeDto(Collections.emptySet(), "parentProd",
-        CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null);
-    parent.setId(parentId);
-    return parent;
+  private Program mockProgram() {
+    Program program = new Program("programCode");
+    program.setId(UUID.randomUUID());
+    when(programReposiroty.findOne(program.getId())).thenReturn(program);
+    return program;
   }
 
-  private ProgramOrderableDto generateProgramOrderable() {
-    return new ProgramOrderableDto(UUID.randomUUID(), UUID.randomUUID(),
-        null, null, true, true, 0, 1, Money.of(CurrencyUnit.USD, 10.0));
+  private OrderableDisplayCategory mockOrderableDisplayCategory() {
+    OrderableDisplayCategory category = OrderableDisplayCategory.createNew(
+        Code.code("categoryCode"), new OrderedDisplayValue("name", 1));
+    category.setId(UUID.randomUUID());
+    when(orderableDisplayCategoryRepository.findOne(category.getId())).thenReturn(category);
+    return category;
   }
 
   private TradeItem mockTradeItem() {
     UUID id = UUID.randomUUID();
-    TradeItem tradeItem = new TradeItem(null, "manufacturer", new ArrayList<>());
+    TradeItem tradeItem = TradeItem.newTradeItem("code " + id.toString(), UNIT,
+        null, 0, 0, false);
     tradeItem.setId(id);
     when(tradeItemRepository.findOne(id)).thenReturn(tradeItem);
     return tradeItem;
   }
+
 }

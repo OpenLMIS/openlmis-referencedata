@@ -5,24 +5,22 @@
   "description": "A single commodityType",
   "properties": {
     "id": { "type": "string", "title": "id" },
-    "orderables": {
-      "type": "array",
-      "title": "orderables",
-      "items": {
-        "type": "object",
-        "$ref": "orderable.json"
-      },
-      "uniqueItems": true
-    },
-    "name": { "type": "string", "title": "name" },
+    "productCode": { "type": "string", "title": "productCode" },
+    "fullProductName": { "type": "string", "title": "fullProductName" },
+    "description": { "type": "string", "title": "description" },
+    "netContent": { "type": "integer", "title": "netContent" },
+    "packRoundingThreshold": { "type": "integer", "title": "packRoundingThreshold" },
+    "roundToZero": { "type": "boolean", "title": "roundToZero" },
     "classificationSystem": { "type": "string", "title": "classificationSystem" },
     "classificationId": { "type": "string", "title": "classificationId" },
     "parent": { "type": "object", "$ref": "commodityType.json", "title": "parent" }
   },
   "required": [
-    "name",
-    "orderables",
-    "classificationSystem",
-    "classificationId"
+    "productCode",
+    "fullProductName",
+    "description",
+    "netContent",
+    "packRoundingThreshold",
+    "roundToZero"
   ]
 }
