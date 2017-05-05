@@ -930,36 +930,17 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldSearchUsersByDirectRights() {
+  public void shouldSearchUsersBySupervisionRights() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    when(userService.rightSearch(RIGHT_ID, null, null, null))
+    when(userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, WAREHOUSE_ID))
         .thenReturn(newHashSet(user1, user2));
 
     UserDto[] users = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam(RIGHT_ID_STRING, RIGHT_ID)
-        .when()
-        .get(RIGHT_SEARCH_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(UserDto[].class);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertUsernames(users, user1.getUsername(), user2.getUsername());
-    verify(userService).rightSearch(RIGHT_ID, null, null, null);
-  }
-
-  @Test
-  public void shouldSearchUsersByFulfillmentRights() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    when(userService.rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID))
-      .thenReturn(newHashSet(user1, user2));
-
-    UserDto[] users = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(RIGHT_ID_STRING, RIGHT_ID)
+        .queryParam(SUPERVISORY_NODE_ID_STRING, SUPERVISORY_NODE_ID)
+        .queryParam(PROGRAM_ID_STRING, PROGRAM_ID)
         .queryParam(WAREHOUSE_ID_STRING, WAREHOUSE_ID)
         .when()
         .get(RIGHT_SEARCH_URL)
@@ -969,30 +950,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertUsernames(users, user1.getUsername(), user2.getUsername());
-    verify(userService).rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID);
-  }
-
-  @Test
-  public void shouldSearchUsersBySupervisionRights() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    when(userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null))
-        .thenReturn(newHashSet(user1, user2));
-
-    UserDto[] users = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(RIGHT_ID_STRING, RIGHT_ID)
-        .queryParam(SUPERVISORY_NODE_ID_STRING, SUPERVISORY_NODE_ID)
-        .queryParam(PROGRAM_ID_STRING, PROGRAM_ID)
-        .when()
-        .get(RIGHT_SEARCH_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(UserDto[].class);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertUsernames(users, user1.getUsername(), user2.getUsername());
-    verify(userService).rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
+    verify(userService).rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, WAREHOUSE_ID);
   }
 
   @Test

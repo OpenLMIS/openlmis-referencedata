@@ -1331,7 +1331,7 @@ resourceTypes:
       /rightSearch:
               get:
                   is: [ secured ]
-                  description: "Search users that have the given right assigned. This searches for users with role assignments matching all the parameters based on their type. Takes additional parameters for fulfillment and supervisory rights."
+                  description: "Search users that have the given right assigned. This searches for users with role assignments matching all the parameters based on their type. Takes additional parameters for fulfillment and supervision rights."
                   queryParameters:
                       rightId:
                           displayName: Right ID

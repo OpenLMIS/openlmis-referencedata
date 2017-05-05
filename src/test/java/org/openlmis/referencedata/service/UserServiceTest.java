@@ -250,7 +250,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void shouldSearchByDirectRightAssignments() {
+  public void rightSearchShouldFindByDirectRightAssignments() {
     Set<User> expected = newHashSet(user, user2);
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.GENERAL_ADMIN);
@@ -264,7 +264,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void shouldSearchByFulfillmentAssignment() {
+  public void rightSearchShouldFindByFulfillmentAssignment() {
     Set<User> expected = newHashSet(user, user2);
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.ORDER_FULFILLMENT);
@@ -280,7 +280,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void shouldSearchBySupervisoryAssignment() {
+  public void rightSearchShouldFindBySupervisionAssignment() {
     Set<User> expected = newHashSet(user, user2);
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.SUPERVISION);
@@ -380,7 +380,7 @@ public class UserServiceTest {
   }
 
   @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionForNonExistentProgram() {
+  public void rightSearchShouldThrowExceptionForNonExistentProgram() {
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.SUPERVISION);
     when(supervisoryNodeRepository.findOne(SUPERVISORY_NODE_ID))
@@ -396,7 +396,7 @@ public class UserServiceTest {
   }
 
   @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionForNonSupervisoryNode() {
+  public void rightSearchShouldThrowExceptionForNonExistentSupervisoryNode() {
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.SUPERVISION);
     when(supervisoryNodeRepository.findOne(SUPERVISORY_NODE_ID))

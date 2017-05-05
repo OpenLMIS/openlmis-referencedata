@@ -28,11 +28,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public interface UserRepository extends
     PagingAndSortingRepository<User, UUID>,
     UserRepositoryCustom {
-
-  static String FROM = " FROM referencedata.users u";
 
   @Override
   <S extends User> S save(S entity);
@@ -45,14 +44,14 @@ public interface UserRepository extends
   User findOneByEmail(@Param("email") String email);
 
   @Query(value = "SELECT u.*"
-      + FROM
+      + " FROM referencedata.users u"
       + " WHERE u.extradata @> (:extraData)\\:\\:jsonb",
       nativeQuery = true
   )
   List<User> findByExtraData(@Param("extraData") String extraData);
 
   @Query(value = "SELECT DISTINCT u.*" 
-      + FROM
+      + " FROM referencedata.users u"
       + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id" 
       + "   JOIN referencedata.roles r ON r.id = ra.roleid" 
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
@@ -65,7 +64,7 @@ public interface UserRepository extends
       @Param("program") Program program);
 
   @Query(value = "SELECT DISTINCT u.*"
-      + FROM
+      + " FROM referencedata.users u"
       + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id"
       + "   JOIN referencedata.roles r ON r.id = ra.roleid"
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
@@ -76,7 +75,7 @@ public interface UserRepository extends
                         @Param("warehouse") Facility warehouse);
 
   @Query(value = "SELECT DISTINCT u.*"
-      + FROM
+      + " FROM referencedata.users u"
       + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id"
       + "   JOIN referencedata.roles r ON r.id = ra.roleid"
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"

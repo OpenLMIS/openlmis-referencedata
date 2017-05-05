@@ -261,10 +261,10 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test
   public void findSupervisingUsersByShouldOnlyFindMatchingUsers() {
     //given
-    Right right = newRight("right", SUPERVISION);
-    Role role = newRole("role", right);
-    Program program = newProgram("P1");
-    SupervisoryNode supervisoryNode = newSupervisoryNode("SN1", generateFacility(10));
+    Right right = saveNewRight("right", SUPERVISION);
+    Role role = saveNewRole("role", right);
+    Program program = saveNewProgram("P1");
+    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
 
     User supervisingUser = repository.findOneByUsername(USER_1);
     supervisingUser = assignRoleToUser(supervisingUser,
@@ -282,10 +282,10 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test
   public void shouldFindUsersByFulfillmentRights() {
     //given
-    Right supervisionRight = newRight("supervisionRight", SUPERVISION);
-    Role supervisionRole = newRole("supervisionRole", supervisionRight);
-    Program program = newProgram("P1");
-    SupervisoryNode supervisoryNode = newSupervisoryNode("SN1", generateFacility(10));
+    Right supervisionRight = saveNewRight("supervisionRight", SUPERVISION);
+    Role supervisionRole = saveNewRole("supervisionRole", supervisionRight);
+    Program program = saveNewProgram("P1");
+    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
 
     User supervisingUser = repository.findOneByUsername(USER_1);
     assignRoleToUser(supervisingUser, new SupervisionRoleAssignment(
@@ -295,8 +295,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     assignRoleToUser(supervisingUser2, new SupervisionRoleAssignment(
         supervisionRole, supervisingUser2, program, supervisoryNode));
 
-    Right fulfillmentRight = newRight("fulfillmentRight", ORDER_FULFILLMENT);
-    Role fulfillmentRole = newRole("fulfillmentRole", fulfillmentRight);
+    Right fulfillmentRight = saveNewRight("fulfillmentRight", ORDER_FULFILLMENT);
+    Role fulfillmentRole = saveNewRole("fulfillmentRole", fulfillmentRight);
     Facility warehouse = generateFacility(11, "warehouse") ;
 
     User warehouseClerk = repository.findOneByUsername("user3");
@@ -318,10 +318,10 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test
   public void shouldFindUsersByDirectRole() {
     //given
-    Right reportRight = newRight("reportRight", REPORTS);
-    Role reportRole = newRole("reportRole", reportRight);
-    Right adminRight = newRight("adminRight", GENERAL_ADMIN);
-    Role adminRole = newRole("adminRole", adminRight);
+    Right reportRight = saveNewRight("reportRight", REPORTS);
+    Role reportRole = saveNewRole("reportRole", reportRight);
+    Right adminRight = saveNewRight("adminRight", GENERAL_ADMIN);
+    Role adminRole = saveNewRole("adminRole", adminRight);
 
     User user1 = repository.findOneByUsername(USER_1);
     User user2 = repository.findOneByUsername(USER_2);
@@ -398,22 +398,22 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     return facilityType;
   }
 
-  private Right newRight(String name, RightType type) {
+  private Right saveNewRight(String name, RightType type) {
     Right right = Right.newRight(name, type);
     return rightRepository.save(right);
   }
 
-  private Role newRole(String name, Right right) {
+  private Role saveNewRole(String name, Right right) {
     Role role = Role.newRole(name, right);
     return roleRepository.save(role);
   }
 
-  private Program newProgram(String code) {
+  private Program saveNewProgram(String code) {
     Program program = new Program(code);
     return programRepository.save(program);
   }
 
-  private SupervisoryNode newSupervisoryNode(String code, Facility facility) {
+  private SupervisoryNode saveNewSupervisoryNode(String code, Facility facility) {
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(code, facility);
     return supervisoryNodeRepository.save(supervisoryNode);
   }

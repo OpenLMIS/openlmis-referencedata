@@ -35,6 +35,7 @@ import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,7 +139,7 @@ public class UserService {
     }
 
     if (right.getType() == RightType.ORDER_FULFILLMENT) {
-      return searchByFullfilmentRight(right, warehouseId);
+      return searchByFulfillmentRight(right, warehouseId);
     } else if (right.getType() == RightType.SUPERVISION) {
       return searchBySupervisionRight(right, supervisoryNodeId, programId);
     } else {
@@ -146,9 +147,9 @@ public class UserService {
     }
   }
 
-  private Set<User> searchByFullfilmentRight(Right right, UUID warehouseId) {
+  private Set<User> searchByFulfillmentRight(Right right, UUID warehouseId) {
     if (warehouseId == null) {
-      throw new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND);
+      throw new ValidationMessageException(UserMessageKeys.WAREHOUSE_ID_REQUIRED);
     }
 
     Facility warehouse = facilityRepository.findOne(warehouseId);
@@ -168,10 +169,10 @@ public class UserService {
   private Set<User> searchBySupervisionRight(Right right, UUID supervisoryNodeId,
                                              UUID programId) {
     if (supervisoryNodeId == null) {
-      throw new ValidationMessageException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+      throw new ValidationMessageException(UserMessageKeys.SUPERVISORY_NODE_ID_REQUIRED);
     }
     if (programId == null) {
-      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
+      throw new ValidationMessageException(UserMessageKeys.PROGRAM_ID_REQUIRED);
     }
 
     SupervisoryNode supervisoryNode = supervisoryNodeRepository

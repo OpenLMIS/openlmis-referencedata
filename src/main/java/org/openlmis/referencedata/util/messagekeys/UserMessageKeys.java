@@ -20,6 +20,10 @@ public abstract class UserMessageKeys extends MessageKeys {
   private static final String RIGHTS = "rights";
   private static final String ASSIGNED_ROLE = "assignedRole";
   private static final String HOME_FACILITY = "homeFacility";
+  private static final String RIGHT_SEARCH = "rightSearch";
+  private static final String WAREHOUSE_ID = "warehouseId";
+  private static final String PROGRAM_ID = "programId";
+  private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
 
   public static final String ERROR_NULL = join(ERROR, NULL);
   public static final String ERROR_ROLE_ID_NULL = join(ERROR, ROLE, ID, NULL);
@@ -38,4 +42,11 @@ public abstract class UserMessageKeys extends MessageKeys {
   public static final String ERROR_USERNAME_DUPLICATED = join(ERROR, USERNAME, DUPLICATED);
   public static final String ERROR_EMAIL_DUPLICATED = join(ERROR, EMAIL, DUPLICATED);
   public static final String ERROR_USERNAME_INVALID = join(ERROR, USERNAME, INVALID);
+
+  public static final String WAREHOUSE_ID_REQUIRED =
+      join(ERROR, RIGHT_SEARCH, WAREHOUSE_ID, REQUIRED);
+  public static final String PROGRAM_ID_REQUIRED =
+      join(ERROR, RIGHT_SEARCH, PROGRAM_ID, REQUIRED);
+  public static final String SUPERVISORY_NODE_ID_REQUIRED =
+      join(ERROR, RIGHT_SEARCH, SUPERVISORY_NODE_ID, REQUIRED);
 }

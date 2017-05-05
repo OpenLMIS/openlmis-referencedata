@@ -231,7 +231,7 @@ public class Facility extends BaseEntity {
   }
 
   public boolean isWarehouse() {
-    return WAREHOUSE_CODE.equalsIgnoreCase(getType().getCode());
+    return WAREHOUSE_CODE.equalsIgnoreCase(type.getCode());
   }
 
   public interface Exporter {
