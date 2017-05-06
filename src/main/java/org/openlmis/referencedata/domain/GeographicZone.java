@@ -15,18 +15,18 @@
 
 package org.openlmis.referencedata.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import com.vividsolutions.jts.geom.Polygon;
 import java.util.Objects;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "geographic_zones", schema = "referencedata")
@@ -68,6 +68,11 @@ public class GeographicZone extends BaseEntity {
   @Getter
   @Setter
   private Double longitude;
+
+  @Type(type = "jts_geometry")
+  @Getter
+  @Setter
+  private Polygon boundary;
 
   public GeographicZone(String code, GeographicLevel level) {
     this.code = code;
@@ -139,6 +144,7 @@ public class GeographicZone extends BaseEntity {
     exporter.setCatchmentPopulation(catchmentPopulation);
     exporter.setLatitude(latitude);
     exporter.setLongitude(longitude);
+    exporter.setBoundary(boundary);
   }
 
   public interface Exporter {
@@ -156,6 +162,8 @@ public class GeographicZone extends BaseEntity {
     void setLatitude(Double latitude);
 
     void setLongitude(Double longitude);
+    
+    void setBoundary(Polygon boundary);
 
     void setParent(GeographicZone parent);
 

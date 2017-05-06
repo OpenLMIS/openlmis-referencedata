@@ -51,7 +51,9 @@ dependencies {
     compile 'org.flywaydb:flyway-core:4.0.3'
     compile 'org.openlmis:openlmis-service-util:3.0.0'
     compile 'org.hibernate:hibernate-java8'
-
+    compile 'org.hibernate:hibernate-spatial:5.0.11.Final'
+    compile 'com.bedatadriven:jackson-datatype-jts:2.2'
+    
     compile 'org.joda:joda-money:0.12'
     compile 'org.jadira.usertype:usertype.core:5.0.0.GA'
 
