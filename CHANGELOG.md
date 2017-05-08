@@ -1,3 +1,47 @@
+5.0.0 / 2017-05-08
+==================
+
+Breaking changes:
+
+* [OLMIS-2320](https://openlmis.atlassian.net/browse/OLMIS-2320): Refactor FTAP - ProgramOrderable association
+* [OLMIS-2284](https://openlmis.atlassian.net/browse/OLMIS-2284): Pagination for search facilities endpoint
+
+New functionality added in a backwards-compatible manner:
+
+* [OLMIS-2262](https://openlmis.atlassian.net/browse/OLMIS-2262): Lot domain object added
+* [OLMIS-2259](https://openlmis.atlassian.net/browse/OLMIS-2259): Support for searching by right type to the 'api/rights/search' endpoint
+* [OLMIS-2264](https://openlmis.atlassian.net/browse/OLMIS-2264): Lot repository and controller with POST and PUT methods
+* [OLMIS-2265](https://openlmis.atlassian.net/browse/OLMIS-2265): Right check for PUT Lot
+* [OLMIS-2263](https://openlmis.atlassian.net/browse/OLMIS-2263): Lot paginated search endpoint
+* [OLMIS-2266](https://openlmis.atlassian.net/browse/OLMIS-2266): Lot GET endpoint
+* [OLMIS-2338](https://openlmis.atlassian.net/browse/OLMIS-2338): Search user based on rights endpoint
+
+Bug fixes, security and performance improvements, also backwards-compatible:
+
+* [OLMIS-2258](https://openlmis.atlassian.net/browse/OLMIS-2258): Rights GET endpoint is available to users
+* [OLMIS-2267](https://openlmis.atlassian.net/browse/OLMIS-2267): Made email an optional field for user
+* [OLMIS-2155](https://openlmis.atlassian.net/browse/OLMIS-2155): Performance issue with custom ZonedDateTimeAttributeConverter
+* [OLMIS-2319](https://openlmis.atlassian.net/browse/OLMIS-2319): Fixed creating new Commodity Type
+* [OLMIS-2342](https://openlmis.atlassian.net/browse/OLMIS-2342): Lot expiration/manufacture dates changed from ZonedDateTime to LocalDate
+* [OLMIS-1695](https://openlmis.atlassian.net/browse/OLMIS-1695): Refactor CommodityType - TradeItem association
+* Requisition Group endpoints allow associating facilities and schedules
+* [OLMIS-2404](https://openlmis.atlassian.net/browse/OLMIS-2404): Fixed concurrency issues in FTAP search
+* [OLMIS-2369](https://openlmis.atlassian.net/browse/OLMIS-2369): Allow creating facilities without supported programs
+* [OLMIS-2382](https://openlmis.atlassian.net/browse/OLMIS-2382): Check for creating duplicated FTAP
+*
+
+Dev and tooling updates made in a backwards-compatible manner:
+
+* [OLMIS-2296](https://openlmis.atlassian.net/browse/OLMIS-2296): Lot demo data
+* [OLMIS-2343](https://openlmis.atlassian.net/browse/OLMIS-2343): Lot endpoints marked as experimental
+* [OLMIS-1972](https://openlmis.atlassian.net/browse/OLMIS-1972): Update Postgres from 9.4 to 9.6
+  * This upgrade will apply automatically and all data will migrate.
+* Update [Docker Dev Image](https://github.com/OpenLMIS/docker-dev) for builds from v1 to v2
+  * Moves the sync_transifex.sh script out of each service and into the Docker Dev Image.
+* Improve demo data
+  * [OLMIS-2188](https://openlmis.atlassian.net/browse/OLMIS-2188): Description for roles in demo data
+  * [OLMIS-2098](https://openlmis.atlassian.net/browse/OLMIS-2098): Stock manager role assigned to administrator
+
 4.0.0 / 2017-03-29
 ==================
 
