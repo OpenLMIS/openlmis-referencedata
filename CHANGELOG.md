@@ -1,3 +1,9 @@
+5.0.1 / 2017-05-09
+==================
+
+Bug fixes, security and performance improvements, also backwards-compatible:
+* [OLMIS-2479](https://openlmis.atlassian.net/browse/OLMIS-2479): Fix database migration error in 5.0.0
+
 5.0.0 / 2017-05-08
 ==================
 
