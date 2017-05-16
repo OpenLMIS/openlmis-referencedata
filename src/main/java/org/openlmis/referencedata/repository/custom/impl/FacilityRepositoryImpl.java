@@ -65,28 +65,26 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     }
 
     if (facilityType != null) {
-      predicate = addFacilityTypePredicate(predicate, builder, facilityType, root,
+      predicate = addPredicate(predicate, builder, facilityType, root, FACILITY_TYPE,
               name == null && code == null);
     }
 
     if (zone != null) {
-      if (name == null && code == null && facilityType == null) {
-        predicate = builder.or(predicate, builder.equal(root.get(GEOGRAPHIC_ZONE), zone));
-      } else {
-        predicate = builder.and(predicate, builder.equal(root.get(GEOGRAPHIC_ZONE), zone));
-      }
+      predicate = addPredicate(predicate, builder, zone, root, GEOGRAPHIC_ZONE,
+              name == null && code == null && facilityType == null);
     }
 
     query.where(predicate);
     return entityManager.createQuery(query).getResultList();
   }
 
-  private Predicate addFacilityTypePredicate(Predicate predicate, CriteriaBuilder builder,
-                 FacilityType facilityType, Root<Facility> root, boolean nameAndCodeNotPresent) {
-    if (nameAndCodeNotPresent) {
-      return builder.or(predicate, builder.equal(root.get(FACILITY_TYPE), facilityType));
+  private Predicate addPredicate(Predicate predicate, CriteriaBuilder builder, Object value,
+                                 Root<Facility> root, String fieldName,
+                                 boolean areOtherParamsPresent) {
+    if (areOtherParamsPresent) {
+      return builder.or(predicate, builder.equal(root.get(fieldName), value));
     } else {
-      return builder.and(predicate, builder.equal(root.get(FACILITY_TYPE), facilityType));
+      return builder.and(predicate, builder.equal(root.get(fieldName), value));
     }
   }
 }
