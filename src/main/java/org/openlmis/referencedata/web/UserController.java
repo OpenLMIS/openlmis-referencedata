@@ -50,6 +50,7 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
@@ -447,6 +448,30 @@ public class UserController extends BaseController {
         supervisoryNodeId, warehouseId);
 
     return exportUsersToDtos(users);
+  }
+
+  @RequestMapping(value = "/users/{id}/auditLog", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public String getFacilitiesAuditLog(
+      @PathVariable("id") UUID id,
+      @RequestParam(name = "author", required = false, defaultValue = "") String author,
+      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+          String changedPropertyName,
+      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+          boolean returnJson,
+      Pageable page) {
+
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    //Return a 404 if the specified facility can't be found
+    User user = userRepository.findOne(id);
+    if (user == null) {
+      throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    return getAuditLog(User.class, id, author, changedPropertyName, page, returnJson);
   }
 
   private User validateUser(UUID userId) {

@@ -19,6 +19,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.util.View;
 
 import java.util.Arrays;
@@ -41,6 +44,7 @@ import javax.persistence.Transient;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @Entity
+@TypeName("User")
 @Table(name = "users", schema = "referencedata")
 @NoArgsConstructor
 public class User extends BaseEntity {
@@ -98,6 +102,7 @@ public class User extends BaseEntity {
   private Boolean allowNotify;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+  @DiffIgnore
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
 
