@@ -193,7 +193,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
-  public void shouldFindFacilitiesByCodeOrNameAndGeographicZoneAndFacilityType() {
+  public void shouldFindFacilitiesByAllParams() {
     // given
     GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
     validZone = geographicZoneRepository.save(validZone);

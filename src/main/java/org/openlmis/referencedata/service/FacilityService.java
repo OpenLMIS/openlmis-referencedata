@@ -113,7 +113,7 @@ public class FacilityService {
     FacilityType facilityType = null;
     if (facilityTypeCode != null) {
       facilityType = facilityTypeRepository.findOneByCode(facilityTypeCode);
-      if (zone == null) {
+      if (facilityType == null) {
         throw new ValidationMessageException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
       }
     }

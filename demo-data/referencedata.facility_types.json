@@ -4,19 +4,12 @@
     "code": "health_center",
     "name": "Health Center",
     "active": "true",
-    "displayOrder": 1
+    "displayOrder": 2
   },
   {
     "id": "663b1d34-cc17-4d60-9619-e553e45aa441",
     "code": "dist_hosp",
     "name": "District Hospital",
-    "active": "true",
-    "displayOrder": 2
-  },
-  {
-    "id": "e2faaa9e-4b2d-4212-bb60-fd62970b2113",
-    "code": "warehouse",
-    "name": "Warehouse",
     "active": "true",
     "displayOrder": 3
   }
