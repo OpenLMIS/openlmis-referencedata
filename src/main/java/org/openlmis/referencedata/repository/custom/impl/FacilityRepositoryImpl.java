@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 
@@ -31,6 +32,7 @@ import javax.persistence.criteria.Root;
 public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
   private static final String GEOGRAPHIC_ZONE = "geographicZone";
+  private static final String FACILITY_TYPE = "type";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -45,7 +47,8 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * @param zone Geographic zone of facility location.
    * @return List of Facilities matching the parameters.
    */
-  public List<Facility> search(String code, String name, GeographicZone zone) {
+  public List<Facility> search(String code, String name,
+                               GeographicZone zone, FacilityType facilityType) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Facility> query = builder.createQuery(Facility.class);
     Root<Facility> root = query.from(Facility.class);
@@ -58,11 +61,16 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
     if (name != null) {
       predicate = builder.or(predicate,
-          builder.like(builder.upper(root.get("name")), "%" + name.toUpperCase() + "%"));
+              builder.like(builder.upper(root.get("name")), "%" + name.toUpperCase() + "%"));
+    }
+
+    if (facilityType != null) {
+      predicate = addFacilityTypePredicate(predicate, builder, facilityType, root,
+              name == null && code == null);
     }
 
     if (zone != null) {
-      if (name == null && code == null) {
+      if (name == null && code == null && facilityType == null) {
         predicate = builder.or(predicate, builder.equal(root.get(GEOGRAPHIC_ZONE), zone));
       } else {
         predicate = builder.and(predicate, builder.equal(root.get(GEOGRAPHIC_ZONE), zone));
@@ -71,5 +79,14 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
     query.where(predicate);
     return entityManager.createQuery(query).getResultList();
+  }
+
+  private Predicate addFacilityTypePredicate(Predicate predicate, CriteriaBuilder builder,
+                 FacilityType facilityType, Root<Facility> root, boolean nameAndCodeNotPresent) {
+    if (nameAndCodeNotPresent) {
+      return builder.or(predicate, builder.equal(root.get(FACILITY_TYPE), facilityType));
+    } else {
+      return builder.and(predicate, builder.equal(root.get(FACILITY_TYPE), facilityType));
+    }
   }
 }

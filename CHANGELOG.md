@@ -1,4 +1,9 @@
 6.0.0 / WIP
+==================
+
+New functionality added in a backwards-compatible manner:
+
+* [OLMIS-2492](https://openlmis.atlassian.net/browse/OLMIS-2492): Added new query param to facility search endpoint - code(facility type code)
 
 5.0.1 / 2017-05-09
 ==================

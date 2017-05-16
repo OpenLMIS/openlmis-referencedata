@@ -33,9 +33,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 
 import java.util.HashMap;
@@ -47,6 +49,7 @@ public class FacilityServiceTest {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
+  private static final String FACILITY_TYPE_CODE = "type";
   private static final String ZONE_ID = "zoneId";
   private static final String RECURSE = "recurse";
 
@@ -58,6 +61,12 @@ public class FacilityServiceTest {
 
   @Mock
   private FacilityRepository facilityRepository;
+
+  @Mock
+  private FacilityTypeRepository facilityTypeRepository;
+
+  @Mock
+  private FacilityType facilityType;
 
   @Mock
   private GeographicZone parent;
@@ -109,8 +118,17 @@ public class FacilityServiceTest {
   }
 
   @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionIfGeographicZoneDoesntExist() {
+  public void shouldThrowExceptionIfGeographicZoneDoesNotExist() {
     when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(null);
+
+    Map<String, Object> searchParams = new HashMap<>();
+    searchParams.put(ZONE_ID, UUID.randomUUID());
+    facilityService.searchFacilities(searchParams);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfFacilityTypeDoesNotExist() {
+    when(facilityTypeRepository.findOneByCode(any(String.class))).thenReturn(null);
 
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put(ZONE_ID, UUID.randomUUID());
@@ -130,25 +148,31 @@ public class FacilityServiceTest {
   public void shouldSearchForFacilitiesInChildZonesIfRecurseOptionProvided() {
     final String code = "FAC1";
     final String name = "Facility";
+    final String type = "facility-type";
 
     when(geographicZoneRepository.findOne(zoneUuid)).thenReturn(parent);
     when(geographicZoneService.getAllZonesInHierarchy(parent)).thenReturn(Lists.newArrayList(
-        child1, child2));
+            child1, child2));
 
-    when(facilityRepository.search(code, name, parent)).thenReturn(Lists.newArrayList(facility));
-    when(facilityRepository.search(code, name, child2)).thenReturn(Lists.newArrayList(facility2));
+    when(facilityTypeRepository.findOneByCode(type)).thenReturn(facilityType);
+
+    when(facilityRepository.search(code, name, parent, facilityType))
+            .thenReturn(Lists.newArrayList(facility));
+    when(facilityRepository.search(code, name, child2, facilityType))
+            .thenReturn(Lists.newArrayList(facility2));
 
     Map<String, Object> params = new HashMap<>();
     params.put(RECURSE, true);
     params.put(CODE, code);
     params.put(NAME, name);
+    params.put(FACILITY_TYPE_CODE, type);
     params.put(ZONE_ID, zoneUuid);
 
     final List<Facility> actual = facilityService.searchFacilities(params);
 
-    verify(facilityRepository).search(eq(code), eq(name), eq(parent));
-    verify(facilityRepository).search(eq(code), eq(name), eq(child1));
-    verify(facilityRepository).search(eq(code), eq(name), eq(child2));
+    verify(facilityRepository).search(eq(code), eq(name), eq(parent), eq(facilityType));
+    verify(facilityRepository).search(eq(code), eq(name), eq(child1), eq(facilityType));
+    verify(facilityRepository).search(eq(code), eq(name), eq(child2), eq(facilityType));
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(facility));
@@ -159,20 +183,25 @@ public class FacilityServiceTest {
   public void shouldSearchForFacilitiesInParentZoneOnlyIfRecurseOptionIsOff() {
     final String code = "FAC1";
     final String name = "Facility";
+    final String type = "facility-type";
 
     when(geographicZoneRepository.findOne(zoneUuid)).thenReturn(parent);
 
-    when(facilityRepository.search(code, name, parent)).thenReturn(Lists.newArrayList(facility));
+    when(facilityTypeRepository.findOneByCode(type)).thenReturn(facilityType);
+
+    when(facilityRepository.search(code, name, parent, facilityType))
+            .thenReturn(Lists.newArrayList(facility));
 
     Map<String, Object> params = new HashMap<>();
     params.put(RECURSE, false);
     params.put(CODE, code);
     params.put(NAME, name);
+    params.put(FACILITY_TYPE_CODE, type);
     params.put(ZONE_ID, zoneUuid);
 
     List<Facility> actual = facilityService.searchFacilities(params);
 
-    verify(facilityRepository).search(eq(code), eq(name), eq(parent));
+    verify(facilityRepository).search(eq(code), eq(name), eq(parent), eq(facilityType));
     verifyNoMoreInteractions(facilityRepository);
 
     assertEquals(1, actual.size());
@@ -183,13 +212,18 @@ public class FacilityServiceTest {
   public void shouldSearchForFacilitiesWithExtraData() {
     final String code = "FAC1";
     final String name = "Facility";
+    final String type = "facility-type";
 
     when(geographicZoneRepository.findOne(zoneUuid)).thenReturn(parent);
     when(geographicZoneService.getAllZonesInHierarchy(parent)).thenReturn(Lists.newArrayList(
         child1, child2));
 
-    when(facilityRepository.search(code, name, parent)).thenReturn(Lists.newArrayList(facility));
-    when(facilityRepository.search(code, name, child2)).thenReturn(Lists.newArrayList(facility2));
+    when(facilityTypeRepository.findOneByCode(type)).thenReturn(facilityType);
+
+    when(facilityRepository.search(code, name, parent, facilityType))
+            .thenReturn(Lists.newArrayList(facility));
+    when(facilityRepository.search(code, name, child2, facilityType))
+            .thenReturn(Lists.newArrayList(facility2));
 
     when(facilityRepository.findByExtraData(anyString())).thenReturn(Lists.newArrayList(facility2));
 
@@ -200,6 +234,7 @@ public class FacilityServiceTest {
     params.put(RECURSE, true);
     params.put(CODE, code);
     params.put(NAME, name);
+    params.put(FACILITY_TYPE_CODE, type);
     params.put(ZONE_ID, zoneUuid);
     params.put("extraData", extraData);
 

@@ -78,7 +78,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility1 = generateInstance();
     repository.save(facility1);
 
-    searchFacilityAndCheckResults(facility.getCode(), null, facility, 1);
+    searchFacilityAndCheckResults(facility.getCode(), null, facility, null, 1);
   }
 
   @Test
@@ -86,10 +86,10 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility = generateInstance();
     repository.save(facility);
 
-    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), null, facility, 1);
-    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), null, facility, 1);
-    searchFacilityAndCheckResults("f", null, facility, 1);
-    searchFacilityAndCheckResults("F", null, facility, 1);
+    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), null, facility, null, 1);
+    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), null, facility, null, 1);
+    searchFacilityAndCheckResults("f", null, facility, null, 1);
+    searchFacilityAndCheckResults("F", null, facility, null, 1);
   }
 
   @Test
@@ -97,7 +97,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility = generateInstance();
     repository.save(facility);
 
-    searchFacilityAndCheckResults(null, "Facil", facility, 1);
+    searchFacilityAndCheckResults(null, "Facil", facility, null, 1);
   }
 
   @Test
@@ -105,10 +105,10 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility = generateInstance();
     repository.save(facility);
 
-    searchFacilityAndCheckResults(null, "facil", facility, 1);
-    searchFacilityAndCheckResults(null, "FACIL", facility, 1);
-    searchFacilityAndCheckResults(null, "fAcIl", facility, 1);
-    searchFacilityAndCheckResults(null, "FAciL", facility, 1);
+    searchFacilityAndCheckResults(null, "facil", facility, null, 1);
+    searchFacilityAndCheckResults(null, "FACIL", facility, null, 1);
+    searchFacilityAndCheckResults(null, "fAcIl", facility, null, 1);
+    searchFacilityAndCheckResults(null, "FAciL", facility, null, 1);
   }
 
   @Test
@@ -118,7 +118,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility1 = generateInstance();
     repository.save(facility1);
 
-    searchFacilityAndCheckResults(facility.getCode(), "Facil", facility, 2);
+    searchFacilityAndCheckResults(facility.getCode(), "Facil", facility, null, 2);
   }
 
   @Test
@@ -128,20 +128,43 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility1 = generateInstance();
     repository.save(facility1);
 
-    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), "facil", facility, 2);
-    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), "FACIL", facility, 2);
-    searchFacilityAndCheckResults("f", "fAcIl", facility, 2);
-    searchFacilityAndCheckResults("F", "FAciL", facility, 2);
+    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), "facil", facility, null, 2);
+    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), "FACIL", facility, null, 2);
+    searchFacilityAndCheckResults("f", "fAcIl", facility, null, 2);
+    searchFacilityAndCheckResults("F", "FAciL", facility, null, 2);
+    repository.save(facility);
   }
 
   @Test
   public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
-    Facility facility = generateInstance();
-    repository.save(facility);
-
-    List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null);
+    List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null, null);
 
     assertEquals(0, foundFacilties.size());
+  }
+
+  @Test
+  public void shouldFindFacilitiesByFacilityType() {
+    // given
+    FacilityType vaildFacilityType = new FacilityType("warehouse");
+    vaildFacilityType = facilityTypeRepository.save(vaildFacilityType);
+
+    Facility validFacility = generateInstance();
+    validFacility.setType(vaildFacilityType);
+    repository.save(validFacility);
+
+    FacilityType invaildfacilityType = new FacilityType("not-a-warehouse");
+    invaildfacilityType = facilityTypeRepository.save(invaildfacilityType);
+
+    Facility invalidFacility = generateInstance();
+    invalidFacility.setType(invaildfacilityType);
+    repository.save(invalidFacility);
+
+    // when
+    List<Facility> foundFacilties = repository.search(null, null, null, vaildFacilityType);
+
+    // then
+    assertEquals(1, foundFacilties.size());
+    assertEquals(validFacility.getId(), foundFacilties.get(0).getId());
   }
 
   @Test
@@ -162,7 +185,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(invalidFacility);
 
     // when
-    List<Facility> foundFacilties = repository.search(null, null, validZone);
+    List<Facility> foundFacilties = repository.search(null, null, validZone, null);
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -170,22 +193,27 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
-  public void shouldFindFacilitiesByCodeOrNameAndGeographicZone() {
+  public void shouldFindFacilitiesByCodeOrNameAndGeographicZoneAndFacilityType() {
     // given
     GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
     validZone = geographicZoneRepository.save(validZone);
 
+    FacilityType vaildFacilityType = new FacilityType("warehouse");
+    vaildFacilityType = facilityTypeRepository.save(vaildFacilityType);
+
     Facility facilityWithCodeAndName = generateInstance();
     facilityWithCodeAndName.setGeographicZone(validZone);
+    facilityWithCodeAndName.setType(vaildFacilityType);
     repository.save(facilityWithCodeAndName);
 
     Facility facilityWithCode = generateInstance();
     facilityWithCode.setGeographicZone(validZone);
+    facilityWithCode.setType(vaildFacilityType);
     repository.save(facilityWithCode);
 
     // when
     List<Facility> foundFacilties = repository
-        .search(facilityWithCodeAndName.getCode(), "Facility", validZone);
+        .search(facilityWithCodeAndName.getCode(), "Facility", validZone, vaildFacilityType);
 
     // then
     assertEquals(2, foundFacilties.size());
@@ -241,12 +269,12 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     return secondFacility;
   }
 
-  private void searchFacilityAndCheckResults(
-      String code, String name, Facility facility, int expectedSize) {
-    List<Facility> foundFacilties = repository.search(code, name, null);
+  private void searchFacilityAndCheckResults(String code, String name, Facility facility,
+                                             FacilityType type, int expectedSize) {
+    List<Facility> foundFacilities = repository.search(code, name, null, type);
 
-    assertEquals(expectedSize, foundFacilties.size());
+    assertEquals(expectedSize, foundFacilities.size());
 
-    assertEquals(facility.getName(), foundFacilties.get(0).getName());
+    assertEquals(facility.getName(), foundFacilities.get(0).getName());
   }
 }

@@ -16,6 +16,10 @@
       "type": "string",
       "title": "zoneId"
     },
+    "type": {
+      "type": "string",
+      "title": "type"
+    },
     "extraData": {
       "type": "object",
       "title": "extraData"

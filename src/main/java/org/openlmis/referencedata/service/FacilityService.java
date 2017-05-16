@@ -21,12 +21,15 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +51,16 @@ public class FacilityService {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
+  private static final String FACILITY_TYPE_CODE = "type";
   private static final String ZONE_ID = "zoneId";
   private static final String RECURSE = "recurse";
   private static final String EXTRA_DATA = "extraData";
 
   @Autowired
   private FacilityRepository facilityRepository;
+
+  @Autowired
+  private FacilityTypeRepository facilityTypeRepository;
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
@@ -77,15 +84,17 @@ public class FacilityService {
 
     String code = MapUtils.getString(queryMap, CODE, null);
     String name = MapUtils.getString(queryMap, NAME, null);
+    String facilityTypeCode = MapUtils.getString(queryMap, FACILITY_TYPE_CODE, null);
     Optional<UUID> zoneId = UuidUtil.fromString(MapUtils.getObject(queryMap,
         ZONE_ID,
         "").toString());
-    boolean recurse = MapUtils.getBooleanValue(queryMap, RECURSE);
+    final boolean recurse = MapUtils.getBooleanValue(queryMap, RECURSE);
 
     // validate query parameters
     if (StringUtils.isEmpty(code)
         && StringUtils.isEmpty(name)
-        && false == zoneId.isPresent() ) {
+        && StringUtils.isEmpty(facilityTypeCode)
+        && false == zoneId.isPresent()) {
 
       throw new ValidationMessageException(
           FacilityMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
@@ -100,7 +109,17 @@ public class FacilityService {
       }
     }
 
-    List<Facility> foundFacilities = findFacilitiesBasedOnZone(zone, code, name, recurse);
+    // find facility type if given
+    FacilityType facilityType = null;
+    if (facilityTypeCode != null) {
+      facilityType = facilityTypeRepository.findOneByCode(facilityTypeCode);
+      if (zone == null) {
+        throw new ValidationMessageException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
+      }
+    }
+
+    List<Facility> foundFacilities = findFacilitiesBasedOnZone(zone, code, name,
+            facilityType, recurse);
 
     foundFacilities = filterByExtraData(foundFacilities,
         (Map<String, String>) queryMap.get(EXTRA_DATA));
@@ -109,7 +128,7 @@ public class FacilityService {
   }
 
   private List<Facility> findFacilitiesBasedOnZone(GeographicZone zone, String code, String name,
-      boolean recurse) {
+                                                   FacilityType facilityType, boolean recurse) {
     List<Facility> foundFacilities = new ArrayList<>();
 
     if (recurse) {
@@ -117,10 +136,10 @@ public class FacilityService {
       foundZones.add(zone);
 
       for (GeographicZone foundZone : foundZones) {
-        foundFacilities.addAll(facilityRepository.search(code, name, foundZone));
+        foundFacilities.addAll(facilityRepository.search(code, name, foundZone, facilityType));
       }
     } else {
-      foundFacilities.addAll(facilityRepository.search(code, name, zone));
+      foundFacilities.addAll(facilityRepository.search(code, name, zone, facilityType));
     }
 
     return foundFacilities;

@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import org.openlmis.referencedata.domain.FacilityType;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
@@ -27,4 +28,6 @@ public interface FacilityTypeRepository extends PagingAndSortingRepository<Facil
 
   @Override
   <S extends FacilityType> Iterable<S> save(Iterable<S> entities);
+
+  FacilityType findOneByCode(@Param("code") String code);
 }

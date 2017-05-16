@@ -1529,7 +1529,7 @@ resourceTypes:
       /search:
           post:
               is: [ secured, paginated ]
-              description: Returns a paginated list of facilities given either a Zone, a Name, or a Code. The recurse option should be given when a zone is also given, and it means that the search should also include all children of the given zone.
+              description: Returns a paginated list of facilities given either a Zone, a Name, a Facility Type or a Code. The recurse option should be given when a zone is also given, and it means that the search should also include all children of the given zone.
               body:
                 application/json:
                   schema: facilityQueryDto
