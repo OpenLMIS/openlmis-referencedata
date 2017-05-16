@@ -35,6 +35,8 @@ import java.util.Map;
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
 
+  private static final String TYPE = "type";
+
   @Autowired
   private FacilityRepository repository;
 
@@ -145,14 +147,14 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   @Test
   public void shouldFindFacilitiesByFacilityType() {
     // given
-    FacilityType vaildFacilityType = new FacilityType("warehouse");
+    FacilityType vaildFacilityType = new FacilityType(TYPE);
     vaildFacilityType = facilityTypeRepository.save(vaildFacilityType);
 
     Facility validFacility = generateInstance();
     validFacility.setType(vaildFacilityType);
     repository.save(validFacility);
 
-    FacilityType invaildfacilityType = new FacilityType("not-a-warehouse");
+    FacilityType invaildfacilityType = new FacilityType("other-type");
     invaildfacilityType = facilityTypeRepository.save(invaildfacilityType);
 
     Facility invalidFacility = generateInstance();
@@ -198,7 +200,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
     validZone = geographicZoneRepository.save(validZone);
 
-    FacilityType vaildFacilityType = new FacilityType("warehouse");
+    FacilityType vaildFacilityType = new FacilityType(TYPE);
     vaildFacilityType = facilityTypeRepository.save(vaildFacilityType);
 
     Facility facilityWithCodeAndName = generateInstance();
@@ -228,7 +230,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     validZone = geographicZoneRepository.save(validZone);
 
     Map<String, String> extraDataRural = new HashMap<>();
-    extraDataRural.put("type", "rural");
+    extraDataRural.put(TYPE, "rural");
 
     Facility facility = generateInstance();
     facility.setGeographicZone(validZone);
@@ -236,7 +238,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
 
     Map<String, String> extraDataUrban = new HashMap<>();
-    extraDataUrban.put("type", "urban");
+    extraDataUrban.put(TYPE, "urban");
 
     Facility facility2 = generateInstance();
     facility2.setGeographicZone(validZone);
@@ -248,7 +250,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     List<Facility> foundFacilties = repository.findByExtraData(extraDataJson);
 
     assertEquals(1, foundFacilties.size());
-    assertEquals("rural", foundFacilties.get(0).getExtraData().get("type"));
+    assertEquals("rural", foundFacilties.get(0).getExtraData().get(TYPE));
   }
 
   @Override

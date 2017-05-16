@@ -297,7 +297,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
     Right fulfillmentRight = saveNewRight("fulfillmentRight", ORDER_FULFILLMENT);
     Role fulfillmentRole = saveNewRole("fulfillmentRole", fulfillmentRight);
-    Facility warehouse = generateFacility(11, "warehouse") ;
+    Facility warehouse = generateFacility(11, "warehouse");
 
     User warehouseClerk = repository.findOneByUsername("user3");
     warehouseClerk = assignRoleToUser(warehouseClerk,
@@ -392,6 +392,9 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   private FacilityType generateFacilityType(String type) {
+    if ("warehouse".equals(type)) {
+      return facilityTypeRepository.findOneByCode(type);
+    }
     FacilityType facilityType = new FacilityType();
     facilityType.setCode(type);
     facilityTypeRepository.save(facilityType);
