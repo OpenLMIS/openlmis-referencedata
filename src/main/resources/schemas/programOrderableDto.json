@@ -58,7 +58,12 @@
     }
   },
   "required": [
+    "orderableId",
+    "orderableFullProductName",
+    "orderableNetContent",
     "orderableDisplayCategoryId",
+    "orderableCategoryDisplayName",
+    "orderableCategoryDisplayOrder",
     "dosesPerPatient",
     "active",
     "fullSupply"

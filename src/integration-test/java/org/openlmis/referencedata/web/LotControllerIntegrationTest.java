@@ -44,7 +44,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
@@ -77,7 +76,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     lotDto = new LotDto();
     lot.export(lotDto);
-    given(lotRepository.save(any(Lot.class))).willAnswer(new SaveAnswer<Lot>());
+    given(lotRepository.save(any(Lot.class)))
+            .willAnswer(new SaveAnswer<Lot>());
   }
 
   @Test
@@ -327,8 +327,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private TradeItem mockTradeItem() {
     UUID id = UUID.randomUUID();
-
-    TradeItem tradeItem = new TradeItem("name", new ArrayList<>());
+    TradeItem tradeItem = TradeItem.newTradeItem("code " + id.toString(), "unit",
+        null, 0, 0, false);
     tradeItem.setId(id);
     when(tradeItemRepository.findOne(id)).thenReturn(tradeItem);
     return tradeItem;

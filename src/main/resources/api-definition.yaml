@@ -70,6 +70,7 @@ schemas:
       {
           "type": "array",
           "items": { "type": "object", "$ref":"schemas/facility.json" }
+
       }
 
   - facilityQueryDto: !include schemas/facilityQueryDto.json
@@ -77,6 +78,14 @@ schemas:
   - facilityOperator: !include schemas/facilityOperator.json
 
   - facilityType: !include schemas/facilityType.json
+
+  - facilityTypeApprovedProduct: !include schemas/facilityTypeApprovedProduct.json
+
+  - facilityTypeApprovedProductArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/facilityTypeApprovedProduct.json" }
+      }
 
   - geographicLevel: !include schemas/geographicLevel.json
 
@@ -92,15 +101,23 @@ schemas:
 
   - commodityType:  !include schemas/commodityType.json
 
-  - commodityTypePage: !include schemas/commodityTypePage.json
-
   - tradeItem:  !include schemas/tradeItem.json
 
-  - tradeItemPage: !include schemas/tradeItemPage.json
+  - tradeItemArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/tradeItem.json" }
+
+      }
 
   - orderable: !include schemas/orderable.json
 
-  - orderablePage: !include schemas/orderablePage.json
+  - orderableArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/orderable.json" }
+
+      }
 
   - processingPeriod: !include schemas/processingPeriod.json
 
@@ -119,6 +136,12 @@ schemas:
       }
 
   - program: !include schemas/program.json
+
+  - programArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref":"schemas/program.json" }
+      }
 
   - programOrderable: !include schemas/programOrderable.json
 
@@ -679,33 +702,14 @@ resourceTypes:
 
   /orderables:
       displayName: Orderable Product
-      put:
-          is: [ secured ]
-          description: Create or update an Orderable.
-          body:
-            application/json:
-              schema: orderable
-          responses:
-              "200":
-                  body:
-                    application/json:
-                        schema: orderable
-              "400":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
       get:
-          is: [ secured, paginated ]
+          is: [ secured ]
           description: Get all Orderable Products.
           responses:
               "200":
                   body:
                     application/json:
-                        schema: orderablePage
+                        schema: orderableArray
               "403":
                   body:
                     application/json:
@@ -747,16 +751,12 @@ resourceTypes:
                   body:
                     application/json:
                         schema: tradeItem
-              "400":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
               "403":
                   body:
                     application/json:
                       schema: localizedErrorResponse
       get:
-          is: [ secured, paginated ]
+          is: [ secured ]
           description: Retrieve trade items. Optionally filter by the classification ID, either by full or partial match.
           queryParameters:
               classificationId:
@@ -773,11 +773,12 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-                      schema: tradeItemPage
+                      schema: tradeItemArray
               "403":
                   body:
                     application/json:
                       schema: localizedErrorResponse
+
 
   /commodityTypes:
       displayName: Commodity Type
@@ -800,19 +801,6 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
-      get:
-          is: [ secured, paginated ]
-          description: Retrieve commodity types.
-          responses:
-              "200":
-                  body:
-                    application/json:
-                      schema: commodityTypePage
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
-
       /{id}/tradeItems:
           uriParameters:
               id:

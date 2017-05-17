@@ -15,24 +15,20 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
-
 import org.apache.commons.lang3.StringUtils;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.TradeItemDto;
 import org.openlmis.referencedata.repository.TradeItemRepository;
-import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.validate.TradeItemValidator;
+import org.openlmis.referencedata.service.RightService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 @RestController
 public class TradeItemController extends BaseController {
@@ -41,7 +37,7 @@ public class TradeItemController extends BaseController {
   private TradeItemRepository repository;
 
   @Autowired
-  private TradeItemValidator validator;
+  private RightService rightService;
 
   /**
    * Create or update a trade item.
@@ -50,31 +46,32 @@ public class TradeItemController extends BaseController {
    */
   @Transactional
   @RequestMapping(value = "/tradeItems", method = RequestMethod.PUT)
-  public TradeItemDto createOrUpdate(@RequestBody TradeItemDto tradeItemDto,
-                                     BindingResult bindingResult) {
+  public TradeItem createOrUpdate(@RequestBody TradeItem tradeItem) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
-    validator.validate(tradeItemDto, bindingResult);
-    throwValidationMessageExceptionIfErrors(bindingResult);
 
-    TradeItem tradeItem = TradeItem.newInstance(tradeItemDto);
+    // if it already exists, update or fail if not already a CommodityType
+    Orderable storedProduct = repository.findByProductCode(tradeItem.getProductCode());
+    if ( null != storedProduct ) {
+      tradeItem.setId(storedProduct.getId());
+    }
 
-    return TradeItemDto.newInstance(repository.save(tradeItem));
+    return repository.save(tradeItem);
   }
+
 
   /**
    * Retrieves trade items. Allows searching by classification id, either using a full
    * or a partial match.
-
+   *
    * @param classificationId the classification id to search by
    * @param fullMatch true to search by a full match, false to search by partial match
    * @return a list of matching trade items
    */
   @Transactional
   @RequestMapping(value = "/tradeItems", method = RequestMethod.GET)
-  public Page<TradeItemDto> retrieveTradeItems(
+  public Iterable<TradeItem> retrieveTradeItems(
       @RequestParam(required = false) String classificationId,
-      @RequestParam(required = false, defaultValue = "false") boolean fullMatch,
-      Pageable pageable) {
+      @RequestParam(required = false, defaultValue = "false") boolean fullMatch) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     Iterable<TradeItem> result;
@@ -88,6 +85,6 @@ public class TradeItemController extends BaseController {
       }
     }
 
-    return Pagination.getPage(TradeItemDto.newInstance(result), pageable);
+    return result;
   }
 }

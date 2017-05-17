@@ -15,11 +15,12 @@
 
 package org.openlmis.referencedata.domain;
 
-import static org.apache.commons.lang3.BooleanUtils.isFalse;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import lombok.Getter;
+
 import java.util.Objects;
-import java.util.UUID;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -36,6 +37,7 @@ public class OrderableDisplayCategory extends BaseEntity {
   private Code code;
 
   @Embedded
+  @JsonUnwrapped
   @Getter
   private OrderedDisplayValue orderedDisplayValue;
 
@@ -43,18 +45,12 @@ public class OrderableDisplayCategory extends BaseEntity {
   }
 
   /**
-   * Creates a new OrderableDisplayCategory with given id.
-   */
-  public OrderableDisplayCategory(UUID id) {
-    this.id = id;
-  }
-
-  /**
    * Creates a new OrderableDisplayCategory.
    *
-   * @param code         this OrderableDisplayCategory's unique implementation code
-   *                     (never {@code null})
-   * @param displayValue the display values of this OrderableDisplayCategory (never {@code null})
+   * @param code         this OrderableDisplayCategory's unique implementation code.
+   * @param displayValue the display values of this OrderableDisplayCategory.
+   * @return a new OrderableDisplayCategory.
+   * @throws NullPointerException if either parameter is null.
    */
   protected OrderableDisplayCategory(Code code, OrderedDisplayValue displayValue) {
     Objects.requireNonNull(code);
@@ -64,7 +60,7 @@ public class OrderableDisplayCategory extends BaseEntity {
   }
 
   /**
-   * Update this from another. Copies display values from the other OrderableDisplayCategory
+   * Update this from another.  Copies display values from the other OrderableDisplayCategory
    * into this one.
    *
    * @param orderableDisplayCategory OrderableDisplayCategory to update from.
@@ -76,9 +72,9 @@ public class OrderableDisplayCategory extends BaseEntity {
   /**
    * Creates a new OrderableDisplayCategory.
    *
-   * @param orderableDisplayCategoryCode this OrderableDisplayCategory's unique implementation code
-   *                                     (never {@code null})
+   * @param orderableDisplayCategoryCode this OrderableDisplayCategory's unique implementation code.
    * @return a new OrderableDisplayCategory using default display value and order
+   * @throws NullPointerException if parameter is null.
    */
   public static OrderableDisplayCategory createNew(Code orderableDisplayCategoryCode) {
     return OrderableDisplayCategory.createNew(orderableDisplayCategoryCode,
@@ -88,11 +84,10 @@ public class OrderableDisplayCategory extends BaseEntity {
   /**
    * Creates a new OrderableDisplayCategory.
    *
-   * @param orderableDisplayCategoryCode this OrderableDisplayCategory's unique implementation code
-   *                                     (never {@code null})
-   * @param displayValue        the display values of this OrderableDisplayCategory
-   *                            (never {@code null})
+   * @param orderableDisplayCategoryCode this OrderableDisplayCategory's unique implementation code.
+   * @param displayValue        the display values of this OrderableDisplayCategory.
    * @return a new OrderableDisplayCategory.
+   * @throws NullPointerException if either parameter is null.
    */
   public static OrderableDisplayCategory createNew(Code orderableDisplayCategoryCode,
                                                    OrderedDisplayValue displayValue) {
@@ -115,49 +110,4 @@ public class OrderableDisplayCategory extends BaseEntity {
   public int hashCode() {
     return Objects.hash(code);
   }
-
-  /**
-   * Creates new instance of OrderableDisplayCategory.
-   */
-  public static OrderableDisplayCategory newInstance(Importer importer) {
-    OrderableDisplayCategory category = OrderableDisplayCategory.createNew(
-        Code.code(importer.getCode()),
-        new OrderedDisplayValue(importer.getDisplayName(), importer.getDisplayOrder()));
-    category.setId(importer.getId());
-    return category;
-  }
-
-  /**
-   * Exports domain object to dto.
-   */
-  public void export(Exporter exporter) {
-    exporter.setId(id);
-    String codeString = code.toString();
-    if (isFalse(codeString.isEmpty())) {
-      exporter.setCode(codeString);
-    }
-    exporter.setDisplayName(orderedDisplayValue.getDisplayName());
-    exporter.setDisplayOrder(orderedDisplayValue.getDisplayOrder());
-  }
-
-  public interface Exporter {
-    void setId(UUID id);
-
-    void setCode(String code);
-
-    void setDisplayName(String name);
-
-    void setDisplayOrder(Integer displayOrder);
-  }
-
-  public interface Importer {
-    UUID getId();
-
-    String getCode();
-
-    String getDisplayName();
-
-    Integer getDisplayOrder();
-  }
-
 }

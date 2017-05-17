@@ -15,16 +15,20 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.OrderableDeserializer;
 
 @Getter
 @Setter
 public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedProduct.Exporter,
     FacilityTypeApprovedProduct.Importer {
 
-  private OrderableDto orderable;
+  @JsonDeserialize(using = OrderableDeserializer.class)
+  private Orderable orderable;
 
   private ProgramDto program;
 

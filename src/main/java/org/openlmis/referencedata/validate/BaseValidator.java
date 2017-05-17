@@ -41,12 +41,6 @@ interface BaseValidator extends Validator {
     errors.rejectValue(field, message, parameters, message);
   }
 
-  default void rejectIfNull(Errors errors, String field, String message) {
-    if (errors.getFieldValue(field) == null) {
-      errors.rejectValue(field, message, message);
-    }
-  }
-
   default void verifyArguments(Object target, Errors errors, String errorNull) {
     Message targetMessage = new Message(errorNull);
     checkNotNull(target, targetMessage.toString());

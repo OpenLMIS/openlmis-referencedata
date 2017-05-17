@@ -50,6 +50,7 @@ public class ProgramOrderableBuilderTest {
   private Orderable orderable;
   private ProgramOrderableBuilder programOrderableBuilder;
   private Program program;
+  private OrderableDisplayCategory orderableDisplayCategory;
 
   private static final String CURRENCY_CODE = "USD";
 
@@ -60,21 +61,20 @@ public class ProgramOrderableBuilderTest {
 
     when(programRepository.findOne(program.getId())).thenReturn(program);
 
-    OrderableDisplayCategory category =
-        OrderableDisplayCategory.createNew(Code.code("SuperCategoryCode"));
-    category.setId(UUID.randomUUID());
+    orderableDisplayCategory = OrderableDisplayCategory.createNew(Code.code("SuperCategoryCode"));
+    orderableDisplayCategory.setId(UUID.randomUUID());
 
     when(orderableDisplayCategoryRepository.findOne(
-        category.getId())).thenReturn(category);
+        orderableDisplayCategory.getId())).thenReturn(orderableDisplayCategory);
 
-    orderable = new Orderable(Code.code("SuperCode123"), Dispensable.createNew("each"),
-        "SuperName123", 10, 5, false, null, null);
+    orderable = CommodityType.newCommodityType("SuperCode123", "each",
+        "SuperName123", "SuperDescription", 10, 5, false, "cSys", "cSysId");
 
     programOrderableBuilder = new ProgramOrderableBuilder(program.getId());
     programOrderableBuilder.setProgramRepository(programRepository);
     programOrderableBuilder.setOrderableDisplayCategoryRepository(
         orderableDisplayCategoryRepository);
-    programOrderableBuilder.setOrderableDisplayCategoryId(category.getId());
+    programOrderableBuilder.setOrderableDisplayCategoryId(orderableDisplayCategory.getId());
   }
 
   @Test

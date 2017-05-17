@@ -20,9 +20,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
@@ -35,9 +32,6 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.config.ObjectMapperConfig;
 import com.jayway.restassured.config.RestAssuredConfig;
 
-import com.jayway.restassured.response.ExtractableResponse;
-import com.jayway.restassured.response.Response;
-import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
@@ -52,7 +46,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -82,7 +75,6 @@ public abstract class BaseWebIntegrationTest {
       "HTTP request/response should match RAML definition.";
 
   static final String MESSAGE_KEY = "messageKey";
-  static final String MESSAGE = "message";
 
   protected RestAssuredClient restAssured;
 
@@ -209,25 +201,6 @@ public abstract class BaseWebIntegrationTest {
     if (userId != null) {
       doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), eq(userId));
     }
-  }
-
-  void checkBadRequestBody(Object object, String code, String resourceUrl) {
-    ExtractableResponse<Response> response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(object)
-        .when()
-        .put(resourceUrl)
-        .then()
-        .statusCode(400)
-        .extract();
-
-    String messageKey = response.path(MESSAGE_KEY);
-    String message = response.path(MESSAGE);
-
-    assertThat(messageKey, is(Matchers.equalTo(code)));
-    assertFalse(message.equals(messageKey));
   }
 
   static class SaveAnswer<T extends BaseEntity> implements Answer<T> {

@@ -18,21 +18,14 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
-import org.openlmis.referencedata.validate.OrderableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,61 +37,37 @@ public class OrderableController extends BaseController {
   @Autowired
   private OrderableRepository repository;
 
-  @Autowired
-  private OrderableValidator validator;
-
-  /**
-   * Create an orderable.
-   *
-   * @return the orderable that was created.
-   */
-  @Transactional
-  @PutMapping("/orderables")
-  public OrderableDto create(@RequestBody OrderableDto orderableDto,
-                                     BindingResult bindingResult) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
-    orderableDto.setId(null);
-    validator.validate(orderableDto, bindingResult);
-    throwValidationMessageExceptionIfErrors(bindingResult);
-
-    Orderable orderable = Orderable.newInstance(orderableDto);
-
-    return OrderableDto.newInstance(repository.save(orderable));
-  }
-
   /**
    * Finds all orderables.
-   *
    * @return a list of orderables
    */
   @GetMapping("/orderables")
-  public Page<OrderableDto> findAll(Pageable pageable) {
+  public List<Orderable> findAll() {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     List<Orderable> allOrderables = new ArrayList<>();
-    for (Orderable product : repository.findAll()) {
+    for (Orderable product:repository.findAll()) {
       allOrderables.add(product);
     }
 
-    return Pagination.getPage(OrderableDto.newInstance(allOrderables), pageable);
+    return allOrderables;
   }
 
   /**
    * Finds product with chosen id.
-   *
    * @param productId id of the chosen product
    * @return chosen product
    */
   @GetMapping("/orderables/{id}")
-  public OrderableDto getChosenOrderable(
+  public ResponseEntity<Orderable> getChosenOrderable(
       @PathVariable("id") UUID productId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     Orderable orderable = repository.findOne(productId);
     if (orderable == null) {
-      throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
+      throw new NotFoundException(OrderableMessageKeys.NOT_FOUND);
     } else {
-      return OrderableDto.newInstance(orderable);
+      return new ResponseEntity<>(orderable, HttpStatus.OK);
     }
   }
 

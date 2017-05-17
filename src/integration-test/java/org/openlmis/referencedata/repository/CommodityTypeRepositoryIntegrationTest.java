@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
-import java.util.ArrayList;
+
 import java.util.UUID;
 
 public class CommodityTypeRepositoryIntegrationTest extends
@@ -42,8 +42,8 @@ public class CommodityTypeRepositoryIntegrationTest extends
 
   @Override
   CommodityType generateInstance() {
-    return new CommodityType("Name" + getNextInstanceNumber(), "cSys", "cId", null,
-        new ArrayList<>());
+    return CommodityType.newCommodityType("Code" + getNextInstanceNumber(), "each",
+        "Name" + getNextInstanceNumber(), "desc", 10, 20, false, "cSys", "cId");
   }
 
   @Test
@@ -59,10 +59,10 @@ public class CommodityTypeRepositoryIntegrationTest extends
 
     repository.save(asList(commodityType, child, grandChild1, grandChild2));
 
-    commodityType = repository.findOne(commodityType.getId());
-    child = repository.findOne(child.getId());
-    grandChild1 = repository.findOne(grandChild1.getId());
-    grandChild2 = repository.findOne(grandChild2.getId());
+    commodityType = repository.findByProductCode(commodityType.getProductCode());
+    child = repository.findByProductCode(child.getProductCode());
+    grandChild1 = repository.findByProductCode(grandChild1.getProductCode());
+    grandChild2 = repository.findByProductCode(grandChild2.getProductCode());
 
     assertNull(commodityType.getParent());
     assertEquals(singletonList(child), commodityType.getChildren());

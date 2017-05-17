@@ -46,7 +46,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Override
   Lot generateInstance() {
-    tradeItem = new TradeItem("manufacturer", null);
+    tradeItem = new TradeItem();
     tradeItem.setId(UUID.randomUUID());
     tradeItem = tradeItemRepository.save(tradeItem);
 

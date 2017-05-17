@@ -18,13 +18,5 @@ package org.openlmis.referencedata.util.messagekeys;
 public abstract class OrderableMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, ORDERABLE);
 
-  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_NULL = join(ERROR, NULL);
-  public static final String ERROR_PRODUCT_CODE_REQUIRED = join(ERROR, "productCode", REQUIRED);
-  public static final String ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED =
-      join(ERROR, "packRoundingThreshold", REQUIRED);
-  public static final String ERROR_ROUND_TO_ZERO_REQUIRED =
-      join(ERROR, "roundToZero", REQUIRED);
-  public static final String ERROR_NET_CONTENT_REQUIRED =
-      join(ERROR, "netContent", REQUIRED);
+  public static final String NOT_FOUND = join(ERROR, MessageKeys.NOT_FOUND);
 }

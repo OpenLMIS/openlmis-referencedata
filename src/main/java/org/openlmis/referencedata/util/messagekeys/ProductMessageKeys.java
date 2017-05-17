@@ -13,38 +13,11 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.dto;
+package org.openlmis.referencedata.util.messagekeys;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.openlmis.referencedata.domain.Dispensable;
+public abstract class ProductMessageKeys extends MessageKeys {
+  private static final String ERROR = join(SERVICE_ERROR, PRODUCT);
+  private static final String DISPENSING_UNITS = "dispensingUnits";
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-public class DispendableDto implements Dispensable.Exporter, Dispensable.Importer {
-
-  private String dispensingUnit;
-
-  /**
-   * Creates new instance based on given {@link Dispensable}.
-   *
-   * @param dispensable instance of Dispensable.
-   * @return new instance of DispensableDto.
-   */
-  public static DispendableDto newInstance(Dispensable dispensable) {
-    if (dispensable == null) {
-      return null;
-    }
-    DispendableDto dispendableDto = new DispendableDto();
-    dispensable.export(dispendableDto);
-
-    return dispendableDto;
-
-  }
+  public static final String ERROR_DISPENSING_UNITS_WRONG = join(ERROR, DISPENSING_UNITS, WRONG);
 }

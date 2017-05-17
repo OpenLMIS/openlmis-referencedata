@@ -15,11 +15,14 @@
 
 package org.openlmis.referencedata.domain;
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -34,19 +37,23 @@ import javax.persistence.UniqueConstraint;
         name = "unq_trade_item_classifications_system",
         columnNames = {"tradeitemid", "classificationsystem"}))
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false, exclude = {"tradeItem"})
+@JsonIgnoreProperties({"id"})
 public class TradeItemClassification extends BaseEntity {
 
   @ManyToOne
-  @Getter(AccessLevel.PRIVATE)
+  @Getter
+  @Setter
+  @JsonIgnore
   private TradeItem tradeItem;
 
   @Getter
   @Setter
+  @JsonProperty
   private String classificationSystem;
 
   @Getter
   @Setter
+  @JsonProperty
   private String classificationId;
 
   /**
@@ -60,36 +67,5 @@ public class TradeItemClassification extends BaseEntity {
     this.tradeItem = tradeItem;
     this.classificationSystem = classificationSystem;
     this.classificationId = classificationId;
-  }
-
-  /**
-   * Creates new instance of TradeItemClassification.
-   */
-  public static TradeItemClassification newInstance(Importer importer, TradeItem tradeItem) {
-    TradeItemClassification classification = new TradeItemClassification();
-    classification.classificationSystem = importer.getClassificationSystem();
-    classification.classificationId = importer.getClassificationId();
-    classification.tradeItem = tradeItem;
-    return classification;
-  }
-
-  /**
-   * Exports domain object to dto.
-   */
-  public void export(Exporter exporter) {
-    exporter.setClassificationId(classificationId);
-    exporter.setClassificationSystem(classificationSystem);
-  }
-
-  public interface Exporter {
-    void setClassificationSystem(String classificationSystem);
-
-    void setClassificationId(String classificationId);
-  }
-
-  public interface Importer {
-    String getClassificationSystem();
-
-    String getClassificationId();
   }
 }
