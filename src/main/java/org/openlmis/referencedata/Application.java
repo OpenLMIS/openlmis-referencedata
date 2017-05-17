@@ -15,12 +15,6 @@
 
 package org.openlmis.referencedata;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.flywaydb.core.Flyway;
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
@@ -34,12 +28,8 @@ import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.boot.sql.JaversProperties;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.openlmis.referencedata.domain.BaseEntity;
-import org.openlmis.referencedata.domain.ProgramOrderableBuilder;
 import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
-import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.security.UserNameProvider;
-import org.openlmis.referencedata.serializer.ProgramOrderableBuilderDeserializer;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +45,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-
 import java.util.Locale;
-import java.util.Objects;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
 @ImportResource("applicationContext.xml")
@@ -66,12 +54,6 @@ import java.util.Objects;
 public class Application {
 
   private Logger logger = LoggerFactory.getLogger(Application.class);
-
-  @Autowired
-  private ProgramRepository programRepository;
-
-  @Autowired
-  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
   @Autowired
   DialectName dialectName;
@@ -190,36 +172,5 @@ public class Application {
   @Bean
   public ProcessingPeriodValidator beforeSavePeriodValidator() {
     return new ProcessingPeriodValidator();
-  }
-
-  /**
-   * Registers a modified deserializer with Jackson's
-   * {@link com.fasterxml.jackson.databind.ObjectMapper} for {@link ProgramOrderableBuilder}.  This
-   * is useful for overriding the default deserializer that SpringBoot is using.
-   * @return a Jackson module that SpringBoot will register with Jackson.
-   */
-  @Bean
-  public Module registerProgramOrderableBuilderDeserializer() {
-    SimpleModule module = new SimpleModule();
-    module.setDeserializerModifier(new BeanDeserializerModifier() {
-      @Override
-      public JsonDeserializer<?> modifyDeserializer(
-          DeserializationConfig config,BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-        Objects.requireNonNull(deserializer, "Jackson passed a null deserializer");
-        Objects.requireNonNull(programRepository,
-            "Spring Boot didn't autowire the Program Repository");
-        Objects.requireNonNull(orderableDisplayCategoryRepository,
-            "Spring Boot didn't autowire the Orderable Display Category Repository");
-
-        if (beanDesc.getBeanClass() == ProgramOrderableBuilder.class) {
-          return new ProgramOrderableBuilderDeserializer(
-              deserializer, programRepository, orderableDisplayCategoryRepository);
-        }
-
-        return deserializer;
-      }
-    });
-
-    return module;
   }
 }
