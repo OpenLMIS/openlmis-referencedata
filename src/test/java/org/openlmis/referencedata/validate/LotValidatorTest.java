@@ -67,7 +67,8 @@ public class LotValidatorTest {
     lotDto.setActive(true);
     lotDto.setId(UUID.randomUUID());
 
-    TradeItem tradeItem = TradeItem.newTradeItem("code2", "unit", null, 0, 0, false);
+    TradeItem tradeItem =
+        new TradeItem("manufacturer", null);
     tradeItem.setId(UUID.randomUUID());
     lotDto.setTradeItemId(tradeItem.getId());
 

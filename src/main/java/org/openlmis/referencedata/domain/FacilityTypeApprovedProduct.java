@@ -22,7 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.openlmis.referencedata.dto.OrderableDto;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -84,7 +84,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     ftap.setMaxPeriodsOfStock(importer.getMaxPeriodsOfStock());
     ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
     ftap.setEmergencyOrderPoint(importer.getEmergencyOrderPoint());
-    ftap.setOrderable(importer.getOrderable());
+    ftap.setOrderable(Orderable.newInstance(importer.getOrderable()));
     if (null != importer.getProgram()) {
       ftap.setProgram(Program.newProgram(importer.getProgram()));
     }
@@ -104,7 +104,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     exporter.setMaxPeriodsOfStock(maxPeriodsOfStock);
     exporter.setMinPeriodsOfStock(minPeriodsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
-    exporter.setOrderable(orderable);
+    exporter.setOrderable(OrderableDto.newInstance(orderable));
     exporter.setProgram(ProgramDto.newInstance(program));
     exporter.setFacilityType(FacilityTypeDto.newInstance(facilityType));
   }
@@ -118,7 +118,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
 
     void setEmergencyOrderPoint(Double emergencyOrderPoint);
 
-    void setOrderable(Orderable orderable);
+    void setOrderable(OrderableDto orderable);
 
     void setProgram(ProgramDto program);
 
@@ -134,7 +134,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
 
     Double getEmergencyOrderPoint();
 
-    Orderable getOrderable();
+    OrderableDto getOrderable();
 
     Program.Importer getProgram();
 

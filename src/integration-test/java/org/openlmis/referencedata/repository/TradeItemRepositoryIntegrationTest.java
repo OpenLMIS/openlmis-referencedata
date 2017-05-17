@@ -27,7 +27,7 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
-
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class TradeItemRepositoryIntegrationTest extends
@@ -47,8 +47,7 @@ public class TradeItemRepositoryIntegrationTest extends
 
   @Override
   TradeItem generateInstance() {
-    TradeItem tradeItem = TradeItem.newTradeItem("advil" + getNextInstanceNumber(), "each",
-        "Advil" + getNextInstanceNumber(), 10, 5, false);
+    TradeItem tradeItem = new TradeItem("advil", new ArrayList<>());
 
     tradeItem.assignCommodityType("classSys1", "MDV1");
     tradeItem.assignCommodityType("classSys2", "MDV2");

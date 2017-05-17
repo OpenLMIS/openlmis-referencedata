@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
@@ -56,11 +56,11 @@ public class ProgramOrderableRepositoryIntegrationTest
 
   ProgramOrderable generateInstance() {
     Program program = generateProgram();
-    CommodityType commodityType = orderableRepository.save(new CommodityType());
+    Orderable orderable = orderableRepository.save(new Orderable());
     OrderableDisplayCategory orderableDisplayCategory = OrderableDisplayCategory.createNew(
         Code.code("testcat"));
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
-    return ProgramOrderable.createNew(program, orderableDisplayCategory, commodityType,
+    return ProgramOrderable.createNew(program, orderableDisplayCategory, orderable,
         CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE));
   }
 
@@ -79,7 +79,7 @@ public class ProgramOrderableRepositoryIntegrationTest
             programOrderableRepository.searchProgramOrderables(
                     programOrderable.getProgram());
 
-    Assert.assertEquals(2, receivedProgramOrderables.size());
+    assertEquals(2, receivedProgramOrderables.size());
     for (ProgramOrderable receivedProgramOrderable : receivedProgramOrderables) {
       Assert.assertEquals(
               programOrderable.getProgram().getId(),
@@ -94,9 +94,9 @@ public class ProgramOrderableRepositoryIntegrationTest
             programOrderableRepository.searchProgramOrderables(
                     programOrderable.getProgram());
 
-    Assert.assertEquals(2, receivedProgramOrderables.size());
+    assertEquals(2, receivedProgramOrderables.size());
     for (ProgramOrderable receivedProgramOrderable : receivedProgramOrderables) {
-      Assert.assertEquals(
+      assertEquals(
               programOrderable.getProgram().getId(),
               receivedProgramOrderable.getProgram().getId());
     }
@@ -107,7 +107,7 @@ public class ProgramOrderableRepositoryIntegrationTest
     List<ProgramOrderable> receivedProgramOrderables =
             programOrderableRepository.searchProgramOrderables(null);
 
-    Assert.assertEquals(programOrderables.size(), receivedProgramOrderables.size());
+    assertEquals(programOrderables.size(), receivedProgramOrderables.size());
   }
 
   @Test

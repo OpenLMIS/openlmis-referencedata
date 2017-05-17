@@ -30,13 +30,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -61,9 +61,6 @@ import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -890,8 +887,11 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private List<FacilityTypeApprovedProduct> generateFacilityTypeApprovedProducts() {
     OrderableDisplayCategory category = OrderableDisplayCategory.createNew(Code.code("gloves"));
     category.setId(UUID.randomUUID());
-    Orderable orderable = CommodityType.newCommodityType(
-        "gloves", "pair", "Gloves", "testDesc", 6, 3, false, "cSys", "cSysId");
+
+    HashMap<String, String> identificators = new HashMap<>();
+    identificators.put("cSys", "cSysId");
+    Orderable orderable = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
+        "Gloves", 6, 3, false, Collections.emptySet(), identificators);
     orderable.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setProgram(program);

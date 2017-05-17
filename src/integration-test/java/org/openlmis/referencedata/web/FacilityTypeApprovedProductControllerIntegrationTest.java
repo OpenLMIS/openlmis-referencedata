@@ -29,7 +29,7 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
@@ -45,9 +45,9 @@ import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
 import guru.nidi.ramltester.junit.RamlMatchers;
-
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -88,8 +88,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         new OrderedDisplayValue("orderableDisplayCategoryName", 1));
     orderableDisplayCategory.setId(UUID.randomUUID());
 
-    orderable = CommodityType.newCommodityType("abcd", "each", "Abcd", "test", 10, 5, false,
-        "cSys", "cSysId");
+    HashMap<String, String> identificators = new HashMap<>();
+    orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
+            "Abcd", 10, 5, false, Collections.emptySet(), identificators);
     orderable.setId(UUID.randomUUID());
 
     facilityType1 = new FacilityType("facilityType1");

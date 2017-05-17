@@ -19,7 +19,6 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
 import org.springframework.data.repository.PagingAndSortingRepository;
-
 import java.util.UUID;
 
 public interface ProgramRepository
