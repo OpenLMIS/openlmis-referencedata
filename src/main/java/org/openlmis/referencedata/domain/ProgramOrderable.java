@@ -15,10 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +23,6 @@ import org.hibernate.annotations.Type;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.CurrencyConfig;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
@@ -39,7 +34,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "program_orderables", schema = "referencedata")
 @NoArgsConstructor
-@JsonSerialize(using = ProgramOrderable.ProgramOrderableSerializer.class)
 public class ProgramOrderable extends BaseEntity {
 
   @ManyToOne
@@ -170,43 +164,6 @@ public class ProgramOrderable extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(program, product);
-  }
-
-  /**
-   * JSON Serializer for ProgramOrderables.
-   */
-  public static class ProgramOrderableSerializer extends StdSerializer<ProgramOrderable> {
-    public ProgramOrderableSerializer() {
-      this(null);
-    }
-
-    public ProgramOrderableSerializer(Class<ProgramOrderable> programOrderableClass) {
-      super(programOrderableClass);
-    }
-
-    @Override
-    public void serialize(ProgramOrderable programOrderable, JsonGenerator generator,
-                          SerializerProvider provider) throws IOException {
-      generator.writeStartObject();
-      generator.writeStringField("programId", programOrderable.program.getId().toString());
-      generator.writeStringField("orderableId", programOrderable.product.getId().toString());
-      generator.writeStringField("orderableDisplayCategoryId",
-          programOrderable.orderableDisplayCategory.getId().toString());
-      generator.writeStringField("orderableCategoryDisplayName",
-          programOrderable.orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
-      generator.writeNumberField("orderableCategoryDisplayOrder",
-          programOrderable.orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder());
-      generator.writeBooleanField("active", programOrderable.active);
-      generator.writeBooleanField("fullSupply", programOrderable.fullSupply);
-      generator.writeNumberField("displayOrder", programOrderable.displayOrder);
-      if (null != programOrderable.dosesPerPatient) {
-        generator.writeNumberField("dosesPerPatient", programOrderable.dosesPerPatient);
-      }
-      if (null != programOrderable.pricePerPack) {
-        generator.writeNumberField("pricePerPack", programOrderable.pricePerPack.getAmount());
-      }
-      generator.writeEndObject();
-    }
   }
 
   /**

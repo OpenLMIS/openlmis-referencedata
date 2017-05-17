@@ -64,7 +64,6 @@ public class Application {
   @Value("${spring.jpa.properties.hibernate.default_schema}")
   private String preferredSchema;
 
-
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
   }
