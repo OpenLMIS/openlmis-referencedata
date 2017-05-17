@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.domain;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.dto.DispensableDto;
@@ -46,6 +47,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "orderables", schema = "referencedata")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Orderable extends BaseEntity {
 
   @Embedded
@@ -79,22 +81,6 @@ public class Orderable extends BaseEntity {
       name = "identifiers",
       joinColumns = @JoinColumn(name = "orderableId"))
   private Map<String, String> identifiers;
-
-  /**
-   * Creates a new Orderable.
-   */
-  public Orderable(Code productCode, Dispensable dispensable, String fullProductName,
-                   long netContent, long packRoundingThreshold, boolean roundToZero,
-                   Set<ProgramOrderable> programOrderables, Map<String, String> identifiers) {
-    this.productCode = productCode;
-    this.dispensable = dispensable;
-    this.fullProductName = fullProductName;
-    this.netContent = netContent;
-    this.packRoundingThreshold = packRoundingThreshold;
-    this.roundToZero = roundToZero;
-    this.programOrderables = programOrderables;
-    this.identifiers = identifiers;
-  }
 
   /**
    * Get the association to a {@link Program}.
