@@ -41,9 +41,7 @@ import javax.persistence.Table;
 
 /**
  * Products that are Orderable by Program.  An Orderable represent any medical commodities
- * that may be ordered/requisitioned, typically by a {@link Program}. An Orderable must be
- * connected to either a {@link TradeItem} (a specific item by a manufacturer/brand owner) or to
- * a {@link CommodityType} (one category of medicines or commodities).
+ * that may be ordered/requisitioned, typically by a {@link Program}.
  */
 @Entity
 @Table(name = "orderables", schema = "referencedata")
