@@ -63,7 +63,11 @@ public class TradeItemClassification extends BaseEntity {
   }
 
   /**
-   * Creates new instance of TradeItemClassification.
+   * Creates new instance based on data from {@link Importer}.
+   *
+   * @param importer instance of {@link Importer}.
+   * @param tradeItem instance of {@link TradeItem} to be associated with TradeItemClassification.
+   * @return new instance of TradeItemClassification.
    */
   public static TradeItemClassification newInstance(Importer importer, TradeItem tradeItem) {
     TradeItemClassification classification = new TradeItemClassification();
@@ -74,7 +78,9 @@ public class TradeItemClassification extends BaseEntity {
   }
 
   /**
-   * Exports domain object to dto.
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to.
    */
   public void export(Exporter exporter) {
     exporter.setClassificationId(classificationId);
