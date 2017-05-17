@@ -15,17 +15,12 @@
 
 package org.openlmis.referencedata.repository;
 
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.custom.TradeItemRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
-
 import java.util.UUID;
 
 public interface TradeItemRepository extends CrudRepository<TradeItem, UUID>,
     JpaRepository<TradeItem, UUID>, TradeItemRepositoryCustom {
-
-  <S extends Orderable> S findByProductCode(Code code);
 }

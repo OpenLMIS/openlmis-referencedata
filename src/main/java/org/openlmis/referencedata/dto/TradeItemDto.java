@@ -15,43 +15,48 @@
 
 package org.openlmis.referencedata.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.domain.Program;
-import java.util.UUID;
+import org.openlmis.referencedata.domain.TradeItem;
+import java.util.LinkedList;
+import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class ProgramDto extends BaseDto implements Program.Exporter, Program.Importer {
-  private String code;
-  private String name;
-  private String description;
-  private Boolean active;
-  private Boolean periodsSkippable;
-  private Boolean showNonFullSupplyTab;
+public class TradeItemDto extends BaseDto implements TradeItem.Importer, TradeItem.Exporter {
 
-  public ProgramDto(UUID id) {
-    setId(id);
+  private String manufacturerOfTradeItem;
+
+  private List<TradeItemClassificationDto> classifications;
+
+  /**
+   * Create new list of TradeItemDto based on given list of {@link TradeItem}
+   *
+   * @param tradeItems list of {@link TradeItem}
+   * @return new list of TradeItemDto.
+   */
+  public static List<TradeItemDto> newInstance(Iterable<TradeItem> tradeItems) {
+    List<TradeItemDto> tradeItemDtos = new LinkedList<>();
+    tradeItems.forEach(item -> tradeItemDtos.add(newInstance(item)));
+    return tradeItemDtos;
   }
 
   /**
-   * Creates new programDto based on given {@link Program}.
+   * Creates new instance based on given {@link TradeItem}.
    *
-   * @param program instance of Program
-   * @return new instance of ProgramDto.
+   * @param po instance of TradeItem.
+   * @return new instance of TradeItemDto.
    */
-  public static ProgramDto newInstance(Program program) {
-    if (program == null) {
+  public static TradeItemDto newInstance(TradeItem po) {
+    if (po == null) {
       return null;
     }
-    ProgramDto programDto = new ProgramDto();
-    program.export(programDto);
-    return programDto;
+    TradeItemDto tradeItemDto = new TradeItemDto();
+    po.export(tradeItemDto);
+
+    return tradeItemDto;
   }
+
 }

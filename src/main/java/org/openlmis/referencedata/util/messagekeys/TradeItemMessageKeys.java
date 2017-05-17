@@ -19,4 +19,9 @@ public abstract class TradeItemMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, TRADE_ITEM);
 
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR, NOT_FOUND, WITH, ID);
+  public static final String ERROR_NULL = join(ERROR, NULL);
+
+  public static final String ERROR_MANUFACTURER_REQUIRED =
+      join(ERROR, "manufacturerOfTradeItem", REQUIRED);
+
 }

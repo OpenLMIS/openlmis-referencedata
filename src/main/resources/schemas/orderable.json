@@ -33,10 +33,10 @@
       "title": "programs",
       "items": {
         "type": "object",
-        "$ref": "programOrderable.json"
+        "$ref": "programOrderableDto.json"
       },
       "uniqueItems": true
     }
   },
-  "required": ["id", "productCode", "packRoundingThreshold", "roundToZero"]
+  "required": ["productCode", "packRoundingThreshold", "roundToZero", "netContent"]
 }

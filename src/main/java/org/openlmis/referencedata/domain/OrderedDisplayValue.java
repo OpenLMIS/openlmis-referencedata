@@ -15,18 +15,11 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.google.common.base.Strings;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.messagekeys.OrderedDisplayValueMessageKeys;
-
-import java.util.Objects;
-
-import javax.persistence.Embeddable;
-
 import lombok.Getter;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import java.util.Objects;
+import javax.persistence.Embeddable;
 
 /**
  * An OrderedDisplayValue is used for unique values/categories that a user would select.  This is
@@ -39,7 +32,7 @@ public class OrderedDisplayValue {
   private String displayName;
   @JsonProperty
   @Getter
-  private int displayOrder;
+  private Integer displayOrder;
 
   private OrderedDisplayValue() {}
 
@@ -49,13 +42,8 @@ public class OrderedDisplayValue {
    * @param displayOrder the order of which to display this.
    * @throws ValidationMessageException if displayName is null or blank.
    */
-  public OrderedDisplayValue(String displayName, int displayOrder) {
-    displayName = displayName.trim();
-    if (Strings.isNullOrEmpty(displayName)) {
-      throw new ValidationMessageException(OrderedDisplayValueMessageKeys.ERROR_DISPLAY_NAME_EMPTY);
-    }
-
-    this.displayName = displayName;
+  public OrderedDisplayValue(String displayName, Integer displayOrder) {
+    this.displayName = displayName != null ? displayName.trim() : null;
     this.displayOrder = displayOrder;
   }
 

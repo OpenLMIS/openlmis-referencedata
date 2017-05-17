@@ -15,43 +15,42 @@
 
 package org.openlmis.referencedata.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.domain.Program;
-import java.util.UUID;
+import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import java.util.HashSet;
+import java.util.Set;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class ProgramDto extends BaseDto implements Program.Exporter, Program.Importer {
-  private String code;
-  private String name;
-  private String description;
-  private Boolean active;
-  private Boolean periodsSkippable;
-  private Boolean showNonFullSupplyTab;
+public class OrderableDisplayCategoryDto extends BaseDto implements
+    OrderableDisplayCategory.Exporter, OrderableDisplayCategory.Importer {
 
-  public ProgramDto(UUID id) {
-    setId(id);
+  private String code;
+
+  private String displayName;
+
+  private Integer displayOrder;
+
+  /**
+   * Creates new set of OrderableDisplayCategoryDto based on
+   * {@link OrderableDisplayCategory} iterable.
+   */
+  public static Set<OrderableDisplayCategoryDto> newInstance(
+      Iterable<OrderableDisplayCategory> iterable) {
+    Set<OrderableDisplayCategoryDto> categoryDtos = new HashSet<>();
+    iterable.forEach(i -> categoryDtos.add(newInstance(i)));
+    return categoryDtos;
   }
 
   /**
-   * Creates new programDto based on given {@link Program}.
-   *
-   * @param program instance of Program
-   * @return new instance of ProgramDto.
+   * Creates new instance of OrderableDisplayCategoryDto based on {@link OrderableDisplayCategory}.
    */
-  public static ProgramDto newInstance(Program program) {
-    if (program == null) {
-      return null;
-    }
-    ProgramDto programDto = new ProgramDto();
-    program.export(programDto);
-    return programDto;
+  public static OrderableDisplayCategoryDto newInstance(OrderableDisplayCategory category) {
+    OrderableDisplayCategoryDto categoryDto = new OrderableDisplayCategoryDto();
+    category.export(categoryDto);
+    return categoryDto;
   }
 }

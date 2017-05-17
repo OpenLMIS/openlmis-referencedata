@@ -15,15 +15,17 @@
 
 package org.openlmis.referencedata.repository;
 
-import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.HashMap;
 import java.util.UUID;
 
-public class OrderableIntegrationTest
+public class OrderableRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<Orderable> {
 
   @Autowired
@@ -36,7 +38,10 @@ public class OrderableIntegrationTest
 
   @Override
   Orderable generateInstance() {
-    return CommodityType.newCommodityType("abcd", "each", "Abcd", "test", 10, 5, false,
-        "cSys", "cSysId");
+
+    HashMap<String, String> identificators = new HashMap<>();
+    identificators.put("cSys", "cSysId");
+    return new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
+            "Abcd", 10, 5, false, null, identificators);
   }
 }

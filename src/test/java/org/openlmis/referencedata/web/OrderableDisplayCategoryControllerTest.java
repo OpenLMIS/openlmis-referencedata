@@ -15,12 +15,11 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -28,9 +27,9 @@ import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
+import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.service.RightService;
-
 import java.util.Set;
 
 @SuppressWarnings({"PMD.UnusedPrivateField"})
@@ -72,22 +71,23 @@ public class OrderableDisplayCategoryControllerTest {
 
   private void preparePostOrPut() {
     when(repository.findAll()).thenReturn(
-        Sets.newHashSet(new OrderableDisplayCategory[]{categoryA, categoryB})
+        Sets.newHashSet(categoryA, categoryB)
     );
   }
 
   @Test
   public void shouldGetAllOrderableDisplayCategories() {
     //given
-    Set<OrderableDisplayCategory> expected = Sets.newHashSet(
-        new OrderableDisplayCategory[]{categoryA, categoryB});
+    Set<OrderableDisplayCategoryDto> expected = Sets.newHashSet(
+        OrderableDisplayCategoryDto.newInstance(categoryA),
+        OrderableDisplayCategoryDto.newInstance(categoryB));
     preparePostOrPut();
 
     //when
-    Iterable<OrderableDisplayCategory> categories =
+    Iterable<OrderableDisplayCategoryDto> categories =
         controller.getAllOrderableDisplayCategories();
 
     //then
-    assertEquals(expected, categories);
+    assertTrue(expected.equals(categories));
   }
 }

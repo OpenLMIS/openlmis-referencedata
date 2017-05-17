@@ -17,25 +17,20 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.CurrencyConfig;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -45,7 +40,6 @@ import javax.persistence.Table;
 @Table(name = "program_orderables", schema = "referencedata")
 @NoArgsConstructor
 @JsonSerialize(using = ProgramOrderable.ProgramOrderableSerializer.class)
-@JsonDeserialize(using = ProgramOrderableDeserializer.class)
 public class ProgramOrderable extends BaseEntity {
 
   @ManyToOne
@@ -56,6 +50,7 @@ public class ProgramOrderable extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "orderableId", nullable = false)
   @Getter
+  @Setter
   private Orderable product;
 
   private Integer dosesPerPatient;
@@ -215,21 +210,40 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   /**
+   * Creates new instance based on data from {@link Importer}
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of ProgramOrderable.
+   */
+  public static ProgramOrderable newInstance(Importer importer, Orderable orderable) {
+    ProgramOrderable programOrderable = new ProgramOrderable();
+    programOrderable.orderableDisplayCategory =
+        new OrderableDisplayCategory(importer.getOrderableDisplayCategoryId());
+    programOrderable.active = importer.isActive();
+    programOrderable.fullSupply = importer.isFullSupply();
+    programOrderable.displayOrder = importer.getDisplayOrder();
+    programOrderable.dosesPerPatient = importer.getDosesPerPatient();
+    programOrderable.pricePerPack = importer.getPricePerPack();
+    programOrderable.program = new Program(importer.getProgramId());
+    programOrderable.product = orderable;
+    return programOrderable;
+  }
+
+  /**
    * Export this object to the specified exporter (DTO).
    *
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setId(id);
-    exporter.setOrderableId(product.getId());
-    exporter.setOrderableFullProductName(product.getFullProductName());
-    exporter.setOrderableCode(product.getProductCode());
-    exporter.setOrderableNetContent(product.getNetContent());
-    exporter.setOrderableDisplayCategoryId(orderableDisplayCategory.getId());
-    exporter.setOrderableCategoryDisplayName(
-        orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
-    exporter.setOrderableCategoryDisplayOrder(
-        orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder());
+    exporter.setOrderableDisplayCategoryId(
+        orderableDisplayCategory.getId());
+    if (orderableDisplayCategory.getOrderedDisplayValue() != null) {
+      exporter.setOrderableCategoryDisplayName(
+          orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
+      exporter.setOrderableCategoryDisplayOrder(
+          orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder());
+    }
+    exporter.setProgramId(program.getId());
     exporter.setActive(active);
     exporter.setFullSupply(fullSupply);
     exporter.setDisplayOrder(displayOrder);
@@ -241,21 +255,13 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   public interface Exporter {
-    void setId(UUID id);
+    void setProgramId(UUID program);
 
-    void setOrderableId(UUID productId);
+    void setOrderableDisplayCategoryId(UUID category);
 
-    void setOrderableFullProductName(String fullProductName);
+    void setOrderableCategoryDisplayName(String name);
 
-    void setOrderableCode(Code productCode);
-
-    void setOrderableNetContent(Long netContent);
-
-    void setOrderableDisplayCategoryId(UUID orderableDisplayCategoryId);
-
-    void setOrderableCategoryDisplayName(String orderableCategoryDisplayName);
-
-    void setOrderableCategoryDisplayOrder(int orderableCategoryDisplayOrder);
+    void setOrderableCategoryDisplayOrder(Integer displayOrder);
 
     void setActive(boolean active);
 
@@ -269,19 +275,9 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   public interface Importer {
-    UUID getId();
-
-    String getOrderableFullProductName();
-
-    Code getOrderableCode();
-
-    Long getOrderableNetContent();
+    UUID getProgramId();
 
     UUID getOrderableDisplayCategoryId();
-
-    String getOrderableCategoryDisplayName();
-
-    int getOrderableCategoryDisplayOrder();
 
     boolean isActive();
 

@@ -22,9 +22,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import java.util.ArrayList;
 
 public class CommodityTypeTest {
-  private static final String EACH = "each";
   private static final String CLASSIFICATION_SYS = "cSys";
   private static final String CLASSIFICATION_SYS_ID = "cSysId";
 
@@ -38,25 +38,8 @@ public class CommodityTypeTest {
 
   static {
     ibuprofen =
-        CommodityType.newCommodityType("ibuprofen", EACH, "Ibuprofen", "test desc", 10, 5, false,
-            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-  }
-
-  @Test
-  public void testCanFulfill() throws Exception {
-    assertTrue(ibuprofen.canFulfill(ibuprofen));
-  }
-
-  @Test
-  public void testPacksToOrder() {
-    assertEquals(0, ibuprofen.packsToOrder(-1));
-    assertEquals(0, ibuprofen.packsToOrder(0));
-    assertEquals(1, ibuprofen.packsToOrder(1));
-    assertEquals(1, ibuprofen.packsToOrder(10));
-    assertEquals(1, ibuprofen.packsToOrder(11));
-    assertEquals(1, ibuprofen.packsToOrder(15));
-    assertEquals(2, ibuprofen.packsToOrder(16));
-    assertEquals(2, ibuprofen.packsToOrder(17));
+        new CommodityType("ibuprofen", CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null, null);
+    ibuprofen.setChildren(new ArrayList<>());
   }
 
   @Test
@@ -64,8 +47,7 @@ public class CommodityTypeTest {
     assertTrue(ibuprofen.equals(ibuprofen));
 
     CommodityType ibuprofenDupe =
-        CommodityType.newCommodityType("ibuprofen", EACH, "Ibuprofen", "dupe", 20, 10, false,
-            CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+        new CommodityType("ibuprofen", CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null, null);
     assertEquals(ibuprofen.hashCode(), ibuprofenDupe.hashCode());
   }
 
@@ -110,8 +92,9 @@ public class CommodityTypeTest {
     grandChild3.assignParent(child2);
   }
 
-  private CommodityType generateCommodityType(String productCode) {
-    return CommodityType.newCommodityType(productCode, EACH, productCode, "XXX",
-        0, 0, false, "CS", "CID");
+  private CommodityType generateCommodityType(String productName) {
+    CommodityType commodityType = new CommodityType(productName, "CS", "CID", null, null);
+    commodityType.setChildren(new ArrayList<>());
+    return commodityType;
   }
 }
