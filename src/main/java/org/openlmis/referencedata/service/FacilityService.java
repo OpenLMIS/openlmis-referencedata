@@ -73,7 +73,7 @@ public class FacilityService {
   /**
    * Method returns all facilities with matched parameters.
    *
-   * @param queryMap request parameters (code, name, zone, recurse) and JSON extraData.
+   * @param queryMap request parameters (code, name, zone, type, recurse) and JSON extraData.
    * @return List of facilities
    */
   public List<Facility> searchFacilities(Map<String, Object> queryMap) {

@@ -45,6 +45,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * @param code Part of wanted code.
    * @param name Part of wanted name.
    * @param zone Geographic zone of facility location.
+   * @param facilityType Wanted facility type.
    * @return List of Facilities matching the parameters.
    */
   public List<Facility> search(String code, String name,
