@@ -10,7 +10,7 @@ Breaking changes:
 
 * [OLMIS-1696](https://openlmis.atlassian.net/browse/OLMIS-1696):
 In our medical commodities model, we changed how Orderables, TradeItems and CommodityTypes are associated - both internally to the Reference Data service, but also to external services.
-Before, the code modeled this relationship as Orderables being an abstract base class to TradeItem and CommodityType. Orderable no longer are abstract, and for TradeItem and CommodityType are not inherited, but rather having a "has a" relationship to Orderable.
+Before, the code modeled this relationship as Orderables being an abstract base class to TradeItem and CommodityType. Orderable no longer are abstract, and TradeItem/CommodityType are not inherited, but rather having a "has a" relationship to Orderable.
   * CommodityType and TradeItem no longer inherit from Orderable.
   * Orderable, TradeItem and CommodityType all migrated to separate tables.
   * Orderable is no longer an abstract class - objects may be instantiated from it.
