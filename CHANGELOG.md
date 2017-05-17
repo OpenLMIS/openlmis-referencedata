@@ -6,6 +6,27 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-2492](https://openlmis.atlassian.net/browse/OLMIS-2492): Added new query param to facility search endpoint - code (facility type code)
   * Moved warehouse facility type from demo data to initial data.
 
+Breaking changes:
+
+* [OLMIS-1696](https://openlmis.atlassian.net/browse/OLMIS-1696):
+In our medical commodities model, we changed how Orderables, TradeItems and CommodityTypes are associated - both internally to the Reference Data service, but also to external services.
+Before, the code modeled this relationship as Orderables being an abstract base class to TradeItem and CommodityType. Orderable no longer are abstract, and for TradeItem and CommodityType are not inherited, but rather having a "has a" relationship to Orderable.
+  * CommodityType and TradeItem no longer inherit from Orderable.
+  * Orderable, TradeItem and CommodityType all migrated to separate tables.
+  * Orderable is no longer an abstract class - objects may be instantiated from it.
+  * Orderable accept a map of identifiers where the key of that map is the type of identifier, and the value is the identifier.
+  * When creating an Orderable, one should give it's identifier in the Orderable's map as e.g. key = commodityType (or tradeItem), value = uuid.
+  * CommodityTypes is able of having 0 or more Orderables.
+  * Removed description from CommodityType, added name (string), classificationSystem (string), classificationId (string). All required.
+  * TradeItem is capable of having 0 or more Orderable.
+  * Added Dtos for: TradeItem, CommodityType, OrderableDisplayCategory, TradeItemClassification, Dispensable.
+  * Added get endpoint for retrieve all commoditytypes.
+  * Added endpoint for create orderables.
+  * Added pagination for getAll/search endpoints for Orderables, CommodityTypes and TradeItems.
+  * Added validation for orderable, commodity type and trade item.
+  * Added data migrations.
+  * Removed redundant code.
+
 5.0.1 / 2017-05-09
 ==================
 
