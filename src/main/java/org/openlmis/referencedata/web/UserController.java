@@ -449,6 +449,41 @@ public class UserController extends BaseController {
     return exportUsersToDtos(users);
   }
 
+  /**
+   * Get the audit information related to users.
+   *
+   * @param author  The author of the changes which should be returned. If null or empty, changes
+   *               are returned regardless of author.
+   * @param changedPropertyName  The name of the property about which changes should be returned.
+   *                             If null or empty, changes associated with any and all properties
+   *                             are returned.
+   * @param page  A Pageable object that allows client to optionally add "page" (page number) and
+   *              "size" (page size) query parameters to the request.
+   */
+  @RequestMapping(value = "/users/{userId}/auditLog", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public String getUsersAuditLog(
+      @PathVariable("userId") UUID userId,
+      @RequestParam(name = "author", required = false, defaultValue = "") String author,
+      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+          String changedPropertyName,
+      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+          boolean returnJson,
+      Pageable page) {
+
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+
+    //Return a 404 if the specified user can't be found
+    User user = userRepository.findOne(userId);
+    if (user == null) {
+      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    return getAuditLog(User.class, userId, author, changedPropertyName, page, returnJson);
+  }
+
   private User validateUser(UUID userId) {
     User user = userRepository.findOne(userId);
     if (user == null) {
