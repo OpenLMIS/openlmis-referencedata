@@ -116,6 +116,7 @@ public class Facility extends BaseEntity {
   private Set<SupportedProgram> supportedPrograms = new HashSet<>();
 
   @Type(type = "jts_geometry")
+  @DiffIgnore
   @Getter
   @Setter
   private Point location;
@@ -187,6 +188,8 @@ public class Facility extends BaseEntity {
     facility.setComment(importer.getComment());
     facility.setEnabled(importer.getEnabled());
     facility.setOpenLmisAccessible(importer.getOpenLmisAccessible());
+    
+    facility.setLocation(importer.getLocation());
 
     return facility;
   }
@@ -300,6 +303,8 @@ public class Facility extends BaseEntity {
     Boolean getEnabled();
 
     Boolean getOpenLmisAccessible();
+    
+    Point getLocation();
     
     Map<String, String> getExtraData();
   }

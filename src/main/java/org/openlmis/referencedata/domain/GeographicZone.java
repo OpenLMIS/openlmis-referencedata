@@ -119,6 +119,8 @@ public class GeographicZone extends BaseEntity {
     geographicZone.setCatchmentPopulation(importer.getCatchmentPopulation());
     geographicZone.setLatitude(importer.getLatitude());
     geographicZone.setLongitude(importer.getLongitude());
+    
+    geographicZone.setBoundary(importer.getBoundary());
 
     return geographicZone;
   }
@@ -184,6 +186,8 @@ public class GeographicZone extends BaseEntity {
     Double getLatitude();
 
     Double getLongitude();
+    
+    Polygon getBoundary();
 
     Importer getParent();
 
