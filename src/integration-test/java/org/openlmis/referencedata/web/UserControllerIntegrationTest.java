@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -73,6 +74,7 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
@@ -86,6 +88,7 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -1007,6 +1010,44 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(AUDIT_URL)
         .then()
         .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getUserAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    given(userRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    given(userRepository.findOne(any(UUID.class))).willReturn(user1);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

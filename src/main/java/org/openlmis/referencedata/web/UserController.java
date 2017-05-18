@@ -60,7 +60,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -459,11 +462,12 @@ public class UserController extends BaseController {
    *                             are returned.
    * @param page  A Pageable object that allows client to optionally add "page" (page number) and
    *              "size" (page size) query parameters to the request.
+   * @return the list of all matching audit logs as string
    */
   @RequestMapping(value = "/users/{userId}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public String getUsersAuditLog(
+  public ResponseEntity<String> getUsersAuditLog(
       @PathVariable("userId") UUID userId,
       @RequestParam(name = "author", required = false, defaultValue = "") String author,
       @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
@@ -481,7 +485,13 @@ public class UserController extends BaseController {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     }
 
-    return getAuditLog(User.class, userId, author, changedPropertyName, page, returnJson);
+    String auditLogs = getAuditLog(User.class, userId, author, changedPropertyName, page,
+        returnJson);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
+
+    return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
   }
 
   private User validateUser(UUID userId) {
