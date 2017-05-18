@@ -15,19 +15,23 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 public class GeographicZoneRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<GeographicZone> {
@@ -45,6 +49,8 @@ public class GeographicZoneRepositoryIntegrationTest
   private GeographicZone countryZone;
   private GeographicZone regionZone;
   private GeographicZone districtZone;
+  
+  private GeometryFactory gf;
 
   @Override
   GeographicZoneRepository getRepository() {
@@ -56,13 +62,24 @@ public class GeographicZoneRepositoryIntegrationTest
     geographicLevelRepository.save(countryLevel);
     geographicLevelRepository.save(regionLevel);
     geographicLevelRepository.save(districtLevel);
+    gf = new GeometryFactory();
   }
 
   @Override
   GeographicZone generateInstance() {
+
     countryZone = new GeographicZone();
     countryZone.setCode("C" + this.getNextInstanceNumber());
     countryZone.setLevel(countryLevel);
+    Coordinate[] regionAndCountryCoords  = new Coordinate[] {
+        new Coordinate(0, 0),
+        new Coordinate(4, 0),
+        new Coordinate(4, 2),
+        new Coordinate(0, 2),
+        new Coordinate(0, 0)
+    };
+    Polygon regionAndCountryBoundary = gf.createPolygon(regionAndCountryCoords);
+    countryZone.setBoundary(regionAndCountryBoundary);
 
     repository.save(countryZone);
 
@@ -70,6 +87,7 @@ public class GeographicZoneRepositoryIntegrationTest
     regionZone.setCode("R" + this.getNextInstanceNumber());
     regionZone.setLevel(regionLevel);
     regionZone.setParent(countryZone);
+    regionZone.setBoundary(regionAndCountryBoundary);
 
     repository.save(regionZone);
 
@@ -77,6 +95,14 @@ public class GeographicZoneRepositoryIntegrationTest
     districtZone.setCode("D" + this.getNextInstanceNumber());
     districtZone.setLevel(districtLevel);
     districtZone.setParent(regionZone);
+    Coordinate[] districtCoords  = new Coordinate[] {
+        new Coordinate(0, 0),
+        new Coordinate(2, 0),
+        new Coordinate(2, 2),
+        new Coordinate(0, 2),
+        new Coordinate(0, 0)
+    };
+    districtZone.setBoundary(gf.createPolygon(districtCoords));
 
     return districtZone;
   }
@@ -119,6 +145,38 @@ public class GeographicZoneRepositoryIntegrationTest
     // then
     assertEquals(1, zones.size());
     assertEquals(regionZone.getId(), zones.get(0).getId());
+  }
+  
+  @Test
+  public void shouldFindByLocation() {
+    // given
+    generateInstance();
+
+    GeographicZone district2Zone = new GeographicZone();
+    district2Zone.setCode("D" + this.getNextInstanceNumber());
+    district2Zone.setLevel(districtLevel);
+    district2Zone.setParent(regionZone);
+    Coordinate[] district2Coords  = new Coordinate[] {
+        new Coordinate(2, 0),
+        new Coordinate(4, 0),
+        new Coordinate(4, 2),
+        new Coordinate(2, 2),
+        new Coordinate(2, 0)
+    };
+    district2Zone.setBoundary(gf.createPolygon(district2Coords));
+    repository.save(district2Zone);
+    
+    // Location is in district2Zone, regionZone, countryZone, but not districtZone
+    Point location = gf.createPoint(new Coordinate(3, 1));
+    
+    // when
+    List<GeographicZone> zones = repository.findByLocation(location);
+
+    // then
+    assertEquals(3, zones.size());
+    assertThat(zones, hasItem(district2Zone));
+    assertThat(zones, hasItem(regionZone));
+    assertThat(zones, hasItem(countryZone));
   }
 
   @Override
