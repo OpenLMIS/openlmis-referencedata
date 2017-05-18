@@ -41,7 +41,7 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
   private String code;
   private String name;
   private String description;
-  private GeographicZoneDto geographicZone;
+  private GeographicZoneSimpleDto geographicZone;
   private FacilityTypeDto type;
   private FacilityOperatorDto operator;
   private Boolean active;
@@ -62,7 +62,7 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
 
   @Override
   public void setGeographicZone(GeographicZone geographicZone) {
-    this.geographicZone = new GeographicZoneDto();
+    this.geographicZone = new GeographicZoneSimpleDto();
     geographicZone.export(this.geographicZone);
   }
 
