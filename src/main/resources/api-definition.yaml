@@ -71,6 +71,8 @@ schemas:
           "type": "array",
           "items": { "type": "object", "$ref":"schemas/facility.json" }
       }
+  
+  - facilityPage: !include schemas/facilityPage.json
 
   - facilityQueryDto: !include schemas/facilityQueryDto.json
 
@@ -1563,6 +1565,26 @@ resourceTypes:
                         schema: localizedErrorResponse
                 404:
 
+      /byBoundary:
+          post:
+              is: [ secured, paginated ]
+              description: Returns a paginated list of facilities given a polygon in the GeoJSON format.
+              body:
+                application/json:
+              responses:
+                200:
+                    body:
+                      application/json:
+                          schema: facilityPage
+                400:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
+                403:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
+
   /facilityTypes:
       displayName: Facility Type
       get:
@@ -2027,6 +2049,25 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
+      /byLocation:
+          post:
+              is: [ secured, paginated ]
+              description: Returns a list of geographic zones given a point in the GeoJSON format.
+              body:
+                application/json:
+              responses:
+                200:
+                    body:
+                      application/json:
+                          schema: geographicZoneArray
+                400:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
+                403:
+                    body:
+                      application/json:
+                        schema: localizedErrorResponse
 
   /geographicLevels:
       displayName: Geographic Level
