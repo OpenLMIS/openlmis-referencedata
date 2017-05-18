@@ -30,7 +30,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,20 +76,6 @@ import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -86,6 +86,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String SEARCH_FACILITIES = RESOURCE_URL + "/search";
+  private static final String BYBOUNDARY_URL = RESOURCE_URL + "/byBoundary";
+  private static final String NAME_KEY = "name";
 
   @MockBean
   private FacilityRepository facilityRepository;
@@ -110,6 +112,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID supervisoryNodeId;
   private Program program;
   private Facility facility;
+  private GeometryFactory gf = new GeometryFactory();
 
   @Before
   public void setUp() {
@@ -297,7 +300,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     String similarName = "Facility";
     Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("name", similarName);
+    requestBody.put(NAME_KEY, similarName);
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
@@ -316,7 +319,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     Map<String, String> foundFacility = (LinkedHashMap) response.getContent().get(0);
     assertEquals(1, response.getContent().size());
-    assertEquals(facility.getName(), foundFacility.get("name"));
+    assertEquals(facility.getName(), foundFacility.get(NAME_KEY));
   }
 
   @Test
@@ -347,7 +350,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("code", "IncorrectCode");
-    requestBody.put("name", "NotSimilarName");
+    requestBody.put(NAME_KEY, "NotSimilarName");
 
     PageImplRepresentation response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -817,6 +820,53 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200);
 
     verify(facilityRepository).save(facility);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+  
+  @Test
+  public void findByBoundaryShouldFindFacilities() {
+
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    Polygon boundary = gf.createPolygon(new Coordinate[] {});
+    given(facilityRepository.findByBoundary(boundary))
+        .willReturn(Collections.singletonList(facility));
+
+    PageImplRepresentation response = restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(boundary)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(BYBOUNDARY_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    Map<String, String> foundFacility = (Map) response.getContent().get(0);
+    assertEquals(1, response.getContent().size());
+    assertEquals(facility.getName(), foundFacility.get(NAME_KEY));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void findByBoundaryShouldReturnForbiddenForUnauthorizedToken() {
+
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    Polygon boundary = gf.createPolygon(new Coordinate[] {});
+
+    String messageKey = restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(boundary)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(BYBOUNDARY_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
