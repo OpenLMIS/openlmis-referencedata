@@ -47,7 +47,7 @@ services:
     image: openlmis/referencedata
 
   db:
-    image: openlmis/postgres:9.6
+    image: openlmis/postgres:9.6-postgis
     env_file: .env
 
   log:
