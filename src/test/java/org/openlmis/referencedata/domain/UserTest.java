@@ -21,8 +21,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.domain.SupportedProgram.newSupportedProgram;
 
 import com.google.common.collect.Sets;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,9 +32,9 @@ import java.util.Collections;
 import java.util.Set;
 
 public class UserTest {
-  
+
   private static final String RIGHT_NAME = "right1";
-  
+
   private RightQuery rightQuery = new RightQuery(Right.newRight("supervisionRight1",
       RightType.SUPERVISION));
 
@@ -231,11 +233,17 @@ public class UserTest {
   }
 
   private SupervisoryNode getSupervisoryHierarchy() {
-    ProcessingSchedule processingSchedule = new ProcessingSchedule("PS1", "Schedule1");
+    Facility facility = new Facility("F10");
+    facility.setSupportedPrograms(
+        Sets.newHashSet(newSupportedProgram(facility, new Program("P10"), true))
+    );
 
     SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("DN", new Facility("C1"));
     RequisitionGroup districtGroup = new RequisitionGroup("DG", "DGN", districtNode);
     districtGroup.setMemberFacilities(Sets.newHashSet(new Facility("C2")));
+    addSupportedPrograms(districtGroup);
+    districtGroup.getMemberFacilities().add(facility);
+    ProcessingSchedule processingSchedule = new ProcessingSchedule("PS1", "Schedule1");
     RequisitionGroupProgramSchedule districtGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
             districtGroup, program, processingSchedule, false);
@@ -246,6 +254,7 @@ public class UserTest {
     SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("PN", new Facility("C3"));
     RequisitionGroup provinceGroup = new RequisitionGroup("PG", "PGN", provinceNode);
     provinceGroup.setMemberFacilities(Sets.newHashSet(new Facility("C4"), new Facility("C5")));
+    addSupportedPrograms(provinceGroup);
     RequisitionGroupProgramSchedule provinceGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
             provinceGroup, program, processingSchedule, false);
@@ -256,5 +265,12 @@ public class UserTest {
     districtNode.assignParentNode(provinceNode);
 
     return provinceNode;
+  }
+
+  private void addSupportedPrograms(RequisitionGroup group) {
+    group
+        .getMemberFacilities()
+        .forEach(facility -> facility
+            .setSupportedPrograms(Sets.newHashSet(newSupportedProgram(facility, program, true))));
   }
 }

@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -151,7 +152,12 @@ public class SupervisoryNode extends BaseEntity {
     Set<Facility> supervisedFacilities = new HashSet<>();
 
     if (requisitionGroup != null && requisitionGroup.supports(program)) {
-      supervisedFacilities.addAll(requisitionGroup.getMemberFacilities());
+      Set<Facility> facilities = requisitionGroup
+          .getMemberFacilities()
+          .stream()
+          .filter(member -> member.supports(program))
+          .collect(Collectors.toSet());
+      supervisedFacilities.addAll(facilities);
     }
 
     if (childNodes != null) {

@@ -58,6 +58,10 @@ public class SupervisionRoleAssignmentTest {
     supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility("F2"));
     RequisitionGroup requisitionGroup = new RequisitionGroup("RG1", "RGN1", supervisoryNode);
     supervisedFacility = new Facility("F2");
+    SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(
+        supervisedFacility, program, true
+    );
+    supervisedFacility.setSupportedPrograms(Sets.newHashSet(supportedProgram));
     requisitionGroup.setMemberFacilities(Sets.newHashSet(supervisedFacility));
     ProcessingSchedule processingSchedule = new ProcessingSchedule("PS1", "Schedule1");
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =

@@ -234,6 +234,15 @@ public class Facility extends BaseEntity {
     return WAREHOUSE_CODE.equalsIgnoreCase(type.getCode());
   }
 
+  /**
+   * Check to see if this facility supports the specified program.
+   */
+  public boolean supports(Program program) {
+    return supportedPrograms
+        .stream()
+        .anyMatch(supported -> supported.getProgram().equals(program));
+  }
+
   public interface Exporter {
 
     void setId(UUID id);
