@@ -464,11 +464,11 @@ public class UserController extends BaseController {
    *              "size" (page size) query parameters to the request.
    * @return the list of all matching audit logs as string
    */
-  @RequestMapping(value = "/users/{userId}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = "/users/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getUsersAuditLog(
-      @PathVariable("userId") UUID userId,
+      @PathVariable("id") UUID userId,
       @RequestParam(name = "author", required = false, defaultValue = "") String author,
       @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
           String changedPropertyName,

@@ -1324,7 +1324,7 @@ resourceTypes:
                           body:
                             application/json:
                               schema: localizedErrorResponse
-      /{userId}/auditLog:
+      /{id}/auditLog:
           type: instanceAuditLog
 
       /search:
