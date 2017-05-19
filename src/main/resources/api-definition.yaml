@@ -288,7 +288,7 @@ resourceTypes:
           queryParameters:
               author:
                   displayName: author
-                  description: Name of the author of changes which should be returned. By default, all changes are returned regardless of author.
+                  description: UUID of the author of changes which should be returned. By default, all changes are returned regardless of author.
                   type: string
                   required: false
                   repeat: false
