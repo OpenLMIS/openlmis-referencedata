@@ -22,9 +22,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -53,7 +50,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String BYLOCATION_URL = RESOURCE_URL + "/byLocation";
   private static final String PAGE = "page";
   private static final String SIZE = "size";
   private static final Integer PAGE_NUMBER = 0;
@@ -74,8 +70,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   private GeographicZone countryZone;
   private GeographicZone regionZone;
   private GeographicZone districtZone;
-  
-  private GeometryFactory gf;
 
   /**
    * Constructor for tests.
@@ -115,8 +109,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     districtZone.setLongitude(41.76);
     districtZone.setLatitude(68.55);
     districtZone.setParent(regionZone);
-
-    gf = new GeometryFactory();
   }
 
   @Test
@@ -519,59 +511,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .body(countryZone)
         .when()
         .post(RESOURCE_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-  
-  @Test
-  public void findByLocationShouldFindGeographicZones() {
-    // given
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    Point location = gf.createPoint(new Coordinate(3, 1));
-    List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
-    given(geographicZoneRepository.findByLocation(location))
-        .willReturn(geographicZones);
-
-    // when
-    GeographicZone[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .body(location)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .post(BYLOCATION_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(GeographicZone[].class);
-
-    // then
-    List<GeographicZone> result = Arrays.asList(response);
-    assertEquals(geographicZones.size(), result.size());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-  
-  @Test
-  public void findByLocationShouldReturnForbiddenForUnauthorizedToken() {
-
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    Point location = gf.createPoint(new Coordinate(3, 1));
-
-    restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(location)
-        .when()
-        .post(BYLOCATION_URL)
         .then()
         .statusCode(403);
 

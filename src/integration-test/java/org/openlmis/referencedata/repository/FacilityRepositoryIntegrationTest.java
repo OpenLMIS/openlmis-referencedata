@@ -19,12 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -32,6 +27,10 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
@@ -222,36 +221,6 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     assertEquals(2, foundFacilties.size());
     assertEquals(facilityWithCodeAndName.getId(), foundFacilties.get(0).getId());
     assertEquals(facilityWithCode.getId(), foundFacilties.get(1).getId());
-  }
-  
-  @Test
-  public void shouldFindFacilitiesByBoundary() {
-    // given
-    GeometryFactory gf = new GeometryFactory();
-    
-    Facility facilityInsideBoundary = generateInstance();
-    facilityInsideBoundary.setLocation(gf.createPoint(new Coordinate(1, 1)));
-    facilityInsideBoundary = repository.save(facilityInsideBoundary);
-    
-    Facility facilityOutsideBoundary = generateInstance();
-    facilityOutsideBoundary.setLocation(gf.createPoint(new Coordinate(-1, 1)));
-    repository.save(facilityOutsideBoundary);
-
-    Coordinate[] coords  = new Coordinate[] {
-        new Coordinate(0, 0),
-        new Coordinate(2, 0),
-        new Coordinate(2, 2),
-        new Coordinate(0, 2),
-        new Coordinate(0, 0)
-    };
-    Polygon boundary = gf.createPolygon(coords);
-    
-    // when
-    List<Facility> foundFacilities = repository.findByBoundary(boundary);
-
-    // then
-    assertEquals(1, foundFacilities.size());
-    assertEquals(facilityInsideBoundary.getId(), foundFacilities.get(0).getId());
   }
 
   @Test

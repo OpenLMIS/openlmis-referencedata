@@ -17,13 +17,20 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.vividsolutions.jts.geom.Point;
+
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -33,11 +40,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.Type;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
 @TypeName("Facility")
@@ -115,11 +117,6 @@ public class Facility extends BaseEntity {
   @Setter
   private Set<SupportedProgram> supportedPrograms = new HashSet<>();
 
-  @Type(type = "jts_geometry")
-  @DiffIgnore
-  @Getter
-  @Setter
-  private Point location;
 
   @Column(name = "extradata", columnDefinition = "jsonb")
   @Convert(converter = ExtraDataConverter.class)
@@ -188,8 +185,6 @@ public class Facility extends BaseEntity {
     facility.setComment(importer.getComment());
     facility.setEnabled(importer.getEnabled());
     facility.setOpenLmisAccessible(importer.getOpenLmisAccessible());
-    
-    facility.setLocation(importer.getLocation());
 
     return facility;
   }
@@ -231,8 +226,6 @@ public class Facility extends BaseEntity {
     if (null != supportedPrograms) {
       exporter.setSupportedPrograms(supportedPrograms);
     }
-    
-    exporter.setLocation(location);
 
     exporter.setExtraData(extraData);
   }
@@ -270,8 +263,6 @@ public class Facility extends BaseEntity {
     void setOpenLmisAccessible(Boolean openLmisAccessible);
 
     void setSupportedPrograms(Set<SupportedProgram> supportedPrograms);
-    
-    void setLocation(Point location);
 
     void setExtraData(Map<String, String> extraData);
   }
@@ -303,9 +294,7 @@ public class Facility extends BaseEntity {
     Boolean getEnabled();
 
     Boolean getOpenLmisAccessible();
-    
-    Point getLocation();
-    
+
     Map<String, String> getExtraData();
   }
 }

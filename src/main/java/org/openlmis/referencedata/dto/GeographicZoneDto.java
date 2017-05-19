@@ -15,18 +15,16 @@
 
 package org.openlmis.referencedata.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.vividsolutions.jts.geom.Polygon;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.domain.GeographicZone;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 public class GeographicZoneDto extends BaseDto implements
@@ -37,8 +35,7 @@ public class GeographicZoneDto extends BaseDto implements
   private Integer catchmentPopulation;
   private Double latitude;
   private Double longitude;
-  private Polygon boundary;
-  private GeographicZoneSimpleDto parent;
+  private GeographicZoneDto parent;
 
   @Override
   public void setLevel(GeographicLevel level) {
@@ -48,7 +45,8 @@ public class GeographicZoneDto extends BaseDto implements
 
   @Override
   public void setParent(GeographicZone parent) {
-    this.parent = new GeographicZoneSimpleDto();
+    this.parent = new GeographicZoneDto();
     parent.export(this.parent);
   }
+
 }

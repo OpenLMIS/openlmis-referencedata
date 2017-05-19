@@ -18,15 +18,6 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
-import com.vividsolutions.jts.geom.Polygon;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -66,6 +57,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 @Controller
@@ -240,25 +240,6 @@ public class FacilityController extends BaseController {
         .searchProducts(facilityId, programId, fullSupply);
 
     return toDto(products);
-  }
-
-  /**
-   * Retrieves all facilities within a boundary.
-   *
-   * @param boundary GeoJSON polygon specifying a boundary
-   * @param pageable object used to encapsulate the pagination related values: page and size.
-   * @return List of wanted facilities within the boundary.
-   */
-  @RequestMapping(value = "/facilities/byBoundary", method = RequestMethod.POST)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Page<FacilityDto> findFacilitiesByBoundary(@RequestBody Polygon boundary, 
-      Pageable pageable) {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    List<Facility> foundFacilities = facilityRepository.findByBoundary(boundary);
-    List<FacilityDto> facilityDtos = toDto(foundFacilities);
-    return Pagination.getPage(facilityDtos, pageable);
   }
 
   /**

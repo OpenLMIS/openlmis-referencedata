@@ -19,7 +19,6 @@
     "operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
     "active": "true",
     "enabled": "true",
-    "location": "POINT(34.922379 -15.054833)",
     "openLmisAccessible": "true"
   },
   {
@@ -31,7 +30,6 @@
     "operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
     "active": "true",
     "enabled": "true",
-    "location": "POINT(35.225225 -14.851849)",
     "openLmisAccessible": "true"
   },
   {
@@ -43,7 +41,6 @@
     "operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
     "active": "true",
     "enabled": "true",
-    "location": "POINT(35.170829 -14.842910)",
     "openLmisAccessible": "true"
   },
   {
@@ -55,7 +52,6 @@
     "operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
     "active": "true",
     "enabled": "true",
-    "location": "POINT(34.949166 -14.984722)",
     "openLmisAccessible": "true"
   },
   {
@@ -67,7 +63,6 @@
     "operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
     "active": "true",
     "enabled": "true",
-    "location": "POINT(34.638646 -14.817427)",
     "openLmisAccessible": "true"
   },
   {
@@ -79,7 +74,6 @@
     "operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
     "active": "true",
     "enabled": "true",
-    "location": "POINT(34.961348 -14.985039)",
     "openLmisAccessible": "true"
   }
 ]

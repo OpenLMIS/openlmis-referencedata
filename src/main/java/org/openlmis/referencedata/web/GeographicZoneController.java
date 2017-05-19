@@ -18,15 +18,9 @@ package org.openlmis.referencedata.web;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 
-import com.vividsolutions.jts.geom.Point;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.dto.GeographicZoneDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -49,6 +43,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 @Transactional
@@ -153,22 +150,6 @@ public class GeographicZoneController extends BaseController {
   }
 
   /**
-   * Retrieves all geographic zones to which a location belongs.
-   *
-   * @param location GeoJSON point specifying a location
-   * @return List of wanted geographic zones to which the location belongs.
-   */
-  @RequestMapping(value = "/geographicZones/byLocation", method = RequestMethod.POST)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<GeographicZoneDto> findGeographicZonesByLocation(@RequestBody Point location) {
-    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    List<GeographicZone> foundGeoZones = geographicZoneRepository.findByLocation(location);
-    return toDto(foundGeoZones);
-  }
-
-  /**
    * Retrieves all Geographic Zones matching given parameters.
    *
    * @param parentId ID of parent geographic zone.
@@ -208,19 +189,5 @@ public class GeographicZoneController extends BaseController {
       return geographicZoneRepository.findByParent(parent);
     }
     return geographicZoneRepository.findByParentAndLevel(parent, level);
-  }
-
-  private GeographicZoneDto toDto(GeographicZone geographicZone) {
-    GeographicZoneDto dto = new GeographicZoneDto();
-    geographicZone.export(dto);
-
-    return dto;
-  }
-
-  private List<GeographicZoneDto> toDto(Iterable<GeographicZone> geographicZones) {
-    return StreamSupport
-        .stream(geographicZones.spliterator(), false)
-        .map(this::toDto)
-        .collect(Collectors.toList());
   }
 }
