@@ -43,6 +43,7 @@ import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,6 +70,7 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
@@ -274,8 +276,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     getUser()
-      .then()
-      .statusCode(200);
+        .then()
+        .statusCode(200);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -1245,6 +1247,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);
     supervisionGroup.setMemberFacilities(newHashSet(generateFacility("F2"),
         generateFacility("F3")));
+    addSupportedPrograms(supervisionGroup, program2);
     RequisitionGroupProgramSchedule supervisionGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
             supervisionGroup, program2, new ProcessingSchedule("PS1", "Schedule 1"), false);
@@ -1273,6 +1276,15 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         user, warehouse);
 
     user.assignRoles(roleAssignment1, roleAssignment2, roleAssignment3, roleAssignment4);
+  }
+
+  private void addSupportedPrograms(RequisitionGroup group, Program program) {
+    group
+        .getMemberFacilities()
+        .forEach(facility -> facility
+            .setSupportedPrograms(
+                Sets.newHashSet(SupportedProgram.newSupportedProgram(facility, program, true))
+            ));
   }
 
   private void assertContainsRoleAssignment(List<DetailedRoleAssignmentDto> dtos,
