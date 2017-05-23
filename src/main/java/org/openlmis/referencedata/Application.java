@@ -48,7 +48,7 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import java.util.Locale;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
-@ImportResource("applicationContext.xml")
+@ImportResource("classpath*:/applicationContext.xml")
 @EntityScan(basePackageClasses = BaseEntity.class)
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class Application {
@@ -104,29 +104,29 @@ public class Application {
   public Javers javersProvidor(ConnectionProvider connectionProvider,
                                PlatformTransactionManager transactionManager) {
     JaversSqlRepository sqlRepository = SqlRepositoryBuilder
-            .sqlRepository()
-            .withConnectionProvider(connectionProvider)
-            .withDialect(dialectName)
-            .withSchema(preferredSchema)
-            .build();
+        .sqlRepository()
+        .withConnectionProvider(connectionProvider)
+        .withDialect(dialectName)
+        .withSchema(preferredSchema)
+        .build();
 
     JaVersDateProvider customDateProvider = new JaVersDateProvider();
 
     return TransactionalJaversBuilder
-            .javers()
-            .withTxManager(transactionManager)
-            .registerJaversRepository(sqlRepository)
-            .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
-            .withListCompareAlgorithm(
-                    ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
-            .withMappingStyle(
-                    MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
-            .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
-            .withPrettyPrint(javersProperties.isPrettyPrint())
-            .withTypeSafeValues(javersProperties.isTypeSafeValues())
-            .withPackagesToScan(javersProperties.getPackagesToScan())
-            .withDateTimeProvider(customDateProvider)
-            .build();
+        .javers()
+        .withTxManager(transactionManager)
+        .registerJaversRepository(sqlRepository)
+        .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
+        .withListCompareAlgorithm(
+            ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
+        .withMappingStyle(
+            MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
+        .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
+        .withPrettyPrint(javersProperties.isPrettyPrint())
+        .withTypeSafeValues(javersProperties.isTypeSafeValues())
+        .withPackagesToScan(javersProperties.getPackagesToScan())
+        .withDateTimeProvider(customDateProvider)
+        .build();
   }
 
   /**

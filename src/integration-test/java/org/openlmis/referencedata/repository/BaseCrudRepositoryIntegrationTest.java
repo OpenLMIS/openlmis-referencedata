@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.domain.BaseEntity;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(Application.class)
+@SpringBootTest(classes = Application.class)
 @ActiveProfiles("test")
 @Transactional
 public abstract class BaseCrudRepositoryIntegrationTest<T extends BaseEntity> {
