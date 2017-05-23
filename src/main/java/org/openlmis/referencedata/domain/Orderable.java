@@ -61,6 +61,9 @@ public class Orderable extends BaseEntity {
   @Getter
   private String fullProductName;
 
+  @Getter
+  private String description;
+
   @Getter(AccessLevel.PACKAGE)
   private long netContent;
 
@@ -85,7 +88,7 @@ public class Orderable extends BaseEntity {
   /**
    * Get the association to a {@link Program}.
    * @param program the Program this product is (maybe) in.
-   * @return the asssociation to the given {@link Program}, or null if this product is not in the
+   * @return the association to the given {@link Program}, or null if this product is not in the
    *        given program.
    */
   public ProgramOrderable getProgramOrderable(Program program) {
@@ -164,6 +167,7 @@ public class Orderable extends BaseEntity {
     orderable.productCode = Code.code(importer.getProductCode());
     orderable.dispensable = Dispensable.newInstance(importer.getDispensable());
     orderable.fullProductName = importer.getFullProductName();
+    orderable.description = importer.getDescription();
     orderable.netContent = importer.getNetContent();
     orderable.packRoundingThreshold = importer.getPackRoundingThreshold();
     orderable.roundToZero = importer.getRoundToZero();
@@ -189,6 +193,7 @@ public class Orderable extends BaseEntity {
     exporter.setProductCode(productCode.toString());
     exporter.setDispensable(DispensableDto.newInstance(dispensable));
     exporter.setFullProductName(fullProductName);
+    exporter.setDescription(description);
     exporter.setNetContent(netContent);
     exporter.setPackRoundingThreshold(packRoundingThreshold);
     exporter.setRoundToZero(roundToZero);
@@ -204,6 +209,8 @@ public class Orderable extends BaseEntity {
     void setDispensable(DispensableDto dispensable);
 
     void setFullProductName(String fullProductName);
+
+    void setDescription(String description);
 
     void setNetContent(Long netContent);
 
@@ -224,6 +231,8 @@ public class Orderable extends BaseEntity {
     DispensableDto getDispensable();
 
     String getFullProductName();
+
+    String getDescription();
 
     Long getNetContent();
 

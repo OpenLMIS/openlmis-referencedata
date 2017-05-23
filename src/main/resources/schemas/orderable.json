@@ -16,6 +16,10 @@
       "type": "string",
       "title": "fullProductName"
     },
+    "description": {
+      "type": "string",
+      "title": "description"
+    },
     "netContent": {
       "type": "number",
       "title": "netContent"

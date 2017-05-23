@@ -21,6 +21,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.service.OrderableService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.validate.OrderableValidator;
@@ -31,11 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -43,6 +47,9 @@ public class OrderableController extends BaseController {
 
   @Autowired
   private OrderableRepository repository;
+
+  @Autowired
+  private OrderableService orderableService;
 
   @Autowired
   private OrderableValidator validator;
@@ -102,4 +109,20 @@ public class OrderableController extends BaseController {
     }
   }
 
+  /**
+   * Finds orderables matching all of the provided parameters.
+   *
+   * @param queryParams request parameters (code, name, program).
+   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @return a page of orderables
+   */
+  @PostMapping("/orderables/search")
+  public Page<OrderableDto> search(@RequestBody Map<String, Object> queryParams,
+                                   Pageable pageable) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    List<Orderable> orderables = orderableService.searchOrderables(queryParams);
+
+    return Pagination.getPage(OrderableDto.newInstance(orderables), pageable);
+  }
 }

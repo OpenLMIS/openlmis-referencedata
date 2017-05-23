@@ -32,15 +32,19 @@ import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.service.OrderableService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +54,29 @@ import java.util.UUID;
 public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/orderables";
+  private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String UNIT = "unit";
   private static final String NAME = "name";
+  private static final String CODE = "code";
+  private static final String PROGRAM_CODE = "program";
 
   @MockBean
   private OrderableRepository repository;
 
-  private OrderableDto orderable;
+  @MockBean
+  private OrderableService service;
+
+  private OrderableDto orderableDto;
+
+  private Orderable orderable;
 
   @Before
   public void setUp() {
-    orderable = new OrderableDto("code", new DispensableDto(UNIT), NAME, 0L, 0L, false,
-        Collections.emptySet(), null);
+    orderableDto = new OrderableDto("code", new DispensableDto(UNIT), NAME, "description", 0L, 0L,
+        false, Collections.emptySet(), null);
+
+    orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
+        "Abcd", "description", 10, 5, false, Collections.emptySet(), null);
 
     when(repository.save(any(Orderable.class)))
         .thenAnswer(new SaveAnswer<CommodityType>());
@@ -75,14 +90,14 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(orderable)
+        .body(orderableDto)
         .when()
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(OrderableDto.class);
 
-    assertEquals(orderable, response);
+    assertEquals(orderableDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -90,27 +105,27 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewOrderableWithProgramOrderable() {
     mockUserHasRight(ORDERABLES_MANAGE);
     ProgramOrderableDto programOrderable = generateProgramOrderable();
-    orderable.setPrograms(Collections.singleton(programOrderable));
+    orderableDto.setPrograms(Collections.singleton(programOrderable));
 
     OrderableDto response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(orderable)
+        .body(orderableDto)
         .when()
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(OrderableDto.class);
 
-    assertEquals(orderable, response);
+    assertEquals(orderableDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldCreateNewOrderableWithIdentifiers() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    orderable.setIdentifiers(
+    orderableDto.setIdentifiers(
         ImmutableMap.of(
             "CommodityType", UUID.randomUUID().toString(),
             "TradeItem", UUID.randomUUID().toString()));
@@ -119,14 +134,14 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(orderable)
+        .body(orderableDto)
         .when()
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(OrderableDto.class);
 
-    assertEquals(orderable, response);
+    assertEquals(orderableDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -138,7 +153,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(orderable)
+        .body(orderableDto)
         .when()
         .put(RESOURCE_URL)
         .then()
@@ -150,16 +165,16 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRejectIfProductCodeIsEmpty() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    orderable.setProductCode("");
+    orderableDto.setProductCode("");
 
-    checkBadRequestBody(orderable, ERROR_PRODUCT_CODE_REQUIRED, RESOURCE_URL);
+    checkBadRequestBody(orderableDto, ERROR_PRODUCT_CODE_REQUIRED, RESOURCE_URL);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldRejectIfPackRoundingThresholdIsNull() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    orderable.setPackRoundingThreshold(null);
+    orderableDto.setPackRoundingThreshold(null);
 
     checkBadRequestBody(orderable, ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED, RESOURCE_URL);
   }
@@ -167,23 +182,23 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRejectIfRoundToZeroIsNull() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    orderable.setRoundToZero(null);
+    orderableDto.setRoundToZero(null);
 
-    checkBadRequestBody(orderable, ERROR_ROUND_TO_ZERO_REQUIRED, RESOURCE_URL);
+    checkBadRequestBody(orderableDto, ERROR_ROUND_TO_ZERO_REQUIRED, RESOURCE_URL);
   }
 
   @Test
   public void shouldRejectIfNetContentIsNull() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    orderable.setNetContent(null);
+    orderableDto.setNetContent(null);
 
-    checkBadRequestBody(orderable, ERROR_NET_CONTENT_REQUIRED, RESOURCE_URL);
+    checkBadRequestBody(orderableDto, ERROR_NET_CONTENT_REQUIRED, RESOURCE_URL);
   }
 
   @Test
   public void shouldRetrieveAllOrderables() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    List<OrderableDto> items = Collections.singletonList(orderable);
+    List<OrderableDto> items = Collections.singletonList(orderableDto);
 
     when(repository.findAll()).thenReturn(Orderable.newInstance(items));
 
@@ -202,6 +217,72 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Test
+  public void shouldSearchOrderables() {
+    final String code = "some-code";
+    final String name = "some-name";
+    final String programCode = "program-code";
+    final List<Orderable> items = Collections.singletonList(orderable);
+
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put(CODE, code);
+    requestBody.put(NAME, name);
+    requestBody.put(PROGRAM_CODE, programCode);
+
+    when(service.searchOrderables(requestBody)).thenReturn(items);
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
+  }
+
+  @Test
+  public void shouldPaginateSearchOrderables() {
+    final String code = "some-code";
+    final String name = "some-name";
+    final String programCode = "program-code";
+    final List<Orderable> items = Collections.singletonList(orderable);
+
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put(CODE, code);
+    requestBody.put(NAME, name);
+    requestBody.put(PROGRAM_CODE, programCode);
+
+    when(service.searchOrderables(requestBody)).thenReturn(items);
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .queryParam("page", 0)
+        .queryParam("size", 1)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(1, response.getTotalElements());
+    assertEquals(1, response.getTotalPages());
+    assertEquals(1, response.getNumberOfElements());
+    assertEquals(1, response.getSize());
+    assertEquals(0, response.getNumber());
+  }
 
   private ProgramOrderableDto generateProgramOrderable() {
     return new ProgramOrderableDto(UUID.randomUUID(), UUID.randomUUID(),

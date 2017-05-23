@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Orderable Query DTO",
+  "description": "A DTO to search for orderables",
+  "properties": {
+    "code": {
+      "type": "string",
+      "title": "code"
+    },
+    "name": {
+      "type": "string",
+      "title": "name"
+    },
+    "program": {
+      "type": "string",
+      "title": "programCode"
+    },
+    "page": {
+      "type": "integer",
+      "title": "page"
+    },
+    "size": {
+      "type": "integer",
+      "title": "size"
+    }
+  }
+}

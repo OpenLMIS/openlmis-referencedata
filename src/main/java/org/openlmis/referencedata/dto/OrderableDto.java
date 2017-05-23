@@ -39,6 +39,8 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
 
   private String fullProductName;
 
+  private String description;
+
   private Long netContent;
 
   private Long packRoundingThreshold;

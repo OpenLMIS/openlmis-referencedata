@@ -90,7 +90,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     HashMap<String, String> identificators = new HashMap<>();
     orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
-            "Abcd", 10, 5, false, Collections.emptySet(), identificators);
+            "Abcd", "description", 10, 5, false, Collections.emptySet(), identificators);
     orderable.setId(UUID.randomUUID());
 
     facilityType1 = new FacilityType("facilityType1");

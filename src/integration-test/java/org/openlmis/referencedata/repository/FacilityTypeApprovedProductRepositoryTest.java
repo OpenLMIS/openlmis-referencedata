@@ -117,7 +117,8 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
             .createNew(program, orderableDisplayCategory, null, currencyUnit);
     orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
-        "Ibuprofen", 10, 5, false, Collections.singleton(programOrderableFullSupply), identifiers);
+        "Ibuprofen", "description", 10, 5, false,
+        Collections.singleton(programOrderableFullSupply), identifiers);
     programOrderableFullSupply.setProduct(orderableFullSupply);
     orderableRepository.save(orderableFullSupply);
 
@@ -125,7 +126,8 @@ public class FacilityTypeApprovedProductRepositoryTest extends
         ProgramOrderable.createNew(program, orderableDisplayCategory, null, 0, true, false, 0,
             Money.of(currencyUnit, 0), currencyUnit);
     orderableNonFullSupply = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
-        "Gloves", 6, 3, false, Collections.singleton(programOrderableNonFullSupply), identifiers);
+        "Gloves", "description", 6, 3, false,
+        Collections.singleton(programOrderableNonFullSupply), identifiers);
     programOrderableNonFullSupply.setProduct(orderableNonFullSupply);
     orderableRepository.save(orderableNonFullSupply);
 

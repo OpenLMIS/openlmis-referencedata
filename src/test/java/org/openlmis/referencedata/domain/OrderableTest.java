@@ -24,6 +24,7 @@ import org.junit.Test;
 public class OrderableTest {
   private static final String IBUPROFEN = "ibuprofen";
   private static final String EACH = "each";
+  private static final String DESCRIPTION = "description";
 
   private static Orderable ibuprofen;
 
@@ -38,7 +39,7 @@ public class OrderableTest {
     ProgramOrderable ibuprofenInFp =
         ProgramOrderable.createNew(fp, testCat, null, CurrencyUnit.USD);
     ibuprofen = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-        10, 5, false, Sets.newHashSet(ibuprofenInEm, ibuprofenInFp), null);
+        "description", 10, 5, false, Sets.newHashSet(ibuprofenInEm, ibuprofenInFp), null);
     ibuprofenInEm.setProduct(ibuprofen);
     ibuprofenInFp.setProduct(ibuprofen);
 
@@ -50,7 +51,7 @@ public class OrderableTest {
   public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsSmallerThanRemainder() {
     Orderable product =
         new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-            10, 4, false, null, null);
+            DESCRIPTION, 10, 4, false, null, null);
 
     long packsToOrder = product.packsToOrder(26);
 
@@ -61,7 +62,7 @@ public class OrderableTest {
   public void shouldCalculatePacksToOrderWhenPackRoundingThresholdIsGreaterThanRemainder() {
     Orderable product =
         new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-            10, 7, false, null, null);
+            DESCRIPTION, 10, 7, false, null, null);
 
     long packsToOrder = product.packsToOrder(26);
 
@@ -71,7 +72,7 @@ public class OrderableTest {
   @Test
   public void shouldCalculatePacksToOrderWhenCanRoundToZero() {
     Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-            10, 7, true, null, null);
+        DESCRIPTION, 10, 7, true, null, null);
 
     long packsToOrder = product.packsToOrder(6);
 
@@ -81,7 +82,7 @@ public class OrderableTest {
   @Test
   public void shouldCalculatePacksToOrderWhenCanNotRoundToZero() {
     Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-            10, 7, false, null, null);
+        DESCRIPTION, 10, 7, false, null, null);
 
     long packsToOrder = product.packsToOrder(6);
 
@@ -91,7 +92,7 @@ public class OrderableTest {
   @Test
   public void shouldReturnZeroPacksToOrderIfNetContentIsZero() {
     Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-            0, 7, false, null, null);
+        DESCRIPTION, 0, 7, false, null, null);
 
     long packsToOrder = product.packsToOrder(6);
 
@@ -101,7 +102,7 @@ public class OrderableTest {
   @Test
   public void shouldReturnZeroPacksToOrderIfOrderQuantityIsZero() {
     Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-            10, 7, false, null, null);
+        DESCRIPTION, 10, 7, false, null, null);
 
     long packsToOrder = product.packsToOrder(0);
 
@@ -111,7 +112,7 @@ public class OrderableTest {
   @Test
   public void shouldReturnZeroPackToOrderIfOrderQuantityIsOneAndRoundToZeroTrueWithNetContentTen() {
     Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-            10, 7, true, null, null);
+        DESCRIPTION, 10, 7, true, null, null);
 
     long packsToOrder = product.packsToOrder(1);
 
@@ -124,7 +125,7 @@ public class OrderableTest {
     final int roundingThreshold = 50;
 
     Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-        netContent, roundingThreshold, false, null, null);
+        DESCRIPTION, netContent, roundingThreshold, false, null, null);
 
     long packsToOrder = product.packsToOrder(250);
     assertEquals(2, packsToOrder);

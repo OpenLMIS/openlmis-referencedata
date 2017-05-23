@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +35,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "program_orderables", schema = "referencedata")
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProgramOrderable extends BaseEntity {
 
   @ManyToOne

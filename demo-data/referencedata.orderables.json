@@ -8,6 +8,7 @@
     "packRoundingThreshold": 8,
     "roundToZero": false,
     "type": "TRADE_ITEM",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "9e25fd93-d8a0-4d1d-8188-55dd3c408d24"
@@ -23,6 +24,7 @@
     "packRoundingThreshold": 20,
     "roundToZero": false,
     "type": "TRADE_ITEM",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "d4e4c6ca-efc9-4ab4-8966-d78ba594ac0c"
@@ -38,6 +40,7 @@
     "packRoundingThreshold": 2,
     "roundToZero": false,
     "type": "TRADE_ITEM",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "267321d1-447c-4fac-9430-907ae38d1854"
@@ -53,6 +56,7 @@
     "packRoundingThreshold": 2,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "1af3b535-fe6a-41ce-b4c6-7d0aa4381cdb"
@@ -68,6 +72,7 @@
     "packRoundingThreshold": 42,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "10d447ea-0a86-4267-8048-0b331d509601"
@@ -83,6 +88,7 @@
     "packRoundingThreshold": 31,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "2e9cf7eb-ae09-431b-a3da-aa51a7f4aca0"
@@ -98,6 +104,7 @@
     "packRoundingThreshold": 2,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "366fdbed-c1ba-4bd0-b387-b1c75df9da48"
@@ -113,6 +120,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "e119197f-2326-47b1-9a7f-00f020d9e2b9"
@@ -128,6 +136,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "ceaa00b6-e2bb-4908-ab82-4e2265c39404"
@@ -143,6 +152,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "79159377-dc1c-4eaa-b4e9-8dad221a1a97"
@@ -158,6 +168,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "d6a1cd34-26d7-4239-ad87-d8e6870e76f5"
@@ -173,6 +184,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "3bbad45f-3faa-4de1-b714-103625edd6bf"
@@ -188,6 +200,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "8b1adea1-9c11-4fff-b21f-e62bfb3c6500"
@@ -203,6 +216,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "fed83adf-5777-4273-a4d7-a7bb79af93c7"
@@ -218,6 +232,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "bdc9eeaa-549f-4899-8b9c-c7fe89c0b0f9"
@@ -233,6 +248,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "568ae7b9-6232-45db-b2b7-c711c60dca7e"
@@ -248,6 +264,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "7cb3ebcb-fcf7-4376-b8b8-48147b421e5d"
@@ -263,6 +280,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "02005e40-24a8-486b-83cb-e865c19dbb89"
@@ -278,6 +296,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "051c3da5-4490-4ff8-b426-bd7c79252685"
@@ -293,6 +312,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "f3e29f41-dd7a-4a4c-9f20-b1c9923bb0be"
@@ -308,6 +328,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "76fc2ccb-8aff-4358-8be7-25e70571f493"
@@ -323,6 +344,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "178c789e-fde2-4c47-a389-fdf449438020"
@@ -338,6 +360,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "0cee0d57-02cb-4ad6-b381-1fea5d17e5d8"
@@ -353,6 +376,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "fbffcdff-10ff-4316-b8fd-f9b29cd3436b"
@@ -368,6 +392,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "e817f021-51f5-4044-b74d-58b4d6d6e547"
@@ -383,6 +408,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "300bdc4e-3ea0-4b3d-96fa-b79faaa14adc"
@@ -398,6 +424,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "174ad3ce-9cff-432f-a902-9b9dcd76b25b"
@@ -413,6 +440,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "ea082992-91d1-42ae-b860-4e16a1192209"
@@ -428,6 +456,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "2a840788-c3d5-400e-8c90-b35b69455089"
@@ -443,6 +472,7 @@
     "packRoundingThreshold": 0,
     "roundToZero": false,
     "type": "COMMODITY_TYPE",
+    "description": "Product description goes here.",
     "programOrderables": [
       {
         "id": "df7214f6-32c5-4e18-8118-3e935b242997"
