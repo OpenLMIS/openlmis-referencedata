@@ -53,7 +53,7 @@ public class OrderablesIntegrationTest {
   @Autowired
   private JdbcTemplate template;
 
-  @FlywayTest(locationsForMigrate = {"/db/migration"})
+  @FlywayTest(locationsForMigrate = {"/db/data"})
   @Test
   public void orderablesShouldMigrate() {
     SqlRowSet sqlRowSet = getSqlRowSet("orderables", ID);
@@ -65,14 +65,14 @@ public class OrderablesIntegrationTest {
     assertFalse(sqlRowSet.getBoolean("roundtozero"));
   }
 
-  @FlywayTest(locationsForMigrate = {"/db/migration"})
+  @FlywayTest(locationsForMigrate = {"/db/data"})
   @Test
   public void tradeItemsShouldMigrate() {
     SqlRowSet sqlRowSet = getSqlRowSet("trade_items", ID);
     assertEquals("manufacturer1", sqlRowSet.getString("manufactureroftradeitem"));
   }
 
-  @FlywayTest(locationsForMigrate = {"/db/migration"})
+  @FlywayTest(locationsForMigrate = {"/db/data"})
   @Test
   public void commodityTypesShouldMigrate() {
     SqlRowSet sqlRowSet = getSqlRowSet("commodity_types", COMMODITY_TYPE_ID);
