@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.flyway;
+package org.openlmis.referencedata.migration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -45,7 +45,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
     DependencyInjectionTestExecutionListener.class, FlywayTestExecutionListener.class
     })
 @FlywayTest
-public class OrderablesIntegrationTest {
+public class OrderablesMigrationIntegrationTest {
 
   private static final String ID = "'4d1115de-0f60-408a-8a1e-44401e20a5b0'";
   private static final String COMMODITY_TYPE_ID = "'4d1115de-0f60-408a-8a1e-44401e20a5b1'";
