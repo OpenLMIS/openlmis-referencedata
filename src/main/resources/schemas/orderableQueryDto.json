@@ -15,14 +15,6 @@
     "program": {
       "type": "string",
       "title": "programCode"
-    },
-    "page": {
-      "type": "integer",
-      "title": "page"
-    },
-    "size": {
-      "type": "integer",
-      "title": "size"
     }
   }
 }

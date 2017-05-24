@@ -67,9 +67,8 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     }
 
     if (program != null) {
-      Join<Orderable, ProgramOrderable> join = root.join(PROGRAMS, JoinType.LEFT);
-      predicate = builder.and(predicate,
-          builder.and(predicate, builder.equal(join.get(PROGRAM), program)));
+      Join<Orderable, ProgramOrderable> orderablePrograms = root.join(PROGRAMS, JoinType.LEFT);
+      predicate = builder.and(predicate, builder.equal(orderablePrograms.get(PROGRAM), program));
     }
 
     query.where(predicate);

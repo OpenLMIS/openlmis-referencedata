@@ -83,7 +83,7 @@ public class OrderableServiceTest {
   }
 
   @Test
-  public void shouldOnlyThrowValidationExceptionIfQueryMapCantBeParsed() {
+  public void shouldNotThrowValidationExceptionIfQueryMapCanBeParsed() {
     when(orderableRepository.findAll()).thenReturn(orderableList);
     when(programRepository.findByCode(Code.code(programCode))).thenReturn(program);
 
@@ -109,7 +109,7 @@ public class OrderableServiceTest {
     final String name = "Orderable";
 
     when(orderableRepository.search(code, name, program))
-            .thenReturn(Lists.newArrayList(orderable1, orderable2));
+        .thenReturn(Lists.newArrayList(orderable1, orderable2));
     when(programRepository.findByCode(Code.code(programCode))).thenReturn(program);
 
     Map<String, Object> params = new HashMap<>();

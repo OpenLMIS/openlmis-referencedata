@@ -39,7 +39,7 @@ public class OrderableTest {
     ProgramOrderable ibuprofenInFp =
         ProgramOrderable.createNew(fp, testCat, null, CurrencyUnit.USD);
     ibuprofen = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-        "description", 10, 5, false, Sets.newHashSet(ibuprofenInEm, ibuprofenInFp), null);
+        DESCRIPTION, 10, 5, false, Sets.newHashSet(ibuprofenInEm, ibuprofenInFp), null);
     ibuprofenInEm.setProduct(ibuprofen);
     ibuprofenInFp.setProduct(ibuprofen);
 
