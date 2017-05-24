@@ -25,7 +25,7 @@ FROM orderables
 WHERE type='TRADE_ITEM' AND
     manufacturerOfTradeItem IS NOT NULL;
 
-CREATE TABLE identifiers (
+CREATE TABLE orderable_identifiers (
     key character varying(255) NOT NULL,
     value character varying(255) NOT NULL,
     orderableId uuid NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE identifiers (
     FOREIGN KEY (orderableId) REFERENCES orderables(id)
 );
 
-INSERT INTO identifiers(key, value, orderableId)
+INSERT INTO orderable_identifiers(key, value, orderableId)
 SELECT 'CommodityType', CAST(id AS varchar(255)), id
 FROM orderables
 WHERE type='COMMODITY_TYPE'
@@ -41,7 +41,7 @@ WHERE type='COMMODITY_TYPE'
     AND classificationsystem IS NOT NULL
     AND classificationid IS NOT NULL;
 
-INSERT INTO identifiers(key, value, orderableId)
+INSERT INTO orderable_identifiers(key, value, orderableId)
 SELECT 'TradeItem', CAST(id AS varchar(255)), id
 FROM orderables
 WHERE type='TRADE_ITEM' AND
