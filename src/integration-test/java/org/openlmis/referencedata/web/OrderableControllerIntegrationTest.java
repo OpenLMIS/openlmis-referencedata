@@ -244,7 +244,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
 
-    assertEquals(1, response.getContent().size());
+    checkIfEquals(response, OrderableDto.newInstance(items));
   }
 
   @Test

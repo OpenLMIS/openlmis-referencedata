@@ -63,7 +63,7 @@ public class OrderableRepositoryIntegrationTest
 
   @Override
   Orderable generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
+    int instanceNumber = getNextInstanceNumber();
     HashMap<String, String> identificators = new HashMap<>();
     identificators.put("cSys", "cSysId");
     return new Orderable(Code.code(CODE + instanceNumber), Dispensable.createNew(EACH),
@@ -114,7 +114,7 @@ public class OrderableRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindOrderablesWithSimilarCodeOrName() {
+  public void shouldFindOrderablesWithSimilarCodeAndName() {
     Orderable orderable = generateInstance();
     repository.save(orderable);
     Orderable orderable2 = generateInstance();
@@ -124,7 +124,7 @@ public class OrderableRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindOrderablesWithSimilarCodeOrNameIgnoringCase() {
+  public void shouldFindOrderablesWithSimilarCodeAndNameIgnoringCase() {
     Orderable orderable = generateInstance();
     repository.save(orderable);
     Orderable orderable2 = generateInstance();
