@@ -29,7 +29,7 @@ import org.openlmis.referencedata.domain.GeographicZone;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
-public class GeographicZoneDto extends BaseDto implements
+public class GeographicZoneSimpleDto extends BaseDto implements
     GeographicZone.Exporter, GeographicZone.Importer {
   private String code;
   private String name;
@@ -37,7 +37,6 @@ public class GeographicZoneDto extends BaseDto implements
   private Integer catchmentPopulation;
   private Double latitude;
   private Double longitude;
-  private Polygon boundary;
   private GeographicZoneSimpleDto parent;
 
   @Override
@@ -50,5 +49,13 @@ public class GeographicZoneDto extends BaseDto implements
   public void setParent(GeographicZone parent) {
     this.parent = new GeographicZoneSimpleDto();
     parent.export(this.parent);
+  }
+  
+  @Override
+  public void setBoundary(Polygon boundary) {}
+  
+  @Override
+  public Polygon getBoundary() {
+    return null;
   }
 }

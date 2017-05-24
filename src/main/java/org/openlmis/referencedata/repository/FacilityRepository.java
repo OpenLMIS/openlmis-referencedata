@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import com.vividsolutions.jts.geom.Polygon;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
@@ -41,6 +42,13 @@ public interface FacilityRepository
       nativeQuery = true
   )
   List<Facility> findByExtraData(@Param("extraData") String extraData);
+
+  @Query(value = "SELECT f.*"
+      + " FROM referencedata.facilities f"
+      + " WHERE ST_Covers(:boundary, f.location)",
+      nativeQuery = true
+  )
+  List<Facility> findByBoundary(@Param("boundary") Polygon boundary);
   
   Facility findFirstByCode(String code);
 }
