@@ -15,12 +15,14 @@
 
 package org.openlmis.referencedata.repository;
 
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.domain.GeographicZone;
-import org.springframework.data.repository.PagingAndSortingRepository;
-
+import com.vividsolutions.jts.geom.Point;
 import java.util.List;
 import java.util.UUID;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface GeographicZoneRepository extends PagingAndSortingRepository<GeographicZone, UUID> {
 
@@ -35,4 +37,11 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
   List<GeographicZone> findByParent(GeographicZone parent);
 
   List<GeographicZone> findByLevel(GeographicLevel level);
+
+  @Query(value = "SELECT gz.*"
+      + " FROM referencedata.geographic_zones gz"
+      + " WHERE ST_Covers(gz.boundary, :location)",
+      nativeQuery = true
+  )
+  List<GeographicZone> findByLocation(@Param("location") Point location);
 }

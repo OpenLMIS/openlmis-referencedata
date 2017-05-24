@@ -16,23 +16,21 @@
 package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityOperator;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.SupportedProgram;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityOperator;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.SupportedProgram;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,7 +41,7 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
   private String code;
   private String name;
   private String description;
-  private GeographicZoneDto geographicZone;
+  private GeographicZoneSimpleDto geographicZone;
   private FacilityTypeDto type;
   private FacilityOperatorDto operator;
   private Boolean active;
@@ -52,6 +50,7 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
   private String comment;
   private Boolean enabled;
   private Boolean openLmisAccessible;
+  private Point location;
   private Map<String, String> extraData;
 
   @Getter
@@ -63,7 +62,7 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
 
   @Override
   public void setGeographicZone(GeographicZone geographicZone) {
-    this.geographicZone = new GeographicZoneDto();
+    this.geographicZone = new GeographicZoneSimpleDto();
     geographicZone.export(this.geographicZone);
   }
 
@@ -79,7 +78,7 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
     this.operator = new FacilityOperatorDto();
     operator.export(this.operator);
   }
-
+  
   @Override
   public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
     if (supportedPrograms == null) {
