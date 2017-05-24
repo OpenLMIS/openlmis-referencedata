@@ -7,7 +7,6 @@
     "netContent": 16,
     "packRoundingThreshold": 8,
     "roundToZero": false,
-    "type": "TRADE_ITEM",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -23,7 +22,6 @@
     "netContent": 40,
     "packRoundingThreshold": 20,
     "roundToZero": false,
-    "type": "TRADE_ITEM",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -39,7 +37,6 @@
     "netContent": 5,
     "packRoundingThreshold": 2,
     "roundToZero": false,
-    "type": "TRADE_ITEM",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -55,7 +52,6 @@
     "netContent": 5,
     "packRoundingThreshold": 2,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -71,7 +67,6 @@
     "netContent": 84,
     "packRoundingThreshold": 42,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -87,7 +82,6 @@
     "netContent": 63,
     "packRoundingThreshold": 31,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -103,7 +97,6 @@
     "netContent": 5,
     "packRoundingThreshold": 2,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -119,7 +112,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -135,7 +127,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -151,7 +142,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -167,7 +157,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -183,7 +172,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -199,7 +187,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -215,7 +202,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -231,7 +217,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -247,7 +232,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -263,7 +247,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -279,7 +262,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -295,7 +277,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -311,7 +292,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -327,7 +307,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -343,7 +322,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -359,7 +337,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -375,7 +352,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -391,7 +367,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -407,7 +382,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -423,7 +397,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -439,7 +412,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -455,7 +427,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
@@ -471,7 +442,6 @@
     "netContent": 1,
     "packRoundingThreshold": 0,
     "roundToZero": false,
-    "type": "COMMODITY_TYPE",
     "description": "Product description goes here.",
     "programOrderables": [
       {
