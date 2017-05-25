@@ -7,6 +7,7 @@ New functionality added in a backwards-compatible manner:
   * Moved warehouse facility type from demo data to initial data.
 * [OLMIS-2370](https://openlmis.atlassian.net/browse/OLMIS-2370): Added paginated search orderables endpoint.
   * Description field was added to Orderable class.
+* [OLMIS-2357](https://openlmis.atlassian.net/browse/OLMIS-2357): Added audit logs for User entity.
 
 Breaking changes:
 
