@@ -27,6 +27,7 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
+import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -65,20 +66,21 @@ public class GeographicZoneController extends BaseController {
   /**
    * Allows creating new geographicZones.
    *
-   * @param geographicZone A geographicZone bound to the request body.
+   * @param geographicZoneDto A geographicZone bound to the request body.
    * @return the created geographicZone.
    */
   @RequestMapping(value = "/geographicZones", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public GeographicZone createGeographicZone(
-      @RequestBody GeographicZone geographicZone) {
+  public GeographicZoneDto createGeographicZone(
+      @RequestBody GeographicZoneDto geographicZoneDto) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
 
     LOGGER.debug("Creating new geographicZone");
+    GeographicZone geographicZone = GeographicZone.newGeographicZone(geographicZoneDto);
     // Ignore provided id
     geographicZone.setId(null);
-    return geographicZoneRepository.save(geographicZone);
+    return toDto(geographicZoneRepository.save(geographicZone));
   }
 
 
@@ -90,27 +92,31 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = "/geographicZones", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<GeographicZone> getAllGeographicZones(Pageable pageable) {
+  public Page<GeographicZoneSimpleDto> getAllGeographicZones(Pageable pageable) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-    return geographicZoneRepository.findAll(pageable);
+    return (geographicZoneRepository.findAll(pageable)).map(this::toSimpleDto);
   }
 
   /**
    * Allows updating geographicZones.
    *
-   * @param geographicZone   A geographicZone bound to the request body.
-   * @param geographicZoneId UUID of geographicZone which we want to update.
+   * @param geographicZoneDto A geographicZone bound to the request body.
+   * @param geographicZoneId  UUID of geographicZone which we want to update.
    * @return the ResponseEntity containing the updated geographicZone.
    */
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public GeographicZone updateGeographicZone(
-      @RequestBody GeographicZone geographicZone, @PathVariable("id") UUID geographicZoneId) {
+  public GeographicZoneDto updateGeographicZone(
+      @RequestBody GeographicZoneDto geographicZoneDto, @PathVariable("id") UUID geographicZoneId) {
+
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
 
+    GeographicZone geoZoneToSave = GeographicZone.newGeographicZone(geographicZoneDto);
+    geoZoneToSave.setId(geographicZoneId);
+
     LOGGER.debug("Updating geographicZone");
-    return geographicZoneRepository.save(geographicZone);
+    return toDto(geographicZoneRepository.save(geoZoneToSave));
   }
 
   /**
@@ -122,7 +128,7 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public GeographicZone getGeographicZone(
+  public GeographicZoneDto getGeographicZone(
       @PathVariable("id") UUID geographicZoneId) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
@@ -130,7 +136,7 @@ public class GeographicZoneController extends BaseController {
     if (geographicZone == null) {
       throw new NotFoundException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return geographicZone;
+      return toDto(geographicZone);
     }
   }
 
@@ -161,24 +167,25 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = "/geographicZones/byLocation", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<GeographicZoneDto> findGeographicZonesByLocation(@RequestBody Point location) {
+  public Iterable<GeographicZoneSimpleDto> findGeographicZonesByLocation(
+      @RequestBody Point location) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     List<GeographicZone> foundGeoZones = geographicZoneRepository.findByLocation(location);
-    return toDto(foundGeoZones);
+    return toSimpleDto(foundGeoZones);
   }
 
   /**
    * Retrieves all Geographic Zones matching given parameters.
    *
-   * @param parentId ID of parent geographic zone.
+   * @param parentId    ID of parent geographic zone.
    * @param levelNumber geographic level number.
    * @return List of matched geographic zones.
    */
   @RequestMapping(value = "/geographicZones/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<GeographicZone> searchGeographicZones(
+  public Iterable<GeographicZoneSimpleDto> searchGeographicZones(
       @RequestParam(value = "parent", required = false) UUID parentId,
       @RequestParam(value = "levelNumber", required = false) Integer levelNumber) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
@@ -202,12 +209,12 @@ public class GeographicZoneController extends BaseController {
     }
 
     if (isNull(parent)) {
-      return geographicZoneRepository.findByLevel(level);
+      return toSimpleDto(geographicZoneRepository.findByLevel(level));
     }
     if (isNull(level)) {
-      return geographicZoneRepository.findByParent(parent);
+      return toSimpleDto(geographicZoneRepository.findByParent(parent));
     }
-    return geographicZoneRepository.findByParentAndLevel(parent, level);
+    return toSimpleDto(geographicZoneRepository.findByParentAndLevel(parent, level));
   }
 
   private GeographicZoneDto toDto(GeographicZone geographicZone) {
@@ -217,10 +224,24 @@ public class GeographicZoneController extends BaseController {
     return dto;
   }
 
-  private List<GeographicZoneDto> toDto(Iterable<GeographicZone> geographicZones) {
+  private Iterable<GeographicZoneDto> toDto(Iterable<GeographicZone> geographicZones) {
     return StreamSupport
         .stream(geographicZones.spliterator(), false)
         .map(this::toDto)
+        .collect(Collectors.toList());
+  }
+
+  private GeographicZoneSimpleDto toSimpleDto(GeographicZone geographicZone) {
+    GeographicZoneSimpleDto dto = new GeographicZoneSimpleDto();
+    geographicZone.export(dto);
+
+    return dto;
+  }
+
+  private Iterable<GeographicZoneSimpleDto> toSimpleDto(Iterable<GeographicZone> geographicZones) {
+    return StreamSupport
+        .stream(geographicZones.spliterator(), false)
+        .map(this::toSimpleDto)
         .collect(Collectors.toList());
   }
 }
