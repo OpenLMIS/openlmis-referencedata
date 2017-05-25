@@ -256,6 +256,10 @@ schemas:
           "type": "array",
           "items": { "type": "object", "$ref": "schemas/lotDto.json" }
       }
+  
+  - geoJsonPoint: !include schemas/geoJsonPoint.json
+  
+  - geoJsonPolygon: !include schemas/geoJsonPolygon.json
 
 traits:
     - secured:
@@ -1593,6 +1597,7 @@ resourceTypes:
               description: Returns a paginated list of facilities given a polygon in the GeoJSON format.
               body:
                 application/json:
+                  schema: geoJsonPolygon
               responses:
                 200:
                     body:
@@ -2077,6 +2082,7 @@ resourceTypes:
               description: Returns a list of geographic zones given a point in the GeoJSON format.
               body:
                 application/json:
+                  schema: geoJsonPoint
               responses:
                 200:
                     body:

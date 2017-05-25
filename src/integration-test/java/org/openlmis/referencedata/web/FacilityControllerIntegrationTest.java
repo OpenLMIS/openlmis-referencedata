@@ -113,6 +113,13 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private Program program;
   private Facility facility;
   private GeometryFactory gf = new GeometryFactory();
+  private Coordinate[] coords = new Coordinate[] {
+      new Coordinate(0, 0),
+      new Coordinate(2, 0),
+      new Coordinate(2, 2),
+      new Coordinate(0, 2),
+      new Coordinate(0, 0)
+  };
 
   @Before
   public void setUp() {
@@ -826,7 +833,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    Polygon boundary = gf.createPolygon(new Coordinate[]{});
+    Polygon boundary = gf.createPolygon(coords);
     given(facilityRepository.findByBoundary(boundary))
         .willReturn(Collections.singletonList(facility));
 
@@ -851,7 +858,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    Polygon boundary = gf.createPolygon(new Coordinate[]{});
+    Polygon boundary = gf.createPolygon(coords);
 
     String messageKey = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
