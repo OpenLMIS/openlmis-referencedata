@@ -1,3 +1,12 @@
+6.0.1 / 2017-06-01
+==================
+
+* [OLMIS-2628](https://openlmis.atlassian.net/browse/OLMIS-2628):
+Fixes 6.0.0 Reference Data migrations with wrong timestamps - this fixes problems with the database
+migration from 5.0.0/5.0.1, by fixing wrong timestamps in migrations. It makes migrating from 6.0.0
+ to 6.0.1 problematic, hence we advise migrating straight to this version.
+
+
 6.0.0 / 2017-05-26
 ==================
 
