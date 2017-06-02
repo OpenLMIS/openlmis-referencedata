@@ -866,13 +866,16 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldCreateUser() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
     User user = generateUser();
+    UserDto userDto = new UserDto();
+    user.export(userDto);
 
     User response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(user)
+        .body(userDto)
         .when()
         .put(RESOURCE_URL)
         .then()

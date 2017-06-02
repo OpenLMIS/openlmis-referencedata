@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vividsolutions.jts.geom.Polygon;
 
 import org.hibernate.annotations.Type;
@@ -36,7 +35,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "geographic_zones", schema = "referencedata")
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GeographicZone extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")

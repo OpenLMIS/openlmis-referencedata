@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vividsolutions.jts.geom.Point;
 
@@ -48,7 +47,6 @@ import javax.persistence.Table;
 @TypeName("Facility")
 @Table(name = "facilities", schema = "referencedata")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Facility extends BaseEntity {
 
   public static final String TEXT = "text";

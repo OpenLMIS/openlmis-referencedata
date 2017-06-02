@@ -1160,7 +1160,7 @@ resourceTypes:
                       schema: localizedErrorResponse
       put:
           is: [ secured ]
-          description: Create a new user or update an exising one. The value of the ID field in the body is used to determine whether this a new or existing user.
+          description: Create a new user or update an exising one. The value of the ID field in the body is used to determine whether this is a new or existing user.
           body:
               application/json:
                 schema: user
