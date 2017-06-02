@@ -26,6 +26,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
+import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -48,6 +50,7 @@ import org.springframework.http.MediaType;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -55,6 +58,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SEARCH = RESOURCE_URL + "/search";
 
   @MockBean
   private FacilityTypeApprovedProductRepository repository;
@@ -350,6 +354,65 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(),
         RamlMatchers.hasNoViolations());
     verify(repository).save(facilityTypeAppProd);
+  }
+
+  @Test
+  public void shouldSearchFtaps() {
+    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+    Map<String, String> inputMap = new HashMap<>();
+    inputMap.put("facilityType", facilityType1.getCode());
+    inputMap.put("program", program.getCode().toString());
+
+    given(repository.searchProducts(facilityType1.getCode(), program.getCode().toString()))
+        .willReturn(Lists.newArrayList(facilityTypeAppProd));
+
+    ApprovedProductDto[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(inputMap)
+        .when()
+        .post(SEARCH)
+        .then()
+        .statusCode(200)
+        .extract().as(ApprovedProductDto[].class);
+
+    assertEquals(1, response.length);
+    assertEquals(ftapDto, response[0]);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturn403WhenUserHasNoRightsToSearchFacilityTypeApprovedProduct() {
+    mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(new HashMap<>())
+        .when()
+        .post(SEARCH)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturn400WhenInvalidSearchParamsAreProvided() {
+    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(new HashMap<>())
+        .when()
+        .post(SEARCH)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   private void ftapEquals(ApprovedProductDto expected, ApprovedProductDto response) {

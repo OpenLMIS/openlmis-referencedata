@@ -22,6 +22,7 @@ import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.service.FacilityTypeApprovedProductService;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -48,6 +53,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
 
   @Autowired
   private FacilityTypeApprovedProductRepository repository;
+
+  @Autowired
+  private FacilityTypeApprovedProductService approvedProductService;
 
   /**
    * Allows creating new facilityTypeApprovedProduct.
@@ -121,6 +129,24 @@ public class FacilityTypeApprovedProductController extends BaseController {
   }
 
   /**
+   * Search approved products by search criteria.
+   *
+   * @param queryParams a map containing search parameters. Supported keys are:
+   *                    * facilityType [required]
+   *                    * program
+   * @return a list of approved products matching the criteria
+   */
+  @RequestMapping(value = "/facilityTypeApprovedProducts/search", method = RequestMethod.POST)
+  @ResponseBody
+  public List<ApprovedProductDto> searchFacilityTypeApprovedProducts(
+        @RequestBody Map<String, String> queryParams) {
+    rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    Collection<FacilityTypeApprovedProduct> ftaps = approvedProductService.search(queryParams);
+    return toDto(ftaps);
+  }
+
+  /**
    * Allows deleting facilityTypeApprovedProduct.
    *
    * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct
@@ -144,6 +170,15 @@ public class FacilityTypeApprovedProductController extends BaseController {
     ApprovedProductDto productDto = new ApprovedProductDto();
     prod.export(productDto);
     return productDto;
+  }
+
+  private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> prods) {
+    List<ApprovedProductDto> dtos = new ArrayList<>();
+    for (FacilityTypeApprovedProduct ftap : prods) {
+      dtos.add(toDto(ftap));
+    }
+
+    return dtos;
   }
 
   private void validateFtapNotDuplicated(ApprovedProductDto approvedProductDto) {

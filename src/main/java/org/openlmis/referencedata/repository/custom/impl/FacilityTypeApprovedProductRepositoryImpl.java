@@ -17,6 +17,8 @@ package org.openlmis.referencedata.repository.custom.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.commons.lang3.StringUtils;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -39,6 +41,12 @@ import javax.persistence.criteria.Root;
 public class FacilityTypeApprovedProductRepositoryImpl
     implements FacilityTypeApprovedProductRepositoryCustom {
 
+  private static final String PROGRAM = "program";
+  private static final String FACILITY_TYPE = "facilityType";
+  private static final String ORDERED_DISPLAY_VALUE = "orderedDisplayValue";
+  private static final String CODE = "code";
+  private static final String ID = "id";
+
   @PersistenceContext
   private EntityManager entityManager;
 
@@ -57,18 +65,18 @@ public class FacilityTypeApprovedProductRepositoryImpl
     Root<Facility> facility = query.from(Facility.class);
 
     Join<Facility, FacilityType> fft = facility.join("type");
-    Join<FacilityTypeApprovedProduct, FacilityType> ft = ftap.join("facilityType");
-    Join<FacilityTypeApprovedProduct, Program> program = ftap.join("program");
+    Join<FacilityTypeApprovedProduct, FacilityType> ft = ftap.join(FACILITY_TYPE);
+    Join<FacilityTypeApprovedProduct, Program> program = ftap.join(PROGRAM);
 
     Predicate conjunctionPredicate = builder.conjunction();
     if (programId != null) {
       conjunctionPredicate = builder.and(conjunctionPredicate,
-          builder.equal(program.get("id"), programId));
+          builder.equal(program.get(ID), programId));
     }
     conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.equal(fft.get("id"), ft.get("id")));
+        builder.equal(fft.get(ID), ft.get(ID)));
     conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.equal(facility.get("id"), facilityId));
+        builder.equal(facility.get(ID), facilityId));
 
     Join<FacilityTypeApprovedProduct, Orderable> orderable = ftap.join("orderable");
     Join<Orderable, Set<ProgramOrderable>> programOrderables =
@@ -79,7 +87,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     conjunctionPredicate = builder.and(conjunctionPredicate,
         builder.isTrue(programOrderables.get("active")));
     conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.equal(programOrderables.get("program"), program));
+        builder.equal(programOrderables.get(PROGRAM), program));
 
     query.select(ftap);
     query.where(conjunctionPredicate);
@@ -88,8 +96,55 @@ public class FacilityTypeApprovedProductRepositoryImpl
         programOrderables.join("orderableDisplayCategory");
 
     query.orderBy(
-        builder.asc(category.get("orderedDisplayValue").get("displayOrder")),
-        builder.asc(category.get("orderedDisplayValue").get("displayName")),
+        builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayOrder")),
+        builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayName")),
+        builder.asc(orderable.get("productCode"))
+    );
+
+    return entityManager.createQuery(query).getResultList();
+  }
+
+  @Override
+  public Collection<FacilityTypeApprovedProduct> searchProducts(String facilityTypeCode,
+                                                                String programCode) {
+    checkNotNull(facilityTypeCode);
+
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<FacilityTypeApprovedProduct> query = builder.createQuery(
+        FacilityTypeApprovedProduct.class
+    );
+
+    Root<FacilityTypeApprovedProduct> ftap = query.from(FacilityTypeApprovedProduct.class);
+
+    Join<FacilityTypeApprovedProduct, FacilityType> ft = ftap.join(FACILITY_TYPE);
+    Join<FacilityTypeApprovedProduct, Program> program = ftap.join(PROGRAM);
+
+    Predicate conjunctionPredicate = builder.conjunction();
+    if (StringUtils.isNotBlank(programCode)) {
+      conjunctionPredicate = builder.and(conjunctionPredicate,
+          builder.equal(program.get(CODE), Code.code(programCode)));
+    }
+    conjunctionPredicate = builder.and(conjunctionPredicate,
+        builder.equal(ft.get(CODE), facilityTypeCode));
+    Join<FacilityTypeApprovedProduct, Orderable> orderable = ftap.join("orderable");
+    Join<Orderable, Set<ProgramOrderable>> programOrderables =
+        orderable.joinSet("programOrderables");
+
+    conjunctionPredicate = builder.and(conjunctionPredicate,
+        builder.isTrue(programOrderables.get("active")));
+    conjunctionPredicate = builder.and(conjunctionPredicate,
+        builder.equal(programOrderables.get(PROGRAM), program));
+
+    query.select(ftap);
+    query.where(conjunctionPredicate);
+
+    Join<ProgramOrderable, OrderableDisplayCategory> category =
+        programOrderables.join("orderableDisplayCategory");
+
+    query.orderBy(
+        builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayOrder")),
+        builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayName")),
         builder.asc(orderable.get("productCode"))
     );
 

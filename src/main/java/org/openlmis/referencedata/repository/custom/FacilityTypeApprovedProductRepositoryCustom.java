@@ -25,4 +25,7 @@ public interface FacilityTypeApprovedProductRepositoryCustom {
   Collection<FacilityTypeApprovedProduct> searchProducts(UUID facility, UUID program,
                                                          boolean fullSupply);
 
+  Collection<FacilityTypeApprovedProduct> searchProducts(String facilityTypeCode,
+                                                         String programCode);
+
 }

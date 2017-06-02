@@ -40,19 +40,26 @@ import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class FacilityTypeApprovedProductRepositoryTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
 
   private static final double MAX_PERIODS_OF_STOCK_DELTA = 1e-15;
   private static final String CLASSIFICATION_SYS = "cSys";
   private static final String CLASSIFICATION_SYS_ID = "cSysId";
+  private static final String FACILITY_TYPE_CODE = "facilityType";
+  private static final String FACILITY_TYPE2_CODE = "facilityType2";
+  private static final String PROGRAM_CODE = "programCode";
+
 
   @Autowired
   private FacilityTypeApprovedProductRepository ftapRepository;
@@ -81,9 +88,9 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   @Autowired
   private EntityManager entityManager;
 
-  private FacilityType facilityType;
-
+  private FacilityType facilityType1;
   private FacilityType facilityType2;
+
   private Program program;
   private Orderable orderableFullSupply;
   private Orderable orderableNonFullSupply;
@@ -96,13 +103,13 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Before
   public void setUp() {
-    facilityType = new FacilityType();
-    facilityType.setCode("facilityType");
-    facilityTypeRepository.save(facilityType);
+    facilityType1 = new FacilityType();
+    facilityType1.setCode(FACILITY_TYPE_CODE);
+    facilityTypeRepository.save(facilityType1);
     facilityType2 = new FacilityType();
-    facilityType2.setCode("newFacilityType");
+    facilityType2.setCode(FACILITY_TYPE2_CODE);
     facilityTypeRepository.save(facilityType2);
-    program = new Program("programCode");
+    program = new Program(PROGRAM_CODE);
     programRepository.save(program);
 
     OrderableDisplayCategory orderableDisplayCategory =
@@ -142,7 +149,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     geographicZoneRepository.save(geographicZone);
 
     facility = new Facility("TF1");
-    facility.setType(facilityType);
+    facility.setType(facilityType1);
     facility.setGeographicZone(geographicZone);
     facility.setName("Facility #1");
     facility.setDescription("Test facility");
@@ -154,7 +161,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Override
   FacilityTypeApprovedProduct generateInstance() {
-    return generateProduct(true);
+    return generateProduct(facilityType1, true);
   }
 
   @Test
@@ -165,7 +172,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ftap.setMaxPeriodsOfStock(10.00);
     ftap.setFacilityType(facilityType2);
     ftapRepository.save(ftap);
-    assertEquals("newFacilityType", ftap.getFacilityType().getCode());
+    assertEquals(FACILITY_TYPE2_CODE, ftap.getFacilityType().getCode());
     assertEquals(10.00, ftap.getMaxPeriodsOfStock(), MAX_PERIODS_OF_STOCK_DELTA);
   }
 
@@ -181,7 +188,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     FacilityTypeApprovedProduct ftap = list.iterator().next();
 
     assertEquals(program, ftap.getProgram());
-    assertEquals(facilityType.getId(), ftap.getFacilityType().getId());
+    assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
     ProgramOrderable programOrderable = ftap.getOrderable().getProgramOrderable(program);
     assertEquals(program.getId(), programOrderable.getProgram().getId());
@@ -201,7 +208,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     assertEquals(0, actual.size());
 
     // Create a non-full supply product
-    ftapRepository.save(generateProduct(false));
+    ftapRepository.save(generateProduct(facilityType1, false));
 
     actual = ftapRepository.searchProducts(facility.getId(), program.getId(), false);
 
@@ -212,7 +219,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     FacilityTypeApprovedProduct ftap = actual.iterator().next();
 
     assertEquals(program, ftap.getProgram());
-    assertEquals(facilityType.getId(), ftap.getFacilityType().getId());
+    assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
     ProgramOrderable programOrderable = ftap.getOrderable().getProgramOrderable(program);
     assertEquals(program.getId(), programOrderable.getProgram().getId());
@@ -222,7 +229,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   @Test
   public void shouldSkipFilteringWhenProgramIsNotProvided() {
-    ftapRepository.save(generateProduct(true));
+    ftapRepository.save(generateProduct(facilityType1, true));
 
     Collection<FacilityTypeApprovedProduct> list = ftapRepository
         .searchProducts(facility.getId(), null, true);
@@ -258,15 +265,48 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     entityManager.flush();
   }
 
+  @Test
+  public void shouldSearchByFacilityType() {
+    ftapRepository.save(generateProduct(facilityType1, true));
+    ftapRepository.save(generateProduct(facilityType2, true));
+    ftapRepository.save(generateProduct(facilityType2, false));
+
+    Collection<FacilityTypeApprovedProduct> result =
+        ftapRepository.searchProducts(FACILITY_TYPE_CODE, null);
+    assertEquals(1, result.size());
+    assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
+
+    result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, null);
+    assertEquals(2, result.size());
+    for (FacilityTypeApprovedProduct ftap :  result) {
+      assertEquals(FACILITY_TYPE2_CODE, ftap.getFacilityType().getCode());
+    }
+  }
+
+  @Test
+  public void shouldSearchByFacilityTypeAndProgram() {
+    ftapRepository.save(generateProduct(facilityType1, true));
+
+    Collection<FacilityTypeApprovedProduct> result =
+        ftapRepository.searchProducts(FACILITY_TYPE_CODE, PROGRAM_CODE);
+    assertEquals(1, result.size());
+    assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
+    assertEquals(PROGRAM_CODE, result.iterator().next().getProgram().getCode().toString());
+
+    result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, "nonExistingCode");
+    assertEquals(0, result.size());
+  }
+
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {
     assertEquals(program, ftap.getProgram());
-    assertEquals(facilityType.getId(), ftap.getFacilityType().getId());
+    assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
     assertTrue(ftap.getOrderable().getProgramOrderable(program).isFullSupply());
     assertTrue(ftap.getOrderable().getProgramOrderable(program).isActive());
   }
 
-  private FacilityTypeApprovedProduct generateProduct(boolean fullSupply) {
+  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+                                                      boolean fullSupply) {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setFacilityType(facilityType);
     ftap.setProgram(program);
