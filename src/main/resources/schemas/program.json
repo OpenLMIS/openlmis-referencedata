@@ -33,5 +33,5 @@
       "title": "showNonFullSupplyTab"
     }
   },
-  "required": ["id", "code", "periodsSkippable"]
+  "required": ["code", "periodsSkippable"]
 }

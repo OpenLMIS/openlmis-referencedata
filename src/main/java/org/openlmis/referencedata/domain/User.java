@@ -15,14 +15,16 @@
 
 package org.openlmis.referencedata.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.util.View;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -47,6 +49,7 @@ import javax.persistence.Transient;
 @TypeName("User")
 @Table(name = "users", schema = "referencedata")
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User extends BaseEntity {
 
   @JsonView(View.BasicInformation.class)

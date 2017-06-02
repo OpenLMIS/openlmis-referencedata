@@ -436,7 +436,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(ERROR_USERNAME_REQUIRED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }
 
   @Test
@@ -478,7 +478,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(ERROR_FIRSTNAME_REQUIRED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }
 
   @Test
@@ -493,7 +493,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(ERROR_LASTNAME_REQUIRED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }
 
   @Test
@@ -1237,8 +1237,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     supervisionRoleId = UUID.randomUUID();
     supervisionRole.setId(supervisionRoleId);
     program1 = new Program(PROGRAM1_CODE);
+    program1.setPeriodsSkippable(false);
     program1Id = UUID.randomUUID();
     program2 = new Program(PROGRAM2_CODE);
+    program2.setPeriodsSkippable(false);
     program2Id = UUID.randomUUID();
     supervisionRightId = UUID.randomUUID();
     supervisionRight.setId(supervisionRightId);

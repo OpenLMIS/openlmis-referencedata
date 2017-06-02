@@ -67,7 +67,6 @@
     "username",
     "firstName",
     "lastName",
-    "email",
     "verified",
     "active",
     "loginRestricted"
