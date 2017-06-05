@@ -45,6 +45,7 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -495,11 +496,11 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
-    Set<Program> homeFacilityPrograms = controller.getUserPrograms(userId, true);
+    Set<ProgramDto> homeFacilityPrograms = controller.getUserPrograms(userId, true);
 
     //then
     assertThat(homeFacilityPrograms.size(), is(1));
-    assertTrue(homeFacilityPrograms.contains(program1));
+    assertTrue(homeFacilityPrograms.contains(ProgramDto.newInstance(program1)));
   }
 
   @Test
@@ -510,11 +511,11 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
-    Set<Program> supervisoryPrograms = controller.getUserPrograms(userId, false);
+    Set<ProgramDto> supervisoryPrograms = controller.getUserPrograms(userId, false);
 
     //then
     assertThat(supervisoryPrograms.size(), is(1));
-    assertTrue(supervisoryPrograms.contains(program1));
+    assertTrue(supervisoryPrograms.contains(ProgramDto.newInstance(program1)));
   }
 
   @Test

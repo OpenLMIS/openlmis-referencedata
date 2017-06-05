@@ -36,6 +36,7 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -362,13 +363,16 @@ public class UserController extends BaseController {
   @RequestMapping(value = "/users/{userId}/programs", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Set<Program> getUserPrograms(@PathVariable(USER_ID) UUID userId,
+  public Set<ProgramDto> getUserPrograms(@PathVariable(USER_ID) UUID userId,
                   @RequestParam(value = "forHomeFacility", required = false, defaultValue = "true")
                     boolean forHomeFacility) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = validateUser(userId);
-    return forHomeFacility ? user.getHomeFacilityPrograms() : user.getSupervisedPrograms();
+    Set<Program> programs = forHomeFacility ? user.getHomeFacilityPrograms() :
+        user.getSupervisedPrograms();
+
+    return programsToDto(programs);
   }
 
   /**
@@ -512,11 +516,6 @@ public class UserController extends BaseController {
     return (null != entity) ? Optional.of(entity) : Optional.empty();
   }
 
-  // helper to construct not found message for entities
-  private Message entityNotFoundMessage(String entityType, UUID id) {
-    return new Message("referenceData.error." + entityType + ".notFound.with.id", id);
-  }
-
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user) {
     LOGGER.debug("Assigning roles to user and saving");
     for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
@@ -595,6 +594,17 @@ public class UserController extends BaseController {
     for (Facility facility : facilities) {
       FacilityDto dto = new FacilityDto();
       facility.export(dto);
+      dtos.add(dto);
+    }
+
+    return dtos;
+  }
+
+  private Set<ProgramDto> programsToDto(Collection<Program> programs) {
+    Set<ProgramDto> dtos = new HashSet<>();
+
+    for (Program program : programs) {
+      ProgramDto dto = ProgramDto.newInstance(program);
       dtos.add(dto);
     }
 

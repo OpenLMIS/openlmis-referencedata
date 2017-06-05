@@ -17,12 +17,12 @@ package org.openlmis.referencedata.domain;
 
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import lombok.Getter;
 import lombok.Setter;
+
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -31,7 +31,6 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "programs", schema = "referencedata")
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Program extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
