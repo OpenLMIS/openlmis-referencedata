@@ -1,3 +1,9 @@
+6.0.2 / WIP
+==================
+
+New functionality added in a backwards-compatible manner:
+* [OLMIS-2611](https://openlmis.atlassian.net/browse/OLMIS-2611): Added using locale from env file.
+
 6.0.1 / 2017-06-01
 ==================
 
