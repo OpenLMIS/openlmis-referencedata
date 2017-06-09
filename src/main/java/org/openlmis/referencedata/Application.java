@@ -58,7 +58,7 @@ public class Application {
 
   private Logger logger = LoggerFactory.getLogger(Application.class);
 
-  @Value("$(defaultLocale)")
+  @Value("${defaultLocale}")
   private Locale defaultLocale;
 
   @Autowired
@@ -86,12 +86,12 @@ public class Application {
 
     String envLocale = System.getenv("LOCALE");
     Locale systemLocale = isBlank(envLocale)
-        ? defaultLocale : toLocale(System.getenv("LOCALE"));
+        ? defaultLocale : toLocale(envLocale);
     lr.setDefaultLocale(systemLocale);
 
     return lr;
   }
-
+/
 
   /**
    * Create and return a UserNameProvider. By default, if we didn't do so, an instance of
