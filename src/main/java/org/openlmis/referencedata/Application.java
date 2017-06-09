@@ -91,7 +91,6 @@ public class Application {
 
     return lr;
   }
-/
 
   /**
    * Create and return a UserNameProvider. By default, if we didn't do so, an instance of
