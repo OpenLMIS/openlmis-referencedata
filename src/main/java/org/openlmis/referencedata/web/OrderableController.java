@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -124,5 +125,21 @@ public class OrderableController extends BaseController {
     List<Orderable> orderables = orderableService.searchOrderables(queryParams);
 
     return Pagination.getPage(OrderableDto.newInstance(orderables), pageable);
+  }
+
+  /**
+   * Finds orderables by their ids.
+   *
+   * @param ids ids to look for.
+   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @return a page of orderables
+   */
+  @PostMapping("/orderables/findByIds")
+  public Page<OrderableDto> findByIds(@RequestBody Set<UUID> ids,
+                                      Pageable pageable) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    return Pagination.getPage(OrderableDto.newInstance(
+            repository.findAll(ids)), pageable);
   }
 }
