@@ -55,7 +55,7 @@ public class Application {
 
   private Logger logger = LoggerFactory.getLogger(Application.class);
 
-  @Value("${locale}")
+  @Value("${defaultLocale}")
   private Locale locale;
 
   @Autowired
