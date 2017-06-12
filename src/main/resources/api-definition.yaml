@@ -769,22 +769,6 @@ resourceTypes:
                     body:
                       application/json:
                         schema: localizedErrorResponse
-      /findByIds:
-          post:
-              is: [ secured, paginated ]
-              description: Find orderables by their ids.
-              body:
-                application/json:
-                  schema: uuidArray
-              responses:
-                  "200":
-                      body:
-                        application/json:
-                          schema: orderablePage
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
 
   /tradeItems:
       displayName: Trade Item

@@ -29,10 +29,15 @@ import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class OrderableService {
@@ -40,6 +45,7 @@ public class OrderableService {
   private static final String CODE = "code";
   private static final String NAME = "name";
   private static final String PROGRAM_CODE = "program";
+  private static final String IDS = "ids";
 
   @Autowired
   private OrderableRepository orderableRepository;
@@ -57,6 +63,13 @@ public class OrderableService {
 
     if (MapUtils.isEmpty(queryMap)) {
       return Lists.newArrayList(orderableRepository.findAll());
+    }
+
+    Set<UUID> ids = getIds(queryMap);
+    if (!ids.isEmpty()) {
+      List<Orderable> orderables = new ArrayList<>();
+      orderableRepository.findAll(ids).forEach(orderables::add);
+      return orderables;
     }
 
     String code = MapUtils.getString(queryMap, CODE, null);
@@ -84,5 +97,15 @@ public class OrderableService {
     List<Orderable> foundOrderables = orderableRepository.search(code, name, program);
 
     return Optional.ofNullable(foundOrderables).orElse(Collections.emptyList());
+  }
+
+  private Set<UUID> getIds(Map<String, Object> queryMap) {
+    Object idsEntry = MapUtils.getObject(queryMap, IDS, Collections.emptySet());
+
+    Set<UUID> ids = new HashSet<>();
+    if (idsEntry instanceof Collection) {
+      ((Collection) idsEntry).forEach(id -> ids.add(UUID.fromString((String) id)));
+    }
+    return ids;
   }
 }

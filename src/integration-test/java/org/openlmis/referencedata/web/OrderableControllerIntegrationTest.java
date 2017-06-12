@@ -45,11 +45,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -57,11 +55,11 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/orderables";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
-  private static final String FIND_BY_IDS_URL = RESOURCE_URL + "/findByIds";
   private static final String UNIT = "unit";
   private static final String NAME = "name";
   private static final String CODE = "code";
   private static final String PROGRAM_CODE = "program";
+  private static final String IDS = "ids";
 
   @MockBean
   private OrderableRepository repository;
@@ -233,6 +231,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(CODE, code);
     requestBody.put(NAME, name);
     requestBody.put(PROGRAM_CODE, programCode);
+    requestBody.put(IDS, orderable.getId());
 
     when(service.searchOrderables(requestBody)).thenReturn(items);
 
@@ -263,6 +262,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(CODE, code);
     requestBody.put(NAME, name);
     requestBody.put(PROGRAM_CODE, programCode);
+    requestBody.put(IDS, orderable.getId());
 
     when(service.searchOrderables(requestBody)).thenReturn(items);
 
@@ -278,61 +278,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
-
-    assertEquals(1, response.getContent().size());
-    assertEquals(1, response.getTotalElements());
-    assertEquals(1, response.getTotalPages());
-    assertEquals(1, response.getNumberOfElements());
-    assertEquals(1, response.getSize());
-    assertEquals(0, response.getNumber());
-  }
-
-  @Test
-  public void shouldFindOrderablesByIds() {
-    final List<Orderable> items = Collections.singletonList(orderable);
-
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    Set<UUID> ids = new HashSet<>();
-    ids.add(orderable.getId());
-    when(repository.findAll(ids)).thenReturn(items);
-
-    PageImplRepresentation response = restAssured
-            .given()
-            .queryParam(ACCESS_TOKEN, getToken())
-            .body(ids)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post(FIND_BY_IDS_URL)
-            .then()
-            .statusCode(200)
-            .extract().as(PageImplRepresentation.class);
-
-    checkIfEquals(response, OrderableDto.newInstance(items));
-  }
-
-  @Test
-  public void shouldPaginateFindOrderablesByIds() {
-    final List<Orderable> items = Collections.singletonList(orderable);
-
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    Set<UUID> ids = new HashSet<>();
-    ids.add(orderable.getId());
-    when(repository.findAll(ids)).thenReturn(items);
-
-    PageImplRepresentation response = restAssured
-            .given()
-            .queryParam("page", 0)
-            .queryParam("size", 1)
-            .queryParam(ACCESS_TOKEN, getToken())
-            .body(ids)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post(FIND_BY_IDS_URL)
-            .then()
-            .statusCode(200)
-            .extract().as(PageImplRepresentation.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(1, response.getTotalElements());

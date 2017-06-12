@@ -15,6 +15,11 @@
     "program": {
       "type": "string",
       "title": "programCode"
+    },
+    "ids": {
+      "type": "array",
+      "items": { "type": "string", "title": "id" },
+      "title": "ids"
     }
   }
 }
