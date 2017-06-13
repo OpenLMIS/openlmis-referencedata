@@ -59,6 +59,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String NAME = "name";
   private static final String CODE = "code";
   private static final String PROGRAM_CODE = "program";
+  private static final String IDS = "ids";
 
   @MockBean
   private OrderableRepository repository;
@@ -230,6 +231,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(CODE, code);
     requestBody.put(NAME, name);
     requestBody.put(PROGRAM_CODE, programCode);
+    requestBody.put(IDS, orderable.getId());
 
     when(service.searchOrderables(requestBody)).thenReturn(items);
 
@@ -260,6 +262,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(CODE, code);
     requestBody.put(NAME, name);
     requestBody.put(PROGRAM_CODE, programCode);
+    requestBody.put(IDS, orderable.getId());
 
     when(service.searchOrderables(requestBody)).thenReturn(items);
 

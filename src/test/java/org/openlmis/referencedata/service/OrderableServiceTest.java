@@ -29,13 +29,16 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,6 +48,7 @@ public class OrderableServiceTest {
   private static final String CODE = "code";
   private static final String NAME = "name";
   private static final String PROGRAM_CODE = "program";
+  private static final String IDS = "ids";
 
   @Mock
   private OrderableRepository orderableRepository;
@@ -123,6 +127,25 @@ public class OrderableServiceTest {
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(orderable1));
+    assertThat(actual, hasItem(orderable2));
+  }
+
+  @Test
+  public void shouldFindOrderablesByIds() {
+    Set<String> ids = new HashSet<>();
+    ids.add(orderableId.toString());
+
+    when(orderableRepository.findAll(anySetOf(UUID.class)))
+            .thenReturn(Lists.newArrayList(orderable2));
+
+    Map<String, Object> params = new HashMap<>();
+    params.put(IDS, ids);
+
+    final List<Orderable> actual = orderableService.searchOrderables(params);
+
+    verify(orderableRepository).findAll(anySetOf(UUID.class));
+
+    assertEquals(1, actual.size());
     assertThat(actual, hasItem(orderable2));
   }
 }

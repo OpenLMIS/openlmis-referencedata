@@ -112,7 +112,7 @@ public class OrderableController extends BaseController {
   /**
    * Finds orderables matching all of the provided parameters.
    *
-   * @param queryParams request parameters (code, name, program).
+   * @param queryParams request parameters (code, name, program, ids).
    * @param pageable object used to encapsulate the pagination related values: page and size.
    * @return a page of orderables
    */
