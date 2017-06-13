@@ -1,0 +1,2 @@
+ALTER TABLE requisition_group_program_schedules DROP CONSTRAINT requisition_group_program_schedule_unique_program_requisitiongr;
+ALTER TABLE requisition_group_program_schedules ADD CONSTRAINT requisition_group_program_schedule_unique_program_requisitiongr UNIQUE (requisitiongroupid, programid) deferrable initially deferred;

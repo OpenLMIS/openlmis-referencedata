@@ -16,10 +16,12 @@
 package org.openlmis.referencedata.validate;
 
 import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
@@ -28,9 +30,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -46,6 +50,7 @@ public class RequisitionGroupValidator implements BaseValidator {
   static final String DESCRIPTION = "description";
   static final String SUPERVISORY_NODE = "supervisoryNode";
   static final String MEMBER_FACILITIES = "memberFacilities";
+  static final String REQUISITION_GROUP_PROGRAM_SCHEDULES = "requisitionGroupProgramSchedules";
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodes;
@@ -55,6 +60,9 @@ public class RequisitionGroupValidator implements BaseValidator {
 
   @Autowired
   private FacilityRepository facilities;
+
+  @Autowired
+  private ProgramRepository programs;
 
   /**
    * Checks if the given class definition is supported.
@@ -99,6 +107,8 @@ public class RequisitionGroupValidator implements BaseValidator {
       verifyFacilities(Optional.ofNullable(group.getMemberFacilities())
           .orElse(Collections.emptySet()).stream().map(facility -> (FacilityDto) facility)
           .collect(Collectors.toList()), errors);
+      verifyProgramSchedules(Optional.ofNullable(group.getRequisitionGroupProgramSchedules())
+          .orElse(Collections.emptyList()), errors);
     }
   }
 
@@ -162,6 +172,38 @@ public class RequisitionGroupValidator implements BaseValidator {
       } else if (null == this.facilities.findOne(facility.getId())) {
         rejectValue(errors, MEMBER_FACILITIES,
             RequisitionGroupMessageKeys.ERROR_FACILITY_NON_EXISTENT);
+      }
+    }
+  }
+
+  private void verifyProgramSchedules(
+      List<RequisitionGroupProgramSchedule.Importer> schedules, Errors errors) {
+    // each program schedule must point to different program
+    for (RequisitionGroupProgramSchedule.Importer schedule : schedules) {
+      if (null == schedule) {
+        rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+            RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_NULL);
+      } else if (null == schedule.getProgram()) {
+        rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+            RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_NULL);
+      } else if (null == schedule.getProgram().getId()) {
+        rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+            RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_ID_REQUIRED);
+      } else if (null == programs.findOne(schedule.getProgram().getId())) {
+        rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+            RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_NON_EXISTENT);
+      }
+    }
+
+    if (!errors.hasErrors()) {
+      Set<UUID> ids = schedules
+          .stream()
+          .map(schedule -> schedule.getProgram().getId())
+          .collect(Collectors.toSet());
+
+      if (ids.size() < schedules.size()) {
+        rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+            RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_DUPLICATED);
       }
     }
   }

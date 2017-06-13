@@ -15,10 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,6 +25,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * RequisitionGroupProgramSchedule represents the schedule to be mapped for a given program and
@@ -117,6 +117,19 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
     }
 
     return newRequisitionGroupProgramSchedule;
+  }
+
+  /**
+   * Copy properties from the given instance.
+   *
+   * @param instance an instance whose properties will be applied to this object
+   */
+  public void updateFrom(RequisitionGroupProgramSchedule instance) {
+    requisitionGroup = instance.getRequisitionGroup();
+    program = instance.getProgram();
+    processingSchedule = instance.getProcessingSchedule();
+    directDelivery = instance.isDirectDelivery();
+    dropOffFacility = instance.getDropOffFacility();
   }
 
   /**

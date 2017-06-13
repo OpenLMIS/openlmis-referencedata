@@ -40,12 +40,12 @@ import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -99,6 +99,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     requisitionGroupProgramSchedule = RequisitionGroupProgramSchedule
         .newRequisitionGroupProgramSchedule(requisitionGroup, program, processingSchedule, true);
+    requisitionGroupProgramSchedule.setId(UUID.randomUUID());
     List<RequisitionGroupProgramSchedule> schedules = new ArrayList<>();
     schedules.add(requisitionGroupProgramSchedule);
 

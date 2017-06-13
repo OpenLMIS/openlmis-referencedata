@@ -16,13 +16,17 @@
 package org.openlmis.referencedata.repository;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -33,6 +37,7 @@ import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -43,14 +48,17 @@ import javax.persistence.PersistenceException;
 public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<RequisitionGroupProgramSchedule> {
 
-  @Autowired
-  RequisitionGroupProgramScheduleRepository repository;
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Autowired
-  ProgramRepository programRepository;
+  private RequisitionGroupProgramScheduleRepository repository;
 
   @Autowired
-  ProcessingScheduleRepository scheduleRepository;
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private ProcessingScheduleRepository scheduleRepository;
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -130,10 +138,14 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     requisitionGroupRepository.save(requisitionGroup);
   }
 
-  @Test(expected = PersistenceException.class)
+  @Test
+  @Rollback(false)
   public void shouldThrowExceptionWhenSavingTheSameRequisitionGroupProgramSchedule() {
+    expectedException.expectCause(isA(PersistenceException.class));
+
     repository.save(generateInstance());
     repository.save(generateInstance());
+
     entityManager.flush();
   }
 

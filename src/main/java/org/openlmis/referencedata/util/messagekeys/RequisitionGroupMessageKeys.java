@@ -20,6 +20,7 @@ public abstract class RequisitionGroupMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, REQUISITION_GROUP);
   private static final String TOO_LONG = "tooLong";
   private static final String DESCRIPTION = "description";
+  private static final String PROGRAM_SCHEDULE = "requisitionGroupProgramSchedule";
 
   public static final String ERROR_NULL = join(ERROR, NULL);
 
@@ -35,8 +36,18 @@ public abstract class RequisitionGroupMessageKeys extends MessageKeys {
   public static final String ERROR_NAME_REQUIRED = join(ERROR, NAME, REQUIRED);
 
   public static final String ERROR_FACILITY_NULL = join(ERROR, FACILITY, NULL);
-  public static final String ERROR_FACILITY_ID_REQUIRED = join(ERROR, FACILITY, REQUIRED);
+  public static final String ERROR_FACILITY_ID_REQUIRED = join(ERROR, FACILITY, ID, REQUIRED);
   public static final String ERROR_FACILITY_NON_EXISTENT = join(ERROR, FACILITY, NON_EXISTENT);
+
+  public static final String ERROR_PROGRAM_SCHEDULE_NULL = join(ERROR, PROGRAM_SCHEDULE, NULL);
+  public static final String ERROR_PROGRAM_SCHEDULE_PROGRAM_NULL =
+      join(ERROR, PROGRAM_SCHEDULE, PROGRAM, NULL);
+  public static final String ERROR_PROGRAM_SCHEDULE_PROGRAM_ID_REQUIRED =
+      join(ERROR, PROGRAM_SCHEDULE, PROGRAM, ID, REQUIRED);
+  public static final String ERROR_PROGRAM_SCHEDULE_PROGRAM_NON_EXISTENT =
+      join(ERROR, FACILITY, NON_EXISTENT);
+  public static final String ERROR_PROGRAM_SCHEDULE_PROGRAM_DUPLICATED =
+      join(ERROR, PROGRAM_SCHEDULE, PROGRAM, DUPLICATED);
 
   public static final String ERROR_SUPERVISORY_NODE_REQUIRED =
       join(ERROR, SUPERVISORY_NODE, REQUIRED);

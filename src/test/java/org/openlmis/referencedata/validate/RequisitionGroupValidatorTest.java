@@ -25,6 +25,7 @@ import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.DESCRIPTION;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.MEMBER_FACILITIES;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.NAME;
+import static org.openlmis.referencedata.validate.RequisitionGroupValidator.REQUISITION_GROUP_PROGRAM_SCHEDULES;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.SUPERVISORY_NODE;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
@@ -41,9 +42,12 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
+import org.openlmis.referencedata.dto.RequisitionGroupProgramScheduleDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
@@ -51,6 +55,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -66,6 +71,9 @@ public class RequisitionGroupValidatorTest {
 
   @Mock
   private FacilityRepository facilities;
+
+  @Mock
+  private ProgramRepository programs;
 
   @InjectMocks
   private Validator validator = new RequisitionGroupValidator();
@@ -191,6 +199,78 @@ public class RequisitionGroupValidatorTest {
 
     validator.validate(requisitionGroupDto, errors);
     assertThat(errors.hasFieldErrors(MEMBER_FACILITIES), is(false));
+  }
+
+  @Test
+  public void shouldRejectIfProgramScheduleIsNull() throws Exception {
+    requisitionGroupDto.setRequisitionGroupProgramScheduleDtos(Collections.singletonList(null));
+
+    validator.validate(requisitionGroupDto, errors);
+
+    assertErrorMessage(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+        RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_NULL);
+  }
+
+  @Test
+  public void shouldRejectIfProgramScheduleProgramIsNull() throws Exception {
+    RequisitionGroupProgramScheduleDto schedule = new RequisitionGroupProgramScheduleDto();
+    schedule.setProgram((ProgramDto)null);
+
+    requisitionGroupDto.setRequisitionGroupProgramScheduleDtos(
+        Collections.singletonList(schedule));
+    validator.validate(requisitionGroupDto, errors);
+
+    assertErrorMessage(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+        RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_NULL);
+  }
+
+  @Test
+  public void shouldRejectIfProgramScheduleProgramHasNoId() throws Exception {
+    RequisitionGroupProgramScheduleDto schedule = new RequisitionGroupProgramScheduleDto();
+    schedule.setProgram(new ProgramDto(null));
+
+    requisitionGroupDto.setRequisitionGroupProgramScheduleDtos(
+        Collections.singletonList(schedule));
+    validator.validate(requisitionGroupDto, errors);
+
+    assertErrorMessage(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+        RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_ID_REQUIRED);
+  }
+
+  @Test
+  public void shouldRejectIfProgramScheduleProgramCanNotBeFound() throws Exception {
+    RequisitionGroupProgramScheduleDto schedule = new RequisitionGroupProgramScheduleDto();
+    schedule.setProgram(new ProgramDto(UUID.randomUUID()));
+
+    requisitionGroupDto.setRequisitionGroupProgramScheduleDtos(
+        Collections.singletonList(schedule));
+    validator.validate(requisitionGroupDto, errors);
+
+    assertErrorMessage(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+        RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_NON_EXISTENT);
+  }
+
+  @Test
+  public void shouldRejectIfProgramSchedulesHaveDuplicatedPrograms() throws Exception {
+    UUID programId = UUID.randomUUID();
+
+    RequisitionGroupProgramScheduleDto schedule1 = new RequisitionGroupProgramScheduleDto();
+    schedule1.setProgram(new ProgramDto(programId));
+
+    RequisitionGroupProgramScheduleDto schedule2 = new RequisitionGroupProgramScheduleDto();
+    schedule2.setProgram(new ProgramDto(programId));
+
+    doReturn(schedule1.getProgram())
+        .when(programs)
+        .findOne(programId);
+
+
+    requisitionGroupDto.setRequisitionGroupProgramScheduleDtos(
+        Arrays.asList(schedule1, schedule2));
+    validator.validate(requisitionGroupDto, errors);
+
+    assertErrorMessage(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+        RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_DUPLICATED);
   }
 
   @Test
