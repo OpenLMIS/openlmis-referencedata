@@ -23,6 +23,7 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +38,9 @@ import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -45,6 +48,7 @@ import javax.persistence.PersistenceException;
 /**
  * Allow testing requisitionGroupProgramScheduleRepository.
  */
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<RequisitionGroupProgramSchedule> {
 
@@ -138,14 +142,18 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     requisitionGroupRepository.save(requisitionGroup);
   }
 
+  @After
+  public void tearDown() {
+    repository.deleteAll();
+  }
+
   @Test
-  @Rollback(false)
+  @Transactional(propagation = Propagation.NEVER)
   public void shouldThrowExceptionWhenSavingTheSameRequisitionGroupProgramSchedule() {
     expectedException.expectCause(isA(PersistenceException.class));
 
     repository.save(generateInstance());
     repository.save(generateInstance());
-
     entityManager.flush();
   }
 

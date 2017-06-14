@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,10 +38,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * RequisitionGroup represents a group of facilities which follow a particular schedule for a
@@ -165,7 +165,7 @@ public class RequisitionGroup extends BaseEntity {
     updateProgramSchedulesListFrom(requisitionGroup.getRequisitionGroupProgramSchedules());
   }
 
-  private void updateProgramSchedulesListFrom(List<RequisitionGroupProgramSchedule> instance) {
+  private void updateProgramSchedulesListFrom(List<RequisitionGroupProgramSchedule> schedules) {
     if (requisitionGroupProgramSchedules == null) {
       requisitionGroupProgramSchedules = new ArrayList<>();
     }
@@ -173,10 +173,10 @@ public class RequisitionGroup extends BaseEntity {
     List<UUID> existentIds = requisitionGroupProgramSchedules
         .stream().map(BaseEntity::getId).collect(Collectors.toList());
 
-    List<UUID> replacementIds = instance
+    List<UUID> replacementIds = schedules
         .stream().map(BaseEntity::getId).collect(Collectors.toList());
 
-    List<RequisitionGroupProgramSchedule> added = instance
+    List<RequisitionGroupProgramSchedule> added = schedules
         .stream()
         .filter(schedule -> !existentIds.contains(schedule.getId()))
         .collect(Collectors.toList());
@@ -189,7 +189,7 @@ public class RequisitionGroup extends BaseEntity {
     requisitionGroupProgramSchedules.removeAll(removed);
 
     for (RequisitionGroupProgramSchedule schedule : requisitionGroupProgramSchedules) {
-      Optional<RequisitionGroupProgramSchedule> replacement = instance
+      Optional<RequisitionGroupProgramSchedule> replacement = schedules
           .stream()
           .filter(obj -> obj.getId().equals(schedule.getId()))
           .findFirst();

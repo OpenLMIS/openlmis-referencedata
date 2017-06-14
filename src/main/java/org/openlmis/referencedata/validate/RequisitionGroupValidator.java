@@ -178,7 +178,7 @@ public class RequisitionGroupValidator implements BaseValidator {
 
   private void verifyProgramSchedules(
       List<RequisitionGroupProgramSchedule.Importer> schedules, Errors errors) {
-    // each program schedule must point to different program
+    // each program schedule must point to different existent program
     for (RequisitionGroupProgramSchedule.Importer schedule : schedules) {
       if (null == schedule) {
         rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
@@ -195,16 +195,22 @@ public class RequisitionGroupValidator implements BaseValidator {
       }
     }
 
-    if (!errors.hasErrors()) {
-      Set<UUID> ids = schedules
-          .stream()
-          .map(schedule -> schedule.getProgram().getId())
-          .collect(Collectors.toSet());
+    if (!errors.hasFieldErrors(REQUISITION_GROUP_PROGRAM_SCHEDULES)) {
+      verifyProgramSchedulesProgramUniqueness(schedules, errors);
+    }
+  }
 
-      if (ids.size() < schedules.size()) {
-        rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
-            RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_DUPLICATED);
-      }
+  private void verifyProgramSchedulesProgramUniqueness(
+      List<RequisitionGroupProgramSchedule.Importer> schedules, Errors errors) {
+    // programs must be unique for program schedules within requisition group
+    Set<UUID> ids = schedules
+        .stream()
+        .map(schedule -> schedule.getProgram().getId())
+        .collect(Collectors.toSet());
+
+    if (ids.size() < schedules.size()) {
+      rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
+          RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_DUPLICATED);
     }
   }
 }
