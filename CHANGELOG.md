@@ -2,7 +2,7 @@
 ==================
 
 Breaking changes:
-* [OLMIS-2280](https://openlmis.atlassian.net/browse/OLMIS-2280): Added pagination, new parameters(zoneId, name, code) to supervisory node search endpoint
+* [OLMIS-2280](https://openlmis.atlassian.net/browse/OLMIS-2280): Added pagination, new parameters (zoneId, name, code) to supervisory node search endpoint
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-2611](https://openlmis.atlassian.net/browse/OLMIS-2611): Added using locale from env file.

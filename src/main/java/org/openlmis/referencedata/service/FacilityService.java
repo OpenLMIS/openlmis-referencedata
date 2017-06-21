@@ -128,7 +128,7 @@ public class FacilityService {
   }
 
   /**
-   * Method returns all facilities within geographic zone.
+   * Method returns all facilities within the geographic zone (non-recursive).
    *
    * @param zone requested geographic zone.
    * @return List of facilities

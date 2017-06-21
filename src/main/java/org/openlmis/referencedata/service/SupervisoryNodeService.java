@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,7 @@ public class SupervisoryNodeService {
 
   private static final String FACILITY_ID = "facilityId";
   private static final String PROGRAM_ID = "programId";
-  private static final String ZONE_ID = "zoneId ";
+  private static final String ZONE_ID = "zoneId";
   private static final String NAME = "name";
   private static final String CODE = "code";
 
@@ -74,7 +73,7 @@ public class SupervisoryNodeService {
   private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
 
   /**
-   * Method returns all supervisory nodes with matched parameters. If there si a facilityId
+   * Method returns all supervisory nodes with matched parameters. If there is a facilityId
    * parameter, zoneId is ignored.
    *
    * @param queryMap request parameters (code, name, zoneId, facilityId, programId).
@@ -88,20 +87,19 @@ public class SupervisoryNodeService {
 
     String name = MapUtils.getString(queryMap, NAME, null);
     String code = MapUtils.getString(queryMap, CODE, null);
-    Optional<UUID> facilityId = UuidUtil.fromString(MapUtils.getObject(queryMap,
-        FACILITY_ID, "").toString());
-    Optional<UUID> zoneId = UuidUtil.fromString(MapUtils.getObject(queryMap,
-        ZONE_ID, "").toString());
-    Optional<UUID> programId = UuidUtil.fromString(MapUtils.getObject(queryMap,
-        PROGRAM_ID, "").toString());
+    Optional<UUID> facilityId = UuidUtil.fromString(MapUtils.getString(queryMap,
+        FACILITY_ID, ""));
+    Optional<UUID> zoneId = UuidUtil.fromString(MapUtils.getString(queryMap,
+        ZONE_ID, ""));
+    Optional<UUID> programId = UuidUtil.fromString(MapUtils.getString(queryMap,
+        PROGRAM_ID, ""));
 
     validateQueryParameters(name, code, facilityId, zoneId, programId);
 
     Facility facility = findFacility(facilityId);
     List<Facility> foundFacilities = new ArrayList<>();
-    GeographicZone zone;
     if (facility == null && zoneId.isPresent()) {
-      zone = findGeographicZone(zoneId);
+      GeographicZone zone = findGeographicZone(zoneId);
       if (zone != null) {
         foundFacilities = facilityService.findFacilitiesBasedOnlyOnZone(zone);
       }
@@ -124,7 +122,7 @@ public class SupervisoryNodeService {
   private Set<SupervisoryNode> findSupervisoryNodeBasedOnSchedule(Facility facility,
                                                                   Program program) {
     return requisitionGroupProgramScheduleService
-        .searchRequisitionGroupProgramSchedule(program, facility)
+        .searchRequisitionGroupProgramSchedules(program, facility)
         .stream()
         .map(a -> a.getRequisitionGroup().getSupervisoryNode())
         .collect(Collectors.toSet());
@@ -153,12 +151,9 @@ public class SupervisoryNodeService {
   }
 
   private GeographicZone findGeographicZone(Optional<UUID> zoneId) {
-    GeographicZone zone = null;
-    if (zoneId.isPresent()) {
-      zone = geographicZoneRepository.findOne(zoneId.get());
-      if (zone == null) {
-        throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
-      }
+    GeographicZone zone = geographicZoneRepository.findOne(zoneId.get());
+    if (zone == null) {
+      throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     }
     return zone;
   }
@@ -190,6 +185,6 @@ public class SupervisoryNodeService {
       supervisoryNodes.addAll(supervisoryNodeRepository.search(code, name));
     }
 
-    return Optional.ofNullable(supervisoryNodes).orElse(Collections.emptySet());
+    return supervisoryNodes;
   }
 }

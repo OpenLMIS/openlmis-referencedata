@@ -22,7 +22,6 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.repository.custom.RequisitionGroupProgramScheduleRepositoryCustom;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -39,14 +38,14 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
   private EntityManager entityManager;
 
   /**
-   * Retrieves requisition group program schedule from reference data service
-   * by program and facility.
+   * Retrieves requisition group program schedule list from reference data service
+   * by program and facility. Both parameters are optional.
    *
    * @param program  Program of searched RequisitionGroupProgramSchedule
    * @param facility Facility of searched RequisitionGroupProgramSchedule
-   * @return Requisition Group Program Schedule matching search criteria
+   * @return Requisition Group Program Schedule list matching search criteria
    */
-  public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedule(
+  public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedules(
       Program program, Facility facility) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
@@ -70,10 +69,6 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
     query.select(rgps);
     query.where(conjunction);
 
-    try {
-      return entityManager.createQuery(query).getResultList();
-    } catch (NoResultException exp) {
-      return null;
-    }
+    return entityManager.createQuery(query).getResultList();
   }
 }

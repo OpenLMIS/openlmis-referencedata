@@ -152,7 +152,7 @@ public class ProcessingScheduleController extends BaseController {
     }
 
     List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules =
-        requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+        requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
             program, facility);
 
     List<ProcessingScheduleDto> schedules = new ArrayList<>();

@@ -546,7 +546,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
-    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
         program, facility)).willReturn(null);
 
     searchForSupervisoryNode(queryParams, 200);

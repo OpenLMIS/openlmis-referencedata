@@ -186,7 +186,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
-    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
         program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
 
     ProcessingSchedule[] response = restAssured
@@ -210,7 +210,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(null);
-    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
         program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
 
     restAssured
@@ -232,7 +232,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     given(facilityRepository.findOne(facilityId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
-    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
+    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
         program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
 
     restAssured

@@ -81,12 +81,12 @@ public class ProcessingPeriodServiceTest {
   @Test
   public void shouldFindPeriodsByProgramAndFacility() {
     doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
-          .searchRequisitionGroupProgramSchedule(program, facility);
+          .searchRequisitionGroupProgramSchedules(program, facility);
     doReturn(Arrays.asList(period)).when(periodRepository).searchPeriods(schedule, null);
 
     periodService.filterPeriods(program, facility);
 
-    verify(repository).searchRequisitionGroupProgramSchedule(program, facility);
+    verify(repository).searchRequisitionGroupProgramSchedules(program, facility);
     verify(periodRepository).searchPeriods(schedule, null);
   }
 

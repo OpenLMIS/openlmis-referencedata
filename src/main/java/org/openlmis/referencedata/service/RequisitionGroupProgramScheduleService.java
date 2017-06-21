@@ -30,8 +30,8 @@ public class RequisitionGroupProgramScheduleService {
   @Autowired
   private RequisitionGroupProgramScheduleRepository repository;
 
-  public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedule(
+  public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedules(
         Program program, Facility facility) {
-    return repository.searchRequisitionGroupProgramSchedule(program, facility);
+    return repository.searchRequisitionGroupProgramSchedules(program, facility);
   }
 }

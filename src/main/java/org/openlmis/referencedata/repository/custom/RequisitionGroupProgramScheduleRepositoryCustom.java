@@ -24,6 +24,6 @@ import java.util.List;
 
 public interface RequisitionGroupProgramScheduleRepositoryCustom {
 
-  List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedule(Program program,
+  List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedules(Program program,
                                                                               Facility facility);
 }

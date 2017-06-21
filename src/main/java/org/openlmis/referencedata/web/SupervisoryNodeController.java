@@ -239,7 +239,7 @@ public class SupervisoryNodeController extends BaseController {
    *
    * @param queryParams request parameters (code, name, zoneId, programId, facilityId).
    * @param pageable object used to encapsulate the pagination related values: page and size.
-   * @return List of wanted Facilities matching query parameters.
+   * @return List of wanted Supervisory Nodes matching query parameters.
    */
   @RequestMapping(value = "/supervisoryNodes/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
