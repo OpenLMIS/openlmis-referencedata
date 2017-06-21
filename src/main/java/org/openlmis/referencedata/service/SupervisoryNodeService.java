@@ -99,7 +99,7 @@ public class SupervisoryNodeService {
     Facility facility = findFacility(facilityId);
     List<Facility> foundFacilities = new ArrayList<>();
     if (facility == null && zoneId.isPresent()) {
-      GeographicZone zone = findGeographicZone(zoneId);
+      GeographicZone zone = findGeographicZone(zoneId.get());
       if (zone != null) {
         foundFacilities = facilityService.findFacilitiesBasedOnlyOnZone(zone);
       }
@@ -150,8 +150,8 @@ public class SupervisoryNodeService {
     return facility;
   }
 
-  private GeographicZone findGeographicZone(Optional<UUID> zoneId) {
-    GeographicZone zone = geographicZoneRepository.findOne(zoneId.get());
+  private GeographicZone findGeographicZone(UUID zoneId) {
+    GeographicZone zone = geographicZoneRepository.findOne(zoneId);
     if (zone == null) {
       throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     }

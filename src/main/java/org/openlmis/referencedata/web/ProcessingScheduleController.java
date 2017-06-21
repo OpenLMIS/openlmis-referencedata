@@ -156,7 +156,7 @@ public class ProcessingScheduleController extends BaseController {
             program, facility);
 
     List<ProcessingScheduleDto> schedules = new ArrayList<>();
-    if (requisitionGroupProgramSchedules != null && requisitionGroupProgramSchedules.size() > 0) {
+    if (!requisitionGroupProgramSchedules.isEmpty()) {
       ProcessingScheduleDto scheduleDto = exportToDto(requisitionGroupProgramSchedules.get(0)
           .getProcessingSchedule());
       schedules.add(scheduleDto);
