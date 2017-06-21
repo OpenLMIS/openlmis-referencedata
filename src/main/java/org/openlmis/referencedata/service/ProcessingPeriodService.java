@@ -62,15 +62,15 @@ public class ProcessingPeriodService {
    * @return Collection of Processing Periods.
    */
   public List<ProcessingPeriod> filterPeriods(Program program, Facility facility) {
-    RequisitionGroupProgramSchedule schedule =
+    List<RequisitionGroupProgramSchedule> schedules =
         repository.searchRequisitionGroupProgramSchedule(program, facility);
 
-    if (null == schedule) {
+    if (null == schedules || schedules.size() < 1) {
       LOGGER.warn("Cannot find Requisition Group Program Schedule for program {} and facility {}",
           program.getId(), facility.getId());
       return Collections.emptyList();
     }
 
-    return searchPeriods(schedule.getProcessingSchedule(), null);
+    return searchPeriods(schedules.get(0).getProcessingSchedule(), null);
   }
 }

@@ -18,9 +18,7 @@ package org.openlmis.referencedata.web;
 import static java.util.stream.Collectors.toSet;
 import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
 
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -29,21 +27,21 @@ import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.openlmis.referencedata.service.RightService;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.openlmis.referencedata.service.SupervisoryNodeService;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -57,10 +55,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @Transactional
@@ -70,12 +69,6 @@ public class SupervisoryNodeController extends BaseController {
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Autowired
-  private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
-
-  @Autowired
-  private FacilityRepository facilityRepository;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -88,6 +81,9 @@ public class SupervisoryNodeController extends BaseController {
 
   @Autowired
   private RightService rightService;
+
+  @Autowired
+  private SupervisoryNodeService supervisoryNodeService;
 
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
@@ -239,41 +235,24 @@ public class SupervisoryNodeController extends BaseController {
   }
 
   /**
-   * Searching for supervisoryNode with given parameters.
+   * Retrieves all Supervisory Nodes that are matching given query parameters
    *
-   * @param programId UUID of RequisitionGroup program by which we want to search.
-   * @param facilityId UUID of RequisitionGroup facility by which we want to search.
-   * @return the found supervisoryNode.
+   * @param queryParams request parameters (code, name, zoneId, programId, facilityId).
+   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @return List of wanted Facilities matching query parameters.
    */
-  @RequestMapping(value = "/supervisoryNodes/search", method = RequestMethod.GET)
+  @RequestMapping(value = "/supervisoryNodes/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<SupervisoryNodeDto> findByRequisitionGroupFacilityAndProgram(
-      @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
+  public Page<SupervisoryNodeDto> search(@RequestBody Map<String, Object> queryParams,
+                                         Pageable pageable) {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
-    Facility facility = facilityRepository.findOne(facilityId);
-    Program program = programRepository.findOne(programId);
-
-    if (program == null) {
-      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    if (facility == null) {
-      throw new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    RequisitionGroupProgramSchedule foundGroup = requisitionGroupProgramScheduleService
-            .searchRequisitionGroupProgramSchedule(program, facility);
-
-    if (foundGroup == null) {
-      throw new NotFoundException(new Message(
-          SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_PROGRAM_AND_FACILITY,
-          programId, facilityId));
-    }
-
-    SupervisoryNode result = foundGroup.getRequisitionGroup().getSupervisoryNode();
-    return Collections.singletonList(exportToDto(result));
+    return Pagination.getPage(supervisoryNodeService.searchSupervisoryNodes(queryParams)
+        .stream()
+        .map(a -> exportToDto(a))
+        .collect(Collectors.toList()),
+        pageable);
   }
 
   private SupervisoryNodeDto exportToDto(SupervisoryNode supervisoryNode) {

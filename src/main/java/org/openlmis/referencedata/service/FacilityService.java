@@ -127,6 +127,16 @@ public class FacilityService {
     return Optional.ofNullable(foundFacilities).orElse(Collections.emptyList());
   }
 
+  /**
+   * Method returns all facilities within geographic zone.
+   *
+   * @param zone requested geographic zone.
+   * @return List of facilities
+   */
+  public List<Facility> findFacilitiesBasedOnlyOnZone(GeographicZone zone) {
+    return findFacilitiesBasedOnZone(zone, null, null, null, false);
+  }
+
   private List<Facility> findFacilitiesBasedOnZone(GeographicZone zone, String code, String name,
                                                    FacilityType facilityType, boolean recurse) {
     List<Facility> foundFacilities = new ArrayList<>();

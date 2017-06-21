@@ -26,13 +26,18 @@ import static org.mockito.Mockito.doThrow;
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.hamcrest.Matchers;
 import org.javers.common.collections.Sets;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -58,6 +63,7 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.service.SupervisoryNodeService;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -89,6 +95,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @MockBean
   private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
+
+  @MockBean
+  private SupervisoryNodeService supervisoryNodeService;
 
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;
@@ -486,31 +495,40 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldGetProcessingScheduleByFacilityAndProgram() {
+  public void shouldGetSupervisoryNodeByFacilityAndProgram() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    HashMap<String, Object> queryParams = new HashMap<>();
+    queryParams.put("facilityId", facilityId.toString());
+    queryParams.put(PROGRAM_ID_PARAM, programId.toString());
 
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
-    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
-        program, facility)).willReturn(requisitionGroupProgramSchedule);
+    given(supervisoryNodeService.searchSupervisoryNodes(queryParams))
+        .willReturn(Collections.singletonList(supervisoryNode));
 
-    SupervisoryNode[] response = searchForSupervisoryNode(programId, facilityId, 200)
-        .extract().as(SupervisoryNode[].class);
+    PageImplRepresentation response = searchForSupervisoryNode(queryParams, 200)
+        .extract().as(PageImplRepresentation.class);
+    Map<String, String> foundSupervisoryNode = (LinkedHashMap) response.getContent().get(0);
 
-    assertEquals(supervisoryNode, response[0]);
+    assertEquals(supervisoryNode.getCode(), foundSupervisoryNode.get("code"));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldRejectGetProcessingScheduleByFacilityAndPrograIfUserHasNoRight() {
+  public void shouldRejectGetProcessingScheduleByFacilityAndProgramIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    HashMap<String, Object> queryParams = new HashMap<>();
+    queryParams.put("facilityId", facilityId.toString());
+    queryParams.put(PROGRAM_ID_PARAM, programId.toString());
 
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
-    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
-        program, facility)).willReturn(requisitionGroupProgramSchedule);
+    given(supervisoryNodeService.searchSupervisoryNodes(queryParams))
+        .willReturn(Collections.singletonList(supervisoryNode));
 
-    String messageKey = searchForSupervisoryNode(programId, facilityId, 403)
+    String messageKey = searchForSupervisoryNode(queryParams, 403)
         .extract()
         .path(MESSAGE_KEY);
 
@@ -519,39 +537,34 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldReturnNotFoundWhenSearchingForNonExistingSupervisoryNode() {
+  public void shouldReturnEmptyListWhenSearchingForNonExistingSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    HashMap<String, Object> queryParams = new HashMap<>();
+    queryParams.put("facilityId", facilityId.toString());
+    queryParams.put(PROGRAM_ID_PARAM, programId.toString());
 
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
         program, facility)).willReturn(null);
 
-    searchForSupervisoryNode(programId, facilityId, 404);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    searchForSupervisoryNode(queryParams, 200);
+    PageImplRepresentation response = searchForSupervisoryNode(queryParams, 200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(0, response.getContent().size());
   }
 
-  @Test
-  public void shouldReturnBadRequestWhenSearchingForSupervisoryNodeWithBadParameters() {
-    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-
-    given(facilityRepository.findOne(facilityId)).willReturn(facility);
-    given(programRepository.findOne(programId)).willReturn(null);
-
-    searchForSupervisoryNode(programId, facilityId, 400);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  private ValidatableResponse searchForSupervisoryNode(UUID programId, UUID facilityId,
+  private ValidatableResponse searchForSupervisoryNode(HashMap<String, Object> queryParams,
                                                        int expectedCode) {
     return restAssured
       .given()
       .queryParam(ACCESS_TOKEN, getToken())
       .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .queryParam("facilityId", facilityId)
-      .queryParam(PROGRAM_ID_PARAM, programId)
+      .body(queryParams)
       .when()
-      .get(SEARCH_URL)
+      .post(SEARCH_URL)
       .then()
       .statusCode(expectedCode);
   }

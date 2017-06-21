@@ -37,6 +37,7 @@ import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepo
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -79,7 +80,7 @@ public class ProcessingPeriodServiceTest {
 
   @Test
   public void shouldFindPeriodsByProgramAndFacility() {
-    doReturn(requisitionGroupProgramSchedule).when(repository)
+    doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
           .searchRequisitionGroupProgramSchedule(program, facility);
     doReturn(Arrays.asList(period)).when(periodRepository).searchPeriods(schedule, null);
 

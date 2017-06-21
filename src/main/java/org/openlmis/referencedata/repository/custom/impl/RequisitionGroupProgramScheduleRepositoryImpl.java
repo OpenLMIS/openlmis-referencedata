@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
@@ -31,6 +29,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.List;
 
 
 public class RequisitionGroupProgramScheduleRepositoryImpl implements
@@ -47,11 +46,8 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
    * @param facility Facility of searched RequisitionGroupProgramSchedule
    * @return Requisition Group Program Schedule matching search criteria
    */
-  public RequisitionGroupProgramSchedule searchRequisitionGroupProgramSchedule(Program program,
-                                                                               Facility facility) {
-    checkNotNull(program);
-    checkNotNull(facility);
-
+  public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedule(
+      Program program, Facility facility) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<RequisitionGroupProgramSchedule> query = builder.createQuery(
@@ -64,14 +60,18 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
     Join<RequisitionGroup, Facility> ft = rg.join("memberFacilities");
 
     Predicate conjunction = builder.conjunction();
-    conjunction = builder.and(conjunction, builder.equal(ft.get("id"), facility.getId()));
-    conjunction = builder.and(conjunction, builder.equal(rgps.get("program"), program));
+    if (facility != null) {
+      conjunction = builder.and(conjunction, builder.equal(ft.get("id"), facility.getId()));
+    }
+    if (program != null) {
+      conjunction = builder.and(conjunction, builder.equal(rgps.get("program"), program));
+    }
 
     query.select(rgps);
     query.where(conjunction);
 
     try {
-      return entityManager.createQuery(query).getSingleResult();
+      return entityManager.createQuery(query).getResultList();
     } catch (NoResultException exp) {
       return null;
     }

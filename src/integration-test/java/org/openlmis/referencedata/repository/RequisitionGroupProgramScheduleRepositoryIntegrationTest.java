@@ -44,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import java.util.List;
 
 /**
  * Allow testing requisitionGroupProgramScheduleRepository.
@@ -159,10 +160,10 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
 
   @Test
   public void shouldReturnNullIfRequisitionGroupProgramScheduleIsNotFound() {
-    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
+    List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedule =
           repository.searchRequisitionGroupProgramSchedule(program, facility);
 
-    assertEquals(requisitionGroupProgramSchedule, null);
+    assertEquals(requisitionGroupProgramSchedule.size(), 0);
   }
 
   @Test
@@ -174,9 +175,9 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     requisitionGroup.setMemberFacilities(Sets.newHashSet(facility));
     requisitionGroupRepository.save(requisitionGroup);
 
-    RequisitionGroupProgramSchedule found = repository
+    List<RequisitionGroupProgramSchedule> found = repository
         .searchRequisitionGroupProgramSchedule(program, facility);
 
-    assertThat(found, is(entity));
+    assertThat(found.get(0), is(entity));
   }
 }

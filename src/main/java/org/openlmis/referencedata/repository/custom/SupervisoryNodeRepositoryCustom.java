@@ -13,16 +13,12 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.repository.custom;
 
 import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.UUID;
+import java.util.List;
 
-public interface SupervisoryNodeRepository
-    extends PagingAndSortingRepository<SupervisoryNode, UUID>, SupervisoryNodeRepositoryCustom {
-
-  <S extends SupervisoryNode> S findByCode(String code);
+public interface SupervisoryNodeRepositoryCustom {
+  List<SupervisoryNode> search(String code, String name);
 }

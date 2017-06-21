@@ -35,6 +35,7 @@ import org.springframework.http.MediaType;
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -186,7 +187,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
-        program, facility)).willReturn(requisitionGroupProgramSchedule);
+        program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
 
     ProcessingSchedule[] response = restAssured
         .given()
@@ -210,7 +211,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(null);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
-        program, facility)).willReturn(requisitionGroupProgramSchedule);
+        program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
 
     restAssured
         .given()
@@ -232,7 +233,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(facilityRepository.findOne(facilityId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
-        program, facility)).willReturn(requisitionGroupProgramSchedule);
+        program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
 
     restAssured
         .given()

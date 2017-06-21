@@ -151,13 +151,13 @@ public class ProcessingScheduleController extends BaseController {
           new Message(FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
     }
 
-    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
+    List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules =
         requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedule(
             program, facility);
 
     List<ProcessingScheduleDto> schedules = new ArrayList<>();
-    if (requisitionGroupProgramSchedule != null) {
-      ProcessingScheduleDto scheduleDto = exportToDto(requisitionGroupProgramSchedule
+    if (requisitionGroupProgramSchedules != null && requisitionGroupProgramSchedules.size() > 0) {
+      ProcessingScheduleDto scheduleDto = exportToDto(requisitionGroupProgramSchedules.get(0)
           .getProcessingSchedule());
       schedules.add(scheduleDto);
     }

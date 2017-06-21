@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Supervisory Node Query DTO",
+  "description": "A DTO to search for supervisory nodes",
+  "properties": {
+    "code": {
+      "type": "string",
+      "title": "code"
+    },
+    "name": {
+      "type": "string",
+      "title": "name"
+    },
+    "zoneId": {
+      "type": "string",
+      "title": "zoneId"
+    },
+    "facilityId": {
+      "type": "string",
+      "title": "type"
+    },
+    "programId": {
+      "type": "string",
+      "title": "type"
+    }
+  }
+}
