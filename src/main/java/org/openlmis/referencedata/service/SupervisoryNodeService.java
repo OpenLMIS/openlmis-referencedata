@@ -107,7 +107,8 @@ public class SupervisoryNodeService {
 
     Program program = findProgram(programId);
 
-    return findSupervisoryNodes(facility, program, name, code, foundFacilities);
+    return findSupervisoryNodes(facility, program, name, code, foundFacilities,
+        !facilityId.isPresent() && !zoneId.isPresent() && !programId.isPresent());
   }
 
   private Set<SupervisoryNode> findSupervisoryNodeBasedOnSchedule(List<Facility> facilities,
@@ -173,20 +174,25 @@ public class SupervisoryNodeService {
 
   private Collection<SupervisoryNode> findSupervisoryNodes(Facility facility, Program program,
                                                            String name, String code,
-                                                           List<Facility> foundFacilities) {
-    Set<SupervisoryNode> supervisoryNodes;
-    if (facility != null) {
-      supervisoryNodes = findSupervisoryNodeBasedOnSchedule(facility, program);
+                                                           List<Facility> foundFacilities,
+                                                           boolean onlyRepositorySearch) {
+    if (onlyRepositorySearch) {
+      return supervisoryNodeRepository.search(code, name);
     } else {
-      supervisoryNodes = findSupervisoryNodeBasedOnSchedule(foundFacilities, program);
-    }
+      Set<SupervisoryNode> supervisoryNodes;
+      if (facility != null) {
+        supervisoryNodes = findSupervisoryNodeBasedOnSchedule(facility, program);
+      } else {
+        supervisoryNodes = findSupervisoryNodeBasedOnSchedule(foundFacilities, program);
+      }
 
-    if (name != null || code != null) {
-      return supervisoryNodeRepository.search(code, name).stream()
-          .filter(a -> supervisoryNodes.contains(a))
-          .collect(Collectors.toSet());
-    } else {
-      return supervisoryNodes;
+      if (name != null || code != null) {
+        return supervisoryNodeRepository.search(code, name).stream()
+            .filter(a -> supervisoryNodes.contains(a))
+            .collect(Collectors.toSet());
+      } else {
+        return supervisoryNodes;
+      }
     }
   }
 }
