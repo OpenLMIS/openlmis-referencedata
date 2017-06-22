@@ -182,9 +182,11 @@ public class SupervisoryNodeService {
     }
 
     if (name != null || code != null) {
-      supervisoryNodes.addAll(supervisoryNodeRepository.search(code, name));
+      return supervisoryNodeRepository.search(code, name).stream()
+          .filter(a -> supervisoryNodes.contains(a))
+          .collect(Collectors.toSet());
+    } else {
+      return supervisoryNodes;
     }
-
-    return supervisoryNodes;
   }
 }
