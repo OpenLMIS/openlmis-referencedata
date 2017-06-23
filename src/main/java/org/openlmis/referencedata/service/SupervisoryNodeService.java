@@ -64,9 +64,6 @@ public class SupervisoryNodeService {
   private GeographicZoneRepository geographicZoneRepository;
 
   @Autowired
-  private FacilityService facilityService;
-
-  @Autowired
   private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
 
   /**
@@ -162,8 +159,7 @@ public class SupervisoryNodeService {
                                                            boolean onlyRepositorySearch) {
     if (onlyRepositorySearch) {
       return supervisoryNodeRepository.search(code, name, zone);
-    }
-    else {
+    } else {
       Set<SupervisoryNode> supervisoryNodes = findSupervisoryNodeBasedOnSchedule(facility, program);
       if (!StringUtils.isEmpty(name) || !StringUtils.isEmpty(name) || zone != null) {
         return supervisoryNodes;
