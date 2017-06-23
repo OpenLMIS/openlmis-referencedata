@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
 
@@ -22,6 +24,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
@@ -30,6 +34,8 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
 
   private static final String CODE = "code";
   private static final String NAME = "name";
+  private static final String FACILITY = "facility";
+  private static final String ZONE = "geographicZone";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -42,20 +48,25 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
    * @param name Part of wanted name.
    * @return List of Supervisory Nodes matching the parameters.
    */
-  public List<SupervisoryNode> search(String code, String name) {
+  public List<SupervisoryNode> search(String code, String name, GeographicZone zone) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<SupervisoryNode> query = builder.createQuery(SupervisoryNode.class);
     Root<SupervisoryNode> root = query.from(SupervisoryNode.class);
-    Predicate predicate = builder.disjunction();
+    Predicate predicate = builder.conjunction();
 
     if (code != null) {
-      predicate = builder.or(predicate,
+      predicate = builder.and(predicate,
           builder.like(builder.upper(root.get(CODE)), "%" + code.toUpperCase() + "%"));
     }
 
     if (name != null) {
-      predicate = builder.or(predicate,
+      predicate = builder.and(predicate,
           builder.like(builder.upper(root.get(NAME)), "%" + name.toUpperCase() + "%"));
+    }
+
+    if (zone != null) {
+      Join<SupervisoryNode, Facility> facilityJoin = root.join(FACILITY, JoinType.LEFT);
+      predicate = builder.and(predicate, builder.equal(facilityJoin.get(ZONE), zone));
     }
 
     query.where(predicate);

@@ -35,10 +35,7 @@ import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -97,27 +94,11 @@ public class SupervisoryNodeService {
     validateQueryParameters(name, code, facilityId, zoneId, programId);
 
     Facility facility = findFacility(facilityId);
-    List<Facility> foundFacilities = new ArrayList<>();
-    if (facility == null && zoneId.isPresent()) {
-      GeographicZone zone = findGeographicZone(zoneId.get());
-      if (zone != null) {
-        foundFacilities = facilityService.findFacilitiesBasedOnlyOnZone(zone);
-      }
-    }
-
+    GeographicZone zone = findGeographicZone(zoneId);
     Program program = findProgram(programId);
 
-    return findSupervisoryNodes(facility, program, name, code, foundFacilities,
-        !facilityId.isPresent() && !zoneId.isPresent() && !programId.isPresent());
-  }
-
-  private Set<SupervisoryNode> findSupervisoryNodeBasedOnSchedule(List<Facility> facilities,
-                                                                  Program program) {
-    Set<SupervisoryNode> supervisoryNodes = new HashSet<>();
-    for (Facility facility : facilities) {
-      supervisoryNodes.addAll(findSupervisoryNodeBasedOnSchedule(facility, program));
-    }
-    return supervisoryNodes;
+    return findSupervisoryNodes(facility, program, name, code, zone,
+        !facilityId.isPresent() && !programId.isPresent());
   }
 
   private Set<SupervisoryNode> findSupervisoryNodeBasedOnSchedule(Facility facility,
@@ -151,10 +132,13 @@ public class SupervisoryNodeService {
     return facility;
   }
 
-  private GeographicZone findGeographicZone(UUID zoneId) {
-    GeographicZone zone = geographicZoneRepository.findOne(zoneId);
-    if (zone == null) {
-      throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
+  private GeographicZone findGeographicZone(Optional<UUID> zoneId) {
+    GeographicZone zone = null;
+    if (zoneId.isPresent()) {
+      zone = geographicZoneRepository.findOne(zoneId.get());
+      if (zone == null) {
+        throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
+      }
     }
     return zone;
   }
@@ -174,25 +158,19 @@ public class SupervisoryNodeService {
 
   private Collection<SupervisoryNode> findSupervisoryNodes(Facility facility, Program program,
                                                            String name, String code,
-                                                           List<Facility> foundFacilities,
+                                                           GeographicZone zone,
                                                            boolean onlyRepositorySearch) {
     if (onlyRepositorySearch) {
-      return supervisoryNodeRepository.search(code, name);
-    } else {
-      Set<SupervisoryNode> supervisoryNodes;
-      if (facility != null) {
-        supervisoryNodes = findSupervisoryNodeBasedOnSchedule(facility, program);
-      } else {
-        supervisoryNodes = findSupervisoryNodeBasedOnSchedule(foundFacilities, program);
-      }
-
-      if (name != null || code != null) {
-        return supervisoryNodeRepository.search(code, name).stream()
-            .filter(a -> supervisoryNodes.contains(a))
-            .collect(Collectors.toSet());
-      } else {
+      return supervisoryNodeRepository.search(code, name, zone);
+    }
+    else {
+      Set<SupervisoryNode> supervisoryNodes = findSupervisoryNodeBasedOnSchedule(facility, program);
+      if (!StringUtils.isEmpty(name) || !StringUtils.isEmpty(name) || zone != null) {
         return supervisoryNodes;
       }
+      return supervisoryNodeRepository.search(code, name, zone).stream()
+          .filter(a -> supervisoryNodes.contains(a))
+          .collect(Collectors.toSet());
     }
   }
 }

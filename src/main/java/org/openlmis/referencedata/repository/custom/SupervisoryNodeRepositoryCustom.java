@@ -15,10 +15,11 @@
 
 package org.openlmis.referencedata.repository.custom;
 
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 
 import java.util.List;
 
 public interface SupervisoryNodeRepositoryCustom {
-  List<SupervisoryNode> search(String code, String name);
+  List<SupervisoryNode> search(String code, String name, GeographicZone zone);
 }
