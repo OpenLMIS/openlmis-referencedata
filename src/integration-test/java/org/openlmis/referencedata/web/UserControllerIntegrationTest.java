@@ -42,13 +42,11 @@ import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_INVALID;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.response.Response;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -94,9 +92,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -117,6 +112,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ROLE_ASSIGNMENTS_URL = ID_URL + "/roleAssignments";
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
   private static final String PROGRAMS_URL = ID_URL + "/programs";
+  private static final String SUPPORTED_PROGRAMS_URL = ID_URL + "/supportedPrograms";
   private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
   private static final String FULFILLMENT_FACILITIES_URL = ID_URL + "/fulfillmentFacilities";
   private static final String USERNAME = "username";
@@ -172,8 +168,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private RightService rightService;
-
-  private ObjectMapper mapper = new ObjectMapper();
 
   private User user1;
   private User user2;
@@ -627,6 +621,54 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
     String messageKey = getUserPrograms()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserSupportedPrograms() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    SupportedProgram supportedProgram =
+        SupportedProgram.newSupportedProgram(homeFacility, program1, true);
+    program1.setId(program1Id);
+    supportedProgram.setId(program1Id);
+    homeFacility.setSupportedPrograms(Sets.newHashSet(
+        supportedProgram));
+    user1.setHomeFacility(homeFacility);
+
+    given(userRepository.findOne(userId)).willReturn(user1);
+
+    Program[] response = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(SUPPORTED_PROGRAMS_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program[].class);
+
+    assertThat(response.length, is(1));
+    assertEquals(program1, response[0]);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectGetUserSupportedProgramsIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(SUPPORTED_PROGRAMS_URL)
         .then()
         .statusCode(403)
         .extract()
@@ -1222,7 +1264,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     return facilityType;
   }
 
-  private Integer generateInstanceNumber() {
+  private static Integer generateInstanceNumber() {
     currentInstanceNumber += 1;
     return currentInstanceNumber;
   }

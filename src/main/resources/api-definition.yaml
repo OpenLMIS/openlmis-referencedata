@@ -1304,6 +1304,23 @@ resourceTypes:
                           body:
                             application/json:
                               schema: localizedErrorResponse
+          /supportedPrograms:
+              is: [ secured ]
+              displayName: User supported programs
+              get:
+                  is: [ secured ]
+                  description: Get all supported programs the associated user supervises through the home
+                      facility.
+                  responses:
+                      "200":
+                          body:
+                            application/json:
+                              schema: programArray
+                      "404":
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
           /supervisedFacilities:
               is: [ secured ]
               displayName: User supervised facilities

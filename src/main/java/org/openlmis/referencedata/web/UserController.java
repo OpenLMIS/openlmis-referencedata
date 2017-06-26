@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -78,17 +78,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import lombok.NoArgsConstructor;
-
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 @NoArgsConstructor
@@ -364,8 +362,11 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Set<ProgramDto> getUserPrograms(@PathVariable(USER_ID) UUID userId,
-                  @RequestParam(value = "forHomeFacility", required = false, defaultValue = "true")
-                    boolean forHomeFacility) {
+                                         @RequestParam(
+                                             value = "forHomeFacility",
+                                             required = false,
+                                             defaultValue = "true") boolean forHomeFacility
+                                         ) {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     User user = validateUser(userId);
@@ -373,6 +374,37 @@ public class UserController extends BaseController {
         user.getSupervisedPrograms();
 
     return programsToDto(programs);
+  }
+
+  /**
+   * Get the programs at a user's home facility that are supported by home facility.
+   *
+   * @param userId id of user to get programs
+   * @return a set of programs
+   */
+  @RequestMapping(value = "/users/{userId}/supportedPrograms", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<ProgramDto> getUserSupportedPrograms(@PathVariable(USER_ID) UUID userId) {
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+
+    User user = validateUser(userId);
+
+    Facility homeFacility = user.getHomeFacility();
+    Set<UUID> supportedProgramsIds;
+    if (homeFacility != null) {
+      supportedProgramsIds = homeFacility.getSupportedPrograms().stream()
+          .map(BaseEntity::getId)
+          .collect(Collectors.toSet());
+    } else {
+      return Collections.emptySet();
+    }
+
+    Set<Program> filteredPrograms = user.getHomeFacilityPrograms().stream()
+        .filter(program -> supportedProgramsIds.contains(program.getId()))
+        .collect(Collectors.toSet());
+
+    return programsToDto(filteredPrograms);
   }
 
   /**
