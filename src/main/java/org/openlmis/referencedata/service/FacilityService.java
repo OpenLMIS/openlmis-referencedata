@@ -94,7 +94,7 @@ public class FacilityService {
     if (StringUtils.isEmpty(code)
         && StringUtils.isEmpty(name)
         && StringUtils.isEmpty(facilityTypeCode)
-        && false == zoneId.isPresent()) {
+        && !zoneId.isPresent()) {
 
       throw new ValidationMessageException(
           FacilityMessageKeys.ERROR_SEARCH_LACKS_PARAMS);

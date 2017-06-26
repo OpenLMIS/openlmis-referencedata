@@ -100,9 +100,10 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
   /**
    * Copy role assignments to DTO.
    */
+  @Override
   public void addRoleAssignments(Set<RoleAssignment> roleAssignments) {
     this.roleAssignments = roleAssignments.stream()
-        .map(roleAssignment -> exportToDto(roleAssignment))
+        .map(this::exportToDto)
         .collect(toSet());
   }
 
