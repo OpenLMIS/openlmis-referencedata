@@ -5,8 +5,8 @@ Breaking changes:
 * [OLMIS-2280](https://openlmis.atlassian.net/browse/OLMIS-2280): Added pagination, new parameters (zoneId, name, code) to supervisory node search endpoint
 
 New functionality added in a backwards-compatible manner:
-* [OLMIS-2611](https://openlmis.atlassian.net/browse/OLMIS-2611): Added using locale from env fill
-* [OLMIS-2729](https://openlmis.atlassian.net/browse/OLMIS-2729): Added endpoint for get supported programs to User Controller
+* [OLMIS-2611](https://openlmis.atlassian.net/browse/OLMIS-2611): Added using locale from env file
+* [OLMIS-2729](https://openlmis.atlassian.net/browse/OLMIS-2729): Added endpoint for get user supported programs for home facility
   * We should not really require client apps to filter if programs are supported by user facility. The logic should be shared in backend service.
 
 
