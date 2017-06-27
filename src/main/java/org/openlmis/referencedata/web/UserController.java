@@ -399,7 +399,7 @@ public class UserController extends BaseController {
           .filter(SupportedProgram::getActive)
           .filter(sp -> sp.getProgram().getActive() != null
               && sp.getProgram().getActive())
-          .map(BaseEntity::getId)
+          .map(sp -> sp.getProgram().getId())
           .collect(Collectors.toSet());
     } else {
       return Collections.emptySet();

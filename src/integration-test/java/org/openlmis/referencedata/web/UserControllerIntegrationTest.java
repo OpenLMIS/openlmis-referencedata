@@ -634,7 +634,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         SupportedProgram.newSupportedProgram(homeFacility, program1, true);
     program1.setId(program1Id);
     program1.setActive(true);
-    supportedProgram.setId(program1Id);
     homeFacility.setSupportedPrograms(Sets.newHashSet(
         supportedProgram));
     user1.setHomeFacility(homeFacility);

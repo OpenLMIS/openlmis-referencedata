@@ -544,7 +544,6 @@ public class UserControllerTest {
 
     SupportedProgram supportedProgram =
         SupportedProgram.newSupportedProgram(homeFacility, program1, true);
-    supportedProgram.setId(program1.getId());
     program1.setActive(false);
     homeFacility.setSupportedPrograms(Sets.newHashSet(
         supportedProgram));
@@ -644,7 +643,6 @@ public class UserControllerTest {
   private void setProgramSupportedAndActive() {
     SupportedProgram supportedProgram =
         SupportedProgram.newSupportedProgram(homeFacility, program1, true);
-    supportedProgram.setId(program1.getId());
     program1.setActive(true);
     homeFacility.setSupportedPrograms(Sets.newHashSet(supportedProgram));
   }
