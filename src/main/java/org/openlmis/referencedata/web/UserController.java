@@ -33,6 +33,7 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.FacilityDto;
@@ -377,7 +378,8 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Get the programs at a user's home facility that are supported by home facility.
+   * Get the programs at a user's home facility that are supported by home facility. Support must be
+   * active and supported program must be active.
    *
    * @param userId id of user to get programs
    * @return a set of programs
@@ -394,6 +396,9 @@ public class UserController extends BaseController {
     Set<UUID> supportedProgramsIds;
     if (homeFacility != null) {
       supportedProgramsIds = homeFacility.getSupportedPrograms().stream()
+          .filter(SupportedProgram::getActive)
+          .filter(sp -> sp.getProgram().getActive() != null
+              && sp.getProgram().getActive())
           .map(BaseEntity::getId)
           .collect(Collectors.toSet());
     } else {

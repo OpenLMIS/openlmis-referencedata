@@ -42,6 +42,7 @@ import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.FacilityDto;
@@ -162,6 +163,7 @@ public class UserControllerTest {
     supervisionRole1.setId(roleId);
     programCode = "P1";
     program1 = new Program(programCode);
+    program1.setId(UUID.randomUUID());
     supervisoryNodeCode = "SN1";
     supervisoryNode1 = new SupervisoryNode();
     supervisoryNode1.setCode(supervisoryNodeCode);
@@ -519,6 +521,106 @@ public class UserControllerTest {
   }
 
   @Test
+  public void shouldGetUserSupportedPrograms() {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    setProgramSupportedAndActive();
+
+    //when
+    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
+
+    //then
+    assertThat(homeFacilityPrograms.size(), is(1));
+    assertTrue(homeFacilityPrograms.contains(ProgramDto.newInstance(program1)));
+  }
+
+  @Test
+  public void shouldNotGetUserSupportedProgramsIfProgramIsNotActive() {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    SupportedProgram supportedProgram =
+        SupportedProgram.newSupportedProgram(homeFacility, program1, true);
+    supportedProgram.setId(program1.getId());
+    program1.setActive(false);
+    homeFacility.setSupportedPrograms(Sets.newHashSet(
+        supportedProgram));
+
+    //when
+    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
+
+    //then
+    assertTrue(homeFacilityPrograms.isEmpty());
+  }
+
+  @Test
+  public void shouldNotGetUserSupportedProgramsIfSupportIsNotActive() {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    SupportedProgram supportedProgram =
+        SupportedProgram.newSupportedProgram(homeFacility, program1, false);
+    supportedProgram.setId(program1.getId());
+    program1.setActive(true);
+    homeFacility.setSupportedPrograms(Sets.newHashSet(supportedProgram));
+
+    //when
+    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
+
+    //then
+    assertTrue(homeFacilityPrograms.isEmpty());
+  }
+
+  @Test
+  public void shouldNotGetUserSupportedProgramsIfNoHomeFacilityPrograms() {
+    //given
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    setProgramSupportedAndActive();
+
+    //when
+    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
+
+    //then
+    assertTrue(homeFacilityPrograms.isEmpty());
+  }
+
+  @Test
+  public void shouldNotGetUserSupportedProgramsIfNoProgramIsSupported() {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    program1.setActive(true);
+
+    //when
+    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
+
+    //then
+    assertTrue(homeFacilityPrograms.isEmpty());
+  }
+
+  @Test
+  public void shouldNotGetUserSupportedProgramsIfUserHaveNoHomeFacility() {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
+    when(repository.findOne(userId)).thenReturn(user1);
+
+    setProgramSupportedAndActive();
+    user1.setHomeFacility(null);
+
+    //when
+    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
+
+    //then
+    assertTrue(homeFacilityPrograms.isEmpty());
+  }
+
+  @Test
   public void shouldGetUserFulfillmentFacilities() {
     //given
     FulfillmentRoleAssignment assignment1 =
@@ -537,5 +639,13 @@ public class UserControllerTest {
 
     //then
     assertThat(facilities.size(), is(1));
+  }
+
+  private void setProgramSupportedAndActive() {
+    SupportedProgram supportedProgram =
+        SupportedProgram.newSupportedProgram(homeFacility, program1, true);
+    supportedProgram.setId(program1.getId());
+    program1.setActive(true);
+    homeFacility.setSupportedPrograms(Sets.newHashSet(supportedProgram));
   }
 }

@@ -51,6 +51,7 @@ public class SupportedProgram extends BaseEntity {
   private Program program;
 
   @Column(nullable = false)
+  @Getter
   private Boolean active;
 
   private LocalDate startDate;

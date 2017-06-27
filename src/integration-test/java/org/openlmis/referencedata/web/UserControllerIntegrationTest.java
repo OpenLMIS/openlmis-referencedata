@@ -86,7 +86,6 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
@@ -165,9 +164,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @MockBean
   private RequisitionGroupRepository requisitionGroupRepository;
-
-  @MockBean
-  private RightService rightService;
 
   private User user1;
   private User user2;
@@ -637,6 +633,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     SupportedProgram supportedProgram =
         SupportedProgram.newSupportedProgram(homeFacility, program1, true);
     program1.setId(program1Id);
+    program1.setActive(true);
     supportedProgram.setId(program1Id);
     homeFacility.setSupportedPrograms(Sets.newHashSet(
         supportedProgram));
@@ -675,6 +672,39 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetUserSupportedProgramsWithNoRightIfUserRequestsTheirOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+    given(userRepository.findOne(userId)).willReturn(user1);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(SUPPORTED_PROGRAMS_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotFoundIfNoUserExistWhenGetSupportedPrograms() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(SUPPORTED_PROGRAMS_URL)
+        .then()
+        .statusCode(404);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

@@ -1300,6 +1300,9 @@ resourceTypes:
                             application/json:
                               schema: programArray
                       "404":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
                       "403":
                           body:
                             application/json:
@@ -1317,6 +1320,9 @@ resourceTypes:
                             application/json:
                               schema: programArray
                       "404":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
                       "403":
                           body:
                             application/json:
