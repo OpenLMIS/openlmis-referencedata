@@ -206,6 +206,15 @@ public class UserValidatorTest {
   }
 
   @Test
+  public void shouldRejectWhenEmailIsInvalid() {
+    userDto.setEmail("invalid@email");
+
+    validator.validate(userDto, errors);
+
+    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
+  }
+
+  @Test
   public void shouldRejectWhenFirstNameIsNull() {
     userDto.setFirstName(null);
 

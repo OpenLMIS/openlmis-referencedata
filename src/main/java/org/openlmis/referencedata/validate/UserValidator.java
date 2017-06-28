@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.UUID;
 
@@ -108,5 +109,10 @@ public class UserValidator implements BaseValidator {
     if (null != db && (null == id || !id.equals(db.getId()))) {
       rejectValue(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_DUPLICATED);
     }
+
+    if (!EmailValidator.getInstance().isValid(email)) {
+      rejectValue(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
+    }
+
   }
 }
