@@ -947,9 +947,10 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     category.setId(UUID.randomUUID());
 
     HashMap<String, String> identificators = new HashMap<>();
+    HashMap<String, String> extraData = new HashMap<>();
     identificators.put("cSys", "cSysId");
     Orderable orderable = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
-        "Gloves", "description", 6, 3, false, Collections.emptySet(), identificators);
+        "Gloves", "description", 6, 3, false, Collections.emptySet(), identificators, extraData);
     orderable.setId(UUID.randomUUID());
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setProgram(program);

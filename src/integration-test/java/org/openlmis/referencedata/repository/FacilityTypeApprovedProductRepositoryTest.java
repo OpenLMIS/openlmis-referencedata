@@ -119,13 +119,14 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
     HashMap<String, String> identifiers = new HashMap<>();
     identifiers.put(CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
+    HashMap<String, String> extraData = new HashMap<>();
     CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
 
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
             .createNew(program, orderableDisplayCategory, null, currencyUnit);
     orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
         "Ibuprofen", "description", 10, 5, false,
-        Collections.singleton(programOrderableFullSupply), identifiers);
+        Collections.singleton(programOrderableFullSupply), identifiers, extraData);
     programOrderableFullSupply.setProduct(orderableFullSupply);
     orderableRepository.save(orderableFullSupply);
 
@@ -134,7 +135,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
             Money.of(currencyUnit, 0), currencyUnit);
     orderableNonFullSupply = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
         "Gloves", "description", 6, 3, false,
-        Collections.singleton(programOrderableNonFullSupply), identifiers);
+        Collections.singleton(programOrderableNonFullSupply), identifiers, extraData);
     programOrderableNonFullSupply.setProduct(orderableNonFullSupply);
     orderableRepository.save(orderableNonFullSupply);
 

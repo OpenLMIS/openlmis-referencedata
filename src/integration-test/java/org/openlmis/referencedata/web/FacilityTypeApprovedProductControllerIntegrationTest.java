@@ -93,8 +93,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderableDisplayCategory.setId(UUID.randomUUID());
 
     HashMap<String, String> identificators = new HashMap<>();
+    HashMap<String, String> extraData = new HashMap<>();
     orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
-            "Abcd", "description", 10, 5, false, Collections.emptySet(), identificators);
+        "Abcd", "description", 10, 5, false, Collections.emptySet(), identificators,
+        extraData);
     orderable.setId(UUID.randomUUID());
 
     facilityType1 = new FacilityType("facilityType1");

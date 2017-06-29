@@ -51,6 +51,8 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
 
   private Map<String, String> identifiers;
 
+  private Map<String, String> extraData;
+
   /**
    * Create new set of OrderableDto based on given iterable of {@link Orderable}
    *

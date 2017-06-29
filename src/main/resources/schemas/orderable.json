@@ -40,6 +40,14 @@
         "$ref": "programOrderableDto.json"
       },
       "uniqueItems": true
+    },
+    "identifiers": {
+      "type": "object",
+      "title": "identifiers"
+    },
+    "extraData": {
+      "type": "object",
+      "title": "extraData"
     }
   },
   "required": ["productCode", "packRoundingThreshold", "roundToZero", "netContent"]

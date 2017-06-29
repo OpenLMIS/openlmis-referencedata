@@ -277,5 +277,14 @@
     "maxPeriodsOfStock": "3",
     "minPeriodsOfStock": "1.5",
     "emergencyOrderPoint": "1"
+  },
+  {
+    "id": "b945809a-2325-4ff3-afa1-1b976f99dcc0",
+    "facilityTypeId": { "id": "ac1d268b-ce10-455f-bf87-9c667da8f060" },
+    "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
+    "orderableId": { "id": "6be94307-c7f4-4782-ba83-45f496c8ac42" },
+    "maxPeriodsOfStock": "3",
+    "minPeriodsOfStock": "1.5",
+    "emergencyOrderPoint": "1"
   }
 ]

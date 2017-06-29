@@ -110,5 +110,21 @@
     "manufactureDate": "2017-08-20",
     "tradeItemId": "DF3A6FDE-C153-4C21-950B-4148F8D82F97",
     "active": "true"
+  },
+  {
+    "id": "7355b200-f7c3-4558-a4b5-d0e0787c94de",
+    "lotCode": "MF2016A",
+    "expirationDate": "2018-01-01",
+    "manufactureDate": "2016-01-10",
+    "tradeItemId": "d25b86ed-0d35-4861-bd3e-1fcc42443aa5",
+    "active": "true"
+  },
+  {
+    "id": "bf2ad108-1ad8-4070-b7d7-d51f5d33a6fa",
+    "lotCode": "MF2016B",
+    "expirationDate": "2018-01-01",
+    "manufactureDate": "2016-01-10",
+    "tradeItemId": "d25b86ed-0d35-4861-bd3e-1fcc42443aa5",
+    "active": "true"
   }
 ]

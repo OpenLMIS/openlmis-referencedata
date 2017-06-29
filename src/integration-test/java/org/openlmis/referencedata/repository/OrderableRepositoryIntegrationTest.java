@@ -66,8 +66,9 @@ public class OrderableRepositoryIntegrationTest
     int instanceNumber = getNextInstanceNumber();
     HashMap<String, String> identificators = new HashMap<>();
     identificators.put("cSys", "cSysId");
+    HashMap<String, String> extraData = new HashMap<>();
     return new Orderable(Code.code(CODE + instanceNumber), Dispensable.createNew(EACH),
-            NAME, DESCRIPTION, 10, 5, false, new HashSet<>(), identificators);
+            NAME, DESCRIPTION, 10, 5, false, new HashSet<>(), identificators, extraData);
   }
 
   @Test
@@ -149,7 +150,7 @@ public class OrderableRepositoryIntegrationTest
     programRepository.save(validProgram);
     Set<ProgramOrderable> programOrderables = new HashSet<>();
     Orderable validOrderable = new Orderable(Code.code(CODE), Dispensable.createNew(EACH),
-        NAME, DESCRIPTION, 10, 5, false, programOrderables, null);
+        NAME, DESCRIPTION, 10, 5, false, programOrderables, null, null);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
@@ -158,7 +159,7 @@ public class OrderableRepositoryIntegrationTest
     programRepository.save(invalidProgram);
     Set<ProgramOrderable> invalidProgramOrderables = new HashSet<>();
     Orderable invalidOrderable = new Orderable(Code.code(CODE), Dispensable.createNew(EACH),
-        NAME, DESCRIPTION, 10, 5, false, invalidProgramOrderables, null);
+        NAME, DESCRIPTION, 10, 5, false, invalidProgramOrderables, null, null);
     repository.save(invalidOrderable);
     invalidProgramOrderables.add(createProgramOrderable(invalidProgram, invalidOrderable));
     repository.save(invalidOrderable);
@@ -175,7 +176,7 @@ public class OrderableRepositoryIntegrationTest
     programRepository.save(validProgram);
     Set<ProgramOrderable> programOrderables = new HashSet<>();
     Orderable validOrderable = new Orderable(Code.code(CODE), Dispensable.createNew(EACH),
-        NAME, DESCRIPTION, 10, 5, false, programOrderables, null);
+        NAME, DESCRIPTION, 10, 5, false, programOrderables, null, null);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);

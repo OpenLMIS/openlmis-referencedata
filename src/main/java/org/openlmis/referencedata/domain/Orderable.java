@@ -31,6 +31,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -84,6 +85,10 @@ public class Orderable extends BaseEntity {
       name = "orderable_identifiers",
       joinColumns = @JoinColumn(name = "orderableId"))
   private Map<String, String> identifiers;
+
+  @Column(name = "extradata", columnDefinition = "jsonb")
+  @Convert(converter = ExtraDataConverter.class)
+  private Map<String, String> extraData;
 
   /**
    * Get the association to a {@link Program}.
@@ -179,6 +184,7 @@ public class Orderable extends BaseEntity {
               .programOrderables.add(ProgramOrderable.newInstance(po, orderable)));
     }
     orderable.identifiers = importer.getIdentifiers();
+    orderable.extraData = importer.getExtraData();
 
     return orderable;
   }
@@ -199,6 +205,7 @@ public class Orderable extends BaseEntity {
     exporter.setRoundToZero(roundToZero);
     exporter.setPrograms(ProgramOrderableDto.newInstance(programOrderables));
     exporter.setIdentifiers(identifiers);
+    exporter.setExtraData(extraData);
   }
 
   public interface Exporter {
@@ -221,6 +228,8 @@ public class Orderable extends BaseEntity {
     void setPrograms(Set<ProgramOrderableDto> programOrderables);
 
     void setIdentifiers(Map<String, String> identifiers);
+
+    void setExtraData(Map<String, String> extraData);
   }
 
   public interface Importer {
@@ -243,5 +252,7 @@ public class Orderable extends BaseEntity {
     Set<ProgramOrderableDto> getPrograms();
 
     Map<String, String> getIdentifiers();
+
+    Map<String, String> getExtraData();
   }
 }

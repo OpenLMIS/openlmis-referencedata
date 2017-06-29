@@ -60,6 +60,24 @@
     ]
   },
   {
+    "id": "6be94307-c7f4-4782-ba83-45f496c8ac42",
+    "code": "C5",
+    "dispensingUnit": "each",
+    "fullProductName": "Streptococcus Pneumoniae Vaccine with VVM",
+    "netContent": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "52128e33-732a-4627-bd4b-69632f0568de"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
     "id": "d602d0c6-4052-456c-8ccd-61b4ad77bece",
     "code": "C100",
     "dispensingUnit": "10 tab strip",
