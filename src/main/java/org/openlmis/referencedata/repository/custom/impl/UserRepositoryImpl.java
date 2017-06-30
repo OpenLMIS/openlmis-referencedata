@@ -56,7 +56,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   }
 
   /**
-   * Method returns all users with matched parameters.
+   * Method returns all matching users sorted in alphabetically descending order.
    * If all parameters are null, returns all users.
    * For firstName, lastName, email: matches values that equal or contain
    * the searched value. Case insensitive.

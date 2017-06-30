@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -79,6 +79,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import lombok.NoArgsConstructor;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -88,6 +91,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import javax.validation.Valid;
 
 @NoArgsConstructor
@@ -272,7 +276,7 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Returns all users with matched parameters.
+   * Returns all matching users sorted in alphabetically descending order.
    *
    * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
    *                 active, verified, loginRestricted) and JSON extraData.
