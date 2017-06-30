@@ -96,7 +96,10 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     predicate = addEqualsFilter(predicate, builder, root, "active", active);
     predicate = addEqualsFilter(predicate, builder, root, "verified", verified);
     predicate = addEqualsFilter(predicate, builder, root, "loginRestricted", loginRestricted);
+
     query.where(predicate);
+    query.orderBy(builder.desc(root.get("username")));
+
     return entityManager.createQuery(query).setMaxResults(pageSize)
                         .setFirstResult(pageNumber * pageSize)
                         .getResultList();
