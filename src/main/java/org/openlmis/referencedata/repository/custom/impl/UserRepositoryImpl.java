@@ -35,7 +35,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   private EntityManager entityManager;
 
   /**
-   * Method returns all users with matched parameters.
+   * Method returns all users with matched parameters sorted by username in alphabetically
+   * descending order.
    * If all parameters are null, returns all users.
    *
    * @param username        username of user.
@@ -56,7 +57,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   }
 
   /**
-   * Method returns all matching users sorted in alphabetically descending order.
+   * Method returns all matching users sorted by username in alphabetically descending order.
    * If all parameters are null, returns all users.
    * For firstName, lastName, email: matches values that equal or contain
    * the searched value. Case insensitive.

@@ -276,7 +276,7 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Returns all matching users sorted in alphabetically descending order.
+   * Returns all matching users sorted by username in alphabetically descending order.
    *
    * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
    *                 active, verified, loginRestricted) and JSON extraData.

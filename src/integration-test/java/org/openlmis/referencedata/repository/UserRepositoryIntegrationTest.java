@@ -194,6 +194,25 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   @Test
+  public void testSearchSortByUsername() {
+    List<User> receivedUsers = repository.searchUsers(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    for (int i = 1; i < receivedUsers.size(); i++) {
+      assertTrue(receivedUsers.get(i).getUsername().compareTo(receivedUsers.get(i - 1)
+          .getUsername()) < 0);
+    }
+  }
+
+  @Test
   public void testSearchUsersOnlyByEmail() {
     User user1 = cloneUser(users.get(0));
     user1.setEmail("user1@mail.com");

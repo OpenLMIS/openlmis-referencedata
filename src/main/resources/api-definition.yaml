@@ -1396,7 +1396,12 @@ resourceTypes:
       /search:
               post:
                   is: [ secured, paginated ]
-                  description: "Search users, matching all parameters specified. Search parameters are passed in the request body, in JSON format. The JSON in the request body should be one or more key-value pairs. Returns paginated user list. For firstName, lastName, email: matches values that equal or contain the searched value. Case insensitive. Other fields: entered string value must equal searched value."
+                  description: "Search users, matching all parameters specified. Search
+                  parameters are passed in the request body, in JSON format. The JSON in the
+                  request body should be one or more key-value pairs. Returns paginated user list
+                   sorted in descending alphabetical order. For firstName, lastName, email: matches
+                   values that equal or
+                   contain the searched value. Case insensitive. Other fields: entered string value must equal searched value."
                   body:
                       application/json:
                         schema: userQueryDto
