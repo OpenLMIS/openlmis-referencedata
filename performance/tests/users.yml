@@ -1,0 +1,47 @@
+execution:
+  - concurrency: 1
+    hold-for: 1m
+    iterations: 10
+    scenario: users-get-all
+  - concurrency: 1
+    hold-for: 1m
+    iterations: 10
+    scenario: users-search-one-page
+
+scenarios:
+  users-get-all:
+    requests:
+      - url: ${__P(base-uri)}/api/oauth/token
+        method: POST
+        headers:
+          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
+        body:
+          grant_type: password
+          username: ${__P(username)}
+          password: ${__P(password)}
+        extract-jsonpath:
+          access_token:
+            jsonpath: $.access_token
+      - url: ${__P(base-uri)}/api/users
+        method: GET
+        headers:
+          Authorization: Bearer ${access_token}
+  users-search-one-page:
+    requests:
+      - url: ${__P(base-uri)}/api/oauth/token
+        method: POST
+        headers:
+          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
+        body:
+          grant_type: password
+          username: ${__P(username)}
+          password: ${__P(password)}
+        extract-jsonpath:
+          access_token:
+            jsonpath: $.access_token
+      - url: ${__P(base-uri)}/api/users/search?page=1&size=10
+        method: POST
+        body: '{}'
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
