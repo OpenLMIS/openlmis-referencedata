@@ -1,0 +1,39 @@
+execution:
+  - concurreny: 1
+    iterations: 10
+    scenario: approved-products
+
+scenarios:
+  approved-products:
+    requests:
+      - url: ${__P(base-uri)}/api/oauth/token
+        method: POST
+        headers:
+          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
+        body:
+          grant_type: password
+          username: ${__P(username)}
+          password: ${__P(password)}
+        extract-jsonpath:
+          access_token:
+            jsonpath: $.access_token
+      - url: ${__P(base-uri)}/api/facilities/search
+        method: POST
+        body:
+          code: HC01
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        extract-jsonpath:
+          facuuid:
+            jsonpath: $.content[:1].id
+      - url: ${__P(base-uri)}/api/facilities/${facuuid}/approvedProducts?fullSupply=true
+        method: GET
+        headers:
+          Authorization: Bearer ${access_token}
+        jsr223:
+          script-text: |
+            String uuid = vars.get("facuuid");
+            uuid = uuid.replaceAll(/"|\[|\]/, "");
+            vars.put("facuuid", uuid);
+          execute: "before"
