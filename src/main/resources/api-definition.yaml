@@ -66,6 +66,14 @@ schemas:
 
   - approvedProductQueryDto: !include schemas/approvedProductQueryDto.json
 
+  - basicFacilityDto: !include schemas/basicFacilityDto.json
+
+  - basicFacilityArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref":"schemas/basicFacilityDto.json" }
+      }
+
   - facility: !include schemas/facility.json
 
   - facilityArray: |
@@ -1466,7 +1474,7 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-                      schema: facilityArray
+                      schema: basicFacilityArray
               "403":
                   body:
                     application/json:

@@ -241,6 +241,19 @@ public class Facility extends BaseEntity {
     exporter.setExtraData(extraData);
   }
 
+  /**
+   * Exports basic fields in the current state of facility object.
+   *
+   * @param basicExporter instance of {@link BasicExporter}
+   */
+  public void basicExport(BasicExporter basicExporter) {
+    basicExporter.setId(id);
+    basicExporter.setCode(code);
+    basicExporter.setName(name);
+    basicExporter.setActive(active);
+    basicExporter.setGeographicZone(geographicZone);
+  }
+
   public boolean isWarehouse() {
     return WAREHOUSE_CODE.equalsIgnoreCase(type.getCode());
   }
@@ -287,6 +300,23 @@ public class Facility extends BaseEntity {
     void setLocation(Point location);
 
     void setExtraData(Map<String, String> extraData);
+  }
+
+  public interface BasicExporter {
+
+    void setId(UUID id);
+
+    void setCode(String code);
+
+    void setName(String name);
+
+    void setActive(Boolean active);
+
+    void setEnabled(Boolean enabled);
+
+    void setType(FacilityType type);
+
+    void setGeographicZone(GeographicZone geographicZone);
   }
 
   public interface Importer {

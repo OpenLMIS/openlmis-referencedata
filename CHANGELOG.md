@@ -1,4 +1,10 @@
-7.0.0 / WIP
+8.0.0 / WIP
+==================
+
+Breaking changes:
+* [OLMIS-2709](https://openlmis.atlassian.net/browse/OLMIS-2709): Facility search and get all now are returning smaller dto object.
+
+7.0.0 / 2017-06-23
 ==================
 
 Breaking changes:
@@ -9,7 +15,6 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-2611](https://openlmis.atlassian.net/browse/OLMIS-2611): Added using locale from env file
 * [OLMIS-2729](https://openlmis.atlassian.net/browse/OLMIS-2729): Added endpoint for get user supported programs for home facility
   * We should not really require client apps to filter if programs are supported by user facility. The logic should be shared in backend service.
-
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-2606](https://openlmis.atlassian.net/browse/OLMIS-2606): Fix saving requisition groups with requisition group program schedules.

@@ -36,6 +36,7 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
+import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.SupportedProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -126,10 +127,10 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<FacilityDto> getAllFacilities() {
+  public List<BasicFacilityDto> getAllFacilities() {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    return toDto(facilityRepository.findAll());
+    return toBasicDto(facilityRepository.findAll());
   }
 
 
@@ -324,12 +325,12 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<FacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
+  public Page<BasicFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
                                             Pageable pageable) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
-    List<FacilityDto> facilityDtos = toDto(foundFacilities);
+    List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities);
     return Pagination.getPage(facilityDtos, pageable);
   }
 
@@ -356,6 +357,20 @@ public class FacilityController extends BaseController {
     }
 
     return productDtos;
+  }
+
+  private BasicFacilityDto toBasicDto(Facility facility) {
+    BasicFacilityDto dto = new BasicFacilityDto();
+    facility.basicExport(dto);
+
+    return dto;
+  }
+
+  private List<BasicFacilityDto> toBasicDto(Iterable<Facility> facilities) {
+    return StreamSupport
+        .stream(facilities.spliterator(), false)
+        .map(this::toBasicDto)
+        .collect(Collectors.toList());
   }
 
   private void addSupportedProgramsToFacility(Set<SupportedProgramDto> supportedProgramDtos,
