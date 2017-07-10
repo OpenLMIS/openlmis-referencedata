@@ -12,4 +12,3 @@ gradlew*
 .tx/
 node_modules/
 demo-data/*.sql
-performance/artifacts/
