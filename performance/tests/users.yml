@@ -2,6 +2,10 @@ execution:
   - concurrency: 1
     hold-for: 1m
     iterations: 10
+    scenario: users-get-one
+  - concurrency: 1
+    hold-for: 1m
+    iterations: 10
     scenario: users-get-all
   - concurrency: 1
     hold-for: 1m
@@ -9,6 +13,23 @@ execution:
     scenario: users-search-one-page
 
 scenarios:
+  users-get-one:
+    requests:
+      - url: ${__P(base-uri)}/api/oauth/token
+        method: POST
+        headers:
+          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
+        body:
+          grant_type: password
+          username: ${__P(username)}
+          password: ${__P(password)}
+        extract-jsonpath:
+          access_token:
+            jsonpath: $.access_token
+      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+        method: GET
+        headers:
+          Authorization: Bearer ${access_token}
   users-get-all:
     requests:
       - url: ${__P(base-uri)}/api/oauth/token
