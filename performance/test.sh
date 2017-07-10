@@ -6,7 +6,7 @@
 
 # determine base uri from first argument or use default
 URL='https://test.openlmis.org'
-if [ ! -z "'$1'" ]; then
+if [ ! -z ${1+x} ]; then
   URL=$1
 fi
 
