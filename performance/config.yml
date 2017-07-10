@@ -1,7 +1,4 @@
 modules:
-  console:
-    disable: true
-    screen: console
   jmeter:
     properties:
       base-uri: http://localhost
