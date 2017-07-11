@@ -2,7 +2,7 @@
 ==================
 
 Breaking changes:
-* [OLMIS-2709](https://openlmis.atlassian.net/browse/OLMIS-2709): Facility search now returns smaller object.
+* [OLMIS-2709](https://openlmis.atlassian.net/browse/OLMIS-2709): Facility search now returns smaller objects.
 
 7.0.0 / 2017-06-23
 ==================
