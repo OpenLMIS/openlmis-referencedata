@@ -1,7 +1,7 @@
 {
   "type": "object",
   "$schema": "http://json-schema.org/draft-04/schema",
-  "title": "BasicFacilityDto",
+  "title": "MinimalFacilityDto",
   "description": "A single facility with minimum fields",
   "properties": {
     "id": {

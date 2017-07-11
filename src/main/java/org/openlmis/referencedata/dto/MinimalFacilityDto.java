@@ -15,21 +15,28 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.vividsolutions.jts.geom.Point;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.SupportedProgram;
+
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class BasicFacilityDto extends BaseDto implements Facility.BasicExporter {
+public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
   private String code;
   private String name;
@@ -37,7 +44,6 @@ public class BasicFacilityDto extends BaseDto implements Facility.BasicExporter 
   private Boolean enabled;
   private FacilityTypeDto type;
   private GeographicZoneSimpleDto geographicZone;
-
 
   @Override
   public void setGeographicZone(GeographicZone geographicZone) {
@@ -50,5 +56,50 @@ public class BasicFacilityDto extends BaseDto implements Facility.BasicExporter 
     this.type = new FacilityTypeDto();
     type.export(this.type);
 
+  }
+
+  @Override
+  public void setDescription(String description) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setOperator(FacilityOperator operator) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setGoLiveDate(LocalDate goLiveDate) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setGoDownDate(LocalDate goDownDate) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setComment(String comment) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setOpenLmisAccessible(Boolean openLmisAccessible) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setLocation(Point location) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setExtraData(Map<String, String> extraData) {
+    // unsupported operation
   }
 }

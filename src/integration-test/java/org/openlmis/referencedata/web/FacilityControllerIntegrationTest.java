@@ -63,7 +63,6 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
-import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -471,16 +470,16 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
 
-    BasicFacilityDto[] response = restAssured
+    FacilityDto[] response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(BasicFacilityDto[].class);
+        .extract().as(FacilityDto[].class);
 
-    List<BasicFacilityDto> facilities = Arrays.asList(response);
+    List<FacilityDto> facilities = Arrays.asList(response);
     assertThat(facilities.size(), is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
