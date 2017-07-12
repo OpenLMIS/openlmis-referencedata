@@ -72,6 +72,9 @@ public class Dispensable {
    * @return new instance of Dispensable.
    */
   public static Dispensable newInstance(Importer importer) {
+    if (importer == null) {
+      return new Dispensable();
+    }
     return new Dispensable(importer.getDispensingUnit());
   }
 
