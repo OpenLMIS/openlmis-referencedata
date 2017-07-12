@@ -81,8 +81,8 @@ public class RightService {
       // service-level tokens not allowed and no user associated with the request
       throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
     } else { // user-based client, check if user has right
-      String username = ((User) authentication.getPrincipal()).getUsername();
-      User user = userRepository.findOneByUsername(username);
+      UUID userId = ((User) authentication.getPrincipal()).getId();
+      User user = userRepository.findOne(userId);
 
       // bypass the right check if user id matches
       if (null != expectedUserId && expectedUserId.equals(user.getId())) {

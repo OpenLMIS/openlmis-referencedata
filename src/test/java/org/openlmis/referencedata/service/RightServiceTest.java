@@ -81,7 +81,7 @@ public class RightServiceTest {
   public void checkAdminRightShouldAllowUserWhoHasRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
     when(userClient.getPrincipal()).thenReturn(user);
-    when(userRepository.findOneByUsername(any(String.class))).thenReturn(user);
+    when(userRepository.findOne(any(UUID.class))).thenReturn(user);
     when(user.hasRight(any(RightQuery.class))).thenReturn(true);
 
     rightService.checkAdminRight(RIGHT_NAME);
@@ -91,7 +91,7 @@ public class RightServiceTest {
   public void checkAdminRightShouldAllowRequesterWithSpecifiedUserId() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
     when(userClient.getPrincipal()).thenReturn(user);
-    when(userRepository.findOneByUsername(any(String.class))).thenReturn(user);
+    when(userRepository.findOne(any(UUID.class))).thenReturn(user);
     when(user.hasRight(any(RightQuery.class))).thenReturn(false);
 
     rightService.checkAdminRight(RIGHT_NAME, true, user.getId());
@@ -101,7 +101,7 @@ public class RightServiceTest {
   public void checkAdminRightShouldThrowUnauthorizedExceptionForUserWhoDoesNotHaveRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
     when(userClient.getPrincipal()).thenReturn(user);
-    when(userRepository.findOneByUsername(any(String.class))).thenReturn(user);
+    when(userRepository.findOne(any(UUID.class))).thenReturn(user);
     when(user.hasRight(any(RightQuery.class))).thenReturn(false);
 
     rightService.checkAdminRight(RIGHT_NAME);
