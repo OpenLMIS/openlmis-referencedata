@@ -32,13 +32,15 @@ that most Services will find useful:
 
 - `clean` to remove build artifacts
 - `build` to build all source. `build`, after building sources, also runs unit tests. Build will
-be successful only if all tests pass.
+be successful only if all tests pass. **NOTE**: Build will not run integration tests.
 - `generateMigration -PmigrationName=<yourMigrationName>` to create a "blank" database migration
 file. The file will be generated under `src/main/resources/db/migration`. Put your migration SQL
 into it.
 - `test` to run unit tests
 - `integrationTest` to run integration tests
 - `sonarqube` to execute the SonarQube analysis.
+
+A typical clean build & test command is: `gradle clean build integrationTest`.
 
 The **test results** are shown in the console.
 
