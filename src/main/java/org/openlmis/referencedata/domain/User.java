@@ -36,7 +36,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -103,8 +102,7 @@ public class User extends BaseEntity {
   @Setter
   private Boolean allowNotify;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true,
-      fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @DiffIgnore
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
