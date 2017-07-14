@@ -5,7 +5,8 @@ Breaking changes:
 * [OLMIS-2709](https://openlmis.atlassian.net/browse/OLMIS-2709): Facility search now returns smaller objects.
 
 New functionality added in a backwards-compatible manner:
-* [OLMIS-2609](https://openlmis.atlassian.net/browse/OLMIS-2609): Created rights to manage CCE and assigned to system administrator
+* [OLMIS-2609](https://openlmis.atlassian.net/browse/OLMIS-2609): Created rights to manage CCE and assigned to system administrator.
+* [OLMIS-2696](https://openlmis.atlassian.net/browse/OLMIS-2696): Added search requisition groups endpoint.
 
 7.0.0 / 2017-06-23
 ==================

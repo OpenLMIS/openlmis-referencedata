@@ -82,7 +82,9 @@ public class RequisitionGroupProgramScheduleBaseDto extends BaseDto implements
   @Override
   public void setProgram(Program program) {
     if (program != null) {
-      this.program = new ProgramDto(program.getId());
+      ProgramDto programDto = new ProgramDto(program.getId());
+      programDto.setName(program.getName());
+      this.program = programDto;
     } else {
       this.program = null;
     }

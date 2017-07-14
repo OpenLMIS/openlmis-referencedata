@@ -60,7 +60,10 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   @Override
   public void setFacility(Facility facility) {
     if (facility != null) {
-      this.facility = new FacilityDto(facility.getId());
+      FacilityDto facilityDto = new FacilityDto(facility.getId());
+      facilityDto.setName(facility.getName());
+      this.facility = facilityDto;
+
     } else {
       this.facility = null;
     }
