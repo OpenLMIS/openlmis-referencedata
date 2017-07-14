@@ -2,11 +2,7 @@
   "service": {
     "Name": "referencedata",
     "Port": 8080,
-    "Tags": ["openlmis-service"],
-    "check": {
-      "interval": "10s",
-      "http": "http://HOST:PORT/health"
-    }
+    "Tags": ["openlmis-service"]
   },
   "raml": "src/main/resources/api-definition.yaml",
   "path": [
