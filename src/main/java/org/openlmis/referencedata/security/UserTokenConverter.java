@@ -15,17 +15,22 @@
 
 package org.openlmis.referencedata.security;
 
-import org.openlmis.referencedata.domain.User;
+import org.apache.commons.collections4.MapUtils;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.util.UuidUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserTokenConverter extends DefaultUserAuthenticationConverter {
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserTokenConverter.class);
 
   @Autowired
   private UserRepository userRepository;
@@ -36,21 +41,19 @@ public class UserTokenConverter extends DefaultUserAuthenticationConverter {
    * @return authentication token.
      */
   public Authentication extractAuthentication(Map<String, ?> map) {
+    LOGGER.info("Entering extractAuthentication");
     UsernamePasswordAuthenticationToken token =
         (UsernamePasswordAuthenticationToken) super.extractAuthentication(map);
-    if (token != null) {
-      User principal = new User();
-      principal.setUsername(token.getPrincipal().toString());
-      Object userId = map.get("referenceDataUserId");
-      if (userId != null) {
-        User user = userRepository.findOne(UUID.fromString((String) userId));
-        if (user != null) {
-          principal = user;
-        }
+    if (null != token) {
+      String userId = MapUtils.getString(map, "referenceDataUserId", "");
+      Optional<UUID> userUuid = UuidUtil.fromString(userId);
+      if (userUuid.isPresent() && userRepository.exists(userUuid.get())) {
+        LOGGER.info("Exiting extractAuthentication: found user " + userUuid.get());
+        return new UsernamePasswordAuthenticationToken(userUuid.get(), token.getCredentials(),
+            token.getAuthorities());
       }
-      return new UsernamePasswordAuthenticationToken(principal, token.getCredentials(),
-          token.getAuthorities());
     }
+    LOGGER.info("Exiting extractAuthentication: didn't find user");
     return null;
   }
 }

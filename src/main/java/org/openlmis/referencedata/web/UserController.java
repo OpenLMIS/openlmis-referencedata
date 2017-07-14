@@ -223,14 +223,17 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public UserDto getUser(@PathVariable("userId") UUID userId) {
+    LOGGER.info("Entering getUser: " + userId);
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
-    LOGGER.debug("Getting user");
+    LOGGER.info("Start lookup of user in repository");
     User user = userRepository.findOne(userId);
+    LOGGER.info("End lookup of user in repository");
     if (user == null) {
       LOGGER.error("User to get does not exist");
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
+      LOGGER.info("Exiting getUser: " + userId);
       return exportUserToDto(user);
     }
   }

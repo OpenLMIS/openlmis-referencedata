@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.security;
 
 import org.javers.spring.auditable.AuthorProvider;
-import org.openlmis.referencedata.domain.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -30,16 +29,15 @@ public class UserNameProvider implements AuthorProvider {
   public String provide() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-    if (auth == null) {
+    if (null == auth) {
       return "unauthenticated user";
     }
 
-    try {
-      User user = (User) auth.getPrincipal();
-      return user.getId().toString();
-    } catch (Exception ex) {
+    Object principle = auth.getPrincipal();
+    if (null == principle) {
       return "unknown user";
     }
-  }
 
+    return principle.toString();
+  }
 }
