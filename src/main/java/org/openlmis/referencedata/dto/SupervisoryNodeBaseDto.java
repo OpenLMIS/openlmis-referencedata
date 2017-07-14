@@ -61,7 +61,7 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   public void setFacility(Facility facility) {
     if (facility != null) {
       FacilityDto facilityDto = new FacilityDto(facility.getId());
-      facilityDto.setName(facility.getName());
+      facilityDto.setGeographicZone(facility.getGeographicZone());
       this.facility = facilityDto;
 
     } else {
