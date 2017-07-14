@@ -60,7 +60,30 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
                                        Program program, List<SupervisoryNode> supervisoryNodes,
                                        Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
     CriteriaQuery<RequisitionGroup> query = builder.createQuery(RequisitionGroup.class);
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+
+    query = prepareQuery(query, code, name, program, supervisoryNodes);
+    countQuery = prepareQuery(countQuery, code, name, program, supervisoryNodes);
+
+    countQuery.select(builder.countDistinct(countQuery.from(RequisitionGroup.class)));
+
+    Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    List<RequisitionGroup> result = entityManager.createQuery(query)
+        .setMaxResults(pageable.getPageSize())
+        .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
+        .getResultList();
+
+    return Pagination.getPage(result, pageable, count);
+  }
+
+  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, String code,
+                                            String name, Program program,
+                                            List<SupervisoryNode> supervisoryNodes) {
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
     Root<RequisitionGroup> root = query.from(RequisitionGroup.class);
     Predicate predicate = builder.conjunction();
 
@@ -86,19 +109,8 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
           builder.in(root.get(SUPERVISORY_NODE).in(supervisoryNodes)));
     }
 
-    /*CriteriaQuery<Long> cq = builder.createQuery(Long.class);
-    cq.select(builder.count(cq.from(RequisitionGroup.class)));
-    entityManager.createQuery(cq);
-    cq.where(predicate);
-    Long count = entityManager.createQuery(cq).getSingleResult();*/
-
     query.where(predicate);
 
-    List<RequisitionGroup> result = entityManager.createQuery(query)
-        .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
-        .getResultList();
-
-    return Pagination.getPage(result, pageable, 10);
+    return query;
   }
 }

@@ -259,6 +259,25 @@ public class RequisitionGroupRepositoryIntegrationTest
     assertEquals(0, foundGroups.getContent().size());
   }
 
+  @Test
+  public void shouldReturnRequisitionGroupsWithFullCount() {
+    assertEquals(0, repository.count());
+
+    for (int i = 0; i < 10; i++) {
+      RequisitionGroup group  = generateInstance();
+      repository.save(group);
+    }
+
+    assertEquals(10, repository.count());
+
+    Pageable pageable = mockPageable(3, 1);
+
+    Page<RequisitionGroup> result = repository.search("Code", null, null, null, pageable);
+
+    assertEquals(3, result.getContent().size());
+    assertEquals(10, result.getTotalElements());
+  }
+
   /*@Test
   public void shouldFindFacilitiesBySupervisoryNodes() {
     RequisitionGroup requisitionGroup = generateInstance();
