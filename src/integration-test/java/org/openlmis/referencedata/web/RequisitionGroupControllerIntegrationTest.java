@@ -15,14 +15,18 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -35,14 +39,21 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
+import org.openlmis.referencedata.service.RequisitionGroupService;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -51,11 +62,15 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/requisitionGroups";
+  private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String DESCRIPTION = "OpenLMIS";
 
   @MockBean
   private RequisitionGroupRepository requisitionGroupRepository;
+
+  @MockBean
+  private RequisitionGroupService requisitionGroupService;
 
   @MockBean
   private RequisitionGroupValidator requisitionGroupValidator;
@@ -398,4 +413,141 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     assertEquals(DESCRIPTION, response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
+
+  @Test
+  public void shouldFindRequisitionGroupsWithSimilarCode() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
+
+    String similarCode = "RG";
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("code", similarCode);
+
+    List<RequisitionGroup> listToReturn = new ArrayList<>();
+    Pageable pageable = mock(Pageable.class);
+    given(pageable.getPageNumber()).willReturn(0);
+    given(pageable.getPageSize()).willReturn(1);
+    listToReturn.add(requisitionGroup);
+    given(requisitionGroupService.searchRequisitionGroups(requestBody, any(Pageable.class)))
+        .willReturn(Pagination.getPage(listToReturn, pageable, 1));
+
+    PageImplRepresentation response = restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    Map<String, String> foundRequisitionGroup = (LinkedHashMap) response.getContent().get(0);
+    assertEquals(1, response.getContent().size());
+    assertEquals(requisitionGroup.getCode(), foundRequisitionGroup.get("code"));
+  }
+
+  @Test
+  public void shouldFindRequisitionGroupsWithSimilarName() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
+
+    String similarName = "group-name";
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("name", similarName);
+
+    List<RequisitionGroup> listToReturn = new ArrayList<>();
+    Pageable pageable = mock(Pageable.class);
+    given(pageable.getPageNumber()).willReturn(0);
+    given(pageable.getPageSize()).willReturn(1);
+    listToReturn.add(requisitionGroup);
+    given(requisitionGroupService.searchRequisitionGroups(requestBody, any(Pageable.class)))
+        .willReturn(Pagination.getPage(listToReturn, pageable, 1));
+
+    PageImplRepresentation response = restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    Map<String, String> foundRequisitionGroup = (LinkedHashMap) response.getContent().get(0);
+    assertEquals(1, response.getContent().size());
+    assertEquals(requisitionGroup.getCode(), foundRequisitionGroup.get("code"));
+  }
+
+  @Test
+  public void shouldRejectSearchRequestIfUserHasNoRight() {
+    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
+
+    String messageKey = restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(new HashMap<>())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenSearchThrowsException() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
+
+    given(requisitionGroupService.searchRequisitionGroups(anyMap(), any(Pageable.class))).willThrow(
+        new ValidationMessageException("somethingWrong"));
+
+    restAssured.given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(new HashMap<>())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldPaginateSearchFacilities() {
+    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
+
+    List<RequisitionGroup> listToReturn = new ArrayList<>();
+    listToReturn.add(requisitionGroup);
+
+    Pageable pageable = mock(Pageable.class);
+    given(pageable.getPageNumber()).willReturn(0);
+    given(pageable.getPageSize()).willReturn(1);
+
+    Map<String, Object> requestBody = new HashMap<>();
+
+    given(requisitionGroupService.searchRequisitionGroups(requestBody, any(Pageable.class)))
+        .willReturn(Pagination.getPage(listToReturn, pageable, 1));
+
+    PageImplRepresentation response = restAssured.given()
+        .queryParam("page", 0)
+        .queryParam("size", 1)
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(1, response.getTotalElements());
+    assertEquals(1, response.getTotalPages());
+    assertEquals(1, response.getNumberOfElements());
+    assertEquals(1, response.getSize());
+    assertEquals(0, response.getNumber());
+  }
+
 }

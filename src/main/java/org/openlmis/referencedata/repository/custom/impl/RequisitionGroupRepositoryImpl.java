@@ -15,9 +15,9 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.RequisitionGroupRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
@@ -75,8 +75,8 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
     }
 
     if (program != null) {
-      Join<SupervisoryNode, Facility> programSchedulesJoin = root.join(PROGRAM_SCHEDULES,
-          JoinType.LEFT);
+      Join<RequisitionGroup, RequisitionGroupProgramSchedule> programSchedulesJoin =
+          root.join(PROGRAM_SCHEDULES, JoinType.LEFT);
       predicate = builder.and(predicate,
           builder.equal(programSchedulesJoin.get(PROGRAM), program));
     }

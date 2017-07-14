@@ -209,35 +209,13 @@ schemas:
       }
 
 
-  - requisitionGroup: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "RequisitionGroup",
-          "description": "A single requisitionGroup",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "code": { "type": "string", "required": true, "unique": true, "title": "code" },
-              "name": { "type": "string", "required": true, "title": "name" },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNodeDto", "required": true },
-              "requisitionGroupProgramScheules": { "type": "array", "required": false, "title": "requisitionGroupProgramSchedules", "items": { "type": "object", "$ref": "#/schemas/requisitionGroupProgramSchedule" }, "uniqueItems": false },
-              "memberFacilities": { "type": "array", "required": false, "title": "memberFacilities", "items": { "type": "object", "$ref": "#/schemas/facility" }, "uniqueItems": false }
-          }
-      }
+  - requisitionGroup: !include schemas/requisitionGroupDto.json
 
-  - requisitionGroupProgramSchedule: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "RequisitionGroupProgramSchedule",
-          "description": "A single requisitionGroupProgramSchedule",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "program": { "type": "object", "$ref": "#/schemas/program", "required": true },
-              "processingSchedule": { "type": "object", "$ref": "#/schemas/processingSchedule", "required": true },
-              "directDelivery": { "type": "boolean", "required": true, "title": "directDelivery" },
-              "dropOffFacility": { "type": "object", "$ref": "#/schemas/facility", "required": false }
-          }
-      }
+  - requisitionGroupProgramSchedule: !include schemas/requisitionGroupProgramScheduleDto.json
+
+  - requisitionGroupQuery: !include schemas/requisitionGroupQueryDto.json
+
+  - requisitionGroupPage: !include schemas/requisitionGroupPageDto.json
 
   - stockAdjustmentReason: !include schemas/stockAdjustmentReason.json
 
@@ -2753,6 +2731,28 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
+      /search:
+            post:
+                is: [ secured, paginated ]
+                description: Returns a paginated list of requisition groups given either a zone, a name, a program or a code.
+                body:
+                  application/json:
+                    schema: requisitionGroupQuery
+                responses:
+                  200:
+                      body:
+                        application/json:
+                            schema: requisitionGroupPage
+                  400:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  403:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  404:
+
 
   /currencySettings:
       displayName: Currency settings
