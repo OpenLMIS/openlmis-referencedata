@@ -136,7 +136,7 @@ public class RequisitionGroupServiceTest {
 
   @Test
   public void shouldSearchForRequisitionGroupsWithAllParametersProvided() {
-    when(geographicZoneRepository.findByCode(any(Code.class))).thenReturn(zone);
+    when(geographicZoneRepository.findByCode(any(String.class))).thenReturn(zone);
     when(programRepository.findByCode(any(Code.class))).thenReturn(program);
     List<SupervisoryNode> nodes = Arrays.asList(supervisoryNode);
     when(supervisoryNodeRepository.search(any(String.class), any(String.class), eq(zone)))

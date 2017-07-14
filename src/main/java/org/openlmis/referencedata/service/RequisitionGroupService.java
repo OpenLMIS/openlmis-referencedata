@@ -96,7 +96,7 @@ public class RequisitionGroupService {
   private List<SupervisoryNode> getSupervisoryNodeBasedOnZone(String zoneCode) {
     List<SupervisoryNode> supervisoryNodes = null;
     if (!StringUtils.isEmpty(zoneCode)) {
-      GeographicZone zone = geographicZoneRepository.findByCode(Code.code(zoneCode));
+      GeographicZone zone = geographicZoneRepository.findByCode(zoneCode);
       if (zone == null) {
         throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
       }

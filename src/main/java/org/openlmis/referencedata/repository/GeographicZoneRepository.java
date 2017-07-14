@@ -19,7 +19,6 @@ import com.vividsolutions.jts.geom.Point;
 import java.util.List;
 import java.util.UUID;
 
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.data.jpa.repository.Query;
@@ -40,7 +39,7 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
 
   List<GeographicZone> findByLevel(GeographicLevel level);
 
-  <S extends GeographicZone> S findByCode(Code code);
+  <S extends GeographicZone> S findByCode(String code);
 
   @Query(value = "SELECT gz.*"
       + " FROM referencedata.geographic_zones gz"
