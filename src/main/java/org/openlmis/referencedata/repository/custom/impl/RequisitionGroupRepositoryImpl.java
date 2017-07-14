@@ -86,11 +86,11 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
           builder.in(root.get(SUPERVISORY_NODE).in(supervisoryNodes)));
     }
 
-    CriteriaQuery<Long> cq = builder.createQuery(Long.class);
+    /*CriteriaQuery<Long> cq = builder.createQuery(Long.class);
     cq.select(builder.count(cq.from(RequisitionGroup.class)));
     entityManager.createQuery(cq);
     cq.where(predicate);
-    Long count = entityManager.createQuery(cq).getSingleResult();
+    Long count = entityManager.createQuery(cq).getSingleResult();*/
 
     query.where(predicate);
 
@@ -99,6 +99,6 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
         .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
         .getResultList();
 
-    return Pagination.getPage(result, pageable, count);
+    return Pagination.getPage(result, pageable, 10);
   }
 }

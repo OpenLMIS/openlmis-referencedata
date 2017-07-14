@@ -447,37 +447,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldFindRequisitionGroupsWithSimilarName() {
-    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
-
-    String similarName = "group-name";
-    Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("name", similarName);
-
-    List<RequisitionGroup> listToReturn = new ArrayList<>();
-    Pageable pageable = mock(Pageable.class);
-    given(pageable.getPageNumber()).willReturn(0);
-    given(pageable.getPageSize()).willReturn(1);
-    listToReturn.add(requisitionGroup);
-    given(requisitionGroupService.searchRequisitionGroups(eq(requestBody), any(Pageable.class)))
-        .willReturn(Pagination.getPage(listToReturn, null, 1));
-
-    PageImplRepresentation response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .body(requestBody)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .post(SEARCH_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
-
-    Map<String, String> foundRequisitionGroup = (LinkedHashMap) response.getContent().get(0);
-    assertEquals(1, response.getContent().size());
-    assertEquals(requisitionGroup.getCode(), foundRequisitionGroup.get("code"));
-  }
-
-  @Test
   public void shouldRejectSearchRequestIfUserHasNoRight() {
     mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
 

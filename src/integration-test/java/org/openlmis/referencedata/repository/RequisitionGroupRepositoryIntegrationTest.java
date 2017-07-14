@@ -38,6 +38,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,6 +89,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     requisitionGroup.setName("ReqGr Name # " + instanceNumber);
     requisitionGroup.setSupervisoryNode(supervisoryNode);
     return requisitionGroup;
+
   }
 
   @Before
@@ -166,29 +168,6 @@ public class RequisitionGroupRepositoryIntegrationTest
     actual = repository.save(actual);
 
     assertEquals(0, actual.getMemberFacilities().size());
-  }
-
-  private RequisitionGroup prepareAndSaveRequisitionGroupAndSchedule() {
-    repository.save(generateInstance());
-    RequisitionGroup existingGroup = repository.findAll().iterator().next();
-
-    Program program = new Program("PRO-1");
-    program = programRepository.save(program);
-    ProcessingSchedule schedule = new ProcessingSchedule("SCH-1", "Monthly Schedule");
-    schedule = processingScheduleRepository.save(schedule);
-
-    RequisitionGroupProgramSchedule rgps =
-        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(existingGroup,
-            program, schedule, true);
-
-    List<RequisitionGroupProgramSchedule> schedules = new ArrayList<>();
-    schedules.add(rgps);
-
-    existingGroup.setRequisitionGroupProgramSchedules(schedules);
-
-    repository.save(existingGroup);
-
-    return repository.findOne(existingGroup.getId());
   }
 
   @Test
@@ -280,7 +259,39 @@ public class RequisitionGroupRepositoryIntegrationTest
 
     assertEquals(0, foundGroups.getContent().size());
   }
-  
+
+  /*@Test
+  public void shouldFindFacilitiesBySupervisoryNodes() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    repository.save(requisitionGroup);
+
+    SupervisoryNode supervisoryNode1 = new SupervisoryNode();
+    supervisoryNode1.setCode("some-code");
+    supervisoryNode1.setFacility(facility);
+    supervisoryNodeRepository.save(supervisoryNode1);
+    RequisitionGroup requisitionGroup1 = generateInstance();
+    requisitionGroup1.setSupervisoryNode(supervisoryNode1);
+    repository.save(requisitionGroup1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(null, null, null, Arrays.asList(supervisoryNode),
+        pageable, 1, requisitionGroup);
+  }*/
+
+  /*@Test
+  public void shouldFindFacilitiesByProgram() {
+
+    RequisitionGroup requisitionGroup = prepareAndSaveRequisitionGroupAndSchedule();
+    requisitionGroup = repository.save(requisitionGroup);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(null, null,
+        requisitionGroup.getRequisitionGroupProgramSchedules().get(0).getProgram(),
+        null, pageable, 1, requisitionGroup);
+  }*/
+
   private void searchGroupAndCheckResults(String code, String name, Program program,
                                           List<SupervisoryNode> supervisoryNodes,
                                           Pageable pageable, int expectedSize,
@@ -298,5 +309,28 @@ public class RequisitionGroupRepositoryIntegrationTest
     given(pageable.getPageNumber()).willReturn(pageNumber);
     given(pageable.getPageSize()).willReturn(pageSize);
     return pageable;
+  }
+
+  private RequisitionGroup prepareAndSaveRequisitionGroupAndSchedule() {
+    repository.save(generateInstance());
+    RequisitionGroup existingGroup = repository.findAll().iterator().next();
+
+    Program program = new Program("PRO-1");
+    program = programRepository.save(program);
+    ProcessingSchedule schedule = new ProcessingSchedule("SCH-1", "Monthly Schedule");
+    schedule = processingScheduleRepository.save(schedule);
+
+    RequisitionGroupProgramSchedule rgps =
+        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(existingGroup,
+            program, schedule, true);
+
+    List<RequisitionGroupProgramSchedule> schedules = new ArrayList<>();
+    schedules.add(rgps);
+
+    existingGroup.setRequisitionGroupProgramSchedules(schedules);
+
+    repository.save(existingGroup);
+
+    return repository.findOne(existingGroup.getId());
   }
 }
