@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import org.javers.common.collections.Sets;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -83,12 +84,15 @@ public class RequisitionGroupRepositoryIntegrationTest
 
   RequisitionGroup generateInstance() {
     int instanceNumber = getNextInstanceNumber();
+    return generateInstance("Code # " + instanceNumber, "ReqGr Name # " + instanceNumber);
+  }
+
+  RequisitionGroup generateInstance(String code, String name) {
     RequisitionGroup requisitionGroup = new RequisitionGroup();
-    requisitionGroup.setCode("Code # " + instanceNumber);
-    requisitionGroup.setName("ReqGr Name # " + instanceNumber);
+    requisitionGroup.setCode(code);
+    requisitionGroup.setName(name);
     requisitionGroup.setSupervisoryNode(supervisoryNode);
     return requisitionGroup;
-
   }
 
   @Before
@@ -118,6 +122,9 @@ public class RequisitionGroupRepositoryIntegrationTest
     supervisoryNode.setCode(CODE);
     supervisoryNode.setFacility(facility);
     supervisoryNodeRepository.save(supervisoryNode);
+
+    ProcessingSchedule schedule = new ProcessingSchedule("SCH-1", "Monthly Schedule");
+    processingScheduleRepository.save(schedule);
   }
 
   @Test
@@ -288,6 +295,35 @@ public class RequisitionGroupRepositoryIntegrationTest
     assertEquals(10, result.getTotalElements());
   }
 
+  @Test
+  public void shouldReturnRequisitionGroupsWithWhenSearchingByProgramFullCount() {
+    assertEquals(0, repository.count());
+
+    for (int i = 0; i < 5; i++) {
+      prepareAndSaveRequisitionGroupAndSchedule("C" + i, "PRO1");
+    }
+    for (int i = 5; i < 9; i++) {
+      prepareAndSaveRequisitionGroupAndSchedule("C" + i, "PRO2");
+
+    }
+
+    assertEquals(9, repository.count());
+
+    Pageable pageable = mockPageable(2, 0);
+    Program programOne = programRepository.findByCode(Code.code("PRO1"));
+    Program programTwo = programRepository.findByCode(Code.code("PRO2"));
+
+    Page<RequisitionGroup> result = repository.search(null, null, programOne, null, pageable);
+
+    assertEquals(2, result.getContent().size());
+    assertEquals(5, result.getTotalElements());
+
+    result = repository.search(null, null, programTwo, null, pageable);
+
+    assertEquals(2, result.getContent().size());
+    assertEquals(4, result.getTotalElements());
+  }
+
   /*@Test
   public void shouldFindFacilitiesBySupervisoryNodes() {
     RequisitionGroup requisitionGroup = generateInstance();
@@ -340,25 +376,35 @@ public class RequisitionGroupRepositoryIntegrationTest
   }
 
   private RequisitionGroup prepareAndSaveRequisitionGroupAndSchedule() {
-    repository.save(generateInstance());
-    RequisitionGroup existingGroup = repository.findAll().iterator().next();
+    return prepareAndSaveRequisitionGroupAndSchedule(null, "PRO-1");
+  }
 
-    Program program = new Program("PRO-1");
-    program = programRepository.save(program);
-    ProcessingSchedule schedule = new ProcessingSchedule("SCH-1", "Monthly Schedule");
-    schedule = processingScheduleRepository.save(schedule);
+  private RequisitionGroup prepareAndSaveRequisitionGroupAndSchedule(String code,
+                                                                     String programCode) {
+    RequisitionGroup group;
+    if (code != null) {
+      group = repository.save(generateInstance(code, code));
+    } else {
+      group = repository.save(generateInstance());
+    }
+
+    Program program = programRepository.findByCode(Code.code(programCode));
+    if (program == null) {
+      program = new Program(programCode);
+      program = programRepository.save(program);
+    }
+
+    ProcessingSchedule schedule = processingScheduleRepository.findAll().iterator().next();
 
     RequisitionGroupProgramSchedule rgps =
-        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(existingGroup,
+        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(group,
             program, schedule, true);
 
     List<RequisitionGroupProgramSchedule> schedules = new ArrayList<>();
     schedules.add(rgps);
 
-    existingGroup.setRequisitionGroupProgramSchedules(schedules);
+    group.setRequisitionGroupProgramSchedules(schedules);
 
-    repository.save(existingGroup);
-
-    return repository.findOne(existingGroup.getId());
+    return repository.save(group);
   }
 }
