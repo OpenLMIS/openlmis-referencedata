@@ -268,11 +268,21 @@ public class RequisitionGroupRepositoryIntegrationTest
       repository.save(group);
     }
 
-    assertEquals(10, repository.count());
+    // different code
+    RequisitionGroup group = generateInstance();
+    group.setCode("XXX");
+    repository.save(group);
 
-    Pageable pageable = mockPageable(3, 1);
+    assertEquals(11, repository.count());
 
-    Page<RequisitionGroup> result = repository.search("Code", null, null, null, pageable);
+    Pageable pageable = mockPageable(3, 0);
+
+    Page<RequisitionGroup> result = repository.search("XXX", null, null, null, pageable);
+
+    assertEquals(1, result.getContent().size());
+    assertEquals(1, result.getTotalElements());
+
+    result = repository.search("Code", null, null, null, pageable);
 
     assertEquals(3, result.getContent().size());
     assertEquals(10, result.getTotalElements());

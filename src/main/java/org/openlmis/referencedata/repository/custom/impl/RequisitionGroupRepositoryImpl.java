@@ -64,10 +64,8 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
     CriteriaQuery<RequisitionGroup> query = builder.createQuery(RequisitionGroup.class);
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
 
-    query = prepareQuery(query, code, name, program, supervisoryNodes);
-    countQuery = prepareQuery(countQuery, code, name, program, supervisoryNodes);
-
-    countQuery.select(builder.countDistinct(countQuery.from(RequisitionGroup.class)));
+    query = prepareQuery(query, code, name, program, supervisoryNodes, false);
+    countQuery = prepareQuery(countQuery, code, name, program, supervisoryNodes, true);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -81,10 +79,17 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
 
   private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, String code,
                                             String name, Program program,
-                                            List<SupervisoryNode> supervisoryNodes) {
+                                            List<SupervisoryNode> supervisoryNodes,
+                                            boolean count) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     Root<RequisitionGroup> root = query.from(RequisitionGroup.class);
+
+    if (count) {
+      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
+      query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
+    }
+
     Predicate predicate = builder.conjunction();
 
     if (code != null) {
@@ -109,8 +114,6 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
           builder.in(root.get(SUPERVISORY_NODE).in(supervisoryNodes)));
     }
 
-    query.where(predicate);
-
-    return query;
+    return query.where(predicate);
   }
 }
