@@ -18,6 +18,8 @@ package org.openlmis.referencedata.repository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 import org.javers.common.collections.Sets;
 import org.junit.Before;
@@ -32,6 +34,8 @@ import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +44,7 @@ import java.util.List;
 /**
  * Allow testing requisitionGroupRepository.
  */
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class RequisitionGroupRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<RequisitionGroup> {
 
@@ -70,7 +75,6 @@ public class RequisitionGroupRepositoryIntegrationTest
   private ProcessingScheduleRepository processingScheduleRepository;
 
   private SupervisoryNode supervisoryNode;
-
   private Facility facility;
 
   RequisitionGroupRepository getRepository() {
@@ -185,5 +189,114 @@ public class RequisitionGroupRepositoryIntegrationTest
     repository.save(existingGroup);
 
     return repository.findOne(existingGroup.getId());
+  }
+
+  @Test
+  public void shouldFindGroupsWithSimilarCode() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    repository.save(requisitionGroup);
+    RequisitionGroup requisitionGroup1 = generateInstance();
+    repository.save(requisitionGroup1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(requisitionGroup.getCode(), null, null, null,
+        pageable, 1, requisitionGroup);
+  }
+
+  @Test
+  public void shouldFindGroupsWithSimilarCodeIgnoringCase() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    repository.save(requisitionGroup);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(requisitionGroup.getCode().toUpperCase(), null, null, null,
+        pageable, 1, requisitionGroup);
+    searchGroupAndCheckResults(requisitionGroup.getCode().toLowerCase(), null, null, null,
+        pageable, 1, requisitionGroup);
+    searchGroupAndCheckResults("c", null, null, null, pageable, 1, requisitionGroup);
+    searchGroupAndCheckResults("C", null, null, null, pageable, 1, requisitionGroup);
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarName() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    repository.save(requisitionGroup);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(null, "Req", null, null, pageable, 1, requisitionGroup);
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarNameIgnoringCase() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    repository.save(requisitionGroup);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(null, "req", null, null, pageable, 1, requisitionGroup);
+    searchGroupAndCheckResults(null, "REQ", null, null, pageable, 1, requisitionGroup);
+    searchGroupAndCheckResults(null, "ReQ", null, null, pageable, 1, requisitionGroup);
+    searchGroupAndCheckResults(null, "rEq", null, null, pageable, 1, requisitionGroup);
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarCodeOrName() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    repository.save(requisitionGroup);
+    RequisitionGroup requisitionGroup1 = generateInstance();
+    repository.save(requisitionGroup1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults("Code", "Req", null, null,
+        pageable, 2, requisitionGroup);
+  }
+
+  @Test
+  public void shouldFindFacilitiesWithSimilarCodeOrNameIgnoringCase() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    repository.save(requisitionGroup);
+    RequisitionGroup requisitionGroup1 = generateInstance();
+    repository.save(requisitionGroup1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults("code", "req", null, null,
+        pageable, 2, requisitionGroup);
+    searchGroupAndCheckResults("CODE", "REQ", null, null,
+        pageable, 2, requisitionGroup);
+    searchGroupAndCheckResults("c", "Req", null, null, pageable, 2, requisitionGroup);
+    searchGroupAndCheckResults("C", "ReQ", null, null, pageable, 2, requisitionGroup);
+  }
+
+  @Test
+  public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
+    Pageable pageable = mockPageable(0, 10);
+    Page<RequisitionGroup> foundGroups = repository.search("Cucumber", "Tomato",
+        null, null, pageable);
+
+    assertEquals(0, foundGroups.getContent().size());
+  }
+  
+  private void searchGroupAndCheckResults(String code, String name, Program program,
+                                          List<SupervisoryNode> supervisoryNodes,
+                                          Pageable pageable, int expectedSize,
+                                          RequisitionGroup requisitionGroup) {
+    Page<RequisitionGroup> foundPage = repository.search(code, name, program,
+        supervisoryNodes, pageable);
+
+    assertEquals(expectedSize, foundPage.getContent().size());
+
+    assertEquals(requisitionGroup.getName(), foundPage.getContent().get(0).getName());
+  }
+
+  private Pageable mockPageable(int pageSize, int pageNumber) {
+    Pageable pageable = mock(Pageable.class);
+    given(pageable.getPageNumber()).willReturn(pageNumber);
+    given(pageable.getPageSize()).willReturn(pageSize);
+    return pageable;
   }
 }

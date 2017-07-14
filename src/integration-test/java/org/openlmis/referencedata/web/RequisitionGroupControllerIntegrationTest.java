@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
@@ -427,8 +428,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     given(pageable.getPageNumber()).willReturn(0);
     given(pageable.getPageSize()).willReturn(1);
     listToReturn.add(requisitionGroup);
-    given(requisitionGroupService.searchRequisitionGroups(requestBody, any(Pageable.class)))
-        .willReturn(Pagination.getPage(listToReturn, pageable, 1));
+    given(requisitionGroupService.searchRequisitionGroups(eq(requestBody), any(Pageable.class)))
+        .willReturn(Pagination.getPage(listToReturn, null, 1));
 
     PageImplRepresentation response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -458,8 +459,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     given(pageable.getPageNumber()).willReturn(0);
     given(pageable.getPageSize()).willReturn(1);
     listToReturn.add(requisitionGroup);
-    given(requisitionGroupService.searchRequisitionGroups(requestBody, any(Pageable.class)))
-        .willReturn(Pagination.getPage(listToReturn, pageable, 1));
+    given(requisitionGroupService.searchRequisitionGroups(eq(requestBody), any(Pageable.class)))
+        .willReturn(Pagination.getPage(listToReturn, null, 1));
 
     PageImplRepresentation response = restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -527,8 +528,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     Map<String, Object> requestBody = new HashMap<>();
 
-    given(requisitionGroupService.searchRequisitionGroups(requestBody, any(Pageable.class)))
-        .willReturn(Pagination.getPage(listToReturn, pageable, 1));
+    given(requisitionGroupService.searchRequisitionGroups(eq(requestBody), any(Pageable.class)))
+        .willReturn(Pagination.getPage(listToReturn, null, 1));
 
     PageImplRepresentation response = restAssured.given()
         .queryParam("page", 0)
