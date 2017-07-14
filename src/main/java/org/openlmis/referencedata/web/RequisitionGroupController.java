@@ -16,17 +16,22 @@
 package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
+import org.openlmis.referencedata.service.RequisitionGroupService;
 import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +45,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
@@ -56,6 +63,9 @@ public class RequisitionGroupController extends BaseController {
 
   @Autowired
   private RequisitionGroupRepository requisitionGroupRepository;
+
+  @Autowired
+  private RequisitionGroupService requisitionGroupService;
 
   @Autowired
   private RightService rightService;
@@ -184,6 +194,27 @@ public class RequisitionGroupController extends BaseController {
     }
   }
 
+  /**
+   * Retrieves all Requisition Group with code similar to code parameter or facilityName similar to
+   * name parameter.
+   *
+   * @param queryParams request parameters (code, name, zone, recurse) and JSON extraData.
+   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @return List of wanted Facilities matching query parameters.
+   */
+  @RequestMapping(value = "/requisitionGroups/search", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Page<RequisitionGroupDto> search(@RequestBody Map<String, Object> queryParams,
+                                                    Pageable pageable) {
+    rightService.checkAdminRight(RightName.REQUISITION_GROUPS_MANAGE);
+
+    Page<RequisitionGroup> page = requisitionGroupService
+        .searchRequisitionGroups(queryParams, pageable);
+
+    return exportToDto(page, pageable);
+  }
+
   private RequisitionGroupDto exportToDto(RequisitionGroup requisitionGroup) {
     RequisitionGroupDto requisitionGroupDto = null;
 
@@ -193,5 +224,11 @@ public class RequisitionGroupController extends BaseController {
     }
 
     return requisitionGroupDto;
+  }
+
+  private Page<RequisitionGroupDto> exportToDto(Page<RequisitionGroup> page, Pageable pageable) {
+    List<RequisitionGroupDto> list = page.getContent().stream()
+        .map(this::exportToDto).collect(Collectors.toList());
+    return Pagination.getPage(list, pageable, page.getTotalElements());
   }
 }

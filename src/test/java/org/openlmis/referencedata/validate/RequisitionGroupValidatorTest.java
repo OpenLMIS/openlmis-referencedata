@@ -45,7 +45,7 @@ import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.dto.RequisitionGroupProgramScheduleDto;
-import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
+import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
@@ -121,7 +121,7 @@ public class RequisitionGroupValidatorTest {
 
   @Test
   public void shouldRejectIfSupervisoryNodeIsEmpty() throws Exception {
-    requisitionGroupDto.setSupervisoryNode((SupervisoryNodeBaseDto) null);
+    requisitionGroupDto.setSupervisoryNode((SupervisoryNodeDto) null);
 
     validator.validate(requisitionGroupDto, errors);
 

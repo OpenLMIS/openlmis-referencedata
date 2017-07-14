@@ -13,17 +13,17 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.repository.custom;
 
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
-import org.openlmis.referencedata.repository.custom.RequisitionGroupRepositoryCustom;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.UUID;
+import java.util.List;
 
-public interface RequisitionGroupRepository
-    extends PagingAndSortingRepository<RequisitionGroup, UUID>, RequisitionGroupRepositoryCustom {
-
-  <S extends RequisitionGroup> S findByCode(String code);
-
+public interface RequisitionGroupRepositoryCustom {
+  Page<RequisitionGroup> search(String code, String name, Program program,
+                                List<SupervisoryNode> supervisoryNode, Pageable pageable);
 }

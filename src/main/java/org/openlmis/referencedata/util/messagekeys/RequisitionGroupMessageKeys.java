@@ -55,4 +55,6 @@ public abstract class RequisitionGroupMessageKeys extends MessageKeys {
       join(ERROR, SUPERVISORY_NODE, REQUIRED);
   public static final String ERROR_SUPERVISORY_NODE_NON_EXISTENT =
       join(ERROR, SUPERVISORY_NODE, NON_EXISTENT);
+  public static final String ERROR_SEARCH_LACKS_PARAMS =
+      join(ERROR, SEARCH, LACKS_PARAMETERS);
 }
