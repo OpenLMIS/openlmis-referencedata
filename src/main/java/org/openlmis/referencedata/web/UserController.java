@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -58,6 +58,9 @@ import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.openlmis.referencedata.validate.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -80,8 +83,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import lombok.NoArgsConstructor;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -91,7 +92,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import javax.validation.Valid;
 
 @NoArgsConstructor
@@ -101,6 +101,7 @@ import javax.validation.Valid;
 public class UserController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(UserController.class);
   private static final String USER_ID = "userId";
 
   @Autowired
@@ -223,19 +224,26 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public UserDto getUser(@PathVariable("userId") UUID userId) {
-    LOGGER.info("Entering getUser: " + userId);
+    XLOGGER.entry(userId);
+    Profiler profiler = new Profiler("GET_USER");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
-    LOGGER.info("Start lookup of user in repository");
+    profiler.start("FIND_USER");
     User user = userRepository.findOne(userId);
-    LOGGER.info("End lookup of user in repository");
     if (user == null) {
       LOGGER.error("User to get does not exist");
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      LOGGER.info("Exiting getUser: " + userId);
-      return exportUserToDto(user);
     }
+
+    profiler.start("EXPORT_USER");
+    UserDto userDto = exportUserToDto(user);
+
+    profiler.stop().log();
+    XLOGGER.exit(user);
+    return userDto;
   }
 
   /**
