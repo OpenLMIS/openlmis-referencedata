@@ -91,6 +91,7 @@ public class RightServiceTest {
   public void checkAdminRightShouldAllowRequesterWithSpecifiedUserId() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
     when(userClient.getPrincipal()).thenReturn(UUID.randomUUID());
+    when(userRepository.exists(any(UUID.class))).thenReturn(true);
     when(userRepository.findOne(any(UUID.class))).thenReturn(user);
     when(user.hasRight(any(RightQuery.class))).thenReturn(false);
 

@@ -23,8 +23,8 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -34,7 +34,7 @@ import java.util.UUID;
 
 @Service
 public class RightService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RightService.class);
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(RightService.class);
 
   private static final String MESSAGEKEY_ERROR_UNAUTHORIZED = SystemMessageKeys.ERROR_UNAUTHORIZED;
   private static final String MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC = 
@@ -74,35 +74,38 @@ public class RightService {
    * @throws UnauthorizedException in case the client has got no right to access the resource
    */
   public void checkAdminRight(String rightName, boolean allowServiceTokens, UUID expectedUserId) {
-    LOGGER.info("Enter checkAdminRight");
+    XLOGGER.entry(rightName, allowServiceTokens, expectedUserId);
+
     OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext()
         .getAuthentication();
 
     if (allowServiceTokens && authentication.isClientOnly()) {
       // service-level tokens allowed and no user associated with the request
-      LOGGER.info("Exit checkAdminRight: service level token found");
+      XLOGGER.exit("service token");
       return;
     } else if (!allowServiceTokens && authentication.isClientOnly()) {
       // service-level tokens not allowed and no user associated with the request
+      XLOGGER.exit("service token not allowed, and no user");
       throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
     } else { // user-based client, check if user has right
       UUID userId = (UUID) authentication.getPrincipal();
-      User user = userRepository.findOne(userId);
 
       // bypass the right check if user id matches
-      if (null != expectedUserId && expectedUserId.equals(user.getId())) {
-        LOGGER.info("Exit checkAdminRight: user found");
+      if (null != expectedUserId && userRepository.exists(userId)) {
+        XLOGGER.exit("user id allowed to bypass right check");
         return;
       }
 
+      User user = userRepository.findOne(userId);
       if (user.hasRight(
           new RightQuery(Right.newRight(rightName, RightType.GENERAL_ADMIN)))) {
-        LOGGER.info("Exit checkAdminRight: user has right");
+        XLOGGER.exit("User has right");
         return;
       }
     }
 
     // at this point, token is unauthorized
+    XLOGGER.exit("Token not valid");
     throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
   }
 
