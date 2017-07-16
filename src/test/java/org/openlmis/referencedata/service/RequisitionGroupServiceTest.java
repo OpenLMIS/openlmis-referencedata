@@ -153,7 +153,7 @@ public class RequisitionGroupServiceTest {
 
     Page<RequisitionGroup> actual = requisitionGroupService
         .searchRequisitionGroups(searchParams, pageable);
-    verify(requisitionGroupRepository).search("name", "code", program, nodes, pageable);
+    verify(requisitionGroupRepository).search("code", "name", program, nodes, pageable);
     assertEquals(requisitionGroups, actual.getContent());
   }
 }

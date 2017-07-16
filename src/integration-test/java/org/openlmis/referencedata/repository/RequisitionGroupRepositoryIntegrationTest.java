@@ -39,6 +39,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -324,7 +325,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     assertEquals(4, result.getTotalElements());
   }
 
-  /*@Test
+  @Test
   public void shouldFindFacilitiesBySupervisoryNodes() {
     RequisitionGroup requisitionGroup = generateInstance();
     repository.save(requisitionGroup);
@@ -337,13 +338,28 @@ public class RequisitionGroupRepositoryIntegrationTest
     requisitionGroup1.setSupervisoryNode(supervisoryNode1);
     repository.save(requisitionGroup1);
 
+    SupervisoryNode supervisoryNode2 = new SupervisoryNode();
+    supervisoryNode2.setCode("other-code");
+    supervisoryNode2.setFacility(facility);
+    supervisoryNodeRepository.save(supervisoryNode2);
+    RequisitionGroup requisitionGroup2 = generateInstance();
+    requisitionGroup2.setSupervisoryNode(supervisoryNode2);
+    repository.save(requisitionGroup2);
+
     Pageable pageable = mockPageable(0, 10);
+
+    List<SupervisoryNode> nodes = new ArrayList<>();
+    nodes.add(supervisoryNode);
+    nodes.add(supervisoryNode1);
+
+    searchGroupAndCheckResults(null, null, null, nodes,
+        pageable, 2, requisitionGroup);
 
     searchGroupAndCheckResults(null, null, null, Arrays.asList(supervisoryNode),
         pageable, 1, requisitionGroup);
-  }*/
+  }
 
-  /*@Test
+  @Test
   public void shouldFindFacilitiesByProgram() {
 
     RequisitionGroup requisitionGroup = prepareAndSaveRequisitionGroupAndSchedule();
@@ -354,7 +370,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     searchGroupAndCheckResults(null, null,
         requisitionGroup.getRequisitionGroupProgramSchedules().get(0).getProgram(),
         null, pageable, 1, requisitionGroup);
-  }*/
+  }
 
   private void searchGroupAndCheckResults(String code, String name, Program program,
                                           List<SupervisoryNode> supervisoryNodes,

@@ -90,7 +90,7 @@ public class RequisitionGroupService {
     List<SupervisoryNode> supervisoryNodes = getSupervisoryNodeBasedOnZone(zoneCode);
     Program program = getProgramByCode(programCode);
 
-    return requisitionGroupRepository.search(name, code, program, supervisoryNodes, pageable);
+    return requisitionGroupRepository.search(code, name, program, supervisoryNodes, pageable);
   }
 
   private List<SupervisoryNode> getSupervisoryNodeBasedOnZone(String zoneCode) {

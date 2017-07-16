@@ -110,8 +110,12 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
     }
 
     if (supervisoryNodes != null && !supervisoryNodes.isEmpty()) {
-      predicate = builder.and(predicate,
-          builder.in(root.get(SUPERVISORY_NODE).in(supervisoryNodes)));
+      Predicate supervisoryNodePredicate = builder.disjunction();
+      for (SupervisoryNode node : supervisoryNodes) {
+        supervisoryNodePredicate = builder.or(supervisoryNodePredicate,
+            builder.equal(root.get(SUPERVISORY_NODE), node));
+      }
+      predicate = builder.and(supervisoryNodePredicate);
     }
 
     return query.where(predicate);
