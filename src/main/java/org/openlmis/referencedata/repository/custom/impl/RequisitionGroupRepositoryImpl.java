@@ -110,17 +110,12 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
     }
 
     if (supervisoryNodes != null && !supervisoryNodes.isEmpty()) {
-      if (supervisoryNodes.size() == 1) {
-        predicate = builder.and(predicate,
-            builder.equal(root.get(SUPERVISORY_NODE), supervisoryNodes.get(0)));
-      } else {
-        Predicate supervisoryNodePredicate = builder.disjunction();
-        for (SupervisoryNode node : supervisoryNodes) {
-          supervisoryNodePredicate = builder.or(supervisoryNodePredicate,
-              builder.equal(root.get(SUPERVISORY_NODE), node));
-        }
-        predicate = builder.and(supervisoryNodePredicate);
+      Predicate supervisoryNodePredicate = builder.disjunction();
+      for (SupervisoryNode node : supervisoryNodes) {
+        supervisoryNodePredicate = builder.or(supervisoryNodePredicate,
+            builder.equal(root.get(SUPERVISORY_NODE), node));
       }
+      predicate = builder.and(predicate, supervisoryNodePredicate);
     }
 
     return query.where(predicate);
