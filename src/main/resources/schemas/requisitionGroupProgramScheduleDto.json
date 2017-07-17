@@ -25,5 +25,5 @@
       "$ref": "facility.json"
     }
   },
-  "required": ["id", "program", "processingSchedule", "directDelivery"]
+  "required": ["program", "processingSchedule", "directDelivery"]
 }

@@ -38,5 +38,5 @@
       "uniqueItems": false
     }
   },
-  "required": ["id", "code", "name", "supervisoryNode"]
+  "required": ["code", "name", "supervisoryNode"]
 }
