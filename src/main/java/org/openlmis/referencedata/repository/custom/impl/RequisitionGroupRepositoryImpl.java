@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
@@ -32,6 +33,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.Collections;
 import java.util.List;
 
 public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositoryCustom {
@@ -59,6 +61,13 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
   public Page<RequisitionGroup> search(String code, String name,
                                        Program program, List<SupervisoryNode> supervisoryNodes,
                                        Pageable pageable) {
+    if (StringUtils.isEmpty(code) &&
+        StringUtils.isEmpty(name) &&
+        program == null &&
+        (supervisoryNodes == null || supervisoryNodes.isEmpty())) {
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
+    }
+
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<RequisitionGroup> query = builder.createQuery(RequisitionGroup.class);

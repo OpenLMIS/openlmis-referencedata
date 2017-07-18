@@ -391,6 +391,19 @@ public class RequisitionGroupRepositoryIntegrationTest
     assertEquals(requisitionGroup1.getName(), foundPage.getContent().get(1).getName());
   }
 
+  @Test
+  public void shouldReturnEmptyListIfSearchParametersAreNotProvided() {
+    Pageable pageable = mockPageable(0, 10);
+
+    Page<RequisitionGroup> foundPage = repository.search(null, null, null,
+        null, pageable);
+    assertEquals(0, foundPage.getContent().size());
+
+    foundPage = repository.search(null, null, null,
+        Collections.emptyList(), pageable);
+    assertEquals(0, foundPage.getContent().size());
+  }
+
   private void searchGroupAndCheckResults(String code, String name, Program program,
                                           List<SupervisoryNode> supervisoryNodes,
                                           Pageable pageable, int expectedSize,
