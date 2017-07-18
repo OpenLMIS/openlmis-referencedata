@@ -52,6 +52,7 @@ public class RightServiceTest {
   private OAuth2Authentication trustedClient;
   private OAuth2Authentication userClient;
   private User user;
+  private UUID userId;
   
   @Before
   public void setUp() {
@@ -60,7 +61,8 @@ public class RightServiceTest {
     trustedClient = new OAuth2Authentication(mock(OAuth2Request.class), null);
     userClient = new OAuth2Authentication(mock(OAuth2Request.class), mock(Authentication.class));
     user = mock(User.class);
-    when(user.getId()).thenReturn(UUID.randomUUID());
+    userId = UUID.randomUUID();
+    when(user.getId()).thenReturn(userId);
   }
   
   @Test
@@ -80,7 +82,7 @@ public class RightServiceTest {
   @Test
   public void checkAdminRightShouldAllowUserWhoHasRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
-    when(userClient.getPrincipal()).thenReturn(UUID.randomUUID());
+    when(userClient.getPrincipal()).thenReturn(userId);
     when(userRepository.findOne(any(UUID.class))).thenReturn(user);
     when(user.hasRight(any(RightQuery.class))).thenReturn(true);
 
@@ -90,7 +92,7 @@ public class RightServiceTest {
   @Test
   public void checkAdminRightShouldAllowRequesterWithSpecifiedUserId() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
-    when(userClient.getPrincipal()).thenReturn(UUID.randomUUID());
+    when(userClient.getPrincipal()).thenReturn(userId);
     when(userRepository.exists(any(UUID.class))).thenReturn(true);
     when(userRepository.findOne(any(UUID.class))).thenReturn(user);
     when(user.hasRight(any(RightQuery.class))).thenReturn(false);
@@ -101,7 +103,7 @@ public class RightServiceTest {
   @Test(expected = UnauthorizedException.class)
   public void checkAdminRightShouldThrowUnauthorizedExceptionForUserWhoDoesNotHaveRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
-    when(userClient.getPrincipal()).thenReturn(UUID.randomUUID());
+    when(userClient.getPrincipal()).thenReturn(userId);
     when(userRepository.findOne(any(UUID.class))).thenReturn(user);
     when(user.hasRight(any(RightQuery.class))).thenReturn(false);
 

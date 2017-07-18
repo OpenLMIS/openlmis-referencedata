@@ -91,7 +91,9 @@ public class RightService {
       UUID userId = (UUID) authentication.getPrincipal();
 
       // bypass the right check if user id matches
-      if (null != expectedUserId && userRepository.exists(userId)) {
+      if (null != expectedUserId
+          && userId.equals(expectedUserId)
+          && userRepository.exists(userId)) {
         XLOGGER.exit("user id allowed to bypass right check");
         return;
       }

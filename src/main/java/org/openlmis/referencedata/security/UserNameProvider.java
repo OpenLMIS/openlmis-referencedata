@@ -33,11 +33,11 @@ public class UserNameProvider implements AuthorProvider {
       return "unauthenticated user";
     }
 
-    Object principle = auth.getPrincipal();
-    if (null == principle) {
+    Object principal = auth.getPrincipal();
+    if (null == principal) {
       return "unknown user";
     }
 
-    return principle.toString();
+    return principal.toString();
   }
 }
