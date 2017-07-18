@@ -118,6 +118,12 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
       predicate = builder.and(predicate, supervisoryNodePredicate);
     }
 
-    return query.where(predicate);
+    query.where(predicate);
+
+    if (!count) {
+      query.orderBy(builder.asc(root.get(NAME)));
+    }
+
+    return query;
   }
 }

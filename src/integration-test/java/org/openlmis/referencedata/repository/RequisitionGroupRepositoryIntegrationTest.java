@@ -206,7 +206,7 @@ public class RequisitionGroupRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindFacilitiesWithSimilarName() {
+  public void shouldFindRequisitionGroupsWithSimilarName() {
     RequisitionGroup requisitionGroup = generateInstance();
     repository.save(requisitionGroup);
 
@@ -216,7 +216,7 @@ public class RequisitionGroupRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindFacilitiesWithSimilarNameIgnoringCase() {
+  public void shouldFindRequisitionGroupsWithSimilarNameIgnoringCase() {
     RequisitionGroup requisitionGroup = generateInstance();
     repository.save(requisitionGroup);
 
@@ -229,7 +229,7 @@ public class RequisitionGroupRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindFacilitiesWithSimilarCodeOrName() {
+  public void shouldFindRequisitionGroupsWithSimilarCodeOrName() {
     RequisitionGroup requisitionGroup = generateInstance();
     repository.save(requisitionGroup);
     RequisitionGroup requisitionGroup1 = generateInstance();
@@ -242,7 +242,7 @@ public class RequisitionGroupRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindFacilitiesWithSimilarCodeOrNameIgnoringCase() {
+  public void shouldFindRequisitionGroupsWithSimilarCodeOrNameIgnoringCase() {
     RequisitionGroup requisitionGroup = generateInstance();
     repository.save(requisitionGroup);
     RequisitionGroup requisitionGroup1 = generateInstance();
@@ -326,7 +326,7 @@ public class RequisitionGroupRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindFacilitiesBySupervisoryNodes() {
+  public void shouldFindRequisitionGroupsBySupervisoryNodes() {
     RequisitionGroup requisitionGroup = generateInstance();
     repository.save(requisitionGroup);
 
@@ -360,7 +360,7 @@ public class RequisitionGroupRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindFacilitiesByProgram() {
+  public void shouldFindRequisitionGroupsByProgram() {
 
     RequisitionGroup requisitionGroup = prepareAndSaveRequisitionGroupAndSchedule();
     requisitionGroup = repository.save(requisitionGroup);
@@ -370,6 +370,25 @@ public class RequisitionGroupRepositoryIntegrationTest
     searchGroupAndCheckResults(null, null,
         requisitionGroup.getRequisitionGroupProgramSchedules().get(0).getProgram(),
         null, pageable, 1, requisitionGroup);
+  }
+
+  @Test
+  public void shouldSortByName() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    requisitionGroup.setName("RG-a");
+    repository.save(requisitionGroup);
+
+    RequisitionGroup requisitionGroup1 = generateInstance();
+    requisitionGroup1.setName("RG-b");
+    repository.save(requisitionGroup1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    Page<RequisitionGroup> foundPage = repository.search(null, "RG", null,
+        null, pageable);
+    assertEquals(2, foundPage.getContent().size());
+    assertEquals(requisitionGroup.getName(), foundPage.getContent().get(0).getName());
+    assertEquals(requisitionGroup1.getName(), foundPage.getContent().get(1).getName());
   }
 
   private void searchGroupAndCheckResults(String code, String name, Program program,
