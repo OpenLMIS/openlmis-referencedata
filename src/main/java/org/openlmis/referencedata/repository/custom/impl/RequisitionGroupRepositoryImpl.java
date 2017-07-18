@@ -61,10 +61,10 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
   public Page<RequisitionGroup> search(String code, String name,
                                        Program program, List<SupervisoryNode> supervisoryNodes,
                                        Pageable pageable) {
-    if (StringUtils.isEmpty(code) &&
-        StringUtils.isEmpty(name) &&
-        program == null &&
-        (supervisoryNodes == null || supervisoryNodes.isEmpty())) {
+    if (StringUtils.isEmpty(code)
+        && StringUtils.isEmpty(name)
+        && program == null
+        && (supervisoryNodes == null || supervisoryNodes.isEmpty())) {
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
