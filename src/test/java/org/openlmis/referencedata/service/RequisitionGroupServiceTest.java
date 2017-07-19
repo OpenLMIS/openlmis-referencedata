@@ -95,6 +95,8 @@ public class RequisitionGroupServiceTest {
     MockitoAnnotations.initMocks(this);
     requisitionGroups = Lists.newArrayList(requisitionGroup1, requisitionGroup2);
     when(requisitionGroup1.getId()).thenReturn(requisitionGroup1Id);
+    when(requisitionGroup1.getName()).thenReturn("RG-1");
+    when(requisitionGroup2.getName()).thenReturn("RG-2");
     when(pageable.getPageSize()).thenReturn(10);
     when(pageable.getPageNumber()).thenReturn(0);
   }

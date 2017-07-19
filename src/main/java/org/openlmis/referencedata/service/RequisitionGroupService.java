@@ -37,6 +37,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -69,8 +70,10 @@ public class RequisitionGroupService {
   public Page<RequisitionGroup> searchRequisitionGroups(Map<String, Object> queryMap,
                                                         Pageable pageable) {
     if ( MapUtils.isEmpty(queryMap) ) {
-      return Pagination.getPage(Lists.newArrayList(requisitionGroupRepository.findAll()),
-          pageable);
+      List<RequisitionGroup> requisitionGroups =
+          Lists.newArrayList(requisitionGroupRepository.findAll());
+      requisitionGroups.sort(Comparator.comparing(RequisitionGroup::getName));
+      return Pagination.getPage(requisitionGroups, pageable);
     }
 
     String name = MapUtils.getString(queryMap, NAME, null);
