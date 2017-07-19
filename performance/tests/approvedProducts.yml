@@ -29,14 +29,13 @@ scenarios:
         extract-jsonpath:
           facuuid:
             jsonpath: $.content[:1].id
-      - url: ${__P(base-uri)}/api/facilities/${facuuid}/approvedProducts?fullSupply=true
-        method: GET
-        label: GetFacilitiesApprovedFullSupplyProducts
-        headers:
-          Authorization: Bearer ${access_token}
         jsr223:
           script-text: |
             String uuid = vars.get("facuuid");
             uuid = uuid.replaceAll(/"|\[|\]/, "");
             vars.put("facuuid", uuid);
-          execute: "before"
+      - url: ${__P(base-uri)}/api/facilities/${facuuid}/approvedProducts?fullSupply=true
+        method: GET
+        label: GetFacilitiesApprovedFullSupplyProducts
+        headers:
+          Authorization: Bearer ${access_token}
