@@ -8,6 +8,7 @@ scenarios:
     requests:
       - url: ${__P(base-uri)}/api/oauth/token
         method: POST
+        label: GetUserToken
         headers:
           Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
         body:
@@ -19,6 +20,7 @@ scenarios:
             jsonpath: $.access_token
       - url: ${__P(base-uri)}/api/facilities/search
         method: POST
+        label: GetAllFacilities
         body:
           code: HC01
         headers:
@@ -29,6 +31,7 @@ scenarios:
             jsonpath: $.content[:1].id
       - url: ${__P(base-uri)}/api/facilities/${facuuid}/approvedProducts?fullSupply=true
         method: GET
+        label: GetFacilitiesApprovedFullSupplyProducts
         headers:
           Authorization: Bearer ${access_token}
         jsr223:

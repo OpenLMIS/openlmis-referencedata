@@ -8,6 +8,7 @@ scenarios:
     requests:
       - url: ${__P(base-uri)}/api/oauth/token
         method: POST
+        label: GetUserToken
         headers:
           Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
         body:
@@ -19,6 +20,7 @@ scenarios:
             jsonpath: $.access_token
       - url: ${__P(base-uri)}/api/orderables/search?page=1&size=10
         method: POST
+        label: GetAnOrderablePageOfTen
         body: '{}'
         headers:
           Authorization: Bearer ${access_token}

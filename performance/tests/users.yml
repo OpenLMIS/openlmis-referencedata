@@ -21,6 +21,7 @@ scenarios:
     requests:
       - url: ${__P(base-uri)}/api/oauth/token
         method: POST
+        label: GetUserToken
         headers:
           Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
         body:
@@ -35,6 +36,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb
         method: GET
+        label: GetAdministratorUser
         headers:
           Authorization: Bearer ${access_token}
   users-get-all:
@@ -42,6 +44,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users
         method: GET
+        label: GetAllUsers
         headers:
           Authorization: Bearer ${access_token}
   users-search-one-page:
@@ -49,6 +52,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users/search?page=1&size=10
         method: POST
+        label: GetAUserPageOfTen
         body: '{}'
         headers:
           Authorization: Bearer ${access_token}
@@ -58,6 +62,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/rights
         method: GET
+        label: GetAllRights
         headers:
           Authorization: Bearer ${access_token}
         extract-jsonpath:
@@ -70,5 +75,6 @@ scenarios:
             vars.put("rightUuid", uuid);
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/hasRight?rightId=${rightUuid}
         method: GET
+        label: AdmministratorUserHasRight
         headers:
           Authorization: Bearer ${access_token}
