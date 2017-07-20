@@ -48,5 +48,10 @@
     "id": "5c316c50-96ad-4f04-8a3a-4f5aa8afa67e",
     "name": "Stock Viewer",
     "description": "Can view stock cards."
+  },
+  {
+    "id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b",
+    "name": "Inventory Manager",
+    "description": "Can manage cold chain equipment."
   }
 ]
