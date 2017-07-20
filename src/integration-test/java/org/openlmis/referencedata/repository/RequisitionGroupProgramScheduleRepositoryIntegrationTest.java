@@ -22,8 +22,6 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,18 +36,14 @@ import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.annotation.Commit;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
 import java.util.List;
+import javax.persistence.PersistenceException;
 
 /**
  * Allow testing requisitionGroupProgramScheduleRepository.
  */
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<RequisitionGroupProgramSchedule> {
 
@@ -82,9 +76,6 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
 
   @Autowired
   private RequisitionGroupRepository requisitionGroupRepository;
-
-  @Autowired
-  private EntityManager entityManager;
 
   private RequisitionGroup requisitionGroup;
   private Program program;
@@ -135,7 +126,7 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     facility.setActive(true);
     facility.setEnabled(true);
     facilityRepository.save(facility);
-    
+
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(code, facility);
     supervisoryNodeRepository.save(supervisoryNode);
 
@@ -143,19 +134,13 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     requisitionGroupRepository.save(requisitionGroup);
   }
 
-  @After
-  public void tearDown() {
-    repository.deleteAll();
-  }
-
   @Test
-  @Transactional(propagation = Propagation.NEVER)
+  @Commit
   public void shouldThrowExceptionWhenSavingTheSameRequisitionGroupProgramSchedule() {
     expectedException.expectCause(isA(PersistenceException.class));
 
     repository.save(generateInstance());
     repository.save(generateInstance());
-    entityManager.flush();
   }
 
   @Test
