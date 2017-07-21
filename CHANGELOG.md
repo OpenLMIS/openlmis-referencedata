@@ -8,6 +8,9 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-2609](https://openlmis.atlassian.net/browse/OLMIS-2609): Created rights to manage CCE and assigned to system administrator.
 * [OLMIS-2696](https://openlmis.atlassian.net/browse/OLMIS-2696): Added search requisition groups endpoint.
 
+Dev and tooling updates made in a backwards-compatible manner:
+* [OLMIS-2610](https://openlmis.atlassian.net/browse/OLMIS-2610): Added CCE Inventory View/Edit rights, added demo data for those rights.
+
 7.0.0 / 2017-06-23
 ==================
 

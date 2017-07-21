@@ -249,6 +249,12 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * User Roles Manage
   * users:
     * administrator
+10. Inventory Manager
+  * rights:
+    * CCE Inventory View
+    * CCE Inventory Edit
+  * users:
+    * administrator - has this role for Family Planning & Essential Meds
 
 Other users with no roles:
   * admin (this admin account is built into the bootstrap data)
