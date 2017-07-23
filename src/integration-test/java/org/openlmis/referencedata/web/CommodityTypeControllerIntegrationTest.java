@@ -34,6 +34,13 @@ import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKe
 import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_NAME_REQUIRED;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,20 +50,9 @@ import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
-import org.openlmis.referencedata.repository.CommodityTypeRepository;
-import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -68,15 +64,6 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   private static final String CLASSIFICATION_SYS_ID = "cSysId";
   private static final String NAME = "name";
 
-  @MockBean
-  private CommodityTypeRepository repository;
-
-  @MockBean
-  private TradeItemRepository tradeItemRepository;
-
-  @MockBean
-  private OrderableRepository orderableRepository;
-
   private CommodityTypeDto commodityType;
   private UUID commodityTypeId = UUID.randomUUID();
 
@@ -85,7 +72,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     commodityType = new CommodityTypeDto(NAME,
         CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, null);
 
-    when(repository.save(any(CommodityType.class))).thenAnswer(new SaveAnswer<CommodityType>());
+    when(commodityTypeRepository.save(any(CommodityType.class))).thenAnswer(new 
+        SaveAnswer<CommodityType>());
     when(orderableRepository.save(any(Orderable.class))).thenAnswer(new SaveAnswer<Orderable>());
   }
 
@@ -176,7 +164,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     mockUserHasRight(ORDERABLES_MANAGE);
     commodityType.setId(commodityTypeId);
 
-    given(repository.findOne(commodityTypeId))
+    given(commodityTypeRepository.findOne(commodityTypeId))
         .willReturn(newInstance(commodityType));
 
     CommodityTypeDto response = restAssured
@@ -222,7 +210,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         CommodityType.newInstance(commodityType),
         CommodityType.newInstance(commodityType2));
 
-    when(repository.findAll()).thenReturn(commodityTypes);
+    when(commodityTypeRepository.findAll()).thenReturn(commodityTypes);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -244,7 +232,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldUpdateTradeItemAssociations() {
     mockUserHasRight(ORDERABLES_MANAGE);
     commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
+    given(commodityTypeRepository.findOne(commodityTypeId))
         .willReturn(newInstance(commodityType));
 
     TradeItem tradeItem = mockTradeItem();
@@ -274,7 +262,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldRejectUpdateTradeItemAssociationsIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
     commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
+    given(commodityTypeRepository.findOne(commodityTypeId))
         .willReturn(newInstance(commodityType));
 
     TradeItem tradeItem = mockTradeItem();
@@ -299,7 +287,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldGetTradeItemAssociations() {
     mockUserHasRight(ORDERABLES_MANAGE);
     commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
+    given(commodityTypeRepository.findOne(commodityTypeId))
         .willReturn(newInstance(commodityType));
 
     TradeItem tradeItem = mockTradeItem();
@@ -330,7 +318,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldRejectGetTradeItemAssociationsIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
     commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
+    given(commodityTypeRepository.findOne(commodityTypeId))
         .willReturn(newInstance(commodityType));
 
     restAssured
@@ -355,9 +343,9 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     commodityType = new CommodityTypeDto(NAME, CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, parent);
 
     commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
+    given(commodityTypeRepository.findOne(commodityTypeId))
         .willReturn(newInstance(commodityType));
-    given(repository.findOne(parentId))
+    given(commodityTypeRepository.findOne(parentId))
         .willReturn(newInstance(parent));
 
     CommodityTypeDto response = restAssured
@@ -385,7 +373,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     commodityType = new CommodityTypeDto(NAME,  CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, parent);
     commodityType.setId(commodityTypeId);
-    given(repository.findOne(commodityTypeId))
+    given(commodityTypeRepository.findOne(commodityTypeId))
         .willReturn(newInstance(commodityType));
 
     restAssured

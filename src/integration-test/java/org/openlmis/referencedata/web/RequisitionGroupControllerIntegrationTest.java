@@ -25,6 +25,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -41,23 +49,9 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.RequisitionGroupRepository;
-import org.openlmis.referencedata.service.RequisitionGroupService;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.validate.RequisitionGroupValidator;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -66,15 +60,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String DESCRIPTION = "OpenLMIS";
-
-  @MockBean
-  private RequisitionGroupRepository requisitionGroupRepository;
-
-  @MockBean
-  private RequisitionGroupService requisitionGroupService;
-
-  @MockBean
-  private RequisitionGroupValidator requisitionGroupValidator;
 
   private RequisitionGroup requisitionGroup;
   private RequisitionGroupBaseDto requisitionGroupDto;

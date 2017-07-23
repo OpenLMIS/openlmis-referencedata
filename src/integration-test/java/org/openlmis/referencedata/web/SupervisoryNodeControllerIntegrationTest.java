@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
 import org.hamcrest.Matchers;
 import org.javers.common.collections.Sets;
 import org.junit.Test;
@@ -57,15 +56,7 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.RightRepository;
-import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
-import org.openlmis.referencedata.service.SupervisoryNodeService;
 import org.openlmis.referencedata.util.Message;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -77,27 +68,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String RIGHT_ID_PARAM = "rightId";
   private static final String PROGRAM_ID_PARAM = "programId";
-
-  @MockBean
-  private SupervisoryNodeRepository repository;
-
-  @MockBean
-  private ProgramRepository programRepository;
-
-  @MockBean
-  private FacilityRepository facilityRepository;
-  
-  @MockBean
-  private RightRepository rightRepository;
-  
-  @MockBean
-  private UserRepository userRepository;
-
-  @MockBean
-  private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
-
-  @MockBean
-  private SupervisoryNodeService supervisoryNodeService;
 
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;
@@ -152,7 +122,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldDeleteSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     restAssured
         .given()
@@ -170,7 +140,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectDeleteSupervisoryNodeIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     String messageKey = restAssured
         .given()
@@ -210,7 +180,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectPostSupervisoryNodeIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     String messageKey = restAssured
         .given()
@@ -233,7 +203,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     supervisoryNode.setDescription("OpenLMIS");
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     SupervisoryNodeDto supervisoryNodeDto = new SupervisoryNodeDto();
     supervisoryNode.export(supervisoryNodeDto);
@@ -258,7 +228,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectPutSupervisoryNodeIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     String messageKey = restAssured
         .given()
@@ -283,7 +253,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     List<SupervisoryNode> storedSupervisoryNodes = Arrays.asList(supervisoryNode,
         SupervisoryNode.newSupervisoryNode("SN2", new Facility("F2")));
-    given(repository.findAll()).willReturn(storedSupervisoryNodes);
+    given(supervisoryNodeRepository.findAll()).willReturn(storedSupervisoryNodes);
 
     SupervisoryNodeDto[] response = restAssured
         .given()
@@ -302,7 +272,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectGetAllSupervisoryNodesIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     String messageKey = restAssured
         .given()
@@ -323,7 +293,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldGetSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     SupervisoryNodeDto response = restAssured
         .given()
@@ -343,7 +313,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectGetSupervisoryNodeIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     String messageKey = restAssured
         .given()
@@ -375,7 +345,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     Set<User> supervisingUsers = Sets.asSet(supervisingUser);
 
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(program);
     given(userRepository.findSupervisingUsersBy(right, supervisoryNode, program))
@@ -403,7 +373,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void findSupervisingUsersShouldReturnBadRequestIfRightNotFound() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
 
@@ -427,7 +397,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-    given(repository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(null);
 
@@ -475,7 +445,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-    given(repository.findOne(supervisoryNodeId)).willReturn(null);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(null);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(program);
 

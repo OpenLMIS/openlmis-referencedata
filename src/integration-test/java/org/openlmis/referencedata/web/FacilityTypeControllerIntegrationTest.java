@@ -22,18 +22,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
-import org.junit.Test;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-
 import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.RightName;
+import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -41,9 +37,6 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   private static final String RESOURCE_URL = "/api/facilityTypes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String DESCRIPTION = "OpenLMIS";
-
-  @MockBean
-  private FacilityTypeRepository facilityTypeRepository;
 
   private FacilityType facilityType;
   private UUID facilityTypeId;

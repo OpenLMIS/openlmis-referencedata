@@ -66,14 +66,7 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.service.FacilityService;
-import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -88,24 +81,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SEARCH_FACILITIES = RESOURCE_URL + "/search";
   private static final String BYBOUNDARY_URL = RESOURCE_URL + "/byBoundary";
   private static final String NAME_KEY = "name";
-
-  @MockBean
-  private FacilityRepository facilityRepository;
-
-  @MockBean
-  private FacilityService facilityService;
-
-  @MockBean
-  private SupplyLineService supplyLineService;
-
-  @MockBean
-  private ProgramRepository programRepository;
-
-  @MockBean
-  private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
-
-  @MockBean
-  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   private Integer currentInstanceNumber;
   private UUID programId;

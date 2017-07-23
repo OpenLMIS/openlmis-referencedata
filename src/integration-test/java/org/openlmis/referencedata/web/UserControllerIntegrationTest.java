@@ -47,6 +47,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -76,29 +84,9 @@ import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
-import org.openlmis.referencedata.repository.GeographicZoneRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.RequisitionGroupRepository;
-import org.openlmis.referencedata.repository.RightRepository;
-import org.openlmis.referencedata.repository.RoleRepository;
-import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateField"})
 public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -131,39 +119,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final UUID SUPERVISORY_NODE_ID = UUID.randomUUID();
   private static final UUID PROGRAM_ID = UUID.randomUUID();
   private static final UUID WAREHOUSE_ID = UUID.randomUUID();
-
-  @MockBean
-  private UserRepository userRepository;
-
-  @MockBean
-  private UserService userService;
-
-  @MockBean
-  private GeographicLevelRepository geographicLevelRepository;
-
-  @MockBean
-  private GeographicZoneRepository geographicZoneRepository;
-
-  @MockBean
-  private FacilityTypeRepository facilityTypeRepository;
-
-  @MockBean
-  private FacilityRepository facilityRepository;
-
-  @MockBean
-  private RoleRepository roleRepository;
-
-  @MockBean
-  private RightRepository rightRepository;
-
-  @MockBean
-  private ProgramRepository programRepository;
-
-  @MockBean
-  private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @MockBean
-  private RequisitionGroupRepository requisitionGroupRepository;
 
   private User user1;
   private User user2;

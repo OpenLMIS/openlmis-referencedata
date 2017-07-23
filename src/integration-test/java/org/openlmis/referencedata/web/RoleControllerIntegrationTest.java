@@ -23,7 +23,11 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 import com.google.common.collect.Sets;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
@@ -31,30 +35,14 @@ import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.repository.RightRepository;
-import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.util.Message;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/roles";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String ROLE_NAME = "role1";
-
-  @MockBean
-  private RoleRepository roleRepository;
-
-  @MockBean
-  private RightRepository rightRepository;
 
   private Role role;
   private RoleDto roleDto;

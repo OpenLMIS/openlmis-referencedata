@@ -27,6 +27,12 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 
 import com.google.common.collect.ImmutableMap;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -39,16 +45,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
-import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.service.OrderableService;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -60,12 +57,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String CODE = "code";
   private static final String PROGRAM_CODE = "program";
   private static final String IDS = "ids";
-
-  @MockBean
-  private OrderableRepository repository;
-
-  @MockBean
-  private OrderableService service;
 
   private OrderableDto orderableDto;
 
@@ -79,7 +70,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
         "Abcd", "description", 10, 5, false, Collections.emptySet(), null, null);
 
-    when(repository.save(any(Orderable.class)))
+    when(orderableRepository.save(any(Orderable.class)))
         .thenAnswer(new SaveAnswer<CommodityType>());
   }
 
@@ -201,7 +192,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(ORDERABLES_MANAGE);
     List<OrderableDto> items = Collections.singletonList(orderableDto);
 
-    when(repository.findAll()).thenReturn(Orderable.newInstance(items));
+    when(orderableRepository.findAll()).thenReturn(Orderable.newInstance(items));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -233,7 +224,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(PROGRAM_CODE, programCode);
     requestBody.put(IDS, orderable.getId());
 
-    when(service.searchOrderables(requestBody)).thenReturn(items);
+    when(orderableService.searchOrderables(requestBody)).thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -264,7 +255,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(PROGRAM_CODE, programCode);
     requestBody.put(IDS, orderable.getId());
 
-    when(service.searchOrderables(requestBody)).thenReturn(items);
+    when(orderableService.searchOrderables(requestBody)).thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()

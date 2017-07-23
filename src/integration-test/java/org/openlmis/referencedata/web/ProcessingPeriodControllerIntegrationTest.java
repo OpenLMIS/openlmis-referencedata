@@ -23,7 +23,13 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 
 import com.google.common.collect.Sets;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -37,24 +43,8 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ResultDto;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.service.ProcessingPeriodService;
-import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -70,24 +60,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   private static final String FACILITY = "facilityId";
   private static final String PROCESSING_SCHEDULE = "processingScheduleId";
   private static final String START_DATE = "startDate";
-
-  @MockBean
-  private ProcessingPeriodRepository periodRepository;
-
-  @MockBean
-  private ProgramRepository programRepository;
-
-  @MockBean
-  private FacilityRepository facilityRepository;
-
-  @MockBean
-  private ProcessingScheduleRepository scheduleRepository;
-
-  @MockBean
-  private ProcessingPeriodService periodService;
-
-  @MockBean(name = "beforeSavePeriodValidator")
-  private ProcessingPeriodValidator validator;
 
   private ProcessingPeriod firstPeriod;
   private ProcessingPeriod secondPeriod;
@@ -164,7 +136,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
       Errors errors = (Errors) args[1];
       errors.reject("testReject", "rejectMessage");
       return null;
-    }).when(validator).validate(anyObject(), any(Errors.class));
+    }).when(periodValidator).validate(anyObject(), any(Errors.class));
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())
@@ -188,7 +160,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
       Errors errors = (Errors) args[1];
       errors.reject("testReject", "rejectMessage");
       return null;
-    }).when(validator).validate(anyObject(), any(Errors.class));
+    }).when(periodValidator).validate(anyObject(), any(Errors.class));
 
     restAssured.given()
         .queryParam(ACCESS_TOKEN, getToken())

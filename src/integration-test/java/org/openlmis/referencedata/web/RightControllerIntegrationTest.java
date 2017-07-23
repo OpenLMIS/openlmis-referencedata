@@ -21,23 +21,18 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import com.google.common.collect.Sets;
-
-import org.junit.Test;
-import org.openlmis.referencedata.domain.Right;
-import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.domain.RightType;
-import org.openlmis.referencedata.dto.RightDto;
-import org.openlmis.referencedata.repository.RightRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-
 import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.domain.RightType;
+import org.openlmis.referencedata.dto.RightDto;
+import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -48,9 +43,6 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RIGHT_NAME = "right";
   private static final String ATTACHMENT_NAME = "attachment";
   private static final RightType RIGHT_TYPE = RightType.GENERAL_ADMIN;
-
-  @MockBean
-  private RightRepository rightRepository;
 
   private Right right;
   private Right attachment;
@@ -108,6 +100,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getShouldGetRight() {
+    mockClientHasRootAccess();
 
     given(rightRepository.findOne(rightId)).willReturn(right);
 
@@ -128,6 +121,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getShouldReturnForbiddenForUnauthorizedToken() {
+    mockClientHasNoRootAccess();
 
     restAssured
         .given()
@@ -143,6 +137,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getShouldReturnNotFoundForNonExistingRight() {
+    mockClientHasRootAccess();
 
     given(rightRepository.findOne(rightId)).willReturn(null);
 
@@ -160,6 +155,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void putShouldCreateNewRightForNonExistingRight() {
+    mockClientHasRootAccess();
 
     given(rightRepository.findFirstByName(ATTACHMENT_NAME)).willReturn(attachment);
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(null);
@@ -183,6 +179,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void putShouldUpdateRightForExistingRight() {
+    mockClientHasRootAccess();
 
     given(rightRepository.findFirstByName(ATTACHMENT_NAME)).willReturn(attachment);
     given(rightRepository.findFirstByName(RIGHT_NAME)).willReturn(right);
@@ -206,6 +203,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void putShouldReturnBadRequestForNonExistingAttachment() {
+    mockClientHasRootAccess();
 
     given(rightRepository.findFirstByName(ATTACHMENT_NAME)).willReturn(null);
 
@@ -224,6 +222,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void putShouldReturnForbiddenForUnauthorizedToken() {
+    mockClientHasNoRootAccess();
 
     restAssured
         .given()
@@ -240,6 +239,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void deleteShouldDeleteRight() {
+    mockClientHasRootAccess();
 
     given(rightRepository.findOne(rightId)).willReturn(right);
 
@@ -257,6 +257,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void deleteShouldReturnForbiddenForUnauthorizedToken() {
+    mockClientHasNoRootAccess();
 
     restAssured
         .given()
@@ -272,6 +273,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void deleteShouldReturnNotFoundForNonExistingRight() {
+    mockClientHasRootAccess();
 
     given(rightRepository.findOne(rightId)).willReturn(null);
 

@@ -21,6 +21,10 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.openlmis.referencedata.domain.RightName.SUPPLY_LINES_MANAGE;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -32,15 +36,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.dto.SupplyLineDto;
-import org.openlmis.referencedata.repository.SupplyLineRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -49,9 +45,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String DESCRIPTION = "OpenLMIS";
-
-  @MockBean
-  private SupplyLineRepository supplyLineRepository;
 
   private SupplyLine supplyLine;
   private SupplyLineDto supplyLineDto;

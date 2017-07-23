@@ -30,7 +30,7 @@ import org.openlmis.referencedata.dto.CurrencySettingsDto;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
-public class CurrencySettingCotrollerIntegratonTest extends BaseWebIntegrationTest {
+public class CurrencySettingControllerIntegratonTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnCurrencySetting() {

@@ -25,31 +25,26 @@ import static org.openlmis.referencedata.dto.TradeItemDto.newInstance;
 import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_MANUFACTURER_REQUIRED;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
-import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.TradeItemDto;
-import org.openlmis.referencedata.repository.TradeItemRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.Before;
+import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.TradeItemDto;
+import org.springframework.http.MediaType;
 
 public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/tradeItems";
   private static final String CID = "cid";
 
-  @MockBean
-  private TradeItemRepository repository;
-
   @Before
   public void setUp() {
-    when(repository.save(any(TradeItem.class))).thenAnswer(new SaveAnswer<TradeItem>());
+    when(tradeItemRepository.save(any(TradeItem.class))).thenAnswer(new SaveAnswer<TradeItem>());
   }
 
   @Test
@@ -58,7 +53,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     TradeItem tradeItem = generateItem("item");
 
-    when(repository.save(any(TradeItem.class))).thenAnswer(new SaveAnswer<TradeItem>());
+    when(tradeItemRepository.save(any(TradeItem.class))).thenAnswer(new SaveAnswer<TradeItem>());
 
     TradeItemDto object = newInstance(tradeItem);
     TradeItemDto response = restAssured
@@ -91,7 +86,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     List<TradeItem> items = asList(generateItem("one"),
         generateItem("two"));
 
-    when(repository.findAll()).thenReturn(items);
+    when(tradeItemRepository.findAll()).thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -115,7 +110,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     List<TradeItem> items = asList(generateItem("one"),
         generateItem("two"));
 
-    when(repository.findByClassificationIdLike(CID)).thenReturn(items);
+    when(tradeItemRepository.findByClassificationIdLike(CID)).thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -140,7 +135,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     List<TradeItem> items = asList(generateItem("one"),
         generateItem("two"));
 
-    when(repository.findByClassificationId(CID)).thenReturn(items);
+    when(tradeItemRepository.findByClassificationId(CID)).thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()

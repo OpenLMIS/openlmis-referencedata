@@ -21,26 +21,19 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
 
-import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-
 import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.hamcrest.Matchers;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.springframework.http.MediaType;
 
 public class GeographicLevelControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/geographicLevels";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-
-  @MockBean
-  private GeographicLevelRepository geographicLevelRepository;
 
   private GeographicLevel geographicLevel;
   private UUID geographicLevelId;

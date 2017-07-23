@@ -15,29 +15,25 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.hamcrest.Matchers.equalTo;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
-import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -46,9 +42,6 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String CODE = "code";
-
-  @MockBean
-  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
   private Integer currentInstanceNumber;
 

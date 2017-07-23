@@ -34,9 +34,13 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.config.ObjectMapperConfig;
 import com.jayway.restassured.config.RestAssuredConfig;
-
 import com.jayway.restassured.response.ExtractableResponse;
 import com.jayway.restassured.response.Response;
+import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlLoaders;
+import guru.nidi.ramltester.restassured.RestAssuredClient;
+import java.util.UUID;
+import javax.annotation.PostConstruct;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -44,30 +48,53 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.repository.CommodityTypeRepository;
+import org.openlmis.referencedata.repository.FacilityOperatorRepository;
+import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.FacilityTypeRepository;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.repository.LotRepository;
+import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
+import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RequisitionGroupRepository;
+import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
+import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.repository.SupplyLineRepository;
+import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.FacilityService;
+import org.openlmis.referencedata.service.OrderableService;
+import org.openlmis.referencedata.service.ProcessingPeriodService;
+import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
+import org.openlmis.referencedata.service.RequisitionGroupService;
 import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.service.SupervisoryNodeService;
+import org.openlmis.referencedata.service.SupplyLineService;
+import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
+import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
+import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.RamlLoaders;
-import guru.nidi.ramltester.restassured.RestAssuredClient;
-
-import javax.annotation.PostConstruct;
-import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@DirtiesContext
 public abstract class BaseWebIntegrationTest {
 
   protected static final String ACCESS_TOKEN = "access_token";
@@ -77,6 +104,8 @@ public abstract class BaseWebIntegrationTest {
 
   protected static final String MESSAGEKEY_ERROR_UNAUTHORIZED =
       SystemMessageKeys.ERROR_UNAUTHORIZED;
+  protected static final String MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC =
+      SystemMessageKeys.ERROR_UNAUTHORIZED_GENERIC;
 
   protected static final String RAML_ASSERT_MESSAGE =
       "HTTP request/response should match RAML definition.";
@@ -125,6 +154,99 @@ public abstract class BaseWebIntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @MockBean
+  protected CommodityTypeRepository commodityTypeRepository;
+
+  @MockBean
+  protected TradeItemRepository tradeItemRepository;
+
+  @MockBean
+  protected OrderableRepository orderableRepository;
+
+  @MockBean
+  protected FacilityRepository facilityRepository;
+
+  @MockBean
+  protected FacilityService facilityService;
+
+  @MockBean
+  protected SupplyLineService supplyLineService;
+
+  @MockBean
+  protected ProgramRepository programRepository;
+
+  @MockBean
+  protected FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
+
+  @MockBean
+  protected SupervisoryNodeRepository supervisoryNodeRepository;
+
+  @MockBean
+  protected FacilityOperatorRepository facilityOperatorRepository;
+
+  @MockBean
+  protected OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
+
+  @MockBean
+  protected FacilityTypeRepository facilityTypeRepository;
+
+  @MockBean
+  protected GeographicLevelRepository geographicLevelRepository;
+
+  @MockBean
+  protected GeographicZoneRepository geographicZoneRepository;
+
+  @MockBean
+  protected LotRepository lotRepository;
+
+  @MockBean
+  protected OrderableService orderableService;
+
+  @MockBean
+  protected ProcessingPeriodRepository periodRepository;
+
+  @MockBean
+  protected ProcessingScheduleRepository scheduleRepository;
+
+  @MockBean
+  protected ProcessingPeriodService periodService;
+
+  @MockBean(name = "beforeSavePeriodValidator")
+  protected ProcessingPeriodValidator periodValidator;
+
+  @MockBean
+  protected RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
+
+  @MockBean
+  protected RequisitionGroupRepository requisitionGroupRepository;
+
+  @MockBean
+  protected RequisitionGroupService requisitionGroupService;
+
+  @MockBean
+  protected RequisitionGroupValidator requisitionGroupValidator;
+
+  @MockBean
+  protected RightRepository rightRepository;
+
+  @MockBean
+  protected RoleRepository roleRepository;
+
+  @MockBean
+  protected StockAdjustmentReasonRepository stockAdjustmentReasonRepository;
+
+  @MockBean
+  protected UserRepository userRepository;
+
+  @MockBean
+  protected SupervisoryNodeService supervisoryNodeService;
+
+  @MockBean
+  protected SupplyLineRepository supplyLineRepository;
+
+  @MockBean
+  protected UserService userService;
 
   /**
    * Constructor for test.
@@ -209,6 +331,16 @@ public abstract class BaseWebIntegrationTest {
     if (userId != null) {
       doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), eq(userId));
     }
+  }
+  
+  protected void mockClientHasRootAccess() {
+    doNothing().when(rightService).checkRootAccess();
+  }
+  
+  protected void mockClientHasNoRootAccess() {
+    UnauthorizedException exception = new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC));
+    doThrow(exception).when(rightService).checkRootAccess();
   }
 
   void checkBadRequestBody(Object object, String code, String resourceUrl) {

@@ -30,6 +30,10 @@ import static org.openlmis.referencedata.util.messagekeys.LotMessageKeys.ERROR_L
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,15 +41,8 @@ import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
-import org.openlmis.referencedata.repository.LotRepository;
-import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -53,12 +50,6 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/lots";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
-
-  @MockBean
-  private TradeItemRepository tradeItemRepository;
-
-  @MockBean
-  private LotRepository lotRepository;
 
   private Lot lot;
   private UUID lotId;

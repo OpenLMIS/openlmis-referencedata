@@ -19,25 +19,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -45,18 +38,6 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   private static final String RESOURCE_URL = "/api/processingSchedules";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
-
-  @MockBean
-  private ProcessingScheduleRepository scheduleRepository;
-
-  @MockBean
-  private ProgramRepository programRepository;
-
-  @MockBean
-  private FacilityRepository facilityRepository;
-
-  @MockBean
-  private RequisitionGroupProgramScheduleService requisitionGroupProgramScheduleService;
 
   private ProcessingSchedule schedule;
   private Facility facility;

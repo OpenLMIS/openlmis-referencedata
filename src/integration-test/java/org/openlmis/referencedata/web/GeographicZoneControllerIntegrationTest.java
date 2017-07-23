@@ -25,27 +25,22 @@ import static org.mockito.Mockito.when;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
-import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -62,11 +57,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   private static final String LEVEL_NUMBER = "levelNumber";
   private static final String PARENT = "parent";
 
-  @MockBean
-  private GeographicZoneRepository geographicZoneRepository;
-
-  @MockBean
-  private GeographicLevelRepository geographicLevelRepository;
   private GeographicLevel countryLevel;
   private GeographicLevel regionLevel;
 

@@ -15,20 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.StockAdjustmentReason;
-import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -38,15 +24,23 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.STOCK_ADJUSTMENT_REASONS_MANAGE;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import org.hamcrest.Matchers;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.StockAdjustmentReason;
+import org.springframework.http.MediaType;
+
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/stockAdjustmentReasons";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String FIND_BY_PROGRAM_ID_URL = RESOURCE_URL + "/search";
-
-  @MockBean
-  private StockAdjustmentReasonRepository stockAdjustmentReasonRepository;
 
   private StockAdjustmentReason reason;
   private UUID reasonId;

@@ -19,28 +19,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
-import org.junit.Test;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-
 import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.dto.ProgramDto;
+import org.springframework.http.MediaType;
 
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/programs";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/search";
-
-  @MockBean
-  private ProgramRepository programRepository;
 
   private Program program;
   private ProgramDto programDto = new ProgramDto();
