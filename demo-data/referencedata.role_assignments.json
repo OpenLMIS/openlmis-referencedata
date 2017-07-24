@@ -493,14 +493,6 @@
     "role": {"id": "5c316c50-96ad-4f04-8a3a-4f5aa8afa67e"}
   },
   {
-    "id": "f3895bb3-972f-4707-b8b7-8e5f2420b55b",
-    "type": "supervision",
-    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
-    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
-    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
-  },
-  {
     "id": "036d4792-d3e1-447b-a023-21402a992611",
     "type": "supervision",
     "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
@@ -513,14 +505,6 @@
     "type": "supervision",
     "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
-    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
-  },
-  {
-    "id": "1ee00cdc-a5d8-4580-9d76-0da60a521dbf",
-    "type": "supervision",
-    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
-    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
     "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
   }
