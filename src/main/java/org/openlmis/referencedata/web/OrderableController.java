@@ -25,6 +25,9 @@ import org.openlmis.referencedata.service.OrderableService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.validate.OrderableValidator;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +47,7 @@ import java.util.UUID;
 
 @RestController
 public class OrderableController extends BaseController {
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableController.class);
 
   @Autowired
   private OrderableRepository repository;
@@ -119,10 +123,21 @@ public class OrderableController extends BaseController {
   @PostMapping("/orderables/search")
   public Page<OrderableDto> search(@RequestBody Map<String, Object> queryParams,
                                    Pageable pageable) {
+    XLOGGER.entry(queryParams, pageable);
+    Profiler profiler = new Profiler("ORDERABLES_SEARCH");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("CHECK_ADMIN_RIGHT");
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
+    profiler.start("ORDERABLE_SERVICE_SEARCH");
     List<Orderable> orderables = orderableService.searchOrderables(queryParams);
 
-    return Pagination.getPage(OrderableDto.newInstance(orderables), pageable);
+    profiler.start("ORDERABLE_PAGINATION");
+    Page<OrderableDto> page = Pagination.getPage(OrderableDto.newInstance(orderables), pageable);
+
+    profiler.stop().log();
+    XLOGGER.exit(page);
+    return page;
   }
 }
