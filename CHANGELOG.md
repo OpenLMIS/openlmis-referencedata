@@ -3,6 +3,7 @@
 
 Breaking changes:
 * [OLMIS-2709](https://openlmis.atlassian.net/browse/OLMIS-2709): Facility search now returns smaller objects.
+* [OLMIS-2698](https://openlmis.atlassian.net/browse/OLMIS-2698): Geographic Zone search endpoint now accepts POST requests, also has new parameters: name and code.
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-2609](https://openlmis.atlassian.net/browse/OLMIS-2609): Created rights to manage CCE and assigned to system administrator.

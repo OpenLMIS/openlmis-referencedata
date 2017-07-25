@@ -21,20 +21,28 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class GeographicZoneRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<GeographicZone> {
+
+  private static final String ZONE = "zone";
 
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
@@ -93,6 +101,7 @@ public class GeographicZoneRepositoryIntegrationTest
 
     districtZone = new GeographicZone();
     districtZone.setCode("D" + this.getNextInstanceNumber());
+    districtZone.setName(ZONE + this.getNextInstanceNumber());
     districtZone.setLevel(districtLevel);
     districtZone.setParent(regionZone);
     Coordinate[] districtCoords  = new Coordinate[] {
@@ -177,6 +186,200 @@ public class GeographicZoneRepositoryIntegrationTest
     assertThat(zones, hasItem(district2Zone));
     assertThat(zones, hasItem(regionZone));
     assertThat(zones, hasItem(countryZone));
+  }
+
+  @Test
+  public void shouldFindGroupsWithSimilarCode() {
+    GeographicZone geographicZone = generateInstance();
+    repository.save(geographicZone);
+    GeographicZone geographicZone1 = generateInstance();
+    repository.save(geographicZone1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(null, geographicZone.getCode(), null, null,
+        pageable, 1, geographicZone);
+  }
+
+  @Test
+  public void shouldFindGroupsWithSimilarCodeIgnoringCase() {
+    GeographicZone geographicZone = generateInstance();
+    geographicZone = repository.save(geographicZone);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(null, geographicZone.getCode().toUpperCase(), null, null,
+        pageable, 1, geographicZone);
+    searchGroupAndCheckResults(null, geographicZone.getCode().toLowerCase(), null, null,
+        pageable, 1, geographicZone);
+    searchGroupAndCheckResults(null, "d", null, null, pageable, 1, geographicZone);
+    searchGroupAndCheckResults(null, "D", null, null, pageable, 1, geographicZone);
+  }
+
+  @Test
+  public void shouldFindGeographicZonesWithSimilarName() {
+    GeographicZone geographicZone = generateInstance();
+    geographicZone = repository.save(geographicZone);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(ZONE, null, null, null, pageable, 1, geographicZone);
+  }
+
+  @Test
+  public void shouldFindGeographicZonesWithSimilarNameIgnoringCase() {
+    GeographicZone geographicZone = generateInstance();
+    geographicZone = repository.save(geographicZone);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(ZONE, null, null, null, pageable, 1, geographicZone);
+    searchGroupAndCheckResults("ZONE", null, null, null, pageable, 1, geographicZone);
+    searchGroupAndCheckResults("ZoNe", null, null, null, pageable, 1, geographicZone);
+    searchGroupAndCheckResults("zONe", null, null, null, pageable, 1, geographicZone);
+  }
+
+  @Test
+  public void shouldFindGeographicZonesWithSimilarCodeOrName() {
+    GeographicZone geographicZone = generateInstance();
+    geographicZone = repository.save(geographicZone);
+    GeographicZone geographicZone1 = generateInstance();
+    repository.save(geographicZone1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(ZONE, "D", null, null,
+        pageable, 2, geographicZone);
+  }
+
+  @Test
+  public void shouldFindGeographicZonesWithSimilarCodeOrNameIgnoringCase() {
+    GeographicZone geographicZone = generateInstance();
+    geographicZone = repository.save(geographicZone);
+    GeographicZone geographicZone1 = generateInstance();
+    repository.save(geographicZone1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults("zon", "d", null, null,
+        pageable, 2, geographicZone);
+    searchGroupAndCheckResults("ZONE", "D", null, null,
+        pageable, 2, geographicZone);
+  }
+
+  @Test
+  public void shouldNotFindAnyGeographicZoneForIncorrectCodeAndName() {
+    Pageable pageable = mockPageable(0, 10);
+    Page<GeographicZone> foundGroups = repository.search("Cucumber", "Tomato",
+        null, null, pageable);
+
+    assertEquals(0, foundGroups.getContent().size());
+  }
+
+  @Test
+  public void shouldReturnGeographicZonesWithFullCount() {
+    assertEquals(0, repository.count());
+
+    for (int i = 0; i < 10; i++) {
+      GeographicZone group  = generateInstance();
+      repository.save(group);
+    }
+
+    // different code
+    GeographicZone group = generateInstance();
+    group.setCode("XXX");
+    repository.save(group);
+
+    assertEquals(33, repository.count());
+
+    Pageable pageable = mockPageable(3, 0);
+
+    Page<GeographicZone> result = repository.search(null, "XXX", null, null, pageable);
+
+    assertEquals(1, result.getContent().size());
+    assertEquals(1, result.getTotalElements());
+
+    result = repository.search(null, "D", null, null, pageable);
+
+    assertEquals(3, result.getContent().size());
+    assertEquals(10, result.getTotalElements());
+  }
+
+  @Test
+  public void shouldFindGeographicZonesByParent() {
+
+    GeographicZone geographicZone = generateInstance();
+    geographicZone = repository.save(geographicZone);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(null, null,
+        geographicZone.getParent(),
+        null, pageable, 1, geographicZone);
+  }
+
+  @Test
+  public void shouldFindGeographicZonesByLevel() {
+
+    GeographicZone geographicZone = generateInstance();
+    geographicZone = repository.save(geographicZone);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    searchGroupAndCheckResults(null, null,
+        geographicZone.getParent(),
+        null, pageable, 1, geographicZone);
+  }
+
+  @Test
+  public void shouldSortByName() {
+    GeographicZone geographicZone = generateInstance();
+    geographicZone.setName("zone-a");
+    geographicZone = repository.save(geographicZone);
+
+    GeographicZone geographicZone1 = generateInstance();
+    geographicZone1.setName("zone-b");
+    geographicZone1 = repository.save(geographicZone1);
+
+    Pageable pageable = mockPageable(0, 10);
+
+    Page<GeographicZone> foundPage = repository.search("zone", null, null,
+        null, pageable);
+    assertEquals(2, foundPage.getContent().size());
+    assertEquals(geographicZone.getName(), foundPage.getContent().get(0).getName());
+    assertEquals(geographicZone1.getName(), foundPage.getContent().get(1).getName());
+  }
+
+  @Test
+  public void shouldReturnEmptyListIfSearchParametersAreNotProvided() {
+    Pageable pageable = mockPageable(0, 10);
+
+    Page<GeographicZone> foundPage = repository.search(null, null, null,
+        null, pageable);
+    assertEquals(0, foundPage.getContent().size());
+
+    foundPage = repository.search(null, null, null,
+        null, pageable);
+    assertEquals(0, foundPage.getContent().size());
+  }
+
+  private void searchGroupAndCheckResults(String name, String code, GeographicZone parent,
+                                          GeographicLevel geographicLevel,
+                                          Pageable pageable, int expectedSize,
+                                          GeographicZone geographicZone) {
+    Page<GeographicZone> foundPage = repository.search(name, code, parent,
+        geographicLevel, pageable);
+
+    assertEquals(expectedSize, foundPage.getContent().size());
+
+    assertEquals(geographicZone.getName(), foundPage.getContent().get(0).getName());
+  }
+
+  private Pageable mockPageable(int pageSize, int pageNumber) {
+    Pageable pageable = mock(Pageable.class);
+    given(pageable.getPageNumber()).willReturn(pageNumber);
+    given(pageable.getPageSize()).willReturn(pageSize);
+    return pageable;
   }
 
   @Override

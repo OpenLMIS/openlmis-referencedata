@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -35,12 +36,26 @@ import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -56,6 +71,12 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   private static final Integer PAGE_SIZE = 1000;
   private static final String LEVEL_NUMBER = "levelNumber";
   private static final String PARENT = "parent";
+
+  @MockBean
+  private GeographicZoneRepository geographicZoneRepository;
+
+  @MockBean
+  private GeographicZoneService geographicZoneService;
 
   private GeographicLevel countryLevel;
   private GeographicLevel regionLevel;
@@ -186,7 +207,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     PageRequest pageRequest = new PageRequest(PAGE_NUMBER, PAGE_SIZE);
     given(geographicZoneRepository.findAll(pageRequest)).willReturn(geographicZonesPage);
 
-    Page<GeographicZone> response = restAssured
+    Page<GeographicZoneSimpleDto> response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
         .queryParam(PAGE, PAGE_NUMBER)
@@ -212,160 +233,30 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
 
-    given(geographicZoneRepository.findOne(regionZone.getId())).willReturn(regionZone);
-    given(geographicLevelRepository.findByLevelNumber(districtLevel.getLevelNumber()))
-        .willReturn(districtLevel);
-    given(geographicZoneRepository.findByParentAndLevel(regionZone, districtLevel))
-        .willReturn(geographicZones);
+    given(geographicZoneService.search(any(Map.class), any(Pageable.class)))
+        .willReturn(Pagination.getPage(geographicZones, null, geographicZones.size()));
+
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put(PAGE, PAGE_NUMBER);
+    requestBody.put(SIZE, PAGE_SIZE);
+    requestBody.put(LEVEL_NUMBER, districtLevel.getLevelNumber());
+    requestBody.put(PARENT, regionZone.getId());
 
     // when
-    GeographicZone[] response = restAssured
+    Page<GeographicZoneSimpleDto> response = restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(PAGE, PAGE_NUMBER)
-        .queryParam(SIZE, PAGE_SIZE)
-        .queryParam(LEVEL_NUMBER, districtLevel.getLevelNumber())
-        .queryParam(PARENT, regionZone.getId())
+        .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .get(SEARCH_URL)
+        .post(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(GeographicZone[].class);
+        .extract().as(PageImplRepresentation.class);
 
     // then
-    List<GeographicZone> result = Arrays.asList(response);
+    List<GeographicZoneSimpleDto> result = response.getContent();
     assertEquals(geographicZones.size(), result.size());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldFindGeographicZonesByLevel() {
-    // given
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
-
-    given(geographicLevelRepository.findByLevelNumber(districtLevel.getLevelNumber()))
-        .willReturn(districtLevel);
-    given(geographicZoneRepository.findByLevel(districtLevel)).willReturn(geographicZones);
-
-    // when
-    GeographicZone[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(PAGE, PAGE_NUMBER)
-        .queryParam(SIZE, PAGE_SIZE)
-        .queryParam(LEVEL_NUMBER, districtLevel.getLevelNumber())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(SEARCH_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(GeographicZone[].class);
-
-    // then
-    List<GeographicZone> result = Arrays.asList(response);
-    assertEquals(geographicZones.size(), result.size());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldFindGeographicZonesByParent() {
-    // given
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
-
-    given(geographicZoneRepository.findOne(regionZone.getId())).willReturn(regionZone);
-    given(geographicZoneRepository.findByParent(regionZone))
-        .willReturn(geographicZones);
-
-    // when
-    GeographicZone[] response = restAssured
-        .given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(PAGE, PAGE_NUMBER)
-        .queryParam(SIZE, PAGE_SIZE)
-        .queryParam(PARENT, regionZone.getId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(SEARCH_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(GeographicZone[].class);
-
-    // then
-    List<GeographicZone> result = Arrays.asList(response);
-    assertEquals(geographicZones.size(), result.size());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRespondWithBadRequestWhenGeographicZonesParentNotFound() {
-    // given
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
-
-    given(geographicZoneRepository.findOne(regionZone.getId())).willReturn(null);
-    given(geographicLevelRepository.findByLevelNumber(districtLevel.getLevelNumber()))
-        .willReturn(districtLevel);
-    given(geographicZoneRepository.findByParentAndLevel(regionZone, districtLevel))
-        .willReturn(geographicZones);
-
-    // when
-    restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(PAGE, PAGE_NUMBER)
-        .queryParam(SIZE, PAGE_SIZE)
-        .queryParam(LEVEL_NUMBER, districtLevel.getLevelNumber())
-        .queryParam(PARENT, regionZone.getId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(SEARCH_URL)
-        .then()
-        .statusCode(400);
-
-    // then
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRespondWithBadRequestWhenGeographicLevelNotFound() {
-    // given
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
-
-    given(geographicZoneRepository.findOne(regionZone.getId())).willReturn(regionZone);
-    given(geographicLevelRepository.findByLevelNumber(districtLevel.getLevelNumber()))
-        .willReturn(null);
-    given(geographicZoneRepository.findByParentAndLevel(regionZone, districtLevel))
-        .willReturn(geographicZones);
-
-    // when
-    restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(PAGE, PAGE_NUMBER)
-        .queryParam(SIZE, PAGE_SIZE)
-        .queryParam(LEVEL_NUMBER, districtLevel.getLevelNumber())
-        .queryParam(PARENT, regionZone.getId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(SEARCH_URL)
-        .then()
-        .statusCode(400);
-
-    // then
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -438,16 +329,19 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put(PAGE, PAGE_NUMBER);
+    requestBody.put(SIZE, PAGE_SIZE);
+    requestBody.put(LEVEL_NUMBER, districtLevel.getLevelNumber());
+    requestBody.put(PARENT, regionZone.getId());
+
     restAssured
         .given()
         .queryParam(ACCESS_TOKEN, getToken())
-        .queryParam(PAGE, PAGE_NUMBER)
-        .queryParam(SIZE, PAGE_SIZE)
-        .queryParam(LEVEL_NUMBER, districtLevel.getLevelNumber())
-        .queryParam(PARENT, regionZone.getId())
+        .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .get(SEARCH_URL)
+        .post(SEARCH_URL)
         .then()
         .statusCode(403);
 

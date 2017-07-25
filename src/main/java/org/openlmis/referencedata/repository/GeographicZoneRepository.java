@@ -21,11 +21,13 @@ import java.util.UUID;
 
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.repository.custom.GeographicZoneRepositoryCustom;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface GeographicZoneRepository extends PagingAndSortingRepository<GeographicZone, UUID> {
+public interface GeographicZoneRepository extends PagingAndSortingRepository<GeographicZone, UUID>,
+                                                  GeographicZoneRepositoryCustom {
 
   @Override
   <S extends GeographicZone> S save(S entity);

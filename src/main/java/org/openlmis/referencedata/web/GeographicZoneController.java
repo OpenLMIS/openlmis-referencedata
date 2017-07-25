@@ -15,25 +15,20 @@
 
 package org.openlmis.referencedata.web;
 
-import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
-
 import com.vividsolutions.jts.geom.Point;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
 import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
+import org.openlmis.referencedata.service.GeographicZoneService;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +42,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -61,7 +55,7 @@ public class GeographicZoneController extends BaseController {
   private GeographicZoneRepository geographicZoneRepository;
 
   @Autowired
-  private GeographicLevelRepository geographicLevelRepository;
+  private GeographicZoneService geographicZoneService;
 
   /**
    * Allows creating new geographicZones.
@@ -176,45 +170,28 @@ public class GeographicZoneController extends BaseController {
   }
 
   /**
-   * Retrieves all Geographic Zones matching given parameters.
+   * Retrieves page of Geographic Zones matching given parameters.
    *
-   * @param parentId    ID of parent geographic zone.
-   * @param levelNumber geographic level number.
-   * @return List of matched geographic zones.
+   * @param queryParams request parameters (code, name, parent).
+   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @return Page of matched geographic zones.
    */
-  @RequestMapping(value = "/geographicZones/search", method = RequestMethod.GET)
+  @RequestMapping(value = "/geographicZones/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<GeographicZoneSimpleDto> searchGeographicZones(
-      @RequestParam(value = "parent", required = false) UUID parentId,
-      @RequestParam(value = "levelNumber", required = false) Integer levelNumber) {
+  public Page<GeographicZoneSimpleDto> search(@RequestBody Map<String, Object> queryParams,
+                                                                 Pageable pageable) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    GeographicZone parent = null;
-    if (isNotTrue(isNull(parentId))) {
-      parent = geographicZoneRepository.findOne(parentId);
-      if (isNull(parent)) {
-        throw new ValidationMessageException(
-            new Message(GeographicZoneMessageKeys.ERROR_NOT_FOUND_WITH_ID, parentId));
-      }
-    }
+    Page<GeographicZone> page = geographicZoneService.search(queryParams, pageable);
 
-    GeographicLevel level = null;
-    if (isNotTrue(isNull(levelNumber))) {
-      level = geographicLevelRepository.findByLevelNumber(levelNumber);
-      if (isNull(level)) {
-        throw new ValidationMessageException(
-            new Message(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER, levelNumber));
-      }
-    }
+    return exportToDto(page, pageable);
+  }
 
-    if (isNull(parent)) {
-      return toSimpleDto(geographicZoneRepository.findByLevel(level));
-    }
-    if (isNull(level)) {
-      return toSimpleDto(geographicZoneRepository.findByParent(parent));
-    }
-    return toSimpleDto(geographicZoneRepository.findByParentAndLevel(parent, level));
+  private Page<GeographicZoneSimpleDto> exportToDto(Page<GeographicZone> page, Pageable pageable) {
+    List<GeographicZoneSimpleDto> list = page.getContent().stream()
+        .map(this::toSimpleDto).collect(Collectors.toList());
+    return Pagination.getPage(list, pageable, page.getTotalElements());
   }
 
   private GeographicZoneDto toDto(GeographicZone geographicZone) {

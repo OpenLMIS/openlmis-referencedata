@@ -13,12 +13,14 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.util.messagekeys;
+package org.openlmis.referencedata.repository.custom;
 
-public abstract class GeographicZoneMessageKeys extends MessageKeys {
-  private static final String ERROR = join(SERVICE_ERROR, GEOGRAPHIC_ZONE);
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
-  public static final String ERROR_SEARCH_LACKS_PARAMS = join(ERROR, SEARCH, LACKS_PARAMETERS);
+public interface GeographicZoneRepositoryCustom {
+  Page<GeographicZone> search(String name, String code, GeographicZone parent,
+                              GeographicLevel geographicLevel, Pageable pageable);
 }

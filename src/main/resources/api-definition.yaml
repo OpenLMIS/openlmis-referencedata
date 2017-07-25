@@ -98,6 +98,8 @@ schemas:
 
   - geographicZonePage: !include schemas/geographicZonePage.json
 
+  - geographicZoneQuery: !include schemas/geographicZoneQueryDto.json
+
   - commodityType:  !include schemas/commodityType.json
 
   - commodityTypePage: !include schemas/commodityTypePage.json
@@ -2075,25 +2077,17 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
       /search:
-          get:
+          post:
               is: [ secured, paginated ]
-              description: Filter geographic zones by parent and level.
-              queryParameters:
-                  parent:
-                          displayName: parent
-                          type: string
-                          required: false
-                          repeat: false
-                  levelNumber:
-                          displayName: level
-                          type: integer
-                          required: false
-                          repeat: false
+              description: Filter geographic zones by parent, level, name and code.
+              body:
+                application/json:
+                  schema: geographicZoneQuery
               responses:
                   "200":
                       body:
                         application/json:
-                          schema: geographicZoneArray
+                          schema: geographicZonePage
                   "400":
                       body:
                         application/json:

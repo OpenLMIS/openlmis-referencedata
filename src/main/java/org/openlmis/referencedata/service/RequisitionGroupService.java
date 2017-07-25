@@ -62,10 +62,10 @@ public class RequisitionGroupService {
   private ProgramRepository programRepository;
 
   /**
-   * Method returns all facilities with matched parameters.
+   * Method returns all requisition groups with matched parameters.
    *
-   * @param queryMap request parameters (code, name, zone, type, recurse) and JSON extraData.
-   * @return List of facilities
+   * @param queryMap request parameters (code, name, zone, program).
+   * @return Page of requisition groups.
    */
   public Page<RequisitionGroup> searchRequisitionGroups(Map<String, Object> queryMap,
                                                         Pageable pageable) {

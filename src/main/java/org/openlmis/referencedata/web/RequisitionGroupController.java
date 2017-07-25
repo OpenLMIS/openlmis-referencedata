@@ -195,12 +195,11 @@ public class RequisitionGroupController extends BaseController {
   }
 
   /**
-   * Retrieves all Requisition Group with code similar to code parameter or facilityName similar to
-   * name parameter.
+   * Retrieves required page of Requisition Groups that are matching given parameters.
    *
-   * @param queryParams request parameters (code, name, zone, recurse) and JSON extraData.
+   * @param queryParams request parameters (code, name, zone, program).
    * @param pageable object used to encapsulate the pagination related values: page and size.
-   * @return List of wanted Facilities matching query parameters.
+   * @return Page of wanted Requisition Groups matching query parameters.
    */
   @RequestMapping(value = "/requisitionGroups/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
