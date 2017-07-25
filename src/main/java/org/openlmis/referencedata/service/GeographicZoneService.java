@@ -58,12 +58,12 @@ public class GeographicZoneService {
   /**
    * Method returns page of geographic zones with matched parameters.
    *
-   * @param queryMap request parameters (code, name, zone, program).
-   * @return Page of requisition groups.
+   * @param queryMap request parameters (code, name, parent, levelNumber).
+   * @return Page of geographic zones.
    */
   public Page<GeographicZone> search(Map<String, Object> queryMap,
                                                       Pageable pageable) {
-    if ( MapUtils.isEmpty(queryMap) ) {
+    if (MapUtils.isEmpty(queryMap)) {
       List<GeographicZone> geographicZones =
           Lists.newArrayList(geographicZoneRepository.findAll());
       geographicZones.sort(Comparator.comparing(GeographicZone::getName));

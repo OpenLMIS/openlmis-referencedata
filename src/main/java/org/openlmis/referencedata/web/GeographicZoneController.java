@@ -172,7 +172,7 @@ public class GeographicZoneController extends BaseController {
   /**
    * Retrieves page of Geographic Zones matching given parameters.
    *
-   * @param queryParams request parameters (code, name, parent).
+   * @param queryParams request parameters (code, name, parent, levelNumber).
    * @param pageable object used to encapsulate the pagination related values: page and size.
    * @return Page of matched geographic zones.
    */
