@@ -17,6 +17,7 @@ package org.openlmis.referencedata.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.service.GeographicZoneService.CODE;
@@ -179,8 +180,8 @@ public class GeographicZoneServiceTest {
   public void shouldSearchForRequisitionGroupsWithAllParametersProvided() {
     when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(parent);
     when(geographicLevelRepository.findByLevelNumber(any(Integer.class))).thenReturn(level);
-    when(geographicZoneRepository.search(any(String.class), any(String.class),
-        any(GeographicZone.class), any(GeographicLevel.class), any(Pageable.class)))
+    when(geographicZoneRepository.search(eq("name"), eq("code"),
+        eq(parent), eq(level), any(Pageable.class)))
         .thenReturn(Pagination.getPage(geographicZones, null, 2));
 
     Map<String, Object> searchParams = new HashMap<>();
