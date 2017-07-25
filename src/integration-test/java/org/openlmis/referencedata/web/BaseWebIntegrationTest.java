@@ -70,6 +70,7 @@ import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.FacilityService;
+import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.service.OrderableService;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
@@ -196,6 +197,9 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected GeographicZoneRepository geographicZoneRepository;
+
+  @MockBean
+  protected GeographicZoneService geographicZoneService;
 
   @MockBean
   protected LotRepository lotRepository;

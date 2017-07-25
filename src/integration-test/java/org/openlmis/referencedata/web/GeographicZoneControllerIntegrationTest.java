@@ -38,11 +38,8 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.repository.GeographicZoneRepository;
-import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -66,12 +63,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   private static final Integer PAGE_SIZE = 1000;
   private static final String LEVEL_NUMBER = "levelNumber";
   private static final String PARENT = "parent";
-
-  @MockBean
-  private GeographicZoneRepository geographicZoneRepository;
-
-  @MockBean
-  private GeographicZoneService geographicZoneService;
 
   private GeographicLevel countryLevel;
   private GeographicLevel regionLevel;
