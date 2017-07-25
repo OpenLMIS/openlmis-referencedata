@@ -17,7 +17,7 @@ execution:
     scenario: users-has-right
   - concurrency: 1
     hold-for: 1m
-    iterations: 100
+    iterations: 10
     scenario: users-get-one-permission-strings
 
 scenarios:
