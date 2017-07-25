@@ -2079,7 +2079,7 @@ resourceTypes:
       /search:
           post:
               is: [ secured, paginated ]
-              description: Filter geographic zones by parent, level, name and code.
+              description: Filter geographic zones by parent, level, name and code. Results are ordered ascending by name.
               body:
                 application/json:
                   schema: geographicZoneQuery

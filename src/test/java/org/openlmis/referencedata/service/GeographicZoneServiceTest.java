@@ -19,6 +19,10 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.service.GeographicZoneService.CODE;
+import static org.openlmis.referencedata.service.GeographicZoneService.LEVEL_NUMBER;
+import static org.openlmis.referencedata.service.GeographicZoneService.NAME;
+import static org.openlmis.referencedata.service.GeographicZoneService.PARENT;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -47,11 +51,6 @@ import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GeographicZoneServiceTest {
-
-  private static final String NAME = "name";
-  private static final String CODE = "code";
-  private static final String PARENT = "parent";
-  private static final String LEVEL_NUMBER = "levelNumber";
 
   @Mock
   private GeographicZoneRepository geographicZoneRepository;
@@ -142,7 +141,7 @@ public class GeographicZoneServiceTest {
   }
 
   @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionIfThereNotProvidedForSearch() {
+  public void shouldThrowExceptionIfThereIsNoValidParameterProvidedForSearch() {
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put("some-param", "some-value");
     geographicZoneService.search(searchParams, pageable);
@@ -167,11 +166,12 @@ public class GeographicZoneServiceTest {
   }
 
   @Test
-  public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
-    when(geographicZoneRepository.findAll()).thenReturn(geographicZones);
+  public void shouldReturnAllElementsSortedByNameIfNoSearchCriteriaProvided() {
+    when(geographicZoneRepository.findAllByOrderByNameAsc(any(Pageable.class)))
+        .thenReturn(Pagination.getPage(geographicZones, null, geographicZones.size()));
 
     Page<GeographicZone> actual = geographicZoneService.search(new HashMap<>(), pageable);
-    verify(geographicZoneRepository).findAll();
+    verify(geographicZoneRepository).findAllByOrderByNameAsc(any(Pageable.class));
     assertEquals(geographicZones, actual.getContent());
   }
 

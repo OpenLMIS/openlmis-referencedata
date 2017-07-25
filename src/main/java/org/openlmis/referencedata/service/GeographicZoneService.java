@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.service;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -24,7 +23,6 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
@@ -35,8 +33,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,10 +40,10 @@ import java.util.UUID;
 @Service
 public class GeographicZoneService {
 
-  private static final String NAME = "name";
-  private static final String CODE = "code";
-  private static final String PARENT = "parent";
-  private static final String LEVEL_NUMBER = "levelNumber";
+  static final String NAME = "name";
+  static final String CODE = "code";
+  static final String PARENT = "parent";
+  static final String LEVEL_NUMBER = "levelNumber";
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
@@ -56,7 +52,8 @@ public class GeographicZoneService {
   private GeographicLevelRepository geographicLevelRepository;
 
   /**
-   * Method returns page of geographic zones with matched parameters.
+   * Method returns page of geographic zones with matched parameters
+   * and sorts results by geographic zone name.
    *
    * @param queryMap request parameters (code, name, parent, levelNumber).
    * @return Page of geographic zones.
@@ -64,18 +61,14 @@ public class GeographicZoneService {
   public Page<GeographicZone> search(Map<String, Object> queryMap,
                                                       Pageable pageable) {
     if (MapUtils.isEmpty(queryMap)) {
-      List<GeographicZone> geographicZones =
-          Lists.newArrayList(geographicZoneRepository.findAll());
-      geographicZones.sort(Comparator.comparing(GeographicZone::getName));
-      return Pagination.getPage(geographicZones, pageable);
+      return geographicZoneRepository.findAllByOrderByNameAsc(pageable);
     }
 
     String name = MapUtils.getString(queryMap, NAME, null);
     String code = MapUtils.getString(queryMap, CODE, null);
     String levelNumber = MapUtils.getString(queryMap, LEVEL_NUMBER, null);
-    Optional<UUID> parentId = UuidUtil.fromString(MapUtils.getObject(queryMap,
-        PARENT,
-        "").toString());
+    Optional<UUID> parentId = UuidUtil
+        .fromString(MapUtils.getObject(queryMap, PARENT, "").toString());
 
     if (StringUtils.isEmpty(code)
         && StringUtils.isEmpty(name)
@@ -86,9 +79,8 @@ public class GeographicZoneService {
           GeographicZoneMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
     }
 
-    GeographicZone parent = findParent(parentId);
+    GeographicZone parent = findGeographicZone(parentId);
     GeographicLevel level = findGeographicLevel(levelNumber);
-
 
     return geographicZoneRepository.search(name, code, parent, level, pageable);
   }
@@ -111,7 +103,7 @@ public class GeographicZoneService {
     return result;
   }
 
-  private GeographicZone findParent(Optional<UUID> parentId) {
+  private GeographicZone findGeographicZone(Optional<UUID> parentId) {
     GeographicZone parent = null;
     if (parentId.isPresent()) {
       parent = geographicZoneRepository.findOne(parentId.get());

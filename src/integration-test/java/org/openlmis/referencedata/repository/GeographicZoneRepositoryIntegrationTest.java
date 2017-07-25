@@ -189,7 +189,7 @@ public class GeographicZoneRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindGroupsWithSimilarCode() {
+  public void shouldFindGeographicZonesWithSimilarCode() {
     GeographicZone geographicZone = generateInstance();
     repository.save(geographicZone);
     GeographicZone geographicZone1 = generateInstance();
@@ -197,23 +197,23 @@ public class GeographicZoneRepositoryIntegrationTest
 
     Pageable pageable = mockPageable(0, 10);
 
-    searchGroupAndCheckResults(null, geographicZone.getCode(), null, null,
+    searchZonesAndCheckResults(null, geographicZone.getCode(), null, null,
         pageable, 1, geographicZone);
   }
 
   @Test
-  public void shouldFindGroupsWithSimilarCodeIgnoringCase() {
+  public void shouldFindGeographicZonesWithSimilarCodeIgnoringCase() {
     GeographicZone geographicZone = generateInstance();
     geographicZone = repository.save(geographicZone);
 
     Pageable pageable = mockPageable(0, 10);
 
-    searchGroupAndCheckResults(null, geographicZone.getCode().toUpperCase(), null, null,
+    searchZonesAndCheckResults(null, geographicZone.getCode().toUpperCase(), null, null,
         pageable, 1, geographicZone);
-    searchGroupAndCheckResults(null, geographicZone.getCode().toLowerCase(), null, null,
+    searchZonesAndCheckResults(null, geographicZone.getCode().toLowerCase(), null, null,
         pageable, 1, geographicZone);
-    searchGroupAndCheckResults(null, "d", null, null, pageable, 1, geographicZone);
-    searchGroupAndCheckResults(null, "D", null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(null, "d", null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(null, "D", null, null, pageable, 1, geographicZone);
   }
 
   @Test
@@ -223,7 +223,7 @@ public class GeographicZoneRepositoryIntegrationTest
 
     Pageable pageable = mockPageable(0, 10);
 
-    searchGroupAndCheckResults(ZONE, null, null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(ZONE, null, null, null, pageable, 1, geographicZone);
   }
 
   @Test
@@ -233,10 +233,10 @@ public class GeographicZoneRepositoryIntegrationTest
 
     Pageable pageable = mockPageable(0, 10);
 
-    searchGroupAndCheckResults(ZONE, null, null, null, pageable, 1, geographicZone);
-    searchGroupAndCheckResults("ZONE", null, null, null, pageable, 1, geographicZone);
-    searchGroupAndCheckResults("ZoNe", null, null, null, pageable, 1, geographicZone);
-    searchGroupAndCheckResults("zONe", null, null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(ZONE, null, null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults("ZONE", null, null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults("ZoNe", null, null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults("zONe", null, null, null, pageable, 1, geographicZone);
   }
 
   @Test
@@ -248,7 +248,7 @@ public class GeographicZoneRepositoryIntegrationTest
 
     Pageable pageable = mockPageable(0, 10);
 
-    searchGroupAndCheckResults(ZONE, "D", null, null,
+    searchZonesAndCheckResults(ZONE, "D", null, null,
         pageable, 2, geographicZone);
   }
 
@@ -261,19 +261,19 @@ public class GeographicZoneRepositoryIntegrationTest
 
     Pageable pageable = mockPageable(0, 10);
 
-    searchGroupAndCheckResults("zon", "d", null, null,
+    searchZonesAndCheckResults("zon", "d", null, null,
         pageable, 2, geographicZone);
-    searchGroupAndCheckResults("ZONE", "D", null, null,
+    searchZonesAndCheckResults("ZONE", "D", null, null,
         pageable, 2, geographicZone);
   }
 
   @Test
   public void shouldNotFindAnyGeographicZoneForIncorrectCodeAndName() {
     Pageable pageable = mockPageable(0, 10);
-    Page<GeographicZone> foundGroups = repository.search("Cucumber", "Tomato",
+    Page<GeographicZone> foundZones = repository.search("Cucumber", "Tomato",
         null, null, pageable);
 
-    assertEquals(0, foundGroups.getContent().size());
+    assertEquals(0, foundZones.getContent().size());
   }
 
   @Test
@@ -281,14 +281,14 @@ public class GeographicZoneRepositoryIntegrationTest
     assertEquals(0, repository.count());
 
     for (int i = 0; i < 10; i++) {
-      GeographicZone group  = generateInstance();
-      repository.save(group);
+      GeographicZone zone  = generateInstance();
+      repository.save(zone);
     }
 
     // different code
-    GeographicZone group = generateInstance();
-    group.setCode("XXX");
-    repository.save(group);
+    GeographicZone zone = generateInstance();
+    zone.setCode("XXX");
+    repository.save(zone);
 
     assertEquals(33, repository.count());
 
@@ -313,7 +313,7 @@ public class GeographicZoneRepositoryIntegrationTest
 
     Pageable pageable = mockPageable(0, 10);
 
-    searchGroupAndCheckResults(null, null,
+    searchZonesAndCheckResults(null, null,
         geographicZone.getParent(),
         null, pageable, 1, geographicZone);
   }
@@ -326,7 +326,7 @@ public class GeographicZoneRepositoryIntegrationTest
 
     Pageable pageable = mockPageable(0, 10);
 
-    searchGroupAndCheckResults(null, null,
+    searchZonesAndCheckResults(null, null,
         geographicZone.getParent(),
         null, pageable, 1, geographicZone);
   }
@@ -363,7 +363,7 @@ public class GeographicZoneRepositoryIntegrationTest
     assertEquals(0, foundPage.getContent().size());
   }
 
-  private void searchGroupAndCheckResults(String name, String code, GeographicZone parent,
+  private void searchZonesAndCheckResults(String name, String code, GeographicZone parent,
                                           GeographicLevel geographicLevel,
                                           Pageable pageable, int expectedSize,
                                           GeographicZone geographicZone) {

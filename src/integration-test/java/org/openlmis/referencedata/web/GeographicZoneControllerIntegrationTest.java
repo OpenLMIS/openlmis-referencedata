@@ -38,8 +38,10 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -330,6 +332,32 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .post(SEARCH_URL)
         .then()
         .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void searchShouldReturnBadRequestOnException() {
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put(PAGE, PAGE_NUMBER);
+    requestBody.put(SIZE, PAGE_SIZE);
+    requestBody.put(LEVEL_NUMBER, districtLevel.getLevelNumber());
+    requestBody.put(PARENT, regionZone.getId());
+
+    doThrow(new ValidationMessageException(
+        GeographicZoneMessageKeys.ERROR_SEARCH_LACKS_PARAMS))
+        .when(geographicZoneService)
+        .search(any(Map.class), any(Pageable.class));
+
+    restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(400);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

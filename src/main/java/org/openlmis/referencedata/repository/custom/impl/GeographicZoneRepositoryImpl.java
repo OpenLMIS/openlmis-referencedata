@@ -34,7 +34,6 @@ import java.util.List;
 
 public class GeographicZoneRepositoryImpl implements GeographicZoneRepositoryCustom {
 
-
   private static final String CODE = "code";
   private static final String NAME = "name";
   private static final String PARENT = "parent";
@@ -68,8 +67,8 @@ public class GeographicZoneRepositoryImpl implements GeographicZoneRepositoryCus
     CriteriaQuery<GeographicZone> query = builder.createQuery(GeographicZone.class);
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
 
-    query = prepareQuery(query, name, code, parent, geographicLevel, false);
-    countQuery = prepareQuery(countQuery, name, code, parent, geographicLevel, true);
+    query = prepareSearchQuery(query, name, code, parent, geographicLevel, false);
+    countQuery = prepareSearchQuery(countQuery, name, code, parent, geographicLevel, true);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -81,7 +80,7 @@ public class GeographicZoneRepositoryImpl implements GeographicZoneRepositoryCus
     return Pagination.getPage(result, pageable, count);
   }
 
-  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, String name,
+  private <T> CriteriaQuery<T> prepareSearchQuery(CriteriaQuery<T> query, String name,
                                             String code, GeographicZone parent,
                                             GeographicLevel geographicLevel,
                                             boolean count) {
