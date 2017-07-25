@@ -257,6 +257,12 @@ schemas:
   
   - geoJsonPolygon: !include schemas/geoJsonPolygon.json
 
+  - stringArray: |
+      {
+          "type": "array",
+          "items": { "type": "string", "title": "string" }
+      }
+
 traits:
     - secured:
           queryParameters:
@@ -1378,6 +1384,25 @@ resourceTypes:
                               schema: localizedErrorResponse
                       "404":
                       "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+          /permissionStrings:
+              is: [ secured ]
+              displayName: User permission strings
+              get:
+                  is: [ secured ]
+                  description: Gets all permissions (in string format) associated with a user.
+                  responses:
+                      "200":
+                          body:
+                            application/json:
+                              schema: stringArray
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+                      "404":
                           body:
                             application/json:
                               schema: localizedErrorResponse

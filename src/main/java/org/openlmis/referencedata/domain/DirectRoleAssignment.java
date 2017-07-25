@@ -16,21 +16,27 @@
 package org.openlmis.referencedata.domain;
 
 import com.google.common.collect.Sets;
-
-import lombok.NoArgsConstructor;
-
 import java.util.Set;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.NoArgsConstructor;
 
 @Entity
 @DiscriminatorValue("direct")
 @NoArgsConstructor
 public class DirectRoleAssignment extends RoleAssignment {
 
+  /**
+   * Default constructor. Must always have a role and a user.
+   *
+   * @param role      the role being assigned
+   * @param user      the user to which the role is being assigned
+   */
   public DirectRoleAssignment(Role role, User user) {
     super(role, user);
+    for (Right right : role.getRights()) {
+      this.permissionStrings.add(new PermissionString(this, right.getName()));
+    }
   }
 
   @Override

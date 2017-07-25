@@ -58,6 +58,7 @@ import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.PermissionStringRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -251,6 +252,9 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected UserService userService;
+  
+  @MockBean
+  protected PermissionStringRepository permissionStringRepository;
 
   /**
    * Constructor for test.

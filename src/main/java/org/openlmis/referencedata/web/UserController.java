@@ -19,12 +19,23 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
+import org.openlmis.referencedata.domain.PermissionString;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
@@ -44,6 +55,7 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.PermissionStringRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
@@ -83,17 +95,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
-
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 @Controller
@@ -130,6 +131,9 @@ public class UserController extends BaseController {
 
   @Autowired
   private UserValidator userValidator;
+  
+  @Autowired
+  private PermissionStringRepository permissionStringRepository;
 
   @InitBinder
   protected void initBinder(WebDataBinder binder) {
@@ -548,6 +552,39 @@ public class UserController extends BaseController {
     headers.setContentType(returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
 
     return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
+  }
+  
+  /**
+   * Get permissions (in string format) of the specified user.
+   *
+   * @param userId UUID of the user to retrieve.
+   * @return a set of user permission strings.
+   */
+  @RequestMapping(value = "/users/{id}/permissionStrings", method = RequestMethod.GET)
+  public ResponseEntity<Set<String>> getUserPermissionStrings(@PathVariable("id") UUID userId) {
+    XLOGGER.entry(userId);
+    Profiler profiler = new Profiler("GET_USER_PERM_STRINGS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+
+    profiler.start("CHECK_USER_EXISTS");
+    if (!userRepository.exists(userId)) {
+      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
+    } else {
+      profiler.start("GET_PERM_STRINGS_FROM_ROLES");
+      Set<PermissionString> permissions = permissionStringRepository.findByUser(userId);
+      Set<String> permissionStrings = permissions.stream().map(PermissionString::getValue)
+          .collect(toSet());
+      
+      profiler.stop().log();
+      XLOGGER.exit(permissionStrings);
+      return ResponseEntity
+          .ok()
+          .eTag(Integer.toString(permissionStrings.hashCode()))
+          .body(permissionStrings);
+    }
   }
 
   private User validateUser(UUID userId) {

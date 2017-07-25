@@ -18,18 +18,16 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @DiscriminatorValue("supervision")
@@ -82,6 +80,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     this.program = program;
     this.supervisoryNode = supervisoryNode;
     addSupervisions();
+    addPermissionStrings();
   }
 
   @Override
@@ -109,6 +108,25 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     }
 
     return roleContainsRight && programMatches && facilityFound;
+  }
+
+  private void addPermissionStrings() {
+    if (null != supervisoryNode) {
+      Set<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities(program);
+      for (Right right : role.getRights()) {
+        for (Facility facility : supervisedFacilities) {
+          this.permissionStrings.add(new PermissionString(
+              this,
+              right.getName() + '|' + facility.getId() + '|' + program.getId()));
+        }
+      }
+    } else {
+      for (Right right : role.getRights()) {
+        this.permissionStrings.add(new PermissionString(
+            this,
+            right.getName() + '|' + user.getHomeFacility().getId() + '|' + program.getId()));
+      }
+    }
   }
 
   /**

@@ -65,6 +65,7 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.PermissionString;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
@@ -102,6 +103,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SUPPORTED_PROGRAMS_URL = ID_URL + "/supportedPrograms";
   private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
   private static final String FULFILLMENT_FACILITIES_URL = ID_URL + "/fulfillmentFacilities";
+  private static final String PERMISSION_STRINGS_URL = ID_URL + "/permissionStrings";
   private static final String USERNAME = "username";
   private static final String TIMEZONE = "UTC";
   private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
@@ -114,6 +116,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM_ID_STRING = "programId";
   private static final String SUPERVISORY_NODE_ID_STRING = "supervisoryNodeId";
   private static final String WAREHOUSE_ID_STRING = "warehouseId";
+  private static final String ADMIN_RIGHT_NAME = "adminRight";
 
   private static final UUID RIGHT_ID = UUID.randomUUID();
   private static final UUID SUPERVISORY_NODE_ID = UUID.randomUUID();
@@ -1083,6 +1086,83 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Test
+  public void getPermissionStringsShouldReturnOkIfServiceToken() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    given(userRepository.exists(userId)).willReturn(true);
+    given(permissionStringRepository.findByUser(userId))
+        .willReturn(Sets.newHashSet(new PermissionString(roleAssignment1, ADMIN_RIGHT_NAME)));
+
+    String[] response = getUsersPermissionStrings()
+        .then()
+        .statusCode(200)
+        .extract().as(String[].class);
+
+    Set<String> actual = Sets.newHashSet(response);
+    assertEquals(1, actual.size());
+    assertEquals(ADMIN_RIGHT_NAME, actual.iterator().next());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getPermissionStringsShouldReturnOkIfUserTokenAndUserRequestsOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+
+    given(userRepository.exists(userId)).willReturn(true);
+    given(permissionStringRepository.findByUser(userId))
+        .willReturn(Sets.newHashSet(new PermissionString(roleAssignment1, ADMIN_RIGHT_NAME)));
+
+    String[] response = getUsersPermissionStrings()
+        .then()
+        .statusCode(200)
+        .extract().as(String[].class);
+
+    Set<String> actual = Sets.newHashSet(response);
+    assertEquals(1, actual.size());
+    assertEquals(ADMIN_RIGHT_NAME, actual.iterator().next());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getPermissionStringsShouldReturnForbiddenIfUserTokenAndUserRequestsDifferentRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = getUsersPermissionStrings()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getPermissionStringsShouldReturnNotFoundIfUserDoesNotExist() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    given(userRepository.exists(userId)).willReturn(false);
+
+    getUsersPermissionStrings()
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private Response getUsersPermissionStrings() {
+
+    return restAssured
+        .given()
+        .queryParam(ACCESS_TOKEN, getToken())
+        .pathParam("id", userId)
+        .when()
+        .get(PERMISSION_STRINGS_URL);
+  }
+
   private Response getUser() {
     given(userRepository.findOne(userId)).willReturn(user1);
 
@@ -1255,7 +1335,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private void assignUserRoles(User user) {
 
-    Right adminRight = Right.newRight("adminRight", RightType.GENERAL_ADMIN);
+    Right adminRight = Right.newRight(ADMIN_RIGHT_NAME, RightType.GENERAL_ADMIN);
     adminRole = Role.newRole("adminRole", adminRight);
     adminRoleId = UUID.randomUUID();
     adminRole.setId(adminRoleId);
