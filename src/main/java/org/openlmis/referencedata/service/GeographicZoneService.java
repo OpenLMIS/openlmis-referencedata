@@ -52,8 +52,8 @@ public class GeographicZoneService {
   private GeographicLevelRepository geographicLevelRepository;
 
   /**
-   * Method returns page of geographic zones with matched parameters
-   * and sorts results by geographic zone name.
+   * Method returns page of geographic zones with matched parameters.
+   * The result will be ordered using sort parameter from pageable.
    *
    * @param queryMap request parameters (code, name, parent, levelNumber).
    * @return Page of geographic zones.
@@ -61,7 +61,7 @@ public class GeographicZoneService {
   public Page<GeographicZone> search(Map<String, Object> queryMap,
                                                       Pageable pageable) {
     if (MapUtils.isEmpty(queryMap)) {
-      return geographicZoneRepository.findAllByOrderByNameAsc(pageable);
+      return geographicZoneRepository.findAll(pageable);
     }
 
     String name = MapUtils.getString(queryMap, NAME, null);

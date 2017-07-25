@@ -37,6 +37,7 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class GeographicZoneRepositoryIntegrationTest
@@ -353,6 +354,7 @@ public class GeographicZoneRepositoryIntegrationTest
   @Test
   public void shouldReturnEmptyListIfSearchParametersAreNotProvided() {
     Pageable pageable = mockPageable(0, 10);
+    given(pageable.getSort()).willReturn(new Sort(new Sort.Order(Sort.Direction.ASC, "name")));
 
     Page<GeographicZone> foundPage = repository.search(null, null, null,
         null, pageable);
@@ -379,6 +381,7 @@ public class GeographicZoneRepositoryIntegrationTest
     Pageable pageable = mock(Pageable.class);
     given(pageable.getPageNumber()).willReturn(pageNumber);
     given(pageable.getPageSize()).willReturn(pageSize);
+    given(pageable.getSort()).willReturn(null);
     return pageable;
   }
 

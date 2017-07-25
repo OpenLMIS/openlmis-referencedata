@@ -167,19 +167,19 @@ public class GeographicZoneServiceTest {
   }
 
   @Test
-  public void shouldReturnAllElementsSortedByNameIfNoSearchCriteriaProvided() {
-    when(geographicZoneRepository.findAllByOrderByNameAsc(any(Pageable.class)))
+  public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
+    when(geographicZoneRepository.findAll(eq(pageable)))
         .thenReturn(Pagination.getPage(geographicZones, null, geographicZones.size()));
 
     Page<GeographicZone> actual = geographicZoneService.search(new HashMap<>(), pageable);
-    verify(geographicZoneRepository).findAllByOrderByNameAsc(any(Pageable.class));
+    verify(geographicZoneRepository).findAll(eq(pageable));
     assertEquals(geographicZones, actual.getContent());
   }
 
   @Test
   public void shouldSearchForRequisitionGroupsWithAllParametersProvided() {
-    when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(parent);
-    when(geographicLevelRepository.findByLevelNumber(any(Integer.class))).thenReturn(level);
+    when(geographicZoneRepository.findOne(zoneId)).thenReturn(parent);
+    when(geographicLevelRepository.findByLevelNumber(1)).thenReturn(level);
     when(geographicZoneRepository.search(eq("name"), eq("code"),
         eq(parent), eq(level), any(Pageable.class)))
         .thenReturn(Pagination.getPage(geographicZones, null, 2));

@@ -224,11 +224,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     given(geographicZoneService.search(any(Map.class), any(Pageable.class)))
         .willReturn(Pagination.getPage(geographicZones, null, geographicZones.size()));
 
-    Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put(PAGE, PAGE_NUMBER);
-    requestBody.put(SIZE, PAGE_SIZE);
-    requestBody.put(LEVEL_NUMBER, districtLevel.getLevelNumber());
-    requestBody.put(PARENT, regionZone.getId());
+    Map<String, Object> requestBody = getSearchBody();
 
     // when
     Page<GeographicZoneSimpleDto> response = restAssured
@@ -317,11 +313,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put(PAGE, PAGE_NUMBER);
-    requestBody.put(SIZE, PAGE_SIZE);
-    requestBody.put(LEVEL_NUMBER, districtLevel.getLevelNumber());
-    requestBody.put(PARENT, regionZone.getId());
+    Map<String, Object> requestBody = getSearchBody();
 
     restAssured
         .given()
@@ -338,11 +330,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void searchShouldReturnBadRequestOnException() {
-    Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put(PAGE, PAGE_NUMBER);
-    requestBody.put(SIZE, PAGE_SIZE);
-    requestBody.put(LEVEL_NUMBER, districtLevel.getLevelNumber());
-    requestBody.put(PARENT, regionZone.getId());
+    Map<String, Object> requestBody = getSearchBody();
 
     doThrow(new ValidationMessageException(
         GeographicZoneMessageKeys.ERROR_SEARCH_LACKS_PARAMS))
@@ -474,5 +462,14 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private Map<String, Object> getSearchBody() {
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put(PAGE, PAGE_NUMBER);
+    requestBody.put(SIZE, PAGE_SIZE);
+    requestBody.put(LEVEL_NUMBER, districtLevel.getLevelNumber());
+    requestBody.put(PARENT, regionZone.getId());
+    return requestBody;
   }
 }

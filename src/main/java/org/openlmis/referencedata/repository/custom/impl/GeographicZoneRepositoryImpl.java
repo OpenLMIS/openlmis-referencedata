@@ -22,14 +22,18 @@ import org.openlmis.referencedata.repository.custom.GeographicZoneRepositoryCust
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class GeographicZoneRepositoryImpl implements GeographicZoneRepositoryCustom {
@@ -67,8 +71,9 @@ public class GeographicZoneRepositoryImpl implements GeographicZoneRepositoryCus
     CriteriaQuery<GeographicZone> query = builder.createQuery(GeographicZone.class);
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
 
-    query = prepareSearchQuery(query, name, code, parent, geographicLevel, false);
-    countQuery = prepareSearchQuery(countQuery, name, code, parent, geographicLevel, true);
+    query = prepareSearchQuery(query, name, code, parent, geographicLevel, pageable, false);
+    countQuery = prepareSearchQuery(countQuery, name, code,
+                                    parent, geographicLevel, pageable, true);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -82,7 +87,7 @@ public class GeographicZoneRepositoryImpl implements GeographicZoneRepositoryCus
 
   private <T> CriteriaQuery<T> prepareSearchQuery(CriteriaQuery<T> query, String name,
                                             String code, GeographicZone parent,
-                                            GeographicLevel geographicLevel,
+                                            GeographicLevel geographicLevel, Pageable pageable,
                                             boolean count) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
@@ -117,8 +122,20 @@ public class GeographicZoneRepositoryImpl implements GeographicZoneRepositoryCus
 
     query.where(predicate);
 
-    if (!count) {
-      query.orderBy(builder.asc(root.get(NAME)));
+    if (!count && pageable.getSort() != null) {
+      List<Order> orders = new ArrayList<>();
+      Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+      Sort.Order order;
+      while (iterator.hasNext()) {
+        order = iterator.next();
+        if (order.isAscending()) {
+          orders.add(builder.asc(root.get(order.getProperty())));
+          query.orderBy(builder.asc(root.get(order.getProperty())));
+        } else {
+          orders.add(builder.desc(root.get(order.getProperty())));
+        }
+      }
+      query.orderBy(orders);
     }
 
     return query;

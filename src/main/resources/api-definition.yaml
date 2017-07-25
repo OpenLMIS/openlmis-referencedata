@@ -279,6 +279,13 @@ traits:
                   type: integer
                   required: false
                   repeat: false
+    - sorted:
+          queryParameters:
+              sort:
+                  description: Sorting criteria in the format "property(,asc|desc)". Default sort order is ascending. Multiple sort criteria are supported.
+                  type: string
+                  required: false
+                  repeat: true
 
 resourceTypes:
     - auditLog:
@@ -2078,7 +2085,7 @@ resourceTypes:
                           schema: localizedErrorResponse
       /search:
           post:
-              is: [ secured, paginated ]
+              is: [ secured, paginated, sorted ]
               description: Filter geographic zones by parent, level, name and code. Results are ordered ascending by name.
               body:
                 application/json:
