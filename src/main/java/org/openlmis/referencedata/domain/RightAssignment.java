@@ -30,9 +30,9 @@ import lombok.NoArgsConstructor;
 public class RightAssignment extends BaseEntity {
 
   @ManyToOne
-  @JoinColumn(name = "roleassignmentid")
+  @JoinColumn(name = "userid")
   @Getter
-  private RoleAssignment roleAssignment;
+  private User user;
 
   @Column(nullable = false)
   @Getter
@@ -46,19 +46,18 @@ public class RightAssignment extends BaseEntity {
   @Getter
   private UUID programId;
 
-  public RightAssignment(RoleAssignment roleAssignment, String rightName) {
-    this.roleAssignment = roleAssignment;
+  public RightAssignment(User user, String rightName) {
+    this.user = user;
     this.rightName = rightName;
   }
   
-  public RightAssignment(RoleAssignment roleAssignment, String rightName, UUID facilityId) {
-    this(roleAssignment, rightName);
+  public RightAssignment(User user, String rightName, UUID facilityId) {
+    this(user, rightName);
     this.facilityId = facilityId;
   }
 
-  public RightAssignment(RoleAssignment roleAssignment, String rightName, UUID facilityId,
-      UUID programId) {
-    this(roleAssignment, rightName, facilityId);
+  public RightAssignment(User user, String rightName, UUID facilityId, UUID programId) {
+    this(user, rightName, facilityId);
     this.programId = programId;
   }
 

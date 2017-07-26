@@ -116,15 +116,12 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       Set<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities(program);
       for (Right right : role.getRights()) {
         for (Facility facility : supervisedFacilities) {
-          this.rightAssignments.add(new RightAssignment(
-              this, right.getName(), facility.getId(), program.getId()));
+          user.addRightAssignment(right.getName(), facility.getId(), program.getId());
         }
       }
     } else {
       for (Right right : role.getRights()) {
-        this.rightAssignments.add(new RightAssignment(
-            this,
-            right.getName(), user.getHomeFacility().getId(), program.getId()));
+        user.addRightAssignment(right.getName(), user.getHomeFacility().getId(), program.getId());
       }
     }
   }

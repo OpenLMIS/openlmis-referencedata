@@ -38,9 +38,8 @@ public interface ProgramRepository
   
   @Query(value = "SELECT DISTINCT p.*"
       + " FROM referencedata.programs p"
-      + "   JOIN referencedata.right_assignments ria ON ria.programid = p.id"
-      + "   JOIN referencedata.role_assignments roa ON roa.id = ria.roleassignmentid"
-      + " WHERE roa.userid = :userId",
+      + "   JOIN referencedata.right_assignments ra ON ra.programid = p.id"
+      + " WHERE ra.userid = :userId",
       nativeQuery = true)
   Set<Program> findSupervisionProgramsByUser(@Param("userId") UUID userId);
 }

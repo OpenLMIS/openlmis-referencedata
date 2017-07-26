@@ -54,10 +54,9 @@ public interface FacilityRepository
 
   @Query(value = "SELECT DISTINCT f.*"
       + " FROM referencedata.facilities f"
-      + "   JOIN referencedata.right_assignments ria ON ria.facilityid = f.id"
-      + "   JOIN referencedata.role_assignments roa ON roa.id = ria.roleassignmentid"
-      + " WHERE ria.programid IS NOT NULL" 
-      + "   AND roa.userid = :userId",
+      + "   JOIN referencedata.right_assignments ra ON ra.facilityid = f.id"
+      + " WHERE ra.programid IS NOT NULL" 
+      + "   AND ra.userid = :userId",
       nativeQuery = true)
   Set<Facility> findSupervisionFacilitiesByUser(@Param("userId") UUID userId);
 }

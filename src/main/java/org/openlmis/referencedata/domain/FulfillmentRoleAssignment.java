@@ -63,8 +63,7 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
     this.warehouse = warehouse;
 
     for (Right right : role.getRights()) {
-      this.rightAssignments.add(new RightAssignment(
-          this, right.getName(), warehouse.getId()));
+      user.addRightAssignment(right.getName(), warehouse.getId());
     }
   }
 

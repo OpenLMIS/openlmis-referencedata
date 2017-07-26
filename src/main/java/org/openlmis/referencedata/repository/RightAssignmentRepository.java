@@ -25,10 +25,9 @@ import org.springframework.data.repository.query.Param;
 public interface RightAssignmentRepository extends
     PagingAndSortingRepository<RightAssignment, UUID> {
 
-  @Query(value = "SELECT DISTINCT ria.*"
-      + " FROM referencedata.right_assignments ria"
-      + "   JOIN referencedata.role_assignments roa ON roa.id = ria.roleassignmentid"
-      + " WHERE roa.userid = :userId",
+  @Query(value = "SELECT DISTINCT ra.*"
+      + " FROM referencedata.right_assignments ra"
+      + " WHERE ra.userid = :userId",
       nativeQuery = true)
   Set<RightAssignment> findByUser(@Param("userId") UUID userId);
 }

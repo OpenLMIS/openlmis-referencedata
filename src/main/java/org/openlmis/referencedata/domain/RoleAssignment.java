@@ -15,10 +15,8 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
@@ -27,7 +25,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,9 +46,6 @@ public abstract class RoleAssignment extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "userid")
   protected User user;
-
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleAssignment", orphanRemoval = true)
-  protected Set<RightAssignment> rightAssignments = new HashSet<>();
 
   /**
    * Default constructor. Must always have a role and a user.

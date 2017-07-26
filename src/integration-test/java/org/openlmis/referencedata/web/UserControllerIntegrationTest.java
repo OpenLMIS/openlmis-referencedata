@@ -1094,7 +1094,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(userRepository.exists(userId)).willReturn(true);
     given(rightAssignmentRepository.findByUser(userId))
-        .willReturn(Sets.newHashSet(new RightAssignment(roleAssignment1, ADMIN_RIGHT_NAME)));
+        .willReturn(Sets.newHashSet(new RightAssignment(user1, ADMIN_RIGHT_NAME)));
 
     String[] response = getUsersPermissionStrings()
         .then()
@@ -1114,7 +1114,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(userRepository.exists(userId)).willReturn(true);
     given(rightAssignmentRepository.findByUser(userId))
-        .willReturn(Sets.newHashSet(new RightAssignment(roleAssignment1, ADMIN_RIGHT_NAME)));
+        .willReturn(Sets.newHashSet(new RightAssignment(user1, ADMIN_RIGHT_NAME)));
 
     String[] response = getUsersPermissionStrings()
         .then()

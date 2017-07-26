@@ -113,6 +113,10 @@ public class User extends BaseEntity {
   @Setter
   private Map<String, String> extraData;
 
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+  @DiffIgnore
+  private Set<RightAssignment> rightAssignments = new HashSet<>();
+
   @Transient
   @Getter
   private Set<Program> homeFacilityPrograms = new HashSet<>();
@@ -218,6 +222,18 @@ public class User extends BaseEntity {
 
   public void addSupervisedProgram(Program program) {
     supervisedPrograms.add(program);
+  }
+  
+  void addRightAssignment(String rightName) {
+    rightAssignments.add(new RightAssignment(this, rightName));
+  }
+
+  void addRightAssignment(String rightName, UUID facilityId) {
+    rightAssignments.add(new RightAssignment(this, rightName, facilityId));
+  }
+
+  void addRightAssignment(String rightName, UUID facilityId, UUID programId) {
+    rightAssignments.add(new RightAssignment(this, rightName, facilityId, programId));
   }
 
   /**
