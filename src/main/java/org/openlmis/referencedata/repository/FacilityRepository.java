@@ -16,15 +16,15 @@
 package org.openlmis.referencedata.repository;
 
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface FacilityRepository
@@ -51,4 +51,13 @@ public interface FacilityRepository
   List<Facility> findByBoundary(@Param("boundary") Polygon boundary);
   
   Facility findFirstByCode(String code);
+
+  @Query(value = "SELECT DISTINCT f.*"
+      + " FROM referencedata.facilities f"
+      + "   JOIN referencedata.right_assignments ria ON ria.facilityid = f.id"
+      + "   JOIN referencedata.role_assignments roa ON roa.id = ria.roleassignmentid"
+      + " WHERE ria.programid IS NOT NULL" 
+      + "   AND roa.userid = :userId",
+      nativeQuery = true)
+  Set<Facility> findSupervisionFacilitiesByUser(@Param("userId") UUID userId);
 }

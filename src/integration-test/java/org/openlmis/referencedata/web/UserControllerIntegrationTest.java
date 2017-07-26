@@ -105,6 +105,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
   private static final String FULFILLMENT_FACILITIES_URL = ID_URL + "/fulfillmentFacilities";
   private static final String PERMISSION_STRINGS_URL = ID_URL + "/permissionStrings";
+  private static final String FACILITIES_URL = ID_URL + "/facilities";
   private static final String USERNAME = "username";
   private static final String TIMEZONE = "UTC";
   private static final String SUPERVISION_RIGHT_NAME = "supervisionRight";
@@ -1154,6 +1155,73 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Test
+  public void getFacilitiesShouldReturnOkIfServiceToken() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    given(userRepository.exists(userId)).willReturn(true);
+    given(facilityRepository.findSupervisionFacilitiesByUser(userId))
+        .willReturn(Sets.newHashSet(homeFacility));
+
+    Facility[] response = getUserFacilities()
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    Set<Facility> actual = Sets.newHashSet(response);
+    assertEquals(1, actual.size());
+    assertEquals(homeFacilityId, actual.iterator().next().getId());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getFacilitiesShouldReturnOkIfUserTokenAndUserRequestsOwnRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+
+    given(userRepository.exists(userId)).willReturn(true);
+    given(facilityRepository.findSupervisionFacilitiesByUser(userId))
+        .willReturn(Sets.newHashSet(homeFacility));
+
+    Facility[] response = getUserFacilities()
+        .then()
+        .statusCode(200)
+        .extract().as(Facility[].class);
+
+    Set<Facility> actual = Sets.newHashSet(response);
+    assertEquals(1, actual.size());
+    assertEquals(homeFacilityId, actual.iterator().next().getId());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getFacilitiesShouldReturnForbiddenIfUserTokenAndUserRequestsDifferentRecord() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = getUserFacilities()
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getFacilitiesShouldReturnNotFoundIfUserDoesNotExist() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    given(userRepository.exists(userId)).willReturn(false);
+
+    getUserFacilities()
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
   private Response getUsersPermissionStrings() {
 
     return restAssured
@@ -1162,6 +1230,16 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .pathParam("id", userId)
         .when()
         .get(PERMISSION_STRINGS_URL);
+  }
+  
+  private Response getUserFacilities() {
+
+    return restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", userId)
+        .when()
+        .get(FACILITIES_URL);
   }
 
   private Response getUser() {

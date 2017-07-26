@@ -68,6 +68,12 @@ schemas:
 
   - minimalFacilityDto: !include schemas/minimalFacilityDto.json
 
+  - veryMinimalFacilityArray: |
+      {
+         "type": "array",
+         "items": { "type": "object", "$ref": "schemas/veryMinimalFacility.json" }
+      }
+
   - facility: !include schemas/facility.json
 
   - facilityArray: |
@@ -1336,7 +1342,7 @@ resourceTypes:
               displayName: User supervised facilities
               get:
                   is: [ secured ]
-                  description: Get all facilities the associated user supervises, by right and program.
+                  description: WARNING! deprecated; please use /facilities to get a user's facilities. To determine which facilities work with which right and program, please use /permissionStrings for mappings. Get all facilities the associated user supervises, by right and program.
                   queryParameters:
                       rightId:
                           displayName: Right ID
@@ -1405,6 +1411,25 @@ resourceTypes:
                           body:
                             application/json:
                               schema: stringArray
+                      "403":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+                      "404":
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+          /facilities:
+              is: [ secured ]
+              displayName: User facilities
+              get:
+                  is: [ secured ]
+                  description: Gets all supervision facilities associated with a user. To determine which facilities work with which right and program, please use /permissionStrings for mappings.
+                  responses:
+                      "200":
+                          body:
+                            application/json:
+                              schema: veryMinimalFacilityArray
                       "403":
                           body:
                             application/json:

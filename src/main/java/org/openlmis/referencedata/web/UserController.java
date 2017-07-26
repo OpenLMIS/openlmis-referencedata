@@ -52,6 +52,7 @@ import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.dto.VeryMinimalFacilityDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -606,6 +607,45 @@ public class UserController extends BaseController {
           .eTag(Integer.toString(permissionStrings.hashCode()))
           .body(permissionStrings);
     }
+  }
+
+  /**
+   * Get all the facilities that the user has supervision rights (home facility and supervised 
+   * facilities).
+   *
+   * @param userId id of user to get supervised facilities
+   * @return a set of facilities
+   */
+  @RequestMapping(value = "/users/{userId}/facilities", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Set<VeryMinimalFacilityDto> getUserFacilities(
+      @PathVariable(USER_ID) UUID userId) {
+    XLOGGER.entry(userId);
+    Profiler profiler = new Profiler("GET_USER_FACILITIES");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+
+    if (!userRepository.exists(userId)) {
+      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    profiler.start("GET_SUPERVISION_FACILITIES_BY_USER");
+    Set<Facility> userFacilities = facilityRepository.findSupervisionFacilitiesByUser(userId);
+
+    profiler.start("EXPORT_USER_FACILITIES");
+    Set<VeryMinimalFacilityDto> userFacilityDtos = new HashSet<>();
+    for (Facility f : userFacilities) {
+      VeryMinimalFacilityDto userFacilityDto = new VeryMinimalFacilityDto();
+      f.export(userFacilityDto);
+      userFacilityDtos.add(userFacilityDto);
+    }
+
+    profiler.stop().log();
+    XLOGGER.exit(userFacilityDtos);
+    return userFacilityDtos;
   }
 
   private User validateUser(UUID userId) {
