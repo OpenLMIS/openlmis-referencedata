@@ -495,6 +495,7 @@ public class UserControllerTest {
   public void shouldGetUserHomeFacilityPrograms() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
+    when(repository.exists(userId)).thenReturn(true);
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when
@@ -510,6 +511,7 @@ public class UserControllerTest {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
         supervisoryNode1));
+    when(repository.exists(userId)).thenReturn(true);
     when(repository.findOne(userId)).thenReturn(user1);
 
     //when

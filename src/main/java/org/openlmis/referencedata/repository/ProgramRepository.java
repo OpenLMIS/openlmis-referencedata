@@ -15,11 +15,14 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.Set;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import java.util.UUID;
+import org.springframework.data.repository.query.Param;
 
 public interface ProgramRepository
     extends PagingAndSortingRepository<Program, UUID>, ProgramRepositoryCustom {
@@ -32,4 +35,12 @@ public interface ProgramRepository
   <S extends Program> Iterable<S> save(Iterable<S> entities);
 
   <S extends Program> S findByCode(Code code);
+  
+  @Query(value = "SELECT DISTINCT p.*"
+      + " FROM referencedata.programs p"
+      + "   JOIN referencedata.right_assignments ria ON ria.programid = p.id"
+      + "   JOIN referencedata.role_assignments roa ON roa.id = ria.roleassignmentid"
+      + " WHERE roa.userid = :userId",
+      nativeQuery = true)
+  Set<Program> findSupervisionProgramsByUser(@Param("userId") UUID userId);
 }

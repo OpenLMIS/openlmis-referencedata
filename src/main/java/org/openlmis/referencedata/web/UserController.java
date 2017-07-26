@@ -384,16 +384,37 @@ public class UserController extends BaseController {
   public Set<ProgramDto> getUserPrograms(@PathVariable(USER_ID) UUID userId,
                                          @RequestParam(
                                              value = "forHomeFacility",
-                                             required = false,
-                                             defaultValue = "true") boolean forHomeFacility
+                                             required = false) Boolean forHomeFacility
                                          ) {
+    XLOGGER.entry(userId);
+    Profiler profiler = new Profiler("GET_USER_PROGRAMS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
-    User user = validateUser(userId);
-    Set<Program> programs = forHomeFacility ? user.getHomeFacilityPrograms() :
-        user.getSupervisedPrograms();
+    profiler.start("CHECK_USER_EXISTS");
+    if (!userRepository.exists(userId)) {
+      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
+    }
 
-    return programsToDto(programs);
+    Set<Program> userPrograms;
+    if (null == forHomeFacility) {
+      profiler.start("GET_SUPERVISION_PROGRAMS_BY_USER");
+      userPrograms = programRepository.findSupervisionProgramsByUser(userId);
+    } else {
+      profiler.start("GET_USER");
+      User user = userRepository.findOne(userId);
+      userPrograms = forHomeFacility ? user.getHomeFacilityPrograms() :
+        user.getSupervisedPrograms();
+    }
+
+    profiler.start("EXPORT_USER_PROGRAMS");
+    Set<ProgramDto> userProgramDtos = programsToDto(userPrograms);
+
+    profiler.stop().log();
+    XLOGGER.exit(userProgramDtos);
+    return userProgramDtos;
   }
 
   /**

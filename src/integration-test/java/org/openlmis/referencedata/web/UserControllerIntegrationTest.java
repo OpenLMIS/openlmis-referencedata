@@ -1239,7 +1239,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Response getUserPrograms() {
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.exists(userId)).willReturn(true);
+    given(programRepository.findSupervisionProgramsByUser(userId)).willReturn(
+        Sets.newHashSet(program1));
 
     return restAssured
         .given()
