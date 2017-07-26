@@ -61,6 +61,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     this(role, user);
     this.program = program;
     addSupervisions();
+    addPermissionStrings();
   }
 
   /**
@@ -115,16 +116,15 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       Set<Facility> supervisedFacilities = supervisoryNode.getAllSupervisedFacilities(program);
       for (Right right : role.getRights()) {
         for (Facility facility : supervisedFacilities) {
-          this.permissionStrings.add(new PermissionString(
-              this,
-              right.getName() + '|' + facility.getId() + '|' + program.getId()));
+          this.rightAssignments.add(new RightAssignment(
+              this, right.getName(), facility.getId(), program.getId()));
         }
       }
     } else {
       for (Right right : role.getRights()) {
-        this.permissionStrings.add(new PermissionString(
+        this.rightAssignments.add(new RightAssignment(
             this,
-            right.getName() + '|' + user.getHomeFacility().getId() + '|' + program.getId()));
+            right.getName(), user.getHomeFacility().getId(), program.getId()));
       }
     }
   }

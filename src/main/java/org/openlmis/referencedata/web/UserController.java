@@ -35,9 +35,9 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
-import org.openlmis.referencedata.domain.PermissionString;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.Role;
@@ -55,8 +55,8 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.PermissionStringRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -133,7 +133,7 @@ public class UserController extends BaseController {
   private UserValidator userValidator;
   
   @Autowired
-  private PermissionStringRepository permissionStringRepository;
+  private RightAssignmentRepository rightAssignmentRepository;
 
   @InitBinder
   protected void initBinder(WebDataBinder binder) {
@@ -573,9 +573,9 @@ public class UserController extends BaseController {
     if (!userRepository.exists(userId)) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
-      profiler.start("GET_PERM_STRINGS_FROM_ROLES");
-      Set<PermissionString> permissions = permissionStringRepository.findByUser(userId);
-      Set<String> permissionStrings = permissions.stream().map(PermissionString::getValue)
+      profiler.start("GET_PERM_STRINGS_FROM_RIGHT_ASSIGNMENTS");
+      Set<RightAssignment> rightAssignments = rightAssignmentRepository.findByUser(userId);
+      Set<String> permissionStrings = rightAssignments.stream().map(RightAssignment::toString)
           .collect(toSet());
       
       profiler.stop().log();

@@ -35,7 +35,7 @@ public class DirectRoleAssignment extends RoleAssignment {
   public DirectRoleAssignment(Role role, User user) {
     super(role, user);
     for (Right right : role.getRights()) {
-      this.permissionStrings.add(new PermissionString(this, right.getName()));
+      this.rightAssignments.add(new RightAssignment(this, right.getName()));
     }
   }
 

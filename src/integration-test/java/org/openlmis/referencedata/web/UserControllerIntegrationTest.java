@@ -65,7 +65,7 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.PermissionString;
+import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
@@ -1091,8 +1091,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.exists(userId)).willReturn(true);
-    given(permissionStringRepository.findByUser(userId))
-        .willReturn(Sets.newHashSet(new PermissionString(roleAssignment1, ADMIN_RIGHT_NAME)));
+    given(rightAssignmentRepository.findByUser(userId))
+        .willReturn(Sets.newHashSet(new RightAssignment(roleAssignment1, ADMIN_RIGHT_NAME)));
 
     String[] response = getUsersPermissionStrings()
         .then()
@@ -1111,8 +1111,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     given(userRepository.exists(userId)).willReturn(true);
-    given(permissionStringRepository.findByUser(userId))
-        .willReturn(Sets.newHashSet(new PermissionString(roleAssignment1, ADMIN_RIGHT_NAME)));
+    given(rightAssignmentRepository.findByUser(userId))
+        .willReturn(Sets.newHashSet(new RightAssignment(roleAssignment1, ADMIN_RIGHT_NAME)));
 
     String[] response = getUsersPermissionStrings()
         .then()

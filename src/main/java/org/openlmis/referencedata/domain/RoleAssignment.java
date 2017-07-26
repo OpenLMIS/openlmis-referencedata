@@ -51,7 +51,7 @@ public abstract class RoleAssignment extends BaseEntity {
   protected User user;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleAssignment", orphanRemoval = true)
-  protected Set<PermissionString> permissionStrings = new HashSet<>();
+  protected Set<RightAssignment> rightAssignments = new HashSet<>();
 
   /**
    * Default constructor. Must always have a role and a user.

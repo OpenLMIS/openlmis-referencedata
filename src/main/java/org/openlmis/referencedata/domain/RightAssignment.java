@@ -15,25 +15,57 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "permission_strings")
+@Table(name = "right_assignments")
 @NoArgsConstructor
-@AllArgsConstructor
-public class PermissionString extends BaseEntity {
+public class RightAssignment extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "roleassignmentid")
   @Getter
   private RoleAssignment roleAssignment;
 
+  @Column(nullable = false)
   @Getter
-  private String value;
+  private String rightName;
+
+  @Column
+  @Getter
+  private UUID facilityId;
+
+  @Column
+  @Getter
+  private UUID programId;
+
+  public RightAssignment(RoleAssignment roleAssignment, String rightName) {
+    this.roleAssignment = roleAssignment;
+    this.rightName = rightName;
+  }
+  
+  public RightAssignment(RoleAssignment roleAssignment, String rightName, UUID facilityId) {
+    this(roleAssignment, rightName);
+    this.facilityId = facilityId;
+  }
+
+  public RightAssignment(RoleAssignment roleAssignment, String rightName, UUID facilityId,
+      UUID programId) {
+    this(roleAssignment, rightName, facilityId);
+    this.programId = programId;
+  }
+
+  @Override
+  public String toString() {
+    return rightName 
+        + (null != facilityId ? "|" + facilityId : "")
+        + (null != programId ? "|" + programId : "");
+  }
 }

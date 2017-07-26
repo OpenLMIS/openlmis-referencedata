@@ -17,18 +17,18 @@ package org.openlmis.referencedata.repository;
 
 import java.util.Set;
 import java.util.UUID;
-import org.openlmis.referencedata.domain.PermissionString;
+import org.openlmis.referencedata.domain.RightAssignment;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface PermissionStringRepository extends
-    PagingAndSortingRepository<PermissionString, UUID> {
+public interface RightAssignmentRepository extends
+    PagingAndSortingRepository<RightAssignment, UUID> {
 
-  @Query(value = "SELECT DISTINCT ps.*"
-      + " FROM referencedata.permission_strings ps"
-      + "   JOIN referencedata.role_assignments ra ON ra.id = ps.roleassignmentid"
-      + " WHERE ra.userid = :userId",
+  @Query(value = "SELECT DISTINCT ria.*"
+      + " FROM referencedata.right_assignments ria"
+      + "   JOIN referencedata.role_assignments roa ON roa.id = ria.roleassignmentid"
+      + " WHERE roa.userid = :userId",
       nativeQuery = true)
-  Set<PermissionString> findByUser(@Param("userId") UUID userId);
+  Set<RightAssignment> findByUser(@Param("userId") UUID userId);
 }
