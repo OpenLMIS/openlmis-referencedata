@@ -33,6 +33,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -71,7 +72,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", reasonId)
         .when()
@@ -90,7 +91,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", reasonId)
         .when()
@@ -112,7 +113,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     StockAdjustmentReason response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(reason)
         .when()
@@ -136,7 +137,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(reason)
         .when()
@@ -158,7 +159,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     StockAdjustmentReason response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", reasonId)
         .body(reason)
@@ -180,7 +181,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", reasonId)
         .body(reason)
@@ -209,7 +210,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     StockAdjustmentReason[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -229,7 +230,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     StockAdjustmentReason response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", reasonId)
         .when()
@@ -254,7 +255,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
     StockAdjustmentReason[] response = restAssured.given()
         .queryParam("program", programId)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(FIND_BY_PROGRAM_ID_URL)

@@ -36,6 +36,7 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -76,7 +77,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RoleDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -97,7 +98,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -115,7 +116,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RoleDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", roleId)
         .when()
         .get(ID_URL)
@@ -136,7 +137,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", roleId)
         .when()
         .get(ID_URL)
@@ -158,7 +159,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RoleDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(roleDto)
         .when()
@@ -180,7 +181,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(roleDto)
         .when()
@@ -203,7 +204,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RoleDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", roleId)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(roleDto)
@@ -226,7 +227,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", roleId)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(roleDto)
@@ -247,7 +248,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
     given(roleRepository.findOne(roleId)).willReturn(role);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", roleId)
         .when()
@@ -266,7 +267,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", roleId)
         .when()

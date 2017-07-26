@@ -52,6 +52,7 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -83,7 +84,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     CommodityTypeDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(commodityType)
         .when()
@@ -103,7 +104,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     commodityType.setName("");
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(commodityType)
         .when()
@@ -124,7 +125,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     commodityType.setClassificationSystem("");
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(commodityType)
         .when()
@@ -145,7 +146,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     commodityType.setClassificationId("");
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(commodityType)
         .when()
@@ -169,7 +170,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     CommodityTypeDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(commodityType)
         .when()
@@ -189,7 +190,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(commodityType)
         .when()
@@ -214,7 +215,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -241,7 +242,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", commodityTypeId)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(tradeItemIds)
@@ -271,7 +272,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", commodityTypeId)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(tradeItemIds)
@@ -298,7 +299,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     UUID[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", commodityTypeId)
         .when()
@@ -323,7 +324,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", commodityTypeId)
         .when()
@@ -350,7 +351,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     CommodityTypeDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(commodityType)
         .when()
@@ -378,7 +379,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(commodityType)
         .when()

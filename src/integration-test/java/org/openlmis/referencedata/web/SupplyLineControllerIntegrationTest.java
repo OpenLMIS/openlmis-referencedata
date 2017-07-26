@@ -36,6 +36,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.dto.SupplyLineDto;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings("PMD.TooManyMethods")
@@ -71,7 +72,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .given()
         .queryParam("program", supplyLine.getProgram().getId())
         .queryParam("supervisoryNode", supplyLine.getSupervisoryNode().getId())
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SEARCH_URL)
         .then()
@@ -101,7 +102,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .when()
@@ -120,7 +121,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .when()
@@ -142,7 +143,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .when()
@@ -159,7 +160,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     SupplyLineDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(supplyLineDto)
         .when()
@@ -178,7 +179,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(supplyLineDto)
         .when()
@@ -204,7 +205,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     SupplyLineDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .body(supplyLineDto)
@@ -231,7 +232,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .body(supplyLineDto)
@@ -258,7 +259,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     SupplyLineDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .body(supplyLineDto)
@@ -283,7 +284,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     SupplyLineDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -305,7 +306,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -326,7 +327,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     SupplyLineDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .when()
@@ -347,7 +348,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .when()
@@ -369,7 +370,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supplyLineId)
         .when()

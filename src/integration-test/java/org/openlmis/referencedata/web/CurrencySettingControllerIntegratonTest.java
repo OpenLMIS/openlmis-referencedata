@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.dto.CurrencySettingsDto;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+import org.springframework.http.HttpHeaders;
 
 public class CurrencySettingControllerIntegratonTest extends BaseWebIntegrationTest {
 
@@ -37,7 +38,7 @@ public class CurrencySettingControllerIntegratonTest extends BaseWebIntegrationT
 
     CurrencySettingsDto response = new CurrencySettingsDto();
     response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get("api/currencySettings")
         .then()

@@ -45,6 +45,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -110,7 +111,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
         .when()
@@ -127,7 +128,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
         .when()
@@ -148,7 +149,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     ApprovedProductDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(ftapDto)
         .when()
@@ -166,7 +167,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(ftapDto)
         .when()
@@ -192,7 +193,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     ApprovedProductDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
         .body(ftapDto)
@@ -212,7 +213,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
         .body(ftapDto)
@@ -235,7 +236,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     ApprovedProductDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
         .when()
@@ -253,7 +254,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
         .when()
@@ -276,7 +277,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     )).thenReturn(existingFtap);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", ftapDto.getId())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(ftapDto)
@@ -304,7 +305,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     )).thenReturn(existingFtap);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(ftapDto)
         .post(RESOURCE_URL)
@@ -331,7 +332,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     )).thenReturn(existingFtap);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", ftapDto.getId())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(ftapDto)
@@ -358,7 +359,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     ApprovedProductDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(inputMap)
         .when()
@@ -377,7 +378,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(new HashMap<>())
         .when()
@@ -394,7 +395,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(new HashMap<>())
         .when()

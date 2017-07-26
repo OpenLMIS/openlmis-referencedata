@@ -33,6 +33,7 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -67,7 +68,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     OrderableDisplayCategoryDto[] response = restAssured
         .given()
         .queryParam(CODE, orderableDisplayCategory.getCode())
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SEARCH_URL)
         .then()
@@ -89,7 +90,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     OrderableDisplayCategoryDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SEARCH_URL)
         .then()
@@ -110,7 +111,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SEARCH_URL)
         .then()
@@ -131,7 +132,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", orderableDisplayCategoryId)
         .when()
@@ -151,7 +152,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", orderableDisplayCategoryId)
         .when()
@@ -171,7 +172,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     OrderableDisplayCategoryDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory))
         .when()
@@ -190,7 +191,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory))
         .when()
@@ -213,7 +214,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     OrderableDisplayCategoryDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", orderableDisplayCategoryId)
         .body(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory))
@@ -236,7 +237,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", orderableDisplayCategoryId)
         .body(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory))
@@ -262,7 +263,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     OrderableDisplayCategoryDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -285,7 +286,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -307,7 +308,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     OrderableDisplayCategoryDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", orderableDisplayCategoryId)
         .when()
@@ -334,7 +335,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", orderableDisplayCategoryId)
         .when()

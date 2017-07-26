@@ -27,6 +27,7 @@ import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -57,7 +58,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", programId)
         .when()
@@ -73,7 +74,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     Program response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(programDto)
         .when()
@@ -92,7 +93,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     given(programRepository.findByCode(program.getCode())).willReturn(program);
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(programDto)
         .when()
@@ -111,7 +112,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     Program response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", programId)
         .body(programDto)
@@ -135,7 +136,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", programId)
         .body(programDto)
@@ -155,7 +156,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     Program[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -174,7 +175,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     Program response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", programId)
         .when()
@@ -196,7 +197,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(listToReturn);
     Program[] response = restAssured.given()
         .queryParam("name", similarProgramName)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(FIND_BY_NAME_URL)
@@ -217,7 +218,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(new ArrayList<>());
     Program[] response = restAssured.given()
         .queryParam("name", incorrectProgramName)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(FIND_BY_NAME_URL)

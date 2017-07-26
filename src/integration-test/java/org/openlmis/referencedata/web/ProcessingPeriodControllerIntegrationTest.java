@@ -43,6 +43,7 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ResultDto;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
 
@@ -98,7 +99,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     firstPeriod.export(dto);
 
     ProcessingPeriodDto savedFirstPeriod = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(firstPeriod)
         .when()
@@ -139,7 +140,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     }).when(periodValidator).validate(anyObject(), any(Errors.class));
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(secondPeriod)
         .when()
@@ -163,7 +164,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     }).when(periodValidator).validate(anyObject(), any(Errors.class));
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", UUID.randomUUID())
         .body(secondPeriod)
@@ -183,7 +184,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     ResultDto<Integer> response = new ResultDto<>();
     response = restAssured.given()
         .pathParam("id", firstPeriodId)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(DIFFERENCE_URL)
         .then()
@@ -208,7 +209,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     ProcessingPeriodDto[] response = restAssured.given()
         .queryParam(PROGRAM, programId)
         .queryParam(FACILITY, facilityId)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SEARCH_URL)
         .then()
@@ -229,7 +230,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     ProcessingPeriodDto[] response = restAssured.given()
         .queryParam(PROCESSING_SCHEDULE, scheduleId)
         .queryParam(START_DATE, secondPeriod.getStartDate().toString())
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SEARCH_BY_UUID_AND_DATE_URL)
         .then()
@@ -251,7 +252,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", firstPeriodId)
         .when()
@@ -272,7 +273,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     ProcessingPeriodDto response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", firstPeriodId)
         .body(firstPeriod)
@@ -293,7 +294,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
     ProcessingPeriodDto[] response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -313,7 +314,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
     ProcessingPeriodDto[] response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("sort", "startDate")
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -337,7 +338,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("sort", "invalid")
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -356,7 +357,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     ProcessingPeriodDto response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", firstPeriodId)
         .when()
@@ -375,7 +376,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
     restAssured.given()
         .pathParam("id", firstPeriodId)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(DIFFERENCE_URL)
         .then()
@@ -389,7 +390,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", firstPeriodId)
         .when()
@@ -405,7 +406,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", firstPeriodId)
         .body(firstPeriod)
@@ -422,7 +423,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -437,7 +438,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", firstPeriodId)
         .when()

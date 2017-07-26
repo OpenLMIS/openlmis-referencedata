@@ -57,6 +57,7 @@ import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -126,7 +127,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .when()
@@ -144,7 +145,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .when()
@@ -164,7 +165,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     SupervisoryNodeDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(supervisoryNodeDto)
         .when()
@@ -184,7 +185,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(supervisoryNodeDto)
         .when()
@@ -210,7 +211,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     SupervisoryNodeDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .body(supervisoryNodeDto)
@@ -232,7 +233,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .body(supervisoryNodeDto)
@@ -257,7 +258,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     SupervisoryNodeDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -276,7 +277,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -297,7 +298,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     SupervisoryNodeDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .when()
@@ -317,7 +318,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .when()
@@ -353,7 +354,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     UserDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
@@ -379,7 +380,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
@@ -403,7 +404,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
@@ -426,7 +427,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
@@ -451,7 +452,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
@@ -530,7 +531,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
                                                        int expectedCode) {
     return restAssured
       .given()
-      .queryParam(ACCESS_TOKEN, getToken())
+      .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body(queryParams)
       .when()

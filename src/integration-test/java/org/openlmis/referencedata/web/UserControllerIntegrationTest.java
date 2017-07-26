@@ -87,6 +87,7 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateField"})
@@ -173,7 +174,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     UserDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -191,7 +192,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -297,7 +298,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(ROLE_ASSIGNMENTS_URL)
@@ -533,7 +534,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, supervisionRightId)
         .queryParam(PROGRAM_ID_STRING, program2Id)
         .pathParam("id", userId)
@@ -600,7 +601,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     Program[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(SUPPORTED_PROGRAMS_URL)
@@ -619,7 +620,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(SUPPORTED_PROGRAMS_URL)
@@ -639,7 +640,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(SUPPORTED_PROGRAMS_URL)
@@ -655,7 +656,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(SUPPORTED_PROGRAMS_URL)
@@ -712,7 +713,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     given(userRepository.findOne(userId)).willReturn(null);
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, supervisionRightId)
         .queryParam(PROGRAM_ID_STRING, program2Id)
         .pathParam("id", userId)
@@ -734,7 +735,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, supervisionRightId)
         .queryParam(PROGRAM_ID_STRING, program1Id)
         .pathParam("id", userId)
@@ -792,7 +793,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, fulfillmentRightId)
         .pathParam("id", userId)
         .when()
@@ -816,7 +817,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(queryMap)
         .when()
@@ -846,7 +847,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .given()
         .queryParam("page", 0)
         .queryParam("size", 1)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(queryMap)
         .when()
@@ -875,7 +876,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(queryMap)
         .when()
@@ -902,7 +903,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     User response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(userDto)
         .when()
@@ -931,7 +932,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     newUser.export(newUserDto);
     UserDto user = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(newUserDto)
         .when()
@@ -977,7 +978,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     UserDto[] users = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, RIGHT_ID)
         .queryParam(SUPERVISORY_NODE_ID_STRING, SUPERVISORY_NODE_ID)
         .queryParam(PROGRAM_ID_STRING, PROGRAM_ID)
@@ -999,7 +1000,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, RIGHT_ID)
         .when()
         .get(RIGHT_SEARCH_URL)
@@ -1018,7 +1019,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, RIGHT_ID)
         .when()
         .get(RIGHT_SEARCH_URL)
@@ -1038,7 +1039,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(AUDIT_URL)
@@ -1057,7 +1058,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(AUDIT_URL)
@@ -1076,7 +1077,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(AUDIT_URL)
@@ -1157,7 +1158,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(PERMISSION_STRINGS_URL);
@@ -1168,7 +1169,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(ID_URL);
@@ -1179,7 +1180,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(ROLE_ASSIGNMENTS_URL);
@@ -1202,7 +1203,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(userDto)
         .when()
@@ -1214,7 +1215,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", userId)
         .when()
@@ -1229,7 +1230,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, supervisionRightId)
         .queryParam(PROGRAM_ID_STRING, program1Id)
         .queryParam("facilityId", homeFacilityId)
@@ -1245,7 +1246,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", userId)
         .when()
         .get(PROGRAMS_URL);
@@ -1258,7 +1259,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, supervisionRightId)
         .queryParam(PROGRAM_ID_STRING, program2Id)
         .pathParam("id", userId)
@@ -1272,7 +1273,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(RIGHT_ID_STRING, fulfillmentRightId)
         .pathParam("id", userId)
         .when()

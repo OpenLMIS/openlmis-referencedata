@@ -45,6 +45,7 @@ import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 
@@ -127,7 +128,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", countryZone.getId())
         .when()
@@ -147,7 +148,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     GeographicZone response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(countryZone)
         .when()
@@ -169,7 +170,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     GeographicZone response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", countryZone.getId())
         .body(countryZone)
@@ -197,7 +198,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     Page<GeographicZoneSimpleDto> response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(PAGE, PAGE_NUMBER)
         .queryParam(SIZE, PAGE_SIZE)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -229,7 +230,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     // when
     Page<GeographicZoneSimpleDto> response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -254,7 +255,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     GeographicZone response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", countryZone.getId())
         .when()
@@ -276,7 +277,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", countryZone.getId())
         .when()
@@ -296,7 +297,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -317,7 +318,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -339,7 +340,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -359,7 +360,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", countryZone.getId())
         .body(countryZone)
@@ -380,7 +381,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", countryZone.getId())
         .when()
@@ -400,7 +401,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(countryZone)
         .when()
@@ -426,7 +427,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     // when
     GeographicZone[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(location)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -453,7 +454,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(location)
         .when()

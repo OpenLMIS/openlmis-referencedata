@@ -30,6 +30,7 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -69,7 +70,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", processingScheduleId)
         .when()
@@ -85,7 +86,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     ProcessingSchedule response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(schedule)
         .when()
@@ -106,7 +107,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     ProcessingSchedule response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", processingScheduleId)
         .body(schedule)
@@ -130,7 +131,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     ProcessingSchedule[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -149,7 +150,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     ProcessingSchedule response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", processingScheduleId)
         .when()
@@ -172,7 +173,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     ProcessingSchedule[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .queryParam("facilityId", facilityId)
         .queryParam("programId", programId)
@@ -196,7 +197,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .queryParam("facilityId", facilityId)
         .queryParam("programId", programId)
@@ -218,7 +219,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .queryParam("facilityId", facilityId)
         .queryParam("programId", programId)
@@ -236,7 +237,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", processingScheduleId)
         .when()
@@ -253,7 +254,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(schedule)
         .when()
@@ -270,7 +271,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", processingScheduleId)
         .body(schedule)
@@ -288,7 +289,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -304,7 +305,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", processingScheduleId)
         .when()

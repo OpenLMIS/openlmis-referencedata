@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.RightName;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -54,7 +55,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     FacilityOperator response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityOperator)
         .when()
@@ -73,7 +74,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityOperator)
         .when()
@@ -98,7 +99,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     FacilityOperator[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -116,7 +117,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -139,7 +140,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     FacilityOperator response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityOperatorId)
         .body(facilityOperator)
@@ -160,7 +161,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityOperatorId)
         .body(facilityOperator)
@@ -183,7 +184,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     FacilityOperator response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityOperatorId)
         .when()
@@ -202,7 +203,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityOperatorId)
         .when()
@@ -224,7 +225,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityOperatorId)
         .when()
@@ -241,7 +242,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityOperatorId)
         .when()

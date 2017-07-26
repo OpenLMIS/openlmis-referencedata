@@ -67,6 +67,7 @@ import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -129,7 +130,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     FacilityDto[] response = restAssured.given()
         .queryParam(PROGRAM_ID, programId)
         .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SUPPLYING_URL)
         .then()
@@ -174,7 +175,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     String messageKey = restAssured.given()
         .queryParam(PROGRAM_ID, programId)
         .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SUPPLYING_URL)
         .then()
@@ -198,7 +199,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured.given()
         .queryParam(PROGRAM_ID, programId)
         .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SUPPLYING_URL)
         .then()
@@ -219,7 +220,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured.given()
         .queryParam(PROGRAM_ID, programId)
         .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SUPPLYING_URL)
         .then()
@@ -242,7 +243,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(listToReturn);
 
     PageImplRepresentation response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -261,7 +262,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String messageKey = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(new HashMap<>())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -289,7 +290,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(listToReturn);
 
     PageImplRepresentation response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -313,7 +314,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     // when
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(new HashMap<>())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -334,7 +335,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(NAME_KEY, "NotSimilarName");
 
     PageImplRepresentation response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -360,7 +361,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     PageImplRepresentation response = restAssured.given()
         .queryParam("page", 0)
         .queryParam("size", 1)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -388,7 +389,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     List<Map<String, ?>> productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
         .queryParam("fullSupply", false)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
         .then()
@@ -406,7 +407,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     String messageKey = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
         .queryParam("fullSupply", false)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
         .then()
@@ -427,7 +428,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
         .queryParam("fullSupply", false)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
         .then()
@@ -447,7 +448,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     FacilityDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -469,7 +470,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -488,7 +489,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     FacilityDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(ID_URL)
@@ -510,7 +511,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(ID_URL)
@@ -530,7 +531,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(ID_URL)
@@ -550,7 +551,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .delete(ID_URL)
@@ -569,7 +570,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .delete(ID_URL)
@@ -589,7 +590,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .get(AUDIT_URL)
@@ -610,7 +611,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .when()
         .delete(ID_URL)
@@ -633,7 +634,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     FacilityDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
         .when()
@@ -658,7 +659,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
         .when()
@@ -681,7 +682,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
         .when()
@@ -705,7 +706,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     FacilityDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
@@ -731,7 +732,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
@@ -755,7 +756,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
@@ -790,7 +791,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", UUID.randomUUID())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
@@ -813,7 +814,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(Collections.singletonList(facility));
 
     PageImplRepresentation response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(boundary)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -836,7 +837,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     Polygon boundary = gf.createPolygon(coords);
 
     String messageKey = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(boundary)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()

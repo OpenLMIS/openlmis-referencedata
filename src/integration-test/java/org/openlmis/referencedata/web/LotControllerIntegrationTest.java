@@ -42,6 +42,7 @@ import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings("PMD.TooManyMethods")
@@ -77,7 +78,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     LotDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(lotDto)
         .when()
@@ -101,7 +102,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
             .given()
-            .queryParam(ACCESS_TOKEN, getToken())
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(lotDto)
             .when()
@@ -119,7 +120,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     lotDto.setLotCode("");
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(lotDto)
         .when()
@@ -140,7 +141,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     LotDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", lotId)
         .body(lotDto)
@@ -166,7 +167,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
             .given()
-            .queryParam(ACCESS_TOKEN, getToken())
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .pathParam("id", lotId)
             .body(lotDto)
@@ -185,7 +186,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
             .given()
-            .queryParam(ACCESS_TOKEN, getToken())
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .pathParam("id", lotId)
             .body(lotDto)
@@ -206,7 +207,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("tradeIdemId", lot.getTradeItem().getId())
         .queryParam("lotCode", lot.getLotCode())
         .queryParam("expirationDate",
@@ -229,7 +230,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("tradeIdemId", lot.getTradeItem().getId())
         .when()
         .get(SEARCH_URL)
@@ -248,7 +249,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
             .given()
-            .queryParam(ACCESS_TOKEN, getToken())
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
             .when()
             .get(SEARCH_URL)
             .then()
@@ -264,7 +265,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     LotDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", lotId)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -288,7 +289,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", lotId)
         .when()
         .get(ID_URL)
@@ -305,7 +306,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", lotId)
         .when()

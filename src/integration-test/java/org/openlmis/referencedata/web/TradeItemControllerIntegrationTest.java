@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemDto;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -58,7 +59,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     TradeItemDto object = newInstance(tradeItem);
     TradeItemDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(object)
         .when()
@@ -90,7 +91,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -114,7 +115,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("classificationId", CID)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -139,7 +140,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("classificationId", CID)
         .queryParam("fullMatch", "true")
         .when()
@@ -160,7 +161,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(generateItem("name"))
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -175,7 +176,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()

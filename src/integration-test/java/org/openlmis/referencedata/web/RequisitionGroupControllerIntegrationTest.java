@@ -51,6 +51,7 @@ import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
@@ -119,7 +120,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .when()
@@ -138,7 +139,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .when()
@@ -160,7 +161,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .when()
@@ -177,7 +178,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     RequisitionGroupDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(requisitionGroupDto)
         .when()
@@ -196,7 +197,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(requisitionGroupDto)
         .when()
@@ -220,7 +221,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     RequisitionGroupDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -238,7 +239,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -259,7 +260,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     RequisitionGroupDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .when()
@@ -280,7 +281,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .when()
@@ -302,7 +303,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .when()
@@ -327,7 +328,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     RequisitionGroupDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .body(requisitionGroupDto)
@@ -356,7 +357,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .body(requisitionGroupDto)
@@ -385,7 +386,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     RequisitionGroupDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", requisitionGroupId)
         .body(requisitionGroupDto)
@@ -417,7 +418,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
         .willReturn(Pagination.getPage(listToReturn, null, 1));
 
     PageImplRepresentation response = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -436,7 +437,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
 
     String messageKey = restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(new HashMap<>())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -458,7 +459,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
         new ValidationMessageException("somethingWrong"));
 
     restAssured.given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(new HashMap<>())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -488,7 +489,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     PageImplRepresentation response = restAssured.given()
         .queryParam("page", 0)
         .queryParam("size", 1)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()

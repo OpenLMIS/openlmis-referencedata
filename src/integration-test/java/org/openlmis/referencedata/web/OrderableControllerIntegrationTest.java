@@ -45,6 +45,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -80,7 +81,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     OrderableDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(orderableDto)
         .when()
@@ -101,7 +102,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     OrderableDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(orderableDto)
         .when()
@@ -124,7 +125,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     OrderableDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(orderableDto)
         .when()
@@ -143,7 +144,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(orderableDto)
         .when()
@@ -196,7 +197,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -228,7 +229,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -261,7 +262,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .given()
         .queryParam("page", 0)
         .queryParam("size", 1)
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()

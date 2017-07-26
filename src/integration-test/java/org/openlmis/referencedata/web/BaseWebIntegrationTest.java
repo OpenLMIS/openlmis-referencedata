@@ -90,6 +90,7 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -99,10 +100,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles("test")
 public abstract class BaseWebIntegrationTest {
 
-  protected static final String ACCESS_TOKEN = "access_token";
-
   private static final String USER_ACCESS_TOKEN = "418c89c5-7f21-4cd1-a63a-38c47892b0fe";
+  private static final String USER_ACCESS_TOKEN_HEADER = "Bearer " + USER_ACCESS_TOKEN;
   private static final String CLIENT_ACCESS_TOKEN = "6d6896a5-e94c-4183-839d-911bc63174ff";
+  private static final String CLIENT_ACCESS_TOKEN_HEADER = "Bearer " + CLIENT_ACCESS_TOKEN;
+
 
   protected static final String MESSAGEKEY_ERROR_UNAUTHORIZED =
       SystemMessageKeys.ERROR_UNAUTHORIZED;
@@ -307,8 +309,8 @@ public abstract class BaseWebIntegrationTest {
    *
    * @return an access token
    */
-  String getToken() {
-    return USER_ACCESS_TOKEN;
+  String getTokenHeader() {
+    return USER_ACCESS_TOKEN_HEADER;
   }
 
   /**
@@ -317,8 +319,8 @@ public abstract class BaseWebIntegrationTest {
    *
    * @return an access token
    */
-  String getClientToken() {
-    return CLIENT_ACCESS_TOKEN;
+  String getClientTokenHeader() {
+    return CLIENT_ACCESS_TOKEN_HEADER;
   }
 
   protected void mockUserHasRight(String rightName) {
@@ -354,7 +356,7 @@ public abstract class BaseWebIntegrationTest {
   void checkBadRequestBody(Object object, String code, String resourceUrl) {
     ExtractableResponse<Response> response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(object)
         .when()

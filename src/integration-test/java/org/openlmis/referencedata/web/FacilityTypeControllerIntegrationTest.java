@@ -22,14 +22,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import org.junit.Test;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.RightName;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Test;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.RightName;
-import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -53,7 +55,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeId)
         .when()
@@ -70,7 +72,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeId)
         .when()
@@ -90,7 +92,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     FacilityType response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityType)
         .when()
@@ -109,7 +111,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityType)
         .when()
@@ -131,7 +133,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     FacilityType response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeId)
         .body(facilityType)
@@ -152,7 +154,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeId)
         .body(facilityType)
@@ -176,7 +178,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     FacilityType[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -194,7 +196,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -215,7 +217,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     FacilityType response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeId)
         .when()
@@ -234,7 +236,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeId)
         .when()

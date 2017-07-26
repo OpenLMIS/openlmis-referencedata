@@ -32,6 +32,7 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.dto.RightDto;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -71,7 +72,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -89,7 +90,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -106,7 +107,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .pathParam("id", rightId)
         .when()
         .get(ID_URL)
@@ -125,7 +126,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", rightId)
         .when()
         .get(ID_URL)
@@ -143,7 +144,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .pathParam("id", rightId)
         .when()
         .get(ID_URL)
@@ -163,7 +164,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(rightDto)
         .when()
@@ -187,7 +188,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(rightDto)
         .when()
@@ -209,7 +210,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(rightDto)
         .when()
@@ -226,7 +227,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(rightDto)
         .when()
@@ -245,7 +246,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .pathParam("id", rightId)
         .when()
         .delete(ID_URL)
@@ -261,7 +262,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam("id", rightId)
         .when()
         .delete(ID_URL)
@@ -279,7 +280,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .pathParam("id", rightId)
         .when()
         .delete(ID_URL)
@@ -298,7 +299,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     RightDto[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getClientToken())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .queryParam("name", RIGHT_NAME)
         .queryParam("type", RIGHT_TYPE.toString())
         .when()
@@ -319,7 +320,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("name", RIGHT_NAME)
         .when()
         .get(SEARCH_URL)
@@ -335,7 +336,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
             .given()
-            .queryParam(ACCESS_TOKEN, getClientToken())
+            .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
             .queryParam("type", "INVALID_TYPE")
             .when()
             .get(SEARCH_URL)

@@ -21,14 +21,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
 
+import org.hamcrest.Matchers;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.springframework.http.MediaType;
 
 public class GeographicLevelControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -51,7 +53,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", geographicLevelId)
         .when()
@@ -70,7 +72,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", geographicLevelId)
         .when()
@@ -90,7 +92,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     GeographicLevel response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(geographicLevel)
         .when()
@@ -109,7 +111,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(geographicLevel)
         .when()
@@ -132,7 +134,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     GeographicLevel response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", geographicLevelId)
         .body(geographicLevel)
@@ -156,7 +158,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", geographicLevelId)
         .body(geographicLevel)
@@ -181,7 +183,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     GeographicLevel[] response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -203,7 +205,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -224,7 +226,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     GeographicLevel response = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", geographicLevelId)
         .when()
@@ -243,7 +245,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
     String messageKey = restAssured
         .given()
-        .queryParam(ACCESS_TOKEN, getToken())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", geographicLevelId)
         .when()
