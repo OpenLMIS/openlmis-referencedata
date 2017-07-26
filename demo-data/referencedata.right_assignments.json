@@ -1,0 +1,1694 @@
+[
+    {
+        "id": "008c42d1-475e-43a1-ad4c-c701d292e1e5",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "071b3b5a-ad70-48a5-a74f-f1395b8c17c4",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "072c77b0-0bce-44f5-a6d9-e165145fee41",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "07b29147-9d08-452a-956a-a6ba6ebfdfe9",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "469c6e1c-aab7-4640-8925-f3c34bbe752d"
+    },
+    {
+        "id": "0a2c03eb-0813-434a-a58c-1fc7435c38a0",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "0b6d277d-dfe3-439d-a13a-d8713a897372",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "469c6e1c-aab7-4640-8925-f3c34bbe752d"
+    },
+    {
+        "id": "0bca4aa9-0cde-4d40-8a64-650fefca9942",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "0be42672-aae4-4f1d-9e5f-7174580e2bae",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c994d1ea-47f7-435d-9d4d-42fb54197698"
+    },
+    {
+        "id": "0c3b32a9-baaf-4728-9215-7c16f97b6d6e",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "0d48e7b3-83f2-47ec-ac45-f7d13a100af5",
+        "rightname": "CCE_INVENTORY_EDIT",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "0e2c3a31-9a94-45f9-a4ec-1477b9eb9fa8",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "0f447207-603b-4fcd-a65a-e69ef131de94",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "119629d3-78a7-46f2-8d73-56b0d0b3acb9",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "122c09fe-9eaf-4e65-a2f7-45ad0707d904",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "130c83f1-331c-4a10-8e48-e62c3366f74e",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "469c6e1c-aab7-4640-8925-f3c34bbe752d"
+    },
+    {
+        "id": "14e6b78e-e6c0-413c-86bf-a63ca22355de",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "15646fd0-f154-420c-83b7-e04e8c7189f0",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "7d6c0269-0c6a-4c9a-a098-46de276b9d26"
+    },
+    {
+        "id": "1740c7ff-452e-41e4-b42f-3d717c1015a9",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "cb5cd52f-f205-475d-8763-90852839424d"
+    },
+    {
+        "id": "19879a78-1b7d-430a-be3a-f132b43dde9b",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "2bb552b3-0324-42ef-bb21-c5cc74a38592"
+    },
+    {
+        "id": "1aa6954e-adf8-4e18-9dbe-470cc66d1dc8",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "1b64e69b-fecd-4f36-bf34-cf3e63f4d536",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "1b9c98f1-4ed0-4066-8e94-9407137df46d",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c54df462-66d8-4a02-bee9-b786fe2f30ee"
+    },
+    {
+        "id": "1d66cff1-1c5c-401f-973a-69278aeb7383",
+        "rightname": "STOCK_SOURCES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "1df79f46-4c20-46d8-bef0-6f84345617a2",
+        "rightname": "ORDERABLES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "1efb6805-2b22-49ec-b37b-a2f074347857",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "1f677c84-e9cb-4d7e-9cb1-4da831bcdc2a",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "200424a7-18c1-4a2a-8d8d-46e052f1de31",
+        "rightname": "CCE_INVENTORY_EDIT",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "2011d492-bfc8-4565-be69-4dcebb06a99c",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "20aa8b52-6d19-423c-9929-8bdb363cc5e6",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "244221fd-9b89-437d-bf79-c225ccd8ff14",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "2461f844-68ed-44c3-babe-1427b9c399bb",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "469c6e1c-aab7-4640-8925-f3c34bbe752d"
+    },
+    {
+        "id": "25299843-bd72-4ed1-85ef-e8fcb8ab36c3",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "25692bab-76f8-4b0b-a61d-92c35ee1aa0b",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "258b2c4b-f974-45ae-b5d3-e6bc7a1223e9",
+        "rightname": "CCE_INVENTORY_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "26c45711-ccff-4ecb-8822-6c25f72cfeb6",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "469c6e1c-aab7-4640-8925-f3c34bbe752d"
+    },
+    {
+        "id": "27439ebc-cc21-479a-9a80-6ce76598823a",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c994d1ea-47f7-435d-9d4d-42fb54197698"
+    },
+    {
+        "id": "29a1354e-2bfa-4075-a6c8-273f4edd1c8f",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "2a43b5c4-addf-4382-9e93-281ca9b16fc9",
+        "rightname": "ORDERS_VIEW",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "476415b1-ca81-4561-a3b7-fa3d08434800"
+    },
+    {
+        "id": "2a840518-349f-4eb0-a04f-28cb32c2ab70",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "c54df462-66d8-4a02-bee9-b786fe2f30ee"
+    },
+    {
+        "id": "2b54d301-f01c-4fa9-bc7e-d53efba36171",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "2b663010-d75f-4e97-af7f-94453e96d3b0",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "2bccd6da-735c-4ea0-9cf0-5687b5592de8",
+        "rightname": "FACILITIES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "2c31ef88-28a0-4bf1-b102-c84861d0c550",
+        "rightname": "CCE_INVENTORY_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "2c744ac4-8638-49e3-9b64-f4d119272faa",
+        "rightname": "ORDERS_EDIT",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "2c907a3b-fc81-4a60-9684-ee372f447d0f",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "2bb552b3-0324-42ef-bb21-c5cc74a38592"
+    },
+    {
+        "id": "2ee2a335-f43d-4867-9e12-b6a3044d8f23",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "2f2969e0-cec2-426c-a599-7fa51ea87ba2",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "2f797946-2e47-4724-979c-d2b3a88c42c1",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "2fd69888-42b0-4f79-8c38-c307ce8d6b99",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "2bb552b3-0324-42ef-bb21-c5cc74a38592"
+    },
+    {
+        "id": "3000260b-481f-4e92-8fd9-6cfa83a0466b",
+        "rightname": "PRODUCTS_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "3046c84f-6367-4139-b60b-6d98483e7260",
+        "rightname": "RIGHTS_VIEW",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "307154dc-442b-4859-8cd1-c28d402a12d0",
+        "rightname": "CCE_INVENTORY_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "30cdbb39-4e39-4e80-93c5-b5c52ab4bcbc",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "3219f975-0ae1-4146-827c-e3f15003cd58",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "247b366d-f8ab-4226-9ae9-a188d5ee8e22"
+    },
+    {
+        "id": "3268a7ea-e39d-4d52-8c2c-c23aa8ca6a23",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c54df462-66d8-4a02-bee9-b786fe2f30ee"
+    },
+    {
+        "id": "344ef33b-fb02-4e1c-8e89-4bfcb96b0992",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "355b47e6-a837-4f18-b75b-d78e0d6e8bc0",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "469c6e1c-aab7-4640-8925-f3c34bbe752d"
+    },
+    {
+        "id": "37b741d4-4b8a-47c9-8f9e-80f43fb684a4",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "39e0f167-bd47-4dc9-b7c0-5310a0728b6d",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "3c327045-dc09-49df-a9c2-58441e5fbb54",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "3d52361b-1424-4714-98bc-7f064bca65ff",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "3d779c62-2923-495f-b697-79348e01644c",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "3e278e04-1397-4a89-94db-49c386e67663",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "3e83e1c8-96cb-4831-9071-0e4227835bab",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "c54df462-66d8-4a02-bee9-b786fe2f30ee"
+    },
+    {
+        "id": "3f0ad0ff-ad20-4d49-b941-7caf30ec2c34",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "3fde4a95-1031-4abc-a207-02bc37ad3010",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "3fe371ac-9b1b-4bd6-9ae3-5ceed662dfa7",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4259d3e9-c105-432b-9dca-2b5e51fcb038",
+        "rightname": "REPORT_TEMPLATES_EDIT",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4304a24d-8771-4017-ae76-c86c81789d9b",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "44806efa-99e5-45b9-93c8-74b43d15cec3",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "44b6d86d-77ab-42f9-85de-7fe4c97f926f",
+        "rightname": "STOCK_ADJUSTMENT_REASONS_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4523e76f-b191-4e88-9405-301b7db2e474",
+        "rightname": "ORDERS_EDIT",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "476415b1-ca81-4561-a3b7-fa3d08434800"
+    },
+    {
+        "id": "463b1027-7bdd-452b-ae3c-1439aabe000f",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "4684c5f1-37c4-49f7-bd49-65e5be60b1c4",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "cb5cd52f-f205-475d-8763-90852839424d"
+    },
+    {
+        "id": "4813ebb4-3810-4ccb-a2f5-5c0b911c7a29",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4880fd2b-69bf-46ea-a8bf-ce2ec325d66f",
+        "rightname": "CCE_INVENTORY_EDIT",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4887ff9c-7eb8-4387-802d-14bf313f0edd",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "2bb552b3-0324-42ef-bb21-c5cc74a38592"
+    },
+    {
+        "id": "4942b9b1-545e-4aa9-a4f6-b68a6f4bcf04",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "49500c0d-2500-44c4-a734-557f9bd2e534",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "49ef62a0-1fa1-45b5-a062-df04be2a6c63",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "4a9c8aa5-19fc-48b1-b3a1-40bf4a0c9a90",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "cb5cd52f-f205-475d-8763-90852839424d"
+    },
+    {
+        "id": "4aa45f14-b238-4865-897e-27b057209550",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4b91286d-2b2f-4593-a931-1fe1b335533e",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4c023180-ad39-4bff-854a-de8c2666b040",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4d555816-b365-4c03-98ee-0ef320e4b7ad",
+        "rightname": "GEOGRAPHIC_ZONES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4d905abb-a9d7-4405-9a51-6ede4beace4c",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4de365c4-42f7-42c7-9fa7-71a1bce79869",
+        "rightname": "SUPPLY_LINES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "4dea4e0a-1968-4509-9f3a-5257d9cc122b",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "4f589b30-7d2c-40e2-ba9f-13495290a8b1",
+        "rightname": "STOCK_CARD_TEMPLATES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "511fc15e-7bb5-4b8e-8eaa-7a636ea16390",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c994d1ea-47f7-435d-9d4d-42fb54197698"
+    },
+    {
+        "id": "5162cb53-fbd4-404e-a0d7-23f0700b78c7",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "549c4410-2c2b-4dc3-a937-e27221685054",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "2bb552b3-0324-42ef-bb21-c5cc74a38592"
+    },
+    {
+        "id": "55585b50-59c1-4f91-ae55-bd83ad999234",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "2bb552b3-0324-42ef-bb21-c5cc74a38592"
+    },
+    {
+        "id": "56200591-3832-4f41-82e6-0536d27a5d5c",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "5706dc85-f4ed-47ea-8820-c0e0704e1d75",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "5914c4e7-2b47-4145-b9c1-aee15dd6b9be",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c994d1ea-47f7-435d-9d4d-42fb54197698"
+    },
+    {
+        "id": "5d25629c-b202-4f79-809e-aa5e94002da1",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "5e222756-0c30-4c34-9827-fc9564404554",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "5fef1024-15f3-4606-9143-395a5fd842bd",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "60d4bfa6-ea2d-4e95-91f5-f11dc0a95f30",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "6362a17b-4825-4860-a4b0-93df3690db4a",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "66bcd56a-4cba-46b1-a117-72c2e91530c1",
+        "rightname": "FACILITY_APPROVED_ORDERABLES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "684a0d8a-6d2f-4a3c-80a0-cbc9ff272450",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "6a51452d-895b-4eac-98e5-031857b1e95a",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "6a531fd1-6f45-4324-bdf2-5b6f73e7cb78",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "6b1f5960-cd0f-42fc-8923-331d59b588ad",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "2bb552b3-0324-42ef-bb21-c5cc74a38592"
+    },
+    {
+        "id": "6c5f74c2-d4ea-43da-adb0-f87d15dd2d5c",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "6d1c1534-e9b0-42a7-89f9-d8bf973edd17",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "2bb552b3-0324-42ef-bb21-c5cc74a38592"
+    },
+    {
+        "id": "6f2e69ef-7bc1-42b7-a711-a4d697f0af14",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "c994d1ea-47f7-435d-9d4d-42fb54197698"
+    },
+    {
+        "id": "702744c7-073b-40a4-9bad-9d0e148d0531",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "7088306c-d041-4713-b01b-6d3ead3f8257",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "7107e30e-8131-42e7-8742-913b7e2a137c",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "7179d3aa-2be8-4296-8e69-98d0df98ceeb",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "71969faa-6620-4209-a883-047173fed980",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "74cf6e85-408f-4e2d-9f3f-9490fb36d165",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "784f4e52-8cba-4ff2-9e02-0132699cd7eb",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "7c24ae91-9a75-417e-9ebb-f1c7067c88ac",
+        "rightname": "CCE_INVENTORY_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "7c3f255d-cc27-4d57-b1eb-d28513893869",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "7e88132d-26c3-4677-9759-279e23179328",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "7fe0c1a0-59ff-4b52-815d-114ab7144eae",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "8094a32b-f173-4da3-9b25-dc9045920b48",
+        "rightname": "USERS_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "811b2dd1-0363-42ec-94d5-7d7e76a98056",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "81df5fe5-727e-4b44-a745-473c67655e7e",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "82330f79-b98b-4b9c-8af5-c6ca3f47cd1c",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c994d1ea-47f7-435d-9d4d-42fb54197698"
+    },
+    {
+        "id": "82a6c63b-1669-4741-a5b7-823f98ef3a70",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "830f88db-2bfb-42af-99d4-128f5ca7264e",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "84a1031b-5b40-4241-b1b6-33fce5803544",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c994d1ea-47f7-435d-9d4d-42fb54197698"
+    },
+    {
+        "id": "87b8c31b-c0ac-42b8-88c8-a437f9b9ad08",
+        "rightname": "CCE_INVENTORY_EDIT",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "886c8ab0-8b29-40b1-b858-6e260a0e1c7e",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "89accff3-9b87-4eb3-bc04-e38a4d89b0b7",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "476415b1-ca81-4561-a3b7-fa3d08434800"
+    },
+    {
+        "id": "8b2ecdab-7ff0-4de2-a473-8af7a1f9d036",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "469c6e1c-aab7-4640-8925-f3c34bbe752d"
+    },
+    {
+        "id": "8cd1c4e4-5fa0-435d-9c9e-8e712dc655ba",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "8cdfd696-1be7-4db0-81b1-3e2773f23a7b",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "8dfebc25-f77a-4244-bd6a-ce37fba41272",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "476415b1-ca81-4561-a3b7-fa3d08434800"
+    },
+    {
+        "id": "8e7e750f-8e13-4a39-8622-6ed7b38b95c0",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "2fbe9be3-f5e4-47ec-a10a-f3380c0daf75"
+    },
+    {
+        "id": "91e634ff-6680-48dc-a85c-d99639783b04",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "92331a58-2dc7-4b2f-b6bf-d96353f24e93",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "93ab92fb-1586-4aa5-bb98-2b77a96dbb86",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "94702085-d1e0-4043-a2b6-407615f7953f",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "7d6c0269-0c6a-4c9a-a098-46de276b9d26"
+    },
+    {
+        "id": "9715eeda-9e4f-4c52-859a-be942a27036f",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "9745ff54-934a-40c6-94da-a88f65cb85c4",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "996c1516-e34c-4940-a92d-86293cfb751d",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "999ebce3-8936-4083-9ac2-5e6018d50d7b",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "99ccfe5c-fd4d-44c9-8a14-b6e2d6dd76e8",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "c54df462-66d8-4a02-bee9-b786fe2f30ee"
+    },
+    {
+        "id": "9a3973eb-11f7-4028-9649-e6f31044ba9f",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "9a6557d3-fd2c-42e7-ba15-c577d988217c",
+        "rightname": "REQUISITION_GROUPS_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "9abf39a3-8490-42d8-8c4c-2b0d227f3979",
+        "rightname": "CCE_INVENTORY_EDIT",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "9c04ad0d-a2ec-4ed6-b10b-9903590252dd",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "9c2fe4a3-f5a0-47f0-a1a7-e4a3a6d92987",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "9cba54ff-c6c4-4bab-b73e-141ba8e8e08b",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "9dc4691d-819b-4562-8e0a-e29a5e251bd4",
+        "rightname": "REQUISITION_TEMPLATES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "9e4ca992-0a36-42ed-890a-961df0fb41b3",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "9e75050d-b3e3-4ed1-a604-8c5fcae0dd5e",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "9e8506fc-0737-4c3c-aa23-e98bcaaba69b",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "9eb58ad3-9a47-476b-8b6c-9098b36d9221",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "9ec094c2-0b46-47f6-8039-9ad6ef6b0f6b",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a06602da-ec7a-4403-847c-d80e9e412f88",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a0cc649d-59a7-4a91-9c0a-1617be368844",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "a1fd5c4d-f50b-46af-a6f8-a449ff0388ee",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "cb5cd52f-f205-475d-8763-90852839424d"
+    },
+    {
+        "id": "a27699b0-d874-4ca6-867d-2f5c03bc8a54",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a2cf099f-0b8b-4cd8-863c-d0d5890a235b",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a35c049c-3d40-4b95-b327-3a09666547d6",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a38a5f6f-6d07-4034-ab02-f550b4c1f926",
+        "rightname": "CCE_INVENTORY_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a4afb367-86e0-45fe-86db-1bfb9c48391a",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a4d2add5-863c-49e6-b939-f5ba1f4c337a",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a5f8b9ab-d0d9-4af3-96be-35e3496d177e",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "c54df462-66d8-4a02-bee9-b786fe2f30ee"
+    },
+    {
+        "id": "a635236e-db80-4450-8ccc-8ca50d9b3ee2",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a71a3b65-e215-4d59-bb8e-871c4308c418",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "a87b8039-0348-49bf-ace6-8c584089a1f0",
+        "rightname": "REPORTS_VIEW",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "a928d4f1-74f4-40f5-8cbc-78ecaaacd116",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "a99baee8-f21d-473a-a948-c6efd8355d2a",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "aabaaba5-e1f7-4f53-9e84-97756c31497c",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "adf23fcb-a451-4ded-9a4b-b4232224cee9",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "ae3dcfb1-2ce7-41e1-a2ea-fdf3e1f0af40",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "aeb0f213-09fb-4880-83b5-4c14a2fb67a1",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "af8b6841-32ae-4c2f-aabd-6e7f0c92b4d2",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "247b366d-f8ab-4226-9ae9-a188d5ee8e22"
+    },
+    {
+        "id": "afce5e40-6369-4b9e-8520-44cb5b426862",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "b1de7802-7343-48c5-b923-f5a0b01105ef",
+        "rightname": "CCE_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "b2247de8-7151-460e-b7a4-bed975e13ce6",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "476415b1-ca81-4561-a3b7-fa3d08434800"
+    },
+    {
+        "id": "b234243b-48de-4244-a83e-304abaf676ea",
+        "rightname": "CCE_INVENTORY_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "b38c83f2-c605-46f4-8104-1926037a11c8",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "2fbe9be3-f5e4-47ec-a10a-f3380c0daf75"
+    },
+    {
+        "id": "b6420e85-e162-411d-8efb-0f746161a050",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "b713ff9b-ddb3-42d8-963c-9907dfddac8f",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "b7d1f40d-c69a-41fd-b4db-fb9aa4f56433",
+        "rightname": "SUPERVISORY_NODES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "b82f6769-edc2-413c-a9d2-300beddfe344",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "b8e774a9-c64e-41c6-9fd0-a1b8d51749b0",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "7d6c0269-0c6a-4c9a-a098-46de276b9d26"
+    },
+    {
+        "id": "ba50e810-ee92-463d-b734-6313e8523a64",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "bb43d579-b4c3-4465-9542-d53984f4cbba",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "bb548178-f62f-4b3b-a0fe-9ba4efe2ceb7",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "c994d1ea-47f7-435d-9d4d-42fb54197698"
+    },
+    {
+        "id": "bbb82041-79ce-4c32-b804-c430a43b5078",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "7d6c0269-0c6a-4c9a-a098-46de276b9d26"
+    },
+    {
+        "id": "bda8f68d-5dc0-4e49-a25c-92610dc5dcd6",
+        "rightname": "ORDERS_VIEW",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "247b366d-f8ab-4226-9ae9-a188d5ee8e22"
+    },
+    {
+        "id": "be3f23df-7258-4289-a3f4-143ffd23cea2",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "beffe72b-2eda-4ce9-82b5-9473a2574574",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "c0d00a06-b442-4713-8bd2-c7abba00f9e1",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "c0ef7137-f566-4b93-b91a-89c24ddd6ecc",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "c1aab9d7-e034-4939-9019-7ef1b823ad7a",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "c2760748-c62d-4a35-a4e3-00391a7c7c00",
+        "rightname": "USER_ROLES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "c30a730a-56b1-47fb-be66-6c7bf0c2fe4e",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "c38e6f99-ecbd-4864-878a-6ee6699307cd",
+        "rightname": "STOCK_INVENTORIES_EDIT",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "c6ff2ec6-adc0-48b4-bf42-1bff28d76d7e",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "c89f8332-8373-4201-afef-8b61c7c36494",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "c9321e3c-517e-4b94-ade7-ba987e81c846",
+        "rightname": "STOCK_DESTINATIONS_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "c9a86d87-0899-4487-9a1f-96c9525b2a82",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "cb8a82c0-3efa-4827-b2ac-0c6c2c734fe7",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "cc594e55-e9ce-4f19-bb21-1078cb3f1783",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "cdcf3887-7455-46c6-a168-83e625d5d6c0",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "2fbe9be3-f5e4-47ec-a10a-f3380c0daf75"
+    },
+    {
+        "id": "d0f9cc5d-c730-4d90-a178-3a515ca3d637",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d1443578-b833-49f2-bf63-ea2feefc29fe",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d1926d6c-d6ff-46f4-9707-8696942aa8a4",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d1afd65e-cf8c-4664-863b-3ed4068f8579",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d1b02708-0475-405d-8ac9-a27d40f96201",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "c54df462-66d8-4a02-bee9-b786fe2f30ee"
+    },
+    {
+        "id": "d1c20985-7156-41af-a710-17077d3334fa",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "2fbe9be3-f5e4-47ec-a10a-f3380c0daf75"
+    },
+    {
+        "id": "d26632a3-0f40-4ab6-ac6b-b98311aebc4f",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d2979893-234d-4e0f-9d54-5e1d139ca9b2",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "cb5cd52f-f205-475d-8763-90852839424d"
+    },
+    {
+        "id": "d30e3cc5-88a0-4c26-af79-8eea8a8925a7",
+        "rightname": "STOCK_ORGANIZATIONS_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d3895727-1bd4-4c2c-9b48-103730b4a6d0",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d4dde7c0-5573-432c-ba58-313113a0bbaa",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "d54ea0c7-469c-4fd6-8356-d6a2b5e8c907",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d6447606-4bce-422e-ae9a-aae5b95df250",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "c54df462-66d8-4a02-bee9-b786fe2f30ee"
+    },
+    {
+        "id": "d77f20ba-7a2d-429b-8b9d-78a15c6b44a5",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d9180955-1c12-4a2f-85b3-f1077b70e6ca",
+        "rightname": "CCE_INVENTORY_EDIT",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "d9fd0367-f47e-401d-b256-fe2952e1c463",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "da25425b-6783-4245-a64d-56712c05eabf",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "db50e88d-e938-406d-957a-18d635d8a476",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "de34c9f7-108d-44c6-9ddd-728264ffc4b3",
+        "rightname": "PROCESSING_SCHEDULES_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "de55f851-8010-457a-8d16-e91f4ace8e8e",
+        "rightname": "CCE_INVENTORY_EDIT",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "dee0ff48-6063-4a97-8642-970ce0570434",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "df43ca47-cf52-46c7-b4f2-c98ca0cbd997",
+        "rightname": "STOCK_CARD_LINE_ITEM_REASONS_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "e200f608-719f-47a5-8d87-9eeddf888a7f",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "e2a05948-2080-4d69-a522-e4c5acff585b",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "469c6e1c-aab7-4640-8925-f3c34bbe752d"
+    },
+    {
+        "id": "e58d323d-b5cf-455a-8023-48ccc661f28e",
+        "rightname": "CCE_INVENTORY_VIEW",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "e59926a3-9577-4ad4-bf5d-93cb239f6a2e",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "e5c03187-f753-480e-83ab-0b8b2448ba99",
+        "rightname": "ORDERS_EDIT",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "e80e721c-c082-4107-8219-390570044d3a",
+        "rightname": "CCE_INVENTORY_EDIT",
+        "facilityid": "5b39f0fb-5c47-4551-b983-1e30ac6df65d",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "e94609d6-d5b6-426d-9dc0-a28ac8cf272e",
+        "rightname": "STOCK_CARDS_VIEW",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "247b366d-f8ab-4226-9ae9-a188d5ee8e22"
+    },
+    {
+        "id": "e998b41d-573c-473c-b460-25f66bc33c2e",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "ea200feb-4697-4434-80fa-19102f999962",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "ebab5edf-9c10-429c-864b-67e98dd5c595",
+        "rightname": "ORDERS_VIEW",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "ec1e8e72-a1b1-4c3d-83d6-b4fba758f9ae",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f0947433-11c9-4176-a34a-2b33fa222949",
+        "rightname": "CCE_INVENTORY_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f0a87722-cb4d-4d95-a459-64b3fa7cecdb",
+        "rightname": "PODS_MANAGE",
+        "facilityid": "9318b2ea-9ae0-42b2-a7e1-353683f54000",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f21f4c25-9bf3-476b-adc3-1f2c6673f1c4",
+        "rightname": "ORDERS_VIEW",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f36261df-4f82-4ef3-9c98-34c9b669039f",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f3bd57e4-107c-44f6-bf32-af97a455ff82",
+        "rightname": "SYSTEM_SETTINGS_MANAGE",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f411a024-3f2a-4467-aa32-656a4ece05e3",
+        "rightname": "STOCK_ADJUST",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f488f826-4c0e-45bd-a163-ad540baa19be",
+        "rightname": "ORDERS_EDIT",
+        "facilityid": "19121381-9f3d-4e77-b9e5-d3f59fc1639e",
+        "userid": "247b366d-f8ab-4226-9ae9-a188d5ee8e22"
+    },
+    {
+        "id": "f4f7f93f-dc13-4fc3-ae91-50641fd2c132",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f613bcc8-01db-4bcf-ae9a-34d47288d16c",
+        "rightname": "REQUISITION_VIEW",
+        "facilityid": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    },
+    {
+        "id": "f89debe0-7644-470e-b4d4-1f6a0cf0ae49",
+        "rightname": "REQUISITION_APPROVE",
+        "facilityid": "13037147-1769-4735-90a7-b9b310d128b8",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "573cf089-dfff-4273-b353-d94058164e55"
+    },
+    {
+        "id": "fa0bf322-8c53-47b0-b37a-63f221d411b9",
+        "rightname": "REQUISITION_CREATE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0"
+    },
+    {
+        "id": "fa85c75a-8933-425c-89ec-265fc83e8698",
+        "rightname": "REQUISITION_AUTHORIZE",
+        "facilityid": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
+        "programid": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
+        "userid": "9b2778af-5372-4410-a5c8-899e7f74296b"
+    },
+    {
+        "id": "ffbfc463-73a8-476d-9f32-381ea958657e",
+        "rightname": "REQUISITION_DELETE",
+        "facilityid": "176c4276-1fb1-4507-8ad2-cdfba0f47445",
+        "programid": "dce17f2e-af3e-40ad-8e00-3496adef44c3",
+        "userid": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb"
+    }
+]
