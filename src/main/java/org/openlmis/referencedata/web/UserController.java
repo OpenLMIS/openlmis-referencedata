@@ -37,7 +37,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
-import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.Role;
@@ -596,9 +595,7 @@ public class UserController extends BaseController {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
       profiler.start("GET_PERM_STRINGS_FROM_RIGHT_ASSIGNMENTS");
-      Set<RightAssignment> rightAssignments = rightAssignmentRepository.findByUser(userId);
-      Set<String> permissionStrings = rightAssignments.stream().map(RightAssignment::toString)
-          .collect(toSet());
+      Set<String> permissionStrings = rightAssignmentRepository.findByUser(userId);
       
       profiler.stop().log();
       XLOGGER.exit(permissionStrings);

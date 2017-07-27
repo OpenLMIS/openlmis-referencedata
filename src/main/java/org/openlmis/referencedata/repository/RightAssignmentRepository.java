@@ -25,9 +25,13 @@ import org.springframework.data.repository.query.Param;
 public interface RightAssignmentRepository extends
     PagingAndSortingRepository<RightAssignment, UUID> {
 
-  @Query(value = "SELECT DISTINCT ra.*"
+  @Query(value = "SELECT" 
+      + "   CASE WHEN ra.programid IS NULL AND ra.facilityid IS NULL THEN ra.rightname"
+      + "        WHEN ra.programid IS NULL THEN ra.rightname || '|' || ra.facilityid"
+      + "        ELSE ra.rightname || '|' || ra.facilityid || '|' || ra.programid"
+      + "   END AS permissionstring"
       + " FROM referencedata.right_assignments ra"
       + " WHERE ra.userid = :userId",
       nativeQuery = true)
-  Set<RightAssignment> findByUser(@Param("userId") UUID userId);
+  Set<String> findByUser(@Param("userId") UUID userId);
 }
