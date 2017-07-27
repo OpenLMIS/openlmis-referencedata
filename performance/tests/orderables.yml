@@ -1,6 +1,6 @@
 execution:
   - concurreny: 1
-    iterations: 10
+    iterations: 20
     scenario: orderables-get-first-10
 
 scenarios:
