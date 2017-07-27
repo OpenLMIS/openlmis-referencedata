@@ -1,0 +1,1 @@
+CREATE INDEX ON right_assignments (userid, rightname);
