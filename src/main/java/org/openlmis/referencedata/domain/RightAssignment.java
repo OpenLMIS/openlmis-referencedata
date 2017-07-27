@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 public class RightAssignment extends BaseEntity {
 
   @ManyToOne
-  @JoinColumn(name = "userid")
+  @JoinColumn(name = "userid", nullable = false)
   @Getter
   private User user;
 

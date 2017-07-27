@@ -1,0 +1,1 @@
+ALTER TABLE right_assignments ALTER COLUMN userid SET NOT NULL;
