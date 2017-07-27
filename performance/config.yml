@@ -7,7 +7,5 @@ modules:
       password: password
     xml-jtl-flags:
       responseData: true
-  local:
-    sequential: true
 reporting:
   - module: final-stats
