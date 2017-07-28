@@ -379,13 +379,10 @@ public class UserController extends BaseController {
    * @return a set of programs
    */
   @RequestMapping(value = "/users/{userId}/programs", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Set<ProgramDto> getUserPrograms(@PathVariable(USER_ID) UUID userId,
+  public ResponseEntity<Set<ProgramDto>> getUserPrograms(@PathVariable(USER_ID) UUID userId,
                                          @RequestParam(
                                              value = "forHomeFacility",
-                                             required = false) Boolean forHomeFacility
-                                         ) {
+                                             required = false) Boolean forHomeFacility) {
     XLOGGER.entry(userId);
     Profiler profiler = new Profiler("GET_USER_PROGRAMS");
     profiler.setLogger(LOGGER);
@@ -414,7 +411,10 @@ public class UserController extends BaseController {
 
     profiler.stop().log();
     XLOGGER.exit(userProgramDtos);
-    return userProgramDtos;
+    return ResponseEntity
+        .ok()
+        .eTag(Integer.toString(userProgramDtos.hashCode()))
+        .body(userProgramDtos);
   }
 
   /**
