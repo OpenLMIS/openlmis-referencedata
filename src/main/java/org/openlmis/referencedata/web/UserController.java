@@ -614,9 +614,7 @@ public class UserController extends BaseController {
    * @return a set of facilities
    */
   @RequestMapping(value = "/users/{userId}/facilities", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Set<VeryMinimalFacilityDto> getUserFacilities(
+  public ResponseEntity<Set<VeryMinimalFacilityDto>> getUserFacilities(
       @PathVariable(USER_ID) UUID userId) {
     XLOGGER.entry(userId);
     Profiler profiler = new Profiler("GET_USER_FACILITIES");
@@ -642,7 +640,10 @@ public class UserController extends BaseController {
 
     profiler.stop().log();
     XLOGGER.exit(userFacilityDtos);
-    return userFacilityDtos;
+    return ResponseEntity
+        .ok()
+        .eTag(Integer.toString(userFacilityDtos.hashCode()))
+        .body(userFacilityDtos);
   }
 
   private User validateUser(UUID userId) {
