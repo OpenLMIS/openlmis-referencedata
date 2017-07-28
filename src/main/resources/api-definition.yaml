@@ -1405,7 +1405,7 @@ resourceTypes:
               displayName: User permission strings
               get:
                   is: [ secured ]
-                  description: Gets all permissions (in string format) associated with a user. The format is as follows: RightName|FacilityUUID|ProgramUUID for supervision rights, RightName|FacilityUUID for fulfillment rights, and RightName for general rights.
+                  description: Gets all permissions (in string format) associated with a user. The format is as follows; RightName|FacilityUUID|ProgramUUID for supervision rights, RightName|FacilityUUID for fulfillment rights, and RightName for general rights.
                   responses:
                       "200":
                           body:
