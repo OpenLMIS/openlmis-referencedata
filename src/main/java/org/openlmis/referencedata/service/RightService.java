@@ -15,8 +15,11 @@
 
 package org.openlmis.referencedata.service;
 
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightQuery;
+import org.openlmis.referencedata.domain.RightType;
+import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
@@ -39,9 +42,6 @@ public class RightService {
   
   @Autowired
   private UserRepository userRepository;
-
-  @Autowired
-  private RightAssignmentRepository rightAssignmentRepository;
 
   /**
    * Check the client has the admin right specified.
@@ -98,7 +98,9 @@ public class RightService {
         return;
       }
 
-      if (rightAssignmentRepository.existsByUserIdAndRightName(userId, rightName)) {
+      User user = userRepository.findOne(userId);
+      if (user.hasRight(
+          new RightQuery(Right.newRight(rightName, RightType.GENERAL_ADMIN)))) {
         XLOGGER.exit("User has right");
         return;
       }
