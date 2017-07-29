@@ -16,9 +16,9 @@
 package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Set;
-import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -32,6 +32,9 @@ import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Set;
+import java.util.UUID;
 
 public class RightAssignmentRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<RightAssignment> {
@@ -154,7 +157,25 @@ public class RightAssignmentRepositoryIntegrationTest
     assertEquals(1, foundFacilities.size());
     assertEquals(facility, foundFacilities.iterator().next());
   }
-  
+
+  @Test
+  public void existsByUserIdAndRightNameShouldBeTrue() {
+    // when
+    boolean userHasRight = repository.existsByUserIdAndRightName(userId, RIGHT_NAME);
+
+    // then
+    assertTrue(userHasRight);
+  }
+
+  @Test
+  public void existsByUserIdAndRightNameShouldBeFalse() {
+    // when
+    boolean userHasRight = repository.existsByUserIdAndRightName(userId, SUPERVISION_RIGHT_NAME);
+
+    // then
+    assertFalse(userHasRight);
+  }
+
   private Program persistProgram() {
     Program program = new Program("P1");
     program.setPeriodsSkippable(true);

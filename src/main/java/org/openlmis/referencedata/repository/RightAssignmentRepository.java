@@ -15,12 +15,13 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.Set;
-import java.util.UUID;
 import org.openlmis.referencedata.domain.RightAssignment;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Set;
+import java.util.UUID;
 
 public interface RightAssignmentRepository extends
     PagingAndSortingRepository<RightAssignment, UUID> {
@@ -34,4 +35,6 @@ public interface RightAssignmentRepository extends
       + " WHERE ra.userid = :userId",
       nativeQuery = true)
   Set<String> findByUser(@Param("userId") UUID userId);
+
+  boolean existsByUserIdAndRightName(UUID user, String rightName);
 }
