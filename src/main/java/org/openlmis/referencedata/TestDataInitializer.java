@@ -38,19 +38,22 @@ public class TestDataInitializer implements CommandLineRunner {
   @Value(value = "classpath:db/testData/referencedata.users.sql")
   private Resource usersResource;
 
+  @Value(value = "classpath:db/testData/referencedata.facilities.sql")
+  private Resource facilitiesResource;
+
   @Autowired
   JdbcTemplate template;
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
 
   /**
-   * initialize test data
-   * @param args
+   * Initializes test data.
+   * @param args command line arguments
    */
   public void run(String... args) throws IOException {
-    XLOGGER.entry();
+    XLOGGER.entry(args);
 
-    // update users
     updateDbFromResource(usersResource);
+    updateDbFromResource(facilitiesResource);
 
     XLOGGER.exit();
   }
