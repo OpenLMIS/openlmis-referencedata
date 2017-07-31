@@ -126,4 +126,4 @@ reporting:
         90% of get permission strings for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserPermissionStrings>500ms
         90% of get programs for administrator user fail to get in 250 milliseconds: p90 of GetAdministratorUserPrograms>250ms
         90% of get facilities for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserFacilities>500ms
-        90% of get supervised facilities for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorSupervisedFacilities>500ms
+        90% of get supervised facilities for administrator user fail to get in 250 milliseconds: p90 of GetAdministratorSupervisedFacilities>250ms
