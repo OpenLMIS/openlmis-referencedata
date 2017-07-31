@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -52,11 +53,7 @@ public interface FacilityRepository
   
   Facility findFirstByCode(String code);
 
-  @Query(value = "SELECT DISTINCT f.*"
-      + " FROM referencedata.facilities f"
-      + "   JOIN referencedata.right_assignments ra ON ra.facilityid = f.id"
-      + " WHERE ra.programid IS NOT NULL" 
-      + "   AND ra.userid = :userId",
+  @Query(name = "Facility.findSupervisionFacilitiesByUser",
       nativeQuery = true)
-  Set<Facility> findSupervisionFacilitiesByUser(@Param("userId") UUID userId);
+  Set<NamedResource> findSupervisionFacilitiesByUser(@Param("userId") UUID userId);
 }

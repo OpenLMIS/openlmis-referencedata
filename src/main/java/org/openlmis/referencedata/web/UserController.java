@@ -47,11 +47,11 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.dto.VeryMinimalFacilityDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -614,7 +614,7 @@ public class UserController extends BaseController {
    * @return a set of facilities
    */
   @RequestMapping(value = "/users/{userId}/facilities", method = RequestMethod.GET)
-  public ResponseEntity<Set<VeryMinimalFacilityDto>> getUserFacilities(
+  public ResponseEntity<Set<NamedResource>> getUserFacilities(
       @PathVariable(USER_ID) UUID userId) {
     XLOGGER.entry(userId);
     Profiler profiler = new Profiler("GET_USER_FACILITIES");
@@ -628,15 +628,8 @@ public class UserController extends BaseController {
     }
 
     profiler.start("GET_SUPERVISION_FACILITIES_BY_USER");
-    Set<Facility> userFacilities = facilityRepository.findSupervisionFacilitiesByUser(userId);
-
-    profiler.start("EXPORT_USER_FACILITIES");
-    Set<VeryMinimalFacilityDto> userFacilityDtos = new HashSet<>();
-    for (Facility f : userFacilities) {
-      VeryMinimalFacilityDto userFacilityDto = new VeryMinimalFacilityDto();
-      f.export(userFacilityDto);
-      userFacilityDtos.add(userFacilityDto);
-    }
+    Set<NamedResource> userFacilityDtos = facilityRepository
+        .findSupervisionFacilitiesByUser(userId);
 
     profiler.stop().log();
     XLOGGER.exit(userFacilityDtos);

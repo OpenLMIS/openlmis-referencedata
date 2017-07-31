@@ -31,6 +31,7 @@ import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.dto.NamedResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RightAssignmentRepositoryIntegrationTest
@@ -148,11 +149,13 @@ public class RightAssignmentRepositoryIntegrationTest
         user1, SUPERVISION_RIGHT_NAME, facility.getId(), program.getId()));
 
     // when
-    Set<Facility> foundFacilities = facilityRepository.findSupervisionFacilitiesByUser(userId);
+    Set<NamedResource> foundFacilities = facilityRepository.findSupervisionFacilitiesByUser(userId);
 
     // then
     assertEquals(1, foundFacilities.size());
-    assertEquals(facility, foundFacilities.iterator().next());
+    NamedResource resource = foundFacilities.iterator().next();
+    assertEquals(facility.getId(), resource.getId());
+    assertEquals(facility.getName(), resource.getName());
   }
   
   private Program persistProgram() {

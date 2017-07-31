@@ -18,35 +18,62 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vividsolutions.jts.geom.Point;
-
-import org.hibernate.annotations.Type;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
-
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.dto.NamedResource;
 
 @Entity
 @TypeName("Facility")
 @Table(name = "facilities", schema = "referencedata")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@NamedNativeQueries({
+    @NamedNativeQuery(name = "Facility.findSupervisionFacilitiesByUser",
+        query = "SELECT DISTINCT f.id" 
+            + "   , f.name"
+            + " FROM referencedata.facilities f"
+            + "   JOIN referencedata.right_assignments ra ON ra.facilityid = f.id"
+            + " WHERE ra.programid IS NOT NULL"
+            + "   AND ra.userid = :userId",
+        resultSetMapping = "Facility.namedResource")
+    })
+@SqlResultSetMappings({
+    @SqlResultSetMapping(
+        name = "Facility.namedResource",
+        classes = {
+            @ConstructorResult(
+                targetClass = NamedResource.class,
+                columns = {
+                    @ColumnResult(name = "id", type = UUID.class),
+                    @ColumnResult(name = "name", type = String.class)
+                }
+            )
+        }
+    )
+    })
 public class Facility extends BaseEntity {
 
   public static final String TEXT = "text";

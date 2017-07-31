@@ -68,10 +68,10 @@ schemas:
 
   - minimalFacilityDto: !include schemas/minimalFacilityDto.json
 
-  - veryMinimalFacilityArray: |
+  - namedResourceArray: |
       {
          "type": "array",
-         "items": { "type": "object", "$ref": "schemas/veryMinimalFacility.json" }
+         "items": { "type": "object", "$ref": "schemas/namedResource.json" }
       }
 
   - facility: !include schemas/facility.json
@@ -1429,7 +1429,7 @@ resourceTypes:
                       "200":
                           body:
                             application/json:
-                              schema: veryMinimalFacilityArray
+                              schema: namedResourceArray
                       "403":
                           body:
                             application/json:
