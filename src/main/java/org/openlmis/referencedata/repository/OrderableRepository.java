@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
@@ -25,6 +26,7 @@ import java.util.UUID;
 /**
  * Persistence repository for saving/finding {@link Orderable}.
  */
+@JaversSpringDataAuditable
 public interface OrderableRepository extends
     PagingAndSortingRepository<Orderable, UUID>, OrderableRepositoryCustom {
 

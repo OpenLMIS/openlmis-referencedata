@@ -39,8 +39,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -247,6 +251,45 @@ public class ProcessingPeriodController extends BaseController {
     LOGGER.debug("Returning total number of months of processingPeriod");
 
     return new ResultDto<>(period.getDurationInMonths());
+  }
+
+  /**
+   * Get the audit information related to processing period.
+   *  @param author The author of the changes which should be returned.
+   *               If null or empty, changes are returned regardless of author.
+   * @param changedPropertyName The name of the property about which changes should be returned.
+   *               If null or empty, changes associated with any and all properties are returned.
+   * @param page A Pageable object that allows client to optionally add "page" (page number)
+   *             and "size" (page size) query parameters to the request.
+   */
+  @RequestMapping(value = "/processingPeriods/{id}/auditLog", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public ResponseEntity<String> getProcessingPeriodAuditLog(
+      @PathVariable("id") UUID id,
+      @RequestParam(name = "author", required = false, defaultValue = "") String author,
+      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+          String changedPropertyName,
+      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+          boolean returnJson,
+      Pageable page) {
+
+    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
+    //Return a 404 if the specified instance can't be found
+    ProcessingPeriod instance = periodRepository.findOne(id);
+    if (instance == null) {
+      throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    String auditLogs = getAuditLog(ProcessingPeriod.class, id, author, changedPropertyName, page,
+        returnJson);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
+
+    return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
   }
 
   /**

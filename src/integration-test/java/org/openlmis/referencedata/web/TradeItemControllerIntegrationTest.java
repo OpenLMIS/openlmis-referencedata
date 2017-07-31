@@ -18,29 +18,40 @@ package org.openlmis.referencedata.web;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.dto.TradeItemDto.newInstance;
 import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_MANUFACTURER_REQUIRED;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.TradeItemDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.util.Message;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
-import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.TradeItemDto;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import java.util.UUID;
 
 public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/tradeItems";
+  private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String CID = "cid";
 
   @Before
@@ -181,6 +192,63 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(403);
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(generateItem("abc"));
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   private TradeItem generateItem(String manufacturer) {

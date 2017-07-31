@@ -15,11 +15,13 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.UUID;
 
+@JaversSpringDataAuditable
 public interface FacilityOperatorRepository
     extends PagingAndSortingRepository<FacilityOperator, UUID> {
     //Add custom FacilityOperator related members here. See UserRepository.java for examples.

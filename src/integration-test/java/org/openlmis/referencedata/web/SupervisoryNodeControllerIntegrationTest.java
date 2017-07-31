@@ -20,19 +20,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 import com.jayway.restassured.response.ValidatableResponse;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+
 import org.hamcrest.Matchers;
 import org.javers.common.collections.Sets;
 import org.junit.Test;
@@ -60,11 +53,23 @@ import org.openlmis.referencedata.util.Message;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String SUPERVISING_USERS_URL = ID_URL + "/supervisingUsers";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String RIGHT_ID_PARAM = "rightId";
@@ -525,6 +530,63 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .extract().as(PageImplRepresentation.class);
 
     assertEquals(0, response.getContent().size());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(supervisoryNodeRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(supervisoryNodeRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(supervisoryNodeRepository.findOne(any(UUID.class))).willReturn(supervisoryNode);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   private ValidatableResponse searchForSupervisoryNode(HashMap<String, Object> queryParams,

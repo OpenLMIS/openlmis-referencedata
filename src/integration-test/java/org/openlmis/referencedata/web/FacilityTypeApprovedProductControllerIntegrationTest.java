@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,11 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
 import com.google.common.collect.Lists;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -42,11 +40,21 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.LocalizedMessage;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -54,6 +62,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SEARCH = RESOURCE_URL + "/search";
+  private static final String AUDIT_URL = ID_URL + "/auditLog";
 
   private Program program;
   private Orderable orderable;
@@ -402,6 +411,64 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .post(SEARCH)
         .then()
         .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
+    given(facilityTypeApprovedProductRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
+    given(facilityTypeApprovedProductRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
+    given(facilityTypeApprovedProductRepository.findOne(any(UUID.class)))
+        .willReturn(facilityTypeAppProd);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

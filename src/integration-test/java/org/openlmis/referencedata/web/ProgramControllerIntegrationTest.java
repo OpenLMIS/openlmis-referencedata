@@ -18,22 +18,26 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/programs";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/search";
 
   private Program program;
@@ -228,6 +232,38 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<Program> foundProgram = Arrays.asList(response);
     assertEquals(0, foundProgram.size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    given(programRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    given(programRepository.findOne(any(UUID.class))).willReturn(program);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

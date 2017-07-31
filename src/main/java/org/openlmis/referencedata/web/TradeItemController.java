@@ -20,19 +20,30 @@ import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.validate.TradeItemValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 public class TradeItemController extends BaseController {
@@ -59,6 +70,44 @@ public class TradeItemController extends BaseController {
     TradeItem tradeItem = TradeItem.newInstance(tradeItemDto);
 
     return TradeItemDto.newInstance(repository.save(tradeItem));
+  }
+
+  /**
+   * Get the audit information related to trade item.
+   *  @param author The author of the changes which should be returned.
+   *               If null or empty, changes are returned regardless of author.
+   * @param changedPropertyName The name of the property about which changes should be returned.
+   *               If null or empty, changes associated with any and all properties are returned.
+   * @param page A Pageable object that allows client to optionally add "page" (page number)
+   *             and "size" (page size) query parameters to the request.
+   */
+  @RequestMapping(value = "/tradeItems/{id}/auditLog", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public ResponseEntity<String> getTradeItemAuditLog(
+      @PathVariable("id") UUID id,
+      @RequestParam(name = "author", required = false, defaultValue = "") String author,
+      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+          String changedPropertyName,
+      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+          boolean returnJson,
+      Pageable page) {
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    //Return a 404 if the specified instance can't be found
+    TradeItem instance = repository.findOne(id);
+    if (instance == null) {
+      throw new NotFoundException(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID);
+    }
+
+    String auditLogs = getAuditLog(TradeItem.class, id, author, changedPropertyName, page,
+        returnJson);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
+
+    return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
   }
 
   /**

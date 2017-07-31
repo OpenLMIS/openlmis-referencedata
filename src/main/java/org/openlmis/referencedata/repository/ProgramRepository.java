@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.Set;
+
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
@@ -24,6 +26,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import java.util.UUID;
 import org.springframework.data.repository.query.Param;
 
+@JaversSpringDataAuditable
 public interface ProgramRepository
     extends PagingAndSortingRepository<Program, UUID>, ProgramRepositoryCustom {
   // Add custom Program related members here. See UserRepository.java for examples.

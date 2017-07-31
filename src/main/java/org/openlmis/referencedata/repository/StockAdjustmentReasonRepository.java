@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -23,6 +24,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
+@JaversSpringDataAuditable
 public interface StockAdjustmentReasonRepository
         extends PagingAndSortingRepository<StockAdjustmentReason, UUID> {
 

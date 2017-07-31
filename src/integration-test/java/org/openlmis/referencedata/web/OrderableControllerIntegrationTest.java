@@ -17,7 +17,10 @@ package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NET_CONTENT_REQUIRED;
@@ -26,13 +29,7 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
 import com.google.common.collect.ImmutableMap;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -42,16 +39,30 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.util.Message;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/orderables";
+  private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String UNIT = "unit";
   private static final String NAME = "name";
@@ -277,6 +288,63 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(1, response.getNumberOfElements());
     assertEquals(1, response.getSize());
     assertEquals(0, response.getNumber());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(orderableRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(orderableRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(orderableRepository.findOne(any(UUID.class))).willReturn(orderable);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   private ProgramOrderableDto generateProgramOrderable() {

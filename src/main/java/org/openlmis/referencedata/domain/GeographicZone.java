@@ -18,6 +18,7 @@ package org.openlmis.referencedata.domain;
 import com.vividsolutions.jts.geom.Polygon;
 
 import org.hibernate.annotations.Type;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "geographic_zones", schema = "referencedata")
 @NoArgsConstructor
+@TypeName("GeographicZone")
 public class GeographicZone extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")

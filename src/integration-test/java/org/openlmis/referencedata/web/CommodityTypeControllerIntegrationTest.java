@@ -25,6 +25,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.CommodityType.newInstance;
@@ -33,14 +35,6 @@ import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKe
 import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_CLASSIFICATION_SYSTEM_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys.ERROR_NAME_REQUIRED;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,18 +42,32 @@ import org.mockito.ArgumentCaptor;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.LocalizedMessage;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/commodityTypes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String TRADE_ITEMS_URL = ID_URL + "/tradeItems";
   private static final String CLASSIFICATION_SYS = "cSys";
   private static final String CLASSIFICATION_SYS_ID = "cSysId";
@@ -388,6 +396,63 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .statusCode(400)
         .content(LocalizedMessage.MESSAGE_KEY_FIELD,
             is(CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND));
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(commodityTypeRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(commodityTypeRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(commodityTypeRepository.findOne(any(UUID.class))).willReturn(newInstance(commodityType));
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   private CommodityTypeDto generateParent(UUID parentId) {

@@ -15,19 +15,24 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.dto.DispensableDto;
+import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.ProgramOrderableDto;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.dto.DispensableDto;
-import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.dto.ProgramOrderableDto;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -47,6 +52,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "orderables", schema = "referencedata")
+@TypeName("Orderable")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Orderable extends BaseEntity {
@@ -76,6 +82,7 @@ public class Orderable extends BaseEntity {
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
       fetch = FetchType.EAGER)
+  @DiffIgnore
   private Set<ProgramOrderable> programOrderables;
 
   @ElementCollection(fetch = FetchType.EAGER)

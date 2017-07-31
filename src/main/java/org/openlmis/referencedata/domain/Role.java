@@ -19,17 +19,21 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.Message;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -41,6 +45,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "roles", schema = "referencedata")
 @NoArgsConstructor
+@TypeName("Role")
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class Role extends BaseEntity {
   private static final String TEXT = "text";
@@ -61,6 +66,7 @@ public class Role extends BaseEntity {
       joinColumns = @JoinColumn(name = "roleid", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "rightid", nullable = false))
   @Getter
+  @DiffIgnore
   private Set<Right> rights;
 
   private Role(String name, Right... rights) {
