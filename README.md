@@ -181,20 +181,20 @@ debugger has connected.
 
 ### Demo Data
 A basic set of demo data is included with this service, defined under `./demo-data/`.  This data may
-be optionally loaded by using the `demodata` Spring Profile.  Setting this profile may be done by
+be optionally loaded by using the `demo-data` Spring Profile.  Setting this profile may be done by
 setting the `spring.profiles.active` environment variable.
 
 When building locally from the development environment, you may run:
 
 ```shell
-$ export spring_profiles_active=demodata
+$ export spring_profiles_active=demo-data
 $ gradle bootRun
 ```
 
 To see how to set environment variables through Docker Compose, see the 
 [Reference Distribution](https://github.org/openlmis/openlmis-ref-distro)
 
-### Performance Data
+### Performance Testing Data
 A generated, sufficiently-large set of data is defined in 
 `./src/main/resources/db/performance-data/`.  This data set is meant for performance testing, which
 helps answer questions such as:
@@ -207,7 +207,7 @@ This data set builds upon the demo data set and therefore must be loaded after d
 To do so activate the `performance-data` Spring Profle after demo-data, for example:
 
 ```shell
-$ export spring_profiles_active=demodata,performance-data
+$ export spring_profiles_active=demo-data,performance-data
 $ gradle bootRun
 ```
 

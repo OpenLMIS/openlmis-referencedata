@@ -44,13 +44,15 @@ import java.util.stream.Collectors;
 @Component
 @Profile("performance-data")
 public class TestDataInitializer implements CommandLineRunner {
-  @Value(value = "classpath:db/testData/referencedata.users.sql")
+  private static final String PERF_DATA_PATH = "classpath:db/performance-data/";
+
+  @Value(value = PERF_DATA_PATH + "referencedata.users.sql")
   private Resource usersResource;
 
-  @Value(value = "classpath:db/testData/facilities.csv")
+  @Value(value = PERF_DATA_PATH + "facilities.csv")
   private Resource facilitiesResource;
 
-  @Value(value = "classpath:db/testData/orderables.csv")
+  @Value(value = PERF_DATA_PATH + "orderables.csv")
   private Resource orderablesResource;
 
   @Autowired
