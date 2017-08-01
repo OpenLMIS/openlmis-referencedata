@@ -19,14 +19,17 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
-import org.springframework.data.repository.CrudRepository;
+import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.util.Message;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -37,8 +40,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class GeographicLevelControllerIntegrationTest
-    extends AuditLogWebIntegrationTest<GeographicLevel> {
+public class GeographicLevelControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/geographicLevels";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -266,33 +268,60 @@ public class GeographicLevelControllerIntegrationTest
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected void mockHasNoAuditRight() {
-    mockUserHasNoRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected void mockHasAuditRight() {
-    mockUserHasRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected GeographicLevel getInstance() {
-    return geographicLevel;
-  }
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(geographicLevel);
 
-  @Override
-  protected CrudRepository<GeographicLevel, UUID> getRepository() {
-    return geographicLevelRepository;
-  }
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
 
-  @Override
-  protected String getAuditAddress() {
-    return AUDIT_URL;
-  }
-
-  @Override
-  protected String getErrorNotFoundMessage() {
-    return GeographicLevelMessageKeys.ERROR_NOT_FOUND;
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

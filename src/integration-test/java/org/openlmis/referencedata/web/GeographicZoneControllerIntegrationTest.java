@@ -41,7 +41,6 @@ import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -55,8 +54,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class GeographicZoneControllerIntegrationTest
-    extends AuditLogWebIntegrationTest<GeographicZone> {
+public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
@@ -469,34 +467,61 @@ public class GeographicZoneControllerIntegrationTest
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected void mockHasNoAuditRight() {
-    mockUserHasNoRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected void mockHasAuditRight() {
-    mockUserHasRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected GeographicZone getInstance() {
-    return districtZone;
-  }
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(districtZone);
 
-  @Override
-  protected CrudRepository<GeographicZone, UUID> getRepository() {
-    return geographicZoneRepository;
-  }
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
 
-  @Override
-  protected String getAuditAddress() {
-    return AUDIT_URL;
-  }
-
-  @Override
-  protected String getErrorNotFoundMessage() {
-    return GeographicZoneMessageKeys.ERROR_NOT_FOUND;
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
 

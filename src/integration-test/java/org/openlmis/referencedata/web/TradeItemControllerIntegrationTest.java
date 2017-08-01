@@ -18,7 +18,10 @@ package org.openlmis.referencedata.web;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.dto.TradeItemDto.newInstance;
@@ -30,8 +33,8 @@ import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemDto;
-import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
-import org.springframework.data.repository.CrudRepository;
+import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.util.Message;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -44,8 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@SuppressWarnings("PMD.TooManyMethods")
-public class TradeItemControllerIntegrationTest extends AuditLogWebIntegrationTest<TradeItem> {
+public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/tradeItems";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -192,34 +194,61 @@ public class TradeItemControllerIntegrationTest extends AuditLogWebIntegrationTe
         .statusCode(403);
   }
 
-  @Override
-  protected void mockHasNoAuditRight() {
-    mockUserHasNoRight(RightName.ORDERABLES_MANAGE);
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected void mockHasAuditRight() {
-    mockUserHasRight(RightName.ORDERABLES_MANAGE);
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected TradeItem getInstance() {
-    return generateItem("abc");
-  }
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(generateItem("abc"));
 
-  @Override
-  protected CrudRepository<TradeItem, UUID> getRepository() {
-    return tradeItemRepository;
-  }
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
 
-  @Override
-  protected String getAuditAddress() {
-    return AUDIT_URL;
-  }
-
-  @Override
-  protected String getErrorNotFoundMessage() {
-    return TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID;
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   private TradeItem generateItem(String manufacturer) {

@@ -22,6 +22,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
@@ -41,11 +43,11 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -60,8 +62,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
-public class RequisitionGroupControllerIntegrationTest
-    extends AuditLogWebIntegrationTest<RequisitionGroup> {
+public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/requisitionGroups";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
@@ -513,33 +514,61 @@ public class RequisitionGroupControllerIntegrationTest
     assertEquals(0, response.getNumber());
   }
 
-  @Override
-  protected void mockHasNoAuditRight() {
-    mockUserHasNoRight(RightName.REQUISITION_GROUPS_MANAGE);
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.REQUISITION_GROUPS_MANAGE);
+    given(requisitionGroupRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected void mockHasAuditRight() {
-    mockUserHasRight(RightName.REQUISITION_GROUPS_MANAGE);
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.REQUISITION_GROUPS_MANAGE);
+    given(requisitionGroupRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected RequisitionGroup getInstance() {
-    return requisitionGroup;
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.REQUISITION_GROUPS_MANAGE);
+    given(requisitionGroupRepository.findOne(any(UUID.class))).willReturn(requisitionGroup);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected CrudRepository<RequisitionGroup, UUID> getRepository() {
-    return requisitionGroupRepository;
-  }
-
-  @Override
-  protected String getAuditAddress() {
-    return AUDIT_URL;
-  }
-
-  @Override
-  protected String getErrorNotFoundMessage() {
-    return RequisitionGroupMessageKeys.ERROR_NOT_FOUND;
-  }
 }

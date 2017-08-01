@@ -18,13 +18,11 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -35,8 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
-public class ProgramControllerIntegrationTest extends AuditLogWebIntegrationTest<Program> {
+public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/programs";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -239,38 +236,34 @@ public class ProgramControllerIntegrationTest extends AuditLogWebIntegrationTest
   }
 
   @Test
-  @Ignore
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    // currently there is no right check
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    given(programRepository.findOne(any(UUID.class))).willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Override
-  protected void mockHasNoAuditRight() {
-    // nothing to do here
-  }
+  @Test
+  public void shouldGetAuditLog() {
+    given(programRepository.findOne(any(UUID.class))).willReturn(program);
 
-  @Override
-  protected void mockHasAuditRight() {
-    // nothing to do here
-  }
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
 
-  @Override
-  protected Program getInstance() {
-    return program;
-  }
-
-  @Override
-  protected CrudRepository<Program, UUID> getRepository() {
-    return programRepository;
-  }
-
-  @Override
-  protected String getAuditAddress() {
-    return AUDIT_URL;
-  }
-
-  @Override
-  protected String getErrorNotFoundMessage() {
-    return ProgramMessageKeys.ERROR_NOT_FOUND;
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }
