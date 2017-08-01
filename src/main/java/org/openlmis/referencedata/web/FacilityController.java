@@ -36,8 +36,9 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
-import org.openlmis.referencedata.dto.MinimalFacilityDto;
+import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.MinimalFacilityDto;
 import org.openlmis.referencedata.dto.SupportedProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -131,6 +132,20 @@ public class FacilityController extends BaseController {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     return toDto(facilityRepository.findAll());
+  }
+
+  /**
+   * Get all facilities with minimal representation (id, name).
+   *
+   * @return Facilities.
+   */
+  @RequestMapping(value = "/facilities/minimal", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<MinimalFacilityDto> getMinimalFacilities() {
+    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    return toMinimalDto(facilityRepository.findAll());
   }
 
 
@@ -325,12 +340,12 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<MinimalFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
-                                                   Pageable pageable) {
+  public Page<BasicFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
+                                                 Pageable pageable) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
-    List<MinimalFacilityDto> facilityDtos = toBasicDto(foundFacilities);
+    List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities);
     return Pagination.getPage(facilityDtos, pageable);
   }
 
@@ -359,14 +374,28 @@ public class FacilityController extends BaseController {
     return productDtos;
   }
 
-  private MinimalFacilityDto toBasicDto(Facility facility) {
+  private MinimalFacilityDto toMinimalDto(Facility facility) {
     MinimalFacilityDto dto = new MinimalFacilityDto();
     facility.export(dto);
 
     return dto;
   }
 
-  private List<MinimalFacilityDto> toBasicDto(Iterable<Facility> facilities) {
+  private List<MinimalFacilityDto> toMinimalDto(Iterable<Facility> facilities) {
+    return StreamSupport
+        .stream(facilities.spliterator(), false)
+        .map(this::toMinimalDto)
+        .collect(Collectors.toList());
+  }
+
+  private BasicFacilityDto toBasicDto(Facility facility) {
+    BasicFacilityDto dto = new BasicFacilityDto();
+    facility.export(dto);
+
+    return dto;
+  }
+
+  private List<BasicFacilityDto> toBasicDto(Iterable<Facility> facilities) {
     return StreamSupport
         .stream(facilities.spliterator(), false)
         .map(this::toBasicDto)

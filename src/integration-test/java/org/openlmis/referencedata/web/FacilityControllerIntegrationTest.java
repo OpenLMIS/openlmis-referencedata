@@ -64,6 +64,7 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.MinimalFacilityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
@@ -76,6 +77,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM_ID = "programId";
   static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
   private static final String RESOURCE_URL = "/api/facilities";
+  private static final String MINIMAL_URL = RESOURCE_URL + "/minimal";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
@@ -473,6 +475,48 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
+        .then()
+        .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAllShouldGetAllFacilitiesWithMinimalRepresentation() {
+
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
+    given(facilityRepository.findAll()).willReturn(storedFacilities);
+
+    MinimalFacilityDto[] response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(MINIMAL_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(MinimalFacilityDto[].class);
+
+    List<MinimalFacilityDto> facilities = Arrays.asList(response);
+    assertThat(facilities.size(), is(2));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAllMinimalShouldReturnForbiddenForUnauthorizedToken() {
+
+    doThrow(new UnauthorizedException(
+        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(MINIMAL_URL)
         .then()
         .statusCode(403);
 
