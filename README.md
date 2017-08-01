@@ -194,6 +194,23 @@ $ gradle bootRun
 To see how to set environment variables through Docker Compose, see the 
 [Reference Distribution](https://github.org/openlmis/openlmis-ref-distro)
 
+### Performance Data
+A generated, sufficiently-large set of data is defined in 
+`./src/main/resources/db/performance-data/`.  This data set is meant for performance testing, which
+helps answer questions such as:
+
+1. what happens to this operation when there are 10,000 Orderables / users / facilities?
+1. how many concurrent requests can we serve?
+1. what's the network characteristic for clients on mobile connections?
+
+This data set builds upon the demo data set and therefore must be loaded after demo-data is loaded.
+To do so activate the `performance-data` Spring Profle after demo-data, for example:
+
+```shell
+$ export spring_profiles_active=demodata,performance-data
+$ gradle bootRun
+```
+
 ## Production by Spring Profile
 
 By default when this service is started, it will clean its schema in the database before migrating
