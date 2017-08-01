@@ -33,6 +33,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.OrderableDisplayCategoryDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -49,7 +50,6 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   private static final String RESOURCE_URL = "/api/orderableDisplayCategories";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String CODE = "code";
 
   private Integer currentInstanceNumber;
@@ -364,14 +364,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
     given(orderableDisplayCategoryRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -383,14 +376,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
     given(orderableDisplayCategoryRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -403,14 +389,7 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     given(orderableDisplayCategoryRepository.findOne(any(UUID.class)))
         .willReturn(orderableDisplayCategory);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

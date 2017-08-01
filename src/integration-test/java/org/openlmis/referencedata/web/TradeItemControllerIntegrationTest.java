@@ -35,6 +35,7 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -50,8 +51,6 @@ import java.util.UUID;
 public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/tradeItems";
-  private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String CID = "cid";
 
   @Before
@@ -201,14 +200,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
     given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -220,14 +212,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
     given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -239,14 +224,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
     given(tradeItemRepository.findOne(any(UUID.class))).willReturn(generateItem("abc"));
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

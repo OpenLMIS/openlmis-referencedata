@@ -33,6 +33,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -48,7 +49,6 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
 
   private static final String RESOURCE_URL = "/api/stockAdjustmentReasons";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String FIND_BY_PROGRAM_ID_URL = RESOURCE_URL + "/search";
 
   private StockAdjustmentReason reason;
@@ -284,14 +284,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
         .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
     given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -303,14 +296,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
         .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
     given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -322,14 +308,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
         .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
     given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(reason);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

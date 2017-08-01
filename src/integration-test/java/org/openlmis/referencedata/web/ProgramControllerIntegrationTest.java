@@ -23,6 +23,7 @@ import static org.mockito.Matchers.any;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -37,7 +38,6 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/programs";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/search";
 
   private Program program;
@@ -239,14 +239,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
     given(programRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -255,14 +248,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetAuditLog() {
     given(programRepository.findOne(any(UUID.class))).willReturn(program);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

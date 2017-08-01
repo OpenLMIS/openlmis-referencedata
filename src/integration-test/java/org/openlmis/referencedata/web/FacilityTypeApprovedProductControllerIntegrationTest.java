@@ -46,6 +46,7 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -62,7 +63,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SEARCH = RESOURCE_URL + "/search";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
 
   private Program program;
   private Orderable orderable;
@@ -422,14 +422,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
     given(facilityTypeApprovedProductRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -441,14 +434,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
     given(facilityTypeApprovedProductRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -461,14 +447,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     given(facilityTypeApprovedProductRepository.findOne(any(UUID.class)))
         .willReturn(facilityTypeAppProd);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

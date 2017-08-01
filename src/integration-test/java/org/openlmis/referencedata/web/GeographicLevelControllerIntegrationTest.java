@@ -30,6 +30,7 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -44,7 +45,6 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
   private static final String RESOURCE_URL = "/api/geographicLevels";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
 
   private GeographicLevel geographicLevel;
   private UUID geographicLevelId;
@@ -275,14 +275,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
     given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -294,14 +287,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
     given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -313,14 +299,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
     given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(geographicLevel);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

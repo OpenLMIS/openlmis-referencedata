@@ -38,6 +38,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +60,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String BYLOCATION_URL = RESOURCE_URL + "/byLocation";
   private static final String PAGE = "page";
   private static final String SIZE = "size";
@@ -474,14 +474,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
     given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -493,14 +486,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
     given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -512,14 +498,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
     given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(districtZone);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

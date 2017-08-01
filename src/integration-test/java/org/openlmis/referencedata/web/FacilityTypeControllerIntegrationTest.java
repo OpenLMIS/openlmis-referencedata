@@ -30,6 +30,7 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -45,7 +46,6 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   private static final String RESOURCE_URL = "/api/facilityTypes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String DESCRIPTION = "OpenLMIS";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
 
   private FacilityType facilityType;
   private UUID facilityTypeId;
@@ -264,14 +264,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityTypeRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -283,14 +276,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityTypeRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -302,14 +288,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityTypeRepository.findOne(any(UUID.class))).willReturn(facilityType);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
