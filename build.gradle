@@ -109,6 +109,12 @@ sourceSets {
         }
         resources.srcDir file('src/integration-test/resources')
     }
+
+    main {
+        resources {
+            srcDirs "src/main/resources", "build/data"
+        }
+    }
 }
 
 configurations {
@@ -162,7 +168,7 @@ task generateMigration {
 
 task demoDataSeed(type:Exec) {
     executable "./demo-data/demo_seed.sh"
-    args "demo-data", "build/demo-data", "demo-data/generator.js"
+    args "demo-data", "build/data/demo-data", "demo-data/generator.js"
 }
 
 task checkApiIsRaml(type:Exec) {
@@ -235,6 +241,8 @@ apply from: "documentation.gradle"
 integrationTest.dependsOn copyRamlToBuild
 
 processResources {
+    dependsOn demoDataSeed
+
     // we want the generated Swagger spec file included in the output jar
     finalizedBy ramlToSwagger
 
@@ -252,13 +260,11 @@ assemble {
     dependsOn copyRamlHtmlToBuild
     dependsOn copyConsulRegistrationToBuild
     dependsOn jacocoTestReport
-    dependsOn demoDataSeed
 }
 
 build {
     dependsOn check
     dependsOn jacocoTestReport
-    dependsOn demoDataSeed
 }
 
 check {
