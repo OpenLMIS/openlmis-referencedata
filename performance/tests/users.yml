@@ -114,7 +114,7 @@ scenarios:
     requests:
       - include-scenario: get-user-token
       # Program = Family Planning, Right = REQUISITION_CREATE
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/supervisedFacilities?programdI=dce17f2e-af3e-40ad-8e00-3496adef44c3&rightId=9ade922b-3523-4582-bef4-a47701f7df14
+      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/supervisedFacilities?programId=dce17f2e-af3e-40ad-8e00-3496adef44c3&rightId=9ade922b-3523-4582-bef4-a47701f7df14
         method: GET
         label: GetAdministratorSupervisedFacilities
         headers:
