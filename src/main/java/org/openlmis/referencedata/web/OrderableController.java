@@ -31,9 +31,7 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -152,13 +150,8 @@ public class OrderableController extends BaseController {
       throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
     }
 
-    String auditLogs = getAuditLog(Orderable.class, id, author, changedPropertyName, page,
+    return getAuditLogResponse(Orderable.class, id, author, changedPropertyName, page,
         returnJson);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
-
-    return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
   }
 
   /**

@@ -41,9 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -283,13 +281,8 @@ public class ProcessingPeriodController extends BaseController {
       throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
     }
 
-    String auditLogs = getAuditLog(ProcessingPeriod.class, id, author, changedPropertyName, page,
+    return getAuditLogResponse(ProcessingPeriod.class, id, author, changedPropertyName, page,
         returnJson);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
-
-    return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
   }
 
   /**

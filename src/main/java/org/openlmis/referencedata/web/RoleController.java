@@ -33,9 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,12 +129,7 @@ public class RoleController extends BaseController {
       throw new NotFoundException(RoleMessageKeys.ERROR_NOT_FOUND);
     }
 
-    String auditLogs = getAuditLog(Role.class, id, author, changedPropertyName, page, returnJson);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
-
-    return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
+    return getAuditLogResponse(Role.class, id, author, changedPropertyName, page, returnJson);
   }
 
   /**
