@@ -57,6 +57,8 @@ import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -75,7 +77,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
+public class FacilityControllerIntegrationTest extends AuditLogWebIntegrationTest<Facility> {
 
   private static final String PROGRAM_ID = "programId";
   static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
@@ -855,61 +857,34 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasNoAuditRight() {
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
   }
 
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasAuditRight() {
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
   }
 
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
+  @Override
+  protected Facility getInstance() {
+    return facility;
+  }
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+  @Override
+  protected CrudRepository<Facility, UUID> getRepository() {
+    return facilityRepository;
+  }
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return FacilityMessageKeys.ERROR_NOT_FOUND;
   }
 
   private SupplyLine generateSupplyLine() {

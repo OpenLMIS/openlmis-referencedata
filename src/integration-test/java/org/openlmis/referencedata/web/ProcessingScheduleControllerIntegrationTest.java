@@ -18,9 +18,6 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -28,8 +25,8 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -41,7 +38,8 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrationTest {
+public class ProcessingScheduleControllerIntegrationTest
+    extends AuditLogWebIntegrationTest<ProcessingSchedule> {
 
   private static final String RESOURCE_URL = "/api/processingSchedules";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -324,60 +322,33 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(scheduleRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasNoAuditRight() {
+    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
   }
 
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(scheduleRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasAuditRight() {
+    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
   }
 
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(scheduleRepository.findOne(any(UUID.class))).willReturn(schedule);
+  @Override
+  protected ProcessingSchedule getInstance() {
+    return schedule;
+  }
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+  @Override
+  protected CrudRepository<ProcessingSchedule, UUID> getRepository() {
+    return scheduleRepository;
+  }
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return ProcessingScheduleMessageKeys.ERROR_NOT_FOUND;
   }
 }

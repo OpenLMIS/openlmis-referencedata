@@ -19,7 +19,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
@@ -33,6 +32,8 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -44,7 +45,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
+public class RoleControllerIntegrationTest extends AuditLogWebIntegrationTest<Role> {
 
   private static final String RESOURCE_URL = "/api/roles";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -284,60 +285,33 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-    given(roleRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasNoAuditRight() {
+    mockUserHasNoRight(RightName.USER_ROLES_MANAGE_RIGHT);
   }
 
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-    given(roleRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasAuditRight() {
+    mockUserHasRight(RightName.USER_ROLES_MANAGE_RIGHT);
   }
 
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-    given(roleRepository.findOne(any(UUID.class))).willReturn(role);
+  @Override
+  protected Role getInstance() {
+    return role;
+  }
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+  @Override
+  protected CrudRepository<Role, UUID> getRepository() {
+    return roleRepository;
+  }
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return RoleMessageKeys.ERROR_NOT_FOUND;
   }
 }

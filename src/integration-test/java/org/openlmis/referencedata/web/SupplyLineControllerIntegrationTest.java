@@ -19,9 +19,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.openlmis.referencedata.domain.RightName.SUPPLY_LINES_MANAGE;
 
 import org.hamcrest.Matchers;
@@ -36,8 +33,8 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.dto.SupplyLineDto;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -48,7 +45,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
-public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest {
+public class SupplyLineControllerIntegrationTest extends AuditLogWebIntegrationTest<SupplyLine> {
 
   private static final String RESOURCE_URL = "/api/supplyLines";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
@@ -390,61 +387,34 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
-    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasNoAuditRight() {
+    mockUserHasNoRight(RightName.SUPPLY_LINES_MANAGE);
   }
 
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
-    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasAuditRight() {
+    mockUserHasRight(RightName.SUPPLY_LINES_MANAGE);
   }
 
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
-    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(supplyLine);
+  @Override
+  protected SupplyLine getInstance() {
+    return supplyLine;
+  }
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+  @Override
+  protected CrudRepository<SupplyLine, UUID> getRepository() {
+    return supplyLineRepository;
+  }
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return SupplyLineMessageKeys.ERROR_NOT_FOUND;
   }
 
   private SupplyLine generateSupplyLine() {

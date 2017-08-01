@@ -19,7 +19,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 
 import com.google.common.collect.Sets;
 
@@ -28,6 +27,8 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.dto.RightDto;
+import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -40,7 +41,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
+public class RightControllerIntegrationTest extends AuditLogWebIntegrationTest<Right> {
 
   private static final String RESOURCE_URL = "/api/rights";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -351,54 +352,34 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    mockClientHasRootAccess();
-    given(rightRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+  @Override
+  protected void mockHasNoAuditRight() {
     mockClientHasNoRootAccess();
-    given(rightRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void shouldGetAuditLog() {
+  @Override
+  protected void mockHasAuditRight() {
     mockClientHasRootAccess();
-    given(rightRepository.findOne(any(UUID.class))).willReturn(right);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
+
+  @Override
+  protected Right getInstance() {
+    return right;
+  }
+
+  @Override
+  protected CrudRepository<Right, UUID> getRepository() {
+    return rightRepository;
+  }
+
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return RightMessageKeys.ERROR_NOT_FOUND;
+  }
+
 }

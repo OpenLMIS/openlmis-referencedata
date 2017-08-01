@@ -20,16 +20,13 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.FacilityOperatorMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -40,7 +37,8 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegrationTest {
+public class FacilityOperatorControllerIntegrationTest
+    extends AuditLogWebIntegrationTest<FacilityOperator> {
 
   private static final String RESOURCE_URL = "/api/facilityOperators";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -264,61 +262,34 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityOperatorRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasNoAuditRight() {
+    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
   }
 
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityOperatorRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasAuditRight() {
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
   }
 
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityOperatorRepository.findOne(any(UUID.class))).willReturn(facilityOperator);
+  @Override
+  protected FacilityOperator getInstance() {
+    return facilityOperator;
+  }
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+  @Override
+  protected CrudRepository<FacilityOperator, UUID> getRepository() {
+    return facilityOperatorRepository;
+  }
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return FacilityOperatorMessageKeys.ERROR_NOT_FOUND;
   }
 
   private FacilityOperator generateFacilityOperator() {

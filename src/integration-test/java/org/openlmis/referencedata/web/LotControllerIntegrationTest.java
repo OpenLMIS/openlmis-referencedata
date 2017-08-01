@@ -24,8 +24,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.util.messagekeys.LotMessageKeys.ERROR_LOT_CODE_REQUIRED;
@@ -40,9 +38,9 @@ import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -54,7 +52,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
-public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
+public class LotControllerIntegrationTest extends AuditLogWebIntegrationTest<Lot> {
 
   private static final String RESOURCE_URL = "/api/lots";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -326,61 +324,34 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(lotRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasNoAuditRight() {
+    mockUserHasNoRight(RightName.ORDERABLES_MANAGE);
   }
 
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(lotRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasAuditRight() {
+    mockUserHasRight(RightName.ORDERABLES_MANAGE);
   }
 
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(lotRepository.findOne(any(UUID.class))).willReturn(lot);
+  @Override
+  protected Lot getInstance() {
+    return lot;
+  }
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
+  @Override
+  protected CrudRepository<Lot, UUID> getRepository() {
+    return lotRepository;
+  }
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return LotMessageKeys.ERROR_NOT_FOUND;
   }
 
   private TradeItem mockTradeItem() {

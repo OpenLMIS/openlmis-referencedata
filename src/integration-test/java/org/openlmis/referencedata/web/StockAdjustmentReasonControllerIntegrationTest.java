@@ -21,8 +21,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.STOCK_ADJUSTMENT_REASONS_MANAGE;
 
@@ -31,8 +29,8 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.StockAdjustmentReasonMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -44,7 +42,8 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebIntegrationTest {
+public class StockAdjustmentReasonControllerIntegrationTest
+    extends AuditLogWebIntegrationTest<StockAdjustmentReason> {
 
   private static final String RESOURCE_URL = "/api/stockAdjustmentReasons";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -277,61 +276,33 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
-    given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasNoAuditRight() {
+    mockUserHasNoRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
   }
 
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
-    given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected void mockHasAuditRight() {
+    mockUserHasRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
   }
 
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
-    given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(reason);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(200);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Override
+  protected StockAdjustmentReason getInstance() {
+    return reason;
   }
 
+  @Override
+  protected CrudRepository<StockAdjustmentReason, UUID> getRepository() {
+    return stockAdjustmentReasonRepository;
+  }
+
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND;
+  }
 }

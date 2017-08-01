@@ -42,19 +42,12 @@ import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_INVALID;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.restassured.response.Response;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -86,11 +79,24 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateField"})
-public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
+public class UserControllerIntegrationTest extends AuditLogWebIntegrationTest<User> {
 
   private static final String RESOURCE_URL = "/api/users";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
@@ -1219,6 +1225,36 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Override
+  protected void mockHasNoAuditRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+  }
+
+  @Override
+  protected void mockHasAuditRight() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+  }
+
+  @Override
+  protected User getInstance() {
+    return user1;
+  }
+
+  @Override
+  protected CrudRepository<User, UUID> getRepository() {
+    return userRepository;
+  }
+
+  @Override
+  protected String getAuditAddress() {
+    return AUDIT_URL;
+  }
+
+  @Override
+  protected String getErrorNotFoundMessage() {
+    return UserMessageKeys.ERROR_NOT_FOUND;
   }
 
   private Response getUsersPermissionStrings() {
