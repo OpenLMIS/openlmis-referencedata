@@ -180,14 +180,36 @@ exposed. Note that the process starts suspended, so the application will not sta
 debugger has connected.
 
 ### Demo Data
-You can use a standard data set for demonstration purposes. To do so, first follow the Quick Start
-until step 3 is done: https://github.com/OpenLMIS/openlmis-referencedata/blob/master/README.md#quickstart.
-Then, before `gradle bootRun`, use `gradle demoDataSeed`. This will generate a sql input file under
-`./demo-data` directory.
+A basic set of demo data is included with this service, defined under `./demo-data/`.  This data may
+be optionally loaded by using the `demo-data` Spring Profile.  Setting this profile may be done by
+setting the `spring.profiles.active` environment variable.
 
-To insert this data into the database, finish the Quick Start steps,
-and then outside of container's interactive shell, run:
-`docker exec -i openlmisreferencedata_db_1 psql -Upostgres open_lmis < demo-data/input.sql`
+When building locally from the development environment, you may run:
+
+```shell
+$ export spring_profiles_active=demo-data
+$ gradle bootRun
+```
+
+To see how to set environment variables through Docker Compose, see the 
+[Reference Distribution](https://github.org/openlmis/openlmis-ref-distro)
+
+### Performance Testing Data
+A generated, sufficiently-large set of data is defined in 
+`./src/main/resources/db/performance-data/`.  This data set is meant for performance testing, which
+helps answer questions such as:
+
+1. what happens to this operation when there are 10,000 Orderables / users / facilities?
+1. how many concurrent requests can we serve?
+1. what's the network characteristic for clients on mobile connections?
+
+This data set builds upon the demo data set and therefore must be loaded after demo-data is loaded.
+To do so activate the `performance-data` Spring Profle after demo-data, for example:
+
+```shell
+$ export spring_profiles_active=demo-data,performance-data
+$ gradle bootRun
+```
 
 ## Production by Spring Profile
 

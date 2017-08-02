@@ -1,8 +1,8 @@
 {
   "type": "object",
   "$schema": "http://json-schema.org/draft-04/schema",
-  "title": "VeryMinimalFacility",
-  "description": "A single facility with only id and name",
+  "title": "NamedResource",
+  "description": "A resource with only id and name",
   "properties": {
     "id": {
       "type": "string",

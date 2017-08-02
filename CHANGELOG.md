@@ -9,6 +9,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-2609](https://openlmis.atlassian.net/browse/OLMIS-2609): Created rights to manage CCE and assigned to system administrator.
 * [OLMIS-2610](https://openlmis.atlassian.net/browse/OLMIS-2610): Added CCE Inventory View/Edit rights, added demo data for those rights.
 * [OLMIS-2696](https://openlmis.atlassian.net/browse/OLMIS-2696): Added search requisition groups endpoint.
+* [OLMIS-2780](https://openlmis.atlassian.net/browse/OLMIS-2780): Added endpoint for getting all facilities with minimal representation.
 * Introduced JaVers to all domain entities. Also each domain entity has endpoint to get the audit information.
 
 Bug fixes, security and performance improvements, also backwards-compatible:

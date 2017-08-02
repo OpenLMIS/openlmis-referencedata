@@ -492,37 +492,6 @@ public class UserControllerTest {
   }
 
   @Test
-  public void shouldGetUserHomeFacilityPrograms() {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
-    when(repository.exists(userId)).thenReturn(true);
-    when(repository.findOne(userId)).thenReturn(user1);
-
-    //when
-    Set<ProgramDto> homeFacilityPrograms = controller.getUserPrograms(userId, true);
-
-    //then
-    assertThat(homeFacilityPrograms.size(), is(1));
-    assertTrue(homeFacilityPrograms.contains(ProgramDto.newInstance(program1)));
-  }
-
-  @Test
-  public void shouldGetUserSupervisoryPrograms() {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
-        supervisoryNode1));
-    when(repository.exists(userId)).thenReturn(true);
-    when(repository.findOne(userId)).thenReturn(user1);
-
-    //when
-    Set<ProgramDto> supervisoryPrograms = controller.getUserPrograms(userId, false);
-
-    //then
-    assertThat(supervisoryPrograms.size(), is(1));
-    assertTrue(supervisoryPrograms.contains(ProgramDto.newInstance(program1)));
-  }
-
-  @Test
   public void shouldGetUserSupportedPrograms() {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));

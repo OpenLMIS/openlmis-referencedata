@@ -73,6 +73,7 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
+import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
@@ -1143,16 +1144,18 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(userRepository.exists(userId)).willReturn(true);
     given(facilityRepository.findSupervisionFacilitiesByUser(userId))
-        .willReturn(Sets.newHashSet(homeFacility));
+        .willReturn(Sets.newHashSet(new NamedResource(homeFacilityId, homeFacility.getName())));
 
-    Facility[] response = getUserFacilities()
+    NamedResource[] response = getUserFacilities()
         .then()
         .statusCode(200)
-        .extract().as(Facility[].class);
+        .extract().as(NamedResource[].class);
 
-    Set<Facility> actual = Sets.newHashSet(response);
+    Set<NamedResource> actual = Sets.newHashSet(response);
     assertEquals(1, actual.size());
-    assertEquals(homeFacilityId, actual.iterator().next().getId());
+    NamedResource resource = actual.iterator().next();
+    assertEquals(homeFacilityId, resource.getId());
+    assertEquals(homeFacility.getName(), resource.getName());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -1163,16 +1166,18 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(userRepository.exists(userId)).willReturn(true);
     given(facilityRepository.findSupervisionFacilitiesByUser(userId))
-        .willReturn(Sets.newHashSet(homeFacility));
+        .willReturn(Sets.newHashSet(new NamedResource(homeFacilityId, homeFacility.getName())));
 
-    Facility[] response = getUserFacilities()
+    NamedResource[] response = getUserFacilities()
         .then()
         .statusCode(200)
-        .extract().as(Facility[].class);
+        .extract().as(NamedResource[].class);
 
-    Set<Facility> actual = Sets.newHashSet(response);
+    Set<NamedResource> actual = Sets.newHashSet(response);
     assertEquals(1, actual.size());
-    assertEquals(homeFacilityId, actual.iterator().next().getId());
+    NamedResource resource = actual.iterator().next();
+    assertEquals(homeFacilityId, resource.getId());
+    assertEquals(homeFacility.getName(), resource.getName());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

@@ -1,0 +1,67 @@
+{
+  "id": 74469,
+  "num_rows": 1000,
+  "file_format": "sql",
+  "name": "users",
+  "table_name": "referencedata.users",
+  "include_create_sql": false,
+  "columns": [
+    {
+      "name": "id",
+      "type": "GUID",
+      "formula": ""
+    },
+    {
+      "name": "username",
+      "type": "Username",
+      "formula": ""
+    },
+    {
+      "name": "email",
+      "type": "Email Address",
+      "formula": ""
+    },
+    {
+      "name": "firstname",
+      "type": "First Name",
+      "formula": ""
+    },
+    {
+      "name": "lastname",
+      "type": "Last Name",
+      "formula": ""
+    },
+    {
+      "name": "verified",
+      "type": "Boolean",
+      "formula": ""
+    },
+    {
+      "name": "active",
+      "type": "Boolean",
+      "formula": ""
+    },
+    {
+      "name": "loginRestricted",
+      "type": "Boolean",
+      "formula": ""
+    },
+    {
+      "name": "allowNotify",
+      "type": "Boolean",
+      "formula": ""
+    },
+    {
+      "name": "timezone",
+      "type": "Custom List",
+      "values": [
+        "CET",
+        "PDT",
+        "PST"
+      ],
+      "selectionStyle": "random",
+      "distribution": null,
+      "formula": ""
+    }
+  ]
+}

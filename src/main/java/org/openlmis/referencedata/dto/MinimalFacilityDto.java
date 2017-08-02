@@ -38,24 +38,21 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
-  private String code;
   private String name;
-  private Boolean active;
-  private Boolean enabled;
-  private FacilityTypeDto type;
-  private GeographicZoneSimpleDto geographicZone;
 
   @Override
   public void setGeographicZone(GeographicZone geographicZone) {
-    this.geographicZone = new GeographicZoneSimpleDto();
-    geographicZone.export(this.geographicZone);
+    // unsupported operation
   }
 
   @Override
   public void setType(FacilityType type) {
-    this.type = new FacilityTypeDto();
-    type.export(this.type);
+    // unsupported operation
+  }
 
+  @Override
+  public void setCode(String code) {
+    // unsupported operation
   }
 
   @Override
@@ -65,6 +62,11 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
   @Override
   public void setOperator(FacilityOperator operator) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setActive(Boolean active) {
     // unsupported operation
   }
 
@@ -80,6 +82,11 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
   @Override
   public void setComment(String comment) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setEnabled(Boolean enabled) {
     // unsupported operation
   }
 

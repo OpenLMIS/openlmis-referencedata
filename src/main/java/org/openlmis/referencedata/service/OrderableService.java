@@ -85,7 +85,7 @@ public class OrderableService {
               OrderableMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
     }
 
-    // find facility type if given
+    // find program if given
     Program program = null;
     if (programCode != null) {
       program = programRepository.findByCode(Code.code(programCode));

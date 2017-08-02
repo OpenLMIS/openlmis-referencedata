@@ -20,6 +20,9 @@ execution:
   - concurrency: 1
     iterations: 10
     scenario: users-get-one-facilities
+  - concurrency: 1
+    iterations: 10
+    scenario: users-get-one-supervised-facilities
 
 scenarios:
   get-user-token:
@@ -107,6 +110,15 @@ scenarios:
         label: GetAdministratorUserFacilities
         headers:
           Authorization: Bearer ${access_token}
+  users-get-one-supervised-facilities:
+    requests:
+      - include-scenario: get-user-token
+      # Program = Family Planning, Right = REQUISITION_CREATE
+      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/supervisedFacilities?programId=dce17f2e-af3e-40ad-8e00-3496adef44c3&rightId=9ade922b-3523-4582-bef4-a47701f7df14
+        method: GET
+        label: GetAdministratorSupervisedFacilities
+        headers:
+          Authorization: Bearer ${access_token}
 
 reporting:
     - module: passfail
@@ -114,3 +126,4 @@ reporting:
         90% of get permission strings for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserPermissionStrings>500ms
         90% of get programs for administrator user fail to get in 250 milliseconds: p90 of GetAdministratorUserPrograms>250ms
         90% of get facilities for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserFacilities>500ms
+        90% of get supervised facilities for administrator user fail to get in 250 milliseconds: p90 of GetAdministratorSupervisedFacilities>250ms
