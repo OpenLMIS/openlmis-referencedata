@@ -1,0 +1,63 @@
+{
+  "id": 74951,
+  "num_rows": 1000,
+  "file_format": "csv",
+  "name": "orderables",
+  "include_header": true,
+  "columns": [
+    {
+      "name": "id",
+      "type": "GUID",
+      "formula": ""
+    },
+    {
+      "name": "code",
+      "type": "App Name",
+      "formula": ""
+    },
+    {
+      "name": "dispensingUnit",
+      "type": "Custom List",
+      "values": [
+        "each",
+        "pill",
+        "injection",
+        "strip"
+      ],
+      "selectionStyle": "random",
+      "distribution": null,
+      "formula": ""
+    },
+    {
+      "name": "fullProductName",
+      "type": "Drug Name (Brand)",
+      "formula": ""
+    },
+    {
+      "name": "netContent",
+      "type": "Number",
+      "min": 1,
+      "max": 100,
+      "decimals": 0,
+      "formula": ""
+    },
+    {
+      "name": "packRoundingThreshold",
+      "type": "Number",
+      "min": 1,
+      "max": 10,
+      "decimals": 0,
+      "formula": ""
+    },
+    {
+      "name": "roundToZero",
+      "type": "Boolean",
+      "formula": ""
+    },
+    {
+      "name": "description",
+      "type": "Catch Phrase",
+      "formula": ""
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": 74470,
+  "num_rows": 1000,
+  "file_format": "csv",
+  "name": "facilities",
+  "include_header": true,
+  "columns": [
+    {
+      "name": "id",
+      "type": "GUID",
+      "formula": ""
+    },
+    {
+      "name": "code",
+      "type": "Password",
+      "formula": ""
+    },
+    {
+      "name": "name",
+      "type": "App Name",
+      "formula": ""
+    },
+    {
+      "name": "geographicZoneId",
+      "type": "Dataset Column",
+      "dataset": "GeoZones4",
+      "column": "code",
+      "selectionStyle": "random",
+      "formula": ""
+    },
+    {
+      "name": "typeId",
+      "type": "Dataset Column",
+      "dataset": "FacilityTypesAll",
+      "column": "id",
+      "selectionStyle": "random",
+      "formula": ""
+    },
+    {
+      "name": "operatedById",
+      "type": "Dataset Column",
+      "dataset": "FacilityOperatorsAll",
+      "column": "id",
+      "selectionStyle": "random",
+      "formula": ""
+    },
+    {
+      "name": "active",
+      "type": "Boolean",
+      "formula": ""
+    },
+    {
+      "name": "enabled",
+      "type": "Boolean",
+      "formula": ""
+    },
+    {
+      "name": "openLmisAccessible",
+      "type": "Boolean",
+      "formula": ""
+    }
+  ]
+}
