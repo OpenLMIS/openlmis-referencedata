@@ -178,10 +178,31 @@ public class OrderableRepositoryIntegrationTest
     invalidProgramOrderables.add(createProgramOrderable(invalidProgram, invalidOrderable));
     repository.save(invalidOrderable);
 
-    List<Orderable> foundOrderables = repository.search(null, null, validProgram);
+    List<Orderable> foundOrderables = repository.search(null, null, validProgram.getCode());
 
     assertEquals(1, foundOrderables.size());
     assertEquals(validOrderable.getId(), foundOrderables.get(0).getId());
+  }
+
+  @Test
+  public void shouldFindOrderablesByProgramCodeIgnoreCase() {
+    // given
+    Program validProgram = new Program("valid-code");
+    programRepository.save(validProgram);
+    Set<ProgramOrderable> programOrderables = new HashSet<>();
+    Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
+        Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
+        null);
+    repository.save(validOrderable);
+    programOrderables.add(createProgramOrderable(validProgram, validOrderable));
+    repository.save(validOrderable);
+
+    // when & then
+    searchOrderablesAndCheckResults(null,
+        null,
+        new Program("VALID-CODE"),
+        validOrderable,
+        1);
   }
 
   @Test
@@ -199,7 +220,7 @@ public class OrderableRepositoryIntegrationTest
     repository.save(orderableWithCode);
 
     List<Orderable> foundOrderables = repository
-        .search(validOrderable.getProductCode().toString(), CODE, validProgram);
+        .search(validOrderable.getProductCode().toString(), CODE, validProgram.getCode());
 
     assertEquals(1, foundOrderables.size());
     assertEquals(validOrderable.getId(), foundOrderables.get(0).getId());
@@ -234,7 +255,8 @@ public class OrderableRepositoryIntegrationTest
 
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
                                              Orderable orderable, int expectedSize) {
-    List<Orderable> foundOrderables = repository.search(code, name, program);
+    Code programCode = null == program ? null : program.getCode();
+    List<Orderable> foundOrderables = repository.search(code, name, programCode);
 
     assertEquals(expectedSize, foundOrderables.size());
 

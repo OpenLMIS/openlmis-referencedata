@@ -15,14 +15,15 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.Set;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import java.util.UUID;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Set;
+import java.util.UUID;
 
 public interface ProgramRepository
     extends PagingAndSortingRepository<Program, UUID>, ProgramRepositoryCustom {
@@ -42,4 +43,6 @@ public interface ProgramRepository
       + " WHERE ra.userid = :userId",
       nativeQuery = true)
   Set<Program> findSupervisionProgramsByUser(@Param("userId") UUID userId);
+
+  boolean existsByCode(Code programCode);
 }

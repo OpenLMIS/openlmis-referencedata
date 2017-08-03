@@ -15,11 +15,11 @@
 
 package org.openlmis.referencedata.repository.custom;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.Program;
 
 import java.util.List;
 
 public interface OrderableRepositoryCustom {
-  List<Orderable> search(String code, String name, Program program);
+  List<Orderable> search(String code, String name, Code programCode);
 }
