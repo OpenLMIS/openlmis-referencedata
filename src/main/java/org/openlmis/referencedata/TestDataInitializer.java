@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@Profile({"!test", "performance-data"})
+@Profile("performance-data")
 public class TestDataInitializer implements CommandLineRunner {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
   private static final String PERF_DATA_PATH = "classpath:db/performance-data/";
