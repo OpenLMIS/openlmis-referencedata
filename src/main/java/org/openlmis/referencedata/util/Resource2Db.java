@@ -38,11 +38,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Spring oriented utility class to load data into a database.  When given Spring's
+ * {@link JdbcTemplate}, an instance of this class is able to run SQL inserts/updates against the
+ * attached datasource. It knows what SQL to run, or what data to load, based on Spring
+ * {@link Resource}'s passed in.
+ */
 public class Resource2Db {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(Resource2Db.class);
 
   private final JdbcTemplate template;
 
+  /**
+   * new with given data connection
+   * @param template the active {@link JdbcTemplate} to run SQL updates against.
+   * @throws NullPointerException if template is null.
+   */
   public Resource2Db(JdbcTemplate template) {
     Validate.notNull(template);
     this.template = template;
@@ -52,6 +63,7 @@ public class Resource2Db {
    * Update the database from a Resource which has lines of SQL.  One SQL statement per line.
    * @param resource the Resource with SQL in lines.
    * @throws IOException if the Resource can't be used.
+   * @throws NullPointerException if the resource is null.
    */
   public void updateDbFromSql(Resource resource) throws IOException {
     XLOGGER.entry(resource.getDescription());
@@ -66,6 +78,8 @@ public class Resource2Db {
    * @param tableName the name of the table (incl schema) to load the data into.
    * @param resource the Resource as a CSV, with a header, that has the data to load.
    * @throws IOException if the Resource can't be used.
+   * @throws NullPointerException if any of the arguments are null
+   * @throws IllegalArgumentException if the tableName is blank
    */
   public void insertToDbFromCsv(String tableName, Resource resource) throws IOException {
     XLOGGER.entry(tableName, resource);
