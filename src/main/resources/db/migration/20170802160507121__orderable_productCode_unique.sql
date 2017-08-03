@@ -1,0 +1,1 @@
+ALTER TABLE ONLY orderables ADD CONSTRAINT unq_productCode UNIQUE(code);

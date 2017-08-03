@@ -15,19 +15,22 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.openlmis.referencedata.dto.DispensableDto;
+import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.ProgramOrderableDto;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.dto.DispensableDto;
-import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.dto.ProgramOrderableDto;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -40,13 +43,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Products that are Orderable by Program.  An Orderable represent any medical commodities
  * that may be ordered/requisitioned, typically by a {@link Program}.
  */
 @Entity
-@Table(name = "orderables", schema = "referencedata")
+@Table(name = "orderables", schema = "referencedata",
+    uniqueConstraints = @UniqueConstraint(name = "unq_productCode", columnNames = "code"))
 @NoArgsConstructor
 @AllArgsConstructor
 public class Orderable extends BaseEntity {
