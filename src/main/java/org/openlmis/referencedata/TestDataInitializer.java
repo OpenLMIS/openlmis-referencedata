@@ -29,8 +29,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@Profile("performance-data")
+@Profile({"!test", "performance-data"})
 public class TestDataInitializer implements CommandLineRunner {
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
   private static final String PERF_DATA_PATH = "classpath:db/performance-data/";
 
   @Value(value = PERF_DATA_PATH + "referencedata.users.sql")
@@ -44,8 +45,6 @@ public class TestDataInitializer implements CommandLineRunner {
 
   @Autowired
   private JdbcTemplate template;
-
-  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
 
   /**
    * Initializes test data.
