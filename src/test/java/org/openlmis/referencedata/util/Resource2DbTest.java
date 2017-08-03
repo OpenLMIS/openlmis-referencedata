@@ -93,10 +93,10 @@ public class Resource2DbTest {
     resource2Db.insertToDbFromCsv("", resource);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void insertToDbFromCsvWithNullTableNameShouldThrowException() throws IOException {
     Resource resource = mock(Resource.class);
-    resource2Db.insertToDbFromCsv("", resource);
+    resource2Db.insertToDbFromCsv(null, resource);
   }
 
   @Test(expected = NullPointerException.class)
