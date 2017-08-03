@@ -45,14 +45,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Products that are Orderable by Program.  An Orderable represent any medical commodities
  * that may be ordered/requisitioned, typically by a {@link Program}.
  */
 @Entity
-@Table(name = "orderables", schema = "referencedata")
 @TypeName("Orderable")
+@Table(name = "orderables", schema = "referencedata",
+    uniqueConstraints = @UniqueConstraint(name = "unq_productCode", columnNames = "code"))
 @NoArgsConstructor
 @AllArgsConstructor
 public class Orderable extends BaseEntity {

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_DUPLICATED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NET_CONTENT_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
@@ -196,6 +197,16 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     orderableDto.setNetContent(null);
 
     checkBadRequestBody(orderableDto, ERROR_NET_CONTENT_REQUIRED, RESOURCE_URL);
+  }
+
+  @Test
+  public void shouldRejectIfProductCodeDuplicated() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    when(orderableRepository.existsByProductCode(Code.code(orderableDto.getProductCode())))
+        .thenReturn(true);
+
+    checkBadRequestBody(orderableDto, ERROR_DUPLICATED, RESOURCE_URL);
   }
 
   @Test
