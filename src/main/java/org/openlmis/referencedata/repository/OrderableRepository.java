@@ -36,4 +36,6 @@ public interface OrderableRepository extends
 
   <S extends Orderable> S findByProductCode(Code code);
 
+  boolean existsByProductCode(Code code);
+
 }

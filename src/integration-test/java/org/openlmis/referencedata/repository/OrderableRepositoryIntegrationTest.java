@@ -15,12 +15,16 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
-
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
@@ -33,7 +37,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableRepositoryIntegrationTest
@@ -51,6 +56,9 @@ public class OrderableRepositoryIntegrationTest
   @Autowired
   private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
+  @Autowired
+  private EntityManager entityManager;
+
   private static final String CODE = "abcd";
   private static final String NAME = "Abcd";
   private static final String EACH = "each";
@@ -64,11 +72,15 @@ public class OrderableRepositoryIntegrationTest
   @Override
   Orderable generateInstance() {
     int instanceNumber = getNextInstanceNumber();
+    return generateInstance(Code.code(CODE + instanceNumber));
+  }
+
+  Orderable generateInstance(Code productCode) {
     HashMap<String, String> identificators = new HashMap<>();
     identificators.put("cSys", "cSysId");
     HashMap<String, String> extraData = new HashMap<>();
-    return new Orderable(Code.code(CODE + instanceNumber), Dispensable.createNew(EACH),
-            NAME, DESCRIPTION, 10, 5, false, new HashSet<>(), identificators, extraData);
+    return new Orderable(productCode, Dispensable.createNew(EACH),
+        NAME, DESCRIPTION, 10, 5, false, new HashSet<>(), identificators, extraData);
   }
 
   @Test
@@ -149,8 +161,9 @@ public class OrderableRepositoryIntegrationTest
     Program validProgram = new Program("valid-code");
     programRepository.save(validProgram);
     Set<ProgramOrderable> programOrderables = new HashSet<>();
-    Orderable validOrderable = new Orderable(Code.code(CODE), Dispensable.createNew(EACH),
-        NAME, DESCRIPTION, 10, 5, false, programOrderables, null, null);
+    Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
+        Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
+        null);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
@@ -158,8 +171,9 @@ public class OrderableRepositoryIntegrationTest
     Program invalidProgram = new Program("invalid-code");
     programRepository.save(invalidProgram);
     Set<ProgramOrderable> invalidProgramOrderables = new HashSet<>();
-    Orderable invalidOrderable = new Orderable(Code.code(CODE), Dispensable.createNew(EACH),
-        NAME, DESCRIPTION, 10, 5, false, invalidProgramOrderables, null, null);
+    Orderable invalidOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
+        Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, invalidProgramOrderables,
+        null, null);
     repository.save(invalidOrderable);
     invalidProgramOrderables.add(createProgramOrderable(invalidProgram, invalidOrderable));
     repository.save(invalidOrderable);
@@ -189,6 +203,33 @@ public class OrderableRepositoryIntegrationTest
 
     assertEquals(1, foundOrderables.size());
     assertEquals(validOrderable.getId(), foundOrderables.get(0).getId());
+  }
+
+  @Test
+  public void shouldFindByProductCode() throws Exception {
+    Orderable orderable = generateInstance();
+    Code productCode = orderable.getProductCode();
+
+    assertNull(repository.findByProductCode(productCode));
+    assertFalse(repository.existsByProductCode(productCode));
+
+    repository.save(orderable);
+
+    assertEquals(orderable.getId(), repository.findByProductCode(productCode).getId());
+    assertTrue(repository.existsByProductCode(productCode));
+  }
+
+  @Test(expected = PersistenceException.class)
+  public void shouldNotAllowDuplicates() {
+    Code productCode = Code.code("test_product_code");
+
+    Orderable orderable1 = generateInstance(productCode);
+    Orderable orderable2 = generateInstance(productCode);
+
+    repository.save(orderable1);
+    repository.save(orderable2);
+
+    entityManager.flush();
   }
 
   private void searchOrderablesAndCheckResults(String code, String name, Program program,

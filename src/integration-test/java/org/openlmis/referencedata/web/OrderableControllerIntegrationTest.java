@@ -20,19 +20,14 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_DUPLICATED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NET_CONTENT_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
 import com.google.common.collect.ImmutableMap;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -47,6 +42,15 @@ import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -186,6 +190,16 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     orderableDto.setNetContent(null);
 
     checkBadRequestBody(orderableDto, ERROR_NET_CONTENT_REQUIRED, RESOURCE_URL);
+  }
+
+  @Test
+  public void shouldRejectIfProductCodeDuplicated() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    when(orderableRepository.existsByProductCode(Code.code(orderableDto.getProductCode())))
+        .thenReturn(true);
+
+    checkBadRequestBody(orderableDto, ERROR_DUPLICATED, RESOURCE_URL);
   }
 
   @Test
