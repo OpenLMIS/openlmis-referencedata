@@ -17,6 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Embeddable;
 
@@ -33,6 +34,14 @@ public class Code {
 
   private Code(String code) {
     this.code = code.replaceAll("\\s", "");
+  }
+
+  /**
+   * is this blank
+   * @return true if blank, false otherwise.
+   */
+  public boolean isBlank() {
+    return StringUtils.isBlank(this.code);
   }
 
   /**

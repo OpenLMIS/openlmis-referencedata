@@ -20,7 +20,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -86,15 +85,13 @@ public class OrderableService {
     }
 
     // find program if given
-    Program program = null;
-    if (programCode != null) {
-      program = programRepository.findByCode(Code.code(programCode));
-      if (program == null) {
-        throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
-      }
+    Code workingProgramCode = Code.code(programCode);
+    if ( false == workingProgramCode.isBlank()
+        && false == programRepository.existsByCode(workingProgramCode) ) {
+      throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
 
-    List<Orderable> foundOrderables = orderableRepository.search(code, name, program);
+    List<Orderable> foundOrderables = orderableRepository.search(code, name, workingProgramCode);
 
     return Optional.ofNullable(foundOrderables).orElse(Collections.emptyList());
   }

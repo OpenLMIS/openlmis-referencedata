@@ -15,6 +15,14 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,14 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class OrderableServiceTest {
 
@@ -89,7 +89,7 @@ public class OrderableServiceTest {
   @Test
   public void shouldNotThrowValidationExceptionIfQueryMapCanBeParsed() {
     when(orderableRepository.findAll()).thenReturn(orderableList);
-    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program);
+    when(programRepository.existsByCode(Code.code(programCode))).thenReturn(true);
 
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put(CODE, "-1");
@@ -112,9 +112,10 @@ public class OrderableServiceTest {
     final String code = "ORD1";
     final String name = "Orderable";
 
-    when(orderableRepository.search(code, name, program))
+    when(program.getCode()).thenReturn(Code.code(programCode));
+    when(orderableRepository.search(code, name, program.getCode()))
         .thenReturn(Lists.newArrayList(orderable1, orderable2));
-    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program);
+    when(programRepository.existsByCode(program.getCode())).thenReturn(true);
 
     Map<String, Object> params = new HashMap<>();
     params.put(CODE, code);
@@ -123,7 +124,7 @@ public class OrderableServiceTest {
 
     final List<Orderable> actual = orderableService.searchOrderables(params);
 
-    verify(orderableRepository).search(eq(code), eq(name), eq(program));
+    verify(orderableRepository).search(eq(code), eq(name), eq(Code.code(programCode)));
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(orderable1));

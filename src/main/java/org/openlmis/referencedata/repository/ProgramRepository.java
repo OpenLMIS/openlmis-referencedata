@@ -15,16 +15,16 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.Set;
-
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import java.util.UUID;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Set;
+import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface ProgramRepository
@@ -38,11 +38,13 @@ public interface ProgramRepository
   <S extends Program> Iterable<S> save(Iterable<S> entities);
 
   <S extends Program> S findByCode(Code code);
-  
+
   @Query(value = "SELECT DISTINCT p.*"
       + " FROM referencedata.programs p"
       + "   JOIN referencedata.right_assignments ra ON ra.programid = p.id"
       + " WHERE ra.userid = :userId",
       nativeQuery = true)
   Set<Program> findSupervisionProgramsByUser(@Param("userId") UUID userId);
+
+  boolean existsByCode(Code programCode);
 }
