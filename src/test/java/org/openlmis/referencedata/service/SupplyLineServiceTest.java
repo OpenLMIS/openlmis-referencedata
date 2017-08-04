@@ -16,87 +16,31 @@
 package org.openlmis.referencedata.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.service.SupplyLineService.PROGRAM;
-import static org.openlmis.referencedata.service.SupplyLineService.SUPERVISORY_NODE;
-import static org.openlmis.referencedata.service.SupplyLineService.SUPPLYING_FACILITY;
 
-import com.google.common.collect.Lists;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
-import org.openlmis.referencedata.util.Pagination;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@SuppressWarnings("PMD.TooManyMethods")
 @RunWith(MockitoJUnitRunner.class)
 public class SupplyLineServiceTest {
-
-  @InjectMocks
-  private SupplyLineService supplyLineService;
 
   @Mock
   private SupplyLineRepository supplyLineRepository;
 
-  @Mock
-  private ProgramRepository programRepository;
-
-  @Mock
-  private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Mock
-  private FacilityRepository facilityRepository;
-
-  @Mock
-  private Pageable pageable;
-
-  @Mock
-  private Program program;
-
-  @Mock
-  private SupervisoryNode supervisoryNode;
-
-  @Mock
-  private Facility supplyingFacility;
-
-  @Mock
-  private SupplyLine supplyLine;
-
-  private List<SupplyLine> supplyLines;
-
-  @Before
-  public void setUp() {
-    MockitoAnnotations.initMocks(this);
-
-    supplyLines = Lists.newArrayList(supplyLine);
-
-    when(pageable.getPageSize()).thenReturn(10);
-    when(pageable.getPageNumber()).thenReturn(0);
-  }
+  @InjectMocks
+  private SupplyLineService supplyLineService;
 
   @Test
   public void shouldFindSupplyLineIfMatchedProgram() {
@@ -131,69 +75,5 @@ public class SupplyLineServiceTest {
 
     assertEquals(1, receivedSupplyLines.size());
     assertEquals(supplyLine, receivedSupplyLines.get(0));
-  }
-
-  @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionIfThereIsNoValidParameterProvidedForSearch() {
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put("some-param", "some-value");
-    supplyLineService.searchSupplyLines(searchParams, pageable);
-  }
-
-  @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionIfProgramDoesNotExist() {
-    when(programRepository.findByCode(any(Code.class))).thenReturn(null);
-
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(PROGRAM, "program-code");
-    supplyLineService.searchSupplyLines(searchParams, pageable);
-  }
-
-  @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionIfSupervisoryNodeDoesNotExist() {
-    when(supervisoryNodeRepository.findByCode(any(String.class))).thenReturn(null);
-
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(SUPERVISORY_NODE, "supervisory-node-code");
-    supplyLineService.searchSupplyLines(searchParams, pageable);
-  }
-
-  @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionIfSupplyingFacilityDoesNotExist() {
-    when(facilityRepository.findFirstByCode(any(String.class))).thenReturn(null);
-
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(SUPPLYING_FACILITY, "facility-code");
-    supplyLineService.searchSupplyLines(searchParams, pageable);
-  }
-
-  @Test
-  public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
-    when(supplyLineRepository.searchSupplyLines(eq(null), eq(null), eq(null), eq(pageable)))
-        .thenReturn(Pagination.getPage(supplyLines, null, supplyLines.size()));
-
-    Page<SupplyLine> actual = supplyLineService.searchSupplyLines(new HashMap<>(), pageable);
-    verify(supplyLineRepository).searchSupplyLines(eq(null), eq(null), eq(null), eq(pageable));
-    assertEquals(supplyLines, actual.getContent());
-  }
-
-  @Test
-  public void shouldSearchForRequisitionGroupsWithAllParametersProvided() {
-    when(programRepository.findByCode(any(Code.class))).thenReturn(program);
-    when(supervisoryNodeRepository.findByCode(any(String.class))).thenReturn(supervisoryNode);
-    when(facilityRepository.findFirstByCode(any(String.class))).thenReturn(supplyingFacility);
-    when(supplyLineRepository.searchSupplyLines(eq(program), eq(supervisoryNode),
-        eq(supplyingFacility), any(Pageable.class)))
-        .thenReturn(Pagination.getPage(supplyLines, null, supplyLines.size()));
-
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(PROGRAM, "program-code");
-    searchParams.put(SUPERVISORY_NODE, "node-code");
-    searchParams.put(SUPPLYING_FACILITY, "facility-code");
-
-    Page<SupplyLine> actual = supplyLineService.searchSupplyLines(searchParams, pageable);
-    verify(supplyLineRepository).searchSupplyLines(program, supervisoryNode,
-        supplyingFacility, pageable);
-    assertEquals(supplyLines, actual.getContent());
   }
 }

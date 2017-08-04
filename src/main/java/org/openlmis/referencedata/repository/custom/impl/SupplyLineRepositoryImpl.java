@@ -20,28 +20,17 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.custom.SupplyLineRepositoryCustom;
-import org.openlmis.referencedata.util.Pagination;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
-
-  private static final String SUPPLYING_FACILITY = "supplyingFacility";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -59,60 +48,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
                                             Facility supplyingFacility) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<SupplyLine> query = builder.createQuery(SupplyLine.class);
-
-    query = prepareSearchQuery(query, program, supervisoryNode, supplyingFacility, null, false);
-
-    return entityManager.createQuery(query).getResultList();
-  }
-
-  /**
-   * Method returns page of Supply lines with matched parameters.
-   * Result can be sorted by supplying facility name if
-   * "supplyingFacilityName" parameter is used in sort property in pageable object.
-   *
-   * @param program           program of searched Supply Lines.
-   * @param supervisoryNode   supervisoryNode of searched Supply Lines.
-   * @param supplyingFacility supplyingFacility of searched Supply Lines.
-   * @param pageable          object with pagination and sorting parameters
-   * @return page of Supply Lines with matched parameters.
-   */
-  @Override
-  public Page<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode,
-                                            Facility supplyingFacility, Pageable pageable) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-    CriteriaQuery<SupplyLine> query = builder.createQuery(SupplyLine.class);
-    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-
-    query = prepareSearchQuery(query, program, supervisoryNode,
-        supplyingFacility, pageable, false);
-    countQuery = prepareSearchQuery(countQuery, program, supervisoryNode,
-        supplyingFacility, pageable, true);
-
-    Long count = entityManager.createQuery(countQuery).getSingleResult();
-
-    List<SupplyLine> result = entityManager.createQuery(query)
-        .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
-        .getResultList();
-
-    return Pagination.getPage(result, pageable, count);
-  }
-
-  private <T> CriteriaQuery<T> prepareSearchQuery(CriteriaQuery<T> query,
-                                                  Program program,
-                                                  SupervisoryNode supervisoryNode,
-                                                  Facility supplyingFacility,
-                                                  Pageable pageable,
-                                                  boolean count) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<SupplyLine> root = query.from(SupplyLine.class);
-
-    if (count) {
-      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
-      query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
-    }
-
     Predicate predicate = builder.conjunction();
 
     if (program != null) {
@@ -137,37 +73,8 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
     }
 
     query.where(predicate);
-
-    if (!count && pageable != null && pageable.getSort() != null) {
-      query = addSortProperties(query, root, pageable);
-    }
-
-    return query;
+    return entityManager.createQuery(query).getResultList();
   }
 
-  private <T> CriteriaQuery<T> addSortProperties(CriteriaQuery<T> query,
-                                                 Root root, Pageable pageable) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    List<Order> orders = new ArrayList<>();
-    Iterator<Sort.Order> iterator = pageable.getSort().iterator();
-    Sort.Order order;
 
-    while (iterator.hasNext()) {
-      order = iterator.next();
-      String property = order.getProperty();
-
-      Path path;
-      if (SUPPLYING_FACILITY.equals(property)) {
-        path = root.join(SUPPLYING_FACILITY, JoinType.LEFT).get("name");
-      } else {
-        path = root.get(property);
-      }
-      if (order.isAscending()) {
-        orders.add(builder.asc(path));
-      } else {
-        orders.add(builder.desc(path));
-      }
-    }
-    return query.orderBy(orders);
-  }
 }
