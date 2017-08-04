@@ -15,22 +15,18 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.javers.core.metamodel.annotation.TypeName;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
-import org.openlmis.referencedata.CurrencyConfig;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+import org.openlmis.referencedata.CurrencyConfig;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -40,7 +36,6 @@ import javax.persistence.Table;
 @Table(name = "program_orderables", schema = "referencedata")
 @NoArgsConstructor
 @AllArgsConstructor
-@TypeName("ProgramOrderable")
 public class ProgramOrderable extends BaseEntity {
 
   @ManyToOne

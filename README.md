@@ -231,29 +231,3 @@ expected use-case for this is when this service is deployed through the
 ## Environment variables
 
 Environment variables common to all services are listed here: https://github.com/OpenLMIS/openlmis-template-service/blob/master/README.md#environment-variables
-
-## Audit Logging
-
-Services use JaVers to log changes made throughout the system. The audits logs for individual resources
-should be exposed via endpoints which look as follows:
-
-```
-/api/someResources/{id}/auditLog
-```
-
-Just as with other paginated endpoints, these requests may be filtered via _page_ and _size_
-query paramaters:  `/api/someResources?page=0&size=10`
-
-The returned log may additionally be filtered by _author_ and _changedPropertyName_ query paramaters.
-The later specifies that only changes made by a given user should be returned, whereas the later dictates
-that only changes related to the named property should be shown.
-
-Each `/api/someResources/{id}/auditLog` endpoint should return a 404 error if and only if the specified {id} does not exist.
-In cases where the resource id exists but lacks an associated audit log, an empty array representing the empty audit should be returned.
-
-Within production services, the response bodies returned by these endpoints should correspond
-to the JSON schema defined by _auditLogEntryArray_ within _/resources/api-definition.yaml_. It is
-recognized and accepted that this differs from the schema intended for use by other collections
-throughout the system. Specifically, whereas other collections which support paginated requests are
-expected to return pagination-related metadata (eg: "totalElements," "totalPages") within their
-response bodies, the responses proffered by /auditLog endpoints do not retur pagination related data.

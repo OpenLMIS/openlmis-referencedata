@@ -16,20 +16,14 @@
 package org.openlmis.referencedata.domain;
 
 import com.google.common.collect.Sets;
-
-import org.javers.core.metamodel.annotation.TypeName;
-
-import lombok.NoArgsConstructor;
-
 import java.util.Set;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.NoArgsConstructor;
 
 @Entity
 @DiscriminatorValue("direct")
 @NoArgsConstructor
-@TypeName("DirectRoleAssignment")
 public class DirectRoleAssignment extends RoleAssignment {
 
   /**

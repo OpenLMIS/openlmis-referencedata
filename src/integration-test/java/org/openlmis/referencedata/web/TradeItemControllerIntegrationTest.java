@@ -18,35 +18,25 @@ package org.openlmis.referencedata.web;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.dto.TradeItemDto.newInstance;
 import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_MANUFACTURER_REQUIRED;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
-import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.TradeItemDto;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.utils.AuditLogHelper;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-
 import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import org.junit.Before;
+import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.TradeItemDto;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -191,42 +181,6 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(403);
-  }
-
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
-
-    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
-
-    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(generateItem("abc"));
-
-    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   private TradeItem generateItem(String manufacturer) {

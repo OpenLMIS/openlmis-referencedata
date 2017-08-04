@@ -15,10 +15,12 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
-
 import com.vividsolutions.jts.geom.Point;
-
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
@@ -34,22 +36,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Controller
 @Transactional
@@ -192,40 +186,6 @@ public class GeographicZoneController extends BaseController {
     Page<GeographicZone> page = geographicZoneService.search(queryParams, pageable);
 
     return exportToDto(page, pageable);
-  }
-
-  /**
-   * Get the audit information related to geographic zone.
-   *  @param author The author of the changes which should be returned.
-   *               If null or empty, changes are returned regardless of author.
-   * @param changedPropertyName The name of the property about which changes should be returned.
-   *               If null or empty, changes associated with any and all properties are returned.
-   * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
-   */
-  @RequestMapping(value = "/geographicZones/{id}/auditLog", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public ResponseEntity<String> getGeographicZoneAuditLog(
-      @PathVariable("id") UUID id,
-      @RequestParam(name = "author", required = false, defaultValue = "") String author,
-      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-          String changedPropertyName,
-      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
-      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-          boolean returnJson,
-      Pageable page) {
-
-    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    //Return a 404 if the specified instance can't be found
-    GeographicZone instance = geographicZoneRepository.findOne(id);
-    if (instance == null) {
-      throw new NotFoundException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    return getAuditLogResponse(GeographicZone.class, id, author, changedPropertyName, page,
-        returnJson);
   }
 
   private Page<GeographicZoneSimpleDto> exportToDto(Page<GeographicZone> page, Pageable pageable) {

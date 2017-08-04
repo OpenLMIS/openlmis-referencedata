@@ -15,14 +15,12 @@
 
 package org.openlmis.referencedata.repository;
 
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.custom.SupplyLineRepositoryCustom;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.UUID;
 
-@JaversSpringDataAuditable
 public interface SupplyLineRepository extends
         PagingAndSortingRepository<SupplyLine, UUID>,
     SupplyLineRepositoryCustom {

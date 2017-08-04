@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.domain.RightName.SUPPLY_LINES_MANAGE;
-
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -35,9 +33,7 @@ import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +47,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.openlmis.referencedata.domain.RightName.SUPPLY_LINES_MANAGE;
 
 @Controller
 @Transactional
@@ -141,39 +139,6 @@ public class SupplyLineController extends BaseController {
 
     LOGGER.debug("Saved supplyLine with id: " + supplyLineToUpdate.getId());
     return exportToDto(supplyLineToUpdate);
-  }
-
-  /**
-   * Get the audit information related to stock supply line.
-   *  @param author The author of the changes which should be returned.
-   *               If null or empty, changes are returned regardless of author.
-   * @param changedPropertyName The name of the property about which changes should be returned.
-   *               If null or empty, changes associated with any and all properties are returned.
-   * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
-   */
-  @RequestMapping(value = "/supplyLines/{id}/auditLog", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public ResponseEntity<String> getSupplyLineAuditLog(
-      @PathVariable("id") UUID id,
-      @RequestParam(name = "author", required = false, defaultValue = "") String author,
-      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-          String changedPropertyName,
-      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
-      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-          boolean returnJson,
-      Pageable page) {
-    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
-
-    //Return a 404 if the specified instance can't be found
-    SupplyLine instance = supplyLineRepository.findOne(id);
-    if (instance == null) {
-      throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    return getAuditLogResponse(SupplyLine.class, id, author, changedPropertyName, page,
-        returnJson);
   }
 
   /**

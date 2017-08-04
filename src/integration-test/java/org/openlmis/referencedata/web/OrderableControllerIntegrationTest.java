@@ -17,10 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_DUPLICATED;
@@ -40,13 +37,9 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -298,42 +291,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(1, response.getNumberOfElements());
     assertEquals(1, response.getSize());
     assertEquals(0, response.getNumber());
-  }
-
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(orderableRepository.findOne(any(UUID.class))).willReturn(null);
-
-    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(orderableRepository.findOne(any(UUID.class))).willReturn(null);
-
-    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(orderableRepository.findOne(any(UUID.class))).willReturn(orderable);
-
-    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   private ProgramOrderableDto generateProgramOrderable() {

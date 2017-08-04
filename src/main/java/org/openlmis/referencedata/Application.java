@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata;
 
-import com.google.gson.internal.bind.TypeAdapters;
-
 import org.flywaydb.core.Flyway;
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
@@ -47,7 +45,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-
 import java.util.Locale;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
@@ -131,10 +128,6 @@ public class Application {
         .withTypeSafeValues(javersProperties.isTypeSafeValues())
         .withPackagesToScan(javersProperties.getPackagesToScan())
         .withDateTimeProvider(customDateProvider)
-        .registerValueGsonTypeAdapter(double.class, TypeAdapters.DOUBLE)
-        .registerValueGsonTypeAdapter(Double.class, TypeAdapters.DOUBLE)
-        .registerValueGsonTypeAdapter(float.class, TypeAdapters.FLOAT)
-        .registerValueGsonTypeAdapter(Float.class, TypeAdapters.FLOAT)
         .build();
   }
 

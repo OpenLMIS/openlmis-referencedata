@@ -27,10 +27,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -45,19 +41,6 @@ public abstract class BaseController {
 
   @Autowired
   private Javers javers;
-
-  protected ResponseEntity<String> getAuditLogResponse(Class type, UUID id, String author,
-                                                       String changedPropertyName,
-                                                       Pageable page, boolean returnJson) {
-    String auditLogs = getAuditLog(type, id, author, changedPropertyName, page, returnJson);
-
-    MediaType contentType = returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN;
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(contentType);
-
-    return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
-  }
 
   /**
    * <p>

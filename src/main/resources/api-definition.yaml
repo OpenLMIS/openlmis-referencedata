@@ -547,8 +547,6 @@ resourceTypes:
                   "500":
                       body:
                         application/json:
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
           get:
               is: [ secured ]
@@ -695,8 +693,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
           get:
               is: [ secured ]
@@ -775,8 +771,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
           post:
               is: [ secured, paginated ]
@@ -842,8 +836,6 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /commodityTypes:
       displayName: Commodity Type
@@ -916,8 +908,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /processingSchedules:
       displayName: Processing Schedule
@@ -1029,8 +1019,6 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "400":
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /supplyLines:
       displayName: Supply Lines
@@ -1116,8 +1104,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
           get:
               is: [ secured ]
@@ -1817,8 +1803,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /programs:
       displayName: Program
@@ -1899,8 +1883,6 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /stockAdjustmentReasons:
       displayName: Stock Adjustment Reason
@@ -2008,8 +1990,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /facilityOperators:
       displayName: Facility Operators
@@ -2099,8 +2079,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /geographicZones:
       displayName: Geographic Zone
@@ -2182,8 +2160,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
           post:
               is: [ secured, paginated, sorted ]
@@ -2304,8 +2280,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /facilityTypeApprovedProducts:
       displayName: Facility Type Approved Product
@@ -2411,8 +2385,6 @@ resourceTypes:
                     "409":
                         body:
                             application/json:
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /supervisoryNodes:
       displayName: Supervisory Node
@@ -2535,8 +2507,6 @@ resourceTypes:
                               body:
                                 application/json:
                                   schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
             post:
                 is: [ secured, paginated ]
@@ -2654,8 +2624,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
 
   /rights:
       displayName: Right
@@ -2725,8 +2693,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
           get:
               is: [ secured ]
@@ -2843,8 +2809,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
             post:
                 is: [ secured, paginated ]
@@ -2952,8 +2916,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
-      /{id}/auditLog:
-          type: instanceAuditLog
       /search:
           get:
               is: [ secured, paginated]

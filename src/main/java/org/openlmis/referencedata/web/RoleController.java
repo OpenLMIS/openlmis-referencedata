@@ -32,16 +32,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -98,38 +95,6 @@ public class RoleController extends BaseController {
     }
 
     return exportToDto(role);
-  }
-
-  /**
-   * Get the audit information related to role.
-   *  @param author The author of the changes which should be returned.
-   *               If null or empty, changes are returned regardless of author.
-   * @param changedPropertyName The name of the property about which changes should be returned.
-   *               If null or empty, changes associated with any and all properties are returned.
-   * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
-   */
-  @RequestMapping(value = "/roles/{id}/auditLog", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public ResponseEntity<String> getRoleAuditLog(
-      @PathVariable("id") UUID id,
-      @RequestParam(name = "author", required = false, defaultValue = "") String author,
-      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-          String changedPropertyName,
-      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
-      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-          boolean returnJson,
-      Pageable page) {
-    rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-
-    //Return a 404 if the specified instance can't be found
-    Role instance = roleRepository.findOne(id);
-    if (instance == null) {
-      throw new NotFoundException(RoleMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    return getAuditLogResponse(Role.class, id, author, changedPropertyName, page, returnJson);
   }
 
   /**

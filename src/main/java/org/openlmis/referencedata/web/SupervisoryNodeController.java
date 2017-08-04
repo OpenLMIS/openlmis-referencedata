@@ -255,40 +255,6 @@ public class SupervisoryNodeController extends BaseController {
         pageable);
   }
 
-  /**
-   * Get the audit information related to stock supervisory node.
-   *  @param author The author of the changes which should be returned.
-   *               If null or empty, changes are returned regardless of author.
-   * @param changedPropertyName The name of the property about which changes should be returned.
-   *               If null or empty, changes associated with any and all properties are returned.
-   * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
-   */
-  @RequestMapping(value = "/supervisoryNodes/{id}/auditLog", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public ResponseEntity<String> getSupervisoryNodeAuditLog(
-      @PathVariable("id") UUID id,
-      @RequestParam(name = "author", required = false, defaultValue = "") String author,
-      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-          String changedPropertyName,
-      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
-      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-          boolean returnJson,
-      Pageable page) {
-    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
-
-    //Return a 404 if the specified instance can't be found
-    SupervisoryNode instance = supervisoryNodeRepository.findOne(id);
-    if (instance == null) {
-      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    return getAuditLogResponse(SupervisoryNode.class, id, author, changedPropertyName, page,
-        returnJson);
-  }
-
-
   private SupervisoryNodeDto exportToDto(SupervisoryNode supervisoryNode) {
     SupervisoryNodeDto supervisoryNodeDto = null;
 

@@ -15,23 +15,18 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.referencedata.dto.CommodityTypeDto;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.openlmis.referencedata.dto.CommodityTypeDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -49,7 +44,6 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "name", callSuper = false)
-@TypeName("CommodityType")
 public final class CommodityType extends BaseEntity {
 
   @Column(nullable = false)
@@ -71,7 +65,6 @@ public final class CommodityType extends BaseEntity {
   @Getter
   @Setter
   @OneToMany(mappedBy = "parent")
-  @DiffIgnore
   private List<CommodityType> children;
 
   /**

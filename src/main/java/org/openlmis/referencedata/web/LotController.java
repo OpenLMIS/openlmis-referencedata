@@ -37,7 +37,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -49,7 +48,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -178,39 +176,6 @@ public class LotController extends BaseController {
 
     return Pagination.getPage(foundLotDtos, pageable);
 
-  }
-
-  /**
-   * Get the audit information related to lot.
-   *  @param author The author of the changes which should be returned.
-   *               If null or empty, changes are returned regardless of author.
-   * @param changedPropertyName The name of the property about which changes should be returned.
-   *               If null or empty, changes associated with any and all properties are returned.
-   * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
-   */
-  @RequestMapping(value = "/lots/{id}/auditLog", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public ResponseEntity<String> getLotAuditLog(
-      @PathVariable("id") UUID id,
-      @RequestParam(name = "author", required = false, defaultValue = "") String author,
-      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-          String changedPropertyName,
-      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
-      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-          boolean returnJson,
-      Pageable page) {
-
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
-
-    //Return a 404 if the specified instance can't be found
-    Lot instance = lotRepository.findOne(id);
-    if (instance == null) {
-      throw new NotFoundException(LotMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    return getAuditLogResponse(Lot.class, id, author, changedPropertyName, page, returnJson);
   }
 
   private LotDto exportToDto(Lot lot) {

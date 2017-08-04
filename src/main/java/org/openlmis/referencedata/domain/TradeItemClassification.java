@@ -15,14 +15,11 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -38,7 +35,6 @@ import javax.persistence.UniqueConstraint;
         columnNames = {"tradeitemid", "classificationsystem"}))
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false, exclude = {"tradeItem"})
-@TypeName("TradeItemClassification")
 public class TradeItemClassification extends BaseEntity {
 
   @ManyToOne

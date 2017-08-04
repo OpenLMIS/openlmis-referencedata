@@ -18,21 +18,17 @@ package org.openlmis.referencedata.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-
-import org.junit.Test;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.utils.AuditLogHelper;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.dto.ProgramDto;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -232,24 +228,6 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<Program> foundProgram = Arrays.asList(response);
     assertEquals(0, foundProgram.size());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    given(programRepository.findOne(any(UUID.class))).willReturn(null);
-
-    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetAuditLog() {
-    given(programRepository.findOne(any(UUID.class))).willReturn(program);
-
-    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
-
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

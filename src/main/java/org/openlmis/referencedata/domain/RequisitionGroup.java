@@ -15,9 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -49,7 +46,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "requisition_groups", schema = "referencedata")
 @NoArgsConstructor
-@TypeName("RequisitionGroup")
 public class RequisitionGroup extends BaseEntity {
 
   @Column(unique = true, nullable = false, columnDefinition = "text")
@@ -76,7 +72,6 @@ public class RequisitionGroup extends BaseEntity {
   @OneToMany(mappedBy = "requisitionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
   @Getter
   @Setter
-  @DiffIgnore
   private List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules;
 
   @ManyToMany(fetch = FetchType.EAGER)
@@ -85,7 +80,6 @@ public class RequisitionGroup extends BaseEntity {
       inverseJoinColumns = @JoinColumn(name = "facilityid", nullable = false))
   @Getter
   @Setter
-  @DiffIgnore
   private Set<Facility> memberFacilities;
 
   /**

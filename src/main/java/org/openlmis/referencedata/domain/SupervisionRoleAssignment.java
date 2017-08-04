@@ -18,25 +18,20 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @DiscriminatorValue("supervision")
 @NoArgsConstructor
-@TypeName("SupervisionRoleAssignment")
 public class SupervisionRoleAssignment extends RoleAssignment {
 
   @ManyToOne

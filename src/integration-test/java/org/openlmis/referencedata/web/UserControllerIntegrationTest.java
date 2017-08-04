@@ -42,12 +42,19 @@ import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_INVALID;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.restassured.response.Response;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -80,20 +87,8 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
-import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateField"})
 public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -102,6 +97,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String RIGHT_SEARCH_URL = RESOURCE_URL + "/rightSearch";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String ROLE_ASSIGNMENTS_URL = ID_URL + "/roleAssignments";
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
   private static final String PROGRAMS_URL = ID_URL + "/programs";
@@ -1042,7 +1038,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(userRepository.findOne(any(UUID.class))).willReturn(null);
 
-    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(404);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -1054,7 +1057,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(userRepository.findOne(any(UUID.class))).willReturn(null);
 
-    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -1066,7 +1076,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
     given(userRepository.findOne(any(UUID.class))).willReturn(user1);
 
-    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .when()
+        .get(AUDIT_URL)
+        .then()
+        .statusCode(200);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

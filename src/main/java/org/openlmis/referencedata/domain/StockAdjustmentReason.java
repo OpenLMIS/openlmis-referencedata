@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +32,6 @@ import javax.persistence.Table;
 @Table(name = "stock_adjustment_reasons", schema = "referencedata")
 @NoArgsConstructor
 @AllArgsConstructor
-@TypeName("StockAdjustmentReason")
 public class StockAdjustmentReason extends BaseEntity {
 
   @ManyToOne(cascade = CascadeType.REFRESH)

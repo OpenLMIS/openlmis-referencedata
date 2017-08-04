@@ -17,8 +17,6 @@ package org.openlmis.referencedata.domain;
 
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,7 +31,6 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "programs", schema = "referencedata")
-@TypeName("Program")
 public class Program extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
