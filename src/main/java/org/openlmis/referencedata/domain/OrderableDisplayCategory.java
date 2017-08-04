@@ -17,9 +17,13 @@ package org.openlmis.referencedata.domain;
 
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.Getter;
+
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -29,6 +33,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "orderable_display_categories", schema = "referencedata")
+@TypeName("OrderableDisplayCategory")
 public class OrderableDisplayCategory extends BaseEntity {
 
   @Embedded

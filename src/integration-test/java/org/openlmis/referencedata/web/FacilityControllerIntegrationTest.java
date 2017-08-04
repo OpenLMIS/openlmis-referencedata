@@ -30,21 +30,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,8 +58,23 @@ import org.openlmis.referencedata.dto.MinimalFacilityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -79,7 +84,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String MINIMAL_URL = RESOURCE_URL + "/minimal";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String AUDIT_URL = ID_URL + "/auditLog";
   private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String SEARCH_FACILITIES = RESOURCE_URL + "/search";
   private static final String BYBOUNDARY_URL = RESOURCE_URL + "/byBoundary";
@@ -632,14 +636,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(AUDIT_URL)
-        .then()
-        .statusCode(404);
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -892,6 +889,42 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
+
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

@@ -19,14 +19,7 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
 import com.vividsolutions.jts.geom.Polygon;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -59,6 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,6 +62,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 @Controller
@@ -161,7 +164,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public String getFacilitiesAuditLog(
+  public ResponseEntity<String> getFacilitiesAuditLog(
           @PathVariable("id") UUID id,
           @RequestParam(name = "author", required = false, defaultValue = "") String author,
           @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
@@ -179,7 +182,8 @@ public class FacilityController extends BaseController {
       throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
     }
 
-    return getAuditLog(Facility.class, id, author, changedPropertyName, page, returnJson);
+    return getAuditLogResponse(Facility.class, id, author, changedPropertyName, page,
+        returnJson);
   }
 
 

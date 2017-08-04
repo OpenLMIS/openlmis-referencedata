@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +39,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "supervisory_nodes", schema = "referencedata")
 @NoArgsConstructor
+@TypeName("SupervisoryNode")
 public class SupervisoryNode extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
@@ -66,6 +70,7 @@ public class SupervisoryNode extends BaseEntity {
 
   @OneToMany(mappedBy = "parentNode")
   @Getter
+  @DiffIgnore
   private Set<SupervisoryNode> childNodes;
 
   @OneToOne(mappedBy = "supervisoryNode")

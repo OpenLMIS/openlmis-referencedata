@@ -17,20 +17,25 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Collections.singleton;
 
+import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 import java.util.Set;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 
 @Entity
 @DiscriminatorValue("fulfillment")
 @NoArgsConstructor
+@TypeName("FulfillmentRoleAssignment")
 public class FulfillmentRoleAssignment extends RoleAssignment {
 
   @ManyToOne

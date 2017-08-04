@@ -15,11 +15,15 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,6 +33,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "lots", schema = "referencedata")
+@TypeName("Lot")
 @Getter
 @Setter
 public class Lot extends BaseEntity {

@@ -15,18 +15,23 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "right_assignments")
 @NoArgsConstructor
+@TypeName("RightAssignment")
 public class RightAssignment extends BaseEntity {
 
   @ManyToOne

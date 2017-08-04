@@ -29,7 +29,9 @@ import org.openlmis.referencedata.validate.ProgramValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -183,5 +185,37 @@ public class ProgramController extends BaseController {
   public List<Program> findProgramsByName(
       @RequestParam("name") String programName) {
     return programRepository.findProgramsByName(programName);
+  }
+
+
+  /**
+   * Get the audit information related to program.
+   *  @param author The author of the changes which should be returned.
+   *               If null or empty, changes are returned regardless of author.
+   * @param changedPropertyName The name of the property about which changes should be returned.
+   *               If null or empty, changes associated with any and all properties are returned.
+   * @param page A Pageable object that allows client to optionally add "page" (page number)
+   *             and "size" (page size) query parameters to the request.
+   */
+  @RequestMapping(value = "/programs/{id}/auditLog", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public ResponseEntity<String> getProgramAuditLog(
+      @PathVariable("id") UUID id,
+      @RequestParam(name = "author", required = false, defaultValue = "") String author,
+      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+          String changedPropertyName,
+      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+          boolean returnJson,
+      Pageable page) {
+    //Return a 404 if the specified instance can't be found
+    Program instance = programRepository.findOne(id);
+    if (instance == null) {
+      throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    return getAuditLogResponse(Program.class, id, author, changedPropertyName, page,
+        returnJson);
   }
 }
