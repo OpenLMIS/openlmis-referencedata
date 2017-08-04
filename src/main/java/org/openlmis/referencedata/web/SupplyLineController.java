@@ -21,8 +21,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
-import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.SupplyLineDto;
 import org.openlmis.referencedata.dto.SupplyLineSimpleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -31,10 +29,12 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.service.SupplyLineService;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +50,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @Transactional
@@ -215,31 +217,22 @@ public class SupplyLineController extends BaseController {
   }
 
   /**
-   * Returns all supply lines with matched parameters.
+   * Retrieves page of Geographic Zones matching given parameters.
    *
-   * @param programDto         program of searched Supply Lines.
-   * @param supervisoryNodeDto supervisory node of searched Supply Lines.
-   * @return a list of all Supply Lines matching provided parameters.
+   * @param queryParams request parameters (program, supervisoryNode, supplyingFacility).
+   * @param pageable object used to encapsulate the pagination related values: page, size and sort.
+   * @return Page of matched Supply Lines.
    */
-  @RequestMapping(value = "/supplyLines/search", method = RequestMethod.GET)
+  @RequestMapping(value = "/supplyLines/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<SupplyLineDto> searchSupplyLines(
-      @RequestParam(value = "program") ProgramDto programDto,
-      @RequestParam(value = "supervisoryNode") SupervisoryNodeDto supervisoryNodeDto) {
+  public Page<SupplyLineDto> searchSupplyLines(@RequestBody Map<String, Object> queryParams,
+                                               Pageable pageable) {
     rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
-    Program program = Program.newProgram(programDto);
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
-    List<SupplyLine> result = supplyLineService.searchSupplyLines(program, supervisoryNode);
+    Page<SupplyLine> page = supplyLineService.searchSupplyLines(queryParams, pageable);
 
-    List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
-
-    for (SupplyLine supplyLine : result) {
-      supplyLineDtos.add(exportToDto(supplyLine));
-    }
-
-    return supplyLineDtos;
+    return exportToDto(page, pageable);
   }
 
   /**
@@ -290,5 +283,11 @@ public class SupplyLineController extends BaseController {
     }
 
     return supplyLineDto;
+  }
+
+  private Page<SupplyLineDto> exportToDto(Page<SupplyLine> page, Pageable pageable) {
+    List<SupplyLineDto> list = page.getContent().stream()
+        .map(this::exportToDto).collect(Collectors.toList());
+    return Pagination.getPage(list, pageable, page.getTotalElements());
   }
 }
