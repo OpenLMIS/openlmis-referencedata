@@ -130,7 +130,6 @@ public class GeographicZoneRepositoryImpl implements GeographicZoneRepositoryCus
         order = iterator.next();
         if (order.isAscending()) {
           orders.add(builder.asc(root.get(order.getProperty())));
-          query.orderBy(builder.asc(root.get(order.getProperty())));
         } else {
           orders.add(builder.desc(root.get(order.getProperty())));
         }

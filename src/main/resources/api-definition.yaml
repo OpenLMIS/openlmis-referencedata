@@ -210,20 +210,11 @@ schemas:
 
   - supervisoryNodeQueryDto: !include schemas/supervisoryNodeQueryDto.json
 
-  - supplyLine: |
-      {   "type": "object",
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "title": "SupplyLine",
-          "description": "A single supplyLine",
-          "properties": {
-              "id": { "type": "string", "required": true, "title": "id" },
-              "supervisoryNode": { "type": "object", "$ref": "#/schemas/supervisoryNodeDto", "required": true },
-              "description": { "type": "string", "required": false, "title": "description" },
-              "program": { "type": "object", "$ref": "#/schemas/program", "required": true },
-              "supplyingFacility": { "type": "object", "$ref": "#/schemas/facility", "required": true }
-          }
-      }
+  - supplyLine: !include schemas/supplyLineDto.json
 
+  - supplyLineQuery: !include schemas/supplyLineQuery.json
+
+  - supplyLinePage: !include schemas/supplyLinePage.json
 
   - requisitionGroup: !include schemas/requisitionGroupDto.json
 
@@ -1105,33 +1096,25 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
       /search:
-          get:
-              is: [ secured ]
-              description: Find Supply Lines with matched parameters.
-              queryParameters:
-                  program:
-                      displayName: program
-                      description: program ID
-                      type: string
-                      required: true
-                      repeat: false
-                  supervisoryNode:
-                      displayName: supervisoryNode
-                      description: supervisoryNode ID
-                      type: string
-                      required: true
-                      repeat: false
+          post:
+              is: [ secured, paginated, sorted ]
+              description: Filter Supply Lines by program, supervisory node and supplying facility. All properties are codes.
+              body:
+                  application/json:
+                      schema: supplyLineQuery
               responses:
                   "200":
                       body:
-                        application/json:
-                  "404":
-                  "500":
+                          application/json:
+                              schema: supplyLinePage
+                  "400":
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse
                   "403":
                       body:
-                        application/json:
-                          schema: localizedErrorResponse
-
+                          application/json:
+                              schema: localizedErrorResponse
       /searchByUUID:
           get:
               is: [ secured ]
