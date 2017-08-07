@@ -24,7 +24,6 @@ import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -37,6 +36,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 /**
  * AuditLogInitializer runs after its associated Spring application has loaded.
  * It examines each domain object in the database and registers them with JaVers
@@ -45,7 +46,7 @@ import java.util.Map;
  */
 @Component
 @Profile("!test")
-public class AuditLogInitializer implements CommandLineRunner {
+public class AuditLogInitializer {
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -54,10 +55,10 @@ public class AuditLogInitializer implements CommandLineRunner {
   private Javers javers;
 
   /**
-   * This method is part of CommandLineRunner and is called automatically by Spring.
-   * @param args Main method arguments.
+   * Checks whether there are snapshots for domain entities in the audit log.
    */
-  public void run(String... args) {
+  @PostConstruct
+  public void init() {
     //Get all JaVers repositories.
     Map<String,Object> repositoryMap =
         applicationContext.getBeansWithAnnotation(JaversSpringDataAuditable.class);
