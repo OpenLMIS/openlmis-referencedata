@@ -37,13 +37,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 @RequestMapping("/api")
 public abstract class BaseController {
 
   @Autowired
   RightService rightService;
 
-  @Autowired
+  @Resource(name = "javersProvidor")
   private Javers javers;
 
   protected ResponseEntity<String> getAuditLogResponse(Class type, UUID id, String author,

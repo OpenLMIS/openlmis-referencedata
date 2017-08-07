@@ -34,9 +34,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 /**
  * AuditLogInitializer runs after its associated Spring application has loaded.
@@ -51,7 +51,7 @@ public class AuditLogInitializer {
   @Autowired
   private ApplicationContext applicationContext;
 
-  @Autowired
+  @Resource(name = "javersProvidor")
   private Javers javers;
 
   /**
@@ -59,17 +59,17 @@ public class AuditLogInitializer {
    */
   @PostConstruct
   public void init() {
-    //Get all JaVers repositories.
-    Map<String,Object> repositoryMap =
-        applicationContext.getBeansWithAnnotation(JaversSpringDataAuditable.class);
+    applicationContext
+        .getBeansWithAnnotation(JaversSpringDataAuditable.class)
+        .values()
+        .forEach(this::createSnapshots);
+  }
 
-    //For each one...
-    for (Object object : repositoryMap.values()) {
-      if (object instanceof PagingAndSortingRepository) {
-        createSnapshots((PagingAndSortingRepository<?, ?>) object);
-      } else if (object instanceof CrudRepository) {
-        createSnapshots((CrudRepository<?, ?>) object);
-      }
+  private void createSnapshots(Object bean) {
+    if (bean instanceof PagingAndSortingRepository) {
+      createSnapshots((PagingAndSortingRepository<?, ?>) bean);
+    } else if (bean instanceof CrudRepository) {
+      createSnapshots((CrudRepository<?, ?>) bean);
     }
   }
 
