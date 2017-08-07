@@ -15,12 +15,14 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.UUID;
 
+@JaversSpringDataAuditable
 public interface OrderableDisplayCategoryRepository extends
         PagingAndSortingRepository<OrderableDisplayCategory, UUID> {
 

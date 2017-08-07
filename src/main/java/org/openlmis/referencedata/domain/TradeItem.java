@@ -15,13 +15,18 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.dto.TradeItemClassificationDto;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.dto.TradeItemClassificationDto;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -42,12 +47,14 @@ import javax.persistence.Table;
 @Table(name = "trade_items", schema = "referencedata")
 @NoArgsConstructor
 @AllArgsConstructor
+@TypeName("TradeItem")
 public final class TradeItem extends BaseEntity {
 
   private String manufacturerOfTradeItem;
 
   @OneToMany(mappedBy = "tradeItem", cascade = CascadeType.ALL)
   @Getter
+  @DiffIgnore
   private List<TradeItemClassification> classifications;
 
   /**

@@ -15,10 +15,12 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.UUID;
 
+@JaversSpringDataAuditable
 public interface CommodityTypeRepository extends CrudRepository<CommodityType, UUID> {
 }

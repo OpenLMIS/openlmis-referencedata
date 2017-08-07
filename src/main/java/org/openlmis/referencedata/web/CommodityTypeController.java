@@ -33,14 +33,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -176,5 +180,39 @@ public class CommodityTypeController extends BaseController {
     Iterable<CommodityType> result = repository.findAll();
 
     return Pagination.getPage(CommodityTypeDto.newInstance(result), pageable);
+  }
+
+  /**
+   * Get the audit information related to commodity types.
+   *  @param author The author of the changes which should be returned.
+   *               If null or empty, changes are returned regardless of author.
+   * @param changedPropertyName The name of the property about which changes should be returned.
+   *               If null or empty, changes associated with any and all properties are returned.
+   * @param page A Pageable object that allows client to optionally add "page" (page number)
+   *             and "size" (page size) query parameters to the request.
+   */
+  @RequestMapping(value = "/commodityTypes/{id}/auditLog", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public ResponseEntity<String> getCommodityTypeAuditLog(
+      @PathVariable("id") UUID id,
+      @RequestParam(name = "author", required = false, defaultValue = "") String author,
+      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+          String changedPropertyName,
+      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+          boolean returnJson,
+      Pageable page) {
+
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    //Return a 404 if the specified instance can't be found
+    CommodityType instance = repository.findOne(id);
+    if (instance == null) {
+      throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    return getAuditLogResponse(CommodityType.class, id, author, changedPropertyName, page,
+        returnJson);
   }
 }

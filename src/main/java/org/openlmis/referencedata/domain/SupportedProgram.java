@@ -18,6 +18,8 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +38,7 @@ import javax.persistence.Table;
 @Table(name = "supported_programs", schema = "referencedata")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @NoArgsConstructor
+@TypeName("SupportedProgram")
 public class SupportedProgram extends BaseEntity {
 
   @ManyToOne

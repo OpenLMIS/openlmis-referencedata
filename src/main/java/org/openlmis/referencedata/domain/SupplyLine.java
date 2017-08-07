@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,6 +33,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "supply_lines", schema = "referencedata")
 @NoArgsConstructor
+@TypeName("SupplyLine")
 public class SupplyLine extends BaseEntity {
 
   @ManyToOne

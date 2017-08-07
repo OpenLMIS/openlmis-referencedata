@@ -15,6 +15,12 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,10 +32,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 /**
  * RequisitionGroupProgramSchedule represents the schedule to be mapped for a given program and
  * requisition group.
@@ -40,6 +42,7 @@ import lombok.Setter;
         name = "requisition_group_program_schedule_unique_program_requisitionGroup",
         columnNames = {"requisitionGroupId", "programId"}))
 @NoArgsConstructor
+@TypeName("RequisitionGroupProgramSchedule")
 public class RequisitionGroupProgramSchedule extends BaseEntity {
 
   @ManyToOne

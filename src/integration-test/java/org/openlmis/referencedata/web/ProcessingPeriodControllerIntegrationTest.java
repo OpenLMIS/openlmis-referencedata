@@ -21,15 +21,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 import com.google.common.collect.Sets;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -43,9 +39,21 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ResultDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -445,6 +453,42 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .get(ID_URL)
         .then()
         .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    given(periodRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    given(periodRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+    given(periodRepository.findOne(any(UUID.class))).willReturn(firstPeriod);
+
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
