@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,13 +31,20 @@ import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.dto.SupplyLineDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.SupplyLineService;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.UnusedPrivateField"})
 public class SupplyLineControllerTest {
@@ -60,6 +71,12 @@ public class SupplyLineControllerTest {
   private Facility supplyingFacility;
 
   @Mock
+  private SupplyLineDto supplyLine;
+
+  @Mock
+  private SupplyLineDto supplyLine2;
+
+  @Mock
   private RightService rightService;
 
   @InjectMocks
@@ -68,6 +85,7 @@ public class SupplyLineControllerTest {
   private UUID programId = UUID.randomUUID();
   private UUID supervisoryNodeId = UUID.randomUUID();
   private UUID supplyingFacilityId = UUID.randomUUID();
+  private Pageable pageable = mock(Pageable.class);
 
   @Before
   public void setUp() {
@@ -116,5 +134,25 @@ public class SupplyLineControllerTest {
     verify(supervisoryNodeRepository, never()).findOne(null);
     verify(facilityRepository, never()).findOne(null);
     verify(supplyLineService).searchSupplyLines(program, null, null);
+  }
+
+  @Test
+  public void shouldReturnAllElementsInPageContent() {
+    when(pageable.getPageSize()).thenReturn(2);
+    when(pageable.getOffset()).thenReturn(2);
+    when(pageable.getPageNumber()).thenReturn(1);
+    List<SupplyLineDto> supplyLineDtos = Arrays.asList(supplyLine, supplyLine2);
+    List<SupplyLine> supplyLines = supplyLineDtos.stream()
+        .map(SupplyLine::newSupplyLine)
+        .collect(Collectors.toList());
+
+    when(supplyLineService.searchSupplyLines(anyMap(), any(Pageable.class)))
+        .thenReturn(new DummyPage<>(supplyLines));
+
+    Page<SupplyLineDto> supplyLinePage =
+        supplyLineController.searchSupplyLines(new HashMap<>(), pageable);
+
+    assertEquals(2, supplyLinePage.getContent().size());
+    assertEquals(4, supplyLinePage.getTotalElements());
   }
 }
