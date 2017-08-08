@@ -1,27 +1,27 @@
 execution:
   - concurrency: 1
-    iterations: 10
+    hold-for: 1m
     scenario: users-get-one
   - concurrency: 1
-    iterations: 10
+    hold-for: 1m
     scenario: users-get-all
   - concurrency: 1
-    iterations: 10
+    hold-for: 1m
     scenario: users-search-one-page
   - concurrency: 1
-    iterations: 10
+    hold-for: 1m
     scenario: users-has-right
   - concurrency: 1
-    iterations: 10
+    hold-for: 1m
     scenario: users-get-one-permission-strings
   - concurrency: 1
-    iterations: 10
+    hold-for: 1m
     scenario: users-get-one-programs
   - concurrency: 1
-    iterations: 10
+    hold-for: 1m
     scenario: users-get-one-facilities
   - concurrency: 1
-    iterations: 10
+    hold-for: 1m
     scenario: users-get-one-supervised-facilities
 
 scenarios:
