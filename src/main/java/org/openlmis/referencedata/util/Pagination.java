@@ -71,6 +71,14 @@ public class Pagination {
   }
 
   /**
+   * Return Page of the list using Page defaults.
+   * See {@link #getPage(List, Pageable)}
+   */
+  public static <T> Page<T> getPage(List<T> originalList) {
+    return getPage(originalList, null);
+  }
+
+  /**
    * Returns the Page for a subset of the specified list, determined by the pageable passed in.
    * @param originalList A list of values, some or all of which should be included in a page.
    * @param pageable An object used to encapsulate the pagination related values: page and size.
@@ -113,5 +121,4 @@ public class Pagination {
   public static <T> Page<T> getPage(List<T> subList, Pageable pageable, long fullListSize) {
     return new PageImpl<T>(subList, pageable, fullListSize);
   }
-
 }
