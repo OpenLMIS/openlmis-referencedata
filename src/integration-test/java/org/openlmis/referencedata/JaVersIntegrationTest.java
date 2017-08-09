@@ -45,7 +45,7 @@ import javax.annotation.Resource;
 @Transactional
 public class JaVersIntegrationTest {
 
-  @Resource(name = "javersProvidor")
+  @Resource(name = "javersProvider")
   private Javers javers;
 
   private static DateTimeZone defaultZone;

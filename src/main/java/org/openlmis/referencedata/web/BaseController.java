@@ -45,7 +45,7 @@ public abstract class BaseController {
   @Autowired
   RightService rightService;
 
-  @Resource(name = "javersProvidor")
+  @Resource(name = "javersProvider")
   private Javers javers;
 
   protected ResponseEntity<String> getAuditLogResponse(Class type, UUID id, String author,

@@ -51,7 +51,7 @@ public class AuditLogInitializer {
   @Autowired
   private ApplicationContext applicationContext;
 
-  @Resource(name = "javersProvidor")
+  @Resource(name = "javersProvider")
   private Javers javers;
 
   /**
