@@ -19,17 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -77,9 +67,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,6 +82,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import lombok.NoArgsConstructor;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
@@ -566,13 +568,8 @@ public class UserController extends BaseController {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     }
 
-    String auditLogs = getAuditLog(User.class, userId, author, changedPropertyName, page,
+    return getAuditLogResponse(User.class, userId, author, changedPropertyName, page,
         returnJson);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(returnJson ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
-
-    return new ResponseEntity<>(auditLogs, headers, HttpStatus.OK);
   }
   
   /**

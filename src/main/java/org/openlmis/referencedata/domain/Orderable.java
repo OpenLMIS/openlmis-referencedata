@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
@@ -50,6 +52,7 @@ import javax.persistence.UniqueConstraint;
  * that may be ordered/requisitioned, typically by a {@link Program}.
  */
 @Entity
+@TypeName("Orderable")
 @Table(name = "orderables", schema = "referencedata",
     uniqueConstraints = @UniqueConstraint(name = "unq_productCode", columnNames = "code"))
 @NoArgsConstructor
@@ -81,6 +84,7 @@ public class Orderable extends BaseEntity {
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
       fetch = FetchType.EAGER)
+  @DiffIgnore
   private Set<ProgramOrderable> programOrderables;
 
   @ElementCollection(fetch = FetchType.EAGER)

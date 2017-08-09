@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,6 +31,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "facility_operators", schema = "referencedata")
 @NoArgsConstructor
+@TypeName("FacilityOperator")
 public class FacilityOperator extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")

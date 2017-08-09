@@ -19,19 +19,28 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class GeographicLevelControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/geographicLevels";
@@ -256,6 +265,42 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(geographicLevel);
+
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }

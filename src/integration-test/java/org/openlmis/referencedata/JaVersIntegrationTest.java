@@ -29,7 +29,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -38,13 +37,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
 public class JaVersIntegrationTest {
 
-  @Autowired
+  @Resource(name = "javersProvider")
   private Javers javers;
 
   private static DateTimeZone defaultZone;

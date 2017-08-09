@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +40,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "rights", schema = "referencedata")
 @NoArgsConstructor
+@TypeName("Right")
 @SuppressWarnings({"PMD.UnusedPrivateField"})
 public class Right extends BaseEntity {
   private static final String TEXT = "text";
@@ -61,11 +65,11 @@ public class Right extends BaseEntity {
       joinColumns = @JoinColumn(name = "rightid", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "attachmentid", nullable = false))
   @Getter
+  @DiffIgnore
   private Set<Right> attachments = new HashSet<>();
 
-  @ManyToMany(
-      mappedBy = "rights"
-  )
+  @ManyToMany(mappedBy = "rights")
+  @DiffIgnore
   private Set<Role> roles;
 
   private Right(String name, RightType type) {

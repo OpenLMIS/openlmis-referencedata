@@ -20,13 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.openlmis.referencedata.domain.RightName.SUPPLY_LINES_MANAGE;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -50,6 +47,13 @@ import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.openlmis.referencedata.utils.AuditLogHelper;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -431,6 +435,42 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .get(ID_URL)
         .then()
         .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
+    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
+    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
+    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(supplyLine);
+
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

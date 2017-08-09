@@ -15,11 +15,13 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.UUID;
 
+@JaversSpringDataAuditable
 public interface GeographicLevelRepository extends
     PagingAndSortingRepository<GeographicLevel, UUID> {
 

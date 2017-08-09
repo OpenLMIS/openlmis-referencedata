@@ -15,12 +15,14 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.repository.custom.RequisitionGroupRepositoryCustom;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.UUID;
 
+@JaversSpringDataAuditable
 public interface RequisitionGroupRepository
     extends PagingAndSortingRepository<RequisitionGroup, UUID>, RequisitionGroupRepositoryCustom {
 

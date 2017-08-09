@@ -24,7 +24,6 @@ import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -35,7 +34,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 /**
  * AuditLogInitializer runs after its associated Spring application has loaded.
@@ -45,30 +46,30 @@ import java.util.Map;
  */
 @Component
 @Profile("!test")
-public class AuditLogInitializer implements CommandLineRunner {
+public class AuditLogInitializer {
 
   @Autowired
   private ApplicationContext applicationContext;
 
-  @Autowired
+  @Resource(name = "javersProvider")
   private Javers javers;
 
   /**
-   * This method is part of CommandLineRunner and is called automatically by Spring.
-   * @param args Main method arguments.
+   * Checks whether there are snapshots for domain entities in the audit log.
    */
-  public void run(String... args) {
-    //Get all JaVers repositories.
-    Map<String,Object> repositoryMap =
-        applicationContext.getBeansWithAnnotation(JaversSpringDataAuditable.class);
+  @PostConstruct
+  public void init() {
+    applicationContext
+        .getBeansWithAnnotation(JaversSpringDataAuditable.class)
+        .values()
+        .forEach(this::createSnapshots);
+  }
 
-    //For each one...
-    for (Object object : repositoryMap.values()) {
-      if (object instanceof PagingAndSortingRepository) {
-        createSnapshots((PagingAndSortingRepository<?, ?>) object);
-      } else if (object instanceof CrudRepository) {
-        createSnapshots((CrudRepository<?, ?>) object);
-      }
+  private void createSnapshots(Object bean) {
+    if (bean instanceof PagingAndSortingRepository) {
+      createSnapshots((PagingAndSortingRepository<?, ?>) bean);
+    } else if (bean instanceof CrudRepository) {
+      createSnapshots((CrudRepository<?, ?>) bean);
     }
   }
 

@@ -15,14 +15,16 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.FacilityTypeDto;
+import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramDto;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.dto.OrderableDto;
+
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -38,6 +40,7 @@ import javax.persistence.UniqueConstraint;
         columnNames = { "orderableId", "programId", "facilityTypeId" }))
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@TypeName("FacilityTypeApprovedProduct")
 public class FacilityTypeApprovedProduct extends BaseEntity {
 
   @ManyToOne

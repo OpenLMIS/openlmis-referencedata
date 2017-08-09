@@ -19,15 +19,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 import com.google.common.collect.Sets;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
@@ -36,9 +33,18 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/roles";
@@ -274,6 +280,42 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
         .delete(ID_URL)
         .then()
         .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
+    given(roleRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
+    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
+        .when(rightService)
+        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
+    given(roleRepository.findOne(any(UUID.class))).willReturn(null);
+
+    AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAuditLog() {
+    doNothing()
+        .when(rightService)
+        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
+    given(roleRepository.findOne(any(UUID.class))).willReturn(role);
+
+    AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

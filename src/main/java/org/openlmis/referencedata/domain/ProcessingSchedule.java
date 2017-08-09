@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,6 +35,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "processing_schedules", schema = "referencedata")
 @NoArgsConstructor
+@TypeName("ProcessingSchedule")
 public class ProcessingSchedule extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
