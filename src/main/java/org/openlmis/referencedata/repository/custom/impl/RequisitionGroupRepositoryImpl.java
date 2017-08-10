@@ -25,6 +25,8 @@ import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -33,8 +35,6 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.Collections;
-import java.util.List;
 
 public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositoryCustom {
 
@@ -90,6 +90,7 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
                                             String name, Program program,
                                             List<SupervisoryNode> supervisoryNodes,
                                             boolean count) {
+
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     Root<RequisitionGroup> root = query.from(RequisitionGroup.class);

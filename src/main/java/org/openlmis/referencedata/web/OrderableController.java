@@ -172,10 +172,14 @@ public class OrderableController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     profiler.start("ORDERABLE_SERVICE_SEARCH");
-    List<Orderable> orderables = orderableService.searchOrderables(queryParams);
+    Page<Orderable> orderablesPage = orderableService.searchOrderables(queryParams, pageable);
 
     profiler.start("ORDERABLE_PAGINATION");
-    Page<OrderableDto> page = Pagination.getPage(OrderableDto.newInstance(orderables), pageable);
+    assert orderablesPage != null;
+    Page<OrderableDto> page = Pagination.getPage(OrderableDto.newInstance(
+        orderablesPage.getContent()),
+        pageable,
+        orderablesPage.getTotalElements());
 
     profiler.stop().log();
     XLOGGER.exit(page);

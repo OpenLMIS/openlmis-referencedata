@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.service;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Code;
@@ -26,15 +25,14 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -53,22 +51,29 @@ public class OrderableService {
   private ProgramRepository programRepository;
 
   /**
+   * Searches for Orderables with Page defaults.
+   * See {@link #searchOrderables(Map, Pageable)}
+   */
+  public Page<Orderable> searchOrderables(Map<String, Object> queryMap) {
+    return this.searchOrderables(queryMap, null);
+  }
+
+  /**
    * Method returns all orderables with matched parameters.
    *
    * @param queryMap request parameters (code, name, description, program).
-   * @return List of orderables
+   * @param pageable the page to get, or one page with all if null.
+   * @return the Page of orderables found, or an empty page.
    */
-  public List<Orderable> searchOrderables(Map<String, Object> queryMap) {
+  public Page<Orderable> searchOrderables(Map<String, Object> queryMap, Pageable pageable) {
 
     if (MapUtils.isEmpty(queryMap)) {
-      return Lists.newArrayList(orderableRepository.findAll());
+      return orderableRepository.findAll(pageable);
     }
 
     Set<UUID> ids = getIds(queryMap);
     if (!ids.isEmpty()) {
-      List<Orderable> orderables = new ArrayList<>();
-      orderableRepository.findAll(ids).forEach(orderables::add);
-      return orderables;
+      return orderableRepository.findAllById(ids, pageable);
     }
 
     String code = MapUtils.getString(queryMap, CODE, null);
@@ -91,9 +96,12 @@ public class OrderableService {
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
 
-    List<Orderable> foundOrderables = orderableRepository.search(code, name, workingProgramCode);
+    Page<Orderable> foundOrderables = orderableRepository.search(code,
+        name,
+        workingProgramCode,
+        pageable);
 
-    return Optional.ofNullable(foundOrderables).orElse(Collections.emptyList());
+    return foundOrderables;
   }
 
   private Set<UUID> getIds(Map<String, Object> queryMap) {

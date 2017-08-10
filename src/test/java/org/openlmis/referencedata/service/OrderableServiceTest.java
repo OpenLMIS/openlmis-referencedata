@@ -17,24 +17,31 @@ package org.openlmis.referencedata.service;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+@RunWith(MockitoJUnitRunner.class)
 public class OrderableServiceTest {
 
   private static final String CODE = "code";
@@ -100,11 +108,17 @@ public class OrderableServiceTest {
 
   @Test
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
-    when(orderableRepository.findAll()).thenReturn(orderableList);
+    // given
+    Page thePage = Pagination.getPage(orderableList, null);
+    when(orderableRepository.findAll(isNull(Pageable.class)))
+        .thenReturn(thePage);
 
-    List<Orderable> actual = orderableService.searchOrderables(new HashMap<>());
-    verify(orderableRepository).findAll();
-    assertEquals(orderableList, actual);
+    // when
+    Page<Orderable> actual = orderableService.searchOrderables(new HashMap<>());
+
+    // then
+    verify(orderableRepository).findAll(isNull(Pageable.class));
+    assertEquals(thePage, actual);
   }
 
   @Test
@@ -113,8 +127,12 @@ public class OrderableServiceTest {
     final String name = "Orderable";
 
     when(program.getCode()).thenReturn(Code.code(programCode));
-    when(orderableRepository.search(code, name, program.getCode()))
-        .thenReturn(Lists.newArrayList(orderable1, orderable2));
+    when(orderableRepository.search(
+        eq(code),
+        eq(name),
+        eq(Code.code(programCode)),
+        isNull(Pageable.class)))
+      .thenReturn(Pagination.getPage(Lists.newArrayList(orderable1, orderable2)));
     when(programRepository.existsByCode(program.getCode())).thenReturn(true);
 
     Map<String, Object> params = new HashMap<>();
@@ -122,11 +140,14 @@ public class OrderableServiceTest {
     params.put(NAME, name);
     params.put(PROGRAM_CODE, programCode);
 
-    final List<Orderable> actual = orderableService.searchOrderables(params);
+    final Page<Orderable> actual = orderableService.searchOrderables(params);
 
-    verify(orderableRepository).search(eq(code), eq(name), eq(Code.code(programCode)));
+    verify(orderableRepository).search(eq(code),
+        eq(name),
+        eq(Code.code(programCode)),
+        isNull(Pageable.class));
 
-    assertEquals(2, actual.size());
+    assertEquals(2, actual.getTotalElements());
     assertThat(actual, hasItem(orderable1));
     assertThat(actual, hasItem(orderable2));
   }
@@ -136,17 +157,50 @@ public class OrderableServiceTest {
     Set<String> ids = new HashSet<>();
     ids.add(orderableId.toString());
 
-    when(orderableRepository.findAll(anySetOf(UUID.class)))
-            .thenReturn(Lists.newArrayList(orderable2));
+    when(orderableRepository.findAllById(anySetOf(UUID.class), isNull(Pageable.class)))
+            .thenReturn(Pagination.getPage(Lists.newArrayList(orderable2)));
 
     Map<String, Object> params = new HashMap<>();
     params.put(IDS, ids);
 
-    final List<Orderable> actual = orderableService.searchOrderables(params);
+    final Page<Orderable> actual = orderableService.searchOrderables(params);
 
-    verify(orderableRepository).findAll(anySetOf(UUID.class));
+    verify(orderableRepository).findAllById(anySetOf(UUID.class), isNull(Pageable.class));
 
-    assertEquals(1, actual.size());
+    assertEquals(1, actual.getTotalElements());
     assertThat(actual, hasItem(orderable2));
+  }
+
+  @Test
+  public void searchShouldReturnAnEmptyPageWithFindAll() {
+    // given
+    when(orderableRepository.findAll(isNull(Pageable.class)))
+        .thenReturn(Pagination.getPage(Lists.newArrayList()));
+
+    // when
+    final Page<Orderable> actual = orderableService.searchOrderables(null, null);
+
+    // then
+    verify(orderableRepository).findAll(isNull(Pageable.class));
+    assertNotNull(actual);
+  }
+
+  @Test
+  public void searchShouldReturnAnEmptyPageWithFindAllById() {
+    // given
+    Set<String> ids = new HashSet<>();
+    ids.add(orderableId.toString());
+    when(orderableRepository.findAllById(anySetOf(UUID.class), isNull(Pageable.class)))
+        .thenReturn(Pagination.getPage(Lists.newArrayList()));
+
+    // when
+    Map<String, Object> params = new HashMap<>();
+    params.put(IDS, ids);
+    final Page<Orderable> actual = orderableService.searchOrderables(params, null);
+
+    // then
+    verify(orderableRepository).findAllById(anySetOf(UUID.class), isNull(Pageable.class));
+    assertNotNull(actual);
+    assertNotNull(actual.getContent());
   }
 }

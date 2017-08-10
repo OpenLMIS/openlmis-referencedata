@@ -15,10 +15,14 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -51,10 +55,39 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
    * @param programCode Wanted program.
    * @return List of orderables matching the parameters.
    */
-  public List<Orderable> search(String code, String name, Code programCode) {
+  public Page<Orderable> search(String code, String name, Code programCode, Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Orderable> query = builder.createQuery(Orderable.class);
+
+    CriteriaQuery<Orderable> orderableQuery = builder.createQuery(Orderable.class);
+    orderableQuery = prepareQuery(orderableQuery, code, name, programCode, false);
+
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    countQuery = prepareQuery(countQuery, code, name, programCode, true);
+
+    Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+    List<Orderable> orderableList = entityManager.createQuery(orderableQuery)
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
+        .getResultList();
+    return Pagination.getPage(orderableList, pageable, count);
+  }
+
+  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query,
+                                            String code,
+                                            String name,
+                                            Code programCode,
+                                            boolean count) {
+
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<Orderable> root = query.from(Orderable.class);
+
+    if ( count ) {
+      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
+      query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
+    }
+
     Predicate predicate = builder.conjunction();
 
     if (code != null) {
@@ -74,10 +107,10 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
           .INNER);
       predicate = builder.and(predicate,
           builder.like(builder.upper(programs.get(CODE).get("code")),
-            programCode.toString().toUpperCase()));
+              programCode.toString().toUpperCase()));
     }
 
     query.where(predicate);
-    return entityManager.createQuery(query).getResultList();
+    return query;
   }
 }

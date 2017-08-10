@@ -19,8 +19,11 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -39,5 +42,7 @@ public interface OrderableRepository extends
   <S extends Orderable> S findByProductCode(Code code);
 
   boolean existsByProductCode(Code code);
+
+  Page<Orderable> findAllById(Collection<UUID> ids, Pageable pageable);
 
 }

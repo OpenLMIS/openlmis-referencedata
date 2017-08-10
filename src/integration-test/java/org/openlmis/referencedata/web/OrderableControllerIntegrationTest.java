@@ -21,6 +21,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_DUPLICATED;
@@ -30,7 +32,7 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
 import com.google.common.collect.ImmutableMap;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -47,10 +49,11 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -246,7 +249,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(PROGRAM_CODE, programCode);
     requestBody.put(IDS, orderable.getId());
 
-    when(orderableService.searchOrderables(requestBody)).thenReturn(items);
+    when(orderableService.searchOrderables(eq(requestBody), any(Pageable.class)))
+        .thenReturn(Pagination.getPage(items));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -258,6 +262,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
+
+    verify(orderableService).searchOrderables(eq(requestBody), any(Pageable.class));
 
     checkIfEquals(response, OrderableDto.newInstance(items));
   }
@@ -277,12 +283,14 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     requestBody.put(PROGRAM_CODE, programCode);
     requestBody.put(IDS, orderable.getId());
 
-    when(orderableService.searchOrderables(requestBody)).thenReturn(items);
+    Pageable page = new PageRequest(0, 10);
+    when(orderableService.searchOrderables(requestBody, page))
+        .thenReturn(Pagination.getPage(items, page));
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam("page", 0)
-        .queryParam("size", 1)
+        .queryParam("page", page.getPageNumber())
+        .queryParam("size", page.getPageSize())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -296,7 +304,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(1, response.getTotalElements());
     assertEquals(1, response.getTotalPages());
     assertEquals(1, response.getNumberOfElements());
-    assertEquals(1, response.getSize());
+    assertEquals(10, response.getSize());
     assertEquals(0, response.getNumber());
   }
 

@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -29,14 +30,15 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
@@ -151,9 +153,9 @@ public class OrderableRepositoryIntegrationTest
 
   @Test
   public void shouldNotFindAnyOrderableForIncorrectCodeAndName() {
-    List<Orderable> foundOrderables = repository.search("something", "something", null);
+    Page<Orderable> foundOrderables = repository.search("something", "something", null, null);
 
-    assertEquals(0, foundOrderables.size());
+    assertEquals(0, foundOrderables.getTotalElements());
   }
 
   @Test
@@ -178,10 +180,11 @@ public class OrderableRepositoryIntegrationTest
     invalidProgramOrderables.add(createProgramOrderable(invalidProgram, invalidOrderable));
     repository.save(invalidOrderable);
 
-    List<Orderable> foundOrderables = repository.search(null, null, validProgram.getCode());
+    Page<Orderable> foundOrderables = repository.search(null, null, validProgram.getCode(),
+        null);
 
-    assertEquals(1, foundOrderables.size());
-    assertEquals(validOrderable.getId(), foundOrderables.get(0).getId());
+    assertEquals(1, foundOrderables.getTotalElements());
+    assertEquals(validOrderable.getId(), foundOrderables.getContent().get(0).getId());
   }
 
   @Test
@@ -219,11 +222,13 @@ public class OrderableRepositoryIntegrationTest
     Orderable orderableWithCode = generateInstance();
     repository.save(orderableWithCode);
 
-    List<Orderable> foundOrderables = repository
-        .search(validOrderable.getProductCode().toString(), CODE, validProgram.getCode());
+    Page<Orderable> foundOrderables = repository.search(validOrderable.getProductCode().toString(),
+        CODE,
+        validProgram.getCode(),
+        null);
 
-    assertEquals(1, foundOrderables.size());
-    assertEquals(validOrderable.getId(), foundOrderables.get(0).getId());
+    assertEquals(1, foundOrderables.getTotalElements());
+    assertEquals(validOrderable.getId(), foundOrderables.getContent().get(0).getId());
   }
 
   @Test
@@ -253,14 +258,67 @@ public class OrderableRepositoryIntegrationTest
     entityManager.flush();
   }
 
+  @Test
+  public void findAllShouldReturnEmptyPageNotNull() {
+    // given and when
+    Pageable pageable = null;
+    Page<Orderable> actual = repository.findAll(pageable);
+
+    // then
+    assertNotNull(actual);
+    assertNotNull(actual.getContent());
+  }
+
+  @Test
+  public void findAllByIdsShouldReturnEmptyPageNotNull() {
+    // given and when
+    Page<Orderable> actual = repository.findAllById(null, null);
+
+    // then
+    assertNotNull(actual);
+    assertNotNull(actual.getContent());
+  }
+
+  @Test
+  public void searchShouldReturnEmptyPageNotNull() {
+    // given and when
+    Page<Orderable> actual = repository.search(null, null, null, null);
+
+    // then
+    assertNotNull(actual);
+    assertNotNull(actual.getContent());
+  }
+
+  @Test
+  public void searchShouldPaginate() {
+    // given
+    for (int i = 0; i < 10; ++i) {
+      Orderable orderable = generateInstance();
+      repository.save(orderable);
+    }
+
+    // when
+    Pageable pageable = new PageRequest(1, 2);
+    Page<Orderable> actual = repository.search(null, null, null, pageable);
+
+    // then
+    assertNotNull(actual);
+    assertEquals(1, actual.getNumber());
+    assertEquals(2, actual.getSize());
+    assertEquals(5, actual.getTotalPages());
+    assertEquals(10, actual.getTotalElements());
+    assertEquals(2, actual.getContent().size());
+  }
+
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
                                              Orderable orderable, int expectedSize) {
     Code programCode = null == program ? null : program.getCode();
-    List<Orderable> foundOrderables = repository.search(code, name, programCode);
+    Page<Orderable> foundOrderables = repository.search(code, name, programCode, null);
 
-    assertEquals(expectedSize, foundOrderables.size());
+    assertEquals(expectedSize, foundOrderables.getTotalElements());
 
-    assertEquals(orderable.getFullProductName(), foundOrderables.get(0).getFullProductName());
+    assertEquals(orderable.getFullProductName(),
+        foundOrderables.getContent().get(0).getFullProductName());
   }
 
   private ProgramOrderable createProgramOrderable(Program program, Orderable orderable) {
