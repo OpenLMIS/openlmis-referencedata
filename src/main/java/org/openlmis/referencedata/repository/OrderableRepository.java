@@ -21,9 +21,9 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -43,6 +43,7 @@ public interface OrderableRepository extends
 
   boolean existsByProductCode(Code code);
 
-  Page<Orderable> findAllById(Collection<UUID> ids, Pageable pageable);
+  @Query("SELECT o FROM Orderable o WHERE o.id in ?1")
+  Page<Orderable> findAllById(Iterable<UUID> ids, Pageable pageable);
 
 }

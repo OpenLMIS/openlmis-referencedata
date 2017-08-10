@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.Sets;
 import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -83,6 +84,25 @@ public class OrderableRepositoryIntegrationTest
     HashMap<String, String> extraData = new HashMap<>();
     return new Orderable(productCode, Dispensable.createNew(EACH),
         NAME, DESCRIPTION, 10, 5, false, new HashSet<>(), identificators, extraData);
+  }
+
+  @Test
+  public void findAllByIdShouldFindAll() {
+    // given orderables I want
+    Orderable orderable = generateInstance();
+    orderable = repository.save(orderable);
+    Orderable orderable2 = generateInstance();
+    orderable2 = repository.save(orderable2);
+
+    // given an orderable I don't
+    repository.save(generateInstance());
+
+    // when
+    Set<UUID> ids = Sets.newHashSet(orderable.getId(), orderable2.getId());
+    Page<Orderable> found = repository.findAllById(ids, null);
+
+    // then
+    assertEquals(2, found.getTotalElements());
   }
 
   @Test
@@ -153,13 +173,7 @@ public class OrderableRepositoryIntegrationTest
 
   @Test
   public void shouldNotFindAnyOrderableForIncorrectCodeAndName() {
-    Page<Orderable> foundOrderables = repository.search("something", "something", null, null);
-
-    assertEquals(0, foundOrderables.getTotalElements());
-  }
-
-  @Test
-  public void shouldFindOrderablesByProgram() {
+    // given a program and an orderable in that program
     Program validProgram = new Program("valid-code");
     programRepository.save(validProgram);
     Set<ProgramOrderable> programOrderables = new HashSet<>();
@@ -170,6 +184,27 @@ public class OrderableRepositoryIntegrationTest
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
 
+    // when
+    Page<Orderable> foundOrderables = repository.search("something", "something", null, null);
+
+    // then
+    assertEquals(0, foundOrderables.getTotalElements());
+  }
+
+  @Test
+  public void shouldFindOrderablesByProgram() {
+    // given a program and an orderable in that program
+    Program validProgram = new Program("some-code");
+    programRepository.save(validProgram);
+    Set<ProgramOrderable> programOrderables = new HashSet<>();
+    Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
+        Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
+        null);
+    repository.save(validOrderable);
+    programOrderables.add(createProgramOrderable(validProgram, validOrderable));
+    repository.save(validOrderable);
+
+    // given another program and another orderable in that program
     Program invalidProgram = new Program("invalid-code");
     programRepository.save(invalidProgram);
     Set<ProgramOrderable> invalidProgramOrderables = new HashSet<>();
@@ -180,18 +215,22 @@ public class OrderableRepositoryIntegrationTest
     invalidProgramOrderables.add(createProgramOrderable(invalidProgram, invalidOrderable));
     repository.save(invalidOrderable);
 
+    // when
     Page<Orderable> foundOrderables = repository.search(null, null, validProgram.getCode(),
         null);
 
+    // then
     assertEquals(1, foundOrderables.getTotalElements());
     assertEquals(validOrderable.getId(), foundOrderables.getContent().get(0).getId());
   }
 
   @Test
   public void shouldFindOrderablesByProgramCodeIgnoreCase() {
-    // given
-    Program validProgram = new Program("valid-code");
+    // given a program
+    Program validProgram = new Program("a-code");
     programRepository.save(validProgram);
+
+    // given an orderable in that program
     Set<ProgramOrderable> programOrderables = new HashSet<>();
     Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
         Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
@@ -200,18 +239,25 @@ public class OrderableRepositoryIntegrationTest
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
 
+    // given an orderable not in that program
+    Orderable orderableWithCode = generateInstance();
+    repository.save(orderableWithCode);
+
     // when & then
     searchOrderablesAndCheckResults(null,
         null,
-        new Program("VALID-CODE"),
+        new Program("a-code"),
         validOrderable,
         1);
   }
 
   @Test
-  public void shouldFindFacilitiesByAllParams() {
-    Program validProgram = new Program("valid-code");
+  public void shouldFindOrderablesByAllParams() {
+    // given a program
+    Program validProgram = new Program("some-test-code");
     programRepository.save(validProgram);
+
+    // given an orderable in that program
     Set<ProgramOrderable> programOrderables = new HashSet<>();
     Orderable validOrderable = new Orderable(Code.code(CODE), Dispensable.createNew(EACH),
         NAME, DESCRIPTION, 10, 5, false, programOrderables, null, null);
@@ -219,14 +265,17 @@ public class OrderableRepositoryIntegrationTest
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
 
+    // given some other orderable
     Orderable orderableWithCode = generateInstance();
     repository.save(orderableWithCode);
 
+    // when
     Page<Orderable> foundOrderables = repository.search(validOrderable.getProductCode().toString(),
         CODE,
         validProgram.getCode(),
         null);
 
+    // then
     assertEquals(1, foundOrderables.getTotalElements());
     assertEquals(validOrderable.getId(), foundOrderables.getContent().get(0).getId());
   }
