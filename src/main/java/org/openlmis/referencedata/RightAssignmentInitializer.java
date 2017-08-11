@@ -38,11 +38,10 @@ import org.springframework.util.StreamUtils;
 /**
  * RightAssignmentInitializer runs after its associated Spring application has loaded. It 
  * automatically re-generates right assignments into the database, after dropping the existing 
- * right assignments. This component only runs when the "generate-right-assignments" Spring 
- * profile is set.
+ * right assignments. This component only runs when the "refresh-db" Spring profile is set.
  */
 @Component
-@Profile("generate-right-assignments")
+@Profile("refresh-db")
 public class RightAssignmentInitializer implements CommandLineRunner {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(
