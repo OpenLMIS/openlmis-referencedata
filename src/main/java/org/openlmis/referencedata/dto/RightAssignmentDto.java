@@ -13,10 +13,11 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.dto;
 
 import java.util.Objects;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,7 +31,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RightAssignmentDto {
+@AllArgsConstructor
+public class RightAssignmentDto extends BaseDto {
   
   private UUID userId;
   private String rightName;

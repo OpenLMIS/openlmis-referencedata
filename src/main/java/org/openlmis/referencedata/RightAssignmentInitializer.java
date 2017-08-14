@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.openlmis.referencedata.dto.RightAssignmentDto;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,8 @@ public class RightAssignmentInitializer implements CommandLineRunner {
   
   private static final String RIGHT_ASSIGNMENTS_PATH = "classpath:db/right-assignments/";
 
+  static final String DELETE_SQL = "DELETE FROM referencedata.right_assignments;";
+
   @Value(value = RIGHT_ASSIGNMENTS_PATH + "get_right_assignments.sql")
   private Resource rightAssignmentsResource;
 
@@ -57,22 +60,45 @@ public class RightAssignmentInitializer implements CommandLineRunner {
 
   @Autowired
   JdbcTemplate template;
-
+  
   /**
    * Re-generates right assignments.
    * @param args command line arguments
    */
   public void run(String... args) throws IOException {
     XLOGGER.entry();
-
+    
     // Drop existing rows; we are regenerating from scratch
     XLOGGER.debug("Drop existing right assignments");
-    template.update("DELETE FROM referencedata.right_assignments;");
+    template.update(DELETE_SQL);
 
     // Get a right assignment matrix from database
     XLOGGER.debug("Get intermediate right assignments from role assignments");
-    List<RightAssignmentDto> dbRightAssignments = template.query(
-        resourceToString(rightAssignmentsResource),
+    List<RightAssignmentDto> dbRightAssignments = getRightAssignmentsFromDbResource(
+        rightAssignmentsResource);
+
+    // Convert matrix to a set of right assignments to insert
+    XLOGGER.debug("Convert intermediate right assignments to right assignments for insert");
+    Set<RightAssignmentDto> rightAssignmentsToInsert = convertForInsert(dbRightAssignments,
+        supervisedFacilitiesResource);
+
+    // Convert set of right assignments to insert to a set of SQL inserts
+    XLOGGER.debug("Convert right assignments to SQL inserts");
+    Set<String> rightAssignmentSqlInserts = rightAssignmentsToInsert.stream()
+        .map(this::convertRightAssignmentToSqlInsertString)
+        .collect(Collectors.toSet());
+
+    XLOGGER.debug("Perform SQL inserts");
+    int[] updateCounts = template.batchUpdate(
+        rightAssignmentSqlInserts.toArray(new String[rightAssignmentSqlInserts.size()]));
+
+    XLOGGER.exit("Total db updates: " + Arrays.stream(updateCounts).sum());
+  }
+
+  List<RightAssignmentDto> getRightAssignmentsFromDbResource(Resource resource)
+      throws IOException {
+    return template.query(
+        resourceToString(resource),
         (ResultSet rs, int rowNum) -> {
 
           RightAssignmentDto rightAssignmentMap = new RightAssignmentDto();
@@ -91,58 +117,48 @@ public class RightAssignmentInitializer implements CommandLineRunner {
           return rightAssignmentMap;
         }
     );
+  }
 
-    // Convert matrix to a set of right assignments to insert
-    XLOGGER.debug("Convert intermediate right assignments to right assignments for insert");
+  Set<RightAssignmentDto> convertForInsert(List<RightAssignmentDto> rightAssignments,
+      Resource supervisedFacilitiesResource)
+      throws IOException {
     Set<RightAssignmentDto> rightAssignmentsToInsert = new HashSet<>();
-    for (RightAssignmentDto dbRightAssignment : dbRightAssignments) {
+    for (RightAssignmentDto rightAssignment : rightAssignments) {
 
-      if (null != dbRightAssignment.getSupervisoryNodeId()) {
+      if (null != rightAssignment.getSupervisoryNodeId()) {
 
         // Special case: supervisory node is present. We need to expand the supervisory node and 
         // turn it into a list of all facility IDs being supervised by this node.
 
         // Get all supervised facilities. Add each facility to the set.
-        List<UUID> facilityIds = template.queryForList(
-            resourceToString(supervisedFacilitiesResource),
-            UUID.class,
-            dbRightAssignment.getSupervisoryNodeId(),
-            dbRightAssignment.getProgramId());
+        List<UUID> facilityIds = getSupervisedFacilityIds(supervisedFacilitiesResource,
+            rightAssignment.getSupervisoryNodeId(),
+            rightAssignment.getProgramId());
 
         for (UUID facilityId : facilityIds) {
 
           rightAssignmentsToInsert.add(new RightAssignmentDto(
-              dbRightAssignment.getUserId(),
-              dbRightAssignment.getRightName(),
+              rightAssignment.getUserId(),
+              rightAssignment.getRightName(),
               facilityId,
-              dbRightAssignment.getProgramId()));
+              rightAssignment.getProgramId()));
         }
       } else {
 
         // All other cases: home facility supervision, fulfillment and direct right assignments.
         // Just copy everything but the supervisoryNodeId and add it to the set.
         rightAssignmentsToInsert.add(new RightAssignmentDto(
-            dbRightAssignment.getUserId(),
-            dbRightAssignment.getRightName(),
-            dbRightAssignment.getFacilityId(),
-            dbRightAssignment.getProgramId()));
+            rightAssignment.getUserId(),
+            rightAssignment.getRightName(),
+            rightAssignment.getFacilityId(),
+            rightAssignment.getProgramId()));
       }
     }
 
-    // Convert set of right assignments to insert to a set of SQL inserts
-    XLOGGER.debug("Convert right assignments to SQL inserts");
-    Set<String> rightAssignmentSqlInserts = rightAssignmentsToInsert.stream()
-        .map(this::convertRightAssignmentToSqlInsertString)
-        .collect(Collectors.toSet());
-
-    XLOGGER.debug("Perform SQL inserts");
-    int[] updateCounts = template.batchUpdate(
-        rightAssignmentSqlInserts.toArray(new String[rightAssignmentSqlInserts.size()]));
-
-    XLOGGER.exit("Total db updates: " + Arrays.stream(updateCounts).sum());
+    return rightAssignmentsToInsert;
   }
   
-  private String convertRightAssignmentToSqlInsertString(RightAssignmentDto rightAssignmentDto) {
+  String convertRightAssignmentToSqlInsertString(RightAssignmentDto rightAssignmentDto) {
     String insertValues = String.join(",",
         surroundWithSingleQuotes(UUID.randomUUID().toString()),
         surroundWithSingleQuotes(rightAssignmentDto.getUserId().toString()),
@@ -158,7 +174,18 @@ public class RightAssignmentInitializer implements CommandLineRunner {
         + insertValues
         + ");";
   }
-  
+
+  private List<UUID> getSupervisedFacilityIds(Resource supervisedFacilitiesResource,
+      UUID supervisoryNodeId, UUID programId)
+      throws IOException {
+
+    return template.queryForList(
+        resourceToString(supervisedFacilitiesResource),
+        UUID.class,
+        supervisoryNodeId,
+        programId);
+  }
+
   private String surroundWithSingleQuotes(String str) {
     return "'" + str + "'";
   }
