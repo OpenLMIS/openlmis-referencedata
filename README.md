@@ -211,6 +211,18 @@ $ export spring_profiles_active=demo-data,performance-data
 $ gradle bootRun
 ```
 
+### Database Refresh
+In order to improve performance on checking permissions, the database stores a set of right 
+assignments for all users. If the database has no assignments or incorrect assignments set in 
+this table, it may be necessary to refresh this table from time to time. A mechanism has been 
+created to allow these right assignments to be re-generated, by activating the `refresh-db` 
+Spring profile. For example:
+
+```shell
+$ export spring_profiles_active=demo-data,refresh-db
+$ gradle bootRun
+```
+
 ## Production by Spring Profile
 
 By default when this service is started, it will clean its schema in the database before migrating
