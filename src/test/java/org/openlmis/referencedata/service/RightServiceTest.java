@@ -27,7 +27,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.springframework.security.core.Authentication;
@@ -45,9 +44,6 @@ public class RightServiceTest {
 
   @Mock
   private UserRepository userRepository;
-
-  @Mock
-  private RightAssignmentRepository rightAssignmentRepository;
 
   @InjectMocks
   private RightService rightService;
@@ -87,8 +83,8 @@ public class RightServiceTest {
   public void checkAdminRightShouldAllowUserWhoHasRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
     when(userClient.getPrincipal()).thenReturn(userId);
-    when(rightAssignmentRepository.existsByUserIdAndRightName(user.getId(), RIGHT_NAME))
-        .thenReturn(true);
+    when(userRepository.findOne(any(UUID.class))).thenReturn(user);
+    when(user.hasRight(any(RightQuery.class))).thenReturn(true);
 
     rightService.checkAdminRight(RIGHT_NAME);
   }
@@ -108,8 +104,8 @@ public class RightServiceTest {
   public void checkAdminRightShouldThrowUnauthorizedExceptionForUserWhoDoesNotHaveRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
     when(userClient.getPrincipal()).thenReturn(userId);
-    when(rightAssignmentRepository.existsByUserIdAndRightName(user.getId(), RIGHT_NAME))
-        .thenReturn(false);
+    when(userRepository.findOne(any(UUID.class))).thenReturn(user);
+    when(user.hasRight(any(RightQuery.class))).thenReturn(false);
 
     rightService.checkAdminRight(RIGHT_NAME);
   }
