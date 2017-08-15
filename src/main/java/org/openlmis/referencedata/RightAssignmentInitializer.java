@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,7 @@ import org.springframework.util.StreamUtils;
  */
 @Component
 @Profile("refresh-db")
+@Order(10)
 public class RightAssignmentInitializer implements CommandLineRunner {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(

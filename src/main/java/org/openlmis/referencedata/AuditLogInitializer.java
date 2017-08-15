@@ -18,6 +18,9 @@ package org.openlmis.referencedata;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_SIZE;
 
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -26,17 +29,13 @@ import org.openlmis.referencedata.domain.BaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 /**
  * AuditLogInitializer runs after its associated Spring application has loaded.
@@ -46,6 +45,7 @@ import javax.annotation.Resource;
  */
 @Component
 @Profile("!test")
+@Order(20)
 public class AuditLogInitializer {
 
   @Autowired

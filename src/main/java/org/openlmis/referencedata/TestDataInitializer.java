@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata;
 
+import java.io.IOException;
 import org.openlmis.referencedata.util.Resource2Db;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -22,14 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 @Component
 @Profile("performance-data")
+@Order(5)
 public class TestDataInitializer implements CommandLineRunner {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
   private static final String PERF_DATA_PATH = "classpath:db/performance-data/";
@@ -42,6 +43,12 @@ public class TestDataInitializer implements CommandLineRunner {
 
   @Value(value = PERF_DATA_PATH + "orderables.csv")
   private Resource orderablesResource;
+
+  @Value(value = PERF_DATA_PATH + "requisition_group_members.csv")
+  private Resource requisitionGroupMembersResource;
+
+  @Value(value = PERF_DATA_PATH + "supported_programs.csv")
+  private Resource supportedProgramsResource;
 
   @Autowired
   private JdbcTemplate template;
@@ -58,6 +65,9 @@ public class TestDataInitializer implements CommandLineRunner {
     r2db.updateDbFromSql(usersResource);
     r2db.insertToDbFromCsv("referencedata.facilities", facilitiesResource);
     r2db.insertToDbFromCsv("referencedata.orderables", orderablesResource);
+    r2db.insertToDbFromCsv("referencedata.requisition_group_members",
+        requisitionGroupMembersResource);
+    r2db.insertToDbFromCsv("referencedata.supported_programs", supportedProgramsResource);
 
     XLOGGER.exit();
   }
