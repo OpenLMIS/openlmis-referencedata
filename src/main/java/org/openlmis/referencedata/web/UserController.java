@@ -213,10 +213,17 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Set<UserDto> getAllUsers() {
+    Profiler profiler = new Profiler("GET_USERS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     LOGGER.debug("Getting all users");
+    profiler.start("GET_ALL_USERS");
     Set<User> users = Sets.newHashSet(userRepository.findAll());
+
+    profiler.stop().log();
     return users.stream().map(this::exportUserToDto).collect(toSet());
   }
 
