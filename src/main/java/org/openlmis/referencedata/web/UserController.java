@@ -262,13 +262,19 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Set<DetailedRoleAssignmentDto> getUserRightsAndRoles(@PathVariable("userId") UUID userId) {
+    Profiler profiler = new Profiler("GET_USER_ROLE_ASSIGNMENTS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
+    profiler.start("FIND_USER_ROLE_ASSIGNMENTS");
     User user = userRepository.findOne(userId);
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
       Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
+      profiler.stop().log();
       return exportRoleAssignmentsToDtos(roleAssignments);
     }
   }
