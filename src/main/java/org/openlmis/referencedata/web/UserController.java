@@ -312,11 +312,20 @@ public class UserController extends BaseController {
   @ResponseBody
   public Page<UserDto> searchUsers(
       @RequestBody Map<String, Object> queryMap, Pageable pageable) {
+
+    Profiler profiler = new Profiler("POST_USER_SEARCH");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN_RIGHT");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
+    profiler.start("SEARCH_USERS");
     List<User> result = userService.searchUsers(queryMap);
+
+    profiler.start("EXPORT_TO_DTOS");
     List<UserDto> userDtos = exportUsersToDtos(result);
 
+    profiler.stop().log();
     return Pagination.getPage(userDtos, pageable);
   }
 
