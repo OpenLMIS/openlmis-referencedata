@@ -560,16 +560,28 @@ public class UserController extends BaseController {
           boolean returnJson,
       Pageable page) {
 
+    Profiler profiler = new Profiler("GET_USER_AUDIT_LOG");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     //Return a 404 if the specified user can't be found
-    User user = userRepository.findOne(userId);
-    if (user == null) {
+    profiler.start("CHECK_USER_EXISTS");
+    if (false == userRepository.exists(userId)) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     }
 
-    return getAuditLogResponse(User.class, userId, author, changedPropertyName, page,
+    profiler.start("GET_AUDIT_LOG");
+    ResponseEntity responseEntity = getAuditLogResponse(User.class,
+        userId,
+        author,
+        changedPropertyName,
+        page,
         returnJson);
+
+    profiler.stop().log();
+    return responseEntity;
   }
   
   /**

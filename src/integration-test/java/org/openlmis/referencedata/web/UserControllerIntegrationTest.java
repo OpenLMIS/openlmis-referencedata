@@ -1064,7 +1064,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-    given(userRepository.findOne(any(UUID.class))).willReturn(user1);
+    given(userRepository.exists(any(UUID.class))).willReturn(true);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
