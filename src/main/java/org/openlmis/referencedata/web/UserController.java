@@ -460,11 +460,19 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Set<ProgramDto> getUserSupportedPrograms(@PathVariable(USER_ID) UUID userId) {
+    Profiler profiler = new Profiler("GET_USER_SUPPORTED_PROGRAMS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
+    profiler.start("VALIDATE_USER");
     User user = validateUser(userId);
 
+    profiler.start("GET_HOME_FACILITY");
     Facility homeFacility = user.getHomeFacility();
+
+    profiler.start("GET_SUPPORTED_PROGRAMS");
     Set<UUID> supportedProgramsIds;
     if (homeFacility != null) {
       supportedProgramsIds = homeFacility.getSupportedPrograms().stream()
@@ -474,13 +482,16 @@ public class UserController extends BaseController {
           .map(sp -> sp.getProgram().getId())
           .collect(Collectors.toSet());
     } else {
+      profiler.stop().log();
       return Collections.emptySet();
     }
 
+    profiler.start("FILTER_PROGRAMS");
     Set<Program> filteredPrograms = user.getHomeFacilityPrograms().stream()
         .filter(program -> supportedProgramsIds.contains(program.getId()))
         .collect(Collectors.toSet());
 
+    profiler.stop().log();
     return programsToDto(filteredPrograms);
   }
 
