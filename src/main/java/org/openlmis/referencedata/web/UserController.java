@@ -341,10 +341,16 @@ public class UserController extends BaseController {
                                                    required = false) UUID facilityId,
                                                @RequestParam(value = "warehouseId",
                                                    required = false) UUID warehouseId) {
+    Profiler profiler = new Profiler("GET_USER_HAS_RIGHT");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN_RIGHT");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
-    User user = validateUser(userId);
+    profiler.start("VALIDATE_USER");
+    final User user = validateUser(userId);
 
+    profiler.start("CONSTRUCT_RIGHT_QUERY");
     RightQuery rightQuery;
     Right right = rightRepository.findOne(rightId);
     if (programId != null) {
@@ -367,8 +373,10 @@ public class UserController extends BaseController {
       rightQuery = new RightQuery(right);
     }
 
+    profiler.start("RUN_RIGHT_QUERY");
     boolean hasRight = user.hasRight(rightQuery);
 
+    profiler.stop().log();
     return new ResultDto<>(hasRight);
   }
 
