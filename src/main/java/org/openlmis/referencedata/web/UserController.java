@@ -506,15 +506,24 @@ public class UserController extends BaseController {
   public Set<FacilityDto> getUserFulfillmentFacilities(
       @PathVariable(USER_ID) UUID userId,
       @RequestParam(value = "rightId") UUID rightId) {
+    Profiler profiler = new Profiler("GET_USER_FULFILLMENT_FACILITIES");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
+    profiler.start("VALIDATE_USER");
     User user = validateUser(userId);
+
+    profiler.start("VALIDATE_RIGHT");
     Right right = (Right) validateId(rightId, rightRepository).orElseThrow( () ->
         new ValidationMessageException(
             new Message(RightMessageKeys.ERROR_NOT_FOUND_WITH_ID, rightId)));
 
+    profiler.start("GET_FULFILLMENT_FACILITIES");
     Set<Facility> facilities = user.getFulfillmentFacilities(right);
 
+    profiler.stop().log();
     return facilitiesToDto(facilities);
   }
 
