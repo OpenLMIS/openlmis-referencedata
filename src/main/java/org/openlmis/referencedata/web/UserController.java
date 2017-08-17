@@ -535,11 +535,17 @@ public class UserController extends BaseController {
                                    @RequestParam(required = false) UUID programId,
                                    @RequestParam(required = false) UUID supervisoryNodeId,
                                    @RequestParam(required = false) UUID warehouseId) {
+    Profiler profiler = new Profiler("GET_USER_RIGHT_SEARCH");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
+    profiler.start("RIGHT_SEARCH");
     Set<User> users = userService.rightSearch(rightId, programId,
         supervisoryNodeId, warehouseId);
 
+    profiler.stop().log();
     return exportUsersToDtos(users);
   }
 
