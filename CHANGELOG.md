@@ -11,6 +11,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-2696](https://openlmis.atlassian.net/browse/OLMIS-2696): Added search requisition groups endpoint.
 * [OLMIS-2780](https://openlmis.atlassian.net/browse/OLMIS-2780): Added endpoint for getting all facilities with minimal representation.
 * Introduced JaVers to all domain entities. Also each domain entity has endpoint to get the audit information.
+* [OLMIS-3023](https://openlmis.atlassian.net/browse/OLMIS-3023): Added enableDatePhysicalStockCountCompleted field to program settings.
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-2871](https://openlmis.atlassian.net/browse/OLMIS-2871): The service now uses an Authorization header instead of an access_token request parameter when communicating with other services.
