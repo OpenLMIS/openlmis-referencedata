@@ -35,6 +35,7 @@ public class ProgramDto extends BaseDto implements Program.Exporter, Program.Imp
   private Boolean active;
   private Boolean periodsSkippable;
   private Boolean showNonFullSupplyTab;
+  private Boolean enableDatePhysicalStockCountCompleted;
 
   public ProgramDto(UUID id) {
     setId(id);

@@ -65,6 +65,10 @@ public class Program extends BaseEntity {
   @Setter
   private Boolean showNonFullSupplyTab;
 
+  @Getter
+  @Setter
+  private Boolean enableDatePhysicalStockCountCompleted;
+
   private Program() {
     code = null;
   }
