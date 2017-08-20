@@ -1,0 +1,25 @@
+id,additive,descrption,displayorder,name,programid
+038a6ede-8506-4438-9d4a-d012bbc74f36,FALSE,Expired,6,Expired,10845cb9-d365-4aaa-badd-b4fa39c6a26a
+18e3b832-671c-493e-8359-c2133be5288c,TRUE,Transfer in,1,Transfer in,66032ea8-b69b-4102-a1eb-844e57143187
+212a775a-1632-4cf4-9701-99c568094b10,FALSE,Passed open-vial time limit,7,Passed open-vial time limit,dce17f2e-af3e-40ad-8e00-3496adef44c3
+236c97a5-1829-4304-b5b4-f40b3d11a136,FALSE,Transfer out,2,Transfer out,dce17f2e-af3e-40ad-8e00-3496adef44c3
+28fa945c-ff9c-4121-affb-5c9ac572e8e4,FALSE,Damaged,3,Damaged,10845cb9-d365-4aaa-badd-b4fa39c6a26a
+2ae965c6-2218-4f71-88f2-d0ad1c5af7e2,FALSE,Damaged,3,Damaged,66032ea8-b69b-4102-a1eb-844e57143187
+30f6002d-a78d-44db-b2b9-46e76795a188,FALSE,Passed open-vial time limit,7,Passed open-vial time limit,66032ea8-b69b-4102-a1eb-844e57143187
+3f671afa-9c28-4de0-b94e-6475e7ae15d4,FALSE,Lost,4,Lost,dce17f2e-af3e-40ad-8e00-3496adef44c3
+530c5c76-cdf0-4d6e-b3a4-f599f73f47fd,FALSE,Transfer out,2,Transfer out,66032ea8-b69b-4102-a1eb-844e57143187
+61f65c5b-2e29-4657-9905-459898d85426,FALSE,Lost,4,Lost,66032ea8-b69b-4102-a1eb-844e57143187
+6f8d0431-6ec5-4280-9019-c6024b168b23,FALSE,Cold chain failure,8,Cold chain failure,66032ea8-b69b-4102-a1eb-844e57143187
+71ee1dc3-5444-4a40-8b17-5676152e2ee1,FALSE,Damaged,3,Damaged,dce17f2e-af3e-40ad-8e00-3496adef44c3
+85a6f1eb-853c-4283-921c-7125ef65b089,FALSE,Stolen,5,Stolen,dce17f2e-af3e-40ad-8e00-3496adef44c3
+881a5fff-b4cd-4d7f-9aac-e76bef6dbbf9,TRUE,Clinic return,9,Clinic return,10845cb9-d365-4aaa-badd-b4fa39c6a26a
+8dab137b-4aff-4884-90ef-5bc7fc25fdba,FALSE,Stolen,5,Stolen,66032ea8-b69b-4102-a1eb-844e57143187
+9beb151f-1162-4695-87e6-812552858336,FALSE,Cold chain failure,8,Cold chain failure,dce17f2e-af3e-40ad-8e00-3496adef44c3
+9e25fd93-d8a0-4d1d-8188-55dd3c408d24,TRUE,Transfer in,1,Transfer in,dce17f2e-af3e-40ad-8e00-3496adef44c3
+b047c538-78a1-490a-86ec-9fe5256943b1,FALSE,Transfer out,2,Transfer out,10845cb9-d365-4aaa-badd-b4fa39c6a26a
+bbc1d3fc-bd9d-4623-a10c-7f253bdc6199,TRUE,Clinic return,9,Clinic return,dce17f2e-af3e-40ad-8e00-3496adef44c3
+cdbce4e1-70c1-4762-9d61-9e1577c7414c,FALSE,Lost,4,Lost,10845cb9-d365-4aaa-badd-b4fa39c6a26a
+cef4ff73-1a42-4481-98d1-57092c9d5fad,FALSE,Expired,6,Expired,66032ea8-b69b-4102-a1eb-844e57143187
+ed73fe63-2151-4dcb-83bc-461140b8e5a5,FALSE,Stolen,5,Stolen,10845cb9-d365-4aaa-badd-b4fa39c6a26a
+f1b833e0-3cad-4dc1-a13d-7d8b293c3b09,TRUE,Transfer in,1,Transfer in,10845cb9-d365-4aaa-badd-b4fa39c6a26a
+faf5b4c4-817c-4c2a-b9fb-ea3ac6094a17,FALSE,Expired,6,Expired,dce17f2e-af3e-40ad-8e00-3496adef44c3
