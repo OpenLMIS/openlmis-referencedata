@@ -44,6 +44,7 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     programName = "Program Name";
     program.setName(programName);
     program.setPeriodsSkippable(true);
+    program.setEnableDatePhysicalStockCountCompleted(true);
     return program;
   }
 
@@ -58,6 +59,20 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     testProgram = repository.save(testProgram);
     testProgram = repository.findOne(testProgram.getId());
     assertFalse(testProgram.getPeriodsSkippable());
+    repository.deleteAll();
+  }
+
+  @Test
+  public void testEnableDatePhysicalStockCountCompletedEdit() {
+    Program testProgram = this.generateInstance();
+    testProgram = repository.save(testProgram);
+    testProgram = repository.findOne(testProgram.getId());
+    assertTrue(testProgram.getEnableDatePhysicalStockCountCompleted());
+
+    testProgram.setEnableDatePhysicalStockCountCompleted(false);
+    testProgram = repository.save(testProgram);
+    testProgram = repository.findOne(testProgram.getId());
+    assertFalse(testProgram.getEnableDatePhysicalStockCountCompleted());
     repository.deleteAll();
   }
   

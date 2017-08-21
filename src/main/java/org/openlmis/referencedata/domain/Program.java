@@ -134,6 +134,8 @@ public class Program extends BaseEntity {
     program.setActive(importer.getActive());
     program.setPeriodsSkippable(importer.getPeriodsSkippable());
     program.setShowNonFullSupplyTab(importer.getShowNonFullSupplyTab());
+    program.setEnableDatePhysicalStockCountCompleted(
+        importer.getEnableDatePhysicalStockCountCompleted());
 
     return program;
   }
@@ -154,6 +156,7 @@ public class Program extends BaseEntity {
     exporter.setActive(active);
     exporter.setPeriodsSkippable(periodsSkippable);
     exporter.setShowNonFullSupplyTab(showNonFullSupplyTab);
+    exporter.setEnableDatePhysicalStockCountCompleted(enableDatePhysicalStockCountCompleted);
   }
 
   public interface Exporter {
@@ -171,6 +174,8 @@ public class Program extends BaseEntity {
     void setPeriodsSkippable(Boolean periodsSkippable);
 
     void setShowNonFullSupplyTab(Boolean showNonFullSupplyTab);
+
+    void setEnableDatePhysicalStockCountCompleted(Boolean enableDatePhysicalStockCountCompleted);
   }
 
   public interface Importer {
@@ -189,5 +194,6 @@ public class Program extends BaseEntity {
 
     Boolean getShowNonFullSupplyTab();
 
+    Boolean getEnableDatePhysicalStockCountCompleted();
   }
 }
