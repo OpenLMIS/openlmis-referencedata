@@ -32,41 +32,30 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "programs", schema = "referencedata")
 @TypeName("Program")
 public class Program extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
-  @Getter
-  @Setter
   @Embedded
   private Code code;
 
   @Column(columnDefinition = "text")
-  @Getter
-  @Setter
   private String name;
 
   @Column(columnDefinition = "text")
-  @Getter
-  @Setter
   private String description;
 
-  @Getter
-  @Setter
   private Boolean active;
 
   @Column(nullable = false)
-  @Getter
-  @Setter
   private Boolean periodsSkippable;
 
-  @Getter
-  @Setter
   private Boolean showNonFullSupplyTab;
 
-  @Getter
-  @Setter
+  @Column(nullable = false)
   private Boolean enableDatePhysicalStockCountCompleted;
 
   private Program() {
@@ -95,6 +84,9 @@ public class Program extends BaseEntity {
   private void prePersist() {
     if (this.periodsSkippable == null) {
       this.periodsSkippable = false;
+    }
+    if (this.enableDatePhysicalStockCountCompleted == null) {
+      this.enableDatePhysicalStockCountCompleted = false;
     }
   }
 
