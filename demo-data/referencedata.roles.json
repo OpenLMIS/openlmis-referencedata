@@ -53,5 +53,10 @@
     "id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b",
     "name": "Inventory Manager",
     "description": "Can manage cold chain equipment."
+  },
+  {
+    "id": "4e1888eb-b072-41a8-b064-bfbc76f05745",
+    "name": "CCE Manager",
+    "description": "Can manage the CCE catalog."
   }
 ]
