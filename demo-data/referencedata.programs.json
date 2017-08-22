@@ -5,20 +5,23 @@
     "name": "Family Planning",
     "active": "true",
     "periodsSkippable": "true",
-    "showNonFullSupplyTab": "true"
+    "showNonFullSupplyTab": "true",
+    "enableDatePhysicalStockCountCompleted": "false"
   },
   {
     "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a",
     "code": "PRG002",
     "name": "Essential Meds",
     "active": "true",
-    "periodsSkippable": "false"
+    "periodsSkippable": "false",
+    "enableDatePhysicalStockCountCompleted": "false"
   },
   {
     "id": "66032ea8-b69b-4102-a1eb-844e57143187",
     "code": "PRG003",
     "name": "New Program",
     "active": "true",
-    "periodsSkippable": "false"
+    "periodsSkippable": "false",
+    "enableDatePhysicalStockCountCompleted": "false"
   }
 ]
