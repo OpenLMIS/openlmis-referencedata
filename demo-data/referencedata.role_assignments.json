@@ -529,5 +529,19 @@
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "7214eb3d-3a74-4048-9a4a-619927fbc501" },
     "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
+  },
+  {
+    "id": "6039fa02-196c-47d0-9c7d-f5a6af280013",
+    "type": "supervision",
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "7214eb3d-3a74-4048-9a4a-619927fbc501" },
+    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
+  },
+  {
+    "id": "f26f6500-c4f0-471a-ad3c-67a2ef15edf7",
+    "type": "supervision",
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
+    "user": { "id": "7214eb3d-3a74-4048-9a4a-619927fbc501" },
+    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
   }
 ]
