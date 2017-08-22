@@ -254,7 +254,14 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * CCE Inventory View
     * CCE Inventory Edit
   * users:
-    * administrator - has this role for Family Planning at FP approval point and Essential Meds and EM approval point
+    * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
+    * ccemanager - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
+10. CCE Manager
+  * rights:
+    * CCE MANAGE
+  * users:
+    * administrator
+    * ccemanager
 
 Other users with no roles:
   * admin (this admin account is built into the bootstrap data)
