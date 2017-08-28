@@ -1889,7 +1889,7 @@ resourceTypes:
       displayName: Stock Adjustment Reason
       get:
           is: [ secured ]
-          description: Get all stockAdjustmentReasons.
+          description: WARNING! deprecated; please use /stockCardLineItemReasons (for all reasons) or /validReasons (for reasons by program and facility type) to get a list of reasons. Get all stockAdjustmentReasons.
           responses:
               "200":
                   body:
@@ -1902,7 +1902,7 @@ resourceTypes:
                       schema: localizedErrorResponse
       post:
           is: [ secured ]
-          description: Creates new Stock Adjustment Reason.
+          description: WARNING! deprecated; please use /stockCardLineItemReasons to create a reason or /validReasons to map reasons by program and facility type. Creates new Stock Adjustment Reason.
           body:
               application/json:
                   schema: stockAdjustmentReason
@@ -1927,7 +1927,7 @@ resourceTypes:
                   repeat: false
           delete:
               is: [ secured ]
-              description: "[AVOID USING] Completely removes stock adjustment reason. This action is not recoverable."
+              description: "WARNING! deprecated. [AVOID USING] Completely removes stock adjustment reason. This action is not recoverable."
               responses:
                   "204":
                   "404":
@@ -1941,7 +1941,7 @@ resourceTypes:
                           schema: localizedErrorResponse
           get:
               is: [ secured ]
-              description: Get chosen Stock Adjustment Reason.
+              description: WARNING! deprecated; please use /stockCardLineItemReasons (for all reasons) or /validReasons (for reasons by program and facility type) to get a list of reasons. Get chosen Stock Adjustment Reason.
               responses:
                   "200":
                       body:
@@ -1957,7 +1957,7 @@ resourceTypes:
                           schema: localizedErrorResponse
           put:
               is: [ secured ]
-              description: Update existing Stock Adjustment Reason.
+              description: "WARNING! deprecated; please use /stockCardLineItemReasons/{id} to update a reason or /validReasons to map reasons by program and facility type. Update existing Stock Adjustment Reason."
               body:
                   application/json:
                       schema: stockAdjustmentReason
@@ -1974,7 +1974,7 @@ resourceTypes:
       /search:
           get:
               is: [ secured ]
-              description: Search for Stock Adjustment Reasons.
+              description: WARNING! deprecated; please use /stockCardLineItemReasons (for all reasons) or /validReasons (for reasons by program and facility type) to get a list of reasons. Search for Stock Adjustment Reasons.
               queryParameters:
                   program:
                       displayName: programId
