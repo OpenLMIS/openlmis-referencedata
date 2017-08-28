@@ -99,7 +99,7 @@ public class OrderableRepositoryIntegrationTest
 
     // when
     Set<UUID> ids = Sets.newHashSet(orderable.getId(), orderable2.getId());
-    Page<Orderable> found = repository.findAllById(ids, null);
+    Page<Orderable> found = repository.findAllByIds(ids, null);
 
     // then
     assertEquals(2, found.getTotalElements());
@@ -321,7 +321,7 @@ public class OrderableRepositoryIntegrationTest
   @Test
   public void findAllByIdsShouldReturnEmptyPageNotNull() {
     // given and when
-    Page<Orderable> actual = repository.findAllById(null, null);
+    Page<Orderable> actual = repository.findAllByIds(null, null);
 
     // then
     assertNotNull(actual);

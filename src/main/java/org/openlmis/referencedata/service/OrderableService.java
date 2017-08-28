@@ -73,7 +73,7 @@ public class OrderableService {
 
     Set<UUID> ids = getIds(queryMap);
     if (!ids.isEmpty()) {
-      return orderableRepository.findAllById(ids, pageable);
+      return orderableRepository.findAllByIds(ids, pageable);
     }
 
     String code = MapUtils.getString(queryMap, CODE, null);

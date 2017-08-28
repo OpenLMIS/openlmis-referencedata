@@ -157,7 +157,7 @@ public class OrderableServiceTest {
     Set<String> ids = new HashSet<>();
     ids.add(orderableId.toString());
 
-    when(orderableRepository.findAllById(anySetOf(UUID.class), isNull(Pageable.class)))
+    when(orderableRepository.findAllByIds(anySetOf(UUID.class), isNull(Pageable.class)))
             .thenReturn(Pagination.getPage(Lists.newArrayList(orderable2)));
 
     Map<String, Object> params = new HashMap<>();
@@ -165,7 +165,7 @@ public class OrderableServiceTest {
 
     final Page<Orderable> actual = orderableService.searchOrderables(params);
 
-    verify(orderableRepository).findAllById(anySetOf(UUID.class), isNull(Pageable.class));
+    verify(orderableRepository).findAllByIds(anySetOf(UUID.class), isNull(Pageable.class));
 
     assertEquals(1, actual.getTotalElements());
     assertThat(actual, hasItem(orderable2));
@@ -190,7 +190,7 @@ public class OrderableServiceTest {
     // given
     Set<String> ids = new HashSet<>();
     ids.add(orderableId.toString());
-    when(orderableRepository.findAllById(anySetOf(UUID.class), isNull(Pageable.class)))
+    when(orderableRepository.findAllByIds(anySetOf(UUID.class), isNull(Pageable.class)))
         .thenReturn(Pagination.getPage(Lists.newArrayList()));
 
     // when
@@ -199,7 +199,7 @@ public class OrderableServiceTest {
     final Page<Orderable> actual = orderableService.searchOrderables(params, null);
 
     // then
-    verify(orderableRepository).findAllById(anySetOf(UUID.class), isNull(Pageable.class));
+    verify(orderableRepository).findAllByIds(anySetOf(UUID.class), isNull(Pageable.class));
     assertNotNull(actual);
     assertNotNull(actual.getContent());
   }

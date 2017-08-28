@@ -44,6 +44,6 @@ public interface OrderableRepository extends
   boolean existsByProductCode(Code code);
 
   @Query("SELECT o FROM Orderable o WHERE o.id in ?1")
-  Page<Orderable> findAllById(Iterable<UUID> ids, Pageable pageable);
+  Page<Orderable> findAllByIds(Iterable<UUID> ids, Pageable pageable);
 
 }
