@@ -146,8 +146,6 @@ public class FacilityController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<MinimalFacilityDto> getMinimalFacilities() {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     return toMinimalDto(facilityRepository.findAll());
   }
 
