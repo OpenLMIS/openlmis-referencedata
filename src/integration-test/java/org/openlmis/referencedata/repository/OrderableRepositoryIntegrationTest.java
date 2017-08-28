@@ -308,34 +308,34 @@ public class OrderableRepositoryIntegrationTest
   }
 
   @Test
-  public void findAllShouldReturnEmptyPageNotNull() {
+  public void findAllShouldReturnEmptyPageEmptyContentWithNothingInTheRepository() {
     // given and when
     Pageable pageable = null;
     Page<Orderable> actual = repository.findAll(pageable);
 
     // then
     assertNotNull(actual);
-    assertNotNull(actual.getContent());
+    assertEquals(0, actual.getContent().size());
   }
 
   @Test
-  public void findAllByIdsShouldReturnEmptyPageNotNull() {
+  public void findAllByIdsShouldReturnEmptyPageEmptyContentWithNothingInTheRepository() {
     // given and when
     Page<Orderable> actual = repository.findAllByIds(null, null);
 
     // then
     assertNotNull(actual);
-    assertNotNull(actual.getContent());
+    assertEquals(0, actual.getContent().size());
   }
 
   @Test
-  public void searchShouldReturnEmptyPageNotNull() {
+  public void searchShouldReturnEmptyPageEmptyContentWithNothingInTheRepository() {
     // given and when
     Page<Orderable> actual = repository.search(null, null, null, null);
 
     // then
     assertNotNull(actual);
-    assertNotNull(actual.getContent());
+    assertEquals(0, actual.getContent().size());
   }
 
   @Test
