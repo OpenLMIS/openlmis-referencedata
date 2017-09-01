@@ -1,4 +1,4 @@
-8.0.0 / WIP
+8.0.0 / 2017-09-01
 ==================
 
 Breaking changes:
@@ -13,11 +13,20 @@ New functionality added in a backwards-compatible manner:
 * Introduced JaVers to all domain entities. Also each domain entity has endpoint to get the audit information.
 * [OLMIS-3023](https://openlmis.atlassian.net/browse/OLMIS-3023): Added enableDatePhysicalStockCountCompleted field to program settings.
 * [OLMIS-2619](https://openlmis.atlassian.net/browse/OLMIS-2619): Added CCE Manager role and assigned CCE Manager and Inventory Manager roles to new user ccemanager.
+* [OLMIS-2811](https://openlmis.atlassian.net/browse/OLMIS-2811): Added API endpoint for user's permission strings.
+* [OLMIS-2885](https://openlmis.atlassian.net/browse/OLMIS-2885): Added ETag support for programs and facilities endpointsw.
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-2871](https://openlmis.atlassian.net/browse/OLMIS-2871): The service now uses an Authorization header instead of an access_token request parameter when communicating with other services.
 * [OLMIS-2534](https://openlmis.atlassian.net/browse/OLMIS-2534): Fixed potential huge performance issue
 * [OLMIS-2716](https://openlmis.atlassian.net/browse/OLMIS-2716): Set productCode field in Orderable as unique
+* [OLMIS-2238](https://openlmis.atlassian.net/browse/OLMIS-2238): Added sorting users by username in user search endpoint.
+* [MW-412](https://openlmis.atlassian.net/browse/MW-412): Added CORS support.
+* [MW-430](https://openlmis.atlassian.net/browse/MW-430): Added missing foreign keys in FTAP.
+* [MW-129](https://openlmis.atlassian.net/browse/MW-129): Introduced JaVers to all domain objects.
+* [OLMIS-2901](https://openlmis.atlassian.net/browse/OLMIS-2901): Added keys to the lots table.
+* [OLMIS-2724](https://openlmis.atlassian.net/browse/OLMIS-2724): Facility minimal endpoint will not be protected by admin right.
+* [OLMIS-2831](https://openlmis.atlassian.net/browse/OLMIS-2831): Deprecate stock adjustment reason APIs in RAML.
 
 7.0.0 / 2017-06-23
 ==================
