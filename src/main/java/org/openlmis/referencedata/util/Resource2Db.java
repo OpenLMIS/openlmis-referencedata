@@ -17,6 +17,14 @@ package org.openlmis.referencedata.util;
 
 import static java.util.stream.Collectors.joining;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
@@ -29,14 +37,6 @@ import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Spring oriented utility class to load data into a database.  When given Spring's
@@ -154,12 +154,16 @@ public class Resource2Db {
     XLOGGER.exit("Total db updates: " + Arrays.stream(updateCounts).sum());
   }
 
-  /*
-   runs a sql insert with the contents of a Pair as defined in resourceCsvToBatchedPair against
-   the given table name (which should include the schema name)
+  /**
+   * Inserts data into a single table.  Given the columns and a list of data to insert, will
+   * run a batch update to insert it.
+   * @param tableName the name of the table (including schema) to insert into.
+   * @param dataWithHeader a pair where pair.left is an ordered list of column names and pair.right
+   *                       is an array of rows to insert, where each row is similarly ordered as
+   *                       the columns in pair.left.
    */
-  private void insertToDbFromBatchedPair(String tableName,
-                                         Pair<List<String>, List<Object[]>> dataWithHeader) {
+  public void insertToDbFromBatchedPair(String tableName,
+                                        Pair<List<String>, List<Object[]>> dataWithHeader) {
     XLOGGER.entry(tableName);
 
     String columnDesc = dataWithHeader.getLeft()
