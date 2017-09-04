@@ -16,6 +16,7 @@
 package org.openlmis.referencedata;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import org.openlmis.referencedata.dto.RightAssignmentDto;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -194,7 +196,10 @@ public class RightAssignmentInitializer implements CommandLineRunner {
 
   private String resourceToString(final Resource resource) throws IOException {
     XLOGGER.entry(resource.getDescription());
-    String str = StreamUtils.copyToString(resource.getInputStream(), Charset.defaultCharset());
+    String str;
+    try (InputStream is = resource.getInputStream()) {
+      str = StreamUtils.copyToString(is, Charset.defaultCharset());
+    }
     XLOGGER.exit();
     return str;
   }
