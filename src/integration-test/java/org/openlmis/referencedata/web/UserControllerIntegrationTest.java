@@ -30,6 +30,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -79,8 +80,10 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -818,7 +821,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     Map<String, String> extraData = Collections.singletonMap("color", "orange");
     queryMap.put("extraData", extraData);
 
-    given(userService.searchUsers(queryMap)).willReturn(singletonList(user1));
+    given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
+        .willReturn(Pagination.getPage(singletonList(user1)));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -846,7 +850,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     user2.setId(UUID.randomUUID());
     assignUserRoles(user2);
 
-    given(userService.searchUsers(queryMap)).willReturn(asList(user1, user2));
+    given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
+        .willReturn(Pagination.getPage(asList(user1), null, 2));
 
     PageImplRepresentation response = restAssured
         .given()

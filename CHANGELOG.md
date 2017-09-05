@@ -1,3 +1,8 @@
+8.0.2 / WIP
+
+Bug fixes, security and performance improvements, also backwards-compatible:
+* [OLMIS-2857](https://openlmis.atlassian.net/browse/OLMIS-2857): Refactored user search repository method to user database pagination and sorting.
+
 8.0.1 / 2017-09-05
 
 Bug fixes, security and performance improvements, also backwards-compatible:

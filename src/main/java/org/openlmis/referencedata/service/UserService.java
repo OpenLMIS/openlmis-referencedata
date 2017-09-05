@@ -39,19 +39,29 @@ import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class UserService {
+
+  protected static final String USERNAME = "username";
+  protected static final String FIRST_NAME = "firstName";
+  protected static final String LAST_NAME = "lastName";
+  protected static final String EMAIL = "email";
+  protected static final String HOME_FACILITY = "homeFacility";
+  protected static final String HOME_FACILITY_ID = "homeFacilityId";
+  protected static final String ACTIVE = "active";
+  protected static final String VERIFIED = "verified";
+  protected static final String LOGIN_RESTRICTED = "loginRestricted";
+  protected static final String EXTRA_DATA = "extraData";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
@@ -77,46 +87,40 @@ public class UserService {
    *
    * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
    *                 active, verified, loginRestricted) and JSON extraData.
-   * @return List of users
+   * @param pageable pagination parameters
+   * @return Page of users
    */
-  public List<User> searchUsers(Map<String, Object> queryMap) {
+  public Page<User> searchUsers(Map<String, Object> queryMap, Pageable pageable) {
 
     Map<String, Object> regularQueryMap = new HashMap<>(queryMap);
-    Map<String, String> extraData = (Map<String, String>) regularQueryMap.remove("extraData");
+    Map<String, String> extraData = (Map<String, String>) regularQueryMap.remove(EXTRA_DATA);
 
-    if (queryMap.containsKey("homeFacilityId")) {
-      queryMap.put("homeFacility", facilityRepository.findOne(
-          UUID.fromString((String) queryMap.get("homeFacilityId"))));
+    if (queryMap.containsKey(HOME_FACILITY_ID)) {
+      queryMap.put(HOME_FACILITY, facilityRepository.findOne(
+          UUID.fromString((String) queryMap.get(HOME_FACILITY_ID))));
     }
-    List<User> foundUsers = new ArrayList<>(userRepository.searchUsers(
-        (String) queryMap.get("username"),
-        (String) queryMap.get("firstName"),
-        (String) queryMap.get("lastName"),
-        (String) queryMap.get("email"),
-        (Facility) queryMap.get("homeFacility"),
-        (Boolean) queryMap.get("active"),
-        (Boolean) queryMap.get("verified"),
-        (Boolean) queryMap.get("loginRestricted")));
 
+    List<User> foundUsers = null;
     if (extraData != null && !extraData.isEmpty()) {
-
-      String extraDataString;
       try {
-        extraDataString = mapper.writeValueAsString(extraData);
-        List<User> extraDataUsers = userRepository.findByExtraData(extraDataString);
-
-        if (!foundUsers.isEmpty()) {
-          // intersection between two lists
-          foundUsers.retainAll(extraDataUsers);
-        } else {
-          foundUsers = extraDataUsers;
-        }
+        String extraDataString = mapper.writeValueAsString(extraData);
+        foundUsers = userRepository.findByExtraData(extraDataString);
       } catch (JsonProcessingException jpe) {
         LOGGER.error("Cannot serialize extra data query request body into JSON", jpe);
       }
     }
 
-    return Optional.ofNullable(foundUsers).orElse(Collections.emptyList());
+    return userRepository.searchUsers(
+        (String) queryMap.get(USERNAME),
+        (String) queryMap.get(FIRST_NAME),
+        (String) queryMap.get(LAST_NAME),
+        (String) queryMap.get(EMAIL),
+        (Facility) queryMap.get(HOME_FACILITY),
+        (Boolean) queryMap.get(ACTIVE),
+        (Boolean) queryMap.get(VERIFIED),
+        (Boolean) queryMap.get(LOGIN_RESTRICTED),
+        foundUsers,
+        pageable);
   }
 
   /**

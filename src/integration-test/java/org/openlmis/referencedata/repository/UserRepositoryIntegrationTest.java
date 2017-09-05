@@ -26,12 +26,14 @@ import static org.openlmis.referencedata.domain.RightType.GENERAL_ADMIN;
 import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 import static org.openlmis.referencedata.domain.RightType.REPORTS;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -48,6 +50,9 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,6 +97,9 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
+  @Mock
+  private Pageable pageable;
+
   private List<User> users;
   
   private ObjectMapper mapper = new ObjectMapper();
@@ -116,15 +124,18 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
     users = new ArrayList<>();
 
-    for (int usersCount = 0; usersCount < TOTAL_USERS; usersCount++) {
+    for (int usersCount = 0; usersCount < TOTAL_USERS - 1; usersCount++) {
       users.add(repository.save(generateInstance()));
     }
+
+    when(pageable.getPageNumber()).thenReturn(0);
+    when(pageable.getPageSize()).thenReturn(10);
   }
 
   @Test
   public void testSearchUsersByAllParameters() {
     User user = cloneUser(users.get(0));
-    List<User> receivedUsers = repository.searchUsers(
+    Page<User> receivedUsers = repository.searchUsers(
         user.getUsername(),
         user.getFirstName(),
         user.getLastName(),
@@ -132,44 +143,47 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.getHomeFacility(),
         user.isActive(),
         user.isVerified(),
-        user.isLoginRestricted());
+        user.isLoginRestricted(),
+        null,
+        pageable);
 
-    assertEquals(1, receivedUsers.size());
+    assertEquals(1, receivedUsers.getContent().size());
+    assertEquals(1, receivedUsers.getTotalElements());
     assertEquals(
         user.getUsername(),
-        receivedUsers.get(0).getUsername());
+        receivedUsers.getContent().get(0).getUsername());
     assertEquals(
         user.getFirstName(),
-        receivedUsers.get(0).getFirstName());
+        receivedUsers.getContent().get(0).getFirstName());
     assertEquals(
         user.getLastName(),
-        receivedUsers.get(0).getLastName());
+        receivedUsers.getContent().get(0).getLastName());
     assertEquals(
         user.getHomeFacility().getId(),
-        receivedUsers.get(0).getHomeFacility().getId());
+        receivedUsers.getContent().get(0).getHomeFacility().getId());
     assertEquals(
         user.isActive(),
-        receivedUsers.get(0).isActive());
+        receivedUsers.getContent().get(0).isActive());
     assertEquals(
         user.isVerified(),
-        receivedUsers.get(0).isVerified());
+        receivedUsers.getContent().get(0).isVerified());
     assertEquals(
         user.isLoginRestricted(),
-        receivedUsers.get(0).isLoginRestricted());
+        receivedUsers.getContent().get(0).isLoginRestricted());
   }
 
   @Test
   public void searchUsersWithAllParametersNullShouldReturnAllUsers() {
-    List<User> receivedUsers = repository.searchUsers(
-            null, null, null, null, null, null, null, null);
+    Page<User> receivedUsers = repository.searchUsers(
+            null, null, null, null, null, null, null, null, null, pageable);
 
-    assertEquals(6, receivedUsers.size());
+    assertEquals(TOTAL_USERS, receivedUsers.getContent().size());
   }
 
   @Test
   public void testSearchUsersByFirstNameAndLastNameAndHomeFacility() {
     User user = cloneUser(users.get(0));
-    List<User> receivedUsers = repository.searchUsers(
+    Page<User> receivedUsers = repository.searchUsers(
         null,
         user.getFirstName(),
         user.getLastName(),
@@ -177,9 +191,11 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.getHomeFacility(),
         null,
         null,
-        null);
+        null,
+        null,
+        pageable);
 
-    assertEquals(2, receivedUsers.size());
+    assertEquals(2, receivedUsers.getContent().size());
     for (User receivedUser : receivedUsers) {
       assertEquals(
           user.getFirstName(),
@@ -194,8 +210,29 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   @Test
+  public void testSearchUsersShouldReturnEmptyListIfEmptyListIsPassed() {
+    User user = cloneUser(users.get(0));
+    Page<User> receivedUsers = repository.searchUsers(
+        null,
+        user.getFirstName(),
+        user.getLastName(),
+        null,
+        user.getHomeFacility(),
+        null,
+        null,
+        null,
+        Collections.emptyList(),
+        pageable);
+
+    assertEquals(0, receivedUsers.getContent().size());
+  }
+
+  @Test
   public void testSearchSortByUsername() {
-    List<User> receivedUsers = repository.searchUsers(
+    Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "username"));
+    when(pageable.getSort()).thenReturn(sort);
+
+    Page<User> receivedUsers = repository.searchUsers(
         null,
         null,
         null,
@@ -203,12 +240,14 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         null,
         null,
         null,
-        null
+        null,
+        null,
+        pageable
     );
 
-    for (int i = 1; i < receivedUsers.size(); i++) {
-      assertTrue(receivedUsers.get(i).getUsername().compareTo(receivedUsers.get(i - 1)
-          .getUsername()) < 0);
+    for (int i = 1; i < receivedUsers.getContent().size(); i++) {
+      assertTrue(receivedUsers.getContent().get(i).getUsername()
+          .compareTo(receivedUsers.getContent().get(i - 1).getUsername()) > 0);
     }
   }
 
@@ -221,7 +260,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     user2.setEmail("user2@mail.com");
     repository.save(user2);
 
-    List<User> receivedUsers = repository.searchUsers(
+    Page<User> receivedUsers = repository.searchUsers(
         null,
         null,
         null,
@@ -229,12 +268,14 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         null,
         null,
         null,
-        null);
+        null,
+        null,
+        pageable);
 
-    assertEquals(2, receivedUsers.size());
+    assertEquals(2, receivedUsers.getContent().size());
 
-    assertTrue(receivedUsers.contains(user1));
-    assertTrue(receivedUsers.contains(user2));
+    assertTrue(receivedUsers.getContent().contains(user1));
+    assertTrue(receivedUsers.getContent().contains(user2));
   }
 
   @Test

@@ -333,13 +333,13 @@ public class UserController extends BaseController {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     profiler.start("SEARCH_USERS");
-    List<User> result = userService.searchUsers(queryMap);
+    Page<User> result = userService.searchUsers(queryMap, pageable);
 
     profiler.start("EXPORT_TO_DTOS");
-    List<UserDto> userDtos = exportUsersToDtos(result);
+    Page<UserDto> userDtos = exportUsersToDtos(result, pageable);
 
     profiler.stop().log();
-    return Pagination.getPage(userDtos, pageable);
+    return userDtos;
   }
 
   /**
@@ -803,6 +803,13 @@ public class UserController extends BaseController {
 
   private List<UserDto> exportUsersToDtos(Collection<User> users) {
     return users.stream().map(this::exportUserToDto).collect(toList());
+  }
+
+  private Page<UserDto> exportUsersToDtos(Page<User> users, Pageable pageable) {
+    List<UserDto> userDtos = users.getContent().stream()
+        .map(this::exportUserToDto)
+        .collect(Collectors.toList());
+    return Pagination.getPage(userDtos, pageable, users.getTotalElements());
   }
 
   private Set<FacilityDto> facilitiesToDto(Collection<Facility> facilities) {

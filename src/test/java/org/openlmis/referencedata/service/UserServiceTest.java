@@ -24,13 +24,21 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.service.UserService.ACTIVE;
+import static org.openlmis.referencedata.service.UserService.EMAIL;
+import static org.openlmis.referencedata.service.UserService.EXTRA_DATA;
+import static org.openlmis.referencedata.service.UserService.FIRST_NAME;
+import static org.openlmis.referencedata.service.UserService.HOME_FACILITY_ID;
+import static org.openlmis.referencedata.service.UserService.LAST_NAME;
+import static org.openlmis.referencedata.service.UserService.LOGIN_RESTRICTED;
+import static org.openlmis.referencedata.service.UserService.USERNAME;
+import static org.openlmis.referencedata.service.UserService.VERIFIED;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -49,9 +57,12 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.util.Pagination;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,7 +82,6 @@ public class UserServiceTest {
   private static final String EXTRA_DATA_VALUE = "extraDataValue";
   private static final String FIRST_NAME_SEARCH = "FirstNameMatchesTwoUsers";
   private static final String EXTRA_DATA_KEY = "extraDataKey";
-  private static final String EXTRA_DATA_PROP_NAME = "extraData";
 
   private static final UUID RIGHT_ID = UUID.randomUUID();
   private static final UUID WAREHOUSE_ID = UUID.randomUUID();
@@ -105,13 +115,14 @@ public class UserServiceTest {
   @Mock
   private Right right;
 
+  @Mock
+  private Pageable pageable;
+
   @InjectMocks
   private UserService userService;
 
   private User user;
   private User user2;
-  private User user3;
-  private User user4;
 
   private Map<String, Object> userSearch;
   private Map<String, String> extraData;
@@ -123,17 +134,16 @@ public class UserServiceTest {
   public void setUp() throws JsonProcessingException {
     user = generateUser();
     user2 = mock(User.class);
-    user3 = mock(User.class);
-    user4 = mock(User.class);
-    userSearch = Collections.singletonMap("firstName", FIRST_NAME_SEARCH);
+    userSearch = Collections.singletonMap(FIRST_NAME, FIRST_NAME_SEARCH);
     extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
     extraDataString = mapper.writeValueAsString(extraData);
     queryMap = new HashMap<>();
+    when(pageable.getPageSize()).thenReturn(10);
+    when(pageable.getPageNumber()).thenReturn(1);
   }
 
   @Test
-  @Ignore
-  public void searchUsersShouldGetNoUsersIfSearchesGetDisjointedResults() {
+  public void searchUsersShouldUseExtraDataString() {
     when(userRepository
         .searchUsers(
             any(String.class),
@@ -143,86 +153,31 @@ public class UserServiceTest {
             any(Facility.class),
             any(Boolean.class),
             any(Boolean.class),
-            any(Boolean.class)))
-        .thenReturn(Arrays.asList(user, user2));
-
-    when(userRepository.findByExtraData(extraDataString))
-        .thenReturn(Arrays.asList(user3, user4));
+            any(Boolean.class),
+            any(List.class),
+            any(Pageable.class)))
+        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
     queryMap.putAll(userSearch);
-    queryMap.put(EXTRA_DATA_PROP_NAME, extraData);
+    queryMap.put(EXTRA_DATA, extraData);
 
-    List<User> receivedUsers = userService.searchUsers(queryMap);
+    when(userRepository.findByExtraData(any(String.class))).thenReturn(Arrays.asList(user, user2));
 
-    assertEquals(0, receivedUsers.size());
-  }
+    Page<User> receivedUsers = userService.searchUsers(queryMap, pageable);
 
-  @Test
-  @Ignore
-  public void searchUsersShouldGetSomeUsersForOverlappingSearchResults() {
-    when(userRepository
-        .searchUsers(
-            any(String.class),
-            eq(FIRST_NAME_SEARCH),
-            any(String.class),
-            any(String.class),
-            any(Facility.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(Boolean.class)))
-        .thenReturn(Arrays.asList(user, user2));
-
-    when(userRepository.findByExtraData(extraDataString))
-        .thenReturn(Arrays.asList(user2, user3));
-
-    queryMap.putAll(userSearch);
-    queryMap.put(EXTRA_DATA_PROP_NAME, extraData);
-
-    List<User> receivedUsers = userService.searchUsers(queryMap);
-
-    assertEquals(1, receivedUsers.size());
-    assertEquals(user2, receivedUsers.get(0));
-  }
-
-  @Test
-  public void searchUsersShouldGetAllUsersIfSearchResultsAreTheSame() {
-    when(userRepository
-        .searchUsers(
-            any(String.class),
-            eq(FIRST_NAME_SEARCH),
-            any(String.class),
-            any(String.class),
-            any(Facility.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(Boolean.class)))
-        .thenReturn(Arrays.asList(user, user2));
-
-    when(userRepository.findByExtraData(extraDataString))
-        .thenReturn(Arrays.asList(user, user2));
-
-    queryMap.putAll(userSearch);
-    queryMap.put(EXTRA_DATA_PROP_NAME, extraData);
-
-    List<User> receivedUsers = userService.searchUsers(queryMap);
-
-    assertEquals(2, receivedUsers.size());
-    assertTrue(receivedUsers.contains(user));
-    assertTrue(receivedUsers.contains(user2));
-  }
-
-  @Test
-  public void shouldSearchUsersWithExtraData() {
-    when(userRepository.findByExtraData(extraDataString))
-        .thenReturn(Arrays.asList(user, user2));
-
-    queryMap.put(EXTRA_DATA_PROP_NAME, extraData);
-
-    List<User> receivedUsers = userService.searchUsers(queryMap);
-
-    assertEquals(2, receivedUsers.size());
-    assertTrue(receivedUsers.contains(user));
-    assertTrue(receivedUsers.contains(user2));
+    assertEquals(2, receivedUsers.getContent().size());
+    verify(userRepository).findByExtraData(extraDataString);
+    verify(userRepository).searchUsers(
+        eq(null),
+        eq(FIRST_NAME_SEARCH),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(Arrays.asList(user, user2)),
+        eq(pageable));
   }
 
   @Test
@@ -236,17 +191,87 @@ public class UserServiceTest {
             any(Facility.class),
             any(Boolean.class),
             any(Boolean.class),
-            any(Boolean.class)))
-        .thenReturn(Arrays.asList(user, user2));
+            any(Boolean.class),
+            any(List.class),
+            any(Pageable.class)))
+        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
     queryMap.putAll(userSearch);
 
-    List<User> receivedUsers = userService.searchUsers(queryMap);
+    Page<User> receivedUsers = userService.searchUsers(queryMap, pageable);
 
-    assertEquals(2, receivedUsers.size());
-    assertTrue(receivedUsers.contains(user));
-    assertTrue(receivedUsers.contains(user2));
+    assertEquals(2, receivedUsers.getContent().size());
+    assertTrue(receivedUsers.getContent().contains(user));
+    assertTrue(receivedUsers.getContent().contains(user2));
     verify(userRepository, never()).findByExtraData(any(String.class));
+    verify(userRepository).searchUsers(
+        eq(null),
+        eq(FIRST_NAME_SEARCH),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(pageable));
+  }
+
+  @Test
+  public void searchUsersShouldSearchByAllParameters() {
+    when(userRepository
+        .searchUsers(
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            any(String.class),
+            any(Facility.class),
+            any(Boolean.class),
+            any(Boolean.class),
+            any(Boolean.class),
+            any(List.class),
+            any(Pageable.class)))
+        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
+
+    final String username = "user";
+    final String lastName = "last-name";
+    final String email = "user@mail.com";
+    final String homeFacilityId = UUID.randomUUID().toString();
+    final Boolean active = true;
+    final Boolean verified = true;
+    final Boolean loginRestricted = true;
+
+    Facility homeFacility = new Facility("some-code");
+    when(facilityRepository.findOne(eq(UUID.fromString(homeFacilityId)))).thenReturn(homeFacility);
+
+    when(userRepository.findByExtraData(any(String.class))).thenReturn(Arrays.asList(user, user2));
+
+    queryMap.putAll(userSearch);
+    queryMap.put(USERNAME, username);
+    queryMap.put(LAST_NAME, lastName);
+    queryMap.put(EMAIL, email);
+    queryMap.put(HOME_FACILITY_ID, homeFacilityId);
+    queryMap.put(ACTIVE, active);
+    queryMap.put(VERIFIED, verified);
+    queryMap.put(LOGIN_RESTRICTED, loginRestricted);
+    queryMap.put(EXTRA_DATA, extraData);
+
+    Page<User> receivedUsers = userService.searchUsers(queryMap, pageable);
+
+    assertEquals(2, receivedUsers.getContent().size());
+    assertTrue(receivedUsers.getContent().contains(user));
+    assertTrue(receivedUsers.getContent().contains(user2));
+    verify(userRepository).searchUsers(
+        eq(username),
+        eq(FIRST_NAME_SEARCH),
+        eq(lastName),
+        eq(email),
+        eq(homeFacility),
+        eq(active),
+        eq(verified),
+        eq(loginRestricted),
+        eq(Arrays.asList(user, user2)),
+        eq(pageable));
   }
 
   @Test
