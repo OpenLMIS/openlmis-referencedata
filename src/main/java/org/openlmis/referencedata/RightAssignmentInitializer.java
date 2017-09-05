@@ -19,14 +19,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.javers.common.collections.Lists;
 import org.openlmis.referencedata.dto.RightAssignmentDto;
 import org.openlmis.referencedata.util.Resource2Db;
 import org.slf4j.ext.XLogger;
@@ -83,9 +84,21 @@ public class RightAssignmentInitializer implements CommandLineRunner {
     List<RightAssignmentDto> dbRightAssignments = getRightAssignmentsFromDbResource(
         rightAssignmentsResource);
 
+    Resource2Db r2db = new Resource2Db(template);
+    for ( List partialRightAssignments : ListUtils.partition(dbRightAssignments, 100) ) {
+      insertFromDbRightAssignmentList(r2db, partialRightAssignments);
+    }
+
+    XLOGGER.exit();
+  }
+
+  private void insertFromDbRightAssignmentList(Resource2Db resource2Db,
+                                               List<RightAssignmentDto> rightAssignmentDtos)
+      throws IOException {
+
     // Convert matrix to a set of right assignments to insert
     XLOGGER.debug("Convert intermediate right assignments to right assignments for insert");
-    Set<RightAssignmentDto> rightAssignmentsToInsert = convertForInsert(dbRightAssignments,
+    Set<RightAssignmentDto> rightAssignmentsToInsert = convertForInsert(rightAssignmentDtos,
         supervisedFacilitiesResource);
 
     // Convert set of right assignments to insert to a set of SQL inserts
@@ -96,7 +109,7 @@ public class RightAssignmentInitializer implements CommandLineRunner {
         .collect(Collectors.toList()) );
 
     // set column headers
-    dataWithHeader.setLeft(Lists.asList("id",
+    dataWithHeader.setLeft(Arrays.asList("id",
         "userid",
         "rightname",
         "facilityid",
@@ -104,10 +117,7 @@ public class RightAssignmentInitializer implements CommandLineRunner {
 
     // insert into right_assignments
     XLOGGER.debug("Perform SQL inserts");
-    Resource2Db r2db = new Resource2Db(template);
-    r2db.insertToDbFromBatchedPair("referencedata.right_assignments", dataWithHeader);
-
-    XLOGGER.exit();
+    resource2Db.insertToDbFromBatchedPair("referencedata.right_assignments", dataWithHeader);
   }
 
   List<RightAssignmentDto> getRightAssignmentsFromDbResource(Resource resource)
