@@ -17,6 +17,7 @@ package org.openlmis.referencedata.dto;
 
 import java.util.Objects;
 import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,6 +54,27 @@ public class RightAssignmentDto extends BaseDto {
     this.rightName = rightName;
     this.facilityId = facilityId;
     this.programId = programId;
+  }
+
+  /**
+   * Converts to an Array suitable for SQL insert.  The order:
+   * <ol>
+   *   <li>ID - randomly generated</li>
+   *   <li>userId</li>
+   *   <li>rightName</li>
+   *   <li>facilityId - may be null</li>
+   *   <li>programId - may be null</li>
+   * </ol>
+   * @return as an Array of Strings, some elements may be null
+   */
+  public String[] toColumnArray() {
+    String[] columns = new String[5];
+    columns[0] = UUID.randomUUID().toString();
+    columns[1] = userId.toString();
+    columns[2] = rightName;
+    columns[3] = facilityId != null ? facilityId.toString() : null;
+    columns[4] = programId != null ? programId.toString() : null;
+    return columns;
   }
   
   @Override

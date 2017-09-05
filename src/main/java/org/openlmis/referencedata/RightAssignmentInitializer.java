@@ -19,14 +19,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.sql.ResultSet;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.javers.common.collections.Lists;
 import org.openlmis.referencedata.dto.RightAssignmentDto;
+import org.openlmis.referencedata.util.Resource2Db;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,15 +90,24 @@ public class RightAssignmentInitializer implements CommandLineRunner {
 
     // Convert set of right assignments to insert to a set of SQL inserts
     XLOGGER.debug("Convert right assignments to SQL inserts");
-    Set<String> rightAssignmentSqlInserts = rightAssignmentsToInsert.stream()
-        .map(this::convertRightAssignmentToSqlInsertString)
-        .collect(Collectors.toSet());
+    MutablePair dataWithHeader = new MutablePair<List<String>, List<Object[]>>();
+    dataWithHeader.setRight( rightAssignmentsToInsert.stream()
+        .map(rad -> rad.toColumnArray())
+        .collect(Collectors.toList()) );
 
+    // set column headers
+    dataWithHeader.setLeft(Lists.asList("id",
+        "userid",
+        "rightname",
+        "facilityid",
+        "programid"));
+
+    // insert into right_assignments
     XLOGGER.debug("Perform SQL inserts");
-    int[] updateCounts = template.batchUpdate(
-        rightAssignmentSqlInserts.toArray(new String[rightAssignmentSqlInserts.size()]));
+    Resource2Db r2db = new Resource2Db(template);
+    r2db.insertToDbFromBatchedPair("referencedata.right_assignments", dataWithHeader);
 
-    XLOGGER.exit("Total db updates: " + Arrays.stream(updateCounts).sum());
+    XLOGGER.exit();
   }
 
   List<RightAssignmentDto> getRightAssignmentsFromDbResource(Resource resource)
@@ -162,23 +173,6 @@ public class RightAssignmentInitializer implements CommandLineRunner {
     return rightAssignmentsToInsert;
   }
   
-  String convertRightAssignmentToSqlInsertString(RightAssignmentDto rightAssignmentDto) {
-    String insertValues = String.join(",",
-        surroundWithSingleQuotes(UUID.randomUUID().toString()),
-        surroundWithSingleQuotes(rightAssignmentDto.getUserId().toString()),
-        surroundWithSingleQuotes(rightAssignmentDto.getRightName()),
-        null != rightAssignmentDto.getFacilityId()
-            ? surroundWithSingleQuotes(rightAssignmentDto.getFacilityId().toString()) : "NULL",
-        null != rightAssignmentDto.getProgramId()
-            ? surroundWithSingleQuotes(rightAssignmentDto.getProgramId().toString()) : "NULL"
-        );
-
-    return "INSERT INTO referencedata.right_assignments "
-        + "(id, userid, rightname, facilityid, programid) VALUES ("
-        + insertValues
-        + ");";
-  }
-
   private List<UUID> getSupervisedFacilityIds(Resource supervisedFacilitiesResource,
       UUID supervisoryNodeId, UUID programId)
       throws IOException {
@@ -188,10 +182,6 @@ public class RightAssignmentInitializer implements CommandLineRunner {
         UUID.class,
         supervisoryNodeId,
         programId);
-  }
-
-  private String surroundWithSingleQuotes(String str) {
-    return "'" + str + "'";
   }
 
   private String resourceToString(final Resource resource) throws IOException {
