@@ -1,3 +1,8 @@
+8.0.1 / 2017-09-05
+
+Bug fixes, security and performance improvements, also backwards-compatible:
+* [OLMIS-3130](https://openlmis.atlassian.net/browse/OLMIS-3130): Fixed high memory usage during right assignment migration.
+
 8.0.0 / 2017-09-01
 ==================
 
