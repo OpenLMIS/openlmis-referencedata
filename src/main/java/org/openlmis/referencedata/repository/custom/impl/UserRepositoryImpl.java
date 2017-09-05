@@ -114,7 +114,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
       query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
     }
 
-    predicate = addEqualsFilter(predicate, builder, root, USERNAME, username);
+    predicate = addLikeFilter(predicate, builder, root, USERNAME, username);
     predicate = addLikeFilter(predicate, builder, root, FIRST_NAME, firstName);
     predicate = addLikeFilter(predicate, builder, root, LAST_NAME, lastName);
     predicate = addLikeFilter(predicate, builder, root, EMAIL, email);
