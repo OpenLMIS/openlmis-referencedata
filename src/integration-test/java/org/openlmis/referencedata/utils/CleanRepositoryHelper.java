@@ -130,7 +130,7 @@ public class CleanRepositoryHelper {
 
   private void deleteAllUsersExceptAdmin() {
     User initialUser = userRepository.findOne(INITIAL_USER_ID);
-    initialUser.setHomeFacility(null);
+    initialUser.setHomeFacilityId(null);
     userRepository.save(initialUser);
     for (User user : userRepository.findAll()) {
       if (!user.getId().equals(INITIAL_USER_ID)) {

@@ -36,8 +36,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.Table;
@@ -76,11 +74,9 @@ public class User extends BaseEntity {
   @Setter
   private String timezone;
 
-  @ManyToOne
-  @JoinColumn(name = "homefacilityid")
   @Getter
   @Setter
-  private Facility homeFacility;
+  private UUID homeFacilityId;
 
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   @Getter
@@ -132,11 +128,7 @@ public class User extends BaseEntity {
     lastName = importer.getLastName();
     email = importer.getEmail();
     timezone = importer.getTimezone();
-
-    if (null != importer.getHomeFacility()) {
-      homeFacility = Facility.newFacility(importer.getHomeFacility());
-    }
-
+    homeFacilityId = importer.getHomeFacilityId();
     verified = importer.isVerified();
     active = importer.isActive();
     loginRestricted = importer.isLoginRestricted();
@@ -149,7 +141,7 @@ public class User extends BaseEntity {
   }
 
   User(UUID id, String username, String firstName, String lastName, String email, String timezone,
-       Facility homeFacility, boolean active, boolean verified, boolean loginRestricted,
+       UUID homeFacilityId, boolean active, boolean verified, boolean loginRestricted,
        Boolean allowNotify, Map<String, String> extraData) {
     this.id = id;
     this.username = username;
@@ -157,7 +149,7 @@ public class User extends BaseEntity {
     this.lastName = lastName;
     this.email = email;
     this.timezone = timezone;
-    this.homeFacility = homeFacility;
+    this.homeFacilityId = homeFacilityId;
     this.active = active;
     this.verified = verified;
     this.loginRestricted = loginRestricted;
@@ -284,11 +276,7 @@ public class User extends BaseEntity {
     exporter.setLastName(lastName);
     exporter.setEmail(email);
     exporter.setTimezone(timezone);
-
-    if (null != homeFacility) {
-      exporter.setHomeFacility(homeFacility);
-    }
-
+    exporter.setHomeFacilityId(homeFacilityId);
     exporter.setActive(active);
     exporter.setVerified(verified);
     exporter.setLoginRestricted(loginRestricted);
@@ -327,7 +315,7 @@ public class User extends BaseEntity {
 
     void setTimezone(String timezone);
 
-    void setHomeFacility(Facility homeFacility);
+    void setHomeFacilityId(UUID homeFacilityId);
 
     void setVerified(boolean verified);
 
@@ -355,7 +343,7 @@ public class User extends BaseEntity {
 
     String getTimezone();
 
-    Facility.Importer getHomeFacility();
+    UUID getHomeFacilityId();
 
     boolean isVerified();
 

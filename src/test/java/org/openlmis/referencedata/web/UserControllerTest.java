@@ -101,7 +101,7 @@ public class UserControllerTest {
   @InjectMocks
   private UserController controller = new UserController();
 
-  private String homeFacilityCode;
+  private UUID homeFacilityId;
   private Facility homeFacility;
   private String user1UserName;
   private User user1;
@@ -133,24 +133,25 @@ public class UserControllerTest {
   public UserControllerTest() {
     initMocks(this);
 
-    homeFacilityCode = "homeFacilityCode";
+    homeFacilityId = UUID.randomUUID();
     homeFacility = new Facility("C1");
+    homeFacility.setId(homeFacilityId);
     user1UserName = "user1";
     user2UserName = "user2";
     user1 = new UserBuilder(user1UserName, "User", "1", "user1@openlmis.org")
-        .setHomeFacility(homeFacility)
+        .setHomeFacilityId(homeFacilityId)
         .createUser();
     user2 = new UserBuilder(user2UserName, "User", "2", "user2@openlmis.org")
-        .setHomeFacility(homeFacility)
+        .setHomeFacilityId(homeFacilityId)
         .createUser();
     users = Sets.newHashSet(user1, user2);
 
     user1Dto = new UserDto();
     user1.export(user1Dto);
-    user1Dto.setHomeFacilityCode(homeFacilityCode);
+    user1Dto.setHomeFacilityId(homeFacilityId);
     user2Dto = new UserDto();
     user2.export(user2Dto);
-    user2Dto.setHomeFacilityCode(homeFacilityCode);
+    user2Dto.setHomeFacilityId(homeFacilityId);
 
     userId = UUID.randomUUID();
 
@@ -179,7 +180,7 @@ public class UserControllerTest {
 
   public void preparePostOrPut() {
     when(repository.findOne(userId)).thenReturn(user1);
-    when(facilityRepository.findFirstByCode(homeFacilityCode)).thenReturn(homeFacility);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
   }
 
   @Test
@@ -455,11 +456,11 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(user1);
     when(rightRepository.findOne(any(UUID.class))).thenReturn(supervisionRight1);
     when(programRepository.findOne(any(UUID.class))).thenReturn(program1);
-    when(facilityRepository.findOne(any(UUID.class))).thenReturn(homeFacility);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     //when
     ResultDto<Boolean> booleanResultDto = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
-        UUID.randomUUID(), UUID.randomUUID(), null);
+        UUID.randomUUID(), homeFacilityId, null);
 
     //then
     assertTrue(booleanResultDto.getResult());
@@ -496,6 +497,7 @@ public class UserControllerTest {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     setProgramSupportedAndActive();
 
@@ -512,6 +514,7 @@ public class UserControllerTest {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     SupportedProgram supportedProgram =
         SupportedProgram.newSupportedProgram(homeFacility, program1, true);
@@ -531,6 +534,7 @@ public class UserControllerTest {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     SupportedProgram supportedProgram =
         SupportedProgram.newSupportedProgram(homeFacility, program1, false);
@@ -549,6 +553,7 @@ public class UserControllerTest {
   public void shouldNotGetUserSupportedProgramsIfNoHomeFacilityPrograms() {
     //given
     when(repository.findOne(userId)).thenReturn(user1);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     setProgramSupportedAndActive();
 
@@ -564,6 +569,7 @@ public class UserControllerTest {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     program1.setActive(true);
 
@@ -579,9 +585,10 @@ public class UserControllerTest {
     //given
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
     when(repository.findOne(userId)).thenReturn(user1);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     setProgramSupportedAndActive();
-    user1.setHomeFacility(null);
+    user1.setHomeFacilityId(null);
 
     //when
     Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);

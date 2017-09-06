@@ -17,21 +17,19 @@ package org.openlmis.referencedata.dto;
 
 import static java.util.stream.Collectors.toSet;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.User;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -57,11 +55,9 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
   @Setter
   private String timezone;
 
-  @Setter
-  private String homeFacilityCode;
-
   @Getter
-  private FacilityDto homeFacility;
+  @Setter
+  private UUID homeFacilityId;
 
   @Getter
   @Setter
@@ -86,16 +82,6 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
   @Getter
   @Setter
   private Set<RoleAssignmentDto> roleAssignments;
-
-  public String fetchHomeFacilityCode() {
-    return homeFacilityCode;
-  }
-
-  @Override
-  public void setHomeFacility(Facility homeFacility) {
-    this.homeFacility = new FacilityDto();
-    homeFacility.export(this.homeFacility);
-  }
 
   /**
    * Copy role assignments to DTO.

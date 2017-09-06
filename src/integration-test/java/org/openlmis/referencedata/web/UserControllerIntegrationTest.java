@@ -164,6 +164,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
    * Constructor for test class.
    */
   public UserControllerIntegrationTest() {
+    homeFacilityId = UUID.randomUUID();
+    homeFacility = generateFacility(HOME_FACILITY_CODE);
+    homeFacility.setId(homeFacilityId);
+
     userId = UUID.randomUUID();
     user1 = generateUser();
     user1.setId(userId);
@@ -603,9 +607,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     program1.setActive(true);
     homeFacility.setSupportedPrograms(Sets.newHashSet(
         supportedProgram));
-    user1.setHomeFacility(homeFacility);
+    user1.setHomeFacilityId(homeFacilityId);
 
     given(userRepository.findOne(userId)).willReturn(user1);
+    given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
 
     Program[] response = restAssured
         .given()
@@ -929,7 +934,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.getFirstName(), response.getFirstName());
     assertEquals(user.getLastName(), response.getLastName());
     assertEquals(user.getEmail(), response.getEmail());
-    assertEquals(user.getHomeFacility().getId(), response.getHomeFacility().getId());
+    assertEquals(user.getHomeFacilityId(), response.getHomeFacilityId());
     assertEquals(user.isActive(), response.isActive());
     assertEquals(user.isVerified(), response.isVerified());
   }
@@ -975,7 +980,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.getFirstName(), response.getFirstName());
     assertEquals(user.getLastName(), response.getLastName());
     assertEquals(user.getEmail(), response.getEmail());
-    assertEquals(user.getHomeFacility().getCode(), response.getHomeFacility().getCode());
+    assertEquals(user.getHomeFacilityId(), response.getHomeFacilityId());
     assertEquals(user.isActive(), response.isActive());
     assertEquals(user.isVerified(), response.isVerified());
   }
@@ -1261,8 +1266,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
       userDto = new UserDto();
     }
     user1.export(userDto);
-    given(facilityRepository.findFirstByCode(userDto.fetchHomeFacilityCode()))
-        .willReturn(homeFacility);
     given(roleRepository.findOne(adminRoleId)).willReturn(adminRole);
     given(roleRepository.findOne(supervisionRoleId)).willReturn(supervisionRole);
     given(programRepository.findByCode(Code.code(PROGRAM1_CODE))).willReturn(program1);
@@ -1352,13 +1355,12 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private User generateUser() {
     Integer instanceNumber = generateInstanceNumber();
-    homeFacility = generateFacility(HOME_FACILITY_CODE);
     return new UserBuilder("kota" + instanceNumber,
         "Ala" + instanceNumber,
         "ma" + instanceNumber,
         instanceNumber + "@mail.com")
         .setTimezone(TIMEZONE)
-        .setHomeFacility(homeFacility)
+        .setHomeFacilityId(homeFacilityId)
         .setVerified(true)
         .setActive(true)
         .createUser();
@@ -1367,8 +1369,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private Facility generateFacility(String facilityCode) {
     FacilityType facilityType = generateFacilityType();
     Facility facility = new Facility(facilityCode);
-    homeFacilityId = UUID.randomUUID();
-    facility.setId(homeFacilityId);
+    facility.setId(UUID.randomUUID());
     facility.setType(facilityType);
     GeographicLevel geographicLevel = generateGeographicLevel();
     GeographicZone geographicZone = generateGeographicZone(geographicLevel);

@@ -176,16 +176,6 @@ public class UserController extends BaseController {
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
 
-    String homeFacilityCode = userDto.fetchHomeFacilityCode();
-    if (homeFacilityCode != null) {
-      Facility homeFacility = facilityRepository.findFirstByCode(userDto.fetchHomeFacilityCode());
-      if (homeFacility == null) {
-        LOGGER.error("Home facility does not exist");
-        throw new ValidationMessageException(UserMessageKeys.ERROR_HOME_FACILITY_NON_EXISTENT);
-      } else {
-        userDto.setHomeFacility(homeFacility);
-      }
-    }
     User userToSave = User.newUser(userDto);
 
     Set<RoleAssignmentDto> roleAssignmentDtos = userDto.getRoleAssignments();
@@ -448,7 +438,7 @@ public class UserController extends BaseController {
         .eTag(Integer.toString(userProgramDtos.hashCode()))
         .body(userProgramDtos);
   }
-
+  
   /**
    * Get the programs at a user's home facility that are supported by home facility. Support must be
    * active and supported program must be active.
@@ -470,7 +460,11 @@ public class UserController extends BaseController {
     User user = validateUser(userId);
 
     profiler.start("GET_HOME_FACILITY");
-    Facility homeFacility = user.getHomeFacility();
+    if (user.getHomeFacilityId() == null) {
+      profiler.stop().log();
+      return Collections.emptySet();
+    }
+    Facility homeFacility = facilityRepository.findOne(user.getHomeFacilityId());
 
     profiler.start("GET_SUPPORTED_PROGRAMS");
     Set<UUID> supportedProgramsIds;

@@ -15,21 +15,11 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
-import org.openlmis.referencedata.util.Pagination;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -37,6 +27,13 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import org.apache.commons.collections4.CollectionUtils;
+import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 public class UserRepositoryImpl implements UserRepositoryCustom {
 
@@ -44,7 +41,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   protected static final String FIRST_NAME = "firstName";
   protected static final String LAST_NAME = "lastName";
   protected static final String EMAIL = "email";
-  protected static final String HOME_FACILITY = "homeFacility";
+  protected static final String HOME_FACILITY_ID = "homeFacilityId";
   protected static final String ACTIVE = "active";
   protected static final String VERIFIED = "verified";
   protected static final String LOGIN_RESTRICTED = "loginRestricted";
@@ -64,7 +61,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
    * @param firstName       firstName of user.
    * @param lastName        lastName of user.
    * @param email           email of user.
-   * @param homeFacility    homeFacility of user.
+   * @param homeFacilityId  homeFacility of user.
    * @param active          is the account activated.
    * @param verified        is the account verified.
    * @param loginRestricted is the account login restricted.
@@ -73,17 +70,17 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
    * @return Page of users
    */
   public Page<User> searchUsers(String username, String firstName, String lastName,
-                                String email, Facility homeFacility, Boolean active,
+                                String email, UUID homeFacilityId, Boolean active,
                                 Boolean verified, Boolean loginRestricted,
                                 List<User> foundUsers, Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<User> query = builder.createQuery(User.class);
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
 
-    query = prepareQuery(username, firstName, lastName, email, homeFacility, active, verified,
+    query = prepareQuery(username, firstName, lastName, email, homeFacilityId, active, verified,
         loginRestricted, foundUsers, query, false, pageable);
-    countQuery = prepareQuery(username, firstName, lastName, email, homeFacility, active, verified,
-        loginRestricted, foundUsers, countQuery, true, pageable);
+    countQuery = prepareQuery(username, firstName, lastName, email, homeFacilityId, active, 
+        verified, loginRestricted, foundUsers, countQuery, true, pageable);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -92,11 +89,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
         .getResultList();
 
-    return Pagination.getPage(result, pageable, count);
+    return Pagination.getPage(result, pageable, count);   
   }
 
   private <T> CriteriaQuery<T> prepareQuery(String username, String firstName, String lastName,
-                                            String email, Facility homeFacility, Boolean active,
+                                            String email, UUID homeFacilityId, Boolean active,
                                             Boolean verified, Boolean loginRestricted,
                                             List<User> foundUsers, CriteriaQuery<T> query,
                                             boolean count, Pageable pageable) {
@@ -114,7 +111,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     predicate = addLikeFilter(predicate, builder, root, FIRST_NAME, firstName);
     predicate = addLikeFilter(predicate, builder, root, LAST_NAME, lastName);
     predicate = addLikeFilter(predicate, builder, root, EMAIL, email);
-    predicate = addEqualsFilter(predicate, builder, root, HOME_FACILITY, homeFacility);
+    predicate = addEqualsFilter(predicate, builder, root, HOME_FACILITY_ID, homeFacilityId);
     predicate = addEqualsFilter(predicate, builder, root, ACTIVE, active);
     predicate = addEqualsFilter(predicate, builder, root, VERIFIED, verified);
     predicate = addEqualsFilter(predicate, builder, root, LOGIN_RESTRICTED, loginRestricted);
@@ -158,7 +155,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   }
 
   private Predicate addEqualsFilter(Predicate predicate, CriteriaBuilder builder, Root root,
-                                    String filterKey, Object filterValue) {
+                              String filterKey, Object filterValue) {
     if (filterValue != null) {
       return builder.and(
           predicate,
@@ -173,9 +170,9 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                                   String filterKey, String filterValue) {
     if (filterValue != null) {
       return builder.and(
-          predicate,
-          builder.like(
-              builder.upper(root.get(filterKey)), "%" + filterValue.toUpperCase() + "%"));
+              predicate,
+              builder.like(
+                  builder.upper(root.get(filterKey)), "%" + filterValue.toUpperCase() + "%"));
     } else {
       return predicate;
     }

@@ -27,7 +27,7 @@ public class UserBuilder {
   private String lastName;
   private String email;
   private String timezone;
-  private Facility homeFacility;
+  private UUID homeFacilityId;
   private boolean active;
   private boolean verified;
   private boolean loginRestricted;
@@ -35,7 +35,7 @@ public class UserBuilder {
   private Map<String, String> extraData;
 
   private UserBuilder() {
-    this.homeFacility = null;
+    this.homeFacilityId = null;
     this.active = false;
     this.verified = false;
     this.allowNotify = true;
@@ -62,8 +62,8 @@ public class UserBuilder {
     return this;
   }
 
-  public UserBuilder setHomeFacility(Facility homeFacility) {
-    this.homeFacility = homeFacility;
+  public UserBuilder setHomeFacilityId(UUID homeFacilityId) {
+    this.homeFacilityId = homeFacilityId;
     return this;
   }
 
@@ -93,7 +93,7 @@ public class UserBuilder {
   }
 
   public User createUser() {
-    return new User(id, username, firstName, lastName, email, timezone, homeFacility, active,
+    return new User(id, username, firstName, lastName, email, timezone, homeFacilityId, active,
         verified, loginRestricted, allowNotify, extraData);
   }
 }

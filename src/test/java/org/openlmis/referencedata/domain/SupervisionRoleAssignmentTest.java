@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import com.google.common.collect.Sets;
+import java.util.UUID;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -49,9 +50,11 @@ public class SupervisionRoleAssignmentTest {
     role = Role.newRole("role", right);
     program = new Program("P1");
     homeFacility = new Facility("F1");
+    UUID homeFacilityId = UUID.randomUUID();
+    homeFacility.setId(homeFacilityId);
 
     user = new UserBuilder("testuser", "Test", "User", "test@test.com")
-        .setHomeFacility(homeFacility).createUser();
+        .setHomeFacilityId(homeFacilityId).createUser();
 
     homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, user, program);
 

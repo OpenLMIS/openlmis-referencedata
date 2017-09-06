@@ -107,8 +107,8 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     boolean facilityFound;
     if (supervisoryNode != null) {
       facilityFound = supervisoryNode.supervises(rightQuery.getFacility(), rightQuery.getProgram());
-    } else if (user.getHomeFacility() != null) {
-      facilityFound = user.getHomeFacility().equals(rightQuery.getFacility());
+    } else if (user.getHomeFacilityId() != null && rightQuery.getFacility() != null) {
+      facilityFound = user.getHomeFacilityId().equals(rightQuery.getFacility().getId());
     } else {
       facilityFound = false;
     }
@@ -126,7 +126,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       }
     } else {
       for (Right right : role.getRights()) {
-        user.addRightAssignment(right.getName(), user.getHomeFacility().getId(), program.getId());
+        user.addRightAssignment(right.getName(), user.getHomeFacilityId(), program.getId());
       }
     }
   }

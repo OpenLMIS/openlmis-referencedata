@@ -57,7 +57,6 @@ public class UserService {
   protected static final String FIRST_NAME = "firstName";
   protected static final String LAST_NAME = "lastName";
   protected static final String EMAIL = "email";
-  protected static final String HOME_FACILITY = "homeFacility";
   protected static final String HOME_FACILITY_ID = "homeFacilityId";
   protected static final String ACTIVE = "active";
   protected static final String VERIFIED = "verified";
@@ -96,11 +95,6 @@ public class UserService {
     Map<String, Object> regularQueryMap = new HashMap<>(queryMap);
     Map<String, String> extraData = (Map<String, String>) regularQueryMap.remove(EXTRA_DATA);
 
-    if (queryMap.containsKey(HOME_FACILITY_ID)) {
-      queryMap.put(HOME_FACILITY, facilityRepository.findOne(
-          UUID.fromString((String) queryMap.get(HOME_FACILITY_ID))));
-    }
-
     List<User> foundUsers = null;
     if (extraData != null && !extraData.isEmpty()) {
       try {
@@ -119,7 +113,7 @@ public class UserService {
         (String) queryMap.get(FIRST_NAME),
         (String) queryMap.get(LAST_NAME),
         (String) queryMap.get(EMAIL),
-        (Facility) queryMap.get(HOME_FACILITY),
+        (UUID) queryMap.get(HOME_FACILITY_ID),
         (Boolean) queryMap.get(ACTIVE),
         (Boolean) queryMap.get(VERIFIED),
         (Boolean) queryMap.get(LOGIN_RESTRICTED),

@@ -150,7 +150,7 @@ public class UserServiceTest {
             eq(FIRST_NAME_SEARCH),
             any(String.class),
             any(String.class),
-            any(Facility.class),
+            any(UUID.class),
             any(Boolean.class),
             any(Boolean.class),
             any(Boolean.class),
@@ -185,10 +185,10 @@ public class UserServiceTest {
     when(userRepository
         .searchUsers(
             any(String.class),
-            eq(FIRST_NAME_SEARCH),
+        eq(FIRST_NAME_SEARCH),
             any(String.class),
             any(String.class),
-            any(Facility.class),
+            any(UUID.class),
             any(Boolean.class),
             any(Boolean.class),
             any(Boolean.class),
@@ -210,7 +210,7 @@ public class UserServiceTest {
         any(String.class),
         any(String.class),
         any(String.class),
-        any(Facility.class),
+        any(UUID.class),
         any(Boolean.class),
         any(Boolean.class),
         any(Boolean.class),
@@ -226,7 +226,7 @@ public class UserServiceTest {
             eq(FIRST_NAME_SEARCH),
             any(String.class),
             any(String.class),
-            any(Facility.class),
+            any(UUID.class),
             any(Boolean.class),
             any(Boolean.class),
             any(Boolean.class),
@@ -263,7 +263,7 @@ public class UserServiceTest {
             any(String.class),
             any(String.class),
             any(String.class),
-            any(Facility.class),
+            any(UUID.class),
             any(Boolean.class),
             any(Boolean.class),
             any(Boolean.class),
@@ -274,13 +274,13 @@ public class UserServiceTest {
     final String username = "user";
     final String lastName = "last-name";
     final String email = "user@mail.com";
-    final String homeFacilityId = UUID.randomUUID().toString();
+    final UUID homeFacilityId = UUID.randomUUID();
     final Boolean active = true;
     final Boolean verified = true;
     final Boolean loginRestricted = true;
 
     Facility homeFacility = new Facility("some-code");
-    when(facilityRepository.findOne(eq(UUID.fromString(homeFacilityId)))).thenReturn(homeFacility);
+    when(facilityRepository.findOne(eq(homeFacilityId))).thenReturn(homeFacility);
 
     when(userRepository.findByExtraData(any(String.class))).thenReturn(Arrays.asList(user, user2));
 
@@ -304,7 +304,7 @@ public class UserServiceTest {
         FIRST_NAME_SEARCH,
         lastName,
         email,
-        homeFacility,
+        homeFacilityId,
         active,
         verified,
         loginRestricted,
@@ -478,7 +478,7 @@ public class UserServiceTest {
     return new UserBuilder("kota", "Ala", "ma", "test@mail.com")
         .setId(UUID.randomUUID())
         .setTimezone("UTC")
-        .setHomeFacility(mock(Facility.class))
+        .setHomeFacilityId(mock(UUID.class))
         .setVerified(false)
         .setActive(true)
         .setLoginRestricted(true)

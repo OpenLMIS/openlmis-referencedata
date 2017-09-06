@@ -30,7 +30,11 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -53,12 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateFiled"})
 public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<User> {
@@ -112,7 +110,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     int instanceNumber = this.getNextInstanceNumber();
     return new UserBuilder("user" + instanceNumber, "Test", "User", instanceNumber + "@mail.com")
         .setTimezone("UTC")
-        .setHomeFacility(generateFacility(instanceNumber))
+        .setHomeFacilityId(generateFacility(instanceNumber).getId())
         .setActive(true)
         .setVerified(true)
         .setLoginRestricted(false)
@@ -140,7 +138,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.getFirstName(),
         user.getLastName(),
         user.getEmail(),
-        user.getHomeFacility(),
+        user.getHomeFacilityId(),
         user.isActive(),
         user.isVerified(),
         user.isLoginRestricted(),
@@ -159,8 +157,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.getLastName(),
         receivedUsers.getContent().get(0).getLastName());
     assertEquals(
-        user.getHomeFacility().getId(),
-        receivedUsers.getContent().get(0).getHomeFacility().getId());
+        user.getHomeFacilityId(),
+        receivedUsers.getContent().get(0).getHomeFacilityId());
     assertEquals(
         user.isActive(),
         receivedUsers.getContent().get(0).isActive());
@@ -188,7 +186,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.getFirstName(),
         user.getLastName(),
         null,
-        user.getHomeFacility(),
+        user.getHomeFacilityId(),
         null,
         null,
         null,
@@ -204,8 +202,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
           user.getLastName(),
           receivedUser.getLastName());
       assertEquals(
-          user.getHomeFacility().getId(),
-          receivedUser.getHomeFacility().getId());
+          user.getHomeFacilityId(),
+          receivedUser.getHomeFacilityId());
     }
   }
 
@@ -298,7 +296,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     assertEquals(expectedUser.getLastName(), user.getLastName());
     assertEquals(expectedUser.getEmail(), user.getEmail());
     assertEquals(expectedUser.getTimezone(), user.getTimezone());
-    assertEquals(expectedUser.getHomeFacility().getId(), user.getHomeFacility().getId());
+    assertEquals(expectedUser.getHomeFacilityId(), user.getHomeFacilityId());
     assertEquals(expectedUser.isActive(), user.isActive());
     assertEquals(expectedUser.isVerified(), user.isVerified());
     assertEquals(expectedUser.isLoginRestricted(), user.isLoginRestricted());
@@ -405,7 +403,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     User clonedUser = new UserBuilder(user.getUsername() + instanceNumber,
         user.getFirstName(), user.getLastName(), instanceNumber + "@mail.com")
         .setTimezone("UTC")
-        .setHomeFacility(user.getHomeFacility())
+        .setHomeFacilityId(user.getHomeFacilityId())
         .setActive(user.isActive())
         .setVerified(user.isVerified())
         .createUser();

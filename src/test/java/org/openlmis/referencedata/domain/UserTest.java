@@ -103,9 +103,7 @@ public class UserTest {
     Program program1 = new Program("prog1");
     Program program2 = new Program("prog2");
 
-    Facility facility = new Facility("F1");
-    facility.setId(UUID.randomUUID());
-    user.setHomeFacility(facility);
+    user.setHomeFacilityId(UUID.randomUUID());
     RoleAssignment assignment3 = new SupervisionRoleAssignment(role, user, program1);
     RoleAssignment assignment4 = new SupervisionRoleAssignment(role, user, program2);
 
