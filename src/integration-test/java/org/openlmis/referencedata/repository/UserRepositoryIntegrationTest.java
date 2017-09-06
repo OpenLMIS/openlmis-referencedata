@@ -210,21 +210,20 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   @Test
-  public void testSearchUsersShouldReturnEmptyListIfEmptyListIsPassed() {
-    User user = cloneUser(users.get(0));
+  public void testSearchUsersShouldReturnAllUsersListIfEmptyListIsPassed() {
     Page<User> receivedUsers = repository.searchUsers(
         null,
-        user.getFirstName(),
-        user.getLastName(),
         null,
-        user.getHomeFacility(),
+        null,
+        null,
+        null,
         null,
         null,
         null,
         Collections.emptyList(),
         pageable);
 
-    assertEquals(0, receivedUsers.getContent().size());
+    assertEquals(TOTAL_USERS, receivedUsers.getContent().size());
   }
 
   @Test

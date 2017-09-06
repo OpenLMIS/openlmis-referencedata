@@ -168,16 +168,54 @@ public class UserServiceTest {
     assertEquals(2, receivedUsers.getContent().size());
     verify(userRepository).findByExtraData(extraDataString);
     verify(userRepository).searchUsers(
-        eq(null),
-        eq(FIRST_NAME_SEARCH),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(Arrays.asList(user, user2)),
-        eq(pageable));
+        null,
+        FIRST_NAME_SEARCH,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        Arrays.asList(user, user2),
+        pageable);
+  }
+
+  @Test
+  public void searchUsersShouldReturnEmptyPageIfExtraDataSearchReturnedNoResults() {
+    when(userRepository
+        .searchUsers(
+            any(String.class),
+            eq(FIRST_NAME_SEARCH),
+            any(String.class),
+            any(String.class),
+            any(Facility.class),
+            any(Boolean.class),
+            any(Boolean.class),
+            any(Boolean.class),
+            any(List.class),
+            any(Pageable.class)))
+        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
+
+    queryMap.putAll(userSearch);
+    queryMap.put(EXTRA_DATA, extraData);
+
+    when(userRepository.findByExtraData(any(String.class))).thenReturn(Collections.emptyList());
+
+    Page<User> receivedUsers = userService.searchUsers(queryMap, pageable);
+
+    assertEquals(0, receivedUsers.getContent().size());
+    verify(userRepository).findByExtraData(extraDataString);
+    verify(userRepository, never()).searchUsers(
+        any(String.class),
+        any(String.class),
+        any(String.class),
+        any(String.class),
+        any(Facility.class),
+        any(Boolean.class),
+        any(Boolean.class),
+        any(Boolean.class),
+        any(List.class),
+        any(Pageable.class));
   }
 
   @Test
@@ -205,16 +243,16 @@ public class UserServiceTest {
     assertTrue(receivedUsers.getContent().contains(user2));
     verify(userRepository, never()).findByExtraData(any(String.class));
     verify(userRepository).searchUsers(
-        eq(null),
-        eq(FIRST_NAME_SEARCH),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(pageable));
+        null,
+        FIRST_NAME_SEARCH,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        pageable);
   }
 
   @Test
@@ -262,16 +300,16 @@ public class UserServiceTest {
     assertTrue(receivedUsers.getContent().contains(user));
     assertTrue(receivedUsers.getContent().contains(user2));
     verify(userRepository).searchUsers(
-        eq(username),
-        eq(FIRST_NAME_SEARCH),
-        eq(lastName),
-        eq(email),
-        eq(homeFacility),
-        eq(active),
-        eq(verified),
-        eq(loginRestricted),
-        eq(Arrays.asList(user, user2)),
-        eq(pageable));
+        username,
+        FIRST_NAME_SEARCH,
+        lastName,
+        email,
+        homeFacility,
+        active,
+        verified,
+        loginRestricted,
+        Arrays.asList(user, user2),
+        pageable);
   }
 
   @Test

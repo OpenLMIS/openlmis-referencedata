@@ -76,10 +76,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                                 String email, Facility homeFacility, Boolean active,
                                 Boolean verified, Boolean loginRestricted,
                                 List<User> foundUsers, Pageable pageable) {
-    if (foundUsers != null && CollectionUtils.isEmpty(foundUsers)) {
-      return Pagination.getPage(foundUsers, pageable, 0);
-    }
-
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<User> query = builder.createQuery(User.class);
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);

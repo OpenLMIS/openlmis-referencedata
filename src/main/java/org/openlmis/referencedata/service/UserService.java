@@ -31,6 +31,7 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
@@ -105,6 +106,9 @@ public class UserService {
       try {
         String extraDataString = mapper.writeValueAsString(extraData);
         foundUsers = userRepository.findByExtraData(extraDataString);
+        if (foundUsers.isEmpty()) {
+          return Pagination.getPage(foundUsers, pageable, 0);
+        }
       } catch (JsonProcessingException jpe) {
         LOGGER.error("Cannot serialize extra data query request body into JSON", jpe);
       }
