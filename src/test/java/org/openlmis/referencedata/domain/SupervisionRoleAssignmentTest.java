@@ -176,26 +176,4 @@ public class SupervisionRoleAssignmentTest {
     //then
     assertThat(supervisedFacilities.size(), is(0));
   }
-
-  @Test
-  public void shouldAssignHomeFacilityProgramWhenUserAssignedWithNoNode() {
-
-    //when
-    Set<Program> programs = user.getHomeFacilityPrograms();
-
-    //then
-    assertThat(programs.size(), is(1));
-    assertTrue(programs.contains(program));
-  }
-
-  @Test
-  public void shouldAssignSupervisedProgramWhenUserAssignedWithNode() {
-
-    //when
-    Set<Program> programs = user.getSupervisedPrograms();
-
-    //then
-    assertThat(programs.size(), is(1));
-    assertTrue(programs.contains(program));
-  }
 }

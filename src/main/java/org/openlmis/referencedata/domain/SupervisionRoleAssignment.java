@@ -18,20 +18,17 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
 @DiscriminatorValue("supervision")
@@ -65,7 +62,6 @@ public class SupervisionRoleAssignment extends RoleAssignment {
   public SupervisionRoleAssignment(Role role, User user, Program program) {
     this(role, user);
     this.program = program;
-    addSupervisions();
     addRightAssignments();
   }
 
@@ -85,7 +81,6 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     this(role, user);
     this.program = program;
     this.supervisoryNode = supervisoryNode;
-    addSupervisions();
     addRightAssignments();
   }
 
@@ -150,17 +145,6 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     return possibleFacilities.stream()
         .filter(possibleFacility -> hasRight(new RightQuery(right, program, possibleFacility)))
         .collect(Collectors.toSet());
-  }
-
-  /**
-   * Add programs and supervised facilities for the associated user.
-   */
-  public void addSupervisions() {
-    if (supervisoryNode == null) {
-      user.addHomeFacilityProgram(program);
-    } else {
-      user.addSupervisedProgram(program);
-    }
   }
 
   /**

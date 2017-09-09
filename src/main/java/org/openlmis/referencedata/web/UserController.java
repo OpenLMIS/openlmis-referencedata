@@ -411,16 +411,8 @@ public class UserController extends BaseController {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     }
 
-    Set<Program> userPrograms;
-    if (null == forHomeFacility) {
-      profiler.start("GET_SUPERVISION_PROGRAMS_BY_USER");
-      userPrograms = programRepository.findSupervisionProgramsByUser(userId);
-    } else {
-      profiler.start("GET_USER");
-      User user = userRepository.findOne(userId);
-      userPrograms = forHomeFacility ? user.getHomeFacilityPrograms() :
-        user.getSupervisedPrograms();
-    }
+    profiler.start("GET_SUPERVISION_PROGRAMS_BY_USER");
+    Set<Program> userPrograms = programRepository.findSupervisionProgramsByUser(userId);
 
     profiler.start("EXPORT_USER_PROGRAMS");
     Set<ProgramDto> userProgramDtos = programsToDto(userPrograms);

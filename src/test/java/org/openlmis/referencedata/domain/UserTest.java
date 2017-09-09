@@ -24,13 +24,10 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.SupportedProgram.newSupportedProgram;
 
 import com.google.common.collect.Sets;
-
-import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.Set;
+import org.junit.Before;
+import org.junit.Test;
 
 public class UserTest {
 
@@ -94,53 +91,6 @@ public class UserTest {
 
     //then
     assertFalse(hasRight);
-  }
-
-  @Test
-  public void shouldGetHomeFacilityPrograms() {
-    //given
-    Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
-    Program program1 = new Program("prog1");
-    Program program2 = new Program("prog2");
-
-    user.setHomeFacilityId(UUID.randomUUID());
-    RoleAssignment assignment3 = new SupervisionRoleAssignment(role, user, program1);
-    RoleAssignment assignment4 = new SupervisionRoleAssignment(role, user, program2);
-
-    user.assignRoles(assignment3);
-    user.assignRoles(assignment4);
-
-    //when
-    Set<Program> programs = user.getHomeFacilityPrograms();
-
-    //then
-    assertTrue(programs.contains(program1));
-    assertTrue(programs.contains(program2));
-  }
-
-  @Test
-  public void shouldGetSupervisedPrograms() {
-    //given
-    Role role = Role.newRole(roleName, Right.newRight(RIGHT_NAME, RightType.SUPERVISION));
-    Program program1 = new Program("prog1");
-    Program program2 = new Program("prog2");
-    SupervisoryNode supervisoryNode =
-        SupervisoryNode.newSupervisoryNode("SN1", new Facility("C1"));
-
-    RoleAssignment assignment3 = new SupervisionRoleAssignment(role, user, program1,
-        supervisoryNode);
-    RoleAssignment assignment4 = new SupervisionRoleAssignment(role, user, program2,
-        supervisoryNode);
-
-    user.assignRoles(assignment3);
-    user.assignRoles(assignment4);
-
-    //when
-    Set<Program> programs = user.getSupervisedPrograms();
-
-    //then
-    assertTrue(programs.contains(program1));
-    assertTrue(programs.contains(program2));
   }
 
   @Test

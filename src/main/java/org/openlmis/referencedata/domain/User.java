@@ -16,30 +16,24 @@
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.util.View;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-import javax.persistence.PostLoad;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.util.View;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @Entity
@@ -112,14 +106,6 @@ public class User extends BaseEntity {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @DiffIgnore
   private Set<RightAssignment> rightAssignments = new HashSet<>();
-
-  @Transient
-  @Getter
-  private Set<Program> homeFacilityPrograms = new HashSet<>();
-
-  @Transient
-  @Getter
-  private Set<Program> supervisedPrograms = new HashSet<>();
 
   private User(Importer importer) {
     id = importer.getId();
@@ -208,14 +194,6 @@ public class User extends BaseEntity {
     return supervisedFacilities;
   }
 
-  public void addHomeFacilityProgram(Program program) {
-    homeFacilityPrograms.add(program);
-  }
-
-  public void addSupervisedProgram(Program program) {
-    supervisedPrograms.add(program);
-  }
-  
   void addRightAssignment(String rightName) {
     rightAssignments.add(new RightAssignment(this, rightName));
   }
@@ -252,19 +230,6 @@ public class User extends BaseEntity {
   }
 
   /**
-   * Refresh transient supervision properties (home facility and supervised programs, supervised
-   * facilities), after the user object is loaded from the database.
-   */
-  @PostLoad
-  private void refreshSupervisions() {
-    for (RoleAssignment roleAssignment : roleAssignments) {
-      if (roleAssignment instanceof SupervisionRoleAssignment) {
-        ((SupervisionRoleAssignment) roleAssignment).addSupervisions();
-      }
-    }
-  }
-
-  /**
    * Export this object to the specified exporter (DTO).
    *
    * @param exporter exporter to export to
@@ -282,7 +247,6 @@ public class User extends BaseEntity {
     exporter.setLoginRestricted(loginRestricted);
     exporter.setAllowNotify(allowNotify);
     exporter.setExtraData(extraData);
-    exporter.addRoleAssignments(roleAssignments);
   }
 
   @Override
@@ -324,8 +288,6 @@ public class User extends BaseEntity {
     void setLoginRestricted(boolean loginRestricted);
 
     void setAllowNotify(Boolean allowNotify);
-
-    void addRoleAssignments(Set<RoleAssignment> roleAssignments);
 
     void setExtraData(Map<String, String> extraData);
   }

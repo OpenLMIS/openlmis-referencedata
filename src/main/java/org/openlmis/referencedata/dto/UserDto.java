@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.dto;
 
-import static java.util.stream.Collectors.toSet;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -25,10 +23,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.domain.DirectRoleAssignment;
-import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
-import org.openlmis.referencedata.domain.RoleAssignment;
-import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.User;
 
 @NoArgsConstructor
@@ -82,28 +76,6 @@ public class UserDto extends BaseDto implements User.Exporter, User.Importer {
   @Getter
   @Setter
   private Set<RoleAssignmentDto> roleAssignments;
-
-  /**
-   * Copy role assignments to DTO.
-   */
-  @Override
-  public void addRoleAssignments(Set<RoleAssignment> roleAssignments) {
-    this.roleAssignments = roleAssignments.stream()
-        .map(this::exportToDto)
-        .collect(toSet());
-  }
-
-  private <T extends RoleAssignment> RoleAssignmentDto exportToDto(T roleAssignment) {
-    RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
-    if (roleAssignment instanceof SupervisionRoleAssignment) {
-      ((SupervisionRoleAssignment) roleAssignment).export(roleAssignmentDto);
-    } else if (roleAssignment instanceof FulfillmentRoleAssignment) {
-      ((FulfillmentRoleAssignment) roleAssignment).export(roleAssignmentDto);
-    } else {
-      ((DirectRoleAssignment) roleAssignment).export(roleAssignmentDto);
-    }
-    return roleAssignmentDto;
-  }
 
   @Override
   public boolean equals(Object obj) {
