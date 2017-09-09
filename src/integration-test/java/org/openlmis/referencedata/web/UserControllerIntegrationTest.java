@@ -600,24 +600,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetUserSupportedPrograms() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    given(userRepository.exists(userId)).willReturn(true);
 
-    SupportedProgram supportedProgram =
-        SupportedProgram.newSupportedProgram(homeFacility, program1, true);
-    program1.setId(program1Id);
-    program1.setActive(true);
-    homeFacility.setSupportedPrograms(Sets.newHashSet(
-        supportedProgram));
-    user1.setHomeFacilityId(homeFacilityId);
-
-    given(userRepository.findOne(userId)).willReturn(user1);
-    given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
-
-    Program[] response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", userId)
-        .when()
-        .get(SUPPORTED_PROGRAMS_URL)
+    Program[] response = getUserSupportedPrograms()
         .then()
         .statusCode(200)
         .extract().as(Program[].class);
@@ -631,12 +616,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldRejectGetUserSupportedProgramsIfUserHasNoRight() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
 
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", userId)
-        .when()
-        .get(SUPPORTED_PROGRAMS_URL)
+    String messageKey = getUserSupportedPrograms()
         .then()
         .statusCode(403)
         .extract()
@@ -649,14 +629,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetUserSupportedProgramsWithNoRightIfUserRequestsTheirOwnRecord() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.exists(userId)).willReturn(true);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", userId)
-        .when()
-        .get(SUPPORTED_PROGRAMS_URL)
+    getUserSupportedPrograms()
         .then()
         .statusCode(200);
 
@@ -666,13 +641,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnNotFoundIfNoUserExistWhenGetSupportedPrograms() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+    given(userRepository.exists(userId)).willReturn(false);
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", userId)
-        .when()
-        .get(SUPPORTED_PROGRAMS_URL)
+    getUserSupportedPrograms()
         .then()
         .statusCode(404);
 
@@ -1323,6 +1294,18 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .pathParam("id", userId)
         .when()
         .get(PROGRAMS_URL);
+  }
+  
+  private Response getUserSupportedPrograms() {
+    given(programRepository.findHomeFacilitySupervisionProgramsByUser(userId)).willReturn(
+        Sets.newHashSet(program1));
+
+    return restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", userId)
+        .when()
+        .get(SUPPORTED_PROGRAMS_URL);
   }
 
   private Response getUserSupervisedFacilities() {

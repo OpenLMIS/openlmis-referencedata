@@ -19,18 +19,53 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.RightAssignment;
+import org.openlmis.referencedata.domain.RightType;
+import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.domain.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
+@SuppressWarnings("PMD.TooManyMethods")
 public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Program> {
 
+  private static final String RIGHT_NAME = "rightName";
+  
   @Autowired
   ProgramRepository repository;
-  
+
+  @Autowired
+  UserRepository userRepository;
+
+  @Autowired
+  FacilityRepository facilityRepository;
+
+  @Autowired
+  private GeographicLevelRepository geographicLevelRepository;
+
+  @Autowired
+  private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private FacilityTypeRepository facilityTypeRepository;
+
+  @Autowired
+  private RightAssignmentRepository rightAssignmentRepository;
+
+  @Autowired
+  private RightRepository rightRepository;
+
   String programCode;
   String programName;
 
@@ -107,7 +142,6 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
 
     assertEquals(1, foundPrograms.size());
     assertEquals(program, foundPrograms.get(0));
-
     foundPrograms = repository.findProgramsByName("program");
 
     assertEquals(1, foundPrograms.size());
@@ -127,5 +161,151 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     List<Program> foundPrograms = repository.findProgramsByName("Incorrect Name");
 
     assertEquals(0, foundPrograms.size());
+  }
+  
+  @Test
+  public void findHomeFacilitySupervisionProgramsByUserShouldFindProgram() {
+    // given
+    Program homeFacilityProgram = this.generateInstance();
+    homeFacilityProgram.setActive(true);
+    repository.save(homeFacilityProgram);
+    
+    Facility homeFacility = persistFacilityWithProgram(homeFacilityProgram, true);
+
+    User user = persistUserWithHomeFacilityId(homeFacility.getId());
+
+    persistRightAssignment(user, RIGHT_NAME, homeFacility.getId(), homeFacilityProgram.getId());
+
+    // when
+    Set<Program> foundPrograms = repository.findHomeFacilitySupervisionProgramsByUser(user.getId());
+    
+    // then
+    assertEquals(1, foundPrograms.size());
+    assertEquals(homeFacilityProgram, foundPrograms.iterator().next());
+  }
+
+  @Test
+  public void findHomeFacilitySupervisionProgramsByUserShouldNotFindIfProgramNotActive() {
+    // given
+    Program homeFacilityProgram = this.generateInstance();
+    homeFacilityProgram.setActive(false);
+    repository.save(homeFacilityProgram);
+
+    Facility homeFacility = persistFacilityWithProgram(homeFacilityProgram, true);
+
+    User user = persistUserWithHomeFacilityId(homeFacility.getId());
+
+    persistRightAssignment(user, RIGHT_NAME, homeFacility.getId(), homeFacilityProgram.getId());
+
+    // when
+    Set<Program> foundPrograms = repository.findHomeFacilitySupervisionProgramsByUser(user.getId());
+
+    // then
+    assertTrue(foundPrograms.isEmpty());
+  }
+
+  @Test
+  public void findHomeFacilitySupervisionProgramsByUserShouldNotFindIfSupportNotActive() {
+    // given
+    Program homeFacilityProgram = this.generateInstance();
+    homeFacilityProgram.setActive(true);
+    repository.save(homeFacilityProgram);
+
+    Facility homeFacility = persistFacilityWithProgram(homeFacilityProgram, false);
+
+    User user = persistUserWithHomeFacilityId(homeFacility.getId());
+    
+    persistRightAssignment(user, RIGHT_NAME, homeFacility.getId(), homeFacilityProgram.getId());
+
+    // when
+    Set<Program> foundPrograms = repository.findHomeFacilitySupervisionProgramsByUser(user.getId());
+
+    // then
+    assertTrue(foundPrograms.isEmpty());
+  }
+
+  @Test
+  public void findHomeFacilitySupervisionProgramsByUserShouldNotFindIfNoHomeFacilityProgram() {
+    // given
+    Program homeFacilityProgram = this.generateInstance();
+    homeFacilityProgram.setActive(true);
+    repository.save(homeFacilityProgram);
+
+    Facility homeFacility = persistFacilityWithProgram(null, true);
+
+    User user = persistUserWithHomeFacilityId(homeFacility.getId());
+
+    persistRightAssignment(user, RIGHT_NAME, homeFacility.getId(), homeFacilityProgram.getId());
+
+    // when
+    Set<Program> foundPrograms = repository.findHomeFacilitySupervisionProgramsByUser(user.getId());
+
+    // then
+    assertTrue(foundPrograms.isEmpty());
+  }
+
+  @Test
+  public void findHomeFacilitySupervisionProgramsByUserShouldNotFindIfNoHomeFacility() {
+    // given
+    Program homeFacilityProgram = this.generateInstance();
+    homeFacilityProgram.setActive(true);
+    repository.save(homeFacilityProgram);
+
+    User user = persistUserWithHomeFacilityId(null);
+
+    persistRightAssignment(user, RIGHT_NAME, null, null);
+
+    // when
+    Set<Program> foundPrograms = repository.findHomeFacilitySupervisionProgramsByUser(user.getId());
+
+    // then
+    assertTrue(foundPrograms.isEmpty());
+  }
+
+  private User persistUserWithHomeFacilityId(UUID homeFacilityId) {
+    User user = new UserBuilder(
+        "user",
+        "Test",
+        "User",
+        "user@mail.com")
+        .setTimezone("UTC")
+        .setActive(true)
+        .setVerified(true)
+        .setLoginRestricted(false)
+        .setHomeFacilityId(homeFacilityId)
+        .createUser();
+    userRepository.save(user);
+    return user;
+  }
+  
+  private Facility persistFacilityWithProgram(Program program, boolean isSupportActive) {
+    GeographicLevel geographicLevel = new GeographicLevel("GL1", 1);
+    geographicLevelRepository.save(geographicLevel);
+
+    GeographicZone geographicZone = new GeographicZone("G1", geographicLevel);
+    geographicZoneRepository.save(geographicZone);
+
+    FacilityType facilityType = new FacilityType("FT1");
+    facilityTypeRepository.save(facilityType);
+
+    Facility facility = new Facility("F1");
+    facility.setActive(true);
+    facility.setEnabled(true);
+    facility.setGeographicZone(geographicZone);
+    facility.setType(facilityType);
+    if (program != null) {
+      facility.addSupportedProgram(SupportedProgram.newSupportedProgram(
+          facility, program, isSupportActive));
+    }
+
+    facilityRepository.save(facility);
+
+    return facility;
+  }
+  
+  private void persistRightAssignment(User user, String rightName, UUID facilityId,
+      UUID programId) {
+    rightRepository.save(Right.newRight(rightName, RightType.SUPERVISION));
+    rightAssignmentRepository.save(new RightAssignment(user, rightName, facilityId, programId));
   }
 }

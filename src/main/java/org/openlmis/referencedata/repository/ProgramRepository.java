@@ -46,5 +46,17 @@ public interface ProgramRepository
       nativeQuery = true)
   Set<Program> findSupervisionProgramsByUser(@Param("userId") UUID userId);
 
+  @Query(value = "SELECT DISTINCT p.*"
+      + " FROM referencedata.programs p"
+      + "   JOIN referencedata.right_assignments ra ON ra.programid = p.id" 
+      + "   JOIN referencedata.users u ON u.homefacilityid = ra.facilityid" 
+      + "   JOIN referencedata.supported_programs sp ON sp.facilityid = ra.facilityid" 
+      + "     AND sp.programid = ra.programid" 
+      + "     AND sp.active = TRUE"
+      + " WHERE p.active = TRUE" 
+      + "   AND ra.userid = :userId",
+      nativeQuery = true)
+  Set<Program> findHomeFacilitySupervisionProgramsByUser(@Param("userId") UUID userId);
+
   boolean existsByCode(Code programCode);
 }

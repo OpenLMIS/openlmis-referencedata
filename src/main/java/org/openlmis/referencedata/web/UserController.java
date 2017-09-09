@@ -19,7 +19,16 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -33,7 +42,6 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.FacilityDto;
@@ -82,20 +90,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import lombok.NoArgsConstructor;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
 
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
@@ -449,44 +443,31 @@ public class UserController extends BaseController {
   @RequestMapping(value = "/users/{userId}/supportedPrograms", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Set<ProgramDto> getUserSupportedPrograms(@PathVariable(USER_ID) UUID userId) {
+  public ResponseEntity<Set<ProgramDto>> getUserSupportedPrograms(
+      @PathVariable(USER_ID) UUID userId) {
     Profiler profiler = new Profiler("GET_USER_SUPPORTED_PROGRAMS");
     profiler.setLogger(LOGGER);
 
     profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
-    profiler.start("VALIDATE_USER");
-    User user = validateUser(userId);
-
-    profiler.start("GET_HOME_FACILITY");
-    if (user.getHomeFacilityId() == null) {
-      profiler.stop().log();
-      return Collections.emptySet();
-    }
-    Facility homeFacility = facilityRepository.findOne(user.getHomeFacilityId());
-
-    profiler.start("GET_SUPPORTED_PROGRAMS");
-    Set<UUID> supportedProgramsIds;
-    if (homeFacility != null) {
-      supportedProgramsIds = homeFacility.getSupportedPrograms().stream()
-          .filter(SupportedProgram::getActive)
-          .filter(sp -> sp.getProgram().getActive() != null
-              && sp.getProgram().getActive())
-          .map(sp -> sp.getProgram().getId())
-          .collect(Collectors.toSet());
-    } else {
-      profiler.stop().log();
-      return Collections.emptySet();
+    profiler.start("CHECK_USER_EXISTS");
+    if (!userRepository.exists(userId)) {
+      throw new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId));
     }
 
-    profiler.start("FILTER_PROGRAMS");
-    Set<Program> filteredPrograms = user.getHomeFacilityPrograms().stream()
-        .filter(program -> supportedProgramsIds.contains(program.getId()))
-        .collect(Collectors.toSet());
+    profiler.start("GET_HOME_FACILITY_SUPERVISION_PROGRAMS_BY_USER");
+    Set<Program> userHomeFacilityPrograms = programRepository
+        .findHomeFacilitySupervisionProgramsByUser(userId);
+
+    profiler.start("EXPORT_USER_PROGRAMS");
+    Set<ProgramDto> userHomeFacilityProgramDtos = programsToDto(userHomeFacilityPrograms);
 
     profiler.stop().log();
-    return programsToDto(filteredPrograms);
+    return ResponseEntity
+        .ok()
+        .eTag(Integer.toString(userHomeFacilityProgramDtos.hashCode()))
+        .body(userHomeFacilityProgramDtos);
   }
 
   /**

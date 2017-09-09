@@ -27,7 +27,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
-
+import java.util.Set;
+import java.util.UUID;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -46,7 +47,6 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.FacilityDto;
-import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -62,9 +62,6 @@ import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.validate.UserValidator;
 import org.springframework.validation.BindingResult;
-
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class UserControllerTest {
@@ -490,111 +487,6 @@ public class UserControllerTest {
 
     //when
     controller.getUserPrograms(userId, true);
-  }
-
-  @Test
-  public void shouldGetUserSupportedPrograms() {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
-
-    setProgramSupportedAndActive();
-
-    //when
-    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
-
-    //then
-    assertThat(homeFacilityPrograms.size(), is(1));
-    assertTrue(homeFacilityPrograms.contains(ProgramDto.newInstance(program1)));
-  }
-
-  @Test
-  public void shouldNotGetUserSupportedProgramsIfProgramIsNotActive() {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
-
-    SupportedProgram supportedProgram =
-        SupportedProgram.newSupportedProgram(homeFacility, program1, true);
-    program1.setActive(false);
-    homeFacility.setSupportedPrograms(Sets.newHashSet(
-        supportedProgram));
-
-    //when
-    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
-
-    //then
-    assertTrue(homeFacilityPrograms.isEmpty());
-  }
-
-  @Test
-  public void shouldNotGetUserSupportedProgramsIfSupportIsNotActive() {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
-
-    SupportedProgram supportedProgram =
-        SupportedProgram.newSupportedProgram(homeFacility, program1, false);
-    supportedProgram.setId(program1.getId());
-    program1.setActive(true);
-    homeFacility.setSupportedPrograms(Sets.newHashSet(supportedProgram));
-
-    //when
-    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
-
-    //then
-    assertTrue(homeFacilityPrograms.isEmpty());
-  }
-
-  @Test
-  public void shouldNotGetUserSupportedProgramsIfNoHomeFacilityPrograms() {
-    //given
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
-
-    setProgramSupportedAndActive();
-
-    //when
-    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
-
-    //then
-    assertTrue(homeFacilityPrograms.isEmpty());
-  }
-
-  @Test
-  public void shouldNotGetUserSupportedProgramsIfNoProgramIsSupported() {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
-
-    program1.setActive(true);
-
-    //when
-    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
-
-    //then
-    assertTrue(homeFacilityPrograms.isEmpty());
-  }
-
-  @Test
-  public void shouldNotGetUserSupportedProgramsIfUserHaveNoHomeFacility() {
-    //given
-    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
-
-    setProgramSupportedAndActive();
-    user1.setHomeFacilityId(null);
-
-    //when
-    Set<ProgramDto> homeFacilityPrograms = controller.getUserSupportedPrograms(userId);
-
-    //then
-    assertTrue(homeFacilityPrograms.isEmpty());
   }
 
   @Test
