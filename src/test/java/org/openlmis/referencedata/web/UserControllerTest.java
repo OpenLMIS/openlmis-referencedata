@@ -32,7 +32,6 @@ import java.util.UUID;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -114,14 +113,14 @@ public class UserControllerTest {
   private String supervisionRight1Name;
   private Right supervisionRight1;
   private Role supervisionRole1;
-  private String programCode;
+  private UUID programId;
   private Program program1;
-  private String supervisoryNodeCode;
+  private UUID supervisoryNodeId;
   private SupervisoryNode supervisoryNode1;
   private String fulfillmentRight1Name;
   private Right fulfillmentRight1;
   private Role fulfillmentRole1;
-  private String warehouseCode;
+  private UUID warehouseId;
   private Facility warehouse1;
 
   /**
@@ -159,19 +158,19 @@ public class UserControllerTest {
     supervisionRight1 = Right.newRight(supervisionRight1Name, RightType.SUPERVISION);
     supervisionRole1 = Role.newRole("supervisionRole1", supervisionRight1);
     supervisionRole1.setId(roleId);
-    programCode = "P1";
-    program1 = new Program(programCode);
-    program1.setId(UUID.randomUUID());
-    supervisoryNodeCode = "SN1";
+    programId = UUID.randomUUID();
+    program1 = new Program("P1");
+    program1.setId(programId);
+    supervisoryNodeId = UUID.randomUUID();
     supervisoryNode1 = new SupervisoryNode();
-    supervisoryNode1.setCode(supervisoryNodeCode);
+    supervisoryNode1.setId(supervisoryNodeId);
     fulfillmentRight1Name = "fulfillmentRight1";
     fulfillmentRight1 = Right.newRight(fulfillmentRight1Name, RightType.ORDER_FULFILLMENT);
     fulfillmentRole1 = Role.newRole("fulfillmentRole1", fulfillmentRight1);
     fulfillmentRole1.setId(roleId);
-    warehouseCode = "W1";
+    warehouseId = UUID.randomUUID();
     warehouse1 = new Facility("C2");
-    warehouse1.setCode(warehouseCode);
+    warehouse1.setId(warehouseId);
     warehouse1.setType(new FacilityType("warehouse"));
   }
 
@@ -306,10 +305,10 @@ public class UserControllerTest {
 
 
     when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
-    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
+    when(programRepository.findOne(programId)).thenReturn(program1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRole(supervisionRole1);
-    roleAssignmentDto.setProgramCode(programCode);
+    roleAssignmentDto.setProgram(program1);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
@@ -330,12 +329,12 @@ public class UserControllerTest {
 
 
     when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
-    when(programRepository.findByCode(Code.code(programCode))).thenReturn(program1);
-    when(supervisoryNodeRepository.findByCode(supervisoryNodeCode)).thenReturn(supervisoryNode1);
+    when(programRepository.findOne(programId)).thenReturn(program1);
+    when(supervisoryNodeRepository.findOne(supervisoryNodeId)).thenReturn(supervisoryNode1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRole(supervisionRole1);
-    roleAssignmentDto.setProgramCode(programCode);
-    roleAssignmentDto.setSupervisoryNodeCode(supervisoryNodeCode);
+    roleAssignmentDto.setProgram(program1);
+    roleAssignmentDto.setSupervisoryNode(supervisoryNode1);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
@@ -355,10 +354,10 @@ public class UserControllerTest {
 
 
     when(roleRepository.findOne(roleId)).thenReturn(fulfillmentRole1);
-    when(facilityRepository.findFirstByCode(warehouseCode)).thenReturn(warehouse1);
+    when(facilityRepository.findOne(warehouseId)).thenReturn(warehouse1);
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRole(fulfillmentRole1);
-    roleAssignmentDto.setWarehouseCode(warehouseCode);
+    roleAssignmentDto.setWarehouse(warehouse1);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);

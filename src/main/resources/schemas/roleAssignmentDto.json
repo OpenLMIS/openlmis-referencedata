@@ -8,17 +8,17 @@
       "type": "string",
       "title": "roleId"
     },
-    "programCode": {
+    "programId": {
       "type": "string",
-      "title": "programCode"
+      "title": "programId"
     },
-    "supervisoryNodeCode": {
+    "supervisoryNodeId": {
       "type": "string",
-      "title": "supervisoryNodeCode"
+      "title": "supervisoryNodeId"
     },
-    "warehouseCode": {
+    "warehouseId": {
       "type": "string",
-      "title": "warehouseCode"
+      "title": "warehouseId"
     }
   },
   "required": [

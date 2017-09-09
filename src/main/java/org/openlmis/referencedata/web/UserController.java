@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
@@ -711,25 +710,25 @@ public class UserController extends BaseController {
             UserMessageKeys.ERROR_ASSIGNED_ROLE_RIGHTS_EMPTY, role.getName()));
       }
 
-      String programCode = roleAssignmentDto.getProgramCode();
-      String warehouseCode = roleAssignmentDto.getWarehouseCode();
-      if (programCode != null) {
+      UUID programId = roleAssignmentDto.getProgramId();
+      UUID warehouseId = roleAssignmentDto.getWarehouseId();
+      if (programId != null) {
 
-        Program program = programRepository.findByCode(Code.code(programCode));
-        String supervisoryNodeCode = roleAssignmentDto.getSupervisoryNodeCode();
-        if (supervisoryNodeCode != null) {
+        Program program = programRepository.findOne(programId);
+        UUID supervisoryNodeId = roleAssignmentDto.getSupervisoryNodeId();
+        if (supervisoryNodeId != null) {
 
-          SupervisoryNode supervisoryNode = supervisoryNodeRepository.findByCode(
-              supervisoryNodeCode);
+          SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(
+              supervisoryNodeId);
           roleAssignment = new SupervisionRoleAssignment(role, user, program, supervisoryNode);
 
         } else {
           roleAssignment = new SupervisionRoleAssignment(role, user, program);
         }
 
-      } else if (warehouseCode != null) {
+      } else if (warehouseId != null) {
 
-        Facility warehouse = facilityRepository.findFirstByCode(warehouseCode);
+        Facility warehouse = facilityRepository.findOne(warehouseId);
         roleAssignment = new FulfillmentRoleAssignment(role, user, warehouse);
 
       } else {
