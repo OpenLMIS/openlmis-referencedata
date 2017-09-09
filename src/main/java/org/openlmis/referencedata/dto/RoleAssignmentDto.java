@@ -17,6 +17,7 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Role;
@@ -82,6 +83,11 @@ public class RoleAssignmentDto implements RoleAssignment.Exporter,
   @Override
   public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
     supervisoryNodeCode = supervisoryNode.getCode();
+  }
+
+  @Override
+  public void setWarehouse(Facility warehouse) {
+    warehouseCode = warehouse.getCode();
   }
 }
 

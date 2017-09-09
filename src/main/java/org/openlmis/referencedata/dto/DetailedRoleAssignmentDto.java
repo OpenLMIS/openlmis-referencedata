@@ -18,6 +18,7 @@ package org.openlmis.referencedata.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Role;
@@ -54,6 +55,9 @@ public class DetailedRoleAssignmentDto implements RoleAssignment.Exporter,
   @Getter
   @Setter
   private UUID supervisoryNodeId;
+
+  @Getter
+  private UUID warehouseId;
 
   @Override
   public void setRole(Role role) {
@@ -95,6 +99,12 @@ public class DetailedRoleAssignmentDto implements RoleAssignment.Exporter,
   public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
     this.supervisoryNodeId = supervisoryNode.getId();
     this.supervisoryNodeCode = supervisoryNode.getCode();
+  }
+  
+  @Override
+  public void setWarehouse(Facility warehouse) {
+    this.warehouseCode = warehouse.getCode();
+    this.warehouseId = warehouse.getId();
   }
 }
 
