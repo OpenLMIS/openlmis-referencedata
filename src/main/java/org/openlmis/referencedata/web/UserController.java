@@ -39,6 +39,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
+import org.openlmis.referencedata.dto.RoleAssignmentResource;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
@@ -55,6 +56,7 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
@@ -129,6 +131,9 @@ public class UserController extends BaseController {
   
   @Autowired
   private RightAssignmentRepository rightAssignmentRepository;
+  
+  @Autowired
+  private RoleAssignmentRepository roleAssignmentRepository;
 
   @InitBinder
   protected void initBinder(WebDataBinder binder) {
@@ -236,6 +241,16 @@ public class UserController extends BaseController {
 
     profiler.start("EXPORT_USER");
     UserDto userDto = exportUserToDto(user);
+
+    profiler.start("GET_ROLE_ASSIGNMENT_RESOURCES");
+    Set<RoleAssignmentResource> roleAssignmentResources = roleAssignmentRepository
+        .findByUser(user.getId());
+
+    profiler.start("ADD_ROLE_ASSIGNMENTS_TO_USER_DTO");
+    Set<RoleAssignmentDto> roleAssignmentDtos = roleAssignmentResources.stream()
+        .map(this::roleAssignmentResourceToDto)
+        .collect(toSet());
+    userDto.setRoleAssignments(roleAssignmentDtos);
 
     profiler.stop().log();
     XLOGGER.exit(user);
@@ -798,5 +813,14 @@ public class UserController extends BaseController {
     }
 
     return dtos;
+  }
+  
+  private RoleAssignmentDto roleAssignmentResourceToDto(RoleAssignmentResource resource) {
+    RoleAssignmentDto dto = new RoleAssignmentDto();
+    dto.setRoleId(resource.getRoleId());
+    dto.setProgramId(resource.getProgramId());
+    dto.setSupervisoryNodeId(resource.getSupervisoryNodeId());
+    dto.setWarehouseId(resource.getWarehouseId());
+    return dto;
   }
 }

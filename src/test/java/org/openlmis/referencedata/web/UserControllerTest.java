@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Test;
@@ -48,12 +49,14 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
+import org.openlmis.referencedata.dto.RoleAssignmentResource;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
@@ -93,6 +96,9 @@ public class UserControllerTest {
 
   @Mock
   private UserValidator validator;
+  
+  @Mock
+  private RoleAssignmentRepository roleAssignmentRepository;
 
   @InjectMocks
   private UserController controller = new UserController();
@@ -196,6 +202,7 @@ public class UserControllerTest {
   public void shouldGetUser() {
     //given
     when(repository.findOne(userId)).thenReturn(user1);
+    when(roleAssignmentRepository.findByUser(userId)).thenReturn(Collections.emptySet());
 
     //when
     UserDto userDto = controller.getUser(userId);
@@ -212,6 +219,9 @@ public class UserControllerTest {
         user1, program1);
     user1.assignRoles(roleAssignment1, roleAssignment2);
     when(repository.findOne(userId)).thenReturn(user1);
+    when(roleAssignmentRepository.findByUser(userId)).thenReturn(Sets.newHashSet(
+        new RoleAssignmentResource(roleId, null, null, null),
+        new RoleAssignmentResource(roleId, programId, null, null)));
 
     UserDto expectedUserDto = new UserDto();
     user1.export(expectedUserDto);

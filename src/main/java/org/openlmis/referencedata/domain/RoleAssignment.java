@@ -17,6 +17,9 @@ package org.openlmis.referencedata.domain;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
@@ -25,9 +28,14 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.openlmis.referencedata.dto.RoleAssignmentResource;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 
 @Entity
@@ -36,6 +44,32 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("abstract")
 @NoArgsConstructor
+@NamedNativeQueries({
+    @NamedNativeQuery(name = "RoleAssignment.findByUser",
+        query = "SELECT ra.roleid"
+            + "   , ra.programid"
+            + "   , ra.supervisorynodeid"
+            + "   , ra.warehouseid"
+            + " FROM referencedata.role_assignments ra"
+            + " WHERE ra.userid = :userId",
+        resultSetMapping = "RoleAssignment.idResource")
+    })
+@SqlResultSetMappings({
+    @SqlResultSetMapping(
+        name = "RoleAssignment.idResource",
+        classes = {
+            @ConstructorResult(
+                targetClass = RoleAssignmentResource.class,
+                columns = {
+                    @ColumnResult(name = "roleid", type = UUID.class),
+                    @ColumnResult(name = "programid", type = UUID.class),
+                    @ColumnResult(name = "supervisorynodeid", type = UUID.class),
+                    @ColumnResult(name = "warehouseid", type = UUID.class)
+                }
+            )
+        }
+    )
+    })
 public abstract class RoleAssignment extends BaseEntity {
 
   @ManyToOne
