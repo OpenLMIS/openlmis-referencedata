@@ -219,6 +219,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetUser() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    when(roleAssignmentRepository.findByUser(any(UUID.class))).thenReturn(Collections.emptySet());
 
     UserDto userDto = new UserDto();
     user1.export(userDto);
@@ -235,6 +236,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetUserWithNoRightIfUserRequestsTheirOwnRecord() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
+    when(roleAssignmentRepository.findByUser(any(UUID.class))).thenReturn(Collections.emptySet());
 
     getUser()
         .then()
@@ -882,6 +884,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldCreateUser() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    when(roleAssignmentRepository.findByUser(any(UUID.class))).thenReturn(Collections.emptySet());
 
     User user = generateUser();
     UserDto userDto = new UserDto();
@@ -913,9 +916,12 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldUpdateUser() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    when(roleAssignmentRepository.findByUser(any(UUID.class))).thenReturn(Collections.emptySet());
+
     User newUser = generateUser();
     UserDto newUserDto = new UserDto();
     newUser.export(newUserDto);
+
     UserDto user = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())

@@ -189,7 +189,10 @@ public class UserController extends BaseController {
     }
     userRepository.save(userToSave);
 
-    return exportUserToDto(userToSave);
+    UserDto responseDto = exportUserToDto(userToSave);
+    addRoleAssignmentIdsToUserDto(responseDto);
+
+    return responseDto;
   }
 
   /**
@@ -242,15 +245,8 @@ public class UserController extends BaseController {
     profiler.start("EXPORT_USER");
     UserDto userDto = exportUserToDto(user);
 
-    profiler.start("GET_ROLE_ASSIGNMENT_RESOURCES");
-    Set<RoleAssignmentResource> roleAssignmentResources = roleAssignmentRepository
-        .findByUser(user.getId());
-
     profiler.start("ADD_ROLE_ASSIGNMENTS_TO_USER_DTO");
-    Set<RoleAssignmentDto> roleAssignmentDtos = roleAssignmentResources.stream()
-        .map(this::roleAssignmentResourceToDto)
-        .collect(toSet());
-    userDto.setRoleAssignments(roleAssignmentDtos);
+    addRoleAssignmentIdsToUserDto(userDto);
 
     profiler.stop().log();
     XLOGGER.exit(user);
@@ -791,6 +787,16 @@ public class UserController extends BaseController {
         .map(this::exportUserToDto)
         .collect(Collectors.toList());
     return Pagination.getPage(userDtos, pageable, users.getTotalElements());
+  }
+  
+  private void addRoleAssignmentIdsToUserDto(UserDto userDto) {
+    Set<RoleAssignmentResource> roleAssignmentResources = roleAssignmentRepository
+        .findByUser(userDto.getId());
+
+    Set<RoleAssignmentDto> roleAssignmentDtos = roleAssignmentResources.stream()
+        .map(this::roleAssignmentResourceToDto)
+        .collect(toSet());
+    userDto.setRoleAssignments(roleAssignmentDtos);
   }
 
   private Set<FacilityDto> facilitiesToDto(Collection<Facility> facilities) {

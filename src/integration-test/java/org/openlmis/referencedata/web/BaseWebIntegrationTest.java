@@ -64,6 +64,7 @@ import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -257,6 +258,9 @@ public abstract class BaseWebIntegrationTest {
   
   @MockBean
   protected RightAssignmentRepository rightAssignmentRepository;
+  
+  @MockBean
+  protected RoleAssignmentRepository roleAssignmentRepository;
 
   /**
    * Constructor for test.
