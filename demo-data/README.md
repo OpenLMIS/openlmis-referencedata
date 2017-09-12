@@ -256,6 +256,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
   * users:
     * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
     * ccemanager - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
+    * divo - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
 10. CCE Manager
   * rights:
     * CCE MANAGE

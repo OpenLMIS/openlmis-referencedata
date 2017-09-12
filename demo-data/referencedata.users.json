@@ -192,5 +192,18 @@
     "allowNotify": "true",
     "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "timeZone": "CET"
+  },
+  {
+    "id": "560be32a-ea2e-4d12-ae00-1f69376ad535",
+    "username": "divo",
+    "email": "divo@openlmis.org",
+    "firstName": "Alan",
+    "lastName": "Ehrenfreund",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "allowNotify": "true",
+    "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
+    "timeZone": "CET"
   }
 ]
