@@ -181,7 +181,8 @@ public class ProgramOrderable extends BaseEntity {
    * @param importer instance of {@link Importer}
    * @return new instance of ProgramOrderable.
    */
-  public static ProgramOrderable newInstance(Importer importer, Orderable orderable) {
+  public static ProgramOrderable newInstance(Importer importer, Orderable orderable,
+                                             Program program) {
     ProgramOrderable programOrderable = new ProgramOrderable();
     programOrderable.orderableDisplayCategory =
         new OrderableDisplayCategory(importer.getOrderableDisplayCategoryId());
@@ -190,7 +191,7 @@ public class ProgramOrderable extends BaseEntity {
     programOrderable.displayOrder = importer.getDisplayOrder();
     programOrderable.dosesPerPatient = importer.getDosesPerPatient();
     programOrderable.pricePerPack = importer.getPricePerPack();
-    programOrderable.program = new Program(importer.getProgramId());
+    programOrderable.program = program;
     programOrderable.product = orderable;
     return programOrderable;
   }

@@ -22,6 +22,7 @@ import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.OrderableService;
+import org.openlmis.referencedata.util.OrderableBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.validate.OrderableValidator;
@@ -63,6 +64,9 @@ public class OrderableController extends BaseController {
   private OrderableService orderableService;
 
   @Autowired
+  private OrderableBuilder orderableBuilder;
+
+  @Autowired
   private OrderableValidator validator;
 
   /**
@@ -79,7 +83,7 @@ public class OrderableController extends BaseController {
     validator.validate(orderableDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    Orderable orderable = Orderable.newInstance(orderableDto);
+    Orderable orderable = orderableBuilder.newOrderable(orderableDto);
 
     return OrderableDto.newInstance(repository.save(orderable));
   }

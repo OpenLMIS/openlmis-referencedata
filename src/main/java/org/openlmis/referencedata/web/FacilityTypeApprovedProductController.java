@@ -18,11 +18,13 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.service.FacilityTypeApprovedProductService;
+import org.openlmis.referencedata.util.OrderableBuilder;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @Autowired
   private FacilityTypeApprovedProductService approvedProductService;
 
+  @Autowired
+  private OrderableBuilder orderableBuilder;
+
   /**
    * Allows creating new facilityTypeApprovedProduct.
    *
@@ -76,8 +81,10 @@ public class FacilityTypeApprovedProductController extends BaseController {
     validateFtapNotDuplicated(approvedProductDto);
 
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
+    Orderable orderable = orderableBuilder.newOrderable(approvedProductDto.getOrderable());
+
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
-        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
+        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto, orderable);
     // Ignore provided id
     facilityTypeApprovedProduct.setId(null);
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
@@ -103,8 +110,10 @@ public class FacilityTypeApprovedProductController extends BaseController {
     validateFtapNotDuplicated(approvedProductDto);
 
     LOGGER.debug("Updating facilityTypeApprovedProduct");
+    Orderable orderable = orderableBuilder.newOrderable(approvedProductDto.getOrderable());
+
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
-        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
+        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto, orderable);
 
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
     return toDto(save);

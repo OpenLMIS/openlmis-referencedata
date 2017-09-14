@@ -18,7 +18,6 @@ package org.openlmis.referencedata.domain;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.DispensableDto;
-import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
 import lombok.AccessLevel;
@@ -26,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -160,22 +158,11 @@ public class Orderable extends BaseEntity {
   /**
    * Creates new instance based on data from {@link Importer}
    *
-   * @param orderableDtos collection of {@link Importer}
-   * @return new set of Orderables.
-   */
-  public static Set<Orderable> newInstance(Collection<OrderableDto> orderableDtos) {
-    Set<Orderable> orderables = new HashSet<>(orderableDtos.size(), 1);
-    orderableDtos.forEach(o -> orderables.add(newInstance(o)));
-    return orderables;
-  }
-
-  /**
-   * Creates new instance based on data from {@link Importer}
-   *
    * @param importer instance of {@link Importer}
+   * @param programs map with programs where key need to be equal to program id
    * @return new instance of Orderable.
    */
-  public static Orderable newInstance(Importer importer) {
+  public static Orderable newInstance(Importer importer, Map<UUID, Program> programs) {
     Orderable orderable = new Orderable();
     orderable.id = importer.getId();
     orderable.productCode = Code.code(importer.getProductCode());
@@ -188,10 +175,17 @@ public class Orderable extends BaseEntity {
     orderable.programOrderables = new HashSet<>();
 
     if (importer.getPrograms() != null) {
-      importer.getPrograms()
-          .forEach(po -> orderable
-              .programOrderables.add(ProgramOrderable.newInstance(po, orderable)));
+      importer
+          .getPrograms()
+          .forEach(item -> {
+            Program program = programs.get(item.getProgramId());
+            ProgramOrderable programOrderable = ProgramOrderable
+                .newInstance(item, orderable, program);
+
+            orderable.programOrderables.add(programOrderable);
+          });
     }
+
     orderable.identifiers = importer.getIdentifiers();
     orderable.extraData = importer.getExtraData();
 

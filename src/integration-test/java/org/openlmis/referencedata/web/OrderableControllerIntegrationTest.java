@@ -61,6 +61,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -216,8 +217,12 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldRetrieveAllOrderables() {
     mockUserHasRight(ORDERABLES_MANAGE);
     List<OrderableDto> items = Collections.singletonList(orderableDto);
+    List<Orderable> orderables = items
+        .stream()
+        .map(dto -> Orderable.newInstance(dto, null))
+        .collect(Collectors.toList());
 
-    when(orderableRepository.findAll()).thenReturn(Orderable.newInstance(items));
+    when(orderableRepository.findAll()).thenReturn(orderables);
 
     PageImplRepresentation response = restAssured
         .given()
