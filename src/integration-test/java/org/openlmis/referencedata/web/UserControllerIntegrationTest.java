@@ -499,7 +499,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserHasRight() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
+    given(facilityRepository.exists(homeFacilityId)).willReturn(true);
 
     ResultDto<Boolean> response = new ResultDto<>();
     response = getUserHasRight()
@@ -515,7 +515,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserHasRightIfUserRequestsTheirOwnRecord() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
-    given(facilityRepository.findOne(homeFacilityId)).willReturn(homeFacility);
+    given(facilityRepository.exists(homeFacilityId)).willReturn(true);
 
     getUserHasRight()
         .then()
@@ -542,9 +542,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldBadRequestGetUserHasRightWithMissingFacility() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.exists(userId)).willReturn(true);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
-    given(programRepository.findOne(program2Id)).willReturn(program2);
+    given(programRepository.exists(program2Id)).willReturn(true);
 
     restAssured
         .given()
@@ -1273,10 +1273,12 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Response getUserHasRight() {
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.exists(userId)).willReturn(true);
     given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
-    given(programRepository.findOne(program1Id)).willReturn(program1);
-    given(programRepository.findOne(program2Id)).willReturn(program2);
+    given(programRepository.exists(program1Id)).willReturn(true);
+    given(programRepository.exists(program2Id)).willReturn(true);
+    given(rightAssignmentRepository.existsByUserIdAndAndRightNameAndFacilityIdAndProgramId(
+        userId, supervisionRight.getName(), homeFacilityId, program1Id)).willReturn(true);
 
     return restAssured
         .given()
