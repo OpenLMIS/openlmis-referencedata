@@ -36,8 +36,10 @@ import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
+import org.openlmis.referencedata.dto.RoleAssignmentResource;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
@@ -47,7 +49,6 @@ import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
-import org.openlmis.referencedata.dto.RoleAssignmentResource;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -62,7 +63,6 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
@@ -364,53 +364,33 @@ public class UserController extends BaseController {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     profiler.start("VALIDATE_USER");
-    if (!userRepository.exists(userId)) {
-      throw new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId));
-    }
+    final User user = validateUser(userId);
 
-    boolean hasRight;
-
-    profiler.start("GET_RIGHT");
+    profiler.start("CONSTRUCT_RIGHT_QUERY");
+    RightQuery rightQuery;
     Right right = rightRepository.findOne(rightId);
-
     if (programId != null) {
-      profiler.start("CHECK_PROGRAM_EXISTS");
-      if (!programRepository.exists(programId)) {
-        throw new ValidationMessageException(new Message(
-            ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
-      }
 
+      Program program = programRepository.findOne(programId);
       if (facilityId != null) {
-        profiler.start("CHECK_FACILITY_EXISTS");
-        if (!facilityRepository.exists(facilityId)) {
-          throw new ValidationMessageException(new Message(
-              FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
-        }
 
-        profiler.start("CHECK_HAS_RIGHT_BY_USER_RIGHT_FACILITY_PROGRAM");
-        hasRight = rightAssignmentRepository.existsByUserIdAndAndRightNameAndFacilityIdAndProgramId(
-            userId, right.getName(), facilityId, programId);
+        Facility facility = facilityRepository.findOne(facilityId);
+        rightQuery = new RightQuery(right, program, facility);
 
       } else {
         throw new ValidationMessageException(UserMessageKeys.ERROR_PROGRAM_WITHOUT_FACILITY);
       }
-
     } else if (warehouseId != null) {
 
-      profiler.start("CHECK_WAREHOUSE_EXISTS");
-      if (!facilityRepository.exists(warehouseId)) {
-        throw new ValidationMessageException(new Message(
-            FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
-      }
-
-      profiler.start("CHECK_HAS_RIGHT_BY_USER_RIGHT_WAREHOUSE");
-      hasRight = rightAssignmentRepository.existsByUserIdAndAndRightNameAndFacilityId(
-          userId, right.getName(), facilityId);
+      Facility warehouse = facilityRepository.findOne(warehouseId);
+      rightQuery = new RightQuery(right, warehouse);
 
     } else {
-      profiler.start("CHECK_HAS_RIGHT_BY_USER_RIGHT");
-      hasRight = rightAssignmentRepository.existsByUserIdAndRightName(userId, right.getName());
+      rightQuery = new RightQuery(right);
     }
+
+    profiler.start("RUN_RIGHT_QUERY");
+    boolean hasRight = user.hasRight(rightQuery);
 
     profiler.stop().log();
     return new ResultDto<>(hasRight);

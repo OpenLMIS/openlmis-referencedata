@@ -17,7 +17,10 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +47,7 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.RoleAssignmentResource;
 import org.openlmis.referencedata.dto.UserDto;
@@ -449,6 +453,40 @@ public class UserControllerTest {
         null,
         null,
         null);
+  }
+
+  @Test
+  public void shouldReturnTrueIfUserHasRight() {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
+    when(repository.findOne(userId)).thenReturn(user1);
+    when(rightRepository.findOne(any(UUID.class))).thenReturn(supervisionRight1);
+    when(programRepository.findOne(any(UUID.class))).thenReturn(program1);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
+
+    //when
+    ResultDto<Boolean> booleanResultDto = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
+        UUID.randomUUID(), homeFacilityId, null);
+
+    //then
+    assertTrue(booleanResultDto.getResult());
+  }
+
+  @Test
+  public void shouldReturnFalseIfUserDoesNotHaveRight() {
+    //given
+    user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1,
+        supervisoryNode1));
+    when(repository.findOne(userId)).thenReturn(user1);
+    when(rightRepository.findOne(any(UUID.class))).thenReturn(fulfillmentRight1);
+    when(facilityRepository.findOne(any(UUID.class))).thenReturn(warehouse1);
+
+    //when
+    ResultDto<Boolean> booleanResultDto = controller.checkIfUserHasRight(userId, UUID.randomUUID(),
+        null, null, UUID.randomUUID());
+
+    //then
+    assertFalse(booleanResultDto.getResult());
   }
 
   @Test(expected = NotFoundException.class)
