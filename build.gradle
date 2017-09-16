@@ -216,8 +216,7 @@ sonarqube {
         //Tells SonarQube where the unit tests execution reports are
         property "sonar.junit.reportsPath", "build/test-results/test"
         //Tells SonarQube where the unit tests code coverage report is
-        property "sonar.jacoco.reportPaths",
-                "build/jacoco/test.exec,build/jacoco/integrationTest.exec"
+        property "sonar.jacoco.reportPaths", "build/jacoco/test.exec,build/jacoco/integrationTest.exec"
         //Tells SonarQube where the integration tests code coverage report is
         property "sonar.jacoco.itReportPath", "build/jacoco/integrationTest.exec"
         properties["sonar.tests"] += sourceSets.integrationTest.java
