@@ -31,4 +31,5 @@ public class RightName {
   public static final String FACILITY_APPROVED_ORDERABLES_MANAGE =
       "FACILITY_APPROVED_ORDERABLES_MANAGE";
   public static final String RIGHTS_VIEW = "RIGHTS_VIEW";
+  public static final String PROGRAMS_MANAGE = "PROGRAMS_MANAGE";
 }

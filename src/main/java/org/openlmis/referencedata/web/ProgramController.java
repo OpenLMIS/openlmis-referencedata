@@ -19,6 +19,7 @@ import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -69,6 +70,8 @@ public class ProgramController extends BaseController {
   @ResponseBody
   public Program createProgram(@RequestBody ProgramDto program,
                                BindingResult bindingResult) {
+    rightService.checkAdminRight(RightName.PROGRAMS_MANAGE);
+
     program.setId(null);
     validator.validate(program, bindingResult);
     if (bindingResult.getErrorCount() > 0) {
@@ -125,6 +128,8 @@ public class ProgramController extends BaseController {
   @RequestMapping(value = "/programs/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteProgram(@PathVariable("id") UUID programId) {
+    rightService.checkAdminRight(RightName.PROGRAMS_MANAGE);
+
     Program program = programRepository.findOne(programId);
     if (program == null) {
       throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
@@ -144,6 +149,8 @@ public class ProgramController extends BaseController {
   public Program updateProgram(@PathVariable("id") UUID id,
                                @RequestBody ProgramDto program,
                                BindingResult bindingResult) {
+    rightService.checkAdminRight(RightName.PROGRAMS_MANAGE);
+
     if (program == null || id == null) {
       LOGGER.debug("Update failed - program id not specified");
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_ID_NULL);
