@@ -18,7 +18,9 @@ package org.openlmis.referencedata.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
@@ -29,6 +31,8 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoleAssignmentDto implements RoleAssignment.Exporter,
     SupervisionRoleAssignment.Exporter, FulfillmentRoleAssignment.Exporter {
 

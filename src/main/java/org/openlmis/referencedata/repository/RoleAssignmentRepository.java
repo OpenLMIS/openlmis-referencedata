@@ -18,7 +18,7 @@ package org.openlmis.referencedata.repository;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.RoleAssignment;
-import org.openlmis.referencedata.dto.RoleAssignmentResource;
+import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -27,5 +27,5 @@ public interface RoleAssignmentRepository extends Repository<RoleAssignment, UUI
 
   @Query(name = "RoleAssignment.findByUser",
       nativeQuery = true)
-  Set<RoleAssignmentResource> findByUser(@Param("userId") UUID userId);
+  Set<RoleAssignmentDto> findByUser(@Param("userId") UUID userId);
 }
