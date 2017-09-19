@@ -443,8 +443,6 @@ public class UserController extends BaseController {
    * @return a set of programs
    */
   @RequestMapping(value = "/users/{userId}/supportedPrograms", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public ResponseEntity<Set<ProgramDto>> getUserSupportedPrograms(
       @PathVariable(USER_ID) UUID userId) {
     Profiler profiler = new Profiler("GET_USER_SUPPORTED_PROGRAMS");
