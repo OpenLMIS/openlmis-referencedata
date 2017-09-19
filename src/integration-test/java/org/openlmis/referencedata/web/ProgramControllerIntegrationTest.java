@@ -20,8 +20,10 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/programs";
@@ -57,6 +60,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldDeleteProgram() {
+    mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
     given(programRepository.findOne(programId)).willReturn(program);
 
@@ -74,7 +78,28 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRejectDeleteProgramIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.PROGRAMS_MANAGE);
+
+    String messageKey = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(MESSAGEKEY_ERROR_UNAUTHORIZED));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPostProgram() {
+    mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
     Program response = restAssured
         .given()
@@ -92,7 +117,28 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRejectPostProgramIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.PROGRAMS_MANAGE);
+
+    String messageKey = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(programDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(MESSAGEKEY_ERROR_UNAUTHORIZED));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnBadRequestWhenPostWithDuplicatedCode() {
+    mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
     given(programRepository.findByCode(program.getCode())).willReturn(program);
     restAssured
@@ -110,6 +156,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldPutProgram() {
+    mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
     programDto.setDescription("OpenLMIS");
     given(programRepository.findOne(programId)).willReturn(program);
@@ -132,7 +179,29 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRejectPutProgramIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.PROGRAMS_MANAGE);
+
+    String messageKey = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .body(programDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(403)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(MESSAGEKEY_ERROR_UNAUTHORIZED));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnBadRequestWhenPutWithDuplicatedCode() {
+    mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
     program.setId(UUID.randomUUID());
     given(programRepository.findOne(programId)).willReturn(program);

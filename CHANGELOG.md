@@ -3,6 +3,7 @@
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-2857](https://openlmis.atlassian.net/browse/OLMIS-2857): Refactored user search repository method to user database pagination and sorting.
 * [OLMIS-2913](https://openlmis.atlassian.net/browse/OLMIS-2913): add DIVO user and assign to Inventory Manager role for SN1 and SN2
+* [OLMIS-3146](https://openlmis.atlassian.net/browse/OLMIS-3146): added PROGRAMS_MANAGE right and enforce it on CUD endpoints.
 * [OLMIS-3209](https://openlmis.atlassian.net/browse/OLMIS-3209): Fixed problem with parsing orderable DTO when it contains several program orderables
 
 8.0.1 / 2017-09-05

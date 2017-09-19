@@ -18,7 +18,6 @@ package org.openlmis.referencedata;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
 
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -26,6 +25,7 @@ import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("!test")
 @Order(20)
-public class AuditLogInitializer {
+public class AuditLogInitializer implements CommandLineRunner {
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -54,10 +54,10 @@ public class AuditLogInitializer {
   private Javers javers;
 
   /**
-   * Checks whether there are snapshots for domain entities in the audit log.
+   * This method is part of CommandLineRunner and is called automatically by Spring.
+   * @param args Main method arguments.
    */
-  @PostConstruct
-  public void init() {
+  public void run(String... args) {
     applicationContext
         .getBeansWithAnnotation(JaversSpringDataAuditable.class)
         .values()

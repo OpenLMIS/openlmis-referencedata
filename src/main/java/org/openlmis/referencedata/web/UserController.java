@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
-import org.openlmis.referencedata.dto.RoleAssignmentResource;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
@@ -443,8 +443,6 @@ public class UserController extends BaseController {
    * @return a set of programs
    */
   @RequestMapping(value = "/users/{userId}/supportedPrograms", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public ResponseEntity<Set<ProgramDto>> getUserSupportedPrograms(
       @PathVariable(USER_ID) UUID userId) {
     Profiler profiler = new Profiler("GET_USER_SUPPORTED_PROGRAMS");
@@ -790,12 +788,11 @@ public class UserController extends BaseController {
   }
   
   private void addRoleAssignmentIdsToUserDto(UserDto userDto) {
-    Set<RoleAssignmentResource> roleAssignmentResources = roleAssignmentRepository
-        .findByUser(userDto.getId());
-
-    Set<RoleAssignmentDto> roleAssignmentDtos = roleAssignmentResources.stream()
-        .map(this::roleAssignmentResourceToDto)
-        .collect(toSet());
+    Set<RoleAssignmentDto> roleAssignmentDtos = 
+        Optional
+            .ofNullable(roleAssignmentRepository.findByUser(userDto.getId()))
+            .orElse(Collections.emptySet());
+    
     userDto.setRoleAssignments(roleAssignmentDtos);
   }
 
@@ -819,14 +816,5 @@ public class UserController extends BaseController {
     }
 
     return dtos;
-  }
-  
-  private RoleAssignmentDto roleAssignmentResourceToDto(RoleAssignmentResource resource) {
-    RoleAssignmentDto dto = new RoleAssignmentDto();
-    dto.setRoleId(resource.getRoleId());
-    dto.setProgramId(resource.getProgramId());
-    dto.setSupervisoryNodeId(resource.getSupervisoryNodeId());
-    dto.setWarehouseId(resource.getWarehouseId());
-    return dto;
   }
 }

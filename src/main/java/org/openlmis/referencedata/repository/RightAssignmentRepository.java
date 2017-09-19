@@ -15,17 +15,13 @@
 
 package org.openlmis.referencedata.repository;
 
-
-import org.javers.spring.annotation.JaversSpringDataAuditable;
+import java.util.Set;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.RightAssignment;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Set;
-import java.util.UUID;
-
-@JaversSpringDataAuditable
 public interface RightAssignmentRepository extends
     PagingAndSortingRepository<RightAssignment, UUID> {
 

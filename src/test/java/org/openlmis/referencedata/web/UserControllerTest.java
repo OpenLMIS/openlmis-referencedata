@@ -49,7 +49,6 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
-import org.openlmis.referencedata.dto.RoleAssignmentResource;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -220,8 +219,8 @@ public class UserControllerTest {
     user1.assignRoles(roleAssignment1, roleAssignment2);
     when(repository.findOne(userId)).thenReturn(user1);
     when(roleAssignmentRepository.findByUser(userId)).thenReturn(Sets.newHashSet(
-        new RoleAssignmentResource(roleId, null, null, null),
-        new RoleAssignmentResource(roleId, programId, null, null)));
+        new RoleAssignmentDto(roleId, null, null, null),
+        new RoleAssignmentDto(roleId, programId, null, null)));
 
     UserDto expectedUserDto = new UserDto();
     user1.export(expectedUserDto);

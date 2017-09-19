@@ -54,7 +54,8 @@ public class SupervisionRoleAssignmentTest {
     homeFacility.setId(homeFacilityId);
 
     user = new UserBuilder("testuser", "Test", "User", "test@test.com")
-        .setHomeFacilityId(homeFacilityId).createUser();
+        .setHomeFacilityId(homeFacilityId)
+        .createUser();
 
     homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, user, program);
 
