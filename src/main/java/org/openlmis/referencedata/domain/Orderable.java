@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -83,6 +84,7 @@ public class Orderable extends BaseEntity {
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
       fetch = FetchType.EAGER)
   @DiffIgnore
+  @Setter
   private Set<ProgramOrderable> programOrderables;
 
   @ElementCollection(fetch = FetchType.EAGER)
@@ -159,10 +161,9 @@ public class Orderable extends BaseEntity {
    * Creates new instance based on data from {@link Importer}
    *
    * @param importer instance of {@link Importer}
-   * @param programs map with programs where key need to be equal to program id
    * @return new instance of Orderable.
    */
-  public static Orderable newInstance(Importer importer, Map<UUID, Program> programs) {
+  public static Orderable newInstance(Importer importer) {
     Orderable orderable = new Orderable();
     orderable.id = importer.getId();
     orderable.productCode = Code.code(importer.getProductCode());
@@ -173,18 +174,6 @@ public class Orderable extends BaseEntity {
     orderable.packRoundingThreshold = importer.getPackRoundingThreshold();
     orderable.roundToZero = importer.getRoundToZero();
     orderable.programOrderables = new HashSet<>();
-
-    if (importer.getPrograms() != null) {
-      importer
-          .getPrograms()
-          .forEach(item -> {
-            Program program = programs.get(item.getProgramId());
-            ProgramOrderable programOrderable = ProgramOrderable
-                .newInstance(item, orderable, program);
-
-            orderable.programOrderables.add(programOrderable);
-          });
-    }
 
     orderable.identifiers = importer.getIdentifiers();
     orderable.extraData = importer.getExtraData();

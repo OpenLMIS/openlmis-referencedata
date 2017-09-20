@@ -46,6 +46,7 @@ public class ProgramOrderable extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "programId", nullable = false)
   @Getter
+  @Setter
   private Program program;
 
   @ManyToOne
@@ -181,8 +182,7 @@ public class ProgramOrderable extends BaseEntity {
    * @param importer instance of {@link Importer}
    * @return new instance of ProgramOrderable.
    */
-  public static ProgramOrderable newInstance(Importer importer, Orderable orderable,
-                                             Program program) {
+  public static ProgramOrderable newInstance(Importer importer) {
     ProgramOrderable programOrderable = new ProgramOrderable();
     programOrderable.orderableDisplayCategory =
         new OrderableDisplayCategory(importer.getOrderableDisplayCategoryId());
@@ -191,8 +191,7 @@ public class ProgramOrderable extends BaseEntity {
     programOrderable.displayOrder = importer.getDisplayOrder();
     programOrderable.dosesPerPatient = importer.getDosesPerPatient();
     programOrderable.pricePerPack = importer.getPricePerPack();
-    programOrderable.program = program;
-    programOrderable.product = orderable;
+
     return programOrderable;
   }
 

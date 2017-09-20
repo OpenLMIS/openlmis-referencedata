@@ -42,6 +42,7 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.OrderableDto;
@@ -114,6 +115,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(ORDERABLES_MANAGE);
     ProgramOrderableDto programOrderable = generateProgramOrderable();
     orderableDto.setPrograms(Collections.singleton(programOrderable));
+
+    when(programRepository.findOne(programOrderable.getProgramId()))
+        .thenReturn(new Program(programOrderable.getProgramId()));
 
     OrderableDto response = restAssured
         .given()
@@ -219,7 +223,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     List<OrderableDto> items = Collections.singletonList(orderableDto);
     List<Orderable> orderables = items
         .stream()
-        .map(dto -> Orderable.newInstance(dto, null))
+        .map(Orderable::newInstance)
         .collect(Collectors.toList());
 
     when(orderableRepository.findAll()).thenReturn(orderables);

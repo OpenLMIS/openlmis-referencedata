@@ -15,15 +15,17 @@
 
 package org.openlmis.referencedata.util;
 
-import com.google.common.collect.Maps;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -40,19 +42,33 @@ public class OrderableBuilder {
    * @return new instance of Orderable.
    */
   public Orderable newOrderable(Orderable.Importer importer) {
-    Map<UUID, Program> programs;
+    Orderable orderable = Orderable.newInstance(importer);
 
-    if (importer.getPrograms() != null) {
-      programs = importer
+    if (!isEmpty(importer.getPrograms())) {
+      Map<UUID, Program> programs = importer
           .getPrograms()
           .stream()
           .map(item -> programRepository.findOne(item.getProgramId()))
           .collect(Collectors.toMap(Program::getId, program -> program));
-    } else {
-      programs = Maps.newHashMap();
+
+      Set<ProgramOrderable> programOrderables = importer
+          .getPrograms()
+          .stream()
+          .map(item -> {
+            Program program = programs.get(item.getProgramId());
+
+            ProgramOrderable programOrderable = ProgramOrderable.newInstance(item);
+            programOrderable.setProgram(program);
+            programOrderable.setProduct(orderable);
+
+            return programOrderable;
+          })
+          .collect(Collectors.toSet());
+
+      orderable.setProgramOrderables(programOrderables);
     }
 
-    return Orderable.newInstance(importer, programs);
+    return orderable;
   }
 
 }
