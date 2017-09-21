@@ -27,6 +27,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
@@ -460,6 +461,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     List<FacilityDto> facilities = Arrays.asList(response);
     assertThat(facilities.size(), is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(rightService);
   }
 
   @Test
@@ -479,6 +481,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     List<MinimalFacilityDto> facilities = Arrays.asList(response);
     assertThat(facilities.size(), is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(rightService);
   }
 
   @Test
@@ -497,6 +500,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertEquals(facility.getCode(), response.getCode());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(rightService);
   }
 
   @Test
