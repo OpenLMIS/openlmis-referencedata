@@ -46,6 +46,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
+import org.openlmis.referencedata.validate.FacilityValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,6 +100,8 @@ public class FacilityController extends BaseController {
   @Autowired
   private FacilityService facilityService;
 
+  @Autowired
+  private FacilityValidator facilityValidator;
 
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
@@ -108,9 +112,13 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = "/facilities", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public FacilityDto createFacility(@RequestBody FacilityDto facilityDto) {
+  public FacilityDto createFacility(@RequestBody FacilityDto facilityDto,
+                                    BindingResult bindingResult) {
 
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    facilityValidator.validate(facilityDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
 
     LOGGER.debug("Creating new facility");
     facilityDto.setId(null);

@@ -50,7 +50,7 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
   /**
    * This method is supposed to retrieve all facilities with matched parameters.
    * Method is ignoring case for facility code and name.
-   * To find all wanted Facilities by conde and name we use criteria query and like operator.
+   * To find all wanted Facilities by code and name we use criteria query and like operator.
    *
    * @param code Part of wanted code.
    * @param name Part of wanted name.

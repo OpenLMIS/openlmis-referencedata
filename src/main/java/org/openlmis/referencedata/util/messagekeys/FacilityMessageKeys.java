@@ -20,6 +20,9 @@ public abstract class FacilityMessageKeys extends MessageKeys {
   private static final String MUST_BE_WAREHOUSE = "mustBeWarehouse";
   private static final String ERROR = join(SERVICE_ERROR, FACILITY);
 
+  public static final String ERROR_NULL = join(ERROR, NULL);
+  public static final String ERROR_CODE_REQUIRED = join(ERROR, "code", REQUIRED);
+  public static final String ERROR_CODE_MUST_BE_UNIQUE = join(ERROR, "code", MUST_BE_UNIQUE);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
   public static final String ERROR_SEARCH_LACKS_PARAMS =

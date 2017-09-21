@@ -56,4 +56,6 @@ public interface FacilityRepository
   @Query(name = "Facility.findSupervisionFacilitiesByUser",
       nativeQuery = true)
   Set<NamedResource> findSupervisionFacilitiesByUser(@Param("userId") UUID userId);
+
+  boolean existsByCode(String code);
 }

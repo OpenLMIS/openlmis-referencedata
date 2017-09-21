@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -282,6 +284,15 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     assertEquals(1, foundFacilties.size());
     assertEquals("rural", foundFacilties.get(0).getExtraData().get(TYPE));
+  }
+
+  @Test
+  public void shouldCheckIfFacilityExistsByCode() {
+    Facility facility = generateInstance();
+    repository.save(facility);
+
+    assertTrue(repository.existsByCode(facility.getCode()));
+    assertFalse(repository.existsByCode("some-random-code"));
   }
 
   @Override
