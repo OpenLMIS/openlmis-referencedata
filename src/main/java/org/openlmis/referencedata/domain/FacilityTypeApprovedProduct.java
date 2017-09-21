@@ -81,14 +81,12 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
    * @param importer instance of {@link FacilityTypeApprovedProduct.Importer}
    * @return new instance of FacilityTypeApprovedProduct.
    */
-  public static FacilityTypeApprovedProduct newFacilityTypeApprovedProduct(Importer importer,
-                                                                           Orderable orderable) {
+  public static FacilityTypeApprovedProduct newFacilityTypeApprovedProduct(Importer importer) {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setId(importer.getId());
     ftap.setMaxPeriodsOfStock(importer.getMaxPeriodsOfStock());
     ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
     ftap.setEmergencyOrderPoint(importer.getEmergencyOrderPoint());
-    ftap.setOrderable(orderable);
     if (null != importer.getProgram()) {
       ftap.setProgram(Program.newProgram(importer.getProgram()));
     }

@@ -84,7 +84,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
     Orderable orderable = orderableBuilder.newOrderable(approvedProductDto.getOrderable());
 
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
-        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto, orderable);
+        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
+    facilityTypeApprovedProduct.setOrderable(orderable);
+
     // Ignore provided id
     facilityTypeApprovedProduct.setId(null);
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
@@ -113,7 +115,8 @@ public class FacilityTypeApprovedProductController extends BaseController {
     Orderable orderable = orderableBuilder.newOrderable(approvedProductDto.getOrderable());
 
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
-        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto, orderable);
+        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
+    facilityTypeApprovedProduct.setOrderable(orderable);
 
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
     return toDto(save);
