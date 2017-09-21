@@ -463,25 +463,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getAllShouldReturnForbiddenForUnauthorizedToken() {
-
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void getAllShouldGetAllFacilitiesWithMinimalRepresentation() {
     Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
@@ -517,27 +498,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(facility.getCode(), response.getCode());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-
-  @Test
-  public void getShouldReturnForbiddenForUnauthorizedToken() {
-
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
   @Test
   public void getShouldReturnNotFoundForNonExistingFacility() {
 
