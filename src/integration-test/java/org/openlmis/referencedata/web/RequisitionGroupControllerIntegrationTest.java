@@ -328,7 +328,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     requisitionGroup.setDescription(DESCRIPTION);
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
-    given(requisitionGroupRepository.save(any(RequisitionGroup.class)))
+    given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
     RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
@@ -357,7 +357,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     requisitionGroup.setDescription(DESCRIPTION);
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
-    given(requisitionGroupRepository.save(any(RequisitionGroup.class)))
+    given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
     RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
@@ -386,7 +386,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     requisitionGroup.setDescription(DESCRIPTION);
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);
-    given(requisitionGroupRepository.save(any(RequisitionGroup.class)))
+    given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
     RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
