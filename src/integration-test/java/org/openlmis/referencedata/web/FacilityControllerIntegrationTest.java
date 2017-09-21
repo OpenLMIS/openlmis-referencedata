@@ -498,6 +498,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(facility.getCode(), response.getCode());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
+
   @Test
   public void getShouldReturnNotFoundForNonExistingFacility() {
 
