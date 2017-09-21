@@ -132,8 +132,6 @@ public class FacilityController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<FacilityDto> getAllFacilities() {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     return toDto(facilityRepository.findAll());
   }
 
@@ -220,9 +218,6 @@ public class FacilityController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityDto getFacility(@PathVariable("id") UUID facilityId) {
-    
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
       throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);

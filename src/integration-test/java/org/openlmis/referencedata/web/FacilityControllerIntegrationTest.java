@@ -445,10 +445,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAllShouldGetAllFacilities() {
-
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
 
@@ -487,10 +483,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAllShouldGetAllFacilitiesWithMinimalRepresentation() {
-
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
 
@@ -510,10 +502,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getShouldGetFacility() {
-
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
 
     FacilityDto response = restAssured
