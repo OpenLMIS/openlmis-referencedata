@@ -100,7 +100,7 @@ public class SupplyLineControllerTest {
     supplyLineController.searchSupplyLinesByUuid(programId, supervisoryNodeId, null);
 
     verify(supervisoryNodeRepository).findOne(supervisoryNodeId);
-    verify(facilityRepository, never()).findOne(null);
+    verify(facilityRepository, never()).findOne((UUID)null);
     verify(supplyLineService).searchSupplyLines(program, supervisoryNode, null);
   }
 
@@ -110,7 +110,7 @@ public class SupplyLineControllerTest {
 
     supplyLineController.searchSupplyLinesByUuid(programId, null, supplyingFacilityId);
 
-    verify(supervisoryNodeRepository, never()).findOne(null);
+    verify(supervisoryNodeRepository, never()).findOne((UUID)null);
     verify(facilityRepository).findOne(supplyingFacilityId);
     verify(supplyLineService).searchSupplyLines(program, null, supplyingFacility);
   }
@@ -131,8 +131,8 @@ public class SupplyLineControllerTest {
   public void shouldSearchSupplyLinesWithRequiredParametersOnly() {
     supplyLineController.searchSupplyLinesByUuid(programId, null, null);
 
-    verify(supervisoryNodeRepository, never()).findOne(null);
-    verify(facilityRepository, never()).findOne(null);
+    verify(supervisoryNodeRepository, never()).findOne((UUID)null);
+    verify(facilityRepository, never()).findOne((UUID)null);
     verify(supplyLineService).searchSupplyLines(program, null, null);
   }
 

@@ -229,7 +229,7 @@ public class FacilityController extends BaseController {
     addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(), facilityToSave);
 
     profiler.start("SAVE_FACILITY");
-    facilityToSave = facilityRepository.save(facilityToSave);
+    facilityToSave = facilityRepository.saveAndFlush(facilityToSave);
 
     LOGGER.debug("Regenerating right assignments");
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");

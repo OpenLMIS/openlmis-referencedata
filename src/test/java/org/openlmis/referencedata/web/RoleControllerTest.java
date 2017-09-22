@@ -21,7 +21,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
-
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,9 +38,6 @@ import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.RightService;
 import org.springframework.dao.DataIntegrityViolationException;
-
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class RoleControllerTest {
@@ -65,7 +65,7 @@ public class RoleControllerTest {
   private Right right3;
   private String role1Name;
   private Role role1;
-  private Set<Role> roles;
+  private List<Role> roles;
   private RoleDto role1Dto;
   private UUID roleId;
 
@@ -82,7 +82,7 @@ public class RoleControllerTest {
 
     role1Name = "role1";
     role1 = Role.newRole(role1Name, right1, right2);
-    roles = Sets.newHashSet(role1);
+    roles = Collections.singletonList(role1);
 
     role1Dto = new RoleDto();
     role1.export(role1Dto);
@@ -164,7 +164,7 @@ public class RoleControllerTest {
     controller.updateRole(roleId, role1Dto);
 
     //then
-    verify(repository).save(updatedRole1);
+    verify(repository).saveAndFlush(updatedRole1);
     verify(rightAssignmentService).regenerateRightAssignments();
   }
 
@@ -181,7 +181,7 @@ public class RoleControllerTest {
     controller.updateRole(roleId, role1Dto);
 
     //then
-    verify(repository).save(updatedRole1);
+    verify(repository).saveAndFlush(updatedRole1);
     verify(rightAssignmentService).regenerateRightAssignments();
   }
 
@@ -201,7 +201,7 @@ public class RoleControllerTest {
     controller.updateRole(roleId, updatedRole1Dto);
 
     //then
-    verify(repository).save(updatedRole1);
+    verify(repository).saveAndFlush(updatedRole1);
     verify(rightAssignmentService).regenerateRightAssignments();
   }
 
@@ -221,7 +221,7 @@ public class RoleControllerTest {
     controller.updateRole(roleId, updatedRole1Dto);
 
     //then
-    verify(repository).save(updatedRole1);
+    verify(repository).saveAndFlush(updatedRole1);
     verify(rightAssignmentService).regenerateRightAssignments();
   }
 
@@ -238,7 +238,7 @@ public class RoleControllerTest {
     controller.updateRole(roleId, updatedRole1Dto);
 
     //then
-    verify(repository).save(updatedRole1);
+    verify(repository).saveAndFlush(updatedRole1);
     verify(rightAssignmentService).regenerateRightAssignments();
   }
 

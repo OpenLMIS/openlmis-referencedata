@@ -30,12 +30,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Sets;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,20 +71,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -446,7 +441,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAllShouldGetAllFacilities() {
-    Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
+    List<Facility> storedFacilities = Arrays.asList(facility, generateFacility());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
 
     FacilityDto[] response = restAssured
@@ -466,7 +461,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAllShouldGetAllFacilitiesWithMinimalRepresentation() {
-    Set<Facility> storedFacilities = Sets.newHashSet(facility, generateFacility());
+    List<Facility> storedFacilities = Arrays.asList(facility, generateFacility());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
 
     MinimalFacilityDto[] response = restAssured
@@ -677,7 +672,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(program);
-    given(facilityRepository.save(facility)).willReturn(facility);
+    given(facilityRepository.saveAndFlush(facility)).willReturn(facility);
 
     FacilityDto response = restAssured
         .given()
@@ -762,7 +757,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     facilityDto.setSupportedPrograms(programs);
 
-    when(facilityRepository.save(any(Facility.class))).thenReturn(facility);
+    when(facilityRepository.saveAndFlush(any(Facility.class))).thenReturn(facility);
 
     restAssured
         .given()
@@ -775,7 +770,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(200);
 
-    verify(facilityRepository).save(facility);
+    verify(facilityRepository).saveAndFlush(facility);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

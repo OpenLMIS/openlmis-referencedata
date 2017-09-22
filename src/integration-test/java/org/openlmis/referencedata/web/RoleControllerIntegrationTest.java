@@ -23,8 +23,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
-import com.google.common.collect.Sets;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
@@ -36,13 +38,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -77,7 +72,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-    Set<Role> storedRoles = Sets.newHashSet(role,
+    List<Role> storedRoles = Arrays.asList(role,
         Role.newRole("role2", right1));
     given(roleRepository.findAll()).willReturn(storedRoles);
 

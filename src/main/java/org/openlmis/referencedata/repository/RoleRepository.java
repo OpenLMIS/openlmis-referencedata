@@ -15,14 +15,13 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Role;
-import org.springframework.data.repository.PagingAndSortingRepository;
-
-import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @JaversSpringDataAuditable
-public interface RoleRepository extends PagingAndSortingRepository<Role, UUID> {
+public interface RoleRepository extends JpaRepository<Role, UUID> {
 
   Role findFirstByName(String name);
 }

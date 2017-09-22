@@ -187,7 +187,7 @@ public class SupervisoryNodeController extends BaseController {
     supervisoryNodeToUpdate.updateFrom(SupervisoryNode.newSupervisoryNode(supervisoryNodeDto));
 
     profiler.start("SAVE_SUPERVISORY_NODE");
-    supervisoryNodeRepository.save(supervisoryNodeToUpdate);
+    supervisoryNodeRepository.saveAndFlush(supervisoryNodeToUpdate);
 
     LOGGER.debug("Regenerating right assignments");
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");

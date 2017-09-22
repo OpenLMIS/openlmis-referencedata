@@ -23,19 +23,13 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 @JaversSpringDataAuditable
 public interface FacilityRepository
-    extends PagingAndSortingRepository<Facility, UUID>, FacilityRepositoryCustom {
-
-  @Override
-  <S extends Facility> S save(S entity);
-
-  @Override
-  <S extends Facility> Iterable<S> save(Iterable<S> entities);
+    extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom {
 
   @Query(value = "SELECT f.*"
       + " FROM referencedata.facilities f"
@@ -50,7 +44,7 @@ public interface FacilityRepository
       nativeQuery = true
   )
   List<Facility> findByBoundary(@Param("boundary") Polygon boundary);
-  
+
   Facility findFirstByCode(String code);
 
   @Query(name = "Facility.findSupervisionFacilitiesByUser",

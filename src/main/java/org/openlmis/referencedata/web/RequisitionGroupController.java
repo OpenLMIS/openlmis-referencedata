@@ -105,7 +105,7 @@ public class RequisitionGroupController extends BaseController {
       RequisitionGroup requisitionGroup = RequisitionGroup.newRequisitionGroup(requisitionGroupDto);
 
       profiler.start("SAVE_REQUISITION_GROUP");
-      requisitionGroupRepository.save(requisitionGroup);
+      requisitionGroupRepository.saveAndFlush(requisitionGroup);
 
       LOGGER.debug("Regenerating right assignments");
       profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
@@ -245,6 +245,7 @@ public class RequisitionGroupController extends BaseController {
     } else {
       profiler.start("DELETE_REQUISITION_GROUP");
       requisitionGroupRepository.delete(requisitionGroup);
+      requisitionGroupRepository.flush();
 
       LOGGER.debug("Regenerating right assignments");
       profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");

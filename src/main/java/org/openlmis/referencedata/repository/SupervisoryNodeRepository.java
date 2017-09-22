@@ -15,16 +15,15 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
-import org.springframework.data.repository.PagingAndSortingRepository;
-
-import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @JaversSpringDataAuditable
 public interface SupervisoryNodeRepository
-    extends PagingAndSortingRepository<SupervisoryNode, UUID>, SupervisoryNodeRepositoryCustom {
+    extends JpaRepository<SupervisoryNode, UUID>, SupervisoryNodeRepositoryCustom {
 
   <S extends SupervisoryNode> S findByCode(String code);
 }

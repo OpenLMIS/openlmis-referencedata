@@ -196,7 +196,7 @@ public class RoleController extends BaseController {
     roleToSave.setId(roleId);
 
     profiler.start("SAVE_ROLE");
-    roleRepository.save(roleToSave);
+    roleRepository.saveAndFlush(roleToSave);
 
     LOGGER.debug("Regenerating right assignments");
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
