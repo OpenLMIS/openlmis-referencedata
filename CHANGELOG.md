@@ -1,4 +1,4 @@
-8.1.0 / WIP
+9.0.0 / WIP
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-2892](https://openlmis.atlassian.net/browse/OLMIS-2892): Added ideal stock amounts model.
