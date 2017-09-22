@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -41,7 +41,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RightAssignmentServiceTest {
+public class RightAssignmentInitializerTest {
 
   private static final String RIGHT_NAME = "rightName";
 
@@ -49,7 +49,7 @@ public class RightAssignmentServiceTest {
   private JdbcTemplate jdbcTemplate;
 
   @InjectMocks
-  private RightAssignmentService rightAssignmentService;
+  private RightAssignmentInitializer rightAssignmentInitializer;
 
   private UUID userId;
   private UUID supervisoryNodeId;
@@ -74,7 +74,7 @@ public class RightAssignmentServiceTest {
         null);
 
     // when
-    Set<RightAssignmentDto> actual = rightAssignmentService
+    Set<RightAssignmentDto> actual = rightAssignmentInitializer
         .convertForInsert(Collections.singletonList(expected), null);
 
     // then
@@ -108,7 +108,7 @@ public class RightAssignmentServiceTest {
         any(UUID.class))).thenReturn(facilityIds);
     
     // when
-    Set<RightAssignmentDto> actual = rightAssignmentService
+    Set<RightAssignmentDto> actual = rightAssignmentInitializer
         .convertForInsert(Collections.singletonList(rightAssignmentDto), resource);
 
     // then
