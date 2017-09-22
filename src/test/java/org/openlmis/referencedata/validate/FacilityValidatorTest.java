@@ -116,4 +116,18 @@ public class FacilityValidatorTest {
 
     assertErrorMessage(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
   }
+
+  @Test
+  public void shouldNotRejectWhenFacilityCodeAlreadyExistAndIdIsSameAsThanFoundOne() {
+    Facility foundFacility = new Facility(facilityDto.getCode());
+    foundFacility.setId(UUID.randomUUID());
+    facilityDto.setId(foundFacility.getId());
+
+    when(facilityRepository.existsByCode(facilityDto.getCode())).thenReturn(true);
+    when(facilityRepository.findFirstByCode(facilityDto.getCode())).thenReturn(foundFacility);
+
+    validator.validate(facilityDto, errors);
+
+    assertEquals(0, errors.getErrorCount());
+  }
 }
