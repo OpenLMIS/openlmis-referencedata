@@ -24,14 +24,12 @@ import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.service.RequisitionGroupService;
-import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -73,9 +71,6 @@ public class RequisitionGroupController extends BaseController {
 
   @Autowired
   private RightService rightService;
-  
-  @Autowired
-  private RightAssignmentService rightAssignmentService;
 
   /**
    * Allows creating new requisition group. If the id is specified, it will be ignored.
@@ -158,46 +153,28 @@ public class RequisitionGroupController extends BaseController {
       @RequestBody RequisitionGroupDto requisitionGroupDto,
       @PathVariable("id") UUID requisitionGroupId,
       BindingResult bindingResult) {
-
-    Profiler profiler = new Profiler("UPDATE_REQUISITION_GROUP");
-    profiler.setLogger(LOGGER);
-
-    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
 
-    profiler.start("VALIDATE_REQUISITION_GROUP");
     validator.validate(requisitionGroupDto, bindingResult);
 
     if (bindingResult.getErrorCount() == 0) {
-      profiler.start("FIND_REQUISITION_GROUP");
       RequisitionGroup requisitionGroupToUpdate =
           requisitionGroupRepository.findOne(requisitionGroupId);
 
       if (null == requisitionGroupToUpdate) {
         LOGGER.info("Creating new requisitionGroup");
-        profiler.start("CREATE_REQUISITION_GROUP");
         requisitionGroupToUpdate = new RequisitionGroup();
       } else {
-        LOGGER.debug("Updating requisitionGroup with id: {}", requisitionGroupId);
+        LOGGER.debug("Updating requisitionGroup with id: " + requisitionGroupId);
       }
 
-      profiler.start("SAVE_REQUISITION_GROUP");
       requisitionGroupToUpdate.updateFrom(
           RequisitionGroup.newRequisitionGroup(requisitionGroupDto));
-      requisitionGroupToUpdate = requisitionGroupRepository.saveAndFlush(requisitionGroupToUpdate);
+      requisitionGroupToUpdate = requisitionGroupRepository.save(requisitionGroupToUpdate);
 
-      LOGGER.debug("Regenerating right assignments");
-      profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-      rightAssignmentService.regenerateRightAssignments();
-
-      LOGGER.debug("Saved requisitionGroup with id: {}", requisitionGroupToUpdate.getId());
-      profiler.start("EXPORT_DTO");
-      RequisitionGroupDto dto = exportToDto(requisitionGroupToUpdate);
-
-      profiler.stop().log();
-      return dto;
+      LOGGER.debug("Saved requisitionGroup with id: " + requisitionGroupToUpdate.getId());
+      return exportToDto(requisitionGroupToUpdate);
     } else {
-      profiler.stop().log();
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
   }

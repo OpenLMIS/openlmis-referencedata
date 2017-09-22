@@ -15,15 +15,16 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.repository.custom.RequisitionGroupRepositoryCustom;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface RequisitionGroupRepository
-    extends JpaRepository<RequisitionGroup, UUID>, RequisitionGroupRepositoryCustom {
+    extends PagingAndSortingRepository<RequisitionGroup, UUID>, RequisitionGroupRepositoryCustom {
 
   <S extends RequisitionGroup> S findByCode(String code);
 
