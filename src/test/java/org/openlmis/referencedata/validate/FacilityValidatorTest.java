@@ -21,12 +21,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -57,14 +60,14 @@ public class FacilityValidatorTest {
   }
 
   @Test
-  public void shouldNotFindErrorsWhenLotIsValid() throws Exception {
+  public void shouldNotFindErrorsWhenFacilityIsValid() throws Exception {
     validator.validate(facilityDto, errors);
 
     assertEquals(0, errors.getErrorCount());
   }
 
   @Test
-  public void shouldRejectWhenLotCodeIsNull() {
+  public void shouldRejectWhenFacilityCodeIsNull() {
     facilityDto.setCode(null);
 
     validator.validate(facilityDto, errors);
@@ -73,7 +76,7 @@ public class FacilityValidatorTest {
   }
 
   @Test
-  public void shouldRejectWhenLotCodeIsEmpty() {
+  public void shouldRejectWhenFacilityCodeIsEmpty() {
     facilityDto.setCode("");
 
     validator.validate(facilityDto, errors);
@@ -82,7 +85,7 @@ public class FacilityValidatorTest {
   }
 
   @Test
-  public void shouldRejectWhenLotCodeIsWhitespace() {
+  public void shouldRejectWhenFacilityCodeIsWhitespace() {
     facilityDto.setCode(" ");
 
     validator.validate(facilityDto, errors);
@@ -91,8 +94,23 @@ public class FacilityValidatorTest {
   }
 
   @Test
-  public void shouldRejectWhenLotCodeAlreadyExist() {
+  public void shouldRejectWhenFacilityCodeAlreadyExistAndIdIsEmpty() {
     when(facilityRepository.existsByCode(facilityDto.getCode())).thenReturn(true);
+    facilityDto.setId(null);
+
+    validator.validate(facilityDto, errors);
+
+    assertErrorMessage(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+  }
+
+  @Test
+  public void shouldRejectWhenFacilityCodeAlreadyExistAndIdIsDifferentThanFoundOne() {
+    Facility foundFacility = new Facility(facilityDto.getCode());
+    foundFacility.setId(UUID.randomUUID());
+    facilityDto.setId(UUID.randomUUID());
+
+    when(facilityRepository.existsByCode(facilityDto.getCode())).thenReturn(true);
+    when(facilityRepository.findFirstByCode(facilityDto.getCode())).thenReturn(foundFacility);
 
     validator.validate(facilityDto, errors);
 

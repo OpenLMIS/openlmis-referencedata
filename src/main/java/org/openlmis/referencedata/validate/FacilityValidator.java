@@ -41,7 +41,10 @@ public class FacilityValidator implements BaseValidator {
     rejectIfEmptyOrWhitespace(errors, CODE, FacilityMessageKeys.ERROR_CODE_REQUIRED);
 
     FacilityDto facilityDto = (FacilityDto) target;
-    if (facilityRepository.existsByCode(facilityDto.getCode())) {
+    if (facilityRepository.existsByCode(facilityDto.getCode())
+        && (facilityDto.getId() == null
+            || facilityRepository.findFirstByCode(facilityDto.getCode()).getId()
+            != facilityDto.getId())) {
       rejectValue(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
     }
   }
