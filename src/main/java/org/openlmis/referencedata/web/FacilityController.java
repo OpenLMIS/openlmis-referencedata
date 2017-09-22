@@ -209,6 +209,7 @@ public class FacilityController extends BaseController {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     facilityValidator.validate(facilityDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
 
     Facility facilityToSave = Facility.newFacility(facilityDto);
     facilityToSave.setId(facilityId);
