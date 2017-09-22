@@ -360,7 +360,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 10
   },
   {
     "id": "a3edc24b-070c-4051-871e-757ec98a09bd",
@@ -371,7 +371,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 12
   },
   {
     "id": "a5a69736-fca9-48a3-b0ff-658e3739db86",
@@ -382,7 +382,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 13
   },
   {
     "id": "cd7b3be2-c56e-43c8-b013-123abcd5af60",
@@ -393,7 +393,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 5
   },
   {
     "id": "34f7d0d0-daac-4502-a3b4-82ae6c5fc792",
@@ -404,7 +404,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 2
   },
   {
     "id": "aa40f09f-fa28-468f-987a-515605f51341",
@@ -415,7 +415,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 3.13
   },
   {
     "id": "04c46cef-d420-4623-8ab5-8f5cf023c529",
@@ -426,7 +426,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 4.6
   },
   {
     "id": "66c0c14b-1bf1-4970-b239-1c2f0dab37a0",
@@ -437,7 +437,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 8.5
   },
   {
     "id": "3c752d12-471b-47c0-82d7-4954df384c6b",
@@ -448,7 +448,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 12.5
   },
   {
     "id": "e7813092-ec6d-4d96-8876-35c6310b19ba",
@@ -459,7 +459,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 6
   },
   {
     "id": "b3c3bc1c-fb2f-431e-9284-799b01c05ad9",
@@ -470,7 +470,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 9
   },
   {
     "id": "e5fabbc8-8edc-47fb-a8d9-069dc8c52fca",
@@ -481,7 +481,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 4
   },
   {
     "id": "defadd1a-90a7-43f8-ad87-f382df45c40f",
@@ -492,7 +492,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 4.2
   },
   {
     "id": "fb28e397-ea2c-474a-8312-536ae55bca17",
@@ -503,7 +503,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 1.35
   },
   {
     "id": "b601feb7-108f-436d-b90d-6bc6106f3da1",
@@ -514,7 +514,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 4.8
   },
   {
     "id": "3494a7fc-f37f-46b4-88d5-99e3c77321b5",
@@ -525,7 +525,7 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 15
   },
   {
     "id": "d4d88938-7669-407e-9180-ce16be769314",
@@ -536,6 +536,6 @@
     "active": true,
     "fullSupply": true,
     "displayOrder": 5,
-    "pricePerPack" : 4.1344
+    "pricePerPack" : 20
   }
 ]
