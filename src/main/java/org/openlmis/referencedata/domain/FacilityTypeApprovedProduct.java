@@ -87,7 +87,6 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     ftap.setMaxPeriodsOfStock(importer.getMaxPeriodsOfStock());
     ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
     ftap.setEmergencyOrderPoint(importer.getEmergencyOrderPoint());
-    ftap.setOrderable(Orderable.newInstance(importer.getOrderable()));
     if (null != importer.getProgram()) {
       ftap.setProgram(Program.newProgram(importer.getProgram()));
     }

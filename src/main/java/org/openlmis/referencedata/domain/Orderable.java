@@ -18,15 +18,14 @@ package org.openlmis.referencedata.domain;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.DispensableDto;
-import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -85,6 +84,7 @@ public class Orderable extends BaseEntity {
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
       fetch = FetchType.EAGER)
   @DiffIgnore
+  @Setter
   private Set<ProgramOrderable> programOrderables;
 
   @ElementCollection(fetch = FetchType.EAGER)
@@ -160,18 +160,6 @@ public class Orderable extends BaseEntity {
   /**
    * Creates new instance based on data from {@link Importer}
    *
-   * @param orderableDtos collection of {@link Importer}
-   * @return new set of Orderables.
-   */
-  public static Set<Orderable> newInstance(Collection<OrderableDto> orderableDtos) {
-    Set<Orderable> orderables = new HashSet<>(orderableDtos.size(), 1);
-    orderableDtos.forEach(o -> orderables.add(newInstance(o)));
-    return orderables;
-  }
-
-  /**
-   * Creates new instance based on data from {@link Importer}
-   *
    * @param importer instance of {@link Importer}
    * @return new instance of Orderable.
    */
@@ -187,11 +175,6 @@ public class Orderable extends BaseEntity {
     orderable.roundToZero = importer.getRoundToZero();
     orderable.programOrderables = new HashSet<>();
 
-    if (importer.getPrograms() != null) {
-      importer.getPrograms()
-          .forEach(po -> orderable
-              .programOrderables.add(ProgramOrderable.newInstance(po, orderable)));
-    }
     orderable.identifiers = importer.getIdentifiers();
     orderable.extraData = importer.getExtraData();
 
