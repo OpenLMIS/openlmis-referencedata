@@ -23,5 +23,13 @@
     "active": "true",
     "periodsSkippable": "false",
     "enableDatePhysicalStockCountCompleted": "false"
+  },
+  {
+    "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983",
+    "code": "PRG004",
+    "name": "EPI",
+    "active": "true",
+    "periodsSkippable": "false",
+    "enableDatePhysicalStockCountCompleted": "false"
   }
 ]
