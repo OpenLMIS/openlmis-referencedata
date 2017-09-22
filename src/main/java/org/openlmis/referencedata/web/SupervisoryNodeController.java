@@ -31,6 +31,7 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.SupervisoryNodeService;
 import org.openlmis.referencedata.util.Pagination;
@@ -39,6 +40,7 @@ import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,6 +86,9 @@ public class SupervisoryNodeController extends BaseController {
 
   @Autowired
   private SupervisoryNodeService supervisoryNodeService;
+  
+  @Autowired
+  private RightAssignmentService rightAssignmentService;
 
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
@@ -161,21 +166,39 @@ public class SupervisoryNodeController extends BaseController {
   public SupervisoryNodeDto updateSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto,
       @PathVariable("id") UUID supervisoryNodeId) {
-    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
-    LOGGER.debug("Updating supervisoryNode with id: " + supervisoryNodeId);
 
+    Profiler profiler = new Profiler("UPDATE_SUPERVISORY_NODE");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
+    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+    LOGGER.debug("Updating supervisoryNode with id: {}", supervisoryNodeId);
+
+    profiler.start("FIND_SUPERVISORY_NODE");
     SupervisoryNode supervisoryNodeToUpdate =
         supervisoryNodeRepository.findOne(supervisoryNodeId);
 
     if (supervisoryNodeToUpdate == null) {
+      profiler.start("CREATE_SUPERVISORY_NODE");
       supervisoryNodeToUpdate = new SupervisoryNode();
     }
 
+    profiler.start("IMPORT_SUPERVISORY_NODE_FROM_DTO");
     supervisoryNodeToUpdate.updateFrom(SupervisoryNode.newSupervisoryNode(supervisoryNodeDto));
+
+    profiler.start("SAVE_SUPERVISORY_NODE");
     supervisoryNodeRepository.save(supervisoryNodeToUpdate);
 
-    LOGGER.debug("Updated supervisoryNode with id: " + supervisoryNodeId);
-    return exportToDto(supervisoryNodeToUpdate);
+    LOGGER.debug("Regenerating right assignments");
+    profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
+    rightAssignmentService.regenerateRightAssignments();
+
+    LOGGER.debug("Updated supervisoryNode with id: {}", supervisoryNodeId);
+    profiler.start("EXPORT_SUPERVISORY_NODE_TO_DTO");
+    SupervisoryNodeDto dto = exportToDto(supervisoryNodeToUpdate);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**

@@ -27,9 +27,11 @@ import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
@@ -62,6 +64,9 @@ public class RoleController extends BaseController {
 
   @Autowired
   private RightRepository rightRepository;
+  
+  @Autowired
+  private RightAssignmentService rightAssignmentService;
 
   /**
    * Get all roles in the system.
@@ -174,19 +179,36 @@ public class RoleController extends BaseController {
   @ResponseBody
   public RoleDto updateRole(@PathVariable("roleId") UUID roleId,
                             @RequestBody RoleDto roleDto) {
+
+    Profiler profiler = new Profiler("UPDATE_ROLE");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
-    Role roleToSave;
-    LOGGER.debug("Saving role using id: " + roleId);
+    LOGGER.debug("Saving role using id: {}", roleId);
 
+    profiler.start("POPULATE_RIGHTS");
     populateRights(roleDto);
-    roleToSave = Role.newRole(roleDto);
+
+    profiler.start("IMPORT_ROLE_FROM_DTO");
+    Role roleToSave = Role.newRole(roleDto);
     roleToSave.setId(roleId);
+
+    profiler.start("SAVE_ROLE");
     roleRepository.save(roleToSave);
 
-    LOGGER.debug("Saved role with id: " + roleToSave.getId());
+    LOGGER.debug("Regenerating right assignments");
+    profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
+    rightAssignmentService.regenerateRightAssignments();
+    
+    LOGGER.debug("Saved role with id: {}", roleToSave.getId());
 
-    return exportToDto(roleToSave);
+    profiler.start("EXPORT_ROLE_TO_DTO");
+    RoleDto dto = exportToDto(roleToSave);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**

@@ -32,6 +32,7 @@ import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.RightService;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -49,6 +50,9 @@ public class RoleControllerTest {
 
   @Mock
   private RightService rightService;
+  
+  @Mock
+  private RightAssignmentService rightAssignmentService;
 
   @InjectMocks
   private RoleController controller = new RoleController();
@@ -161,6 +165,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).save(updatedRole1);
+    verify(rightAssignmentService).regenerateRightAssignments();
   }
 
   @Test
@@ -177,6 +182,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).save(updatedRole1);
+    verify(rightAssignmentService).regenerateRightAssignments();
   }
 
   @Test
@@ -196,6 +202,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).save(updatedRole1);
+    verify(rightAssignmentService).regenerateRightAssignments();
   }
 
   @Test
@@ -215,6 +222,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).save(updatedRole1);
+    verify(rightAssignmentService).regenerateRightAssignments();
   }
 
   @Test
@@ -231,6 +239,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).save(updatedRole1);
+    verify(rightAssignmentService).regenerateRightAssignments();
   }
 
   @Test

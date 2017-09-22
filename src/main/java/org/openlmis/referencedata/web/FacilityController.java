@@ -40,6 +40,7 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.FacilityService;
+import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -49,6 +50,7 @@ import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.validate.FacilityValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -102,6 +104,9 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private FacilityValidator facilityValidator;
+
+  @Autowired
+  private RightAssignmentService rightAssignmentService;
 
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
@@ -206,19 +211,36 @@ public class FacilityController extends BaseController {
       @PathVariable("id") UUID facilityId,
       BindingResult bindingResult) {
 
+    Profiler profiler = new Profiler("UPDATE_FACILITY");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
+    profiler.start("VALIDATE_FACILITY_DTO");
     facilityValidator.validate(facilityDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
+    profiler.start("IMPORT_FACILITY_FROM_DTO");
     Facility facilityToSave = Facility.newFacility(facilityDto);
     facilityToSave.setId(facilityId);
 
+    profiler.start("ADD_SUPPORTED_PROGRAMS");
     addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(), facilityToSave);
+
+    profiler.start("SAVE_FACILITY");
     facilityToSave = facilityRepository.save(facilityToSave);
 
-    LOGGER.debug("Saved facility with id: " + facilityToSave.getId());
-    return toDto(facilityToSave);
+    LOGGER.debug("Regenerating right assignments");
+    profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
+    rightAssignmentService.regenerateRightAssignments();
+
+    LOGGER.debug("Saved facility with id: {}", facilityToSave.getId());
+    profiler.start("EXPORT_FACILITY_TO_DTO");
+    FacilityDto dto = toDto(facilityToSave);
+    
+    profiler.stop().log();
+    return dto;
   }
 
   /**

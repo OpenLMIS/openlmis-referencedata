@@ -88,19 +88,37 @@ public class RequisitionGroupController extends BaseController {
   @ResponseBody
   public RequisitionGroupDto createRequisitionGroup(
       @RequestBody RequisitionGroupDto requisitionGroupDto, BindingResult bindingResult) {
+
+    Profiler profiler = new Profiler("CREATE_NEW_REQUISITION_GROUP");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
 
     LOGGER.debug("Creating new requisitionGroup");
+    profiler.start("VALIDATE_REQUISITION_GROUP_DTO");
     validator.validate(requisitionGroupDto, bindingResult);
 
     if (bindingResult.getErrorCount() == 0) {
+      profiler.start("IMPORT_REQUISITION_GROUP_FROM_DTO");
       requisitionGroupDto.setId(null);
       RequisitionGroup requisitionGroup = RequisitionGroup.newRequisitionGroup(requisitionGroupDto);
+
+      profiler.start("SAVE_REQUISITION_GROUP");
       requisitionGroupRepository.save(requisitionGroup);
 
-      LOGGER.debug("Created new requisitionGroup with id: " + requisitionGroup.getId());
-      return exportToDto(requisitionGroup);
+      LOGGER.debug("Regenerating right assignments");
+      profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
+      rightAssignmentService.regenerateRightAssignments();
+
+      LOGGER.debug("Created new requisitionGroup with id: {}", requisitionGroup.getId());
+      profiler.start("EXPORT_REQUISITION_GROUP_TO_DTO");
+      RequisitionGroupDto dto = exportToDto(requisitionGroup);
+
+      profiler.stop().log();
+      return dto;
     } else {
+      profiler.stop().log();
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
   }
@@ -181,9 +199,11 @@ public class RequisitionGroupController extends BaseController {
         LOGGER.debug("Updating requisitionGroup with id: {}", requisitionGroupId);
       }
 
-      profiler.start("SAVE_REQUISITION_GROUP");
+      profiler.start("IMPORT_REQUISITION_GROUP_FROM_DTO");
       requisitionGroupToUpdate.updateFrom(
           RequisitionGroup.newRequisitionGroup(requisitionGroupDto));
+
+      profiler.start("SAVE_REQUISITION_GROUP");
       requisitionGroupToUpdate = requisitionGroupRepository.saveAndFlush(requisitionGroupToUpdate);
 
       LOGGER.debug("Regenerating right assignments");
@@ -191,7 +211,7 @@ public class RequisitionGroupController extends BaseController {
       rightAssignmentService.regenerateRightAssignments();
 
       LOGGER.debug("Saved requisitionGroup with id: {}", requisitionGroupToUpdate.getId());
-      profiler.start("EXPORT_DTO");
+      profiler.start("EXPORT_REQUISITION_GROUP_TO_DTO");
       RequisitionGroupDto dto = exportToDto(requisitionGroupToUpdate);
 
       profiler.stop().log();
@@ -210,12 +230,27 @@ public class RequisitionGroupController extends BaseController {
   @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteRequisitionGroup(@PathVariable("id") UUID requisitionGroupId) {
+
+    Profiler profiler = new Profiler("DELETE_REQUISITION_GROUP");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+
+    profiler.start("FIND_REQUISITION_GROUP");
     RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
     if (requisitionGroup == null) {
+      profiler.stop().log();
       throw new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);
     } else {
+      profiler.start("DELETE_REQUISITION_GROUP");
       requisitionGroupRepository.delete(requisitionGroup);
+
+      LOGGER.debug("Regenerating right assignments");
+      profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
+      rightAssignmentService.regenerateRightAssignments();
+
+      profiler.stop().log();
     }
   }
 
