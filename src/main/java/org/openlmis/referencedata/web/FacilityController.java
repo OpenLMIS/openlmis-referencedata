@@ -202,9 +202,13 @@ public class FacilityController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityDto saveFacility(
-      @RequestBody FacilityDto facilityDto, @PathVariable("id") UUID facilityId) {
+      @RequestBody FacilityDto facilityDto,
+      @PathVariable("id") UUID facilityId,
+      BindingResult bindingResult) {
 
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    facilityValidator.validate(facilityDto, bindingResult);
 
     Facility facilityToSave = Facility.newFacility(facilityDto);
     facilityToSave.setId(facilityId);
