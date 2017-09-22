@@ -193,6 +193,7 @@ public class SupervisoryNode extends BaseEntity {
     this.facility = supervisoryNode.getFacility();
     this.parentNode = supervisoryNode.getParentNode();
     this.childNodes = supervisoryNode.getChildNodes();
+    this.requisitionGroup = supervisoryNode.getRequisitionGroup();
   }
 
   /**
