@@ -470,7 +470,7 @@
   {
     "id": "9c3bea84-487b-4e22-8759-3fe93f8201d9",
     "code": "bcg20",
-    "dispensingUnit": "cada",
+    "dispensingUnit": "each",
     "fullProductName": "BCG",
     "netContent": 20,
     "packRoundingThreshold": 1,
@@ -484,7 +484,7 @@
   {
     "id": "0a83fb92-289b-45c9-adba-f2ac7647312e",
     "code": "polio10",
-    "dispensingUnit": "cada",
+    "dispensingUnit": "each",
     "fullProductName": "Polio (10 dose)",
     "netContent": 10,
     "packRoundingThreshold": 1,
@@ -498,7 +498,7 @@
   {
     "id": "8f5e5923-e192-40b1-bf9e-3b4444579e05",
     "code": "polio20",
-    "dispensingUnit": "cada",
+    "dispensingUnit": "each",
     "fullProductName": "Polio (20 dose)",
     "netContent": 20,
     "packRoundingThreshold": 1,
@@ -512,7 +512,7 @@
   {
     "id": "b0c0426e-6840-4531-a116-043ba854c58b",
     "code": "penta1",
-    "dispensingUnit": "cada",
+    "dispensingUnit": "each",
     "fullProductName": "Pentavalent (1 dose)",
     "netContent": 1,
     "packRoundingThreshold": 1,
@@ -526,7 +526,7 @@
   {
     "id": "a852f785-d82e-4afe-bc6a-04f3236caf90",
     "code": "penta10",
-    "dispensingUnit": "cada",
+    "dispensingUnit": "each",
     "fullProductName": "Pentavalent (10 dose)",
     "netContent": 10,
     "packRoundingThreshold": 1,
@@ -540,7 +540,7 @@
   {
     "id": "b75a88c7-70fa-4bab-9785-3dd980a5ffc3",
     "code": "pcv10",
-    "dispensingUnit": "cada",
+    "dispensingUnit": "each",
     "fullProductName": "PCV10",
     "netContent": 2,
     "packRoundingThreshold": 1,
@@ -554,7 +554,7 @@
   {
     "id": "047638fa-92ce-4adf-9bbd-3bcb3216897a",
     "code": "hpv2",
-    "dispensingUnit": "cada",
+    "dispensingUnit": "each",
     "fullProductName": "HPV",
     "netContent": 2,
     "packRoundingThreshold": 1,
@@ -568,8 +568,8 @@
   {
     "id": "71204042-558e-4c47-a602-7886451e5689",
     "code": "measles10",
-    "dispensingUnit": "cada",
-    "fullProductName": "Sarampo",
+    "dispensingUnit": "each",
+    "fullProductName": "Measles",
     "netContent": 10,
     "packRoundingThreshold": 1,
     "roundToZero": true,
@@ -582,7 +582,7 @@
   {
     "id": "18223845-4d19-4408-b7c2-971c26014058",
     "code": "tetanus10",
-    "dispensingUnit": "cada",
+    "dispensingUnit": "each",
     "fullProductName": "VAT",
     "netContent": 10,
     "packRoundingThreshold": 1,
@@ -596,8 +596,8 @@
   {
     "id": "170738eb-6364-4d2a-98cf-1ea54cc5a61a",
     "code": "syringe5ml",
-    "dispensingUnit": "cada",
-    "fullProductName": "Seringa 5ml",
+    "dispensingUnit": "each",
+    "fullProductName": "Syringe 5ml",
     "netContent": 1,
     "packRoundingThreshold": 1,
     "roundToZero": true,
@@ -610,8 +610,8 @@
   {
     "id": "bfc1bfee-d6bb-4254-8bc9-5a0d962fce97",
     "code": "syringe05ml",
-    "dispensingUnit": "cada",
-    "fullProductName": "Seringa 0,5ml",
+    "dispensingUnit": "each",
+    "fullProductName": "Syringe 0,5ml",
     "netContent": 1,
     "packRoundingThreshold": 1,
     "roundToZero": true,
@@ -624,8 +624,8 @@
   {
     "id": "4457d688-9617-4594-bb54-03f98cabf84d",
     "code": "syringe005ml",
-    "dispensingUnit": "cada",
-    "fullProductName": "Seringa 0,05ml",
+    "dispensingUnit": "each",
+    "fullProductName": "Syringe 0,05ml",
     "netContent": 1,
     "packRoundingThreshold": 1,
     "roundToZero": true,
@@ -638,8 +638,8 @@
   {
     "id": "7d5a1795-b219-465c-ba78-f5187b65d7f9",
     "code": "safetybox",
-    "dispensingUnit": "cada",
-    "fullProductName": "Caixas Inciner.",
+    "dispensingUnit": "each",
+    "fullProductName": "Safety Box",
     "netContent": 1,
     "packRoundingThreshold": 1,
     "roundToZero": true,
@@ -652,8 +652,8 @@
   {
     "id": "4a05482a-68b8-4064-979f-6bfadf464481",
     "code": "gas",
-    "dispensingUnit": "cada",
-    "fullProductName": "Gás (Cilindro)",
+    "dispensingUnit": "each",
+    "fullProductName": "Gas (Cylinder)",
     "netContent": 1,
     "packRoundingThreshold": 1,
     "roundToZero": true,
@@ -666,8 +666,8 @@
   {
     "id": "c75152ee-ebed-47ed-bb87-0930aee18320",
     "code": "bcg20dil",
-    "dispensingUnit": "cada",
-    "fullProductName": "Diluente BCG",
+    "dispensingUnit": "each",
+    "fullProductName": "Measles BCG",
     "netContent": 20,
     "packRoundingThreshold": 1,
     "roundToZero": true,
@@ -680,8 +680,8 @@
   {
     "id": "7c58f053-0ca5-46ad-8209-98cff0c79b42",
     "code": "measles10dil",
-    "dispensingUnit": "cada",
-    "fullProductName": "Diluente Sarampo",
+    "dispensingUnit": "each",
+    "fullProductName": "Measles Syringe",
     "netContent": 10,
     "packRoundingThreshold": 1,
     "roundToZero": true,

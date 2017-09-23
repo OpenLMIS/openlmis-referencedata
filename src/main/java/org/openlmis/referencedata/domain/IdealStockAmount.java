@@ -15,7 +15,9 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.TypeName;
 
@@ -29,6 +31,8 @@ import java.util.UUID;
 @Entity
 @TypeName("IdealStockAmount")
 @Table(name = "ideal_stock_amounts", schema = "referencedata")
+@AllArgsConstructor
+@NoArgsConstructor
 public class IdealStockAmount extends BaseEntity {
 
   @ManyToOne
@@ -66,13 +70,13 @@ public class IdealStockAmount extends BaseEntity {
    * @param importer instance of {@link Importer}
    * @return new instance of ideal stock amount.
    */
-  public static IdealStockAmount newFacility(Importer importer) {
-    IdealStockAmount isa = new IdealStockAmount();
-    isa.setFacility(importer.getFacility());
-    isa.setProgram(importer.getProgram());
-    isa.setOrderable(importer.getOrderable());
-    isa.setProcessingPeriod(importer.getProcessingPeriod());
-    isa.setAmount(importer.getAmount());
+  public static IdealStockAmount newIdealStockAmount(Importer importer) {
+    IdealStockAmount isa = new IdealStockAmount(importer.getFacility(),
+        importer.getProgram(),
+        importer.getOrderable(),
+        importer.getProcessingPeriod(),
+        importer.getAmount());
+    isa.setId(importer.getId());
     return isa;
   }
 
@@ -82,6 +86,7 @@ public class IdealStockAmount extends BaseEntity {
    * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
+    exporter.setId(id);
     exporter.setFacility(facility);
     exporter.setProgram(program);
     exporter.setOrderable(orderable);
