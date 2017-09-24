@@ -43,8 +43,8 @@ public class FacilityValidator implements BaseValidator {
     FacilityDto facilityDto = (FacilityDto) target;
     if (facilityRepository.existsByCode(facilityDto.getCode())
         && (facilityDto.getId() == null
-            || facilityRepository.findFirstByCode(facilityDto.getCode()).getId()
-            != facilityDto.getId())) {
+            || !facilityRepository.findFirstByCode(facilityDto.getCode()).getId()
+                .equals(facilityDto.getId()))) {
       rejectValue(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
     }
   }
