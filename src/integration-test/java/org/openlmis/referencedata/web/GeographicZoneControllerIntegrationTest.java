@@ -188,9 +188,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldGetAllGeographicZones() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     List<GeographicZone> geographicZones = Arrays.asList(countryZone, regionZone, districtZone);
     Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
@@ -218,10 +215,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   @Test
   public void shouldFindGeographicZonesByParentAndLevel() {
     // given
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
     List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
 
     given(geographicZoneService.search(any(Map.class), any(Pageable.class)))
@@ -249,9 +242,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldGetGeographicZone() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     given(geographicZoneRepository.findOne(countryZone.getId())).willReturn(countryZone);
 
@@ -269,68 +259,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     assertEquals(countryZone, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-
-  @Test
-  public void getShouldReturnForbiddenOnUnauthorizedToken() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", countryZone.getId())
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void getAllShouldReturnForbiddenOnUnauthorizedToken() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void searchShouldReturnForbiddenOnUnauthorizedToken() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
-    Map<String, Object> requestBody = getSearchBody();
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .body(requestBody)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .post(SEARCH_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
+  
   @Test
   public void searchShouldReturnBadRequestOnException() {
     Map<String, Object> requestBody = getSearchBody();

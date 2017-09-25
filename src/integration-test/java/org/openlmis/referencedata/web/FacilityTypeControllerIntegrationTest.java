@@ -178,7 +178,6 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldGetAllFacilityTypes() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<FacilityType> storedFacilityTypes = Arrays.asList(facilityType, new FacilityType("code2"));
     given(facilityTypeRepository.findAll()).willReturn(storedFacilityTypes);
@@ -198,27 +197,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   }
 
   @Test
-  public void shouldRejectGetAllRequestIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldGetFacilityType() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
     
     given(facilityTypeRepository.findOne(facilityTypeId)).willReturn(facilityType);
 
@@ -234,26 +213,6 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
         .extract().as(FacilityType.class);
 
     assertEquals(facilityType, response);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectGetRequestIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", facilityTypeId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

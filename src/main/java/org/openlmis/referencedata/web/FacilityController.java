@@ -373,7 +373,6 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public Page<BasicFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
                                                  Pageable pageable) {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
     List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities);

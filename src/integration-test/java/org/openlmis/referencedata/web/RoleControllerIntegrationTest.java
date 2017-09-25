@@ -69,9 +69,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetAllRoles() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
+
     List<Role> storedRoles = Arrays.asList(role,
         Role.newRole("role2", right1));
     given(roleRepository.findAll()).willReturn(storedRoles);
@@ -91,28 +89,8 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldReturnUnauthorizedWhenGettingAllRolesWithoutRight() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.USER_ROLES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldGetRole() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
+
     given(roleRepository.findOne(roleId)).willReturn(role);
 
     RoleDto response = restAssured
@@ -126,25 +104,6 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(RoleDto.class);
 
     assertEquals(roleDto, response);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnUnauthorizedWhenGettingRoleWithoutRight() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.USER_ROLES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", roleId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403);
-
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

@@ -93,7 +93,7 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<GeographicZoneSimpleDto> getAllGeographicZones(Pageable pageable) {
-    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+
     return (geographicZoneRepository.findAll(pageable)).map(this::toSimpleDto);
   }
 
@@ -130,7 +130,6 @@ public class GeographicZoneController extends BaseController {
   @ResponseBody
   public GeographicZoneDto getGeographicZone(
       @PathVariable("id") UUID geographicZoneId) {
-    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
     if (geographicZone == null) {
@@ -187,7 +186,6 @@ public class GeographicZoneController extends BaseController {
   @ResponseBody
   public Page<GeographicZoneSimpleDto> search(@RequestBody Map<String, Object> queryParams,
                                                                  Pageable pageable) {
-    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     Page<GeographicZone> page = geographicZoneService.search(queryParams, pageable);
 

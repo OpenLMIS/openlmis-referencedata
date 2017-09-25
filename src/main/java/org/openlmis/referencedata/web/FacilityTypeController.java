@@ -76,7 +76,7 @@ public class FacilityTypeController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<FacilityType> getAllFacilityTypes() {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     return facilityTypeRepository.findAll();
   }
 
@@ -123,7 +123,7 @@ public class FacilityTypeController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityType getFacilityType(@PathVariable("id") UUID facilityTypeId) {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
     if (facilityType == null) {
       throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);

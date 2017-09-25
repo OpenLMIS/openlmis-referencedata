@@ -233,8 +233,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-
+    
     String similarCode = "Facility";
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("code", similarCode);
@@ -260,27 +259,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldRejectSearchRequestIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    String messageKey = restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .body(new HashMap<>())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .post(SEARCH_FACILITIES)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldFindFacilitiesWithSimilarName() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     String similarName = "Facility";
     Map<String, Object> requestBody = new HashMap<>();
@@ -309,8 +288,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnBadRequestWhenSearchThrowsException() {
     // given
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     given(facilityService.searchFacilities(anyMap())).willThrow(
         new ValidationMessageException("somethingWrong"));
 
@@ -330,7 +307,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldNotFindFacilitiesWithIncorrectCodeAndName() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("code", "IncorrectCode");
@@ -351,7 +327,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldPaginateSearchFacilities() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Map<String, Object> requestBody = new HashMap<>();
 

@@ -77,8 +77,7 @@ public class RoleController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Set<RoleDto> getAllRoles() {
-    rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-
+    
     LOGGER.debug("Getting all roles");
     Set<Role> roles = Sets.newHashSet(roleRepository.findAll());
     return roles.stream().map(this::exportToDto).collect(toSet());
@@ -94,7 +93,6 @@ public class RoleController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public RoleDto getRole(@PathVariable("roleId") UUID roleId) {
-    rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
 
     LOGGER.debug("Getting role");
     Role role = roleRepository.findOne(roleId);

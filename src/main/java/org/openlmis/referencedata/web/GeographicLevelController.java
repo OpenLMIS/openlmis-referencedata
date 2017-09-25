@@ -76,8 +76,7 @@ public class GeographicLevelController extends BaseController {
   @RequestMapping(value = "/geographicLevels", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<GeographicLevel> getAllGeographicLevel() {
-    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+  public Iterable<GeographicLevel> getAllGeographicLevels() {
 
     Iterable<GeographicLevel> geographicLevels = geographicLevelRepository.findAll();
     if (geographicLevels == null) {
@@ -117,7 +116,6 @@ public class GeographicLevelController extends BaseController {
   @ResponseBody
   public GeographicLevel getGeographicLevel(
       @PathVariable("id") UUID geographicLevelId) {
-    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     GeographicLevel geographicLevel = geographicLevelRepository.findOne(geographicLevelId);
     if (geographicLevel == null) {

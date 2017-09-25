@@ -1522,10 +1522,6 @@ resourceTypes:
                   body:
                     application/json:
                       schema: facilityArray
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new facility.
@@ -1573,10 +1569,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: facility
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
                   "404":
                       body:
                         application/json:
@@ -1683,11 +1675,6 @@ resourceTypes:
                     body:
                       application/json:
                         schema: localizedErrorResponse
-                403:
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
-                404:
       /minimal:
           get:
               is: [ secured ]
@@ -1697,10 +1684,6 @@ resourceTypes:
                       body:
                         application/json:
                             schema: minimalFacilityArray
-                  403:
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
       /byBoundary:
           post:
               is: [ secured, paginated ]
@@ -1731,11 +1714,6 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-              "404":
-              403:
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new facilityType.
@@ -1784,10 +1762,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-                  403:
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing facilityType.
@@ -1814,7 +1788,6 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-              "404":
       post:
           is: [ secured ]
           description: Creates new program.
@@ -2230,11 +2203,6 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-              "404":
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new geographicLevel.
@@ -2280,10 +2248,6 @@ resourceTypes:
                       body:
                         application/json:
                   "404":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-                  "403":
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2590,10 +2554,6 @@ resourceTypes:
                     body:
                         application/json:
                           schema: roleArray
-                "403":
-                    body:
-                        application/json:
-                          schema: localizedErrorResponse
       /{roleId}:
             uriParameters:
               roleId:
@@ -2627,10 +2587,6 @@ resourceTypes:
                         body:
                             application/json:
                               schema: role
-                    "403":
-                        body:
-                            application/json:
-                              schema: localizedErrorResponse
                     "404":
                         body:
                           application/json:
