@@ -38,6 +38,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
 /**
@@ -64,9 +66,15 @@ public class RightAssignmentService {
   JdbcTemplate template;
 
   /**
-   * Re-generates right assignments.
+   * Re-generates right assignments. This operation needs to be transactional so that dropping 
+   * and re-generating is one transaction. The isolation level is specified to READ_UNCOMMITTED, 
+   * to allow dirty reads on the right assignments table. This is so that any permission checks 
+   * do not have to wait for this re-generation to finish, but can use the "old" right 
+   * assignments. This is acceptable since the right assignments table is not expected to change 
+   * very often, and the re-generation could take several seconds to finish.
    */
   @Async
+  @Transactional(isolation = Isolation.READ_UNCOMMITTED)
   public void regenerateRightAssignments() {
     XLOGGER.entry();
 
