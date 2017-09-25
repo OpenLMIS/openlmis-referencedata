@@ -1,0 +1,31 @@
+execution:
+  - concurreny: 1
+    iterations: 20
+    scenario: download-ideal-stock-amounts-csv
+
+scenarios:
+  download-ideal-stock-amounts-csv:
+    requests:
+      - url: ${__P(base-uri)}/api/oauth/token
+        method: POST
+        label: GetUserToken
+        headers:
+          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
+        body:
+          grant_type: password
+          username: ${__P(username)}
+          password: ${__P(password)}
+        extract-jsonpath:
+          access_token:
+            jsonpath: $.access_token
+      - url: ${__P(base-uri)}/api/idealStockAmounts?format=csv
+        method: GET
+        label: GetAnIdealStockAmountCSV
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+
+reporting:
+    - module: passfail
+      criteria:
+        at least 10% of users fail to download csv file in less than 500 milliseconds: p90 of GetAnIdealStockAmountCSV>500ms
