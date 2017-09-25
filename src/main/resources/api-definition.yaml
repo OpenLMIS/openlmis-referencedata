@@ -257,6 +257,8 @@ schemas:
           "type": "array",
           "items": { "type": "object", "$ref": "schemas/lotDto.json" }
       }
+
+  - idealStockAmountPage: !include schemas/idealStockAmountPage.json
   
   - geoJsonPoint: !include schemas/geoJsonPoint.json
   
@@ -2981,3 +2983,29 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
+  /idealStockAmounts:
+      displayName: Ideal Stock Amounts
+      get:
+          is: [ secured, paginated ]
+          description: Returns all Ideal Stock Amounts.
+          queryParameters:
+              format:
+                  description: "This parameter specifies return type of this endpoint. If it is not specified json format is returned. Supported formats: csv. Note that other parameters will not work when format is specified."
+                  type: string
+                  required: false
+                  repeat: false
+          responses:
+              "200":
+                  body:
+                      application/json:
+                          schema: idealStockAmountPage
+                      text/csv:
+              "400":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+

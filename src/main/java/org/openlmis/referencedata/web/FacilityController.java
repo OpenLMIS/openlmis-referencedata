@@ -76,7 +76,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-
 @Controller
 @Transactional
 @SuppressWarnings({"PMD.TooManyMethods"})

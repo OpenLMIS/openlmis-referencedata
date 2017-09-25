@@ -36,7 +36,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class BasicFacilityDto extends BaseDto implements Facility.Exporter {
+public class BasicFacilityDto extends BaseDto implements Facility.Exporter, Facility.Importer {
 
   private String code;
   private String name;
@@ -101,5 +101,53 @@ public class BasicFacilityDto extends BaseDto implements Facility.Exporter {
   @Override
   public void setExtraData(Map<String, String> extraData) {
     // unsupported operation
+  }
+
+  @Override
+  public String getDescription() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  public FacilityOperator.Importer getOperator() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  public LocalDate getGoLiveDate() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  public LocalDate getGoDownDate() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  public String getComment() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  public Boolean getOpenLmisAccessible() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  public Point getLocation() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  public Map<String, String> getExtraData() {
+    // unsupported operation
+    return null;
   }
 }

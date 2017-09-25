@@ -71,10 +71,11 @@ public class IdealStockAmount extends BaseEntity {
    * @return new instance of ideal stock amount.
    */
   public static IdealStockAmount newIdealStockAmount(Importer importer) {
-    IdealStockAmount isa = new IdealStockAmount(importer.getFacility(),
-        importer.getProgram(),
-        importer.getOrderable(),
-        importer.getProcessingPeriod(),
+
+    IdealStockAmount isa = new IdealStockAmount(Facility.newFacility(importer.getFacility()),
+        Program.newProgram(importer.getProgram()),
+        Orderable.newInstance(importer.getOrderable()),
+        ProcessingPeriod.newPeriod(importer.getProcessingPeriod()),
         importer.getAmount());
     isa.setId(importer.getId());
     return isa;
@@ -113,13 +114,13 @@ public class IdealStockAmount extends BaseEntity {
 
     UUID getId();
 
-    Facility getFacility();
+    Facility.Importer getFacility();
 
-    Program getProgram();
+    Program.Importer getProgram();
 
-    Orderable getOrderable();
+    Orderable.Importer getOrderable();
 
-    ProcessingPeriod getProcessingPeriod();
+    ProcessingPeriod.Importer getProcessingPeriod();
 
     Integer getAmount();
   }
