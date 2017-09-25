@@ -92,6 +92,8 @@ public abstract class MessageKeys {
   protected static final String FIRSTNAME = "firstName";
   protected static final String LASTNAME = "lastName";
 
+  public static final String ERROR_IO = SERVICE_ERROR + ".io";
+
   protected static String join(String... params) {
     return String.join(DELIMITER, Arrays.asList(params));
   }

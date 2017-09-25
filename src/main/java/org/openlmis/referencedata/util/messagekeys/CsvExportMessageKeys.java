@@ -13,37 +13,17 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.util;
+package org.openlmis.referencedata.util.messagekeys;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.Validate;
+import static org.openlmis.referencedata.util.messagekeys.MessageKeys.SERVICE_ERROR;
 
-/**
- * Value class of a localized message.  Useful for JSON serialization, logging, etc...
- */
-public final class LocalizedMessage {
+public class CsvExportMessageKeys {
 
-  public static final String MESSAGE_KEY_FIELD = "messageKey";
-  public static final String MESSAGE_FIELD = "message";
+  private static final String ERROR_PREFIX = SERVICE_ERROR + ".export";
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String messageKey;
+  public static final String ERROR_EXPORT_RECORD_INVALID = ERROR_PREFIX + ".record.invalid";
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String message;
-
-  LocalizedMessage(String messageKey, String message) {
-    Validate.notBlank(message);
-    this.messageKey = messageKey;
-    this.message = message;
-  }
-
-  @Override
-  public String toString() {
-    return messageKey + ": " + message;
-  }
-
-  public String asMessage() {
-    return message;
+  private CsvExportMessageKeys() {
+    throw new UnsupportedOperationException();
   }
 }

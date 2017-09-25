@@ -13,37 +13,13 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.util;
+package org.openlmis.referencedata.web.dummy;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.Validate;
+import lombok.Data;
 
-/**
- * Value class of a localized message.  Useful for JSON serialization, logging, etc...
- */
-public final class LocalizedMessage {
-
-  public static final String MESSAGE_KEY_FIELD = "messageKey";
-  public static final String MESSAGE_FIELD = "message";
-
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String messageKey;
-
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String message;
-
-  LocalizedMessage(String messageKey, String message) {
-    Validate.notBlank(message);
-    this.messageKey = messageKey;
-    this.message = message;
-  }
-
-  @Override
-  public String toString() {
-    return messageKey + ": " + message;
-  }
-
-  public String asMessage() {
-    return message;
-  }
+@Data
+public class DummyNestedField {
+  private String code;
+  private String entityCode1;
+  private String entityCode2;
 }

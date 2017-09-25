@@ -13,37 +13,37 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.util;
+package org.openlmis.referencedata.web.csv.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.Validate;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Value class of a localized message.  Useful for JSON serialization, logging, etc...
+ * This annotation is used to specify attributes of a field in POJO.
+ * This is used in importing data from CSV files to POJOs.
  */
-public final class LocalizedMessage {
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ImportField {
+  /**
+   * indicate if field is mandatory
+   */
+  boolean mandatory() default false;
 
-  public static final String MESSAGE_KEY_FIELD = "messageKey";
-  public static final String MESSAGE_FIELD = "message";
+  /**
+   * indicate field type
+   */
+  String type() default "String";
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String messageKey;
+  /**
+   * indicate field name
+   */
+  String name() default "";
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String message;
-
-  LocalizedMessage(String messageKey, String message) {
-    Validate.notBlank(message);
-    this.messageKey = messageKey;
-    this.message = message;
-  }
-
-  @Override
-  public String toString() {
-    return messageKey + ": " + message;
-  }
-
-  public String asMessage() {
-    return message;
-  }
+  /**
+   * indicate nested field value
+   */
+  String nested() default "";
 }

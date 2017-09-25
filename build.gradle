@@ -61,6 +61,9 @@ dependencies {
     compile 'org.joda:joda-money:0.12'
     compile 'org.jadira.usertype:usertype.core:5.0.0.GA'
 
+    compile 'net.sf.supercsv:super-csv:2.4.0'
+    compile 'net.sf.supercsv:super-csv-dozer:2.4.0'
+
     testCompile 'io.rest-assured:rest-assured:3.0.0'
     testCompile 'io.rest-assured:json-schema-validator:3.0.0'
     testCompile 'io.rest-assured:spring-mock-mvc:3.0.0'
