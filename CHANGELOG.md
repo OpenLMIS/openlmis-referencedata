@@ -6,6 +6,7 @@ Breaking changes:
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-2892](https://openlmis.atlassian.net/browse/OLMIS-2892): Added ideal stock amounts model.
+* [OLMIS-2966](https://openlmis.atlassian.net/browse/OLMIS-2966): Create User Rights for Managing Ideal Stock Amounts.
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-2857](https://openlmis.atlassian.net/browse/OLMIS-2857): Refactored user search repository method to user database pagination and sorting.
