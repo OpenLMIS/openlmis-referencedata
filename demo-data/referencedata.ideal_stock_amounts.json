@@ -2,7 +2,7 @@
   {
     "id": "bbae8096-586a-4ad9-9aae-1d204a4171e5",
     "facilityId": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
-    "commodityTypeId": "fee5692c-5fcd-469d-9f25-e43bf95e9ae6",
+    "commodityTypeId": "99ccf663-3304-44ae-b2e0-a67fd5511e2a",
     "processingPeriodId": "516ac930-0d28-49f5-a178-64764e22b236",
     "amount": 5200
   },
@@ -30,7 +30,7 @@
   {
     "id": "713154f9-1648-4150-9cf1-c519ff4c4506",
     "facilityId": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
-    "commodityTypeId": "fee5692c-5fcd-469d-9f25-e43bf95e9ae6",
+    "commodityTypeId": "99ccf663-3304-44ae-b2e0-a67fd5511e2a",
     "processingPeriodId": "04ec3c83-a086-4792-b7a3-c46559b7f6cd",
     "amount": 2200
   },
@@ -58,7 +58,7 @@
   {
     "id": "9da151e5-4c40-4138-9217-b02a9e25381d",
     "facilityId": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce",
-    "commodityTypeId": "fee5692c-5fcd-469d-9f25-e43bf95e9ae6",
+    "commodityTypeId": "99ccf663-3304-44ae-b2e0-a67fd5511e2a",
     "processingPeriodId": "61694e82-1be6-40a4-9aaa-bfbb720a0d7d",
     "amount": 4562
   },
@@ -86,7 +86,7 @@
   {
     "id": "dd0371c8-c42c-472a-875a-7caa8a1d5e3b",
     "facilityId": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
-    "commodityTypeId": "fee5692c-5fcd-469d-9f25-e43bf95e9ae6",
+    "commodityTypeId": "99ccf663-3304-44ae-b2e0-a67fd5511e2a",
     "processingPeriodId": "516ac930-0d28-49f5-a178-64764e22b236",
     "amount": 5200
   },
@@ -114,7 +114,7 @@
   {
     "id": "8aaf8147-3220-4418-b431-3850f4c5a086",
     "facilityId": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
-    "commodityTypeId": "fee5692c-5fcd-469d-9f25-e43bf95e9ae6",
+    "commodityTypeId": "99ccf663-3304-44ae-b2e0-a67fd5511e2a",
     "processingPeriodId": "04ec3c83-a086-4792-b7a3-c46559b7f6cd",
     "amount": 2200
   },
@@ -142,7 +142,7 @@
   {
     "id": "23d1fa3b-058e-487e-bb84-19bdb1decc88",
     "facilityId": "7938919f-6f61-4d1a-a4dc-923c31e9cd45",
-    "commodityTypeId": "fee5692c-5fcd-469d-9f25-e43bf95e9ae6",
+    "commodityTypeId": "99ccf663-3304-44ae-b2e0-a67fd5511e2a",
     "processingPeriodId": "61694e82-1be6-40a4-9aaa-bfbb720a0d7d",
     "amount": 4562
   },
