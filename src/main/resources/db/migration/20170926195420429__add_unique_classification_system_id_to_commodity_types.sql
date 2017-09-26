@@ -1,0 +1,1 @@
+ALTER TABLE commodity_types ADD UNIQUE (classificationsystem, classificationid);

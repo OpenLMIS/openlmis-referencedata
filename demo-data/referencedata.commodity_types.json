@@ -2,25 +2,25 @@
   {
     "id": "99ccf663-3304-44ae-b2e0-a67fd5511e2a",
     "name": "BCG",
-    "classificationSystem": "cSys",
-    "classificationId": "cId"
+    "classificationSystem": "UNSPSC",
+    "classificationId": "51201647"
   },
   {
     "id": "c46c3872-3f64-417f-9d03-235eaa100858",
-    "name": "Polio (10 dose)",
-    "classificationSystem": "cSys",
-    "classificationId": "cId"
+    "name": "Polio",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "51201616"
   },
   {
     "id": "08561b98-2f90-4c4a-a1e3-f180a83abd66",
-    "name": "Polio (20 dose)",
-    "classificationSystem": "cSys",
-    "classificationId": "cId"
+    "name": "HPV",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "51201649"
   },
   {
     "id": "3de6338c-e303-4650-8744-ceac8009bba1",
-    "name": "Pentavalent",
-    "classificationSystem": "cSys",
-    "classificationId": "cId"
+    "name": "Measles",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "51201609"
   }
 ]

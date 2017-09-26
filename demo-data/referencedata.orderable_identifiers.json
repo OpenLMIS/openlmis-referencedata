@@ -41,12 +41,17 @@
   },
   {
     "key": "commodityType",
-    "value": "08561b98-2f90-4c4a-a1e3-f180a83abd66",
+    "value": "c46c3872-3f64-417f-9d03-235eaa100858",
     "orderableId": "8f5e5923-e192-40b1-bf9e-3b4444579e05"
   },
   {
     "key": "commodityType",
+    "value": "08561b98-2f90-4c4a-a1e3-f180a83abd66",
+    "orderableId": "047638fa-92ce-4adf-9bbd-3bcb3216897a"
+  },
+  {
+    "key": "commodityType",
     "value": "3de6338c-e303-4650-8744-ceac8009bba1",
-    "orderableId": "b0c0426e-6840-4531-a116-043ba854c58b"
+    "orderableId": "71204042-558e-4c47-a602-7886451e5689"
   }
 ]
