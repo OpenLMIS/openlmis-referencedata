@@ -53,6 +53,7 @@ import javax.persistence.Table;
 public final class CommodityType extends BaseEntity {
 
   @Column(nullable = false)
+  @Getter
   private String name;
 
   @Getter

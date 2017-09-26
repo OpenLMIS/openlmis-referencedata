@@ -12,27 +12,22 @@
       "type": "object",
       "$ref": "basicFacilityDto.json"
     },
-    "program": {
+    "commodityType": {
       "type": "object",
-      "$ref": "program.json"
-    },
-    "orderable": {
-      "type": "object",
-      "$ref": "orderable.json"
+      "$ref": "commodityType.json"
     },
     "processingPeriod": {
       "type": "object",
       "$ref": "processingPeriod.json"
     },
     "amount": {
-      "type": "sting",
+      "type": "integer",
       "title": "amount"
-    },
+    }
   },
   "required": [
     "facility",
-    "program",
-    "orderable",
+    "commodityType",
     "processingPeriod",
     "amount"
   ]

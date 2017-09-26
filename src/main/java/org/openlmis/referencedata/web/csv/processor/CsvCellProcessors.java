@@ -34,16 +34,14 @@ import java.util.Map;
 public class CsvCellProcessors {
 
   public static final String FACILITY_TYPE = "Facility";
-  public static final String PROGRAM_TYPE = "Program";
-  public static final String ORDERABLE_TYPE = "Orderable";
+  public static final String COMMODITY_TYPE = "CommodityType";
   public static final String PROCESSING_PERIOD_TYPE = "ProcessingPeriod";
 
   private static final Map<String, CellProcessor> typeExportMappings = new HashMap<>();
 
   static {
     typeExportMappings.put(FACILITY_TYPE, new FormatFacility());
-    typeExportMappings.put(PROGRAM_TYPE, new FormatProgram());
-    typeExportMappings.put(ORDERABLE_TYPE, new FormatOrderable());
+    typeExportMappings.put(COMMODITY_TYPE, new FormatCommodityType());
     typeExportMappings.put(PROCESSING_PERIOD_TYPE, new FormatProcessingPeriod());
   }
 

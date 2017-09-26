@@ -15,13 +15,13 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
-public class FormatOrderable extends CellProcessorAdaptor implements StringCellProcessor {
+public class FormatCommodityType extends CellProcessorAdaptor implements StringCellProcessor {
 
   @SuppressWarnings("unchecked")
   @Override
@@ -29,14 +29,14 @@ public class FormatOrderable extends CellProcessorAdaptor implements StringCellP
     validateInputNotNull(value, context);
 
     String result;
-    if (value instanceof OrderableDto) {
-      OrderableDto orderable = (OrderableDto) value;
+    if (value instanceof CommodityTypeDto) {
+      CommodityTypeDto commodityType = (CommodityTypeDto) value;
 
-      if (orderable.getProductCode() == null) {
-        throw getSuperCsvCellProcessorException(orderable, context);
+      if (commodityType.getName() == null) {
+        throw getSuperCsvCellProcessorException(commodityType, context);
       }
 
-      result = orderable.getProductCode();
+      result = commodityType.getName();
     } else  {
       throw getSuperCsvCellProcessorException(value, context);
     }
@@ -47,7 +47,7 @@ public class FormatOrderable extends CellProcessorAdaptor implements StringCellP
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
                                                                            CsvContext context) {
     return new SuperCsvCellProcessorException(
-        String.format("Cannot get product code from '%s'.", value.toString()),
+        String.format("Cannot get commodity type name from '%s'.", value.toString()),
         context, this);
   }
 }

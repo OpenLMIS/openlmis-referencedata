@@ -22,14 +22,13 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Dispensable;
+import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.IdealStockAmount;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.util.Pagination;
@@ -40,11 +39,13 @@ import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.UUID;
 
+import static org.apache.commons.lang3.StringUtils.joinWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -61,23 +62,30 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   private IdealStockAmountRepository repository;
 
   private IdealStockAmount isa;
+  private Facility facility;
+  private CommodityType commodityType;
+  private ProcessingPeriod period;
+  private ProcessingSchedule schedule;
 
   @Before
   public void setUp() {
-    final Facility facility = new Facility("facility-code");
-    final Program program = new Program("program-code");
-    final Orderable orderable = new Orderable(Code.code("product-code"),
-        Dispensable.createNew("each"), "fullname", "description", 10, 1, true, new HashSet<>(),
-        new HashMap<>(), new HashMap<>());
-    ProcessingPeriod period = new ProcessingPeriod();
-    ProcessingSchedule schedule = new ProcessingSchedule();
+    facility = new Facility("facility-code");
+    GeographicLevel countryLevel = new GeographicLevel("Country", 1);
+    facility.setGeographicZone(new GeographicZone("TC", countryLevel));
+    commodityType = new CommodityType("Name", "cSys", "cId", null, new ArrayList<>());
+    period = new ProcessingPeriod();
+    schedule = new ProcessingSchedule();
     schedule.setCode("schedule-code");
+    schedule.setDescription("desc");
+    schedule.setId(UUID.randomUUID());
+    schedule.setModifiedDate(ZonedDateTime.now());
+    schedule.setName("schedule");
     period.setProcessingSchedule(schedule);
     period.setName("period");
     period.setStartDate(LocalDate.of(2017, 8, 25));
     period.setEndDate(LocalDate.of(2017, 9, 25));
 
-    isa = new IdealStockAmount(facility, program, orderable, period, 1200);
+    isa = new IdealStockAmount(facility, commodityType, period, 1200);
   }
 
   @Test
@@ -85,7 +93,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
     when(repository.findAll(any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(isa), null, 1));
 
-    PageImplRepresentation response = getCatalogItems(null, null)
+    PageImplRepresentation response = getIdealStockAmounts(null, null)
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
@@ -93,12 +101,12 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
     assertEquals(response.getContent().size(), 1);
     verifyNoMoreInteractions(rightService);
     verify(repository).findAll(any(Pageable.class));
-    //assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldDownloadCsvWithAllPossibleFields() throws IOException {
-    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNT_MANAGE);
+    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
     when(repository.findAll()).thenReturn(Arrays.asList(isa));
 
     String csvContent = download()
@@ -107,14 +115,15 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .extract().body().asString();
 
     verify(repository).findAll();
-    assertEquals("Facility Code,Program Code,Product Code,Period,Ideal Stock Amount\r\n"
-        + "facility-code,program-code,product-code,schedule-code period,1200\r\n", csvContent);
+    assertEquals("Facility Code,Commodity Type,Period,Ideal Stock Amount\r\n"
+        + joinWith(",", facility.getCode(), commodityType.getName(),
+        schedule.getCode() + " " + period.getName(), isa.getAmount()) + "\r\n", csvContent);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldDownloadCsvWithHeadersOnly() throws IOException {
-    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNT_MANAGE);
+    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
     when(repository.findAll())
         .thenReturn(Collections.emptyList());
 
@@ -124,15 +133,15 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .extract().body().asString();
 
     verify(repository).findAll();
-    assertEquals("Facility Code,Program Code,Product Code,Period,Ideal Stock Amount\r\n",
+    assertEquals("Facility Code,Commodity Type,Period,Ideal Stock Amount\r\n",
         csvContent);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldReturnUnauthorizedWhenUploadCsvIfUserHasNoIdealStockAmountManage()
+  public void shouldReturnUnauthorizedWhenDownloadingCsvIfUserHasNoIdealStockAmountManage()
       throws IOException {
-    mockUserHasNoRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNT_MANAGE);
+    mockUserHasNoRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
 
     String messageKey = download()
         .then()
@@ -155,7 +164,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .get(RESOURCE_URL);
   }
 
-  private Response getCatalogItems(Integer page, Integer size) {
+  private Response getIdealStockAmounts(Integer page, Integer size) {
     RequestSpecification request = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())

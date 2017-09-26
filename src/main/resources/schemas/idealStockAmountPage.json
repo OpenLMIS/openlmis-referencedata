@@ -6,7 +6,7 @@
   "properties": {
     "content": {
       "type": "array",
-      "items": { "type": "object", "$ref": "orderable.json" }
+      "items": { "type": "object", "$ref": "idealStockAmount.json" }
     },
     "totalPages": { "type": "integer", "title": "totalPages" },
     "totalElements": { "type": "integer", "title": "totalElements" },

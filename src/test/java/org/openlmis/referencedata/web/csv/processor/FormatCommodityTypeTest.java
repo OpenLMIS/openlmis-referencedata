@@ -20,13 +20,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 import static org.junit.Assert.assertEquals;
 
-public class FormatOrderableTest {
+public class FormatCommodityTypeTest {
 
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
@@ -34,33 +34,33 @@ public class FormatOrderableTest {
   @Mock
   private CsvContext csvContext;
 
-  private FormatOrderable formatOrderable;
+  private FormatCommodityType formatCommodityType;
 
   @Before
   public void beforeEach() {
-    formatOrderable = new FormatOrderable();
+    formatCommodityType = new FormatCommodityType();
   }
 
   @Test
-  public void shouldFormatValidOrderable() throws Exception {
-    OrderableDto orderable = new OrderableDto();
-    orderable.setProductCode("product-code");
+  public void shouldFormatValidCommodityType() throws Exception {
+    CommodityTypeDto commodityType = new CommodityTypeDto();
+    commodityType.setName("commodity-type-name");
 
-    String result = (String) formatOrderable.execute(orderable, csvContext);
+    String result = (String) formatCommodityType.execute(commodityType, csvContext);
 
-    assertEquals("product-code", result);
+    assertEquals("commodity-type-name", result);
   }
 
   @Test
   public void shouldThrownExceptionWhenProductCodeIsNull() {
-    OrderableDto orderable = new OrderableDto();
-    orderable.setProductCode(null);
+    CommodityTypeDto commodityType = new CommodityTypeDto();
+    commodityType.setName(null);
 
     expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get product code from '%s'.",
-        orderable.toString()));
+    expectedEx.expectMessage(String.format("Cannot get commodity type name from '%s'.",
+        commodityType.toString()));
 
-    formatOrderable.execute(orderable, csvContext);
+    formatCommodityType.execute(commodityType, csvContext);
   }
 
   @Test
@@ -68,8 +68,8 @@ public class FormatOrderableTest {
     String invalid = "invalid-type";
 
     expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get product code from '%s'.", invalid));
+    expectedEx.expectMessage(String.format("Cannot get commodity type name from '%s'.", invalid));
 
-    formatOrderable.execute(invalid, csvContext);
+    formatCommodityType.execute(invalid, csvContext);
   }
 }

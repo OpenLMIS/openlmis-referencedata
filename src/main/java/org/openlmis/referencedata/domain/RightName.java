@@ -32,5 +32,6 @@ public class RightName {
       "FACILITY_APPROVED_ORDERABLES_MANAGE";
   public static final String RIGHTS_VIEW = "RIGHTS_VIEW";
   public static final String PROGRAMS_MANAGE = "PROGRAMS_MANAGE";
-  public static final String SYSTEM_IDEAL_STOCK_AMOUNT_MANAGE = "SYSTEM_IDEAL_STOCK_AMOUNT_MANAGE";
+  public static final String SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE =
+      "SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE";
 }

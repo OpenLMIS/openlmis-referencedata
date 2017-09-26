@@ -85,7 +85,7 @@ public class IdealStockAmountController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   public void download(@RequestParam(FORMAT) String format,
                        HttpServletResponse response) throws IOException {
-    rightService.checkAdminRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNT_MANAGE);
+    rightService.checkAdminRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
 
     if (!CSV.equals(format)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -97,7 +97,7 @@ public class IdealStockAmountController extends BaseController {
 
     response.setContentType("text/csv");
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
-        DISPOSITION_BASE + "catalog_items.csv");
+        DISPOSITION_BASE + "ideal_stock_amounts.csv");
 
     try {
       csvFormatter.process(

@@ -19,17 +19,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.web.csv.model.ImportField;
 
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.COMMODITY_TYPE;
 import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.FACILITY_TYPE;
-import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.ORDERABLE_TYPE;
 import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.PROCESSING_PERIOD_TYPE;
-import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.PROGRAM_TYPE;
 
 @Getter
 @Setter
@@ -39,19 +37,15 @@ public class IdealStockAmountDto extends BaseDto
     implements IdealStockAmount.Exporter, IdealStockAmount.Importer {
 
   public static final String FACILITY_CODE = "Facility Code";
-  public static final String PROGRAM_CODE = "Program Code";
-  public static final String PRODUCT_CODE = "Product Code";
+  public static final String COMMODITY = "Commodity Type";
   public static final String PERIOD = "Period";
   public static final String IDEAL_STOCK_AMOUNT = "Ideal Stock Amount";
 
   @ImportField(name = FACILITY_CODE, type = FACILITY_TYPE, mandatory = true)
   private BasicFacilityDto facility;
 
-  @ImportField(name = PROGRAM_CODE, type = PROGRAM_TYPE, mandatory = true)
-  private ProgramDto program;
-
-  @ImportField(name = PRODUCT_CODE, type = ORDERABLE_TYPE, mandatory = true)
-  private OrderableDto orderable;
+  @ImportField(name = COMMODITY, type = COMMODITY_TYPE, mandatory = true)
+  private CommodityTypeDto commodityType;
 
   @ImportField(name = PERIOD, type = PROCESSING_PERIOD_TYPE, mandatory = true)
   private ProcessingPeriodDto processingPeriod;
@@ -66,15 +60,9 @@ public class IdealStockAmountDto extends BaseDto
   }
 
   @Override
-  public void setProgram(Program program) {
-    this.program = new ProgramDto();
-    program.export(this.program);
-  }
-
-  @Override
-  public void setOrderable(Orderable orderable) {
-    this.orderable = new OrderableDto();
-    orderable.export(this.orderable);
+  public void setCommodityType(CommodityType commodityType) {
+    this.commodityType = new CommodityTypeDto();
+    commodityType.export(this.commodityType);
   }
 
   @Override
