@@ -50,6 +50,16 @@ public class TestDataInitializer implements CommandLineRunner {
   @Value(value = PERF_DATA_PATH + "supported_programs.csv")
   private Resource supportedProgramsResource;
 
+  @Value(value = PERF_DATA_PATH + "fullSupplyProducts.csv")
+  private Resource fullSupplyProductsResource;
+
+  @Value(value = PERF_DATA_PATH + "nonfullSupplyProducts.csv")
+  private Resource nonfullSupplyProductsResource;
+
+  @Value(value = PERF_DATA_PATH +
+      "facilityTypeApprovedProductsForEssentialMedicinesDistrictHospital.csv")
+  private Resource ftapResource;
+
   @Autowired
   private JdbcTemplate template;
 
@@ -68,6 +78,9 @@ public class TestDataInitializer implements CommandLineRunner {
     r2db.insertToDbFromCsv("referencedata.requisition_group_members",
         requisitionGroupMembersResource);
     r2db.insertToDbFromCsv("referencedata.supported_programs", supportedProgramsResource);
+    r2db.insertToDbFromCsv("referencedata.program_orderables", fullSupplyProductsResource);
+    r2db.insertToDbFromCsv("referencedata.program_orderables", nonfullSupplyProductsResource);
+    r2db.insertToDbFromCsv("referencedata.facility_type_approved_products", ftapResource);
 
     XLOGGER.exit();
   }

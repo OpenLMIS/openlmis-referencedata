@@ -1,0 +1,69 @@
+{
+  "id": 80376,
+  "num_rows": 10000,
+  "file_format": "csv",
+  "name": "facility type approved products for Essential Medicines & District Hospital",
+  "include_header": true,
+  "columns": [
+    {
+      "name": "id",
+      "null_percentage": 0,
+      "type": "GUID",
+      "formula": ""
+    },
+    {
+      "name": "emergencyorderpoint",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 1,
+      "max": 5,
+      "decimals": 0,
+      "formula": ""
+    },
+    {
+      "name": "maxperiodsofstock",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 10,
+      "max": 100,
+      "decimals": 0,
+      "formula": ""
+    },
+    {
+      "name": "minperiodsofstock",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 1,
+      "max": 9,
+      "decimals": 0,
+      "formula": ""
+    },
+    {
+      "name": "facilitytypeid",
+      "null_percentage": 0,
+      "type": "Dataset Column",
+      "dataset": "FacilityTypesAll",
+      "column": "id",
+      "selectionStyle": "custom",
+      "formula": ""
+    },
+    {
+      "name": "orderableid",
+      "null_percentage": 0,
+      "type": "Dataset Column",
+      "dataset": "Orderables",
+      "column": "id",
+      "selectionStyle": "sequential",
+      "formula": ""
+    },
+    {
+      "name": "programid",
+      "null_percentage": 0,
+      "type": "Dataset Column",
+      "dataset": "Programs2",
+      "column": "id",
+      "selectionStyle": "custom",
+      "formula": ""
+    }
+  ]
+}
