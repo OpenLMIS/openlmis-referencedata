@@ -28,5 +28,25 @@
     "key": "tradeItem",
     "value": "d25b86ed-0d35-4861-bd3e-1fcc42443aa5",
     "orderableId": "6be94307-c7f4-4782-ba83-45f496c8ac42"
+  },
+  {
+    "key": "commodityType",
+    "value": "cfee5692c-5fcd-469d-9f25-e43bf95e9ae6",
+    "orderableId": "9c3bea84-487b-4e22-8759-3fe93f8201d9"
+  },
+  {
+    "key": "commodityType",
+    "value": "c46c3872-3f64-417f-9d03-235eaa100858",
+    "orderableId": "0a83fb92-289b-45c9-adba-f2ac7647312e"
+  },
+  {
+    "key": "commodityType",
+    "value": "08561b98-2f90-4c4a-a1e3-f180a83abd66",
+    "orderableId": "8f5e5923-e192-40b1-bf9e-3b4444579e05"
+  },
+  {
+    "key": "commodityType",
+    "value": "3de6338c-e303-4650-8744-ceac8009bba1",
+    "orderableId": "b0c0426e-6840-4531-a116-043ba854c58b"
   }
 ]

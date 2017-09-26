@@ -1,31 +1,25 @@
 [
   {
-    "id": "fee5692c-5fcd-469d-9f25-e43bf95e9ae6",
-    "name": "Ibuprofen 100mg",
+    "id": "cfee5692c-5fcd-469d-9f25-e43bf95e9ae6",
+    "name": "BCG",
     "classificationSystem": "cSys",
     "classificationId": "cId"
   },
   {
     "id": "c46c3872-3f64-417f-9d03-235eaa100858",
-    "name": "Paracetamol 500mg",
+    "name": "Polio (10 dose)",
     "classificationSystem": "cSys",
     "classificationId": "cId"
   },
   {
     "id": "08561b98-2f90-4c4a-a1e3-f180a83abd66",
-    "name": "Water for injection 10mls",
+    "name": "Polio (20 dose)",
     "classificationSystem": "cSys",
     "classificationId": "cId"
   },
   {
     "id": "3de6338c-e303-4650-8744-ceac8009bba1",
-    "name": "Ketamine 50mg/ml injection",
-    "classificationSystem": "cSys",
-    "classificationId": "cId"
-  },
-  {
-    "id": "ab7e681e-7ecc-4db4-97cf-0696ac1bf51a",
-    "name": "Penicillin Benzathine benzyl",
+    "name": "Pentavalent",
     "classificationSystem": "cSys",
     "classificationId": "cId"
   }
