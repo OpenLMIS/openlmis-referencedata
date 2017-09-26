@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata;
 
-import java.io.IOException;
+import java.util.concurrent.Future;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -45,10 +45,20 @@ public class RightAssignmentInitializer implements CommandLineRunner {
    * Re-generates right assignments.
    * @param args command line arguments
    */
-  public void run(String... args) throws IOException {
+  public void run(String... args) throws InterruptedException {
     XLOGGER.entry();
     
-    rightAssignmentService.regenerateRightAssignments();
+    Future<Void> result = rightAssignmentService.regenerateRightAssignments();
+
+    // Wait until it finishes
+    while (true) {
+      if (result.isDone()) {
+        break;
+      }
+      Thread.sleep(1000);
+    }
+
+    XLOGGER.debug("Finished regenerating right assignments");
     
     XLOGGER.exit();
   }

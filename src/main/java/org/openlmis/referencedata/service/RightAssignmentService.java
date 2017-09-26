@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +77,7 @@ public class RightAssignmentService {
    */
   @Async
   @Transactional(isolation = Isolation.READ_UNCOMMITTED)
-  public void regenerateRightAssignments() {
+  public Future<Void> regenerateRightAssignments() {
     XLOGGER.entry();
 
     // Drop existing rows; we are regenerating from scratch
@@ -101,6 +103,7 @@ public class RightAssignmentService {
     }
 
     XLOGGER.exit();
+    return new AsyncResult<>(null);
   }
 
   private void insertFromDbRightAssignmentList(Resource2Db resource2Db,

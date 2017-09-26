@@ -1,3 +1,13 @@
+-- This SQL query is necessary in order to conceptually separate out the recursion involved in 
+-- getting all supervised facilities, direct and indirect, under a supervisory node.
+--
+-- The recursive CTE supervisory_nodes_recursive returns a list of all supervisory node IDs that 
+-- are descendants of the supervisory node ID specified. That list is then fed to the query below
+-- to expand each supervisory node ID into a list of facility IDs (based on the specified program
+-- ID), then merged into a distinct list.
+--
+-- Input: supervisory node ID and program ID
+-- Output: a list of all supervised facility IDs
 WITH RECURSIVE supervisory_nodes_recursive AS
 (
   SELECT sn.id
