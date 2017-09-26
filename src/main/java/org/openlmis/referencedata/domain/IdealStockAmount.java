@@ -42,16 +42,10 @@ public class IdealStockAmount extends BaseEntity {
   private Facility facility;
 
   @ManyToOne
-  @JoinColumn(name = "programid", nullable = false)
+  @JoinColumn(name = "commoditytypeid", nullable = false)
   @Getter
   @Setter
-  private Program program;
-
-  @ManyToOne
-  @JoinColumn(name = "orderableid", nullable = false)
-  @Getter
-  @Setter
-  private Orderable orderable;
+  private CommodityType commodityType;
 
   @ManyToOne
   @JoinColumn(name = "processingperiodid", nullable = false)
@@ -73,8 +67,7 @@ public class IdealStockAmount extends BaseEntity {
   public static IdealStockAmount newIdealStockAmount(Importer importer) {
 
     IdealStockAmount isa = new IdealStockAmount(Facility.newFacility(importer.getFacility()),
-        Program.newProgram(importer.getProgram()),
-        Orderable.newInstance(importer.getOrderable()),
+        CommodityType.newInstance(importer.getCommodityType()),
         ProcessingPeriod.newPeriod(importer.getProcessingPeriod()),
         importer.getAmount());
     isa.setId(importer.getId());
@@ -89,8 +82,7 @@ public class IdealStockAmount extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setFacility(facility);
-    exporter.setProgram(program);
-    exporter.setOrderable(orderable);
+    exporter.setCommodityType(commodityType);
     exporter.setProcessingPeriod(processingPeriod);
     exporter.setAmount(amount);
   }
@@ -101,9 +93,7 @@ public class IdealStockAmount extends BaseEntity {
 
     void setFacility(Facility facility);
 
-    void setProgram(Program program);
-
-    void setOrderable(Orderable orderable);
+    void setCommodityType(CommodityType commodityType);
 
     void setProcessingPeriod(ProcessingPeriod processingPeriod);
 
@@ -116,9 +106,7 @@ public class IdealStockAmount extends BaseEntity {
 
     Facility.Importer getFacility();
 
-    Program.Importer getProgram();
-
-    Orderable.Importer getOrderable();
+    CommodityType.Importer getCommodityType();
 
     ProcessingPeriod.Importer getProcessingPeriod();
 
