@@ -33,7 +33,7 @@ import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.PRO
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class IdealStockAmountDto extends BaseDto
+public class IdealStockAmountCsvModel extends BaseDto
     implements IdealStockAmount.Exporter, IdealStockAmount.Importer {
 
   public static final String FACILITY_CODE = "Facility Code";

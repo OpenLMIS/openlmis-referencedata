@@ -17,7 +17,7 @@ package org.openlmis.referencedata.web;
 
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.dto.IdealStockAmountDto;
+import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.i18n.MessageService;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
@@ -70,7 +70,7 @@ public class IdealStockAmountController extends BaseController {
   @GetMapping("/idealStockAmounts")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<IdealStockAmountDto> getAll(Pageable pageable) {
+  public Page<IdealStockAmountCsvModel> getAll(Pageable pageable) {
     Page<IdealStockAmount> itemsPage = repository.findAll(pageable);
 
     return Pagination.getPage(toDto(itemsPage.getContent()), pageable,
@@ -93,7 +93,7 @@ public class IdealStockAmountController extends BaseController {
       return;
     }
 
-    List<IdealStockAmountDto> items = toDto(repository.findAll());
+    List<IdealStockAmountCsvModel> items = toDto(repository.findAll());
 
     response.setContentType("text/csv");
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
@@ -101,19 +101,19 @@ public class IdealStockAmountController extends BaseController {
 
     try {
       csvFormatter.process(
-          response.getOutputStream(), new ModelClass(IdealStockAmountDto.class), items);
+          response.getOutputStream(), new ModelClass(IdealStockAmountCsvModel.class), items);
     } catch (IOException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
   }
 
-  private IdealStockAmountDto toDto(IdealStockAmount isa) {
-    IdealStockAmountDto dto = new IdealStockAmountDto();
+  private IdealStockAmountCsvModel toDto(IdealStockAmount isa) {
+    IdealStockAmountCsvModel dto = new IdealStockAmountCsvModel();
     isa.export(dto);
     return dto;
   }
 
-  private List<IdealStockAmountDto> toDto(Iterable<IdealStockAmount> items) {
+  private List<IdealStockAmountCsvModel> toDto(Iterable<IdealStockAmount> items) {
     return StreamSupport
         .stream(items.spliterator(), false)
         .map(this::toDto)
