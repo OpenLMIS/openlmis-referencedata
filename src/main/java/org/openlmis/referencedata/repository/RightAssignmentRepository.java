@@ -36,4 +36,9 @@ public interface RightAssignmentRepository extends
   Set<String> findByUser(@Param("userId") UUID userId);
 
   boolean existsByUserIdAndRightName(UUID user, String rightName);
+  
+  boolean existsByUserIdAndAndRightNameAndFacilityId(UUID user, String rightName, UUID facilityId);
+
+  boolean existsByUserIdAndAndRightNameAndFacilityIdAndProgramId(UUID user, String rightName,
+      UUID facilityId, UUID programId);
 }

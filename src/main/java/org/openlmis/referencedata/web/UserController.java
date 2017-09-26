@@ -37,7 +37,6 @@ import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
@@ -63,6 +62,7 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
@@ -364,33 +364,53 @@ public class UserController extends BaseController {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
     profiler.start("VALIDATE_USER");
-    final User user = validateUser(userId);
+    if (!userRepository.exists(userId)) {
+      throw new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId));
+    }
 
-    profiler.start("CONSTRUCT_RIGHT_QUERY");
-    RightQuery rightQuery;
+    boolean hasRight;
+
+    profiler.start("GET_RIGHT");
     Right right = rightRepository.findOne(rightId);
+
     if (programId != null) {
+      profiler.start("CHECK_PROGRAM_EXISTS");
+      if (!programRepository.exists(programId)) {
+        throw new ValidationMessageException(new Message(
+            ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
+      }
 
-      Program program = programRepository.findOne(programId);
       if (facilityId != null) {
+        profiler.start("CHECK_FACILITY_EXISTS");
+        if (!facilityRepository.exists(facilityId)) {
+          throw new ValidationMessageException(new Message(
+              FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
+        }
 
-        Facility facility = facilityRepository.findOne(facilityId);
-        rightQuery = new RightQuery(right, program, facility);
+        profiler.start("CHECK_HAS_RIGHT_BY_USER_RIGHT_FACILITY_PROGRAM");
+        hasRight = rightAssignmentRepository.existsByUserIdAndAndRightNameAndFacilityIdAndProgramId(
+            userId, right.getName(), facilityId, programId);
 
       } else {
         throw new ValidationMessageException(UserMessageKeys.ERROR_PROGRAM_WITHOUT_FACILITY);
       }
+
     } else if (warehouseId != null) {
 
-      Facility warehouse = facilityRepository.findOne(warehouseId);
-      rightQuery = new RightQuery(right, warehouse);
+      profiler.start("CHECK_WAREHOUSE_EXISTS");
+      if (!facilityRepository.exists(warehouseId)) {
+        throw new ValidationMessageException(new Message(
+            FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
+      }
+
+      profiler.start("CHECK_HAS_RIGHT_BY_USER_RIGHT_WAREHOUSE");
+      hasRight = rightAssignmentRepository.existsByUserIdAndAndRightNameAndFacilityId(
+          userId, right.getName(), facilityId);
 
     } else {
-      rightQuery = new RightQuery(right);
+      profiler.start("CHECK_HAS_RIGHT_BY_USER_RIGHT");
+      hasRight = rightAssignmentRepository.existsByUserIdAndRightName(userId, right.getName());
     }
-
-    profiler.start("RUN_RIGHT_QUERY");
-    boolean hasRight = user.hasRight(rightQuery);
 
     profiler.stop().log();
     return new ResultDto<>(hasRight);
