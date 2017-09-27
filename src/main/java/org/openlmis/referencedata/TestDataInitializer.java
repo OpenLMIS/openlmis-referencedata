@@ -57,7 +57,7 @@ public class TestDataInitializer implements CommandLineRunner {
   private Resource nonfullSupplyProductsResource;
 
   @Value(value = PERF_DATA_PATH
-      + "facilityTypeApprovedProductsForEssentialMedicinesDistrictHospital.csv")
+      + "facility_type_approved_products_for_Essential_Medicines___District_Hospital.csv")
   private Resource ftapResource;
 
   @Autowired
