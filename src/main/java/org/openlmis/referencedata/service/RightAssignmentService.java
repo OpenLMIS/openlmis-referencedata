@@ -76,7 +76,7 @@ public class RightAssignmentService {
    * very often, and the re-generation could take several seconds to finish.
    */
   @Async
-  @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public Future<Void> regenerateRightAssignments() {
     XLOGGER.entry();
 
