@@ -18,6 +18,7 @@ var filesOrdered = [
     "referencedata.supervisory_nodes",
     "referencedata.processing_schedules",
     "referencedata.processing_periods",
+    "referencedata.commodity_types",
     "referencedata.orderable_display_categories",
     "referencedata.orderables",
     "referencedata.programs",
@@ -33,6 +34,7 @@ var filesOrdered = [
     "referencedata.requisition_group_members",
     "referencedata.role_rights",
     "referencedata.trade_items",
+    "referencedata.ideal_stock_amounts",
     "referencedata.lots"
 ]
 
