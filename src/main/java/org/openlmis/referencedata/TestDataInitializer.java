@@ -50,10 +50,10 @@ public class TestDataInitializer implements CommandLineRunner {
   @Value(value = PERF_DATA_PATH + "supported_programs.csv")
   private Resource supportedProgramsResource;
 
-  @Value(value = PERF_DATA_PATH + "fullSupplyProducts.csv")
+  @Value(value = PERF_DATA_PATH + "full_supply_products.csv")
   private Resource fullSupplyProductsResource;
 
-  @Value(value = PERF_DATA_PATH + "nonfullSupplyProducts.csv")
+  @Value(value = PERF_DATA_PATH + "non-full_supply_products.csv")
   private Resource nonfullSupplyProductsResource;
 
   @Value(value = PERF_DATA_PATH
