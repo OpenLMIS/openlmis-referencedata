@@ -103,11 +103,10 @@ public class SupervisoryNodeController extends BaseController {
       @RequestBody SupervisoryNodeDto supervisoryNodeDto) {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
-    LOGGER.debug("Creating new supervisoryNode");
     supervisoryNodeDto.setId(null);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
     supervisoryNodeRepository.save(supervisoryNode);
-    LOGGER.debug("Created new supervisoryNode with id: " + supervisoryNode.getId());
+    LOGGER.info("Created new supervisoryNode with id: {}", supervisoryNode.getId());
     return exportToDto(supervisoryNode);
   }
 
@@ -172,7 +171,7 @@ public class SupervisoryNodeController extends BaseController {
 
     profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
-    LOGGER.debug("Updating supervisoryNode with id: {}", supervisoryNodeId);
+    LOGGER.info("Updating supervisoryNode with id: {}", supervisoryNodeId);
 
     profiler.start("FIND_SUPERVISORY_NODE");
     SupervisoryNode supervisoryNodeToUpdate =
@@ -189,11 +188,10 @@ public class SupervisoryNodeController extends BaseController {
     profiler.start("SAVE_SUPERVISORY_NODE");
     supervisoryNodeRepository.saveAndFlush(supervisoryNodeToUpdate);
 
-    LOGGER.debug("Regenerating right assignments");
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
     rightAssignmentService.regenerateRightAssignments();
 
-    LOGGER.debug("Updated supervisoryNode with id: {}", supervisoryNodeId);
+    LOGGER.info("Updated supervisoryNode with id: {}", supervisoryNodeId);
     profiler.start("EXPORT_SUPERVISORY_NODE_TO_DTO");
     SupervisoryNodeDto dto = exportToDto(supervisoryNodeToUpdate);
 

@@ -230,11 +230,10 @@ public class FacilityController extends BaseController {
     profiler.start("SAVE_FACILITY");
     facilityToSave = facilityRepository.saveAndFlush(facilityToSave);
 
-    LOGGER.debug("Regenerating right assignments");
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
     rightAssignmentService.regenerateRightAssignments();
 
-    LOGGER.debug("Saved facility with id: {}", facilityToSave.getId());
+    LOGGER.info("Saved facility with id: {}", facilityToSave.getId());
     profiler.start("EXPORT_FACILITY_TO_DTO");
     FacilityDto dto = toDto(facilityToSave);
     

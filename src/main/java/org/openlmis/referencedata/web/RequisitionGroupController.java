@@ -95,7 +95,6 @@ public class RequisitionGroupController extends BaseController {
     profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
 
-    LOGGER.debug("Creating new requisitionGroup");
     profiler.start("VALIDATE_REQUISITION_GROUP_DTO");
     validator.validate(requisitionGroupDto, bindingResult);
 
@@ -107,11 +106,10 @@ public class RequisitionGroupController extends BaseController {
       profiler.start("SAVE_REQUISITION_GROUP");
       requisitionGroupRepository.saveAndFlush(requisitionGroup);
 
-      LOGGER.debug("Regenerating right assignments");
       profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
       rightAssignmentService.regenerateRightAssignments();
 
-      LOGGER.debug("Created new requisitionGroup with id: {}", requisitionGroup.getId());
+      LOGGER.info("Created new requisitionGroup with id: {}", requisitionGroup.getId());
       profiler.start("EXPORT_REQUISITION_GROUP_TO_DTO");
       RequisitionGroupDto dto = exportToDto(requisitionGroup);
 
@@ -192,11 +190,10 @@ public class RequisitionGroupController extends BaseController {
           requisitionGroupRepository.findOne(requisitionGroupId);
 
       if (null == requisitionGroupToUpdate) {
-        LOGGER.info("Creating new requisitionGroup");
         profiler.start("CREATE_REQUISITION_GROUP");
         requisitionGroupToUpdate = new RequisitionGroup();
       } else {
-        LOGGER.debug("Updating requisitionGroup with id: {}", requisitionGroupId);
+        LOGGER.info("Updating requisitionGroup with id: {}", requisitionGroupId);
       }
 
       profiler.start("IMPORT_REQUISITION_GROUP_FROM_DTO");
@@ -206,11 +203,10 @@ public class RequisitionGroupController extends BaseController {
       profiler.start("SAVE_REQUISITION_GROUP");
       requisitionGroupToUpdate = requisitionGroupRepository.saveAndFlush(requisitionGroupToUpdate);
 
-      LOGGER.debug("Regenerating right assignments");
       profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
       rightAssignmentService.regenerateRightAssignments();
 
-      LOGGER.debug("Saved requisitionGroup with id: {}", requisitionGroupToUpdate.getId());
+      LOGGER.info("Saved requisitionGroup with id: {}", requisitionGroupToUpdate.getId());
       profiler.start("EXPORT_REQUISITION_GROUP_TO_DTO");
       RequisitionGroupDto dto = exportToDto(requisitionGroupToUpdate);
 
@@ -247,7 +243,6 @@ public class RequisitionGroupController extends BaseController {
       requisitionGroupRepository.delete(requisitionGroup);
       requisitionGroupRepository.flush();
 
-      LOGGER.debug("Regenerating right assignments");
       profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
       rightAssignmentService.regenerateRightAssignments();
 

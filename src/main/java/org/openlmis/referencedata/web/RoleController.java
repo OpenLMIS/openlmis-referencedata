@@ -149,17 +149,15 @@ public class RoleController extends BaseController {
 
     Role storedRole = roleRepository.findFirstByName(roleDto.getName());
     if (storedRole != null) {
-      LOGGER.error("Role to create already exists");
+      LOGGER.warn("Role to create already exists");
       throw new DataIntegrityViolationException(RoleMessageKeys.ERROR_DUPLICATED);
     }
-
-    LOGGER.debug("Saving new role");
 
     populateRights(roleDto);
     Role newRole = Role.newRole(roleDto);
     roleRepository.save(newRole);
 
-    LOGGER.debug("Saved new role with id: " + newRole.getId());
+    LOGGER.info("Saved new role with id: {}", newRole.getId());
 
     return exportToDto(newRole);
   }
@@ -184,7 +182,7 @@ public class RoleController extends BaseController {
     profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
-    LOGGER.debug("Saving role using id: {}", roleId);
+    LOGGER.info("Saving role using id: {}", roleId);
 
     profiler.start("POPULATE_RIGHTS");
     populateRights(roleDto);
@@ -196,11 +194,10 @@ public class RoleController extends BaseController {
     profiler.start("SAVE_ROLE");
     roleRepository.saveAndFlush(roleToSave);
 
-    LOGGER.debug("Regenerating right assignments");
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
     rightAssignmentService.regenerateRightAssignments();
     
-    LOGGER.debug("Saved role with id: {}", roleToSave.getId());
+    LOGGER.info("Saved role with id: {}", roleToSave.getId());
 
     profiler.start("EXPORT_ROLE_TO_DTO");
     RoleDto dto = exportToDto(roleToSave);
