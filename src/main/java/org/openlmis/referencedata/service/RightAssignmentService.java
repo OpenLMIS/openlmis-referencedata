@@ -69,8 +69,8 @@ public class RightAssignmentService {
 
   /**
    * Re-generates right assignments. This operation needs to be transactional so that dropping 
-   * and re-generating is one transaction. The isolation level is specified to READ_UNCOMMITTED, 
-   * to allow dirty reads on the right assignments table. This is so that any permission checks 
+   * and re-generating is one transaction. The isolation level is specified to READ_COMMITTED, 
+   * to allow proper reads on the right assignments table. This is so that any permission checks 
    * do not have to wait for this re-generation to finish, but can use the "old" right 
    * assignments. This is acceptable since the right assignments table is not expected to change 
    * very often, and the re-generation could take several seconds to finish.
