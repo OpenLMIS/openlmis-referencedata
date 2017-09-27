@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -116,7 +117,8 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
 
     verify(repository).findAll();
     assertEquals("Facility Code,Commodity Type,Period,Ideal Stock Amount\r\n"
-        + joinWith(",", facility.getCode(), commodityType.getName(),
+        + joinWith(",", facility.getCode(), StringUtils.joinWith("|",
+        commodityType.getClassificationSystem(), commodityType.getClassificationId()),
         schedule.getCode() + " " + period.getName(), isa.getAmount()) + "\r\n", csvContent);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

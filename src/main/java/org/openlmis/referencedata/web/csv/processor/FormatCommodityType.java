@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
@@ -22,6 +23,8 @@ import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class FormatCommodityType extends CellProcessorAdaptor implements StringCellProcessor {
+
+  private static final String SEPARATOR = "|";
 
   @SuppressWarnings("unchecked")
   @Override
@@ -32,11 +35,13 @@ public class FormatCommodityType extends CellProcessorAdaptor implements StringC
     if (value instanceof CommodityTypeDto) {
       CommodityTypeDto commodityType = (CommodityTypeDto) value;
 
-      if (commodityType.getName() == null) {
+      if (StringUtils.isEmpty(commodityType.getClassificationSystem())
+          || StringUtils.isEmpty(commodityType.getClassificationId())) {
         throw getSuperCsvCellProcessorException(commodityType, context);
       }
 
-      result = commodityType.getName();
+      result = StringUtils.joinWith(SEPARATOR, commodityType.getClassificationSystem(),
+          commodityType.getClassificationId());
     } else  {
       throw getSuperCsvCellProcessorException(value, context);
     }
@@ -47,7 +52,7 @@ public class FormatCommodityType extends CellProcessorAdaptor implements StringC
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
                                                                            CsvContext context) {
     return new SuperCsvCellProcessorException(
-        String.format("Cannot get commodity type name from '%s'.", value.toString()),
+        String.format("Could not get classification system and id from '%s'.", value.toString()),
         context, this);
   }
 }

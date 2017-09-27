@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,20 +45,34 @@ public class FormatCommodityTypeTest {
   @Test
   public void shouldFormatValidCommodityType() throws Exception {
     CommodityTypeDto commodityType = new CommodityTypeDto();
-    commodityType.setName("commodity-type-name");
+    commodityType.setClassificationId("classification-id");
+    commodityType.setClassificationSystem("classification-system");
 
     String result = (String) formatCommodityType.execute(commodityType, csvContext);
 
-    assertEquals("commodity-type-name", result);
+    assertEquals(StringUtils.joinWith("|", commodityType.getClassificationSystem(),
+        commodityType.getClassificationId()), result);
   }
 
   @Test
-  public void shouldThrownExceptionWhenProductCodeIsNull() {
+  public void shouldThrownExceptionWhenClassificationIdIsNull() {
     CommodityTypeDto commodityType = new CommodityTypeDto();
-    commodityType.setName(null);
+    commodityType.setClassificationId(null);
 
     expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get commodity type name from '%s'.",
+    expectedEx.expectMessage(String.format("Could not get classification system and id from '%s'.",
+        commodityType.toString()));
+
+    formatCommodityType.execute(commodityType, csvContext);
+  }
+
+  @Test
+  public void shouldThrownExceptionWhenClassificationSystemIsNull() {
+    CommodityTypeDto commodityType = new CommodityTypeDto();
+    commodityType.setClassificationSystem(null);
+
+    expectedEx.expect(SuperCsvCellProcessorException.class);
+    expectedEx.expectMessage(String.format("Could not get classification system and id from '%s'.",
         commodityType.toString()));
 
     formatCommodityType.execute(commodityType, csvContext);
@@ -68,7 +83,8 @@ public class FormatCommodityTypeTest {
     String invalid = "invalid-type";
 
     expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get commodity type name from '%s'.", invalid));
+    expectedEx.expectMessage(String.format("Could not get classification system and id from '%s'.",
+        invalid));
 
     formatCommodityType.execute(invalid, csvContext);
   }
