@@ -27,4 +27,4 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-        p90 of GetAnIdealStockAmountCSV>500ms
+      - p90 of GetAnIdealStockAmountCSV>500ms
