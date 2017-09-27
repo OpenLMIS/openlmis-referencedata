@@ -55,6 +55,7 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
@@ -261,6 +262,9 @@ public abstract class BaseWebIntegrationTest {
   
   @MockBean
   protected RoleAssignmentRepository roleAssignmentRepository;
+
+  @MockBean
+  protected IdealStockAmountRepository repository;
 
   /**
    * Constructor for test.

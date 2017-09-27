@@ -31,9 +31,7 @@ import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.util.Pagination;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -58,9 +56,6 @@ import static org.mockito.Mockito.when;
 public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/idealStockAmounts";
-
-  @MockBean
-  private IdealStockAmountRepository repository;
 
   private IdealStockAmount isa;
   private Facility facility;
