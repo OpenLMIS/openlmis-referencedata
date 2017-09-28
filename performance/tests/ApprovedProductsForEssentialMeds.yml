@@ -45,7 +45,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/programs/search?name=Family%20Planning
         method: GET
-        label: GetFamiliPlanningProgram
+        label: GetFamilyPlanningProgram
         headers:
           Authorization: Bearer ${access_token}
         extract-jsonpath:
@@ -78,5 +78,5 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-        90% of get facilities approved full supply products fail to get in 2500ms milliseconds: p90 of GetFacilitiesApprovedFullSupplyProducts>550ms, continue as failed
-        90% of get facilities approved non-full supply products fail to get in 5500ms milliseconds: p90 of GetFacilitiesApprovedNonFullSupplyProducts>350ms, continue as failed
+        90% of get facilities approved full supply products fail to get in 550ms milliseconds: p90 of GetFacilitiesApprovedFullSupplyProducts>550ms, continue as failed
+        90% of get facilities approved non-full supply products fail to get in 350ms milliseconds: p90 of GetFacilitiesApprovedNonFullSupplyProducts>350ms, continue as failed
