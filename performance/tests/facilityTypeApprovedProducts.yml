@@ -1,0 +1,34 @@
+execution:
+  - concurreny: 1
+    iterations: 20
+    scenario: ftaps-get-first-10
+
+scenarios:
+  ftaps-get-first-10:
+    requests:
+      - url: ${__P(base-uri)}/api/oauth/token
+        method: POST
+        label: GetUserToken
+        headers:
+          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
+        body:
+          grant_type: password
+          username: ${__P(username)}
+          password: ${__P(password)}
+        extract-jsonpath:
+          access_token:
+            jsonpath: $.access_token
+      - url: ${__P(base-uri)}/api/facilityTypeApprovedProducts/search?page=1&size=10
+        method: POST
+        label: GetAFacilityTypeApprovedProductsPageOfTen
+        body:
+          facilityType: dist_hosp
+          program: PRG002
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+
+reporting:
+    - module: passfail
+      criteria:
+        90% of get facility type approved products page of ten fail to get in 5000ms milliseconds: p90 of GetAFacilityTypeApprovedProductsPageOfTen>5000ms, continue as failed
