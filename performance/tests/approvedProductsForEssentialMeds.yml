@@ -43,9 +43,9 @@ scenarios:
   get-program-uuid:
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/programs/search?name=Family%20Planning
+      - url: ${__P(base-uri)}/api/programs/search?name=Essential%20Meds
         method: GET
-        label: GetFamilyPlanningProgram
+        label: GetEssentialMedsProgram
         headers:
           Authorization: Bearer ${access_token}
         extract-jsonpath:
@@ -53,9 +53,9 @@ scenarios:
             jsonpath: $.content[:1].id
         jsr223:
           script-text: |
-            String uuid = vars.get("facuuid");
+            String uuid = vars.get("prouuid");
             uuid = uuid.replaceAll(/"|\[|\]/, "");
-            vars.put("facuuid", uuid);
+            vars.put("prouuid", uuid);
   full-supply-approved-products:
     requests:
       - include-scenario: get-facility-uuid
