@@ -18,6 +18,7 @@ package org.openlmis.referencedata.dto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.openlmis.referencedata.util.ServiceUrlProvider;
 
 import java.util.UUID;
 
@@ -35,8 +36,9 @@ public class ObjectReferenceDto extends BaseDto {
    * @param path resource path
    * @param id   object id
    */
-  public ObjectReferenceDto(String serviceUrl, String path, UUID id) {
+  public ObjectReferenceDto(String path, UUID id) {
     this.id = id;
-    this.href = StringUtils.joinWith(SEPARATOR, serviceUrl, path, id);
+    this.href = StringUtils.joinWith(SEPARATOR, ServiceUrlProvider.getInstance().getServiceUrl(),
+        path, id);
   }
 }

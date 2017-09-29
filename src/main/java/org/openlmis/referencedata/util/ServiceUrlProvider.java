@@ -15,27 +15,22 @@
 
 package org.openlmis.referencedata.util;
 
-import org.openlmis.referencedata.domain.IdealStockAmount;
-import org.openlmis.referencedata.dto.IdealStockAmountDto;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Component
-public class IdealStockAmountDtoBuilder {
+@Configurable
+public class ServiceUrlProvider {
+
+  private static ServiceUrlProvider instance = new ServiceUrlProvider();
+
+  public static ServiceUrlProvider getInstance() {
+    return instance;
+  }
 
   @Value("${service.url}")
   private String serviceUrl;
 
-  /**
-   * Builds Ideal Stock Amount dto from {@link IdealStockAmount}
-   *
-   * @param idealStockAmount instance of {@link IdealStockAmount}
-   * @return instance of Ideal Stock Amount dto.
-   */
-  public IdealStockAmountDto build(IdealStockAmount idealStockAmount) {
-    IdealStockAmountDto dto = new IdealStockAmountDto();
-    dto.setServiceUrl(serviceUrl);
-    idealStockAmount.export(dto);
-    return dto;
+  public String getServiceUrl() {
+    return serviceUrl;
   }
 }
