@@ -51,7 +51,7 @@
       "name": "orderableid",
       "null_percentage": 0,
       "type": "Dataset Column",
-      "dataset": "Orderables",
+      "dataset": "orderables 10k",
       "column": "id",
       "selectionStyle": "sequential",
       "formula": ""

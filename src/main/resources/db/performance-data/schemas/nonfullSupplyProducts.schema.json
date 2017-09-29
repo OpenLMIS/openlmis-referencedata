@@ -2,7 +2,7 @@
   "id": 80384,
   "num_rows": 5000,
   "file_format": "csv",
-  "name": "5k non-full supply products",
+  "name": "non-full supply products",
   "include_header": true,
   "columns": [
     {
@@ -53,14 +53,17 @@
     {
       "name": "orderabledisplaycategoryid",
       "null_percentage": 0,
-      "type": "GUID",
+      "type": "Dataset Column",
+      "dataset": "OrderableDisplayCategoriesAll",
+      "column": "id",
+      "selectionStyle": "random",
       "formula": ""
     },
     {
       "name": "orderableid",
       "null_percentage": 0,
       "type": "Dataset Column",
-      "dataset": "Orderables",
+      "dataset": "orderables 10k",
       "column": "id",
       "selectionStyle": "random",
       "formula": ""
