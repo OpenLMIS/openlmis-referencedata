@@ -22,25 +22,38 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 
-@Getter
-@Setter
 public class IdealStockAmountDto extends BaseDto implements IdealStockAmount.Exporter {
 
+  @Setter
+  private String serviceUrl;
+
+  @Getter
+  @Setter
   private ObjectReferenceDto facility;
+
+  @Getter
+  @Setter
   private ObjectReferenceDto commodityType;
+
+  @Getter
+  @Setter
   private ObjectReferenceDto processingPeriod;
+
+  @Getter
+  @Setter
   private Integer amount;
 
   public void setFacility(Facility facility) {
-    this.facility = new ObjectReferenceDto("api/facilities", facility.getId());
+    this.facility = new ObjectReferenceDto(serviceUrl, "api/facilities", facility.getId());
   }
 
   public void setCommodityType(CommodityType commodityType) {
-    this.commodityType = new ObjectReferenceDto("api/commodityTypes", commodityType.getId());
+    this.commodityType = new ObjectReferenceDto(serviceUrl, "api/commodityTypes",
+        commodityType.getId());
   }
 
   public void setProcessingPeriod(ProcessingPeriod processingPeriod) {
-    this.processingPeriod = new ObjectReferenceDto("api/processingPeriods",
+    this.processingPeriod = new ObjectReferenceDto(serviceUrl, "api/processingPeriods",
         processingPeriod.getId());
   }
 }
