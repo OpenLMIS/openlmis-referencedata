@@ -22,6 +22,7 @@ import org.openlmis.referencedata.dto.IdealStockAmountDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.i18n.MessageService;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
+import org.openlmis.referencedata.util.IdealStockAmountDtoBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
@@ -61,6 +62,9 @@ public class IdealStockAmountController extends BaseController {
 
   @Autowired
   private MessageService messageService;
+
+  @Autowired
+  private IdealStockAmountDtoBuilder isaDtoBuilder;
 
   /**
    * Retrieves all Ideal Stock Amounts.
@@ -121,16 +125,10 @@ public class IdealStockAmountController extends BaseController {
         .collect(Collectors.toList());
   }
 
-  private IdealStockAmountDto toDto(IdealStockAmount isa) {
-    IdealStockAmountDto dto = new IdealStockAmountDto();
-    isa.export(dto);
-    return dto;
-  }
-
   private List<IdealStockAmountDto> toDto(Iterable<IdealStockAmount> items) {
     return StreamSupport
         .stream(items.spliterator(), false)
-        .map(this::toDto)
+        .map(isa -> isaDtoBuilder.build(isa))
         .collect(Collectors.toList());
   }
 }
