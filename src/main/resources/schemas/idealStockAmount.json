@@ -10,15 +10,15 @@
     },
     "facility": {
       "type": "object",
-      "$ref": "basicFacilityDto.json"
+      "$ref": "referenceObjectDto.json"
     },
     "commodityType": {
       "type": "object",
-      "$ref": "commodityType.json"
+      "$ref": "referenceObjectDto.json"
     },
     "processingPeriod": {
       "type": "object",
-      "$ref": "processingPeriod.json"
+      "$ref": "referenceObjectDto.json"
     },
     "amount": {
       "type": "integer",

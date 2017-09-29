@@ -65,7 +65,6 @@ public class IdealStockAmount extends BaseEntity {
    * @return new instance of ideal stock amount.
    */
   public static IdealStockAmount newIdealStockAmount(Importer importer) {
-
     IdealStockAmount isa = new IdealStockAmount(Facility.newFacility(importer.getFacility()),
         CommodityType.newInstance(importer.getCommodityType()),
         ProcessingPeriod.newPeriod(importer.getProcessingPeriod()),
