@@ -247,6 +247,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * System Settings Manage
     * Users Manage
     * User Roles Manage
+    * System Ideal Stock Amounts Manage
   * users:
     * administrator
 10. Inventory Manager
@@ -295,3 +296,43 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
   * supply lines:
       * WH02/South Warehouse
   * facility: DH01/Balaka District Hospital
+
+## Ideal Stock Amounts
+
+Defined in referencedata.ideal_stock_amounts.json.
+Those amounts are defined for 2 facilities, for each of them we have 3 processing periods in the same schedule.
+For every period in facility there are 4 commodity types that have defined amount values. Those amounts variates from 1000 - 10000.
+
+1. Comfort Health Clinic
+  * January 2017 period:
+    * BCG - 5200
+    * Polio - 6400
+    * HPV - 1100
+    * Measles - 9500
+  * February 2017 period:
+    * BCG - 2200
+    * Polio - 6400
+    * HPV - 9800
+    * Measles - 1015
+  * March 2017 period:
+    * BCG - 4562
+    * Polio - 7533
+    * HPV - 8800
+    * Measles - 5500
+
+2. Kankao Health Facility
+  * January 2017 period:
+    * BCG - 5200
+    * Polio - 6400
+    * HPV - 1100
+    * Measles - 9500
+  * February 2017 period:
+    * BCG - 2200
+    * Polio - 6400
+    * HPV - 9800
+    * Measles - 1015
+  * March 2017 period:
+    * BCG - 4562
+    * Polio - 7533
+    * HPV - 8800
+    * Measles - 5500
