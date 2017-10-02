@@ -30,8 +30,6 @@ scenarios:
           Authorization: Bearer ${access_token}
   non-full-supply-approved-products:
     requests:
-      - include-scenario: get-facility-uuid
-      - include-scenario: get-program-uuid
       - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=false&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
         label: GetFacilitiesApprovedNonFullSupplyProducts
