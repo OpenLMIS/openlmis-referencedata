@@ -28,6 +28,9 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 import org.openlmis.referencedata.web.csv.format.CsvFormatter;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +52,8 @@ import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessag
 
 @Controller
 public class IdealStockAmountController extends BaseController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(IdealStockAmountController.class);
 
   private static final String DISPOSITION_BASE = "attachment; filename=";
   private static final String FORMAT = "format";
@@ -90,26 +95,38 @@ public class IdealStockAmountController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   public void download(@RequestParam(FORMAT) String format,
                        HttpServletResponse response) throws IOException {
+
+    Profiler profiler = new Profiler("DOWNLOAD_IDEAL_STOCK_AMOUNTS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
 
+    profiler.start("CHECK_FORMAT");
     if (!CSV.equals(format)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST,
           messageService.localize(new Message(ERROR_FORMAT_NOT_ALLOWED, format, CSV)).asMessage());
       return;
     }
 
-    List<IdealStockAmountCsvModel> items = toCsvDto(repository.findAll());
+    profiler.start("FIND_ALL_IDEAL_STOCK_AMOUNTS");
+    Iterable<IdealStockAmount> list = repository.findAll();
+
+    profiler.start("CONVERT_IDEAL_STOCK_AMOUNTS_TO_DTO");
+    List<IdealStockAmountCsvModel> items = toCsvDto(list);
 
     response.setContentType("text/csv");
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION,
         DISPOSITION_BASE + "ideal_stock_amounts.csv");
 
+    profiler.start("PARSE_IDEAL_STOCK_AMOUNTS_TO_CSV");
     try {
       csvFormatter.process(
           response.getOutputStream(), new ModelClass(IdealStockAmountCsvModel.class), items);
     } catch (IOException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
+    profiler.stop().log();
   }
 
   private IdealStockAmountCsvModel toCsvDto(IdealStockAmount isa) {
