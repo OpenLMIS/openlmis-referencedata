@@ -65,7 +65,7 @@
       "type": "Dataset Column",
       "dataset": "orderables 10k",
       "column": "id",
-      "selectionStyle": "random",
+      "selectionStyle": "sequential",
       "formula": ""
     },
     {
