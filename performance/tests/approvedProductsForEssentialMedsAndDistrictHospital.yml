@@ -21,46 +21,9 @@ scenarios:
         extract-jsonpath:
           access_token:
             jsonpath: $.access_token
-  get-facility-uuid:
-    requests:
-      - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/facilities/search
-        method: POST
-        label: GetBalakaDistrictHospitalFacility
-        body:
-          code: DH01
-        headers:
-          Authorization: Bearer ${access_token}
-          Content-Type: application/json
-        extract-jsonpath:
-          facuuid:
-            jsonpath: $.content[:1].id
-        jsr223:
-          script-text: |
-            String uuid = vars.get("facuuid");
-            uuid = uuid.replaceAll(/"|\[|\]/, "");
-            vars.put("facuuid", uuid);
-  get-program-uuid:
-    requests:
-      - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/programs/search?name=Essential%20Meds
-        method: GET
-        label: GetEssentialMedsProgram
-        headers:
-          Authorization: Bearer ${access_token}
-        extract-jsonpath:
-          prouuid:
-            jsonpath: $.content[:1].id
-        jsr223:
-          script-text: |
-            String uuid = vars.get("prouuid");
-            uuid = uuid.replaceAll(/"|\[|\]/, "");
-            vars.put("prouuid", uuid);
   full-supply-approved-products:
     requests:
-      - include-scenario: get-facility-uuid
-      - include-scenario: get-program-uuid
-      - url: ${__P(base-uri)}/api/facilities/${facuuid}/approvedProducts?fullSupply=true&programId=${prouuid}
+      - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=true&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
         label: GetFacilitiesApprovedFullSupplyProducts
         headers:
@@ -69,7 +32,7 @@ scenarios:
     requests:
       - include-scenario: get-facility-uuid
       - include-scenario: get-program-uuid
-      - url: ${__P(base-uri)}/api/facilities/${facuuid}/approvedProducts?fullSupply=false&programId=${prouuid}
+      - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=false&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
         label: GetFacilitiesApprovedNonFullSupplyProducts
         headers:
