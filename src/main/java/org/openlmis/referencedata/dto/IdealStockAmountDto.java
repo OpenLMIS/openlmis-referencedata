@@ -21,6 +21,10 @@ import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
+import org.openlmis.referencedata.web.BaseController;
+import org.openlmis.referencedata.web.CommodityTypeController;
+import org.openlmis.referencedata.web.FacilityController;
+import org.openlmis.referencedata.web.ProcessingPeriodController;
 
 public class IdealStockAmountDto extends BaseDto implements IdealStockAmount.Exporter {
 
@@ -43,17 +47,22 @@ public class IdealStockAmountDto extends BaseDto implements IdealStockAmount.Exp
   @Setter
   private Integer amount;
 
+  @Override
   public void setFacility(Facility facility) {
-    this.facility = new ObjectReferenceDto(serviceUrl, "api/facilities", facility.getId());
+    this.facility = new ObjectReferenceDto(serviceUrl,
+        BaseController.API_PATH + FacilityController.RESOURCE_PATH, facility.getId());
   }
 
+  @Override
   public void setCommodityType(CommodityType commodityType) {
-    this.commodityType = new ObjectReferenceDto(serviceUrl, "api/commodityTypes",
-        commodityType.getId());
+    this.commodityType = new ObjectReferenceDto(serviceUrl,
+        BaseController.API_PATH + CommodityTypeController.RESOURCE_PATH, commodityType.getId());
   }
 
+  @Override
   public void setProcessingPeriod(ProcessingPeriod processingPeriod) {
-    this.processingPeriod = new ObjectReferenceDto(serviceUrl, "api/processingPeriods",
+    this.processingPeriod = new ObjectReferenceDto(serviceUrl,
+        BaseController.API_PATH + ProcessingPeriodController.RESOURCE_PATH,
         processingPeriod.getId());
   }
 }

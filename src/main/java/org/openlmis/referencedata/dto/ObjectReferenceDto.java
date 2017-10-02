@@ -37,6 +37,6 @@ public class ObjectReferenceDto extends BaseDto {
    */
   public ObjectReferenceDto(String serviceUrl, String path, UUID id) {
     this.id = id;
-    this.href = StringUtils.joinWith(SEPARATOR, serviceUrl, path, id);
+    this.href = StringUtils.joinWith(SEPARATOR, serviceUrl + path, id);
   }
 }

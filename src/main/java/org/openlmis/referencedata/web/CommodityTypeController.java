@@ -51,6 +51,9 @@ import java.util.UUID;
 
 @RestController
 public class CommodityTypeController extends BaseController {
+
+  public static final String RESOURCE_PATH = "/commodityTypes";
+
   @Autowired
   private CommodityTypeRepository repository;
 
@@ -68,7 +71,7 @@ public class CommodityTypeController extends BaseController {
    * @return CommodytyType that was created or updated
    */
   @Transactional
-  @RequestMapping(value = "/commodityTypes", method = RequestMethod.PUT)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.PUT)
   public CommodityTypeDto createOrUpdate(@RequestBody CommodityTypeDto commodityTypeDto,
                                          BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
@@ -106,7 +109,7 @@ public class CommodityTypeController extends BaseController {
    *                        if any of the given persistence ids are not found.
    */
   @Transactional
-  @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.PUT)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/tradeItems", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   public void updateTradeItemAssociations(@PathVariable("id") UUID commodityTypeId,
                                           @RequestBody Set<UUID> tradeItemIds) {
@@ -148,7 +151,7 @@ public class CommodityTypeController extends BaseController {
    *     commodity type, or an empty set.
    */
   @Transactional
-  @RequestMapping(value = "/commodityTypes/{id}/tradeItems", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/tradeItems", method = RequestMethod.GET)
   public Set<UUID> getTradeItems(@PathVariable("id") UUID commodityTypeId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
@@ -173,7 +176,7 @@ public class CommodityTypeController extends BaseController {
    * Retrieves all Commodity types.
    */
   @Transactional
-  @RequestMapping(value = "/commodityTypes", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   public Page<CommodityTypeDto> retrieveAll(Pageable pageable) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
@@ -191,7 +194,7 @@ public class CommodityTypeController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/commodityTypes/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getCommodityTypeAuditLog(

@@ -55,6 +55,7 @@ public class IdealStockAmountController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdealStockAmountController.class);
 
+  public static final String RESOURCE_PATH = "/idealStockAmounts";
   private static final String DISPOSITION_BASE = "attachment; filename=";
   private static final String FORMAT = "format";
   private static final String CSV = "csv";
@@ -77,7 +78,7 @@ public class IdealStockAmountController extends BaseController {
    * @param pageable object used to encapsulate the pagination values: page and size.
    * @return Page of wanted Ideal Stock Amounts.
    */
-  @GetMapping("/idealStockAmounts")
+  @GetMapping(RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<IdealStockAmountDto> getAll(Pageable pageable) {
@@ -90,7 +91,7 @@ public class IdealStockAmountController extends BaseController {
   /**
    * Downloads csv file with all Ideal Stock Amounts.
    */
-  @GetMapping(value = "/idealStockAmounts", params = FORMAT)
+  @GetMapping(value = RESOURCE_PATH, params = FORMAT)
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
   public void download(@RequestParam(FORMAT) String format,

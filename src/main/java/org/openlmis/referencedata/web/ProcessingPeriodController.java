@@ -66,6 +66,8 @@ public class ProcessingPeriodController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingPeriodController.class);
 
+  public static final String RESOURCE_PATH = "/processingPeriods";
+
   @Autowired
   @Qualifier("beforeSavePeriodValidator")
   private ProcessingPeriodValidator validator;
@@ -92,7 +94,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param facilityId facility of searched ProcessingPeriods.
    * @return a list of all ProcessingPeriods matching provided parameters.
    */
-  @RequestMapping(value = "/processingPeriods/search", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<ProcessingPeriodDto> searchProcessingPeriods(
@@ -126,7 +128,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param bindingResult Object used for validation.
    * @return the new processing period.
    */
-  @RequestMapping(value = "/processingPeriods", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public ProcessingPeriodDto createProcessingPeriod(
@@ -150,7 +152,7 @@ public class ProcessingPeriodController extends BaseController {
    *
    * @return the ProcessingPeriods.
    */
-  @RequestMapping(value = "/processingPeriods", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<ProcessingPeriodDto> getAllProcessingPeriods(
@@ -176,7 +178,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param periodId  id of the ProcessingPeriod to update.
    * @return the updated role.
    */
-  @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ProcessingPeriodDto updateProcessingPeriod(@RequestBody ProcessingPeriodDto periodDto,
@@ -202,7 +204,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param periodId UUID of the ProcessingPeriodDto which we want to get
    * @return the ProcessingPeriod.
    */
-  @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ProcessingPeriodDto getProcessingPeriod(@PathVariable("id") UUID periodId) {
@@ -220,7 +222,7 @@ public class ProcessingPeriodController extends BaseController {
    *
    * @param periodId UUID of the ProcessingPeriodDto which we want to delete
    */
-  @RequestMapping(value = "/processingPeriods/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteProcessingPeriod(@PathVariable("id") UUID periodId) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
@@ -239,7 +241,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param periodId UUID of given ProcessingPeriod.
    * @return String which contains number of months.
    */
-  @RequestMapping(value = "/processingPeriods/{id}/duration", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/duration", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResultDto<Integer> getDuration(@PathVariable("id") UUID periodId) {
@@ -260,7 +262,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/processingPeriods/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getProcessingPeriodAuditLog(
@@ -292,7 +294,7 @@ public class ProcessingPeriodController extends BaseController {
    * @param startDate            which day shall ProcessingPeriod start.
    * @return a list of ProcessingPeriods.
    */
-  @RequestMapping(value = "/processingPeriods/searchByScheduleAndDate", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/searchByScheduleAndDate", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<ProcessingPeriodDto> searchPeriodsByUuidAndDate(

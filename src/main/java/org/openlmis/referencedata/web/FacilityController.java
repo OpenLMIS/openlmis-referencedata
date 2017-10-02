@@ -83,6 +83,8 @@ public class FacilityController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
 
+  public static final String RESOURCE_PATH = "/facilities";
+
   @Autowired
   private FacilityRepository facilityRepository;
 
@@ -113,7 +115,7 @@ public class FacilityController extends BaseController {
    * @param facilityDto A facility bound to the request body.
    * @return created facility.
    */
-  @RequestMapping(value = "/facilities", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public FacilityDto createFacility(@RequestBody FacilityDto facilityDto,
@@ -140,7 +142,7 @@ public class FacilityController extends BaseController {
    *
    * @return Facilities.
    */
-  @RequestMapping(value = "/facilities", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<FacilityDto> getAllFacilities() {
@@ -152,7 +154,7 @@ public class FacilityController extends BaseController {
    *
    * @return Facilities.
    */
-  @RequestMapping(value = "/facilities/minimal", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/minimal", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<MinimalFacilityDto> getMinimalFacilities() {
@@ -169,7 +171,7 @@ public class FacilityController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/facilities/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getFacilitiesAuditLog(
@@ -202,7 +204,7 @@ public class FacilityController extends BaseController {
    * @param facilityId UUID of facility which we want to update.
    * @return the updated facility.
    */
-  @RequestMapping(value = "/facilities/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityDto saveFacility(
@@ -247,7 +249,7 @@ public class FacilityController extends BaseController {
    * @param facilityId UUID of facility which we want to get
    * @return Facility.
    */
-  @RequestMapping(value = "/facilities/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityDto getFacility(@PathVariable("id") UUID facilityId) {
@@ -268,7 +270,7 @@ public class FacilityController extends BaseController {
    *                   products
    * @return collection of approved products
    */
-  @RequestMapping(value = "/facilities/{id}/approvedProducts")
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/approvedProducts")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<ApprovedProductDto> getApprovedProducts(
@@ -295,7 +297,7 @@ public class FacilityController extends BaseController {
    * @param pageable object used to encapsulate the pagination related values: page and size.
    * @return List of wanted facilities within the boundary.
    */
-  @RequestMapping(value = "/facilities/byBoundary", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH + "/byBoundary", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<FacilityDto> findFacilitiesByBoundary(@RequestBody Polygon boundary, 
@@ -312,7 +314,7 @@ public class FacilityController extends BaseController {
    *
    * @param facilityId UUID of facility which we want to delete
    */
-  @RequestMapping(value = "/facilities/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacility(@PathVariable("id") UUID facilityId) {
 
@@ -333,7 +335,7 @@ public class FacilityController extends BaseController {
    * @param supervisoryNodeId supervisoryNode to filter facilities.
    * @return matched facilities.
    */
-  @RequestMapping(value = "/facilities/supplying", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/supplying", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<FacilityDto> getSupplyingDepots(
@@ -367,7 +369,7 @@ public class FacilityController extends BaseController {
    * @param pageable object used to encapsulate the pagination related values: page and size.
    * @return List of wanted Facilities matching query parameters.
    */
-  @RequestMapping(value = "/facilities/search", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH + "/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<BasicFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,

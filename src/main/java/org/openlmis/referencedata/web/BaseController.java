@@ -39,8 +39,12 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-@RequestMapping("/api")
+import static org.openlmis.referencedata.web.BaseController.API_PATH;
+
+@RequestMapping(API_PATH)
 public abstract class BaseController {
+
+  public static final String API_PATH = "/api";
 
   @Autowired
   RightService rightService;
