@@ -132,6 +132,25 @@ referencedata.program_orderables.json.
   * products:
     * Injectable Hormonal Contraceptive
       1. C300/Depo-Estradiol
+4. Epi program:
+  * products:
+    * Vaccines:
+      * BCG
+      * Polio (10 dose)
+      * Polio (20 dose)
+      * Pentavalent (1 dose)
+      * Pentavalent (10 dose)
+      * PCV10
+      * HPV
+      * Measles
+      * VAT
+      * Syringe 5ml
+      * Syringe 0.5ml
+      * Syringe 0.05ml
+      * Safety Box
+      * Gas (Cylinder)
+      * Diluent BCG
+      * Diluent Measles
 
 Currently, all the products are generally approved at all the facility types.
 In the future we could add more differentiation by types of facilities in
