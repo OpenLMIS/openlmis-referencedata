@@ -27,8 +27,26 @@
     "emergencyOrderPoint": "1"
   },
   {
+    "id": "67e61c72-a841-11e7-abc4-cec278b6b50a",
+    "facilityTypeId": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
+    "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "orderableId": { "id": "d602d0c6-4052-456c-8ccd-61b4ad77bece" },
+    "maxPeriodsOfStock": "3",
+    "minPeriodsOfStock": "1.5",
+    "emergencyOrderPoint": "1"
+  },
+  {
     "id": "7e407f1c-5681-4b80-8600-f97beec69a29",
     "facilityTypeId": { "id": "ac1d268b-ce10-455f-bf87-9c667da8f060" },
+    "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "orderableId": { "id": "23819693-0670-4c4b-b400-28e009b86b51" },
+    "maxPeriodsOfStock": "3",
+    "minPeriodsOfStock": "1.5",
+    "emergencyOrderPoint": "1"
+  },
+  {
+    "id": "88498f76-a841-11e7-abc4-cec278b6b50a",
+    "facilityTypeId": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "orderableId": { "id": "23819693-0670-4c4b-b400-28e009b86b51" },
     "maxPeriodsOfStock": "3",
@@ -47,6 +65,15 @@
   {
     "id": "a7ef2398-052a-4e31-9a53-a5fbe702e39d",
     "facilityTypeId": { "id": "ac1d268b-ce10-455f-bf87-9c667da8f060" },
+    "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "orderableId": { "id": "bfde33c3-83f1-4feb-a27c-842852f66b71" },
+    "maxPeriodsOfStock": "3",
+    "minPeriodsOfStock": "1.5",
+    "emergencyOrderPoint": "1"
+  },
+  {
+    "id": "a2d026c0-a841-11e7-abc4-cec278b6b50a",
+    "facilityTypeId": { "id": "663b1d34-cc17-4d60-9619-e553e45aa441" },
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "orderableId": { "id": "bfde33c3-83f1-4feb-a27c-842852f66b71" },
     "maxPeriodsOfStock": "3",

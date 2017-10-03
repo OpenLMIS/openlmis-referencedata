@@ -113,23 +113,23 @@
   },
   {
     "id": "baf98c9a-408b-4e9e-b56a-38640c7dfed6",
-    "name": "Period 008",
-    "startDate": "2017-08-09",
-    "endDate": "2017-09-09",
-    "processingScheduleId": { "id": "d036a3bc-865a-402b-972e-96e0695bf8ce" }
+    "name": "Q5",
+    "startDate": "2018-01-01",
+    "endDate": "2018-03-31",
+    "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   },
   {
     "id": "a4eefb4e-2bb6-4793-9f70-2cc5365de7c6",
-    "name": "Period 009",
-    "startDate": "2017-06-10",
-    "endDate": "2017-09-09",
-    "processingScheduleId": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+    "name": "Q6",
+    "startDate": "2018-04-01",
+    "endDate": "2018-06-30",
+    "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   },
   {
     "id": "f2cecbc4-c6cc-48ca-b4e7-11e69238b386",
-    "name": "Period 010",
-    "startDate": "2017-09-10",
-    "endDate": "2017-10-10",
-    "processingScheduleId": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+    "name": "Q7",
+    "startDate": "2018-07-01",
+    "endDate": "2018-09-30",
+    "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   }
 ]
