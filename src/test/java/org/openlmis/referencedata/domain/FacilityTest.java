@@ -45,4 +45,9 @@ public class FacilityTest {
     assertThat(facility.supports(new Program("P2")), is(false));
   }
 
+  @Test
+  public void supportsShouldReturnFalseIfSupportsProgramButSupportNotActive() {
+    facility.setSupportedPrograms(newHashSet(newSupportedProgram(facility, program, false)));
+    assertThat(facility.supports(program), is(false));
+  }
 }

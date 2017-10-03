@@ -23,6 +23,8 @@ FROM supervisory_nodes_recursive
   JOIN referencedata.requisition_groups rg ON rg.supervisorynodeid = supervisory_nodes_recursive.id
   JOIN referencedata.requisition_group_members rgm ON rgm.requisitiongroupid = rg.id
   JOIN referencedata.requisition_group_program_schedules rgps ON rgps.requisitiongroupid = rg.id
-  JOIN referencedata.supported_programs sp ON sp.facilityid = rgm.facilityid AND sp.programid = rgps.programid
+  JOIN referencedata.supported_programs sp ON sp.facilityid = rgm.facilityid
+    AND sp.programid = rgps.programid
+    AND sp.active = TRUE
 WHERE rgps.programid = ?
 ;

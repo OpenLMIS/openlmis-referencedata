@@ -278,7 +278,7 @@ public class Facility extends BaseEntity {
   public boolean supports(Program program) {
     return supportedPrograms
         .stream()
-        .anyMatch(supported -> supported.getProgram().equals(program));
+        .anyMatch(supported -> supported.getProgram().equals(program) && supported.getActive());
   }
 
   public interface Exporter {
