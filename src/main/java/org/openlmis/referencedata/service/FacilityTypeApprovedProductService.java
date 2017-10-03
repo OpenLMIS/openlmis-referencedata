@@ -22,9 +22,9 @@ import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
 import java.util.Map;
 
 @Service
@@ -41,9 +41,10 @@ public class FacilityTypeApprovedProductService {
    * query to the database.
    *
    * @param queryParams query parameters for the request
-   * @return a collection of approved products that match the search criteria
+   * @return a page of approved products that match the search criteria
    */
-  public Collection<FacilityTypeApprovedProduct> search(Map<String, String> queryParams) {
+  public Page<FacilityTypeApprovedProduct> search(Map<String, String> queryParams,
+                                                  Pageable pageable) {
     String facilityTypeCode = queryParams.get(FACILITY_TYPE);
     String programCode = queryParams.get(PROGRAM);
 
@@ -51,6 +52,6 @@ public class FacilityTypeApprovedProductService {
       throw new ValidationMessageException(ERROR_LACK_PARAMS);
     }
 
-    return repository.searchProducts(facilityTypeCode, programCode);
+    return repository.searchProducts(facilityTypeCode, programCode, pageable);
   }
 }

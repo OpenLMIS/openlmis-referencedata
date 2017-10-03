@@ -18,6 +18,7 @@ package org.openlmis.referencedata.repository.custom.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -27,7 +28,11 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.EntityManager;
@@ -105,15 +110,37 @@ public class FacilityTypeApprovedProductRepositoryImpl
   }
 
   @Override
-  public Collection<FacilityTypeApprovedProduct> searchProducts(String facilityTypeCode,
-                                                                String programCode) {
+  public Page<FacilityTypeApprovedProduct> searchProducts(String facilityTypeCode,
+                                                          String programCode,
+                                                          Pageable pageable) {
     checkNotNull(facilityTypeCode);
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<FacilityTypeApprovedProduct> query = builder.createQuery(
-        FacilityTypeApprovedProduct.class
-    );
+    CriteriaQuery<FacilityTypeApprovedProduct> ftapQuery =
+        builder.createQuery(FacilityTypeApprovedProduct.class);
+    ftapQuery = prepareQuery(facilityTypeCode, programCode, ftapQuery, false);
+
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    countQuery = prepareQuery(facilityTypeCode, programCode, countQuery, true);
+
+    Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+    List<FacilityTypeApprovedProduct> resultList = entityManager.createQuery(ftapQuery)
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
+        .getResultList();
+
+    return Pagination.getPage(resultList, pageable, count);
+
+  }
+
+  private <T> CriteriaQuery<T> prepareQuery(String facilityTypeCode,
+                                            String programCode,
+                                            CriteriaQuery<T> query,
+                                            boolean count) {
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     Root<FacilityTypeApprovedProduct> ftap = query.from(FacilityTypeApprovedProduct.class);
 
@@ -136,18 +163,27 @@ public class FacilityTypeApprovedProductRepositoryImpl
     conjunctionPredicate = builder.and(conjunctionPredicate,
         builder.equal(programOrderables.get(PROGRAM), program));
 
-    query.select(ftap);
+    if (count) {
+      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
+      query = (CriteriaQuery<T>) countQuery.select(builder.count(ftap));
+    } else {
+      CriteriaQuery<FacilityTypeApprovedProduct> ftapQuery =
+          (CriteriaQuery<FacilityTypeApprovedProduct>) query;
+      query = (CriteriaQuery<T>) ftapQuery.select(ftap);
+    }
     query.where(conjunctionPredicate);
 
-    Join<ProgramOrderable, OrderableDisplayCategory> category =
-        programOrderables.join("orderableDisplayCategory");
+    if (!count) {
+      Join<ProgramOrderable, OrderableDisplayCategory> category =
+          programOrderables.join("orderableDisplayCategory");
 
-    query.orderBy(
-        builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayOrder")),
-        builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayName")),
-        builder.asc(orderable.get("productCode"))
-    );
+      query.orderBy(
+          builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayOrder")),
+          builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayName")),
+          builder.asc(orderable.get("productCode"))
+      );
+    }
 
-    return entityManager.createQuery(query).getResultList();
+    return query;
   }
 }

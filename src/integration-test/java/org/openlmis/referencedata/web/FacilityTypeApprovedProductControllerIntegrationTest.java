@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -32,6 +33,7 @@ import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -45,8 +47,11 @@ import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -54,7 +59,6 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -62,7 +66,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String SEARCH = RESOURCE_URL + "/search";
 
   private Program program;
   private Orderable orderable;
@@ -358,27 +361,59 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @Test
   public void shouldSearchFtaps() {
     mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
-    Map<String, String> inputMap = new HashMap<>();
-    inputMap.put("facilityType", facilityType1.getCode());
-    inputMap.put("program", program.getCode().toString());
 
-    given(facilityTypeApprovedProductRepository.searchProducts(facilityType1.getCode(),
-        program.getCode().toString()))
-        .willReturn(Lists.newArrayList(facilityTypeAppProd));
+    given(facilityTypeApprovedProductRepository
+        .searchProducts(eq(facilityType1.getCode()), eq(program.getCode().toString()),
+            any(Pageable.class)))
+        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
 
-    ApprovedProductDto[] response = restAssured
+    PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(inputMap)
+        .queryParam("facilityType", facilityType1.getCode())
+        .queryParam("program", program.getCode().toString())
         .when()
-        .post(SEARCH)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(ApprovedProductDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    assertEquals(1, response.length);
-    assertEquals(ftapDto, response[0]);
+    assertEquals(1, response.getContent().size());
+    assertEquals(ftapDto.getId().toString(),
+        ((java.util.LinkedHashMap)response.getContent().get(0)).get("id"));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldPaginateSearchFtaps() {
+    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
+    Pageable pageable = new PageRequest(0, 10);
+    given(facilityTypeApprovedProductRepository
+        .searchProducts(facilityType1.getCode(), program.getCode().toString(), pageable))
+        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam("page", pageable.getPageNumber())
+        .queryParam("size", pageable.getPageSize())
+        .queryParam("facilityType", facilityType1.getCode())
+        .queryParam("program", program.getCode().toString())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(1, response.getTotalElements());
+    assertEquals(1, response.getTotalPages());
+    assertEquals(1, response.getNumberOfElements());
+    assertEquals(10, response.getSize());
+    assertEquals(0, response.getNumber());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -389,9 +424,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(new HashMap<>())
         .when()
-        .post(SEARCH)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(403);
 
@@ -406,9 +440,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(new HashMap<>())
         .when()
-        .post(SEARCH)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(400);
 

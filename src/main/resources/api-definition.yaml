@@ -58,13 +58,13 @@ schemas:
 
   - approvedProductDto: !include schemas/approvedProductDto.json
 
+  - approvedProductDtoPage: !include schemas/approvedProductDtoPage.json
+
   - approvedProductDtoArray: |
       {
           "type": "array",
           "items": { "type": "object", "$ref": "schemas/approvedProductDto.json" }
       }
-
-  - approvedProductQueryDto: !include schemas/approvedProductQueryDto.json
 
   - basicFacilityDto: !include schemas/basicFacilityDto.json
 
@@ -2291,26 +2291,33 @@ resourceTypes:
                     body:
                         application/json:
 
-      /search:
-          post:
-              is: [ secured ]
-              description: Returns a list of approved products by search criteria
-              body:
-                application/json:
-                  schema: approvedProductQueryDto
-              responses:
-                200:
-                    body:
-                      application/json:
-                          schema: approvedProductDtoArray
-                400:
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
-                403:
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
+      get:
+          is: [ secured, paginated ]
+          description: Returns a page of approved products by search criteria
+          queryParameters:
+            facilityType:
+                displayName: facility type
+                type: string
+                required: false
+                repeat: false
+            program:
+                displayName: program
+                type: string
+                required: false
+                repeat: false
+          responses:
+            200:
+                body:
+                  application/json:
+                      schema: approvedProductDtoPage
+            400:
+                body:
+                  application/json:
+                    schema: localizedErrorResponse
+            403:
+                body:
+                  application/json:
+                    schema: localizedErrorResponse
 
       /{id}:
             uriParameters:

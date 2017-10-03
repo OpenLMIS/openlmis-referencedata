@@ -40,12 +40,11 @@ import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.data.domain.Page;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
@@ -272,13 +271,13 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ftapRepository.save(generateProduct(facilityType2, true));
     ftapRepository.save(generateProduct(facilityType2, false));
 
-    Collection<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(FACILITY_TYPE_CODE, null);
-    assertEquals(1, result.size());
+    Page<FacilityTypeApprovedProduct> result =
+        ftapRepository.searchProducts(FACILITY_TYPE_CODE, null, null);
+    assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
 
-    result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, null);
-    assertEquals(2, result.size());
+    result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, null, null);
+    assertEquals(2, result.getContent().size());
     for (FacilityTypeApprovedProduct ftap :  result) {
       assertEquals(FACILITY_TYPE2_CODE, ftap.getFacilityType().getCode());
     }
@@ -288,14 +287,14 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   public void shouldSearchByFacilityTypeAndProgram() {
     ftapRepository.save(generateProduct(facilityType1, true));
 
-    Collection<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(FACILITY_TYPE_CODE, PROGRAM_CODE);
-    assertEquals(1, result.size());
+    Page<FacilityTypeApprovedProduct> result =
+        ftapRepository.searchProducts(FACILITY_TYPE_CODE, PROGRAM_CODE, null);
+    assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
     assertEquals(PROGRAM_CODE, result.iterator().next().getProgram().getCode().toString());
 
-    result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, "nonExistingCode");
-    assertEquals(0, result.size());
+    result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, "nonExistingCode", null);
+    assertEquals(0, result.getContent().size());
   }
 
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {

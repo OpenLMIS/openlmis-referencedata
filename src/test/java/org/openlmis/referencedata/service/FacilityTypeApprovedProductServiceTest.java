@@ -15,17 +15,27 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
-
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +57,7 @@ public class FacilityTypeApprovedProductServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfLacksRequiredParams() {
-    service.search(new HashMap<>());
+    service.search(new HashMap<>(), null);
   }
 
   @Test
@@ -56,8 +66,27 @@ public class FacilityTypeApprovedProductServiceTest {
     inputMap.put("facilityType", CENTRAL_HOSPITAL);
     inputMap.put("program", ESSENTIAL_MEDS);
 
-    service.search(inputMap);
+    service.search(inputMap, null);
 
-    verify(repository).searchProducts(eq(CENTRAL_HOSPITAL), eq(ESSENTIAL_MEDS));
+    verify(repository)
+        .searchProducts(eq(CENTRAL_HOSPITAL), eq(ESSENTIAL_MEDS), isNull(Pageable.class));
+  }
+
+  @Test
+  public void shouldFindAPageOfProducts() {
+    Map<String, String> inputMap = new HashMap<>();
+    inputMap.put("facilityType", CENTRAL_HOSPITAL);
+    inputMap.put("program", ESSENTIAL_MEDS);
+
+    FacilityTypeApprovedProduct mock = mock(FacilityTypeApprovedProduct.class);
+    when(repository
+        .searchProducts(eq(CENTRAL_HOSPITAL), eq(ESSENTIAL_MEDS), isNull(Pageable.class)))
+        .thenReturn(Pagination.getPage(
+            Collections.singletonList(mock)));
+
+    Page<FacilityTypeApprovedProduct> actual = service.search(inputMap, null);
+
+    assertEquals(1, actual.getContent().size());
+    assertThat(actual, hasItem(mock));
   }
 }
