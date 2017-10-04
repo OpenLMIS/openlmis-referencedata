@@ -1,6 +1,6 @@
 execution:
   - concurreny: 1
-    iterations: 20
+    hold-for: 1m
     scenario: download-ideal-stock-amounts-csv
 
 scenarios:
