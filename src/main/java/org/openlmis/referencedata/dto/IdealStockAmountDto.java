@@ -32,15 +32,12 @@ public class IdealStockAmountDto extends BaseDto implements IdealStockAmount.Exp
   private String serviceUrl;
 
   @Getter
-  @Setter
   private ObjectReferenceDto facility;
 
   @Getter
-  @Setter
   private ObjectReferenceDto commodityType;
 
   @Getter
-  @Setter
   private ObjectReferenceDto processingPeriod;
 
   @Getter
