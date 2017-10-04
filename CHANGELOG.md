@@ -3,6 +3,7 @@
 Breaking changes:
 * [OLMIS-3116](https://openlmis.atlassian.net/browse/OLMIS-3116): User DTO now returns home facility UUID instead of Facility object.
 * [OLMIS-3105](https://openlmis.atlassian.net/browse/OLMIS-3105): User DTO now returns UUIDs instead of codes for role assignments.
+* [OLMIS-3293](https://openlmis.atlassian.net/browse/OLMIS-3293): Paginate search facilityTypeApprovedProducts and made endpoit RESTful
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-2892](https://openlmis.atlassian.net/browse/OLMIS-2892): Added ideal stock amounts model.
