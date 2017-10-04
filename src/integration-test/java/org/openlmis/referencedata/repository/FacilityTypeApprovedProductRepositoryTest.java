@@ -314,7 +314,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     // given
     ftapRepository.save(generateProduct(facilityType1, true));
     ftapRepository.save(generateProduct(facilityType1, false));
-    Program program2 = new Program(PROGRAM_CODE);
+    Program program2 = new Program("programCode2");
     programRepository.save(program2);
     ftapRepository.save(generateProduct(facilityType1, true, program2));
     ftapRepository.save(generateProduct(facilityType1, false, program2));
