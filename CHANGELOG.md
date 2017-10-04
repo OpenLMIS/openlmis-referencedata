@@ -9,12 +9,13 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-2966](https://openlmis.atlassian.net/browse/OLMIS-2966): Create User Rights for Managing Ideal Stock Amounts.
 * [OLMIS-3227](https://openlmis.atlassian.net/browse/OLMIS-3227): Added GET Ideal Stock Amounts endpoint with download csv functionality.
 * [OLMIS-3022](https://openlmis.atlassian.net/browse/OLMIS-3022): Refresh right assignments on role-based access control (RBAC) structural changes.
+* [OLMIS-3263](https://openlmis.atlassian.net/browse/OLMIS-3263): Added new ISA dto with links to nested objects.
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-2857](https://openlmis.atlassian.net/browse/OLMIS-2857): Refactored user search repository method to user database pagination and sorting.
 * [OLMIS-2913](https://openlmis.atlassian.net/browse/OLMIS-2913): add DIVO user and assign to Inventory Manager role for SN1 and SN2
 * [OLMIS-3146](https://openlmis.atlassian.net/browse/OLMIS-3146): added PROGRAMS_MANAGE right and enforce it on CUD endpoints.
-* [OLMIS-3209](https://openlmis.atlassian.net/browse/OLMIS-3209): Fixed problem with parsing orderable DTO when it contains several program orderables
+* [OLMIS-3209](https://openlmis.atlassian.net/browse/OLMIS-3209): Fixed problem with parsing orderable DTO when it contains several program orderables.
 
 8.0.1 / 2017-09-05
 
