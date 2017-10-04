@@ -15,7 +15,7 @@
       "name": "active",
       "null_percentage": 0,
       "type": "Boolean",
-      "formula": ""
+      "formula": "true"
     },
     {
       "name": "displayorder",
