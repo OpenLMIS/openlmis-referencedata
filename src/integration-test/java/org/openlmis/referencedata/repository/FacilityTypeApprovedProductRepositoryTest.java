@@ -60,6 +60,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private static final String FACILITY_TYPE_CODE = "facilityType";
   private static final String FACILITY_TYPE2_CODE = "facilityType2";
   private static final String PROGRAM_CODE = "programCode";
+  private static final String DESCRIPTION = "description";
 
 
   @Autowired
@@ -93,8 +94,11 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private FacilityType facilityType2;
 
   private Program program;
+  private Program program2;
   private Orderable orderableFullSupply;
   private Orderable orderableNonFullSupply;
+  private Orderable orderable1;
+  private Orderable orderable2;
   private Facility facility;
 
   @Override
@@ -112,6 +116,8 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     facilityTypeRepository.save(facilityType2);
     program = new Program(PROGRAM_CODE);
     programRepository.save(program);
+    program2 = new Program("programCode2");
+    programRepository.save(program2);
 
     OrderableDisplayCategory orderableDisplayCategory =
         OrderableDisplayCategory.createNew(Code.code("orderableDisplayCategoryCode"),
@@ -126,16 +132,32 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
             .createNew(program, orderableDisplayCategory, null, currencyUnit);
     orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
-        "Ibuprofen", "description", 10, 5, false,
+        "Ibuprofen", DESCRIPTION, 10, 5, false,
         Collections.singleton(programOrderableFullSupply), identifiers, extraData);
     programOrderableFullSupply.setProduct(orderableFullSupply);
     orderableRepository.save(orderableFullSupply);
+
+    ProgramOrderable programOrderable1 = ProgramOrderable
+            .createNew(program2, orderableDisplayCategory, null, currencyUnit);
+    orderable1 = new Orderable(Code.code("levora"), Dispensable.createNew("each"),
+        "Levora", DESCRIPTION, 10, 5, false,
+        Collections.singleton(programOrderable1), identifiers, extraData);
+    programOrderable1.setProduct(orderable1);
+    orderableRepository.save(orderable1);
+
+    ProgramOrderable programOrderable2 = ProgramOrderable
+            .createNew(program2, orderableDisplayCategory, null, currencyUnit);
+    orderable2 = new Orderable(Code.code("glibenclamide"), Dispensable.createNew("each"),
+        "Glibenclamide", DESCRIPTION, 10, 5, false,
+        Collections.singleton(programOrderable2), identifiers, extraData);
+    programOrderable2.setProduct(orderable2);
+    orderableRepository.save(orderable2);
 
     ProgramOrderable programOrderableNonFullSupply =
         ProgramOrderable.createNew(program, orderableDisplayCategory, null, 0, true, false, 0,
             Money.of(currencyUnit, 0), currencyUnit);
     orderableNonFullSupply = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
-        "Gloves", "description", 6, 3, false,
+        "Gloves", DESCRIPTION, 6, 3, false,
         Collections.singleton(programOrderableNonFullSupply), identifiers, extraData);
     programOrderableNonFullSupply.setProduct(orderableNonFullSupply);
     orderableRepository.save(orderableNonFullSupply);
@@ -314,10 +336,8 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     // given
     ftapRepository.save(generateProduct(facilityType1, true));
     ftapRepository.save(generateProduct(facilityType1, false));
-    Program program2 = new Program("programCode2");
-    programRepository.save(program2);
-    ftapRepository.save(generateProduct(facilityType1, true, program2));
-    ftapRepository.save(generateProduct(facilityType1, false, program2));
+    ftapRepository.save(generateProduct(facilityType1, program2, orderable1));
+    ftapRepository.save(generateProduct(facilityType1, program2, orderable2));
 
     // when
     Pageable pageable = new PageRequest(1, 2);
@@ -349,10 +369,22 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
                                                       boolean fullSupply,
                                                       Program program) {
+    return getFacilityTypeApprovedProduct(facilityType, program,
+        fullSupply ? orderableFullSupply : orderableNonFullSupply);
+  }
+
+  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+                                                      Program program,
+                                                      Orderable orderable) {
+    return getFacilityTypeApprovedProduct(facilityType, program, orderable);
+  }
+
+  private FacilityTypeApprovedProduct getFacilityTypeApprovedProduct(
+      FacilityType facilityType, Program program, Orderable orderable) {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setFacilityType(facilityType);
     ftap.setProgram(program);
-    ftap.setOrderable(fullSupply ? orderableFullSupply : orderableNonFullSupply);
+    ftap.setOrderable(orderable);
     ftap.setMaxPeriodsOfStock(12.00);
     return ftap;
   }
