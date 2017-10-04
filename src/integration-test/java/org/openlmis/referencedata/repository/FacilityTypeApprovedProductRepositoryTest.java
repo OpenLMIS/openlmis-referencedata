@@ -41,6 +41,8 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -297,6 +299,40 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     assertEquals(0, result.getContent().size());
   }
 
+  @Test
+  public void searchShouldReturnEmptyPageNotNull() {
+    // given and when
+    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts("abc", null, null);
+
+    // then
+    assertNotNull(actual);
+    assertNotNull(actual.getContent());
+  }
+
+  @Test
+  public void searchShouldPaginate() {
+    // given
+    ftapRepository.save(generateProduct(facilityType1, true));
+    ftapRepository.save(generateProduct(facilityType1, false));
+    Program program2 = new Program(PROGRAM_CODE);
+    programRepository.save(program2);
+    ftapRepository.save(generateProduct(facilityType1, true, program2));
+    ftapRepository.save(generateProduct(facilityType1, false, program2));
+
+    // when
+    Pageable pageable = new PageRequest(1, 2);
+    Page<FacilityTypeApprovedProduct> actual =
+        ftapRepository.searchProducts(FACILITY_TYPE_CODE, null, pageable);
+
+    // then
+    assertNotNull(actual);
+    assertEquals(1, actual.getNumber());
+    assertEquals(2, actual.getSize());
+    assertEquals(2, actual.getTotalPages());
+    assertEquals(4, actual.getTotalElements());
+    assertEquals(2, actual.getContent().size());
+  }
+
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {
     assertEquals(program, ftap.getProgram());
     assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
@@ -307,6 +343,12 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
   private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
                                                       boolean fullSupply) {
+    return generateProduct(facilityType, fullSupply, program);
+  }
+
+  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+                                                      boolean fullSupply,
+                                                      Program program) {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setFacilityType(facilityType);
     ftap.setProgram(program);
