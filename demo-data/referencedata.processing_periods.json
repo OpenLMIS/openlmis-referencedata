@@ -85,51 +85,58 @@
   },
   {
     "id": "f419bcd8-ac7a-4b75-8c84-c065ef437938",
-    "name": "Q1",
+    "name": "2017Q1",
     "startDate": "2017-01-01",
     "endDate": "2017-03-31",
     "processingSchedule": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   },
   {
     "id": "c5012ddf-b145-4eee-9640-b2cbf4f2da85",
-    "name": "Q2",
+    "name": "2017Q2",
     "startDate": "2017-04-01",
     "endDate": "2017-06-30",
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   },
   {
     "id": "65671374-66e2-4a11-a7dc-05b645c6d815",
-    "name": "Q3",
+    "name": "2017Q3",
     "startDate": "2017-07-01",
     "endDate": "2017-09-30",
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   },
   {
     "id": "7880be4f-6582-472a-9ea5-a6baed71e6e5",
-    "name": "Q4",
+    "name": "2017Q4",
     "startDate": "2017-10-01",
     "endDate": "2017-12-31",
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   },
   {
     "id": "baf98c9a-408b-4e9e-b56a-38640c7dfed6",
-    "name": "Q5",
+    "name": "2018Q1",
     "startDate": "2018-01-01",
     "endDate": "2018-03-31",
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   },
   {
     "id": "a4eefb4e-2bb6-4793-9f70-2cc5365de7c6",
-    "name": "Q6",
+    "name": "2018Q2",
     "startDate": "2018-04-01",
     "endDate": "2018-06-30",
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   },
   {
     "id": "f2cecbc4-c6cc-48ca-b4e7-11e69238b386",
-    "name": "Q7",
+    "name": "2018Q3",
     "startDate": "2018-07-01",
     "endDate": "2018-09-30",
+    "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
+  },
+  {
+    "id": "8d870ab0-a8d5-11e7-abc4-cec278b6b50a",
+    "name": "2018Q4",
+    "startDate": "2018-10-01",
+    "endDate": "2018-12-31",
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
   }
 ]
