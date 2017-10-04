@@ -163,19 +163,19 @@ referencedata.requisition_group_program_schedules.json and
 referencedata.requisition_group_members.json.
 
 1. RGFP1/RG Family Planning 1
-  * schedule: Monthly (Jan2016, Feb2016 ... Dec2016)
+  * schedule: Monthly (Jan2017, Feb2017 ... Dec2017)
   * facilities:
     * HC01/Comfort Health Clinic
     * HC02/Nandumbo Health Center
 2. RGEM1/RG Essential Meds 1
-  * schedule: Quarterly (Q1, Q2, Q3, Q4 of 2016)
+  * schedule: Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018)
   * facilities:
     * HC01/Comfort Health Clinic
     * HC03/Kalembo Health Center
     * DH01/Balaka District Hospital
     * HF01/Kankao Health Facility
 3. RGFP2/RG Family Planning 2
-  * schedule: Quarterly (Q1, Q2, Q3, Q4 of 2016)
+  * schedule: Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018)
   * facilities:
     * DH01/Balaka District Hospital
     * HF01/Kankao Health Facility
