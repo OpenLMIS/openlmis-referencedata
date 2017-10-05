@@ -12,5 +12,19 @@
     "name": "District Hospital",
     "active": "true",
     "displayOrder": 3
+  },
+  {
+    "id": "5fc213c6-1bd7-46f0-9883-57c05250ca90",
+    "code": "dist_store",
+    "name": "District Store",
+    "active": "true",
+    "displayOrder": 4
+  },
+  {
+    "id": "caecea08-6b2f-4ba9-98b2-b87702ba57ba",
+    "code": "prov_store",
+    "name": "Provincial Store",
+    "active": "true",
+    "displayOrder": 5
   }
 ]

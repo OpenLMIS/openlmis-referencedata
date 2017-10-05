@@ -232,5 +232,40 @@
     "parentid": "50293982-602a-4046-ac29-d7f83a8a13e9",
     "latitude": -14.99,
     "longitude": 34.92
+  },
+  {
+    "id": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "code": "niassa",
+    "name": "Niassa",
+    "levelId": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentId": "d22d86fb-9123-437a-9eae-da2b31b77e34",
+    "longitude": -13.174973,
+    "latitude": 36.204547
+  },
+  {
+    "id": "9b8cfb5a-217a-4261-a64f-16ca06ae79fa",
+    "code": "cuamba",
+    "name": "Cuamba",
+    "levelId": "93c05138-4550-4461-9e8a-79d5f050c223",
+    "parentId": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "longitude": -14.747,
+    "latitude": 36.545
+  },
+  {
+    "id": "d22d86fb-9123-437a-9eae-da2b31b77e34",
+    "code": "moz",
+    "name": "Mozambique",
+    "levelId": "6b78e6c6-292e-4733-bb9c-3d802ad61206",
+    "longitude": -18.773706,
+    "latitude": 35.834953
+  },
+  {
+    "id": "88b7eef3-b3f3-4f1a-9782-f5a88f78c56b",
+    "code": "lichinga-distrito",
+    "name": "Lichinga Distrito",
+    "levelId": "93c05138-4550-4461-9e8a-79d5f050c223",
+    "parentId": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "longitude": -13.378,
+    "latitude": 35.189
   }
 ]
