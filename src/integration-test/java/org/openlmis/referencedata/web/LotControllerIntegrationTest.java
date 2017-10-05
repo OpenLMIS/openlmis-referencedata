@@ -217,7 +217,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam("tradeIdemId", lot.getTradeItem().getId())
+        .queryParam("tradeItemId", lot.getTradeItem().getId())
         .queryParam("lotCode", lot.getLotCode())
         .queryParam("expirationDate",
             lot.getExpirationDate().format(DateTimeFormatter.ISO_DATE))
@@ -240,7 +240,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     String messageKey = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam("tradeIdemId", lot.getTradeItem().getId())
+        .queryParam("tradeItemId", lot.getTradeItem().getId())
         .when()
         .get(SEARCH_URL)
         .then()

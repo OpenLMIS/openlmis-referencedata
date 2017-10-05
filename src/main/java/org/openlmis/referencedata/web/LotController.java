@@ -147,7 +147,7 @@ public class LotController extends BaseController {
    * in any position of searched field. Not case sensitive.
    * Other fields: entered string value must equal to searched value.
    *
-   * @param tradeIdemId UUID of trade item associated with Lot.
+   * @param tradeItemId UUID of trade item associated with Lot.
    * @param expirationDate Lot expiration date.
    * @param lotCode Lot code.
    * @param pageable Pageable object that allows client to optionally add "page" (page number).
@@ -157,7 +157,7 @@ public class LotController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<LotDto> searchLots(
-      @RequestParam(value = "tradeIdemId", required = false) UUID tradeIdemId,
+      @RequestParam(value = "tradeItemId", required = false) UUID tradeItemId,
       @RequestParam(value = "expirationDate", required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationDate,
       @RequestParam(value = "lotCode", required = false) String lotCode,
@@ -165,11 +165,11 @@ public class LotController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     TradeItem tradeItem = null;
-    if (null != tradeIdemId) {
-      tradeItem = tradeItemRepository.findOne(tradeIdemId);
+    if (null != tradeItemId) {
+      tradeItem = tradeItemRepository.findOne(tradeItemId);
       if (isNull(tradeItem)) {
         throw new ValidationMessageException(
-            new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, tradeIdemId));
+            new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, tradeItemId));
       }
     }
 

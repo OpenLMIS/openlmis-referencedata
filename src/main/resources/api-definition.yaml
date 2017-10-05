@@ -2919,7 +2919,7 @@ resourceTypes:
               is: [ secured, paginated]
               description: Find lots with matched parameters. This endpoint is experimental.
               queryParameters:
-                  tradeIdemId:
+                  tradeItemId:
                           displayName: tradeIdem
                           type: string
                           required: false
