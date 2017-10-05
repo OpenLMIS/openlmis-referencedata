@@ -19,5 +19,12 @@
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "supplyingFacilityId": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
     "description": "Supply Line for Balaka District Warehouse and Family Planning program"
+  },
+  {
+    "id": "b5e13bf0-21f0-4270-ba2a-41f910858b7f",
+    "supervisoryNodeId": { "id": "219cf7dd-b60a-4c25-ae4e-bf035f357bb4" },
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "supplyingFacilityId": { "id": "482591f1-33c8-4004-bc24-29931fc0c630" },
+    "description": "Supply Line for Mozambique Central Warehouse and EPI program"
   }
 ]
