@@ -94,5 +94,37 @@
     "manufactureDate": "2016-01-10",
     "tradeItemId": "d25b86ed-0d35-4861-bd3e-1fcc42443aa5",
     "active": "true"
+  },
+  {
+    "id": "f08d3db1-9132-487c-ba58-15ea12302aee",
+    "lotCode": "BCGI2017A",
+    "expirationDate": "2019-06-01",
+    "manufactureDate": "2017-06-01",
+    "tradeItemId": "4e59b2cb-c9fb-4103-9ac7-f087cec868c5",
+    "active": "true"
+  },
+  {
+    "id": "9d0cd7cb-5739-491b-8d6b-890fd17ec810",
+    "lotCode": "BCGI2017B",
+    "expirationDate": "2019-07-01",
+    "manufactureDate": "2017-07-01",
+    "tradeItemId": "4e59b2cb-c9fb-4103-9ac7-f087cec868c5",
+    "active": "true"
+  },
+  {
+    "id": "f9f9bb7c-7636-40c1-a548-b45e918a512a",
+    "lotCode": "HPVM2017A",
+    "expirationDate": "2019-06-01",
+    "manufactureDate": "2017-06-01",
+    "tradeItemId": "2f8ab876-dc49-43df-b79b-36c12a210db8",
+    "active": "true"
+  },
+  {
+    "id": "06f86552-1aa9-47d6-8857-6b7ad824f805",
+    "lotCode": "HPVM2017B",
+    "expirationDate": "2019-07-01",
+    "manufactureDate": "2017-07-01",
+    "tradeItemId": "2f8ab876-dc49-43df-b79b-36c12a210db8",
+    "active": "true"
   }
 ]

@@ -34,6 +34,7 @@ var filesOrdered = [
     "referencedata.requisition_group_members",
     "referencedata.role_rights",
     "referencedata.trade_items",
+    "referencedata.trade_item_classifications",
     "referencedata.ideal_stock_amounts",
     "referencedata.lots"
 ]
