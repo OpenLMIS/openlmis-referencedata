@@ -51,8 +51,13 @@
   },
   {
     "id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b",
-    "name": "Inventory Manager",
+    "name": "CCE Inventory Manager",
     "description": "Can manage cold chain equipment."
+  },
+  {
+    "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c",
+    "name": "CCE Inventory Viewer",
+    "description": "Can view cold chain equipment."
   },
   {
     "id": "4e1888eb-b072-41a8-b064-bfbc76f05745",
