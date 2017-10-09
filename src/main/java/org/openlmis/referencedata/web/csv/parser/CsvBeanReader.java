@@ -13,74 +13,80 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.web.csv.format;
+package org.openlmis.referencedata.web.csv.parser;
 
 import lombok.Getter;
 import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
-import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.openlmis.referencedata.web.csv.processor.CsvCellProcessors;
 import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.dozer.CsvDozerBeanWriter;
+import org.supercsv.io.dozer.CsvDozerBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
-import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 
 /**
- * This class has responsibility to instantiate a csvDozerBeanWriter from given inputStream.
+ * This class has responsibility to instantiate a dozerBeanReader from given inputStream,
+ * and CsvPreferences. Also is responsible for validating headers.
  */
-class CsvBeanWriter {
+class CsvBeanReader {
 
   private ModelClass modelClass;
-  private CsvDozerBeanWriter csvDozerBeanWriter;
+  private CsvDozerBeanReader dozerBeanReader;
+  private CsvHeaderValidator csvHeaderValidator;
   private CellProcessor[] processors;
 
   @Getter
   private String[] headers;
 
-  CsvBeanWriter(ModelClass modelClass,
-                OutputStream outputStream) throws IOException {
+  CsvBeanReader(ModelClass modelClass,
+                InputStream inputStream,
+                CsvHeaderValidator csvHeaderValidator) throws IOException {
     this.modelClass = modelClass;
-    configureDozerBeanWriter(outputStream);
+    this.csvHeaderValidator = csvHeaderValidator;
+    configureDozerBeanReader(inputStream);
     configureProcessors();
   }
 
-  void writeWithCellProcessors(List<? extends BaseDto> dtos) throws IOException {
-    csvDozerBeanWriter.writeHeader(headers);
-    for (Object dto : dtos) {
-      csvDozerBeanWriter.write(dto, processors);
-    }
-    csvDozerBeanWriter.close();
+  BaseDto readWithCellProcessors() throws IOException {
+    return dozerBeanReader.read(modelClass.getClazz(), processors);
   }
 
-  private void configureDozerBeanWriter(OutputStream outputStream) throws IOException {
+  int getRowNumber() {
+    return dozerBeanReader.getRowNumber();
+  }
+
+  void validateHeaders() {
+    csvHeaderValidator.validateHeaders(asList(headers), modelClass, false);
+  }
+
+  private void configureDozerBeanReader(InputStream inputStream) throws IOException {
     CsvPreference csvPreference = new CsvPreference.Builder(CsvPreference.STANDARD_PREFERENCE)
         .surroundingSpacesNeedQuotes(true)
         .build();
 
-    BufferedWriter bufferedReader = new BufferedWriter(
-        new OutputStreamWriter(outputStream, "UTF-8"));
-    csvDozerBeanWriter = new CsvDozerBeanWriter(bufferedReader, csvPreference);
+    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+    dozerBeanReader = new CsvDozerBeanReader(bufferedReader, csvPreference);
     headers = readHeaders();
     String[] mappings = modelClass.getFieldNameMappings(headers);
-    csvDozerBeanWriter.configureBeanMapping(modelClass.getClazz(), mappings);
+    dozerBeanReader.configureBeanMapping(modelClass.getClazz(), mappings);
   }
 
-  private String[] readHeaders() {
-    return modelClass.getImportFields().stream()
-        .map(ModelField::getName)
-        .toArray(String[]::new);
+  private String[] readHeaders() throws IOException {
+    String[] headers = dozerBeanReader.getHeader(true);
+    return headers == null ? new String[0] : headers;
   }
 
   private void configureProcessors() {
     List<CellProcessor> cellProcessors =
-        CsvCellProcessors.getFormatProcessors(modelClass, asList(headers));
+        CsvCellProcessors.getParseProcessors(modelClass, asList(headers));
     processors = cellProcessors.toArray(new CellProcessor[cellProcessors.size()]);
   }
 }

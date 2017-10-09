@@ -51,7 +51,7 @@ public class CsvCellProcessorsTest {
         Arrays.asList(MANDATORY_STRING_FIELD, "mandatoryIntField", "optionalStringField");
 
     List<CellProcessor> cellProcessors =
-        CsvCellProcessors.getProcessors(dummyImportableClass, headers);
+        CsvCellProcessors.getParseProcessors(dummyImportableClass, headers);
 
     assertEquals(3, cellProcessors.size());
     assertTrue(cellProcessors.get(0) instanceof NotNull);
@@ -66,7 +66,7 @@ public class CsvCellProcessorsTest {
         Arrays.asList(MANDATORY_STRING_FIELD, "mandatoryIntFIELD");
 
     List<CellProcessor> cellProcessors =
-        CsvCellProcessors.getProcessors(dummyImportableClass, headers);
+        CsvCellProcessors.getParseProcessors(dummyImportableClass, headers);
 
     assertEquals(2, cellProcessors.size());
     assertTrue(cellProcessors.get(0) instanceof NotNull);
@@ -79,7 +79,7 @@ public class CsvCellProcessorsTest {
         Arrays.asList(MANDATORY_STRING_FIELD, "mandatoryIntField", "nonAnnotatedField");
 
     List<CellProcessor> cellProcessors =
-        CsvCellProcessors.getProcessors(dummyImportableClass, headers);
+        CsvCellProcessors.getParseProcessors(dummyImportableClass, headers);
 
     assertEquals(3, cellProcessors.size());
     assertTrue(cellProcessors.get(0) instanceof NotNull);
@@ -93,7 +93,7 @@ public class CsvCellProcessorsTest {
         Arrays.asList(MANDATORY_STRING_FIELD, OPTIONAL_FACILITY_FIELD);
 
     List<CellProcessor> cellProcessors =
-        CsvCellProcessors.getProcessors(dummyImportableClass, headers);
+        CsvCellProcessors.getParseProcessors(dummyImportableClass, headers);
 
     assertEquals(2, cellProcessors.size());
 
@@ -101,11 +101,60 @@ public class CsvCellProcessorsTest {
 
     assertTrue(cellProcessors.get(0) instanceof NotNull);
     NotNull notNull = (NotNull) cellProcessors.get(0);
-    assertEquals(Trim.class, getNextProcessorInstanceClass(nextProcessorField, notNull));
+    assertEquals(getNextProcessorInstanceClass(nextProcessorField, notNull), Trim.class);
 
     assertTrue(cellProcessors.get(1) instanceof Optional);
     Optional optional = (Optional) cellProcessors.get(1);
-    assertEquals(FormatFacility.class, getNextProcessorInstanceClass(nextProcessorField, optional));
+    assertEquals(getNextProcessorInstanceClass(nextProcessorField, optional), ParseFacility.class);
+  }
+
+  @Test
+  public void shouldReturnCorrectFormatProcessorForHeaders() {
+    List<String> headers =
+        Arrays.asList(MANDATORY_STRING_FIELD, "mandatoryIntField", "optionalStringField");
+
+    List<CellProcessor> cellProcessors =
+        CsvCellProcessors.getFormatProcessors(dummyImportableClass, headers);
+
+    assertEquals(3, cellProcessors.size());
+    assertTrue(cellProcessors.get(0) instanceof NotNull);
+    assertTrue(cellProcessors.get(1) instanceof NotNull);
+    assertTrue(cellProcessors.get(2) instanceof Optional);
+  }
+
+
+  @Test
+  public void testReturnFormatProcessorForMismatchCase() {
+    List<String> headers =
+        Arrays.asList(MANDATORY_STRING_FIELD, "mandatoryIntFIELD");
+
+    List<CellProcessor> cellProcessors =
+        CsvCellProcessors.getFormatProcessors(dummyImportableClass, headers);
+
+    assertEquals(2, cellProcessors.size());
+    assertTrue(cellProcessors.get(0) instanceof NotNull);
+    assertTrue(cellProcessors.get(1) instanceof NotNull);
+  }
+
+  @Test
+  public void shouldGetCorrectNextFormatProcessorForFormatHeaders() throws Exception {
+    List<String> headers =
+        Arrays.asList(MANDATORY_STRING_FIELD, OPTIONAL_FACILITY_FIELD);
+
+    List<CellProcessor> cellProcessors =
+        CsvCellProcessors.getFormatProcessors(dummyImportableClass, headers);
+
+    assertEquals(2, cellProcessors.size());
+
+    Field nextProcessorField = getNextProcessorField();
+
+    assertTrue(cellProcessors.get(0) instanceof NotNull);
+    NotNull notNull = (NotNull) cellProcessors.get(0);
+    assertEquals(getNextProcessorInstanceClass(nextProcessorField, notNull), Trim.class);
+
+    assertTrue(cellProcessors.get(1) instanceof Optional);
+    Optional optional = (Optional) cellProcessors.get(1);
+    assertEquals(getNextProcessorInstanceClass(nextProcessorField, optional), FormatFacility.class);
   }
 
   private Class<?> getNextProcessorInstanceClass(Field next, CellProcessorAdaptor instance)

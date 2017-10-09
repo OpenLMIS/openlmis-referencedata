@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web.csv.processor;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.Trim;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -36,35 +37,58 @@ public class CsvCellProcessors {
   public static final String FACILITY_TYPE = "Facility";
   public static final String COMMODITY_TYPE = "CommodityType";
   public static final String PROCESSING_PERIOD_TYPE = "ProcessingPeriod";
+  public static final String INT_TYPE = "int";
 
+  private static final Map<String, CellProcessor> typeParseMappings = new HashMap<>();
   private static final Map<String, CellProcessor> typeExportMappings = new HashMap<>();
 
   static {
     typeExportMappings.put(FACILITY_TYPE, new FormatFacility());
     typeExportMappings.put(COMMODITY_TYPE, new FormatCommodityType());
     typeExportMappings.put(PROCESSING_PERIOD_TYPE, new FormatProcessingPeriod());
+
+    typeParseMappings.put(FACILITY_TYPE, new ParseFacility());
+    typeParseMappings.put(COMMODITY_TYPE, new ParseCommodityType());
+    typeParseMappings.put(PROCESSING_PERIOD_TYPE, new ParseProcessingPeriod());
+    typeParseMappings.put(INT_TYPE, new ParseInt());
+  }
+
+  /**
+   * Get all parse processors for given headers.
+   */
+  public static List<CellProcessor> getParseProcessors(ModelClass modelClass,
+                                                        List<String> headers) {
+    return getProcessors(modelClass, headers, true);
   }
 
   /**
    * Get all format processors for given headers.
    */
-  public static List<CellProcessor> getProcessors(ModelClass modelClass,
+  public static List<CellProcessor> getFormatProcessors(ModelClass modelClass,
                                                    List<String> headers) {
+    return getProcessors(modelClass, headers, false);
+  }
+
+  private static List<CellProcessor> getProcessors(ModelClass modelClass,
+                                                   List<String> headers,
+                                                   boolean forParsing) {
     List<CellProcessor> processors = new ArrayList<>();
     for (String header : headers) {
       ModelField field = modelClass.findImportFieldWithName(header);
       CellProcessor processor = null;
       if (field != null) {
-        processor = chainTypeProcessor(field);
+        processor = chainTypeProcessor(field, forParsing);
       }
       processors.add(processor);
     }
     return processors;
   }
 
-  private static CellProcessor chainTypeProcessor(ModelField field) {
+  private static CellProcessor chainTypeProcessor(ModelField field, boolean forParsing) {
     CellProcessor mappedProcessor;
-    if (typeExportMappings.containsKey(field.getType())) {
+    if (forParsing && typeParseMappings.containsKey(field.getType())) {
+      mappedProcessor = typeParseMappings.get(field.getType());
+    } else if (!forParsing && typeExportMappings.containsKey(field.getType())) {
       mappedProcessor = typeExportMappings.get(field.getType());
     } else {
       mappedProcessor = new Trim();
