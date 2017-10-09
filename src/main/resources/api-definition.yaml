@@ -178,6 +178,8 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/processingSchedule.json" }
       }
 
+  - uploadResult: !include schemas/uploadResult.json
+
   - user: !include schemas/user.json
 
   - userArray: |
@@ -2971,4 +2973,33 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
-
+      post:
+          is: [ secured ]
+          description: Creates given ISA items if possible.
+          queryParameters:
+              format:
+                  description: "This parameter specifies format of body. If it is not specified json format is required. Supported formats: csv."
+                  type: string
+                  required: false
+                  repeat: false
+          body:
+              multipart/form-data:
+                  formParameters:
+                      file:
+                         displayName: File with .csv format
+                         type: file
+                         required: true
+                         repeat: false
+          responses:
+              "200":
+                  body:
+                    application/json:
+                      schema: uploadResult
+              "400":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse

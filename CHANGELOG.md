@@ -11,6 +11,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-3227](https://openlmis.atlassian.net/browse/OLMIS-3227): Added GET Ideal Stock Amounts endpoint with download csv functionality.
 * [OLMIS-3022](https://openlmis.atlassian.net/browse/OLMIS-3022): Refresh right assignments on role-based access control (RBAC) structural changes.
 * [OLMIS-3263](https://openlmis.atlassian.net/browse/OLMIS-3263): Added new ISA dto with links to nested objects.
+* [OLMIS-396](https://openlmis.atlassian.net/browse/OLMIS-396): Added ISA upload endpoint.
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-2857](https://openlmis.atlassian.net/browse/OLMIS-2857): Refactored user search repository method to user database pagination and sorting.
