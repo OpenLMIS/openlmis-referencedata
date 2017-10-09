@@ -33,12 +33,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_FILE_IS_EMPTY;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_INCORRECT_FILE_FORMAT;
 import static org.openlmis.referencedata.web.BaseController.API_PATH;
 
 @RequestMapping(API_PATH)
@@ -144,6 +147,13 @@ public abstract class BaseController {
     return javers.processChangeList(changes, new SimpleTextChangeLog());
   }
 
+  void validateCsvFile(MultipartFile csvFile) {
+    if (csvFile == null || csvFile.isEmpty()) {
+      throw new ValidationMessageException(ERROR_FILE_IS_EMPTY);
+    } else if (!csvFile.getOriginalFilename().endsWith(".csv")) {
+      throw new ValidationMessageException(ERROR_INCORRECT_FILE_FORMAT);
+    }
+  }
 
   void throwValidationMessageExceptionIfErrors(BindingResult bindingResult) {
     if (bindingResult.getErrorCount() > 0) {

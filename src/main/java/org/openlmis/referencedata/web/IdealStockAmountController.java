@@ -19,6 +19,8 @@ import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.dto.IdealStockAmountDto;
+import org.openlmis.referencedata.dto.UploadResultDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.i18n.MessageService;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
@@ -26,8 +28,11 @@ import org.openlmis.referencedata.util.IdealStockAmountDtoBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
+import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.format.CsvFormatter;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
+import org.openlmis.referencedata.web.csv.parser.CsvParser;
+import org.openlmis.referencedata.web.csv.recordhandler.IdealStockAmountsPersistenceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -38,9 +43,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -65,6 +73,15 @@ public class IdealStockAmountController extends BaseController {
 
   @Autowired
   private CsvFormatter csvFormatter;
+
+  @Autowired
+  private CsvParser csvParser;
+
+  @Autowired
+  private IdealStockAmountsPersistenceHandler catalogItemPersistenceHandler;
+
+  @Autowired
+  private CsvHeaderValidator csvHeaderValidator;
 
   @Autowired
   private MessageService messageService;
@@ -128,6 +145,42 @@ public class IdealStockAmountController extends BaseController {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
     profiler.stop().log();
+  }
+
+  /**
+   * Uploads csv file and converts to domain object.
+   *
+   * @param file File in ".csv" format to upload.
+   * @return number of uploaded records
+   */
+  @PostMapping(value = RESOURCE_PATH, params = FORMAT)
+  @ResponseBody
+  @ResponseStatus(HttpStatus.OK)
+  public UploadResultDto upload(@RequestParam(FORMAT) String format,
+                                @RequestPart("file") MultipartFile file) {
+    Profiler profiler = new Profiler("UPLOAD_IDEAL_STOCK_AMOUNTS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
+    rightService.checkAdminRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
+
+    profiler.start("CHECK_FORMAT");
+    if (!CSV.equals(format)) {
+      throw new NotFoundException(new Message(ERROR_FORMAT_NOT_ALLOWED, format, CSV));
+    }
+
+    profiler.start("VALIDATE_FILE");
+    validateCsvFile(file);
+    ModelClass modelClass = new ModelClass(IdealStockAmountCsvModel.class);
+
+    profiler.start("PARSE_FILE");
+    try {
+      int result = csvParser.process(
+          file.getInputStream(), modelClass, catalogItemPersistenceHandler, csvHeaderValidator);
+      return new UploadResultDto(result);
+    } catch (IOException ex) {
+      throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
+    }
   }
 
   private IdealStockAmountCsvModel toCsvDto(IdealStockAmount isa) {

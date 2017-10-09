@@ -264,7 +264,7 @@ public abstract class BaseWebIntegrationTest {
   protected RoleAssignmentRepository roleAssignmentRepository;
 
   @MockBean
-  protected IdealStockAmountRepository repository;
+  protected IdealStockAmountRepository idealStockAmountRepository;
 
   /**
    * Constructor for test.
