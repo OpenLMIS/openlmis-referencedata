@@ -15,44 +15,42 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import org.apache.commons.lang3.StringUtils;
-import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
-public class FormatProcessingPeriod extends CellProcessorAdaptor implements StringCellProcessor {
+public class ParseCommodityType extends CellProcessorAdaptor implements StringCellProcessor {
 
-  private static final String SEPARATOR = "|";
+  private static final String SEPARATOR = "\\|";
 
-  @SuppressWarnings("unchecked")
   @Override
   public Object execute(Object value, CsvContext context) {
     validateInputNotNull(value, context);
 
-    String result;
-    if (value instanceof ProcessingPeriodDto) {
-      ProcessingPeriodDto period = (ProcessingPeriodDto) value;
+    CommodityTypeDto result;
+    if (value instanceof String) {
+      String[] parts = String.valueOf(value).split(SEPARATOR);
 
-      if (period.getName() == null || period.getProcessingSchedule() == null
-          || period.getProcessingSchedule().getCode() == null) {
-        throw getSuperCsvCellProcessorException(period, context);
+      if (parts.length != 2) {
+        throw getSuperCsvCellProcessorException(value, context, null);
       }
 
-      result = StringUtils.joinWith(SEPARATOR, period.getProcessingSchedule().getCode(),
-          period.getName());
-    } else  {
-      throw getSuperCsvCellProcessorException(value, context);
+      result = new CommodityTypeDto();
+      result.setClassificationSystem(parts[0].trim());
+      result.setClassificationId(parts[1].trim());
+    } else {
+      throw getSuperCsvCellProcessorException(value, context, null);
     }
 
     return next.execute(result, context);
   }
 
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
+                                                                           CsvContext context,
+                                                                           Exception cause) {
     return new SuperCsvCellProcessorException(
-        String.format("Cannot format '%s' name or processing schedule.", value.toString()),
-        context, this);
+        String.format("'%s' could not be parsed to Commodity Type", value), context, this, cause);
   }
 }

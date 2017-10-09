@@ -15,44 +15,49 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import org.apache.commons.lang3.StringUtils;
+import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
-public class FormatProcessingPeriod extends CellProcessorAdaptor implements StringCellProcessor {
+/**
+ * This is a custom cell processor used to parse schedule_code|period_name to basic facility dto.
+ * This is used in CsvCellProcessors.
+ */
+public class ParseProcessingPeriod extends CellProcessorAdaptor implements StringCellProcessor {
 
-  private static final String SEPARATOR = "|";
+  private static final String SEPARATOR = "\\|";
 
-  @SuppressWarnings("unchecked")
   @Override
   public Object execute(Object value, CsvContext context) {
     validateInputNotNull(value, context);
 
-    String result;
-    if (value instanceof ProcessingPeriodDto) {
-      ProcessingPeriodDto period = (ProcessingPeriodDto) value;
+    ProcessingPeriodDto result;
+    if (value instanceof String) {
+      String[] parts = ((String) value).split(SEPARATOR);
 
-      if (period.getName() == null || period.getProcessingSchedule() == null
-          || period.getProcessingSchedule().getCode() == null) {
-        throw getSuperCsvCellProcessorException(period, context);
+      if (parts.length != 2) {
+        throw getSuperCsvCellProcessorException(value, context, null);
       }
 
-      result = StringUtils.joinWith(SEPARATOR, period.getProcessingSchedule().getCode(),
-          period.getName());
-    } else  {
-      throw getSuperCsvCellProcessorException(value, context);
+      result = new ProcessingPeriodDto();
+      result.setName(parts[1].trim());
+      ProcessingSchedule processingSchedule = new ProcessingSchedule();
+      processingSchedule.setCode(parts[0].trim());
+      result.setProcessingSchedule(processingSchedule);
+    } else {
+      throw getSuperCsvCellProcessorException(value, context, null);
     }
 
     return next.execute(result, context);
   }
 
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
-    return new SuperCsvCellProcessorException(
-        String.format("Cannot format '%s' name or processing schedule.", value.toString()),
-        context, this);
+                                                                           CsvContext context,
+                                                                           Exception cause) {
+    return new SuperCsvCellProcessorException(String.format(
+        "'%s' could not be parsed to Processing Period", value), context, this, cause);
   }
 }

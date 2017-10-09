@@ -52,7 +52,7 @@ public class FormatProcessingPeriodTest {
 
     String result = (String) formatProcessingPeriod.execute(period, csvContext);
 
-    assertEquals("schedule period", result);
+    assertEquals("schedule|period", result);
   }
 
   @Test
