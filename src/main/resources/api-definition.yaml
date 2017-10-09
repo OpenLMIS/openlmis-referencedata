@@ -2922,7 +2922,7 @@ resourceTypes:
               description: Find lots with matched parameters. This endpoint is experimental.
               queryParameters:
                   tradeItemId:
-                          displayName: tradeIdem
+                          displayName: tradeItem
                           type: string
                           required: false
                           repeat: false
