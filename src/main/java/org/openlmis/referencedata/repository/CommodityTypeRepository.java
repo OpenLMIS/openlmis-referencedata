@@ -23,4 +23,10 @@ import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface CommodityTypeRepository extends CrudRepository<CommodityType, UUID> {
+
+  boolean existsByClassificationIdAndClassificationSystem(String classificationId,
+                                                          String classificationSystem);
+
+  CommodityType findByClassificationIdAndClassificationSystem(String classificationId,
+                                                          String classificationSystem);
 }

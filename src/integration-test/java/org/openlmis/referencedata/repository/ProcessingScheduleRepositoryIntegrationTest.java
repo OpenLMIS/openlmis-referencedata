@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.repository;
 
 import com.google.common.collect.Lists;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +23,10 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ProcessingScheduleRepositoryIntegrationTest
       extends BaseCrudRepositoryIntegrationTest<ProcessingSchedule> {
@@ -51,7 +54,7 @@ public class ProcessingScheduleRepositoryIntegrationTest
     repository.save(getExampleSchedule());
     Iterable<ProcessingSchedule> result = repository.findAll();
     int size = Lists.newArrayList(result).size();
-    Assert.assertEquals(2, size);
+    assertEquals(2, size);
   }
 
   @Test
@@ -66,8 +69,26 @@ public class ProcessingScheduleRepositoryIntegrationTest
     ZonedDateTime savingDateTime = scheduleFromRepo.getModifiedDate();
     iterable = repository.findAll();
     scheduleFromRepo = iterable.iterator().next();
-    Assert.assertTrue(savingDateTime.isBefore(scheduleFromRepo.getModifiedDate()));
-    Assert.assertEquals(newDescription, scheduleFromRepo.getDescription());
+    assertTrue(savingDateTime.isBefore(scheduleFromRepo.getModifiedDate()));
+    assertEquals(newDescription, scheduleFromRepo.getDescription());
+  }
+
+  @Test
+  public void shouldCheckIfPeriodExistsByCode() {
+    ProcessingSchedule schedule = generateInstance();
+    assertFalse(repository.existsByCode(schedule.getCode()));
+
+    schedule = repository.save(schedule);
+    assertTrue(repository.existsByCode(schedule.getCode()));
+  }
+
+  @Test
+  public void shouldFindByNameAndSchedule() {
+    ProcessingSchedule schedule = generateInstance();
+    assertEquals(null, repository.findByCode(schedule.getCode()));
+
+    schedule = repository.save(schedule);
+    assertEquals(schedule.getId(), repository.findByCode(schedule.getCode()).getId());
   }
 
   private ProcessingSchedule getExampleSchedule() {

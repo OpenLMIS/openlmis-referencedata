@@ -25,4 +25,7 @@ import java.util.UUID;
 public interface ProcessingScheduleRepository
       extends PagingAndSortingRepository<ProcessingSchedule, UUID> {
 
+  boolean existsByCode(String code);
+
+  ProcessingSchedule findByCode(String code);
 }

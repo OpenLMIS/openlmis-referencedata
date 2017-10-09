@@ -15,22 +15,28 @@
 
 package org.openlmis.referencedata.repository;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
 import org.junit.Test;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 public class CommodityTypeRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<CommodityType> {
+
+  private static final String CLASSIFICATION_ID = "cId";
+  private static final String CLASSIFICATION_SYSTEM = "cSys";
 
   @Autowired
   private CommodityTypeRepository repository;
@@ -42,8 +48,8 @@ public class CommodityTypeRepositoryIntegrationTest extends
 
   @Override
   CommodityType generateInstance() {
-    return new CommodityType("Name" + getNextInstanceNumber(), "cSys", "cId", null,
-        new ArrayList<>());
+    return new CommodityType("Name" + getNextInstanceNumber(), CLASSIFICATION_SYSTEM,
+        CLASSIFICATION_ID, null, new ArrayList<>());
   }
 
   @Test
@@ -72,5 +78,30 @@ public class CommodityTypeRepositoryIntegrationTest extends
     assertEquals(child, grandChild2.getParent());
     assertThat(grandChild1.getChildren(), empty());
     assertThat(grandChild2.getChildren(), empty());
+  }
+
+  @Test
+  public void shouldCheckIfCommodityTypeExistsByClassificationIdAndSystem() {
+    assertFalse(repository.existsByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
+        CLASSIFICATION_SYSTEM));
+
+    CommodityType commodityType = generateInstance();
+    repository.save(commodityType);
+
+    assertTrue(repository.existsByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
+        CLASSIFICATION_SYSTEM));
+  }
+
+  @Test
+  public void shouldFindByClassificationIdAndSystem() {
+    assertEquals(null, repository.findByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
+        CLASSIFICATION_SYSTEM));
+
+    CommodityType commodityType = generateInstance();
+    commodityType = repository.save(commodityType);
+
+    assertEquals(commodityType.getId(),
+        repository.findByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
+            CLASSIFICATION_SYSTEM).getId());
   }
 }

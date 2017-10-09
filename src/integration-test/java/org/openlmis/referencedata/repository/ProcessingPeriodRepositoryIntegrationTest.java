@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
@@ -187,5 +188,31 @@ public class ProcessingPeriodRepositoryIntegrationTest
 
     assertEquals(1, periods.size());
     assertEquals(dt, periods.get(0).getStartDate());
+  }
+
+  @Test
+  public void shouldCheckIfPeriodExistsByNameAndProcessingSchedule() {
+    ProcessingPeriod processingPeriod = generateInstance();
+
+    assertFalse(periodRepository.existsByNameAndProcessingSchedule(processingPeriod.getName(),
+        testSchedule));
+
+    processingPeriod = periodRepository.save(processingPeriod);
+
+    assertTrue(periodRepository.existsByNameAndProcessingSchedule(processingPeriod.getName(),
+        testSchedule));
+  }
+
+  @Test
+  public void shouldFindByNameAndSchedule() {
+    ProcessingPeriod processingPeriod = generateInstance();
+
+    assertEquals(null, periodRepository.findByNameAndProcessingSchedule(processingPeriod.getName(),
+        testSchedule));
+
+    processingPeriod = periodRepository.save(processingPeriod);
+
+    assertEquals(processingPeriod.getId(), periodRepository.findByNameAndProcessingSchedule(
+        processingPeriod.getName(), testSchedule).getId());
   }
 }
