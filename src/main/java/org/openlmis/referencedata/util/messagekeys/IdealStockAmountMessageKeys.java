@@ -15,6 +15,12 @@
 
 package org.openlmis.referencedata.util.messagekeys;
 
+import static org.openlmis.referencedata.util.messagekeys.MessageKeys.COMMODITY_TYPE;
+import static org.openlmis.referencedata.util.messagekeys.MessageKeys.FACILITY;
+import static org.openlmis.referencedata.util.messagekeys.MessageKeys.NOT_FOUND;
+import static org.openlmis.referencedata.util.messagekeys.MessageKeys.PROCESSING_PERIOD;
+import static org.openlmis.referencedata.util.messagekeys.MessageKeys.PROCESSING_SCHEDULE;
+import static org.openlmis.referencedata.util.messagekeys.MessageKeys.REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.MessageKeys.SERVICE_ERROR;
 import static org.openlmis.referencedata.util.messagekeys.MessageKeys.join;
 
@@ -22,4 +28,13 @@ public class IdealStockAmountMessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, "ideaStockAmount");
 
   public static final String ERROR_FORMAT_NOT_ALLOWED = join(ERROR, "format.notAllowed");
+  public static final String ERROR_FROM_FIELD_REQUIRED = join(ERROR, "field", REQUIRED);
+
+  public static final String ERROR_FACILITY_NOT_FOUND = join(ERROR, FACILITY, NOT_FOUND);
+  public static final String ERROR_PROCESSING_PERIOD_NOT_FOUND = join(ERROR,
+      PROCESSING_PERIOD, NOT_FOUND);
+  public static final String ERROR_PROCESSING_SCHEDULE_NOT_FOUND = join(ERROR,
+      PROCESSING_SCHEDULE, NOT_FOUND);
+  public static final String ERROR_COMMODITY_TYPE_NOT_FOUND = join(ERROR,
+      COMMODITY_TYPE, NOT_FOUND);
 }
