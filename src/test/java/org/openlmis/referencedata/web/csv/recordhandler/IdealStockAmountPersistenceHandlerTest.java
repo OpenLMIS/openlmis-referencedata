@@ -36,7 +36,7 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.openlmis.referencedata.validate.IdealStockAmountsValidator;
+import org.openlmis.referencedata.validate.IdealStockAmountValidator;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -66,7 +66,7 @@ public class IdealStockAmountPersistenceHandlerTest {
   private CommodityTypeRepository commodityTypeRepository;
 
   @Mock
-  private IdealStockAmountsValidator idealStockAmountsValidator;
+  private IdealStockAmountValidator idealStockAmountsValidator;
 
   @InjectMocks
   private IdealStockAmountsPersistenceHandler idealStockAmountsPersistenceHandler;

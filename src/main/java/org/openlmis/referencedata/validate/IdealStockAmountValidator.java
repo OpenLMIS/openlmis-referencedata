@@ -32,7 +32,7 @@ import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessag
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_SCHEDULE_NOT_FOUND;
 
 @Component
-public class IdealStockAmountsValidator {
+public class IdealStockAmountValidator {
 
   @Autowired
   private FacilityRepository facilityRepository;

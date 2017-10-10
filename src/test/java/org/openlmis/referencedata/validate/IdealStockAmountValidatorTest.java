@@ -36,7 +36,6 @@ import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.util.Message;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_COMMODITY_TYPE_NOT_FOUND;
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FROM_FIELD_REQUIRED;
@@ -63,7 +62,7 @@ public class IdealStockAmountValidatorTest {
   private ProcessingScheduleRepository processingScheduleRepository;
 
   @InjectMocks
-  private IdealStockAmountsValidator isaValidator;
+  private IdealStockAmountValidator isaValidator;
 
   private IdealStockAmountCsvModel isa;
   private BasicFacilityDto facility;
@@ -72,9 +71,7 @@ public class IdealStockAmountValidatorTest {
   private CommodityTypeDto commodityType;
 
   @Before
-  public void before() {
-    initMocks(this);
-
+  public void setUp() {
     facility = new BasicFacilityDto();
     facility.setCode("facility-code");
     processingSchedule = new ProcessingSchedule();
