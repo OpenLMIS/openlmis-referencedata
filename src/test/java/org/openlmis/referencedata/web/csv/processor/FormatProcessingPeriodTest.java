@@ -39,6 +39,7 @@ public class FormatProcessingPeriodTest {
 
   @Before
   public void beforeEach() {
+    FormatProcessingPeriod.SEPARATOR = "|";
     formatProcessingPeriod = new FormatProcessingPeriod();
   }
 

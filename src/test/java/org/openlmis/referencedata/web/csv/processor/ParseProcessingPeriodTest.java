@@ -38,6 +38,7 @@ public class ParseProcessingPeriodTest {
 
   @Before
   public void beforeEach() {
+    ParseProcessingPeriod.SEPARATOR = "|";
     parseProcessingPeriod = new ParseProcessingPeriod();
   }
 

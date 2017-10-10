@@ -33,6 +33,10 @@ import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.i18n.ExposedMessageSourceImpl;
 import org.openlmis.referencedata.security.UserNameProvider;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
+import org.openlmis.referencedata.web.csv.processor.FormatCommodityType;
+import org.openlmis.referencedata.web.csv.processor.FormatProcessingPeriod;
+import org.openlmis.referencedata.web.csv.processor.ParseCommodityType;
+import org.openlmis.referencedata.web.csv.processor.ParseProcessingPeriod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +53,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
+import javax.annotation.PostConstruct;
 import java.util.Locale;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
@@ -71,6 +76,9 @@ public class Application {
 
   @Value("${spring.jpa.properties.hibernate.default_schema}")
   private String preferredSchema;
+
+  @Value("${referencedata.csv.separator}")
+  private String separator;
 
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
@@ -182,5 +190,16 @@ public class Application {
   @Bean
   public ProcessingPeriodValidator beforeSavePeriodValidator() {
     return new ProcessingPeriodValidator();
+  }
+
+  /**
+   * Sets separator field for csv parsers/formatters.
+   */
+  @PostConstruct
+  public void setCsvSeparator() {
+    ParseCommodityType.SEPARATOR = separator;
+    FormatCommodityType.SEPARATOR = separator;
+    ParseProcessingPeriod.SEPARATOR = separator;
+    FormatProcessingPeriod.SEPARATOR = separator;
   }
 }

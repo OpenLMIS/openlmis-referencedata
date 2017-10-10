@@ -38,6 +38,7 @@ public class ParseCommodityTypeTest {
 
   @Before
   public void beforeEach() {
+    ParseCommodityType.SEPARATOR = "|";
     parseCommodityType = new ParseCommodityType();
   }
 

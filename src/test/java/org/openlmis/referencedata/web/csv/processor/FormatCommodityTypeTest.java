@@ -39,6 +39,7 @@ public class FormatCommodityTypeTest {
 
   @Before
   public void beforeEach() {
+    FormatCommodityType.SEPARATOR = "|";
     formatCommodityType = new FormatCommodityType();
   }
 

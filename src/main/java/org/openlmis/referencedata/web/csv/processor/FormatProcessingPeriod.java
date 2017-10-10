@@ -24,7 +24,7 @@ import org.supercsv.util.CsvContext;
 
 public class FormatProcessingPeriod extends CellProcessorAdaptor implements StringCellProcessor {
 
-  private static final String SEPARATOR = "|";
+  public static String SEPARATOR;
 
   @SuppressWarnings("unchecked")
   @Override

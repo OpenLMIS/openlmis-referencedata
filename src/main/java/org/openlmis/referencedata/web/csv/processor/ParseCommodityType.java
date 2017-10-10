@@ -23,7 +23,7 @@ import org.supercsv.util.CsvContext;
 
 public class ParseCommodityType extends CellProcessorAdaptor implements StringCellProcessor {
 
-  private static final String SEPARATOR = "\\|";
+  public static String SEPARATOR;
 
   @Override
   public Object execute(Object value, CsvContext context) {
@@ -31,7 +31,7 @@ public class ParseCommodityType extends CellProcessorAdaptor implements StringCe
 
     CommodityTypeDto result;
     if (value instanceof String) {
-      String[] parts = String.valueOf(value).split(SEPARATOR);
+      String[] parts = String.valueOf(value).split("\\" + SEPARATOR);
 
       if (parts.length != 2) {
         throw getSuperCsvCellProcessorException(value, context, null);
