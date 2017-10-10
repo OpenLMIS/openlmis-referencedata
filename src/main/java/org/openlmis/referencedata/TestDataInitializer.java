@@ -60,6 +60,9 @@ public class TestDataInitializer implements CommandLineRunner {
       + "facility_type_approved_products_for_Essential_Medicines___District_Hospital.csv")
   private Resource ftapResource;
 
+  @Value(value = PERF_DATA_PATH + "processing_periods.csv")
+  private Resource processingPeriodsResource;
+
   @Autowired
   private JdbcTemplate template;
 
@@ -81,6 +84,7 @@ public class TestDataInitializer implements CommandLineRunner {
     r2db.insertToDbFromCsv("referencedata.program_orderables", fullSupplyProductsResource);
     r2db.insertToDbFromCsv("referencedata.program_orderables", nonfullSupplyProductsResource);
     r2db.insertToDbFromCsv("referencedata.facility_type_approved_products", ftapResource);
+    r2db.insertToDbFromCsv("referencedata.processing_periods", processingPeriodsResource);
 
     XLOGGER.exit();
   }
