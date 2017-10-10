@@ -22,7 +22,6 @@ import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,9 +49,8 @@ public class CsvHeaderValidator {
   private void validateNullHeaders(List<String> headers) throws ValidationMessageException {
     for (int i = 0; i < headers.size(); i++) {
       if (headers.get(i) == null) {
-        String missingHeaderPosition = i + 1 + "";
         throw new ValidationMessageException(new Message(ERROR_UPLOAD_HEADER_MISSING,
-            missingHeaderPosition));
+            String.valueOf(i + 1)));
       }
     }
   }
@@ -76,16 +74,10 @@ public class CsvHeaderValidator {
   }
 
   private List<String> findMissingFields(List<String> headers, ModelClass modelClass) {
-    List<String> missingFields = new ArrayList<>();
-    for (ModelField field : modelClass.getImportFields()) {
-      if (field.isMandatory()) {
-        String fieldName = field.getName();
-        if (!headers.contains(fieldName.toLowerCase())) {
-          missingFields.add(fieldName);
-        }
-      }
-    }
-    return missingFields;
+    return modelClass.getImportFields().stream()
+        .filter((ModelField fields) -> fields.isMandatory()
+            && !headers.contains(fields.getName().toLowerCase()))
+        .map(ModelField::getName).collect(Collectors.toList());
   }
 
   private List<String> getAllImportedFieldNames(ModelClass modelClass) {
@@ -95,10 +87,8 @@ public class CsvHeaderValidator {
   }
 
   private List<String> lowerCase(List<String> strings) {
-    List<String> lowerCaseStrings = new ArrayList<>();
-    for (String one : strings) {
-      lowerCaseStrings.add(one.toLowerCase());
-    }
-    return lowerCaseStrings;
+    return strings.stream()
+        .map(String::toLowerCase)
+        .collect(Collectors.toList());
   }
 }

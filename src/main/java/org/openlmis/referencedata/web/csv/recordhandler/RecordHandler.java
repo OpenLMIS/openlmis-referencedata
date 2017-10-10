@@ -15,15 +15,12 @@
 
 package org.openlmis.referencedata.web.csv.recordhandler;
 
-import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.dto.BaseDto;
 
 /**
  * This interface is implemented by all record handlers.
  */
 public interface RecordHandler {
-
-  void execute(BaseEntity importable);
 
   void execute(BaseDto importable);
 
