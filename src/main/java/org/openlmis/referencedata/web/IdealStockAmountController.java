@@ -32,7 +32,7 @@ import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.format.CsvFormatter;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.parser.CsvParser;
-import org.openlmis.referencedata.web.csv.recordhandler.IdealStockAmountsPersistenceHandler;
+import org.openlmis.referencedata.web.csv.recordhandler.IdealStockAmountPersistenceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -78,7 +78,7 @@ public class IdealStockAmountController extends BaseController {
   private CsvParser csvParser;
 
   @Autowired
-  private IdealStockAmountsPersistenceHandler catalogItemPersistenceHandler;
+  private IdealStockAmountPersistenceHandler idealStockAmountPersistenceHandler;
 
   @Autowired
   private CsvHeaderValidator csvHeaderValidator;
@@ -175,8 +175,8 @@ public class IdealStockAmountController extends BaseController {
 
     profiler.start("PARSE_FILE");
     try {
-      int result = csvParser.process(
-          file.getInputStream(), modelClass, catalogItemPersistenceHandler, csvHeaderValidator);
+      int result = csvParser.process(file.getInputStream(), modelClass,
+          idealStockAmountPersistenceHandler, csvHeaderValidator);
       return new UploadResultDto(result);
     } catch (IOException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());

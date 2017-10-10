@@ -28,11 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * IdealStockAmountsPersistenceHandler is used for uploads of Ideal Stock Amount.
+ * IdealStockAmountPersistenceHandler is used for uploads of Ideal Stock Amount.
  * It uploads each catalog item record by record.
  */
 @Component
-public class IdealStockAmountsPersistenceHandler
+public class IdealStockAmountPersistenceHandler
     extends AbstractPersistenceHandler<IdealStockAmount, IdealStockAmountCsvModel> {
 
   @Autowired

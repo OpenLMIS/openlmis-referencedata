@@ -69,7 +69,7 @@ public class IdealStockAmountPersistenceHandlerTest {
   private IdealStockAmountValidator idealStockAmountsValidator;
 
   @InjectMocks
-  private IdealStockAmountsPersistenceHandler idealStockAmountsPersistenceHandler;
+  private IdealStockAmountPersistenceHandler idealStockAmountsPersistenceHandler;
 
   private IdealStockAmount idealStockAmount;
   private Facility facility;
@@ -107,6 +107,7 @@ public class IdealStockAmountPersistenceHandlerTest {
     verify(idealStockAmountRepository).save(idealStockAmountArgumentCaptor.capture());
     assertEquals(existingCatalogItem.getId(), idealStockAmountArgumentCaptor.getValue().getId());
   }
+
 
   @Test
   public void shouldNotSetIdIfExistingItemNotFound() {
