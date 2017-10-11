@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.openlmis.referencedata.util.StringHelper.lowerCase;
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_HEADER_INVALID;
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_HEADER_MISSING;
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
@@ -83,12 +84,6 @@ public class CsvHeaderValidator {
   private List<String> getAllImportedFieldNames(ModelClass modelClass) {
     return modelClass.getImportFields().stream()
         .map(ModelField::getName)
-        .collect(Collectors.toList());
-  }
-
-  private List<String> lowerCase(List<String> strings) {
-    return strings.stream()
-        .map(String::toLowerCase)
         .collect(Collectors.toList());
   }
 }
