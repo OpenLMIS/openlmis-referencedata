@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.openlmis.referencedata.util.StringHelper.lowerCase;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_HEADER_INVALID;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_HEADER_MISSING;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_HEADER_INVALID;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_HEADER_MISSING;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
 
 @Component
 public class CsvHeaderValidator {

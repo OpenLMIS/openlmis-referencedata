@@ -40,8 +40,8 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_FILE_IS_EMPTY;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_INCORRECT_FILE_FORMAT;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_FILE_IS_EMPTY;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_INCORRECT_FILE_FORMAT;
 import static org.openlmis.referencedata.web.BaseController.API_PATH;
 
 @RequestMapping(API_PATH)

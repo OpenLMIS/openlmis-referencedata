@@ -17,7 +17,7 @@ package org.openlmis.referencedata.util.messagekeys;
 
 import static org.openlmis.referencedata.util.messagekeys.MessageKeys.SERVICE_ERROR;
 
-public class CsvUploadMessagesKeys {
+public class CsvUploadMessageKeys {
 
   private static final String ERROR_PREFIX = SERVICE_ERROR + ".upload";
 
@@ -29,7 +29,7 @@ public class CsvUploadMessagesKeys {
       + ".mandatory.columns.missing";
   public static final String ERROR_UPLOAD_HEADER_INVALID = ERROR_PREFIX + ".header.invalid";
 
-  private CsvUploadMessagesKeys() {
+  private CsvUploadMessageKeys() {
     throw new UnsupportedOperationException();
   }
 }

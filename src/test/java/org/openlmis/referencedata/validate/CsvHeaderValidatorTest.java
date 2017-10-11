@@ -30,9 +30,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_HEADER_INVALID;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_HEADER_MISSING;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_HEADER_INVALID;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_HEADER_MISSING;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
 import static org.openlmis.referencedata.web.dummy.DummyTransferObject.MANDATORY_STRING_FIELD;
 
 @RunWith(MockitoJUnitRunner.class)

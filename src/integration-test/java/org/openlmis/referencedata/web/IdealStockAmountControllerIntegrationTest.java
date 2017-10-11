@@ -55,8 +55,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_RECORD_INVALID;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegrationTest {

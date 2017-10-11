@@ -29,7 +29,7 @@ import org.supercsv.util.CsvContext;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessagesKeys.ERROR_UPLOAD_RECORD_INVALID;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
 
 /**
  * This class has logic to invoke corresponding respective record handler to parse data from
