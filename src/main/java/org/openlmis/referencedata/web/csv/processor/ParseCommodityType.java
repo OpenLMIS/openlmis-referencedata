@@ -21,6 +21,8 @@ import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
+import java.util.regex.Pattern;
+
 public class ParseCommodityType extends CellProcessorAdaptor implements StringCellProcessor {
 
   public static String SEPARATOR;
@@ -31,7 +33,7 @@ public class ParseCommodityType extends CellProcessorAdaptor implements StringCe
 
     CommodityTypeDto result;
     if (value instanceof String) {
-      String[] parts = String.valueOf(value).split("\\" + SEPARATOR);
+      String[] parts = String.valueOf(value).split(Pattern.quote(SEPARATOR));
 
       if (parts.length != 2) {
         throw getSuperCsvCellProcessorException(value, context, null);

@@ -22,6 +22,8 @@ import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
+import java.util.regex.Pattern;
+
 /**
  * This is a custom cell processor used to parse schedule_code|period_name to basic facility dto.
  * This is used in CsvCellProcessors.
@@ -36,7 +38,7 @@ public class ParseProcessingPeriod extends CellProcessorAdaptor implements Strin
 
     ProcessingPeriodDto result;
     if (value instanceof String) {
-      String[] parts = ((String) value).split("\\" + SEPARATOR);
+      String[] parts = ((String) value).split(Pattern.quote(SEPARATOR));
 
       if (parts.length != 2) {
         throw getSuperCsvCellProcessorException(value, context, null);
