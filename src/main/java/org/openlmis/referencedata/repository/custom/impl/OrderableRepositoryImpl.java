@@ -101,7 +101,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
           builder.like(builder.upper(root.get(NAME)), "%" + name.toUpperCase() + "%"));
     }
 
-    if (programCode != null) {
+    if (programCode != null && !programCode.isBlank()) {
       Join<Orderable, ProgramOrderable> orderablePrograms = root.join(PROGRAMS, JoinType.LEFT);
       Join<Orderable, ProgramOrderable> programs = orderablePrograms.join(PROGRAM, JoinType
           .INNER);

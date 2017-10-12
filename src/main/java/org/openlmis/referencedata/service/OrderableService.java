@@ -91,17 +91,12 @@ public class OrderableService {
 
     // find program if given
     Code workingProgramCode = Code.code(programCode);
-    if ( false == workingProgramCode.isBlank()
-        && false == programRepository.existsByCode(workingProgramCode) ) {
+    if (!workingProgramCode.isBlank()
+        && !programRepository.existsByCode(workingProgramCode) ) {
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
 
-    Page<Orderable> foundOrderables = orderableRepository.search(code,
-        name,
-        workingProgramCode,
-        pageable);
-
-    return foundOrderables;
+    return orderableRepository.search(code, name, workingProgramCode, pageable);
   }
 
   private Set<UUID> getIds(Map<String, Object> queryMap) {

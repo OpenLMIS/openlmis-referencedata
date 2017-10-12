@@ -117,6 +117,17 @@ public class OrderableRepositoryIntegrationTest
   }
 
   @Test
+  public void shouldFindOrderablesWithSimilarCodeWhenProgramCodeIsBlank() {
+    Orderable orderable = generateInstance();
+    repository.save(orderable);
+    Orderable orderable2 = generateInstance();
+    repository.save(orderable2);
+
+    searchOrderablesAndCheckResults(orderable.getProductCode().toString(),
+        null, new Program(""), orderable, 1);
+  }
+
+  @Test
   public void shouldFindOrderablesWithSimilarCodeIgnoringCase() {
     Orderable orderable = generateInstance();
     repository.save(orderable);
@@ -135,6 +146,14 @@ public class OrderableRepositoryIntegrationTest
     repository.save(orderable);
 
     searchOrderablesAndCheckResults(null, "Ab", null, orderable, 1);
+  }
+
+  @Test
+  public void shouldFindOrderablesWithSimilarNameWhenProgramCodeIsBlank() {
+    Orderable orderable = generateInstance();
+    repository.save(orderable);
+
+    searchOrderablesAndCheckResults(null, "Ab", new Program(""), orderable, 1);
   }
 
   @Test
