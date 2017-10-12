@@ -1,6 +1,6 @@
 execution:
   - concurreny: 1
-    iterations: 250
+    hold-for: 1m
     scenario: download-ideal-stock-amounts-csv
 
 scenarios:
@@ -27,4 +27,4 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-      - p90 of GetAnIdealStockAmountCSV>550ms
+      - p90 of GetAnIdealStockAmountCSV>500ms
