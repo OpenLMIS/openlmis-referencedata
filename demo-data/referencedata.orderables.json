@@ -486,10 +486,10 @@
   },
   {
     "id": "0a83fb92-289b-45c9-adba-f2ac7647312e",
-    "code": "polio10",
+    "code": "ipv5",
     "dispensingUnit": "each",
-    "fullProductName": "Polio (10 dose)",
-    "netContent": 10,
+    "fullProductName": "IPV",
+    "netContent": 5,
     "packRoundingThreshold": 1,
     "roundToZero": true,
     "programOrderables": [
@@ -571,10 +571,10 @@
   },
   {
     "id": "047638fa-92ce-4adf-9bbd-3bcb3216897a",
-    "code": "hpv2",
+    "code": "rota1",
     "dispensingUnit": "each",
-    "fullProductName": "HPV",
-    "netContent": 2,
+    "fullProductName": "Rotavirus",
+    "netContent": 1,
     "packRoundingThreshold": 1,
     "roundToZero": true,
     "programOrderables": [
