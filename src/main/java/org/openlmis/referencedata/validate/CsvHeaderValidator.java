@@ -74,15 +74,19 @@ public class CsvHeaderValidator {
     }
   }
 
-  private List<String> findMissingFields(List<String> headers, ModelClass modelClass) {
-    return modelClass.getImportFields().stream()
-        .filter((ModelField fields) -> fields.isMandatory()
-            && !headers.contains(fields.getName().toLowerCase()))
-        .map(ModelField::getName).collect(Collectors.toList());
+  private List<String> findMissingFields(List<String> headers, ModelClass<?> modelClass) {
+    return modelClass
+        .getImportFields()
+        .stream()
+        .filter(fields -> fields.isMandatory() && !headers.contains(fields.getName().toLowerCase()))
+        .map(ModelField::getName)
+        .collect(Collectors.toList());
   }
 
-  private List<String> getAllImportedFieldNames(ModelClass modelClass) {
-    return modelClass.getImportFields().stream()
+  private List<String> getAllImportedFieldNames(ModelClass<?> modelClass) {
+    return modelClass
+        .getImportFields()
+        .stream()
         .map(ModelField::getName)
         .collect(Collectors.toList());
   }

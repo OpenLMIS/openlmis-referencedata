@@ -35,16 +35,16 @@ import static java.util.Arrays.asList;
 /**
  * This class has responsibility to instantiate a csvDozerBeanWriter from given inputStream.
  */
-class CsvBeanWriter {
+class CsvBeanWriter<T extends BaseDto> {
 
-  private ModelClass modelClass;
+  private ModelClass<T> modelClass;
   private CsvDozerBeanWriter csvDozerBeanWriter;
   private CellProcessor[] processors;
 
   @Getter
   private String[] headers;
 
-  CsvBeanWriter(ModelClass modelClass,
+  CsvBeanWriter(ModelClass<T> modelClass,
                 OutputStream outputStream) throws IOException {
     this.modelClass = modelClass;
     configureDozerBeanWriter(outputStream);
@@ -73,7 +73,9 @@ class CsvBeanWriter {
   }
 
   private String[] readHeaders() {
-    return modelClass.getImportFields().stream()
+    return modelClass
+        .getImportFields()
+        .stream()
         .map(ModelField::getName)
         .toArray(String[]::new);
   }

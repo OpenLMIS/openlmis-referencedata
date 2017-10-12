@@ -20,7 +20,6 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.validate.IdealStockAmountValidator;
@@ -28,18 +27,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * IdealStockAmountPersistenceHandler is used for uploads of Ideal Stock Amount.
+ * IdealStockAmountProcessor is used for uploads of Ideal Stock Amount.
  * It uploads each catalog item record by record.
  */
 @Component
-public class IdealStockAmountPersistenceHandler
-    extends AbstractPersistenceHandler<IdealStockAmount, IdealStockAmountCsvModel> {
+public class IdealStockAmountProcessor
+    implements RecordProcessor<IdealStockAmountCsvModel, IdealStockAmount> {
 
   @Autowired
   private IdealStockAmountValidator idealStockAmountsValidator;
-
-  @Autowired
-  private IdealStockAmountRepository idealStockAmountRepository;
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -54,17 +50,7 @@ public class IdealStockAmountPersistenceHandler
   private CommodityTypeRepository commodityTypeRepository;
 
   @Override
-  protected IdealStockAmount getExisting(IdealStockAmount record) {
-    if (idealStockAmountRepository.existsByFacilityAndCommodityTypeAndProcessingPeriod(
-        record.getFacility(), record.getCommodityType(), record.getProcessingPeriod())) {
-      return idealStockAmountRepository.findByFacilityAndCommodityTypeAndProcessingPeriod(
-          record.getFacility(), record.getCommodityType(), record.getProcessingPeriod());
-    }
-    return null;
-  }
-
-  @Override
-  protected IdealStockAmount importDto(IdealStockAmountCsvModel record) {
+  public IdealStockAmount process(IdealStockAmountCsvModel record) {
     idealStockAmountsValidator.validate(record);
     facilityRepository.findFirstByCode(record.getFacility().getCode()).export(record.getFacility());
     ProcessingSchedule schedule = processingScheduleRepository
@@ -76,10 +62,4 @@ public class IdealStockAmountPersistenceHandler
         record.getCommodityType().getClassificationSystem()).export(record.getCommodityType());
     return IdealStockAmount.newIdealStockAmount(record);
   }
-
-  @Override
-  protected void save(IdealStockAmount record) {
-    idealStockAmountRepository.save(record);
-  }
-
 }

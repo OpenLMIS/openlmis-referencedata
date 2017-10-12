@@ -189,7 +189,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .statusCode(200)
         .extract().as(UploadResultDto.class);
 
-    verify(idealStockAmountRepository).save(any(IdealStockAmount.class));
+    verify(idealStockAmountRepository).save(any(Iterable.class));
     assertEquals(1, result.getAmount().intValue());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }

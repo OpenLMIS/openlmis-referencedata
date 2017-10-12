@@ -15,20 +15,30 @@
 
 package org.openlmis.referencedata.web.csv.parser;
 
+import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
+import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
-import org.openlmis.referencedata.web.csv.recordhandler.RecordHandler;
+import org.openlmis.referencedata.web.csv.recordhandler.RecordProcessor;
+import org.openlmis.referencedata.web.csv.recordhandler.RecordWriter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.supercsv.exception.SuperCsvException;
 import org.supercsv.util.CsvContext;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
 
 /**
@@ -39,33 +49,76 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 @NoArgsConstructor
 public class CsvParser {
 
+  @Value("${csvParser.chunkSize}")
+  private int chunkSize;
+
+  @Value("${csvParser.poolSize}")
+  private int poolSize;
+
   /**
    * Parses data from input stream into the corresponding model.
    *
-   * @param inputStream   input stream of csv file
-   * @param modelClass    java model to which the csv row will be mapped
-   * @param recordHandler record persistance handler
    * @return number of uploaded records
    */
-  public int process(
-      InputStream inputStream, ModelClass modelClass, RecordHandler recordHandler,
-      CsvHeaderValidator csvHeaderValidator) throws IOException {
-
-    CsvBeanReader csvBeanReader = new CsvBeanReader(modelClass, inputStream, csvHeaderValidator);
+  public <D extends BaseDto, E extends BaseEntity> int parse(InputStream inputStream,
+                                                             ModelClass<D> modelClass,
+                                                             CsvHeaderValidator headerValidator,
+                                                             RecordProcessor<D, E> processor,
+                                                             RecordWriter<E> writer)
+      throws IOException {
+    CsvBeanReader<D> csvBeanReader = new CsvBeanReader<>(
+        modelClass, inputStream, headerValidator
+    );
     csvBeanReader.validateHeaders();
 
+    ExecutorService executor = Executors.newFixedThreadPool(Math.min(1, poolSize));
+    List<CompletableFuture<Void>> futures = Lists.newArrayList();
+
     try {
-      BaseDto importedModel;
-      while ((importedModel = csvBeanReader.readWithCellProcessors()) != null) {
-        recordHandler.execute(importedModel);
+      while (true) {
+        List<D> imported = doRead(csvBeanReader);
+
+        if (imported.isEmpty()) {
+          break;
+        }
+
+        Runnable runnable = () -> doWrite(processor, writer, imported);
+        CompletableFuture<Void> future = runAsync(runnable, executor);
+        futures.add(future);
+      }
+    } finally {
+      futures.forEach(CompletableFuture::join);
+    }
+
+    return csvBeanReader.getRowNumber() - 1;
+  }
+
+  private <D extends BaseDto> List<D> doRead(CsvBeanReader<D> csvBeanReader) throws IOException {
+    try {
+      List<D> list = Lists.newArrayList();
+
+      for (int i = 0; i < chunkSize; ++i) {
+        D imported = csvBeanReader.readWithCellProcessors();
+
+        if (null == imported) {
+          break;
+        }
+
+        list.add(imported);
       }
 
+      return list;
     } catch (SuperCsvException err) {
       Message message = getCsvRowErrorMessage(err);
       throw new ValidationMessageException(err, message);
     }
+  }
 
-    return csvBeanReader.getRowNumber() - 1;
+  private <D extends BaseDto, E extends BaseEntity> void doWrite(RecordProcessor<D, E> processor,
+                                                                 RecordWriter<E> writer,
+                                                                 List<D> imported) {
+    List<E> entities = imported.stream().map(processor::process).collect(Collectors.toList());
+    writer.write(entities);
   }
 
   private Message getCsvRowErrorMessage(SuperCsvException err) {

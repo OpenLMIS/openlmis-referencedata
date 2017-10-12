@@ -17,8 +17,6 @@ package org.openlmis.referencedata.web.csv.recordhandler;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -33,25 +31,16 @@ import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.validate.IdealStockAmountValidator;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class IdealStockAmountPersistenceHandlerTest {
-
-  @Captor
-  private ArgumentCaptor<IdealStockAmount> idealStockAmountArgumentCaptor;
-
-  @Mock
-  private IdealStockAmountRepository idealStockAmountRepository;
+public class IdealStockAmountProcessorTest {
 
   @Mock
   private FacilityRepository facilityRepository;
@@ -69,7 +58,7 @@ public class IdealStockAmountPersistenceHandlerTest {
   private IdealStockAmountValidator idealStockAmountsValidator;
 
   @InjectMocks
-  private IdealStockAmountPersistenceHandler idealStockAmountsPersistenceHandler;
+  private IdealStockAmountProcessor idealStockAmountProcessor;
 
   private IdealStockAmount idealStockAmount;
   private Facility facility;
@@ -90,33 +79,6 @@ public class IdealStockAmountPersistenceHandlerTest {
     idealStockAmount.setFacility(facility);
     idealStockAmount.setCommodityType(commodityType);
     idealStockAmount.setProcessingPeriod(processingPeriod);
-  }
-
-  @Test
-  public void shouldSetIdIfExistingItemFoundByCode() {
-    IdealStockAmount existingCatalogItem = new IdealStockAmount();
-    existingCatalogItem.setId(UUID.randomUUID());
-
-    when(idealStockAmountRepository.existsByFacilityAndCommodityTypeAndProcessingPeriod(facility,
-        commodityType, processingPeriod)).thenReturn(true);
-    when(idealStockAmountRepository.findByFacilityAndCommodityTypeAndProcessingPeriod(facility,
-        commodityType, processingPeriod)).thenReturn(existingCatalogItem);
-
-    idealStockAmountsPersistenceHandler.execute(idealStockAmount);
-
-    verify(idealStockAmountRepository).save(idealStockAmountArgumentCaptor.capture());
-    assertEquals(existingCatalogItem.getId(), idealStockAmountArgumentCaptor.getValue().getId());
-  }
-
-
-  @Test
-  public void shouldNotSetIdIfExistingItemNotFound() {
-    when(idealStockAmountRepository.existsByFacilityAndCommodityTypeAndProcessingPeriod(facility,
-        commodityType, processingPeriod)).thenReturn(false);
-
-    idealStockAmountsPersistenceHandler.execute(idealStockAmount);
-
-    verify(idealStockAmountRepository).save(idealStockAmount);
   }
 
   @Test
@@ -143,7 +105,7 @@ public class IdealStockAmountPersistenceHandlerTest {
     when(commodityTypeRepository.findByClassificationIdAndClassificationSystem("id",  "system"))
         .thenReturn(commodityType);
 
-    IdealStockAmount idealStockAmount = idealStockAmountsPersistenceHandler.importDto(isa);
+    IdealStockAmount idealStockAmount = idealStockAmountProcessor.process(isa);
 
     assertEquals(idealStockAmount.getFacility(), facility);
     assertEquals(idealStockAmount.getAmount(), new Integer(1212));
