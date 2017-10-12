@@ -66,6 +66,7 @@ public class OrderableRepositoryIntegrationTest
   private static final String NAME = "Abcd";
   private static final String EACH = "each";
   private static final String DESCRIPTION = "description";
+  private static final String ORDERABLE_NAME = "abc";
 
   @Override
   CrudRepository<Orderable, UUID> getRepository() {
@@ -161,7 +162,7 @@ public class OrderableRepositoryIntegrationTest
     Orderable orderable = generateInstance();
     repository.save(orderable);
 
-    searchOrderablesAndCheckResults(null, "abc", null, orderable, 1);
+    searchOrderablesAndCheckResults(null, ORDERABLE_NAME, null, orderable, 1);
     searchOrderablesAndCheckResults(null, "ABC", null, orderable, 1);
     searchOrderablesAndCheckResults(null, "aBc", null, orderable, 1);
     searchOrderablesAndCheckResults(null, "AbC", null, orderable, 1);
@@ -174,7 +175,17 @@ public class OrderableRepositoryIntegrationTest
     Orderable orderable2 = generateInstance();
     repository.save(orderable2);
 
-    searchOrderablesAndCheckResults(CODE, "abc", null, orderable, 2);
+    searchOrderablesAndCheckResults(CODE, ORDERABLE_NAME, null, orderable, 2);
+  }
+
+  @Test
+  public void shouldFindOrderablesWithSimilarCodeAndNameWhenProgramCodeIsBlank() {
+    Orderable orderable = generateInstance();
+    repository.save(orderable);
+    Orderable orderable2 = generateInstance();
+    repository.save(orderable2);
+
+    searchOrderablesAndCheckResults(CODE, ORDERABLE_NAME, new Program(""), orderable, 2);
   }
 
   @Test
@@ -184,7 +195,7 @@ public class OrderableRepositoryIntegrationTest
     Orderable orderable2 = generateInstance();
     repository.save(orderable2);
 
-    searchOrderablesAndCheckResults(CODE, "abc", null, orderable, 2);
+    searchOrderablesAndCheckResults(CODE, ORDERABLE_NAME, null, orderable, 2);
     searchOrderablesAndCheckResults("ABCD", "ABC", null, orderable, 2);
     searchOrderablesAndCheckResults("a", "AbC", null, orderable, 2);
     searchOrderablesAndCheckResults("A", "aBc", null, orderable, 2);
