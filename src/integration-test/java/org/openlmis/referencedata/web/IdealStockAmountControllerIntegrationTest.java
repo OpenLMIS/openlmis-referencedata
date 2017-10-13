@@ -51,6 +51,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -189,7 +190,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .statusCode(200)
         .extract().as(UploadResultDto.class);
 
-    verify(idealStockAmountRepository).save(any(Iterable.class));
+    verify(idealStockAmountRepository).save(anyListOf(IdealStockAmount.class));
     assertEquals(1, result.getAmount().intValue());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }
