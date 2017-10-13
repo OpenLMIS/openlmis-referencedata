@@ -87,6 +87,8 @@ public class IdealStockAmountValidatorTest {
     when(facilityRepository.existsByCode(facility.getCode())).thenReturn(true);
     when(processingScheduleRepository.existsByCode(
         isa.getProcessingPeriod().getProcessingSchedule().getCode())).thenReturn(true);
+    when(processingScheduleRepository.findByCode(isa.getProcessingPeriod()
+        .getProcessingSchedule().getCode())).thenReturn(processingSchedule);
     when(processingPeriodRepository.existsByNameAndProcessingSchedule(
         isa.getProcessingPeriod().getName(),
         isa.getProcessingPeriod().getProcessingSchedule())).thenReturn(true);

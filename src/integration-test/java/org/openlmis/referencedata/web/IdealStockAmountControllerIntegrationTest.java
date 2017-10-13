@@ -108,6 +108,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         any(ProcessingSchedule.class))).thenReturn(period);
     when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(any(String.class),
         any(String.class))).thenReturn(commodityType);
+    when(scheduleRepository.findByCode(any(String.class))).thenReturn(schedule);
   }
 
   @Test

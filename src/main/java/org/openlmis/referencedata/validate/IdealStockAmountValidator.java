@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.validate;
 
+import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
@@ -63,9 +64,11 @@ public class IdealStockAmountValidator {
           idealStockAmount.getProcessingPeriod().getProcessingSchedule().getCode()));
     }
 
+    ProcessingSchedule processingSchedule = processingScheduleRepository
+        .findByCode(idealStockAmount.getProcessingPeriod().getProcessingSchedule().getCode());
+
     if (!processingPeriodRepository.existsByNameAndProcessingSchedule(
-        idealStockAmount.getProcessingPeriod().getName(),
-        idealStockAmount.getProcessingPeriod().getProcessingSchedule())) {
+        idealStockAmount.getProcessingPeriod().getName(), processingSchedule)) {
       throw new ValidationMessageException(new Message(ERROR_PROCESSING_PERIOD_NOT_FOUND,
           idealStockAmount.getProcessingPeriod().getName()));
     }
