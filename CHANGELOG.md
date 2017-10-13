@@ -19,6 +19,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-3146](https://openlmis.atlassian.net/browse/OLMIS-3146): added PROGRAMS_MANAGE right and enforce it on CUD endpoints.
 * [OLMIS-3209](https://openlmis.atlassian.net/browse/OLMIS-3209): Fixed problem with parsing orderable DTO when it contains several program orderables.
 * [OLMIS-3290](https://openlmis.atlassian.net/browse/OLMIS-3290): Fixed searching Orderables by code and name.
+* [OLMIS-3291](https://openlmis.atlassian.net/browse/OLMIS-3291): Fixed searching RequisitionGroups by supervisoryNode.
 
 8.0.1 / 2017-09-05
 
