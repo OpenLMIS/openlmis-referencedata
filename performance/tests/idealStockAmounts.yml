@@ -2,9 +2,12 @@ execution:
   - concurreny: 1
     hold-for: 1m
     scenario: download-ideal-stock-amounts-csv
+  - concurreny: 1
+    hold-for: 1m
+    scenario: upload-ideal-stock-amounts-csv
 
 scenarios:
-  download-ideal-stock-amounts-csv:
+  get-user-token:
     requests:
       - url: ${__P(base-uri)}/api/oauth/token
         method: POST
@@ -18,13 +21,30 @@ scenarios:
         extract-jsonpath:
           access_token:
             jsonpath: $.access_token
+
+  download-ideal-stock-amounts-csv:
+    requests:
+      - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/idealStockAmounts?format=csv
         method: GET
         label: GetAnIdealStockAmountCSV
         headers:
           Authorization: Bearer ${access_token}
 
+  upload-ideal-stock-amounts-csv:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/idealStockAmounts?format=csv
+        method: POST
+        label: UploadIdealStockAmounts
+        headers:
+          Authorization: Bearer ${access_token}
+        upload-files:
+          - param: file
+            path: /tmp/resources/isa.csv
+
 reporting:
     - module: passfail
       criteria:
-      - p90 of GetAnIdealStockAmountCSV>500ms
+        Download Ideal Stock Amounts too slow: p90 of GetAnIdealStockAmountCSV>500ms
+        Upload Ideal Stock Amounts too slow: p90 of UploadIdealStockAmounts>500ms
