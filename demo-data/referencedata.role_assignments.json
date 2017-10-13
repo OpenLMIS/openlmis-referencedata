@@ -545,22 +545,6 @@
     "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
   },
   {
-    "id": "82b9d98d-21e0-41c2-b108-9a3f3cd8c659",
-    "type": "supervision",
-    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
-    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },
-    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
-  },
-  {
-    "id": "b10da420-fd73-4da7-bfbd-55c93820a367",
-    "type": "supervision",
-    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
-    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },
-    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
-  },
-  {
     "id": "48c18a03-59a1-4348-a8f8-772080245740",
     "type": "supervision",
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
