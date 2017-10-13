@@ -46,5 +46,5 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-        Download Ideal Stock Amounts too slow: p90 of GetAnIdealStockAmountCSV>500ms
+        Download Ideal Stock Amounts too slow: p90 of GetAnIdealStockAmountCSV>1100ms
         Upload Ideal Stock Amounts too slow: p90 of UploadIdealStockAmounts>500ms
