@@ -404,6 +404,16 @@ public class RequisitionGroupRepositoryIntegrationTest
     assertEquals(0, foundPage.getContent().size());
   }
 
+  @Test
+  public void shouldReturnEmptyListIfSupervisoryNodesListIsEmpty() {
+    Pageable pageable = mockPageable(0, 10);
+
+    Page<RequisitionGroup> foundPage = repository.search(null, null, null,
+        Collections.emptyList(), pageable);
+
+    assertEquals(0, foundPage.getContent().size());
+  }
+
   private void searchGroupAndCheckResults(String code, String name, Program program,
                                           List<SupervisoryNode> supervisoryNodes,
                                           Pageable pageable, int expectedSize,

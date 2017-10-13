@@ -64,7 +64,11 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
     if (StringUtils.isEmpty(code)
         && StringUtils.isEmpty(name)
         && program == null
-        && (supervisoryNodes == null || supervisoryNodes.isEmpty())) {
+        && supervisoryNodes == null) {
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
+    }
+
+    if (supervisoryNodes != null && supervisoryNodes.isEmpty()) {
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
@@ -120,12 +124,7 @@ public class RequisitionGroupRepositoryImpl implements RequisitionGroupRepositor
     }
 
     if (supervisoryNodes != null && !supervisoryNodes.isEmpty()) {
-      Predicate supervisoryNodePredicate = builder.disjunction();
-      for (SupervisoryNode node : supervisoryNodes) {
-        supervisoryNodePredicate = builder.or(supervisoryNodePredicate,
-            builder.equal(root.get(SUPERVISORY_NODE), node));
-      }
-      predicate = builder.and(predicate, supervisoryNodePredicate);
+      predicate = builder.and(predicate, root.get(SUPERVISORY_NODE).in(supervisoryNodes));
     }
 
     query.where(predicate);
