@@ -15,6 +15,13 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FORMAT_NOT_ALLOWED;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import javax.servlet.http.HttpServletResponse;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
@@ -50,14 +57,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FORMAT_NOT_ALLOWED;
 
 @Controller
 public class IdealStockAmountController extends BaseController {
@@ -181,8 +180,11 @@ public class IdealStockAmountController extends BaseController {
     try {
       int result = csvParser.parse(file.getInputStream(), modelClass, csvHeaderValidator,
           idealStockAmountProcessor, idealStockAmountWriter);
-      return new UploadResultDto(result);
+      UploadResultDto dto = new UploadResultDto(result);
+      profiler.stop().log();
+      return dto;
     } catch (IOException ex) {
+      profiler.stop().log();
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
   }
