@@ -509,42 +509,6 @@
     "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
   },
   {
-    "id": "e5facf55-8e48-4800-b652-25d7cc9f59ef",
-    "type": "direct",
-    "user": { "id": "7214eb3d-3a74-4048-9a4a-619927fbc501" },
-    "role": {"id": "4e1888eb-b072-41a8-b064-bfbc76f05745"}
-  },
-  {
-    "id": "da45c2f0-11c8-4c34-a16c-1083631eca64",
-    "type": "supervision",
-    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
-    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "user": { "id": "7214eb3d-3a74-4048-9a4a-619927fbc501" },
-    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
-  },
-  {
-    "id": "e38274a0-226d-407f-8c0a-2f55554d7925",
-    "type": "supervision",
-    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
-    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "user": { "id": "7214eb3d-3a74-4048-9a4a-619927fbc501" },
-    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
-  },
-  {
-    "id": "6039fa02-196c-47d0-9c7d-f5a6af280013",
-    "type": "supervision",
-    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "user": { "id": "7214eb3d-3a74-4048-9a4a-619927fbc501" },
-    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
-  },
-  {
-    "id": "f26f6500-c4f0-471a-ad3c-67a2ef15edf7",
-    "type": "supervision",
-    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "user": { "id": "7214eb3d-3a74-4048-9a4a-619927fbc501" },
-    "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
-  },
-  {
     "id": "48c18a03-59a1-4348-a8f8-772080245740",
     "type": "supervision",
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },

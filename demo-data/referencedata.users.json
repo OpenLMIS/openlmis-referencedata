@@ -181,19 +181,6 @@
     "timeZone": "CET"
   },
   {
-    "id": "7214eb3d-3a74-4048-9a4a-619927fbc501",
-    "username": "ccemanager",
-    "email": "ccemanager@openlmis.org",
-    "firstName": "Michael",
-    "lastName": "Cataldo",
-    "verified": "true",
-    "active": "true",
-    "loginRestricted": "false",
-    "allowNotify": "true",
-    "homefacilityid": { "id": "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
-    "timeZone": "CET"
-  },
-  {
     "id": "1e3b03a5-1d48-4de1-bb4a-389beece2277",
     "username": "rivo",
     "email": "rivo@openlmis.org",

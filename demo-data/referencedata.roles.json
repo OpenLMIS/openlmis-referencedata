@@ -58,10 +58,5 @@
     "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c",
     "name": "CCE Inventory Viewer",
     "description": "Can view cold chain equipment."
-  },
-  {
-    "id": "4e1888eb-b072-41a8-b064-bfbc76f05745",
-    "name": "CCE Manager",
-    "description": "Can manage the CCE catalog."
   }
 ]
