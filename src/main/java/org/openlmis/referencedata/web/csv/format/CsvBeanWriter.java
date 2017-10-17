@@ -17,7 +17,6 @@ package org.openlmis.referencedata.web.csv.format;
 
 import lombok.Getter;
 import org.openlmis.referencedata.dto.BaseDto;
-import org.openlmis.referencedata.web.IdealStockAmountController;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.openlmis.referencedata.web.csv.processor.CsvCellProcessors;

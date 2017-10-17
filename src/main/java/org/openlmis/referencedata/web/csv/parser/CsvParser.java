@@ -22,7 +22,6 @@ import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
-import org.openlmis.referencedata.web.IdealStockAmountController;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.recordhandler.RecordProcessor;
 import org.openlmis.referencedata.web.csv.recordhandler.RecordWriter;
