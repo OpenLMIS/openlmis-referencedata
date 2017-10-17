@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.BasicFacilityDto;
@@ -29,18 +28,9 @@ import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.CommodityTypeRepository;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.util.Message;
 
-import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_COMMODITY_TYPE_NOT_FOUND;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FROM_FIELD_REQUIRED;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_PERIOD_NOT_FOUND;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_SCHEDULE_NOT_FOUND;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -48,18 +38,6 @@ public class IdealStockAmountValidatorTest {
 
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
-
-  @Mock
-  private FacilityRepository facilityRepository;
-
-  @Mock
-  private CommodityTypeRepository commodityTypeRepository;
-
-  @Mock
-  private ProcessingPeriodRepository processingPeriodRepository;
-
-  @Mock
-  private ProcessingScheduleRepository processingScheduleRepository;
 
   @InjectMocks
   private IdealStockAmountValidator isaValidator;
@@ -83,18 +61,6 @@ public class IdealStockAmountValidatorTest {
     commodityType.setClassificationId("classification-id");
     commodityType.setClassificationSystem("classification-system");
     isa = new IdealStockAmountCsvModel(facility, commodityType, processingPeriod, 11);
-
-    when(facilityRepository.existsByCode(facility.getCode())).thenReturn(true);
-    when(processingScheduleRepository.existsByCode(
-        isa.getProcessingPeriod().getProcessingSchedule().getCode())).thenReturn(true);
-    when(processingScheduleRepository.findByCode(isa.getProcessingPeriod()
-        .getProcessingSchedule().getCode())).thenReturn(processingSchedule);
-    when(processingPeriodRepository.existsByNameAndProcessingSchedule(
-        isa.getProcessingPeriod().getName(),
-        isa.getProcessingPeriod().getProcessingSchedule())).thenReturn(true);
-    when(commodityTypeRepository.existsByClassificationIdAndClassificationSystem(
-        isa.getCommodityType().getClassificationId(),
-        isa.getCommodityType().getClassificationSystem())).thenReturn(true);
   }
 
   @Test
@@ -149,61 +115,6 @@ public class IdealStockAmountValidatorTest {
         new Message(ERROR_FROM_FIELD_REQUIRED, "amount").toString());
 
     isa.setAmount(null);
-    isaValidator.validate(isa);
-  }
-
-  @Test
-  public void shouldThrowExceptionIfFacilityDoesNotExists() {
-    when(facilityRepository.existsByCode(isa.getFacility().getCode()))
-        .thenReturn(false);
-
-    expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        new Message(ERROR_FACILITY_NOT_FOUND,
-            isa.getFacility().getCode()).toString());
-
-    isaValidator.validate(isa);
-  }
-
-  @Test
-  public void shouldThrowExceptionIfProcessingPeriodDoesNotExists() {
-    when(processingPeriodRepository.existsByNameAndProcessingSchedule(
-        isa.getProcessingPeriod().getName(),
-        isa.getProcessingPeriod().getProcessingSchedule())).thenReturn(false);
-
-    expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        new Message(ERROR_PROCESSING_PERIOD_NOT_FOUND,
-            isa.getProcessingPeriod().getName()).toString());
-
-    isaValidator.validate(isa);
-  }
-
-  @Test
-  public void shouldThrowExceptionIfProcessingScheduleDoesNotExists() {
-    when(processingScheduleRepository.existsByCode(
-        isa.getProcessingPeriod().getProcessingSchedule().getCode())).thenReturn(false);
-
-    expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        new Message(ERROR_PROCESSING_SCHEDULE_NOT_FOUND,
-            isa.getProcessingPeriod().getProcessingSchedule().getCode()).toString());
-
-    isaValidator.validate(isa);
-  }
-
-  @Test
-  public void shouldThrowExceptionIfCommodityTypeDoesNotExists() {
-    when(commodityTypeRepository.existsByClassificationIdAndClassificationSystem(
-        isa.getCommodityType().getClassificationId(),
-        isa.getCommodityType().getClassificationSystem())).thenReturn(false);
-
-    expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        new Message(ERROR_COMMODITY_TYPE_NOT_FOUND,
-            isa.getCommodityType().getClassificationId(),
-            isa.getCommodityType().getClassificationSystem()).toString());
-
     isaValidator.validate(isa);
   }
 }

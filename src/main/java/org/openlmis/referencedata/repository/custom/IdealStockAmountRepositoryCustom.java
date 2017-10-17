@@ -13,18 +13,14 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.repository.custom;
 
-import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.openlmis.referencedata.domain.CommodityType;
-import org.springframework.data.repository.CrudRepository;
+import org.openlmis.referencedata.domain.IdealStockAmount;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.Collection;
+import java.util.List;
 
-@JaversSpringDataAuditable
-public interface CommodityTypeRepository extends CrudRepository<CommodityType, UUID> {
+public interface IdealStockAmountRepositoryCustom {
 
-  Optional<CommodityType> findByClassificationIdAndClassificationSystem(
-      String classificationId, String classificationSystem);
+  List<IdealStockAmount> search(Collection<IdealStockAmount> idealStockAmounts);
 }

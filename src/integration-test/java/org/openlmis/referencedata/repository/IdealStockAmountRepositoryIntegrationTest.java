@@ -30,10 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class IdealStockAmountRepositoryIntegrationTest extends
@@ -121,28 +121,14 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   }
 
   @Test
-  public void shouldCheckIfPeriodExists() {
+  public void shouldGetListOfIdealStockAmounts() {
     IdealStockAmount isa = generateInstance();
 
-    assertFalse(isaRepository.existsByFacilityAndCommodityTypeAndProcessingPeriod(
-        facility, commodityType, period));
-
-    isaRepository.save(isa);
-
-    assertTrue(isaRepository.existsByFacilityAndCommodityTypeAndProcessingPeriod(
-        facility, commodityType, period));
-  }
-
-  @Test
-  public void shouldFindByNestedObjects() {
-    IdealStockAmount isa = generateInstance();
-
-    assertEquals(null, isaRepository.findByFacilityAndCommodityTypeAndProcessingPeriod(
-        facility, commodityType, period));
+    assertTrue(isaRepository.search(Collections.singletonList(isa)).isEmpty());
 
     isa = isaRepository.save(isa);
 
-    assertEquals(isa.getId(), isaRepository.findByFacilityAndCommodityTypeAndProcessingPeriod(
-        facility, commodityType, period).getId());
+    assertEquals(1, isaRepository.search(Collections.singletonList(isa)).size());
+    assertEquals(isa, isaRepository.search(Collections.singletonList(isa)).get(0));
   }
 }

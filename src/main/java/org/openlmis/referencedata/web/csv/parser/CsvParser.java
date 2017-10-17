@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
@@ -119,7 +118,7 @@ public class CsvParser {
   private <D extends BaseDto, E extends BaseEntity> void doWrite(RecordProcessor<D, E> processor,
                                                                  RecordWriter<E> writer,
                                                                  List<D> imported) {
-    List<E> entities = imported.stream().map(processor::process).collect(Collectors.toList());
+    List<E> entities = processor.process(imported);
     writer.write(entities);
   }
 

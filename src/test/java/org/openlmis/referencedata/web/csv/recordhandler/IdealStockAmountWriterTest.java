@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
@@ -28,10 +27,10 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 public class IdealStockAmountWriterTest {
 
@@ -42,24 +41,18 @@ public class IdealStockAmountWriterTest {
   private IdealStockAmountWriter idealStockAmountWriter;
 
   private IdealStockAmount idealStockAmount;
-  private Facility facility;
-  private CommodityType commodityType;
-  private ProcessingPeriod processingPeriod;
 
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
 
-    facility = new Facility("facility-code");
-    commodityType = new CommodityType();
-    processingPeriod = new ProcessingPeriod();
+    Facility facility = new Facility("facility-code");
+    CommodityType commodityType = new CommodityType();
+    ProcessingPeriod processingPeriod = new ProcessingPeriod();
     processingPeriod.setStartDate(LocalDate.of(2017, 10, 1));
     processingPeriod.setEndDate(LocalDate.of(2017, 10, 30));
 
-    idealStockAmount = new IdealStockAmount();
-    idealStockAmount.setFacility(facility);
-    idealStockAmount.setCommodityType(commodityType);
-    idealStockAmount.setProcessingPeriod(processingPeriod);
+    idealStockAmount = new IdealStockAmount(facility, commodityType, processingPeriod, 123);
   }
 
   @Test
@@ -67,24 +60,8 @@ public class IdealStockAmountWriterTest {
     IdealStockAmount existingCatalogItem = new IdealStockAmount();
     existingCatalogItem.setId(UUID.randomUUID());
 
-    when(idealStockAmountRepository.existsByFacilityAndCommodityTypeAndProcessingPeriod(facility,
-        commodityType, processingPeriod)).thenReturn(true);
-    when(idealStockAmountRepository.findByFacilityAndCommodityTypeAndProcessingPeriod(facility,
-        commodityType, processingPeriod)).thenReturn(existingCatalogItem);
+    idealStockAmountWriter.write(Arrays.asList(idealStockAmount));
 
-    BaseEntity entity = idealStockAmountWriter.getExisting(idealStockAmount);
-
-    assertEquals(existingCatalogItem.getId(), entity.getId());
-  }
-
-
-  @Test
-  public void shouldReturnIfExistingItemNotFound() {
-    when(idealStockAmountRepository.existsByFacilityAndCommodityTypeAndProcessingPeriod(facility,
-        commodityType, processingPeriod)).thenReturn(false);
-
-    BaseEntity entity = idealStockAmountWriter.getExisting(idealStockAmount);
-
-    assertEquals(null, entity);
+    verify(idealStockAmountRepository).save(Arrays.asList(idealStockAmount));
   }
 }

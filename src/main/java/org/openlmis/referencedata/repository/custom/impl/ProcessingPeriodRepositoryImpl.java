@@ -20,15 +20,22 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCustom;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositoryCustom {
+
+  private static final String PROCESSING_SCHEDULE = "processingSchedule";
+  private static final String NAME = "name";
+  private static final String CODE = "code";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -61,5 +68,40 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
     query.orderBy(builder.asc(root.get("startDate")));
 
     return entityManager.createQuery(query).getResultList();
+  }
+
+  /**
+   * Finds Periods by name and processing schedule code.
+   * @param name                   period name
+   * @param processingScheduleCode schedule code
+   * @return list of all Periods matching all of provided parameters.
+   */
+  public Optional<ProcessingPeriod> findByNameAndProcessingScheduleCode(
+      String name, String processingScheduleCode) {
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<ProcessingPeriod> query = builder.createQuery(ProcessingPeriod.class);
+    Root<ProcessingPeriod> root = query.from(ProcessingPeriod.class);
+    Predicate predicate = builder.conjunction();
+
+    if (null != name) {
+      predicate = builder.and(predicate, builder.equal(root.get(NAME), name));
+    }
+
+    if (null != processingScheduleCode) {
+      Join<ProcessingPeriod, ProcessingSchedule> scheduleJoin = root.join(PROCESSING_SCHEDULE);
+      predicate = builder.and(predicate,
+          builder.equal(scheduleJoin.get(CODE), processingScheduleCode));
+    }
+
+    query.where(predicate);
+
+    Optional result;
+    try {
+      result = Optional.of(entityManager.createQuery(query).getSingleResult());
+    } catch (NoResultException ex) {
+      result = Optional.empty();
+    }
+
+    return result;
   }
 }

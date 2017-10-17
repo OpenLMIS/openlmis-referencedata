@@ -15,71 +15,18 @@
 
 package org.openlmis.referencedata.validate;
 
-import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.CommodityTypeRepository;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.util.Message;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_COMMODITY_TYPE_NOT_FOUND;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FROM_FIELD_REQUIRED;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_PERIOD_NOT_FOUND;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_SCHEDULE_NOT_FOUND;
 
 @Component
 public class IdealStockAmountValidator {
 
-  @Autowired
-  private FacilityRepository facilityRepository;
-
-  @Autowired
-  private CommodityTypeRepository commodityTypeRepository;
-
-  @Autowired
-  private ProcessingPeriodRepository processingPeriodRepository;
-
-  @Autowired
-  private ProcessingScheduleRepository processingScheduleRepository;
-
   public void validate(IdealStockAmountCsvModel idealStockAmount) {
     validateNullValues(idealStockAmount);
-    validateNestedObjectsExist(idealStockAmount);
-  }
-
-  private void validateNestedObjectsExist(IdealStockAmountCsvModel idealStockAmount) {
-    if (!facilityRepository.existsByCode(idealStockAmount.getFacility().getCode())) {
-      throw new ValidationMessageException(new Message(ERROR_FACILITY_NOT_FOUND,
-          idealStockAmount.getFacility().getCode()));
-    }
-
-    if (!processingScheduleRepository.existsByCode(
-        idealStockAmount.getProcessingPeriod().getProcessingSchedule().getCode())) {
-      throw new ValidationMessageException(new Message(ERROR_PROCESSING_SCHEDULE_NOT_FOUND,
-          idealStockAmount.getProcessingPeriod().getProcessingSchedule().getCode()));
-    }
-
-    ProcessingSchedule processingSchedule = processingScheduleRepository
-        .findByCode(idealStockAmount.getProcessingPeriod().getProcessingSchedule().getCode());
-
-    if (!processingPeriodRepository.existsByNameAndProcessingSchedule(
-        idealStockAmount.getProcessingPeriod().getName(), processingSchedule)) {
-      throw new ValidationMessageException(new Message(ERROR_PROCESSING_PERIOD_NOT_FOUND,
-          idealStockAmount.getProcessingPeriod().getName()));
-    }
-
-    if (!commodityTypeRepository.existsByClassificationIdAndClassificationSystem(
-        idealStockAmount.getCommodityType().getClassificationId(),
-        idealStockAmount.getCommodityType().getClassificationSystem())) {
-      throw new ValidationMessageException(new Message(ERROR_COMMODITY_TYPE_NOT_FOUND,
-          idealStockAmount.getCommodityType().getClassificationId(),
-          idealStockAmount.getCommodityType().getClassificationSystem()));
-    }
   }
 
   private void validateNullValues(IdealStockAmountCsvModel idealStockAmount) {

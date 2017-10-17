@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.ZonedDateTime;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ProcessingScheduleRepositoryIntegrationTest
@@ -71,24 +70,6 @@ public class ProcessingScheduleRepositoryIntegrationTest
     scheduleFromRepo = iterable.iterator().next();
     assertTrue(savingDateTime.isBefore(scheduleFromRepo.getModifiedDate()));
     assertEquals(newDescription, scheduleFromRepo.getDescription());
-  }
-
-  @Test
-  public void shouldCheckIfPeriodExistsByCode() {
-    ProcessingSchedule schedule = generateInstance();
-    assertFalse(repository.existsByCode(schedule.getCode()));
-
-    schedule = repository.save(schedule);
-    assertTrue(repository.existsByCode(schedule.getCode()));
-  }
-
-  @Test
-  public void shouldFindByNameAndSchedule() {
-    ProcessingSchedule schedule = generateInstance();
-    assertEquals(null, repository.findByCode(schedule.getCode()));
-
-    schedule = repository.save(schedule);
-    assertEquals(schedule.getId(), repository.findByCode(schedule.getCode()).getId());
   }
 
   private ProcessingSchedule getExampleSchedule() {

@@ -18,10 +18,12 @@ package org.openlmis.referencedata.web.csv.recordhandler;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.dto.BaseDto;
 
+import java.util.List;
+
 /**
  * This interface is implemented by all record processors.
  */
 public interface RecordProcessor<T extends BaseDto, R extends BaseEntity> {
 
-  R process(T dto);
+  List<R> process(List<T> dto);
 }

@@ -81,27 +81,16 @@ public class CommodityTypeRepositoryIntegrationTest extends
   }
 
   @Test
-  public void shouldCheckIfCommodityTypeExistsByClassificationIdAndSystem() {
-    assertFalse(repository.existsByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
-        CLASSIFICATION_SYSTEM));
-
-    CommodityType commodityType = generateInstance();
-    repository.save(commodityType);
-
-    assertTrue(repository.existsByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
-        CLASSIFICATION_SYSTEM));
-  }
-
-  @Test
-  public void shouldFindByClassificationIdAndSystem() {
-    assertEquals(null, repository.findByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
-        CLASSIFICATION_SYSTEM));
+  public void shouldFindCommodityTypeByClassificationIdAndSystem() {
+    assertFalse(repository.findByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
+        CLASSIFICATION_SYSTEM).isPresent());
 
     CommodityType commodityType = generateInstance();
     commodityType = repository.save(commodityType);
 
-    assertEquals(commodityType.getId(),
-        repository.findByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
-            CLASSIFICATION_SYSTEM).getId());
+    assertTrue(repository.findByClassificationIdAndClassificationSystem(CLASSIFICATION_ID,
+        CLASSIFICATION_SYSTEM).isPresent());
+    assertEquals(commodityType, repository.findByClassificationIdAndClassificationSystem(
+        CLASSIFICATION_ID, CLASSIFICATION_SYSTEM).get());
   }
 }

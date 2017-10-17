@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import com.vividsolutions.jts.geom.Polygon;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
@@ -46,6 +47,8 @@ public interface FacilityRepository
   List<Facility> findByBoundary(@Param("boundary") Polygon boundary);
 
   Facility findFirstByCode(String code);
+
+  Optional<Facility> findByCode(String code);
 
   @Query(name = "Facility.findSupervisionFacilitiesByUser",
       nativeQuery = true)

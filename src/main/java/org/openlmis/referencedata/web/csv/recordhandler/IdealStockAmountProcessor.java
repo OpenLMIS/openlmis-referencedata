@@ -15,27 +15,38 @@
 
 package org.openlmis.referencedata.web.csv.recordhandler;
 
+import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
+import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.openlmis.referencedata.validate.IdealStockAmountValidator;
+import org.openlmis.referencedata.util.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_COMMODITY_TYPE_NOT_FOUND;
+import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
+import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_PERIOD_NOT_FOUND;
+
 /**
  * IdealStockAmountProcessor is used for uploads of Ideal Stock Amount.
- * It uploads each catalog item record by record.
+ * It uploads each ideal stock amount by record.
  */
 @Component
 public class IdealStockAmountProcessor
     implements RecordProcessor<IdealStockAmountCsvModel, IdealStockAmount> {
 
   @Autowired
-  private IdealStockAmountValidator idealStockAmountsValidator;
+  private IdealStockAmountRepository idealStockAmountRepository;
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -44,22 +55,87 @@ public class IdealStockAmountProcessor
   private ProcessingPeriodRepository processingPeriodRepository;
 
   @Autowired
-  private ProcessingScheduleRepository processingScheduleRepository;
-
-  @Autowired
   private CommodityTypeRepository commodityTypeRepository;
 
   @Override
-  public IdealStockAmount process(IdealStockAmountCsvModel record) {
-    idealStockAmountsValidator.validate(record);
-    facilityRepository.findFirstByCode(record.getFacility().getCode()).export(record.getFacility());
-    ProcessingSchedule schedule = processingScheduleRepository
-        .findByCode(record.getProcessingPeriod().getProcessingSchedule().getCode());
-    processingPeriodRepository.findByNameAndProcessingSchedule(
-        record.getProcessingPeriod().getName(), schedule).export(record.getProcessingPeriod());
-    commodityTypeRepository.findByClassificationIdAndClassificationSystem(
-        record.getCommodityType().getClassificationId(),
-        record.getCommodityType().getClassificationSystem()).export(record.getCommodityType());
-    return IdealStockAmount.newIdealStockAmount(record);
+  public List<IdealStockAmount> process(List<IdealStockAmountCsvModel> records) {
+    List<IdealStockAmount> idealStockAmounts = idealStockAmountRepository.search(convert(records));
+
+    List<IdealStockAmount> resultList = new ArrayList<>();
+
+    for (IdealStockAmountCsvModel isa : records) {
+      IdealStockAmount result = getExisting(idealStockAmounts, isa);
+      if (null == result) {
+        resultList.add(prepareNewIdealStockAmountObject(isa));
+      } else {
+        result.setAmount(isa.getAmount());
+        resultList.add(result);
+      }
+    }
+
+    return resultList;
+  }
+
+  private IdealStockAmount getExisting(List<IdealStockAmount> list,
+                                       IdealStockAmountCsvModel record) {
+    for (IdealStockAmount isa : list) {
+      if (isa.getFacility().getCode().equals(record.getFacility().getCode())
+          && isa.getProcessingPeriod().getName().equals(record.getProcessingPeriod().getName())
+          && isa.getProcessingPeriod().getProcessingSchedule().getCode().equals(
+              record.getProcessingPeriod().getProcessingSchedule().getCode())
+          && isa.getCommodityType().getClassificationId().equals(
+              record.getCommodityType().getClassificationId())
+          && isa.getCommodityType().getClassificationSystem().equals(
+              record.getCommodityType().getClassificationSystem())) {
+        return isa;
+      }
+    }
+    return null;
+  }
+
+  private IdealStockAmount prepareNewIdealStockAmountObject(IdealStockAmountCsvModel isa) {
+    Facility facility = facilityRepository.findByCode(isa.getFacility().getCode())
+        .orElseThrow(() -> new ValidationMessageException(new Message(ERROR_FACILITY_NOT_FOUND,
+            isa.getFacility().getCode())));
+
+    ProcessingPeriod period = processingPeriodRepository.findByNameAndProcessingScheduleCode(
+        isa.getProcessingPeriod().getName(),
+        isa.getProcessingPeriod().getProcessingSchedule().getCode())
+        .orElseThrow(() -> new ValidationMessageException(
+            new Message(ERROR_PROCESSING_PERIOD_NOT_FOUND,
+            isa.getProcessingPeriod().getName(),
+            isa.getProcessingPeriod().getProcessingSchedule().getCode())));
+
+    CommodityType commodityType = commodityTypeRepository
+        .findByClassificationIdAndClassificationSystem(isa.getCommodityType().getClassificationId(),
+            isa.getCommodityType().getClassificationSystem())
+        .orElseThrow(() -> new ValidationMessageException(new Message(
+            ERROR_COMMODITY_TYPE_NOT_FOUND,
+            isa.getCommodityType().getClassificationId(),
+            isa.getCommodityType().getClassificationSystem())));
+
+    return new IdealStockAmount(facility, commodityType, period, isa.getAmount());
+  }
+
+  private List<IdealStockAmount> convert(List<IdealStockAmountCsvModel> list) {
+    List<IdealStockAmount> result = new ArrayList<>();
+
+    for (IdealStockAmountCsvModel isa : list) {
+      final Facility facility = new Facility(isa.getFacility().getCode());
+
+      ProcessingSchedule schedule = new ProcessingSchedule();
+      schedule.setCode(isa.getProcessingPeriod().getProcessingSchedule().getCode());
+      ProcessingPeriod period = new ProcessingPeriod();
+      period.setName(isa.getProcessingPeriod().getName());
+      period.setProcessingSchedule(schedule);
+
+      CommodityType commodityType = new CommodityType();
+      commodityType.setClassificationId(isa.getCommodityType().getClassificationId());
+      commodityType.setClassificationSystem(isa.getCommodityType().getClassificationSystem());
+
+      result.add(new IdealStockAmount(facility, commodityType, period, isa.getAmount()));
+    }
+
+    return result;
   }
 }

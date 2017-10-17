@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.web.csv.recordhandler;
 
-
-import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,23 +24,13 @@ import org.springframework.stereotype.Component;
  * This class is responsible for saving {@link IdealStockAmount} instances to the database.
  */
 @Component
-public class IdealStockAmountWriter extends AbstractRecordWriter<IdealStockAmount> {
+public class IdealStockAmountWriter implements RecordWriter<IdealStockAmount> {
 
   @Autowired
   private IdealStockAmountRepository repository;
 
   @Override
-  protected BaseEntity getExisting(IdealStockAmount record) {
-    if (repository.existsByFacilityAndCommodityTypeAndProcessingPeriod(record.getFacility(),
-        record.getCommodityType(), record.getProcessingPeriod())) {
-      return repository.findByFacilityAndCommodityTypeAndProcessingPeriod(record.getFacility(),
-          record.getCommodityType(), record.getProcessingPeriod());
-    }
-    return null;
-  }
-
-  @Override
-  protected void save(Iterable<IdealStockAmount> records) {
+  public void write(Iterable<IdealStockAmount> records) {
     repository.save(records);
   }
 }

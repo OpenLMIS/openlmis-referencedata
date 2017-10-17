@@ -57,10 +57,12 @@ public final class CommodityType extends BaseEntity {
   private String name;
 
   @Getter
+  @Setter
   @Column(nullable = false)
   private String classificationSystem;
 
   @Getter
+  @Setter
   @Column(nullable = false)
   private String classificationId;
 

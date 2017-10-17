@@ -44,6 +44,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.joinWith;
@@ -96,19 +97,12 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
 
     when(idealStockAmountRepository.save(any(IdealStockAmount.class)))
         .thenAnswer(new SaveAnswer<IdealStockAmount>());
-    when(facilityRepository.existsByCode(any(String.class))).thenReturn(true);
-    when(periodRepository.existsByNameAndProcessingSchedule(any(String.class),
-        any(ProcessingSchedule.class))).thenReturn(true);
-    when(scheduleRepository.existsByCode(any(String.class))).thenReturn(true);
-    when(commodityTypeRepository.existsByClassificationIdAndClassificationSystem(any(String.class),
-        any(String.class))).thenReturn(true);
 
-    when(facilityRepository.findFirstByCode(any(String.class))).thenReturn(facility);
-    when(periodRepository.findByNameAndProcessingSchedule(any(String.class),
-        any(ProcessingSchedule.class))).thenReturn(period);
+    when(facilityRepository.findByCode(any(String.class))).thenReturn(Optional.of(facility));
+    when(periodRepository.findByNameAndProcessingScheduleCode(any(String.class), any(String.class)))
+        .thenReturn(Optional.of(period));
     when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(any(String.class),
-        any(String.class))).thenReturn(commodityType);
-    when(scheduleRepository.findByCode(any(String.class))).thenReturn(schedule);
+        any(String.class))).thenReturn(Optional.of(commodityType));
   }
 
   @Test

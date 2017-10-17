@@ -16,7 +16,6 @@
 package org.openlmis.referencedata;
 
 import com.google.gson.internal.bind.TypeAdapters;
-
 import org.flywaydb.core.Flyway;
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;

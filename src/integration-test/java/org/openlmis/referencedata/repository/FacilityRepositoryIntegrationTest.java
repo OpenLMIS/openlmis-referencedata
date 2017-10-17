@@ -291,8 +291,18 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility = generateInstance();
     repository.save(facility);
 
-    assertTrue(repository.existsByCode(facility.getCode()));
     assertFalse(repository.existsByCode("some-random-code"));
+    assertTrue(repository.existsByCode(facility.getCode()));
+  }
+
+  @Test
+  public void shouldGetFacilityByCode() {
+    Facility facility = generateInstance();
+    facility = repository.save(facility);
+
+    assertFalse(repository.findByCode("some-random-code").isPresent());
+    assertTrue(repository.findByCode(facility.getCode()).isPresent());
+    assertEquals(facility, repository.findByCode(facility.getCode()).get());
   }
 
   @Override

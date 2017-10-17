@@ -20,8 +20,12 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ProcessingPeriodRepositoryCustom {
 
   List<ProcessingPeriod> searchPeriods(ProcessingSchedule processingSchedule, LocalDate toDate);
+
+  Optional<ProcessingPeriod> findByNameAndProcessingScheduleCode(String name,
+                                                                 String processingScheduleCode);
 }

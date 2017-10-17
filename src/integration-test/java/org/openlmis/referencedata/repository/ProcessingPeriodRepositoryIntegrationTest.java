@@ -191,28 +191,17 @@ public class ProcessingPeriodRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldCheckIfPeriodExistsByNameAndProcessingSchedule() {
+  public void shouldFindByNameAndProcessingScheduleCode() {
     ProcessingPeriod processingPeriod = generateInstance();
 
-    assertFalse(periodRepository.existsByNameAndProcessingSchedule(processingPeriod.getName(),
-        testSchedule));
+    assertFalse(null, periodRepository.findByNameAndProcessingScheduleCode(
+        processingPeriod.getName(), testSchedule.getCode()).isPresent());
 
     processingPeriod = periodRepository.save(processingPeriod);
 
-    assertTrue(periodRepository.existsByNameAndProcessingSchedule(processingPeriod.getName(),
-        testSchedule));
-  }
-
-  @Test
-  public void shouldFindByNameAndSchedule() {
-    ProcessingPeriod processingPeriod = generateInstance();
-
-    assertEquals(null, periodRepository.findByNameAndProcessingSchedule(processingPeriod.getName(),
-        testSchedule));
-
-    processingPeriod = periodRepository.save(processingPeriod);
-
-    assertEquals(processingPeriod.getId(), periodRepository.findByNameAndProcessingSchedule(
-        processingPeriod.getName(), testSchedule).getId());
+    assertTrue(periodRepository.findByNameAndProcessingScheduleCode(processingPeriod.getName(),
+        testSchedule.getCode()).isPresent());
+    assertEquals(processingPeriod, periodRepository.findByNameAndProcessingScheduleCode(
+        processingPeriod.getName(), testSchedule.getCode()).get());
   }
 }

@@ -29,27 +29,38 @@ import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.validate.IdealStockAmountValidator;
 
-import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class IdealStockAmountProcessorTest {
+
+  private static final String FACILITY_CODE = "facility-code";
+  private static final String SYSTEM = "system";
+  private static final String ID = "id";
+  private static final String SCHEDULE = "schedule";
+  private static final String PERIOD = "period";
 
   @Mock
   private FacilityRepository facilityRepository;
 
   @Mock
-  private ProcessingPeriodRepository processingPeriodRepository;
+  private IdealStockAmountRepository idealStockAmountRepository;
 
   @Mock
-  private ProcessingScheduleRepository processingScheduleRepository;
+  private ProcessingPeriodRepository processingPeriodRepository;
 
   @Mock
   private CommodityTypeRepository commodityTypeRepository;
@@ -69,47 +80,118 @@ public class IdealStockAmountProcessorTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
 
-    facility = new Facility("facility-code");
+    facility = new Facility(FACILITY_CODE);
     commodityType = new CommodityType();
+    commodityType.setClassificationSystem(SYSTEM);
+    commodityType.setClassificationId(ID);
+    ProcessingSchedule schedule = new ProcessingSchedule();
+    schedule.setCode(SCHEDULE);
     processingPeriod = new ProcessingPeriod();
-    processingPeriod.setStartDate(LocalDate.of(2017, 10, 1));
-    processingPeriod.setEndDate(LocalDate.of(2017, 10, 30));
+    processingPeriod.setName(PERIOD);
+    processingPeriod.setProcessingSchedule(schedule);
 
-    idealStockAmount = new IdealStockAmount();
-    idealStockAmount.setFacility(facility);
-    idealStockAmount.setCommodityType(commodityType);
-    idealStockAmount.setProcessingPeriod(processingPeriod);
+    idealStockAmount = new IdealStockAmount(facility, commodityType, processingPeriod, 1);
+
+    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+        .thenReturn(Collections.emptyList());
+
+    when(facilityRepository.findByCode(FACILITY_CODE)).thenReturn(Optional.of(facility));
+    when(processingPeriodRepository.findByNameAndProcessingScheduleCode(PERIOD, SCHEDULE))
+        .thenReturn(Optional.of(processingPeriod));
+    when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(ID, SYSTEM))
+        .thenReturn(Optional.of(commodityType));
   }
 
   @Test
-  public void shouldSetFullObjectsToIdealStockAmountsModel() {
-    BasicFacilityDto facilityDto = new BasicFacilityDto();
-    facilityDto.setCode("facility-code");
-    CommodityTypeDto commodityTypeDto = new CommodityTypeDto();
-    commodityTypeDto.setClassificationSystem("system");
-    commodityTypeDto.setClassificationId("id");
-    ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode("schedule");
-    ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto();
-    processingPeriodDto.setName("period");
-    processingPeriodDto.setProcessingSchedule(schedule);
-
-    IdealStockAmountCsvModel isa = new IdealStockAmountCsvModel(facilityDto, commodityTypeDto,
-        processingPeriodDto, 1212);
+  public void shouldUseExistingObject() {
+    IdealStockAmountCsvModel isa = createIsaDto();
 
     idealStockAmountsValidator.validate(isa);
-    when(facilityRepository.findFirstByCode("facility-code")).thenReturn(facility);
-    when(processingScheduleRepository.findByCode("schedule")).thenReturn(schedule);
-    when(processingPeriodRepository.findByNameAndProcessingSchedule("period", schedule))
-        .thenReturn(processingPeriod);
-    when(commodityTypeRepository.findByClassificationIdAndClassificationSystem("id",  "system"))
-        .thenReturn(commodityType);
+    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+        .thenReturn(Collections.singletonList(idealStockAmount));
 
-    IdealStockAmount idealStockAmount = idealStockAmountProcessor.process(isa);
+    List<IdealStockAmount> result = idealStockAmountProcessor
+        .process(Collections.singletonList(isa));
 
-    assertEquals(idealStockAmount.getFacility(), facility);
-    assertEquals(idealStockAmount.getAmount(), new Integer(1212));
-    assertEquals(idealStockAmount.getCommodityType(), commodityType);
-    assertEquals(idealStockAmount.getFacility(), facility);
+    verify(idealStockAmountsValidator).validate(isa);
+    verify(idealStockAmountRepository).search(anyListOf(IdealStockAmount.class));
+
+    assertEquals(result.get(0).getFacility(), facility);
+    assertEquals(result.get(0).getAmount(), new Integer(1212));
+    assertEquals(result.get(0).getCommodityType(), commodityType);
+    assertEquals(result.get(0).getProcessingPeriod(), processingPeriod);
+  }
+
+  @Test
+  public void shouldCreateNewObject() {
+    IdealStockAmountCsvModel isa = createIsaDto();
+
+    idealStockAmountsValidator.validate(isa);
+    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+        .thenReturn(Collections.emptyList());
+
+    List<IdealStockAmount> result = idealStockAmountProcessor
+        .process(Collections.singletonList(isa));
+
+    verify(idealStockAmountsValidator).validate(isa);
+    verify(idealStockAmountRepository).search(anyListOf(IdealStockAmount.class));
+
+    assertEquals(result.get(0).getFacility(), facility);
+    assertEquals(result.get(0).getAmount(), new Integer(1212));
+    assertEquals(result.get(0).getCommodityType(), commodityType);
+    assertEquals(result.get(0).getProcessingPeriod(), processingPeriod);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfFacilityNotFound() {
+    IdealStockAmountCsvModel isa = createIsaDto();
+
+    idealStockAmountsValidator.validate(isa);
+    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+        .thenReturn(Collections.emptyList());
+    when(facilityRepository.findByCode(FACILITY_CODE)).thenReturn(Optional.empty());
+
+    idealStockAmountProcessor.process(Collections.singletonList(isa));
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfPeriodNotFound() {
+    IdealStockAmountCsvModel isa = createIsaDto();
+
+    idealStockAmountsValidator.validate(isa);
+    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+        .thenReturn(Collections.emptyList());
+    when(processingPeriodRepository.findByNameAndProcessingScheduleCode(PERIOD, SCHEDULE))
+        .thenReturn(Optional.empty());
+
+    idealStockAmountProcessor.process(Collections.singletonList(isa));
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfCommodityTypeNotFound() {
+    IdealStockAmountCsvModel isa = createIsaDto();
+
+    idealStockAmountsValidator.validate(isa);
+    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+        .thenReturn(Collections.emptyList());
+    when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(ID, SYSTEM))
+        .thenReturn(Optional.empty());
+
+    idealStockAmountProcessor.process(Collections.singletonList(isa));
+  }
+
+  private IdealStockAmountCsvModel createIsaDto() {
+    BasicFacilityDto facilityDto = new BasicFacilityDto();
+    facilityDto.setCode(FACILITY_CODE);
+    CommodityTypeDto commodityTypeDto = new CommodityTypeDto();
+    commodityTypeDto.setClassificationSystem(SYSTEM);
+    commodityTypeDto.setClassificationId(ID);
+    ProcessingSchedule schedule = new ProcessingSchedule();
+    schedule.setCode(SCHEDULE);
+    ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto();
+    processingPeriodDto.setName(PERIOD);
+    processingPeriodDto.setProcessingSchedule(schedule);
+
+    return new IdealStockAmountCsvModel(facilityDto, commodityTypeDto, processingPeriodDto, 1212);
   }
 }

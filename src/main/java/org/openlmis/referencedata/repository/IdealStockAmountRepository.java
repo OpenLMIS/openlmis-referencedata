@@ -15,22 +15,12 @@
 
 package org.openlmis.referencedata.repository;
 
-import org.openlmis.referencedata.domain.CommodityType;
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
-import org.openlmis.referencedata.domain.ProcessingPeriod;
+import org.openlmis.referencedata.repository.custom.IdealStockAmountRepositoryCustom;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.UUID;
 
 public interface IdealStockAmountRepository extends
-    PagingAndSortingRepository<IdealStockAmount, UUID> {
-
-  boolean existsByFacilityAndCommodityTypeAndProcessingPeriod(Facility facility,
-                                                              CommodityType commodityType,
-                                                              ProcessingPeriod processingPeriod);
-
-  IdealStockAmount findByFacilityAndCommodityTypeAndProcessingPeriod(Facility facility,
-                                                              CommodityType commodityType,
-                                                              ProcessingPeriod processingPeriod);
+    PagingAndSortingRepository<IdealStockAmount, UUID>, IdealStockAmountRepositoryCustom {
 }
