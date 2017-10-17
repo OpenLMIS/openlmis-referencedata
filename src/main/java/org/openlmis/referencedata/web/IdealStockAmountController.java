@@ -146,8 +146,9 @@ public class IdealStockAmountController extends BaseController {
           response.getOutputStream(), new ModelClass(IdealStockAmountCsvModel.class), items);
     } catch (IOException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
+    } finally {
+      profiler.stop().log();
     }
-    profiler.stop().log();
   }
 
   /**
@@ -180,12 +181,13 @@ public class IdealStockAmountController extends BaseController {
     try {
       int result = csvParser.parse(file.getInputStream(), modelClass, csvHeaderValidator,
           idealStockAmountProcessor, idealStockAmountWriter);
+      profiler.start("UPLOAD_RESULT_DTO");
       UploadResultDto dto = new UploadResultDto(result);
-      profiler.stop().log();
       return dto;
     } catch (IOException ex) {
-      profiler.stop().log();
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
+    } finally {
+      profiler.stop().log();
     }
   }
 

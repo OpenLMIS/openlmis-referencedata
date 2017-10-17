@@ -17,9 +17,13 @@ package org.openlmis.referencedata.web.csv.format;
 
 import lombok.Getter;
 import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.web.IdealStockAmountController;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.openlmis.referencedata.web.csv.processor.CsvCellProcessors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.dozer.CsvDozerBeanWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -37,6 +41,8 @@ import static java.util.Arrays.asList;
  */
 class CsvBeanWriter<T extends BaseDto> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CsvBeanWriter.class);
+
   private ModelClass<T> modelClass;
   private CsvDozerBeanWriter csvDozerBeanWriter;
   private CellProcessor[] processors;
@@ -46,30 +52,65 @@ class CsvBeanWriter<T extends BaseDto> {
 
   CsvBeanWriter(ModelClass<T> modelClass,
                 OutputStream outputStream) throws IOException {
+    Profiler profiler = new Profiler("CREATE_CSV_WRITER");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("MODEL_CLASS");
     this.modelClass = modelClass;
+
+    profiler.start("CONFIGURE_WRITER");
     configureDozerBeanWriter(outputStream);
+
+    profiler.start("CONFIGURE_PROCESSORS");
     configureProcessors();
+
+    profiler.stop().log();
   }
 
   void writeWithCellProcessors(List<? extends BaseDto> dtos) throws IOException {
+    Profiler profiler = new Profiler("CSV_WRITE_CELLS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("WRITE_HEADERS");
     csvDozerBeanWriter.writeHeader(headers);
+
+    profiler.start("WRITE_LINE_ITEMS");
     for (Object dto : dtos) {
       csvDozerBeanWriter.write(dto, processors);
     }
+
+    profiler.start("CLOSE_STREAM");
     csvDozerBeanWriter.close();
+
+    profiler.stop().log();
   }
 
   private void configureDozerBeanWriter(OutputStream outputStream) throws IOException {
+    Profiler profiler = new Profiler("CONFIGURE_DOZER_WRITER");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CSV_PREFERENCE");
     CsvPreference csvPreference = new CsvPreference.Builder(CsvPreference.STANDARD_PREFERENCE)
         .surroundingSpacesNeedQuotes(true)
         .build();
 
+    profiler.start("CREATE_STREAM");
     BufferedWriter bufferedReader = new BufferedWriter(
         new OutputStreamWriter(outputStream, "UTF-8"));
+
+    profiler.start("NEW_READER");
     csvDozerBeanWriter = new CsvDozerBeanWriter(bufferedReader, csvPreference);
+
+    profiler.start("READ_HEADERS");
     headers = readHeaders();
+
+    profiler.start("GET_FIELD_MAPPINGS");
     String[] mappings = modelClass.getFieldNameMappings(headers);
+
+    profiler.start("CONFIGURE_BEAN_MAPPING");
     csvDozerBeanWriter.configureBeanMapping(modelClass.getClazz(), mappings);
+
+    profiler.stop().log();
   }
 
   private String[] readHeaders() {

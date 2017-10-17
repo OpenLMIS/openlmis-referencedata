@@ -22,9 +22,13 @@ import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
+import org.openlmis.referencedata.web.IdealStockAmountController;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.recordhandler.RecordProcessor;
 import org.openlmis.referencedata.web.csv.recordhandler.RecordWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.supercsv.exception.SuperCsvException;
@@ -50,6 +54,8 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 @NoArgsConstructor
 public class CsvParser {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CsvParser.class);
+
   @Value("${csvParser.chunkSize}")
   private int chunkSize;
 
@@ -67,14 +73,22 @@ public class CsvParser {
                                                              RecordProcessor<D, E> processor,
                                                              RecordWriter<E> writer)
       throws IOException {
+    Profiler profiler = new Profiler("PARSE_CSV_FILE");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("NEW_CSV_READER");
     CsvBeanReader<D> csvBeanReader = new CsvBeanReader<>(
         modelClass, inputStream, headerValidator
     );
+
+    profiler.start("VALIDATE_HEADERS");
     csvBeanReader.validateHeaders();
 
+    profiler.start("NEW_THREAD_POOL");
     ExecutorService executor = Executors.newFixedThreadPool(Math.min(1, poolSize));
     List<CompletableFuture<Void>> futures = Lists.newArrayList();
 
+    profiler.start("DO_READ");
     try {
       while (true) {
         List<D> imported = doRead(csvBeanReader);
@@ -88,8 +102,12 @@ public class CsvParser {
         futures.add(future);
       }
     } finally {
+      profiler.start("JOIN_RESULTS");
+
       futures.forEach(CompletableFuture::join);
     }
+
+    profiler.stop().log();
 
     return csvBeanReader.getRowNumber() - 1;
   }
@@ -118,8 +136,16 @@ public class CsvParser {
   private <D extends BaseDto, E extends BaseEntity> void doWrite(RecordProcessor<D, E> processor,
                                                                  RecordWriter<E> writer,
                                                                  List<D> imported) {
+    Profiler profiler = new Profiler("WRITE_CSV_CHUNK");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("PROCESS");
     List<E> entities = processor.process(imported);
+
+    profiler.start("WRITE_TO_DB");
     writer.write(entities);
+
+    profiler.stop().log();
   }
 
   private Message getCsvRowErrorMessage(SuperCsvException err) {

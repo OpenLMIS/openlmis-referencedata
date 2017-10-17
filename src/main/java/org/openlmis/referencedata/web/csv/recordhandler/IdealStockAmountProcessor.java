@@ -27,6 +27,10 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.web.csv.parser.CsvParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +49,8 @@ import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessag
 public class IdealStockAmountProcessor
     implements RecordProcessor<IdealStockAmountCsvModel, IdealStockAmount> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(IdealStockAmountProcessor.class);
+
   @Autowired
   private IdealStockAmountRepository idealStockAmountRepository;
 
@@ -59,10 +65,15 @@ public class IdealStockAmountProcessor
 
   @Override
   public List<IdealStockAmount> process(List<IdealStockAmountCsvModel> records) {
+    Profiler profiler = new Profiler("PROCESS_DTO_CHUNK");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("SEARCH_EXISTING_ISA");
     List<IdealStockAmount> idealStockAmounts = idealStockAmountRepository.search(convert(records));
 
     List<IdealStockAmount> resultList = new ArrayList<>();
 
+    profiler.start("PROCESS_RECORDS");
     for (IdealStockAmountCsvModel isa : records) {
       IdealStockAmount result = getExisting(idealStockAmounts, isa);
       if (null == result) {
@@ -72,6 +83,8 @@ public class IdealStockAmountProcessor
         resultList.add(result);
       }
     }
+
+    profiler.stop().log();
 
     return resultList;
   }

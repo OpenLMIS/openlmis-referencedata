@@ -20,6 +20,10 @@ import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.supercsv.exception.SuperCsvException;
 import org.supercsv.util.CsvContext;
@@ -38,6 +42,8 @@ import static org.openlmis.referencedata.util.messagekeys.CsvExportMessageKeys.E
 @NoArgsConstructor
 public class CsvFormatter {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CsvFormatter.class);
+
   /**
    * Parses data from input stream into the corresponding model.
    *
@@ -48,13 +54,20 @@ public class CsvFormatter {
                                           ModelClass<T> modelClass,
                                           List<T> dtos) throws IOException {
 
+    Profiler profiler = new Profiler("CSV_PROCESS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CREATE_CSV_WRITER");
     CsvBeanWriter<T> csvBeanWriter = new CsvBeanWriter<>(modelClass, outputStream);
 
+    profiler.start("WRITE_CSV");
     try {
       csvBeanWriter.writeWithCellProcessors(dtos);
     } catch (SuperCsvException err) {
       Message message = getCsvRowErrorMessage(err);
       throw new ValidationMessageException(err, message);
+    } finally {
+      profiler.stop().log();
     }
   }
 
