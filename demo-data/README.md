@@ -172,8 +172,10 @@ referencedata.program_orderables.json.
       1. C300/Depo-Estradiol
 4. EPI
   * products:
-    * Vaccines:
+    * Vaccines: (all are VVM enabled)
       * BCG (bcg20) - Commodity Type and Orderable
+        * BCGI2017A - Lot, expires 2019-06-01
+        * BCGI2017B - Lot, expires 2019-07-01
       * Polio - Commodity Type
         * Polio (20 dose) (polio20) - Orderable
         * IPV (ipv5) - Orderable
@@ -182,6 +184,8 @@ referencedata.program_orderables.json.
         * Pentavalent (10 dose) (penta10) - Orderable
       * PCV (pcv10) - Commodity Type and Orderable
       * Rotavirus (rota1) - Commodity Type and Orderable
+        * ROTAM2017A - Lot, expires 2019-06-01
+        * ROTAM2017B - Lot, expires 2019-07-01
       * Measles (measles10) - Commodity Type and Orderable
       * Tetanus (tetanus10) - Commodity Type and Orderable
       * Syringe 5ml (syringe5ml) - Orderable
