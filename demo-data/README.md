@@ -15,49 +15,80 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
 1. HC01/Comfort Health Clinic
   * type: Health Center
   * programs: Family Planning and Essential Meds
-  * operated by: moh/Ministry of Health
   * zone: Balaka (City)
   * this is the home facility for _administrator_, _srmanager2_ and _smanager2_ users
   * this facility is in the requisition group RGFP1 and RGEM1
 2. HF01/Kankao Health Facility
+  * type: Health Center
   * programs: Family Planning and Essential Meds
-  * operated by: moh/Ministry of Health
   * zone: Southern Region
   * this is the home facility for _srmanager4_ and _smanager4_ users
   * this facility is in the requisition group RGEM1 and RGFP2
 3. HC02/Nandumbo Health Center
   * type: Health Center
   * programs: Family Planning
-  * operated by: moh/Ministry of Health
   * zone: Southern Region
   * this is the home facility for _srmanager1_ and _smanager1_ users
   * this facility is in the requisition group RGFP1
 4. HC03/Kalembo Health Center
   * type: Health Center
   * programs: Essential Meds
-  * operated by: moh/Ministry of Health
   * zone: Southern Region
   * this is the home facility for _srmanager3_ and _smanager3_ users
   * this facility is in the requisition group RGEM1
 5. DH01/Balaka District Hospital
   * type: District Hospital
   * programs: Family Planning and Essential Meds
-  * operated by: moh/Ministry of Health
   * zone: Balaka District
   * this is the home facility for the _dsrmanager_ user
   * this facility is in the requisition group RGEM1 and RGFP2
 6. WH01/Ntcheu District Warehouse
   * type: Warehouse
   * programs: Family Planning
-  * operated by: moh/Ministry of Health
   * zone: Ntcheu District
   * this is the home facility for _devadmin_ and _wclerk1_ users
 7. WH02/Balaka District Warehouse
   * type: Warehouse
   * programs: Family Planning and Essential Meds
-  * operated by: moh/Ministry of Health
   * zone: Balaka District
   * this is the home facility for _wclerk2_ user
+
+**For EPI (Vaccines) Program**
+
+* Mozambique Central Warehouse (W001)
+  * type: Warehouse
+  * zone: Mozambique Country
+  * this is the home facility for the _vwclerk1_ user
+* Dep—sito Provincial Niassa (P001)
+  * type: Provincial Store
+  * zone: Niassa Province
+  * this is the home facility for the _rivo_ user
+* Dep—sito Distrital Cuamba (D001)
+  * type: District Store
+  * zone: Cuamba District
+  * this is the home facility for the _divo1_ user
+  * this facility is in the requisition RGEPI1
+* Dep—sito Distrital Lichinga (D002)
+  * type: District Store
+  * zone: Lichinga District
+  * this is the home facility for the _divo2_ user
+  * this facility is in the requisition RGEPI1
+
+There are 16 facilities in the Cuamba district, all health centers. Though all of them can be used
+ to demo, it is recommended to use the following facility:
+
+* Cuamba (N003)
+  * type: Health Center
+  * zone: Cuamba District
+  * this facility is in the requisition group RGEPI2
+
+There are 25 facilities in the Lichinga district, all health centers. Though all of them can be used
+ to demo, it is recommended to use the following facility:
+
+* Assumane (N036)
+  * type: Health Center
+  * zone: Lichinga District
+  * this facility is in the requisition group RGEPI3
 
 ## Geographic Levels and Zones
 
@@ -101,6 +132,13 @@ Defined in referencedata.geographic_levels.json and referencedata.geographic_zon
 4. City
   * Malawi-Southern-Balaka-Balaka/Balaka
 
+**For EPI (Vaccines) Program**
+
+* Mozambique (moz) - Country
+  * Niassa (niassa) - Province
+    * Cuamba (cuamba) - District
+    * Lichinga (lichinga-distrito) - District
+
 ## Programs and Products
 
 Defined in referencedata.programs.json, referencedata.orderables.json and
@@ -132,25 +170,27 @@ referencedata.program_orderables.json.
   * products:
     * Injectable Hormonal Contraceptive
       1. C300/Depo-Estradiol
-4. Epi program:
+4. EPI
   * products:
     * Vaccines:
-      * BCG
-      * Polio (10 dose)
-      * Polio (20 dose)
-      * Pentavalent (1 dose)
-      * Pentavalent (10 dose)
-      * PCV10
-      * HPV
-      * Measles
-      * VAT
-      * Syringe 5ml
-      * Syringe 0.5ml
-      * Syringe 0.05ml
-      * Safety Box
-      * Gas (Cylinder)
-      * Diluent BCG
-      * Diluent Measles
+      * BCG (bcg20) - Commodity Type and Orderable
+      * Polio - Commodity Type
+        * Polio (20 dose) (polio20) - Orderable
+        * IPV (ipv5) - Orderable
+      * Pentavalent - Commodity Type
+        * Pentavalent (1 dose) (penta1) - Orderable
+        * Pentavalent (10 dose) (penta10) - Orderable
+      * PCV (pcv10) - Commodity Type and Orderable
+      * Rotavirus (rota1) - Commodity Type and Orderable
+      * Measles (measles10) - Commodity Type and Orderable
+      * Tetanus (tetanus10) - Commodity Type and Orderable
+      * Syringe 5ml (syringe5ml) - Orderable
+      * Syringe 0.5ml (syringe05ml) - Orderable
+      * Syringe 0.05ml (syringe005ml) - Orderable
+      * Safety Box (safetybox) - Orderable
+      * Gas (Cylinder) (gas) - Orderable
+      * Diluent BCG (bcg20dil) - Orderable
+      * Diluent Measles (measles10dil) - Orderable
 
 Currently, all the products are generally approved at all the facility types.
 In the future we could add more differentiation by types of facilities in
@@ -182,6 +222,24 @@ referencedata.requisition_group_members.json.
 
 There are also 3 unused schedules, SCH003 and SCH004, SCH005.
 
+**For EPI (Vaccines) Program**
+
+* RG EPI 1 (districts) (RGEPI1)
+  * schedule: Quarterly
+  * facilities:
+    * Dep—sito Distrital Cuamba (D001)
+    * Dep—sito Distrital Lichinga (D002)
+* RG EPI 2 (health facilities) (RGEPI2)
+  * schedule: Monthly
+  * facilities:
+    * Cuamba (N003)
+    * 15 others...
+* RG EPI 3 (health facilities) (RGEPI3)
+  * schedule: Monthly
+  * facilities:
+    * Assumane (N036)
+    * 24 others...
+
 ## Roles, Users and Rights
 
 Defined in referencedata.users.json, referencedata.roles.json, referencedata.role_assignments.json,
@@ -197,6 +255,10 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * srmanager2, srmanager4 - has this role for Family Planning & Essential Meds
     * srmanager1 - has this role for Family Planning
     * srmanager3 - has this role for Essential Meds
+    * divo1 - has this role for EPI at home facility
+    * divo2 - has this role for EPI at home facility
+    * rivo - has this role for EPI at home facility
+    * vsrmanager1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
 2. Store Manager
   * rights:
     * Requisition View
@@ -207,6 +269,10 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * smanager2, smanager4 - has this role for Family Planning & Essential Meds
     * smanager1 - has this role for Family Planning
     * smanager3 - has this role for Essential Meds
+    * divo1 - has this role for EPI at home facility
+    * divo2 - has this role for EPI at home facility
+    * rivo - has this role for EPI at home facility
+    * vsrmanager1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
 3. District Storeroom Manager
   * rights:
     * Requisition View
@@ -223,15 +289,18 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
                       point supervisory node
     * psupervisor - has this role for Family Planning & Essential Meds for SN1/FP Approval
                     point supervisory node
+    * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
+    * rivo - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
 5. Warehouse Clerk
   * rights:
-    * Requisition View
-    * Requisition Convert to Order
+    * Orders View
+    * Orders Edit (Requisition Convert to Order)
     * PoDs Manage
   * users:
     * administrator - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
     * wclerk1 - has this role for WH01/Ntcheu District Warehouse
     * wclerk2 - has this role for WH02/Balaka District Warehouse
+    * vwclerk1 - has this role at Mozambique Central Warehouse (W001)
 6. Delivery Approver
   * rights:
     * PoDs Manage
@@ -240,9 +309,13 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * srmanager3 - has this role for WH02/Balaka District Warehouse
 7. Stock Manager
   * rights:
-    * Stock Event Create
+    * Stock Cards View
+    * Stock Adjust
+    * Stock Inventories Edit
   * users:
-    * _no users are assigned this role yet_
+    * divo1 - has this role for EPI at home facility
+    * divo2 - has this role for EPI at home facility
+    * rivo - has this role for EPI at home facility
 8. Requisition Viewer
   * rights:
     * Requisition View
@@ -267,31 +340,37 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Users Manage
     * User Roles Manage
     * System Ideal Stock Amounts Manage
+    * CCE Manage
   * users:
     * administrator
-10. Inventory Manager
+    * admin
+10. CCE Inventory Manager
   * rights:
     * CCE Inventory View
     * CCE Inventory Edit
   * users:
     * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
     * ccemanager - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
-    * divo - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
-10. CCE Manager
+    * divo1 - has this role for EPI at home facility
+    * divo2 - has this role for EPI at home facility
+    * rivo - has this role for EPI at home facility
+11. CCE Inventory Viewer
   * rights:
-    * CCE MANAGE
+    * CCE Inventory View
   * users:
-    * administrator
-    * ccemanager
+    * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
+    * ccemanager - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
+    * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
+    * divo2 - has this role for EPI at Lichinga district approval point (SN-LICHINGA-DIST)
+    * rivo - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
 
-Other users with no roles:
-  * admin (this admin account is built into the bootstrap data)
 
 Passwords for these user accounts come from the
 [Authentication Service's demo data](https://github.com/OpenLMIS/openlmis-auth/tree/master/demo-data).
 
 Rights themselves come from the 
-[bootstrap data](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/db/migration/20170206205310272__initial_bootstrap_data.sql).
+[bootstrap data](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/db/migration/20170206205310272__initial_bootstrap_data.sql). **NOTE:** This SQL script does not have all of 
+the rights, as additional rights have been added to later migrations.
 
 ## Supervisory Nodes and Supply Lines
 
@@ -316,42 +395,33 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
       * WH02/South Warehouse
   * facility: DH01/Balaka District Hospital
 
+**For EPI (Vaccines) Program**
+
+* Niassa province approval point (SN-NIASSA-PROV)
+  * requisition group: RG EPI 1 (districts) (RGEPI1)
+  * facility: Dep—sito Provincial Niassa (P001)
+  * supply lines:
+      * Mozambique Central Warehouse (W001)
+* Cuamba district approval point (SN-CUAMBA-DIST)
+  * requisition group: RG EPI 2 (health facilities) (RGEPI2)
+  * facility: Dep—sito Distrital Cuamba (D001)
+  * parent: Niassa province approval point (SN-NIASSA-PROV)
+* Lichinga district approval point (SN-LICHINGA-DIST)
+  * requisition group: RG EPI 3 (health facilities) (RGEPI3)
+  * facility: Dep—sito Distrital Lichinga (D002)
+  * parent: Niassa province approval point (SN-NIASSA-PROV)
+
 ## Ideal Stock Amounts
 
 Defined in referencedata.ideal_stock_amounts.json.
-Those amounts are defined for 2 facilities, for each of them we have 3 processing periods in the same schedule.
-For every period in facility there are 4 commodity types that have defined amount values. Those amounts variates from 1000 - 10000.
 
-1. Comfort Health Clinic
-  * January 2017 period:
-    * BCG - 5200
-    * Polio - 6400
-    * HPV - 1100
-    * Measles - 9500
-  * February 2017 period:
-    * BCG - 2200
-    * Polio - 6400
-    * HPV - 9800
-    * Measles - 1015
-  * March 2017 period:
-    * BCG - 4562
-    * Polio - 7533
-    * HPV - 8800
-    * Measles - 5500
-
-2. Kankao Health Facility
-  * January 2017 period:
-    * BCG - 5200
-    * Polio - 6400
-    * HPV - 1100
-    * Measles - 9500
-  * February 2017 period:
-    * BCG - 2200
-    * Polio - 6400
-    * HPV - 9800
-    * Measles - 1015
-  * March 2017 period:
-    * BCG - 4562
-    * Polio - 7533
-    * HPV - 8800
-    * Measles - 5500
+Only in the EPI program. These amounts are defined for:
+ 
+* Health facilities (all 41)
+  * All monthly periods in 2017 and 2018
+  * All seven commodity types
+  * Values range from 1,000 - 10,000
+* District stores (2)
+  * All quarterly periods in 2017 and 2018
+  * All seven commodity types 
+  * Values range from 10,000 - 99,999
