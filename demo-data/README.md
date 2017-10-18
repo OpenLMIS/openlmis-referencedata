@@ -354,7 +354,6 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * CCE Inventory Edit
   * users:
     * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
-    * ccemanager - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
     * divo1 - has this role for EPI at home facility
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
@@ -363,7 +362,6 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * CCE Inventory View
   * users:
     * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
-    * ccemanager - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
     * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
     * divo2 - has this role for EPI at Lichinga district approval point (SN-LICHINGA-DIST)
     * rivo - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
