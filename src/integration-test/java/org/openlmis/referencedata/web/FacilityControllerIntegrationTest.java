@@ -109,7 +109,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnSupplyingDepots() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     int searchedFacilitiesAmt = 3;
 
@@ -150,43 +149,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
       Facility facility = Facility.newFacility(facilityDto);
       assertTrue(expectedFacilities.contains(facility));
     }
-  }
-
-  @Test
-  public void shouldRejectGetSupplyingRequestIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    int searchedFacilitiesAmt = 3;
-
-    SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
-
-    List<SupplyLine> searchedSupplyLines = new ArrayList<>();
-    for (int i = 0; i < searchedFacilitiesAmt; i++) {
-      SupplyLine supplyLine = generateSupplyLine();
-      supplyLine.setProgram(program);
-      supplyLine.setSupervisoryNode(searchedSupervisoryNode);
-
-      searchedSupplyLines.add(supplyLine);
-    }
-
-    given(programRepository.findOne(programId)).willReturn(program);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
-    given(supplyLineService.searchSupplyLines(program, searchedSupervisoryNode))
-        .willReturn(searchedSupplyLines);
-
-    String messageKey = restAssured.given()
-        .queryParam(PROGRAM_ID, programId)
-        .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(SUPPLYING_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
@@ -357,7 +319,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindApprovedProductsForFacility() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
     when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
@@ -374,25 +335,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(List.class);
 
     assertEquals(1, productDtos.size());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectGetApprovedProductsRequestIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
-
-    String messageKey = restAssured.given()
-        .queryParam(PROGRAM_ID, UUID.randomUUID())
-        .queryParam("fullSupply", false)
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

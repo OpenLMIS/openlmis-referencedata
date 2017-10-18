@@ -75,7 +75,7 @@ public class FacilityOperatorController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<FacilityOperator> getAllFacilityOperators() {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     Iterable<FacilityOperator> facilityOperators = facilityOperatorRepository.findAll();
     if (facilityOperators == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
@@ -113,7 +113,7 @@ public class FacilityOperatorController extends BaseController {
   @ResponseBody
   public FacilityOperator getFacilityOperators(
       @PathVariable("id") UUID facilityOperatorId) {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+
     FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
     if (facilityOperator == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);

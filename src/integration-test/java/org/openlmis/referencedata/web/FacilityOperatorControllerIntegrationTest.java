@@ -98,7 +98,6 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetAllFacilityOperators() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     List<FacilityOperator> facilityOperators = Arrays.asList(facilityOperator,
         generateFacilityOperator());
@@ -116,25 +115,6 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
         .extract().as(FacilityOperator[].class);
 
     assertEquals(2, response.length);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectGetAllRequestIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -186,7 +166,6 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
   
   @Test
   public void shouldGetFacilityOperator() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     given(facilityOperatorRepository.findOne(facilityOperatorId)).willReturn(facilityOperator);
 
@@ -202,26 +181,6 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
         .extract().as(FacilityOperator.class);
 
     assertEquals(facilityOperator, response);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectGetRequestIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", facilityOperatorId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

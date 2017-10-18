@@ -16,10 +16,15 @@
 package org.openlmis.referencedata.web;
 
 
-import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
-
 import com.vividsolutions.jts.geom.Polygon;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -66,15 +71,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Controller
 @Transactional
@@ -277,7 +273,6 @@ public class FacilityController extends BaseController {
       @PathVariable("id") UUID facilityId,
       @RequestParam(required = false, value = "programId") UUID programId,
       @RequestParam(value = "fullSupply") boolean fullSupply) {
-    rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     Facility facility = facilityRepository.findOne(facilityId);
     if (facility == null) {
@@ -341,7 +336,6 @@ public class FacilityController extends BaseController {
   public List<FacilityDto> getSupplyingDepots(
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     Program program = programRepository.findOne(programId);
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
