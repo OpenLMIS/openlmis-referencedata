@@ -205,7 +205,6 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldGetGeographicLevel() {
-    mockUserHasRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
 
