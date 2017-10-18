@@ -34,7 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_COMMODITY_TYPE_NOT_FOUND;
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
@@ -68,13 +70,17 @@ public class IdealStockAmountProcessor
     profiler.setLogger(LOGGER);
 
     profiler.start("SEARCH_EXISTING_ISA");
-    List<IdealStockAmount> idealStockAmounts = idealStockAmountRepository.search(convert(records));
+    List<IdealStockAmount> idealStockAmounts = convert(records);
+    Map<String, IdealStockAmount> isaMap = new HashMap<>();
+    for (IdealStockAmount isa : idealStockAmountRepository.search(convert(records))) {
+      isaMap.put(hash(isa), isa);
+    }
 
     List<IdealStockAmount> resultList = new ArrayList<>();
 
     profiler.start("PROCESS_RECORDS");
-    for (IdealStockAmountCsvModel isa : records) {
-      IdealStockAmount result = getExisting(idealStockAmounts, isa);
+    for (IdealStockAmount isa : idealStockAmounts) {
+      IdealStockAmount result = isaMap.getOrDefault(hash(isa), null);
       if (null == result) {
         resultList.add(prepareNewIdealStockAmountObject(isa));
       } else {
@@ -88,24 +94,7 @@ public class IdealStockAmountProcessor
     return resultList;
   }
 
-  private IdealStockAmount getExisting(List<IdealStockAmount> list,
-                                       IdealStockAmountCsvModel record) {
-    for (IdealStockAmount isa : list) {
-      if (isa.getFacility().getCode().equals(record.getFacility().getCode())
-          && isa.getProcessingPeriod().getName().equals(record.getProcessingPeriod().getName())
-          && isa.getProcessingPeriod().getProcessingSchedule().getCode().equals(
-              record.getProcessingPeriod().getProcessingSchedule().getCode())
-          && isa.getCommodityType().getClassificationId().equals(
-              record.getCommodityType().getClassificationId())
-          && isa.getCommodityType().getClassificationSystem().equals(
-              record.getCommodityType().getClassificationSystem())) {
-        return isa;
-      }
-    }
-    return null;
-  }
-
-  private IdealStockAmount prepareNewIdealStockAmountObject(IdealStockAmountCsvModel isa) {
+  private IdealStockAmount prepareNewIdealStockAmountObject(IdealStockAmount isa) {
     Facility facility = facilityRepository.findByCode(isa.getFacility().getCode())
         .orElseThrow(() -> new ValidationMessageException(new Message(ERROR_FACILITY_NOT_FOUND,
             isa.getFacility().getCode())));
@@ -149,5 +138,13 @@ public class IdealStockAmountProcessor
     }
 
     return result;
+  }
+
+  private String hash(IdealStockAmount isa) {
+    return isa.getFacility().getCode()
+        + isa.getCommodityType().getClassificationId()
+        + isa.getCommodityType().getClassificationSystem()
+        + isa.getProcessingPeriod().getName()
+        + isa.getProcessingPeriod().getProcessingSchedule().getCode();
   }
 }
