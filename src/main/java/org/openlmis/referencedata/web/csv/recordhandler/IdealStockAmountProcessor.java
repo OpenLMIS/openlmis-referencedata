@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_COMMODITY_TYPE_NOT_FOUND;
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
@@ -71,8 +72,8 @@ public class IdealStockAmountProcessor
 
     profiler.start("SEARCH_EXISTING_ISA");
     List<IdealStockAmount> idealStockAmounts = convert(records);
-    Map<String, IdealStockAmount> isaMap = new HashMap<>();
-    for (IdealStockAmount isa : idealStockAmountRepository.search(convert(records))) {
+    Map<Integer, IdealStockAmount> isaMap = new HashMap<>();
+    for (IdealStockAmount isa : idealStockAmountRepository.search(idealStockAmounts)) {
       isaMap.put(hash(isa), isa);
     }
 
@@ -140,11 +141,11 @@ public class IdealStockAmountProcessor
     return result;
   }
 
-  private String hash(IdealStockAmount isa) {
-    return isa.getFacility().getCode()
-        + isa.getCommodityType().getClassificationId()
-        + isa.getCommodityType().getClassificationSystem()
-        + isa.getProcessingPeriod().getName()
-        + isa.getProcessingPeriod().getProcessingSchedule().getCode();
+  private int hash(IdealStockAmount isa) {
+    return Objects.hash(isa.getFacility().getCode(),
+        isa.getCommodityType().getClassificationId(),
+        isa.getCommodityType().getClassificationSystem(),
+        isa.getProcessingPeriod().getName(),
+        isa.getProcessingPeriod().getProcessingSchedule().getCode());
   }
 }
