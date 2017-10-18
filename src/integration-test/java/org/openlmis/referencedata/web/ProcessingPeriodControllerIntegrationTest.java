@@ -186,7 +186,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldDisplayTotalDifference() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
 
     ResultDto<Integer> response = new ResultDto<>();
@@ -204,7 +204,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldFindPeriodsByProgramAndFacility() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     given(programRepository.findOne(programId))
         .willReturn(requisitionGroupProgramSchedule.getProgram());
     given(facilityRepository.findOne(facilityId))
@@ -230,7 +230,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldFindPeriodsByScheduleAndDate() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     given(scheduleRepository.findOne(scheduleId)).willReturn(schedule);
     given(periodService.searchPeriods(schedule, secondPeriod.getStartDate()))
         .willReturn(Arrays.asList(secondPeriod, firstPeriod));
@@ -297,7 +297,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetAllPeriods() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
@@ -317,7 +317,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetAllPeriodsSortedByStartDate() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
@@ -341,7 +341,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldRespondWithBadRequestWhenInvalidSortProperty() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
     given(periodRepository.findAll()).willReturn(storedPeriods);
 
@@ -359,7 +359,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetChosenPeriod() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     ProcessingPeriodDto dto = new ProcessingPeriodDto();
     firstPeriod.export(dto);
     given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
@@ -375,21 +375,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .extract().as(ProcessingPeriodDto.class);
 
     assertEquals(dto, response);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnUnauthorizedOnDisplayTotalDurationIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-
-    restAssured.given()
-        .pathParam("id", firstPeriodId)
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(DIFFERENCE_URL)
-        .then()
-        .statusCode(403);
-
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -420,37 +405,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .body(firstPeriod)
         .when()
         .put(ID_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnUnauthorizedOnGetAllPeriodsIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnUnauthorizedOnGetChosenPeriodIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", firstPeriodId)
-        .when()
-        .get(ID_URL)
         .then()
         .statusCode(403);
 

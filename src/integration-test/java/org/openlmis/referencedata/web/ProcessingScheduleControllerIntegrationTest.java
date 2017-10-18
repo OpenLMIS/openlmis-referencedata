@@ -132,7 +132,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldGetAllProcessingSchedules() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     List<ProcessingSchedule> storedProcessingSchedules = Arrays.asList(schedule,
         new ProcessingSchedule("PS2", "Schedule2"));
     given(scheduleRepository.findAll()).willReturn(storedProcessingSchedules);
@@ -153,7 +153,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldGetProcessingSchedule() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
 
     ProcessingSchedule response = restAssured
@@ -173,7 +173,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldGetProcessingScheduleByFacilityAndProgram() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
@@ -197,7 +197,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldBadRequestSearchWhenProgramDoesNotExist() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(null);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
@@ -219,7 +219,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldBadRequestSearchWhenFacilityDoesNotExist() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     given(facilityRepository.findOne(facilityId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
@@ -285,39 +285,6 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
         .body(schedule)
         .when()
         .put(ID_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnUnauthorizedOnGetAllProcessingSchedulesIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnUnauthorizedOnGetProcessingScheduleIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", processingScheduleId)
-        .when()
-        .get(ID_URL)
         .then()
         .statusCode(403);
 

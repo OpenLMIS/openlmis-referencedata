@@ -100,7 +100,7 @@ public class ProcessingPeriodController extends BaseController {
   public List<ProcessingPeriodDto> searchProcessingPeriods(
       @RequestParam(value = "programId", required = true) UUID programId,
       @RequestParam(value = "facilityId", required = true) UUID facilityId) {
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     if (programId == null) {
       throw new ValidationMessageException(ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL);
     }
@@ -157,7 +157,7 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseBody
   public List<ProcessingPeriodDto> getAllProcessingPeriods(
       @RequestParam(value = "sort", required = false) String sort)  {
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     List<ProcessingPeriodDto> periodDtos = new ArrayList<>();
 
     Iterable<ProcessingPeriod> processingPeriods = periodRepository.findAll();
@@ -208,7 +208,7 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ProcessingPeriodDto getProcessingPeriod(@PathVariable("id") UUID periodId) {
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
       throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
@@ -245,7 +245,7 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResultDto<Integer> getDuration(@PathVariable("id") UUID periodId) {
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     ProcessingPeriod period = periodRepository.findOne(periodId);
 
     LOGGER.debug("Returning total number of months of processingPeriod");
@@ -301,7 +301,7 @@ public class ProcessingPeriodController extends BaseController {
       @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     if (processingScheduleId == null) {
       throw new ValidationMessageException("Processing Schedule id must be provided");
     }

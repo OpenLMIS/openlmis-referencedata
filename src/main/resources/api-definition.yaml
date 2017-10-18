@@ -440,11 +440,6 @@ resourceTypes:
                   body:
                     application/json:
                       schema: processingPeriodArray
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
-              "404":
       post:
           is: [ secured ]
           description: Creates given processingPeriod if possible.
@@ -491,10 +486,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: processingPeriod
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
                   "404":
                       body:
                         application/json:
@@ -535,13 +526,6 @@ resourceTypes:
                   "400":
                       body:
                         application/json:
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-                  "500":
-                      body:
-                        application/json:
       /{id}/auditLog:
           type: instanceAuditLog
       /search:
@@ -564,10 +548,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: processingPeriodArray
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
                   "404":
                       body:
                         application/json:
@@ -591,10 +571,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: processingPeriodArray
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
                   "404":
                       body:
                         application/json:
@@ -923,11 +899,6 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
-              "404":
       post:
           is: [ secured ]
           description: Creates new processingSchedule.
@@ -969,10 +940,6 @@ resourceTypes:
                       body:
                         application/json:
                             schema: errorResponse
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
 
       /{id}:
           uriParameters:
@@ -1002,10 +969,6 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
                   "404":
                       body:
                         application/json:

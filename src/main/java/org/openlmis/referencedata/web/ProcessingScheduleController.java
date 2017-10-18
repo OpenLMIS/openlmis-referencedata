@@ -116,7 +116,7 @@ public class ProcessingScheduleController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<ProcessingSchedule> getAllProcessingSchedules() {
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     Iterable<ProcessingSchedule> schedules = scheduleRepository.findAll();
     if (schedules == null) {
       throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
@@ -137,8 +137,6 @@ public class ProcessingScheduleController extends BaseController {
   @ResponseBody
   public List<ProcessingScheduleDto> search(
       @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
-
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     Program program = programRepository.findOne(programId);
     Facility facility = facilityRepository.findOne(facilityId);
@@ -178,7 +176,7 @@ public class ProcessingScheduleController extends BaseController {
   @ResponseBody
   public ProcessingSchedule getProcessingSchedule(
       @PathVariable("id") UUID scheduleId) {
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
+
     ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
     if (schedule == null) {
       throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
