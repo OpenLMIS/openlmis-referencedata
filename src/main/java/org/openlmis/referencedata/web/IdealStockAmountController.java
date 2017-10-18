@@ -102,6 +102,8 @@ public class IdealStockAmountController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<IdealStockAmountDto> getAll(Pageable pageable) {
+    rightService.checkAdminRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
+    
     Page<IdealStockAmount> itemsPage = repository.findAll(pageable);
 
     return Pagination.getPage(toDto(itemsPage.getContent()), pageable,

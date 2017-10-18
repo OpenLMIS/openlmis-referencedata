@@ -107,6 +107,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldRetrieveAllIdealStockAmounts() {
+    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
     when(idealStockAmountRepository.findAll(any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(isa), null, 1));
 
@@ -116,7 +117,6 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .extract().as(PageImplRepresentation.class);
 
     assertEquals(response.getContent().size(), 1);
-    verifyNoMoreInteractions(rightService);
     verify(idealStockAmountRepository).findAll(any(Pageable.class));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
