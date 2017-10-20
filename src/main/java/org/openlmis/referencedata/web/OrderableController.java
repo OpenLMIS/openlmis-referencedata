@@ -95,7 +95,6 @@ public class OrderableController extends BaseController {
    */
   @GetMapping("/orderables")
   public Page<OrderableDto> findAll(Pageable pageable) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     List<Orderable> allOrderables = new ArrayList<>();
     for (Orderable product : repository.findAll()) {
@@ -114,7 +113,6 @@ public class OrderableController extends BaseController {
   @GetMapping("/orderables/{id}")
   public OrderableDto getChosenOrderable(
       @PathVariable("id") UUID productId) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     Orderable orderable = repository.findOne(productId);
     if (orderable == null) {
@@ -171,9 +169,6 @@ public class OrderableController extends BaseController {
     XLOGGER.entry(queryParams, pageable);
     Profiler profiler = new Profiler("ORDERABLES_SEARCH");
     profiler.setLogger(XLOGGER);
-
-    profiler.start("CHECK_ADMIN_RIGHT");
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     profiler.start("ORDERABLE_SERVICE_SEARCH");
     Page<Orderable> orderablesPage = orderableService.searchOrderables(queryParams, pageable);

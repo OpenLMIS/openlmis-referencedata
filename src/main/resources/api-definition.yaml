@@ -719,10 +719,6 @@ resourceTypes:
                   body:
                     application/json:
                         schema: orderablePage
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -742,10 +738,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
       /{id}/auditLog:
           type: instanceAuditLog
       /search:
@@ -761,10 +753,6 @@ resourceTypes:
                       application/json:
                           schema: orderablePage
                 400:
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
-                403:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -809,10 +797,6 @@ resourceTypes:
                   body:
                     application/json:
                       schema: tradeItemPage
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
       /{id}/auditLog:
           type: instanceAuditLog
 
@@ -845,10 +829,6 @@ resourceTypes:
                   body:
                     application/json:
                       schema: commodityTypePage
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
 
       /{id}/tradeItems:
           uriParameters:
@@ -866,7 +846,6 @@ resourceTypes:
                         application/json:
                           schema: uuidArray
                   "404":
-                  "403":
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1808,7 +1787,6 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
-                  "404":
       /{id}/auditLog:
           type: instanceAuditLog
 

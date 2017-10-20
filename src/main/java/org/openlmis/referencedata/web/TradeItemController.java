@@ -117,7 +117,6 @@ public class TradeItemController extends BaseController {
       @RequestParam(required = false) String classificationId,
       @RequestParam(required = false, defaultValue = "false") boolean fullMatch,
       Pageable pageable) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     Iterable<TradeItem> result;
     if (StringUtils.isBlank(classificationId)) {

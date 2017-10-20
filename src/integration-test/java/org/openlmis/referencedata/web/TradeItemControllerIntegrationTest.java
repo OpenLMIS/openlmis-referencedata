@@ -93,7 +93,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRetrieveAllTradeItems() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+
     List<TradeItem> items = asList(generateItem("one"),
         generateItem("two"));
 
@@ -117,7 +117,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRetrieveTradeItemsByPartialMatch() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+
     List<TradeItem> items = asList(generateItem("one"),
         generateItem("two"));
 
@@ -142,7 +142,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRetrieveTradeItemsByFullMatch() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+
     List<TradeItem> items = asList(generateItem("one"),
         generateItem("two"));
 
@@ -176,19 +176,6 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .put(RESOURCE_URL)
-        .then()
-        .statusCode(403);
-  }
-
-  @Test
-  public void shouldDenyAccessToRetrieve() {
-    mockUserHasNoRight(ORDERABLES_MANAGE);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL)
         .then()
         .statusCode(403);
   }

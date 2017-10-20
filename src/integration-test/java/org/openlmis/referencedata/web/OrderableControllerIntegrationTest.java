@@ -219,7 +219,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRetrieveAllOrderables() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+
     List<OrderableDto> items = Collections.singletonList(orderableDto);
     List<Orderable> orderables = items
         .stream()
@@ -249,8 +249,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     final String name = "some-name";
     final String programCode = "program-code";
     final List<Orderable> items = Collections.singletonList(orderable);
-
-    mockUserHasRight(ORDERABLES_MANAGE);
 
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put(CODE, code);
@@ -283,8 +281,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     final String name = "some-name";
     final String programCode = "program-code";
     final List<Orderable> items = Collections.singletonList(orderable);
-
-    mockUserHasRight(ORDERABLES_MANAGE);
 
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put(CODE, code);

@@ -153,7 +153,6 @@ public class CommodityTypeController extends BaseController {
   @Transactional
   @RequestMapping(value = RESOURCE_PATH + "/{id}/tradeItems", method = RequestMethod.GET)
   public Set<UUID> getTradeItems(@PathVariable("id") UUID commodityTypeId) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     // ensure commodity type exists
     CommodityType commodityType = repository.findOne(commodityTypeId);
@@ -178,7 +177,6 @@ public class CommodityTypeController extends BaseController {
   @Transactional
   @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   public Page<CommodityTypeDto> retrieveAll(Pageable pageable) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     Iterable<CommodityType> result = repository.findAll();
 
