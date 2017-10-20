@@ -132,7 +132,6 @@ public class LotController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public LotDto getLot(@PathVariable("id") UUID lotId) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     Lot lot = lotRepository.findOne(lotId);
     if (lot == null) {
@@ -162,7 +161,6 @@ public class LotController extends BaseController {
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationDate,
       @RequestParam(value = "lotCode", required = false) String lotCode,
       Pageable pageable) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     TradeItem tradeItem = null;
     if (null != tradeItemId) {

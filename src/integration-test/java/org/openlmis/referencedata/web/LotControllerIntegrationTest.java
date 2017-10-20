@@ -209,7 +209,6 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindLots() throws JsonProcessingException {
-    mockUserHasRight(ORDERABLES_MANAGE);
 
     given(lotRepository.search(any(TradeItem.class), any(LocalDate.class), anyString()))
         .willReturn(singletonList(lot));
@@ -233,7 +232,6 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenTradeItemNotFound() throws JsonProcessingException {
-    mockUserHasRight(ORDERABLES_MANAGE);
 
     when(tradeItemRepository.findOne(any(UUID.class))).thenReturn(null);
 
@@ -253,23 +251,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldRejectSearchLotsIfUserHasNoRight() {
-    mockUserHasNoRight(ORDERABLES_MANAGE);
-
-    restAssured
-            .given()
-            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-            .when()
-            .get(SEARCH_URL)
-            .then()
-            .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldGetLot() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+
     when(lotRepository.findOne(lotId)).thenReturn(lot);
 
     LotDto response = restAssured
@@ -293,24 +276,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldRejectGetLotIfUserHasNoRight() {
-    mockUserHasNoRight(ORDERABLES_MANAGE);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", lotId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldReturnNotFoundIfLotNotExist() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+
     when(lotRepository.findOne(lotId)).thenReturn(null);
 
     restAssured

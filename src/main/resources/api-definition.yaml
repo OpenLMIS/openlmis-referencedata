@@ -603,13 +603,6 @@ resourceTypes:
                     body:
                         application/json:
                             schema: orderableDisplayCategoryArray
-                "404":
-                    body:
-                       application/json:
-                "403":
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
       /{id}:
             uriParameters:
               id:
@@ -646,10 +639,6 @@ resourceTypes:
                     "404":
                         body:
                             application/json:
-                    "403":
-                        body:
-                          application/json:
-                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: "[AVOID USING] Completely removes display category. This action is not recoverable."
@@ -684,11 +673,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: orderableDisplayCategoryArray
-                  "404":
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
 
   /orderables:
       displayName: Orderable Product
@@ -2709,9 +2693,6 @@ resourceTypes:
                     body:
                         application/json:
                           schema: lotDto
-                "500":
-                    body:
-                        application/json:
                 "400":
                     body:
                       application/json:
@@ -2758,10 +2739,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: lotDto
-                    "403":
-                        body:
-                          application/json:
-                            schema: localizedErrorResponse
                     "404":
                         body:
                           application/json:
@@ -2793,10 +2770,6 @@ resourceTypes:
                       body:
                         application/json:
                   "400":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-                  "403":
                       body:
                         application/json:
                           schema: localizedErrorResponse

@@ -66,7 +66,6 @@ public class OrderableDisplayCategoryController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<OrderableDisplayCategoryDto> getAllOrderableDisplayCategories() {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     return newInstance(orderableDisplayCategoryRepository.findAll());
   }
@@ -142,7 +141,6 @@ public class OrderableDisplayCategoryController extends BaseController {
   @ResponseBody
   public OrderableDisplayCategoryDto getOrderableDisplayCategory(
       @PathVariable("id") UUID orderableDisplayCategoryId) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository.findOne(
         orderableDisplayCategoryId);
@@ -225,7 +223,6 @@ public class OrderableDisplayCategoryController extends BaseController {
   @ResponseBody
   public Iterable<OrderableDisplayCategoryDto> searchOrderableDisplayCategories(
       @RequestParam(value = "code", required = false) String codeParam) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     if (codeParam != null) {
       OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository
