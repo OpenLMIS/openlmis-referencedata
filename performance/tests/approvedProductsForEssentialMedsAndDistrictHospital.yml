@@ -24,7 +24,7 @@ scenarios:
   full-supply-approved-products:
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=true&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
+      - url: ${__P(base-uri)}/api/facilities/3896d37a-cce1-4713-b151-39996e8d11ab/approvedProducts?fullSupply=true&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
         label: GetFacilitiesApprovedFullSupplyProducts
         headers:
@@ -32,7 +32,7 @@ scenarios:
   non-full-supply-approved-products:
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=false&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
+      - url: ${__P(base-uri)}/api/facilities/3896d37a-cce1-4713-b151-39996e8d11ab/approvedProducts?fullSupply=false&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
         label: GetFacilitiesApprovedNonFullSupplyProducts
         headers:
