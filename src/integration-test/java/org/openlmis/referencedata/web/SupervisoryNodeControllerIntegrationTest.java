@@ -255,7 +255,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldGetAllSupervisoryNodes() {
-    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     List<SupervisoryNode> storedSupervisoryNodes = Arrays.asList(supervisoryNode,
         SupervisoryNode.newSupervisoryNode("SN2", new Facility("F2")));
@@ -276,28 +275,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldRejectGetAllSupervisoryNodesIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldGetSupervisoryNode() {
-    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
@@ -313,27 +291,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .extract().as(SupervisoryNodeDto.class);
 
     assertEquals(supervisoryNodeDto, response);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectGetSupervisoryNodeIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supervisoryNodeId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -472,7 +429,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldGetSupervisoryNodeByFacilityAndProgram() {
-    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     HashMap<String, Object> queryParams = new HashMap<>();
     queryParams.put("facilityId", facilityId.toString());
@@ -492,29 +448,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldRejectGetProcessingScheduleByFacilityAndProgramIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-
-    HashMap<String, Object> queryParams = new HashMap<>();
-    queryParams.put("facilityId", facilityId.toString());
-    queryParams.put(PROGRAM_ID_PARAM, programId.toString());
-
-    given(facilityRepository.findOne(facilityId)).willReturn(facility);
-    given(programRepository.findOne(programId)).willReturn(program);
-    given(supervisoryNodeService.searchSupervisoryNodes(queryParams))
-        .willReturn(Collections.singletonList(supervisoryNode));
-
-    String messageKey = searchForSupervisoryNode(queryParams, 403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldReturnEmptyListWhenSearchingForNonExistingSupervisoryNode() {
-    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     HashMap<String, Object> queryParams = new HashMap<>();
     queryParams.put("facilityId", facilityId.toString());

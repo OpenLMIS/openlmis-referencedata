@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -27,6 +26,14 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -51,16 +58,6 @@ import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -221,7 +218,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetAllRequisitionGroups() {
-    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     List<RequisitionGroup> storedRequisitionGroups = Arrays.asList(requisitionGroup,
         new RequisitionGroup("RG2", "Requisition Group 2", supervisoryNode));
@@ -242,27 +238,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldRejectGetAllRequisitionGroupsIfUserHasNoRight() {
-    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(Matchers.equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldGetRequisitionGroup() {
-    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
 
@@ -282,30 +258,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldRejectGetRequisitionGroupIfUserHasNoRight() {
-    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
-
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", requisitionGroupId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(Matchers.equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldNotGetNonexistentRequisitionGroup() {
-    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);
 
@@ -411,7 +364,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldFindRequisitionGroupsWithSimilarCode() {
-    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     String similarCode = "RG";
     Map<String, Object> requestBody = new HashMap<>();
@@ -441,27 +393,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldRejectSearchRequestIfUserHasNoRight() {
-    mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
-
-    String messageKey = restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .body(new HashMap<>())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .post(SEARCH_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldReturnBadRequestWhenSearchThrowsException() {
-    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     given(requisitionGroupService.searchRequisitionGroups(anyMap(), any(Pageable.class))).willThrow(
         new ValidationMessageException("somethingWrong"));
@@ -480,7 +412,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldPaginateSearchFacilities() {
-    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     List<RequisitionGroup> listToReturn = new ArrayList<>();
     listToReturn.add(requisitionGroup);

@@ -17,8 +17,12 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.RequisitionGroup;
-import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -48,12 +52,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Controller
 @Transactional
@@ -130,7 +128,7 @@ public class RequisitionGroupController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<RequisitionGroupDto> getAllRequisitionGroups() {
-    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+
     Iterable<RequisitionGroup> requisitionGroups = requisitionGroupRepository.findAll();
     List<RequisitionGroupDto> requisitionGroupDtos = new ArrayList<>();
     for (RequisitionGroup requisitionGroup : requisitionGroups) {
@@ -150,7 +148,6 @@ public class RequisitionGroupController extends BaseController {
   @ResponseBody
   public RequisitionGroupDto getRequisitionGroup(
       @PathVariable("id") UUID requisitionGroupId) {
-    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
 
     RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
     if (requisitionGroup == null) {
@@ -295,7 +292,6 @@ public class RequisitionGroupController extends BaseController {
   @ResponseBody
   public Page<RequisitionGroupDto> search(@RequestBody Map<String, Object> queryParams,
                                                     Pageable pageable) {
-    rightService.checkAdminRight(RightName.REQUISITION_GROUPS_MANAGE);
 
     Page<RequisitionGroup> page = requisitionGroupService
         .searchRequisitionGroups(queryParams, pageable);

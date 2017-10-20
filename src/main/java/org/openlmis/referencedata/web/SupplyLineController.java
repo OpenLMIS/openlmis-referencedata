@@ -104,7 +104,6 @@ public class SupplyLineController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<SupplyLineDto> getAllSupplyLines() {
-    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
     Iterable<SupplyLine> supplyLines = supplyLineRepository.findAll();
     List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
@@ -188,7 +187,6 @@ public class SupplyLineController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public SupplyLineDto getSupplyLine(@PathVariable("id") UUID supplyLineId) {
-    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
     SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
     if (supplyLine == null) {
@@ -228,7 +226,6 @@ public class SupplyLineController extends BaseController {
   @ResponseBody
   public Page<SupplyLineDto> searchSupplyLines(@RequestBody Map<String, Object> queryParams,
                                                Pageable pageable) {
-    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
     Page<SupplyLine> page = supplyLineService.searchSupplyLines(queryParams, pageable);
 
@@ -249,7 +246,6 @@ public class SupplyLineController extends BaseController {
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId", required = false) UUID supervisoryNodeId,
       @RequestParam(value = "supplyingFacilityId", required = false) UUID supplyingFacilityId) {
-    rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
     Program program = programRepository.findOne(programId);
     SupervisoryNode supervisoryNode = null != supervisoryNodeId

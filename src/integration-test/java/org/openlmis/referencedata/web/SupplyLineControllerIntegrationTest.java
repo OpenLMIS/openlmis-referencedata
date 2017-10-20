@@ -84,28 +84,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   }
 
   @Test
-  public void searchShouldReturnForbiddenOnUnauthorizedToken() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
-
-    Map<String, Object> requestBody = getSearchBody();
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .body(requestBody)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .post(SEARCH_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void searchShouldReturnBadRequestOnException() {
     Map<String, Object> requestBody = getSearchBody();
 
@@ -129,7 +107,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
   @Test
   public void shouldFindSupplyLines() {
-    mockUserHasRight(SUPPLY_LINES_MANAGE);
 
     given(supplyLineService.searchSupplyLines(any(Map.class), any(Pageable.class)))
         .willReturn(Pagination.getPage(Arrays.asList(supplyLine), null, 1));
@@ -334,7 +311,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
   @Test
   public void shouldGetAllSupplyLines() {
-    mockUserHasRight(SUPPLY_LINES_MANAGE);
 
     SupplyLine newSupplyLine = generateSupplyLine();
     List<SupplyLine> storedSupplyLines = Arrays.asList(supplyLine, newSupplyLine);
@@ -355,31 +331,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   }
 
   @Test
-  public void shouldRejectGetAllSupplyLinesIfUserHasNoRight() {
-    mockUserHasNoRight(SUPPLY_LINES_MANAGE);
-
-    SupplyLine newSupplyLine = generateSupplyLine();
-    List<SupplyLine> storedSupplyLines = Arrays.asList(supplyLine, newSupplyLine);
-    given(supplyLineRepository.findAll()).willReturn(storedSupplyLines);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldGetSupplyLine() {
-    mockUserHasRight(SUPPLY_LINES_MANAGE);
 
     given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
 
@@ -395,28 +347,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .extract().as(SupplyLineDto.class);
 
     assertEquals(supplyLineDto, response);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectGetSupplyLineIfUserHasNoRight() {
-    mockUserHasNoRight(SUPPLY_LINES_MANAGE);
-
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
-
-    String messageKey = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supplyLineId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

@@ -18,6 +18,12 @@ package org.openlmis.referencedata.web;
 import static java.util.stream.Collectors.toSet;
 import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
@@ -55,13 +61,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Controller
 @Transactional
@@ -119,7 +118,6 @@ public class SupervisoryNodeController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<SupervisoryNodeDto> getAllSupervisoryNodes() {
-    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
     Iterable<SupervisoryNode> supervisoryNodes = supervisoryNodeRepository.findAll();
     List<SupervisoryNodeDto> supervisoryNodeDtos = new ArrayList<>();
@@ -142,7 +140,6 @@ public class SupervisoryNodeController extends BaseController {
   @ResponseBody
   public SupervisoryNodeDto getSupervisoryNode(
       @PathVariable("id") UUID supervisoryNodeId) {
-    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
@@ -267,7 +264,6 @@ public class SupervisoryNodeController extends BaseController {
   @ResponseBody
   public Page<SupervisoryNodeDto> search(@RequestBody Map<String, Object> queryParams,
                                          Pageable pageable) {
-    rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
     return Pagination.getPage(supervisoryNodeService.searchSupervisoryNodes(queryParams)
         .stream()

@@ -999,11 +999,6 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-              "404":
-              "403":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Creates new supplyLine.
@@ -1052,10 +1047,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
           put:
               is: [ secured ]
               description: Update existing supplyLine.
@@ -1092,10 +1083,6 @@ resourceTypes:
                       body:
                           application/json:
                               schema: localizedErrorResponse
-                  "403":
-                      body:
-                          application/json:
-                              schema: localizedErrorResponse
       /searchByUUID:
           get:
               is: [ secured ]
@@ -1123,9 +1110,7 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
-                  "404":
-                  "500":
-                  "403":
+                  "400":
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2328,9 +2313,6 @@ resourceTypes:
                 "201":
                     body:
                         application/json:
-                "500":
-                    body:
-                        application/json:
                 "403":
                     body:
                       application/json:
@@ -2342,14 +2324,6 @@ resourceTypes:
                 "200":
                     body:
                         application/json:
-                "404":
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
-                "403":
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
 
       /{id}:
             uriParameters:
@@ -2383,10 +2357,6 @@ resourceTypes:
                         body:
                             application/json:
                     "404":
-                        body:
-                          application/json:
-                            schema: localizedErrorResponse
-                    "403":
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2456,14 +2426,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: errorResponse
-                    "404":
-                        body:
-                          application/json:
-                            schema: localizedErrorResponse
-                    "403":
-                        body:
-                          application/json:
-                            schema: localizedErrorResponse
   /roles:
       displayName: Role
       post:
@@ -2666,9 +2628,6 @@ resourceTypes:
                 "201":
                     body:
                         application/json:
-                "500":
-                    body:
-                        application/json:
                 "403":
                     body:
                       application/json:
@@ -2680,11 +2639,6 @@ resourceTypes:
                 "200":
                     body:
                         application/json:
-                "404":
-                "403":
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
       /{id}:
             uriParameters:
               id:
@@ -2720,10 +2674,6 @@ resourceTypes:
                         body:
                           application/json:
                             schema: localizedErrorResponse
-                    "403":
-                        body:
-                          application/json:
-                            schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: "[AVOID USING] Completely removes requisition group. This action is not recoverable."
@@ -2756,15 +2706,6 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
-                  403:
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-                  404:
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-
 
   /currencySettings:
       displayName: Currency settings
