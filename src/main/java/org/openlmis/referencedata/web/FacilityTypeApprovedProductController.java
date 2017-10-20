@@ -135,7 +135,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @ResponseBody
   public ApprovedProductDto getFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
-    rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+
     FacilityTypeApprovedProduct facilityTypeApprovedProduct =
           repository.findOne(facilityTypeApprovedProductId);
     if (facilityTypeApprovedProduct == null) {
@@ -157,7 +157,6 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @ResponseBody
   public Page<ApprovedProductDto> searchFacilityTypeApprovedProducts(
         @RequestParam Map<String, String> queryParams, Pageable pageable) {
-    rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     Page<FacilityTypeApprovedProduct> ftaps =
         approvedProductService.search(queryParams, pageable);

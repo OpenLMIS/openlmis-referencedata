@@ -102,7 +102,6 @@ public class IdealStockAmountController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<IdealStockAmountDto> getAll(Pageable pageable) {
-    rightService.checkAdminRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
     
     Page<IdealStockAmount> itemsPage = repository.findAll(pageable);
 
@@ -121,9 +120,6 @@ public class IdealStockAmountController extends BaseController {
 
     Profiler profiler = new Profiler("DOWNLOAD_IDEAL_STOCK_AMOUNTS");
     profiler.setLogger(LOGGER);
-
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
 
     profiler.start("CHECK_FORMAT");
     if (!CSV.equals(format)) {

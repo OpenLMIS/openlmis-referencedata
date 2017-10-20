@@ -262,22 +262,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   }
 
   @Test
-  public void shouldReturn403WhenUserHasNoRightsToGetFacilityTypeApprovedProduct() {
-    mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", facilityTypeAppProdId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldReturnBadRequestForDuplicateFtapPut() {
     mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
@@ -360,7 +344,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldSearchFtaps() {
-    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     given(facilityTypeApprovedProductRepository
         .searchProducts(eq(facilityType1.getCode()), eq(program.getCode().toString()),
@@ -387,7 +370,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldPaginateSearchFtaps() {
-    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     Pageable pageable = new PageRequest(0, 10);
     given(facilityTypeApprovedProductRepository
@@ -414,21 +396,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertEquals(1, response.getNumberOfElements());
     assertEquals(10, response.getSize());
     assertEquals(0, response.getNumber());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturn403WhenUserHasNoRightsToSearchFacilityTypeApprovedProduct() {
-    mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(403);
-
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

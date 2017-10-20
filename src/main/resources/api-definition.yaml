@@ -2169,9 +2169,6 @@ resourceTypes:
                     body:
                         application/json:
                           schema: localizedErrorResponse
-                "500":
-                    body:
-                        application/json:
 
       get:
           is: [ secured, paginated ]
@@ -2193,10 +2190,6 @@ resourceTypes:
                   application/json:
                       schema: approvedProductDtoPage
             400:
-                body:
-                  application/json:
-                    schema: localizedErrorResponse
-            403:
                 body:
                   application/json:
                     schema: localizedErrorResponse
@@ -2237,10 +2230,6 @@ resourceTypes:
                     "200":
                         body:
                             application/json:
-                    "403":
-                        body:
-                            application/json:
-                              schema: localizedErrorResponse
                     "404":
                         body:
                           application/json:
@@ -2791,10 +2780,6 @@ resourceTypes:
                           schema: idealStockAmountPage
                       text/csv:
               "400":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
-              "403":
                   body:
                     application/json:
                       schema: localizedErrorResponse

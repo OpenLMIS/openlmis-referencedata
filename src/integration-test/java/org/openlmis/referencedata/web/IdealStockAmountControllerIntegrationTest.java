@@ -15,9 +15,29 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.apache.commons.lang3.StringUtils.joinWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
+
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -37,27 +57,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.apache.commons.lang3.StringUtils.joinWith;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -106,7 +105,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldRetrieveAllIdealStockAmounts() {
-    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
+
     when(idealStockAmountRepository.findAll(any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(isa), null, 1));
 
@@ -122,7 +121,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldDownloadCsvWithAllPossibleFields() throws IOException {
-    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
+
     when(idealStockAmountRepository.findAll()).thenReturn(Arrays.asList(isa));
 
     String csvContent = download()
@@ -142,7 +141,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldDownloadCsvWithHeadersOnly() throws IOException {
-    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
+
     when(idealStockAmountRepository.findAll())
         .thenReturn(Collections.emptyList());
 
@@ -155,23 +154,6 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
     assertEquals("Facility Code,Commodity Type,Period,Ideal Stock Amount\r\n",
         csvContent);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnUnauthorizedWhenDownloadingCsvIfUserHasNoIdealStockAmountManage()
-      throws IOException {
-    mockUserHasNoRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
-
-    String messageKey = download()
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    // changed to responseChecks because file parameter is required
-    // and RAML check does not recognizes it in request
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }
 
   @Test
