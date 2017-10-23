@@ -104,42 +104,18 @@ public class IdealStockAmountProcessorTest {
 
   @Test
   public void shouldUseExistingObject() {
-    IdealStockAmountCsvModel isa = createIsaDto();
-
-    idealStockAmountsValidator.validate(isa);
     when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.singletonList(idealStockAmount));
 
-    List<IdealStockAmount> result = idealStockAmountProcessor
-        .process(Collections.singletonList(isa));
-
-    verify(idealStockAmountsValidator).validate(isa);
-    verify(idealStockAmountRepository).search(anyListOf(IdealStockAmount.class));
-
-    assertEquals(result.get(0).getFacility(), facility);
-    assertEquals(result.get(0).getAmount(), new Integer(1212));
-    assertEquals(result.get(0).getCommodityType(), commodityType);
-    assertEquals(result.get(0).getProcessingPeriod(), processingPeriod);
+    processAndCheckIsa();
   }
 
   @Test
   public void shouldCreateNewObject() {
-    IdealStockAmountCsvModel isa = createIsaDto();
-
-    idealStockAmountsValidator.validate(isa);
     when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
 
-    List<IdealStockAmount> result = idealStockAmountProcessor
-        .process(Collections.singletonList(isa));
-
-    verify(idealStockAmountsValidator).validate(isa);
-    verify(idealStockAmountRepository).search(anyListOf(IdealStockAmount.class));
-
-    assertEquals(result.get(0).getFacility(), facility);
-    assertEquals(result.get(0).getAmount(), new Integer(1212));
-    assertEquals(result.get(0).getCommodityType(), commodityType);
-    assertEquals(result.get(0).getProcessingPeriod(), processingPeriod);
+    processAndCheckIsa();
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -193,5 +169,21 @@ public class IdealStockAmountProcessorTest {
     processingPeriodDto.setProcessingSchedule(schedule);
 
     return new IdealStockAmountCsvModel(facilityDto, commodityTypeDto, processingPeriodDto, 1212);
+  }
+
+  private void processAndCheckIsa() {
+    IdealStockAmountCsvModel isa = createIsaDto();
+    idealStockAmountsValidator.validate(isa);
+
+    List<IdealStockAmount> result = idealStockAmountProcessor
+        .process(Collections.singletonList(isa));
+
+    verify(idealStockAmountsValidator).validate(isa);
+    verify(idealStockAmountRepository).search(anyListOf(IdealStockAmount.class));
+
+    assertEquals(result.get(0).getFacility(), facility);
+    assertEquals(result.get(0).getAmount(), new Integer(1212));
+    assertEquals(result.get(0).getCommodityType(), commodityType);
+    assertEquals(result.get(0).getProcessingPeriod(), processingPeriod);
   }
 }
