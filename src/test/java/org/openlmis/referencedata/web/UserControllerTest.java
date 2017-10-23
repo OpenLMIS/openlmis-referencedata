@@ -456,7 +456,7 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(null);
 
     //when
-    controller.getUserPrograms(userId, true);
+    controller.getUserPrograms(userId);
   }
 
   @Test

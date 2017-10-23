@@ -421,16 +421,11 @@ public class UserController extends BaseController {
   /**
    * Get the programs at a user's home facility or programs that the user supervises.
    *
-   * @param userId          id of user to get programs
-   * @param forHomeFacility true to get home facility programs, false to get supervised programs;
-   *                        default value is true
+   * @param userId id of user to get programs
    * @return a set of programs
    */
   @RequestMapping(value = "/users/{userId}/programs", method = RequestMethod.GET)
-  public ResponseEntity<Set<ProgramDto>> getUserPrograms(@PathVariable(USER_ID) UUID userId,
-                                         @RequestParam(
-                                             value = "forHomeFacility",
-                                             required = false) Boolean forHomeFacility) {
+  public ResponseEntity<Set<ProgramDto>> getUserPrograms(@PathVariable(USER_ID) UUID userId) {
     XLOGGER.entry(userId);
     Profiler profiler = new Profiler("GET_USER_PROGRAMS");
     profiler.setLogger(LOGGER);

@@ -1215,15 +1215,7 @@ resourceTypes:
               displayName: User supervised programs
               get:
                   is: [ secured ]
-                  description: Get all programs the associated user supervises (through the home
-                      facility or through supervisory nodes).
-                  queryParameters:
-                      forHomeFacility:
-                          displayName: For Home Facility
-                          description: Flag to get programs for home facility.
-                          type: boolean
-                          required: false
-                          repeat: false
+                  description: Get all programs the associated user supervises.
                   responses:
                       "200":
                           body:
