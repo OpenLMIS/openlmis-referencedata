@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
@@ -31,12 +30,16 @@ import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductR
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
@@ -46,67 +49,46 @@ import javax.persistence.criteria.Root;
 public class FacilityTypeApprovedProductRepositoryImpl
     implements FacilityTypeApprovedProductRepositoryCustom {
 
+  private static final String SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL = "SELECT ftap.*"
+      + " FROM referencedata.facility_type_approved_products ftap"
+      + " INNER JOIN referencedata.orderables o ON ftap.orderableId = o.id"
+      + " INNER JOIN referencedata.program_orderables po ON po.orderableId = o.id"
+      + " WHERE ftap.facilityTypeId = :facilityTypeId"
+      + " AND po.fullSupply = :fullSupply"
+      + " AND po.active IS TRUE"
+      + " AND po.programId = ftap.programId";
+
+  private static final String SEARCH_PRODUCTS_WITH_PROGRAM_SQL =
+      SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL + " AND ftap.programId = :programId";
+
   private static final String PROGRAM = "program";
   private static final String FACILITY_TYPE = "facilityType";
   private static final String ORDERED_DISPLAY_VALUE = "orderedDisplayValue";
   private static final String CODE = "code";
-  private static final String ID = "id";
 
   @PersistenceContext
   private EntityManager entityManager;
 
   @Override
-  public Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID programId,
+  public Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID programId,
                                                                 boolean fullSupply) {
-    checkNotNull(facilityId);
+    Query query;
 
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-    CriteriaQuery<FacilityTypeApprovedProduct> query = builder.createQuery(
-        FacilityTypeApprovedProduct.class
-    );
-
-    Root<FacilityTypeApprovedProduct> ftap = query.from(FacilityTypeApprovedProduct.class);
-    Root<Facility> facility = query.from(Facility.class);
-
-    Join<Facility, FacilityType> fft = facility.join("type");
-    Join<FacilityTypeApprovedProduct, FacilityType> ft = ftap.join(FACILITY_TYPE);
-    Join<FacilityTypeApprovedProduct, Program> program = ftap.join(PROGRAM);
-
-    Predicate conjunctionPredicate = builder.conjunction();
-    if (programId != null) {
-      conjunctionPredicate = builder.and(conjunctionPredicate,
-          builder.equal(program.get(ID), programId));
+    if (null == programId) {
+      query = entityManager.createNativeQuery(
+          SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL, FacilityTypeApprovedProduct.class
+      );
+    } else {
+      query = entityManager.createNativeQuery(
+          SEARCH_PRODUCTS_WITH_PROGRAM_SQL, FacilityTypeApprovedProduct.class
+      );
+      query.setParameter("programId", programId);
     }
-    conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.equal(fft.get(ID), ft.get(ID)));
-    conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.equal(facility.get(ID), facilityId));
 
-    Join<FacilityTypeApprovedProduct, Orderable> orderable = ftap.join("orderable");
-    Join<Orderable, Set<ProgramOrderable>> programOrderables =
-        orderable.joinSet("programOrderables");
+    query.setParameter("facilityTypeId", facilityTypeId);
+    query.setParameter("fullSupply", fullSupply);
 
-    conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.equal(programOrderables.get("fullSupply"), fullSupply));
-    conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.isTrue(programOrderables.get("active")));
-    conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.equal(programOrderables.get(PROGRAM), program));
-
-    query.select(ftap);
-    query.where(conjunctionPredicate);
-
-    Join<ProgramOrderable, OrderableDisplayCategory> category =
-        programOrderables.join("orderableDisplayCategory");
-
-    query.orderBy(
-        builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayOrder")),
-        builder.asc(category.get(ORDERED_DISPLAY_VALUE).get("displayName")),
-        builder.asc(orderable.get("productCode"))
-    );
-
-    return entityManager.createQuery(query).getResultList();
+    return Collections.checkedCollection(query.getResultList(), FacilityTypeApprovedProduct.class);
   }
 
   @Override

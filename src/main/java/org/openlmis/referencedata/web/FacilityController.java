@@ -274,15 +274,26 @@ public class FacilityController extends BaseController {
       @RequestParam(required = false, value = "programId") UUID programId,
       @RequestParam(value = "fullSupply") boolean fullSupply) {
 
+    Profiler profiler = new Profiler("GET_FACILITY_APPROVED_PRODUCTS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("FIND_FACILITY");
     Facility facility = facilityRepository.findOne(facilityId);
+
     if (facility == null) {
+      profiler.stop().log();
       throw new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND);
     }
 
+    profiler.start("FIND_APPROVED_PRODUCTS");
     Collection<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
-        .searchProducts(facilityId, programId, fullSupply);
+        .searchProducts(facility.getType().getId(), programId, fullSupply);
 
-    return toDto(products);
+    profiler.start("CONVERT_TO_DTO");
+    List<ApprovedProductDto> list = toDto(products);
+
+    profiler.stop().log();
+    return list;
   }
 
   /**

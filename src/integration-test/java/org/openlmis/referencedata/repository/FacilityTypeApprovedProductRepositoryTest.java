@@ -43,10 +43,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
@@ -130,7 +132,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
 
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
-            .createNew(program, orderableDisplayCategory, null, currencyUnit);
+        .createNew(program, orderableDisplayCategory, null, currencyUnit);
     orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
         "Ibuprofen", DESCRIPTION, 10, 5, false,
         Collections.singleton(programOrderableFullSupply), identifiers, extraData);
@@ -138,7 +140,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     orderableRepository.save(orderableFullSupply);
 
     ProgramOrderable programOrderable1 = ProgramOrderable
-            .createNew(program2, orderableDisplayCategory, null, currencyUnit);
+        .createNew(program2, orderableDisplayCategory, null, currencyUnit);
     orderable1 = new Orderable(Code.code("levora"), Dispensable.createNew("each"),
         "Levora", DESCRIPTION, 10, 5, false,
         Collections.singleton(programOrderable1), identifiers, extraData);
@@ -146,7 +148,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     orderableRepository.save(orderable1);
 
     ProgramOrderable programOrderable2 = ProgramOrderable
-            .createNew(program2, orderableDisplayCategory, null, currencyUnit);
+        .createNew(program2, orderableDisplayCategory, null, currencyUnit);
     orderable2 = new Orderable(Code.code("glibenclamide"), Dispensable.createNew("each"),
         "Glibenclamide", DESCRIPTION, 10, 5, false,
         Collections.singleton(programOrderable2), identifiers, extraData);
@@ -205,7 +207,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ftapRepository.save(generateInstance());
 
     Collection<FacilityTypeApprovedProduct> list = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), true);
+        .searchProducts(facility.getType().getId(), program.getId(), true);
 
     assertThat(list, hasSize(1));
 
@@ -226,7 +228,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ftapRepository.save(generateInstance());
 
     Collection<FacilityTypeApprovedProduct> actual = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), false);
+        .searchProducts(facility.getType().getId(), program.getId(), false);
 
     // At this point we have no non-full supply products
     assertEquals(0, actual.size());
@@ -234,7 +236,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     // Create a non-full supply product
     ftapRepository.save(generateProduct(facilityType1, false));
 
-    actual = ftapRepository.searchProducts(facility.getId(), program.getId(), false);
+    actual = ftapRepository.searchProducts(facility.getType().getId(), program.getId(), false);
 
     // We should be able to find non-full supply product we have created
     assertEquals(1, actual.size());
@@ -256,7 +258,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     ftapRepository.save(generateProduct(facilityType1, true));
 
     Collection<FacilityTypeApprovedProduct> list = ftapRepository
-        .searchProducts(facility.getId(), null, true);
+        .searchProducts(facility.getType().getId(), null, true);
 
     assertThat(list, hasSize(1));
 
@@ -302,7 +304,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
 
     result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, null, null);
     assertEquals(2, result.getContent().size());
-    for (FacilityTypeApprovedProduct ftap :  result) {
+    for (FacilityTypeApprovedProduct ftap : result) {
       assertEquals(FACILITY_TYPE2_CODE, ftap.getFacilityType().getCode());
     }
   }

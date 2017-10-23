@@ -24,7 +24,7 @@ import java.util.UUID;
 
 public interface FacilityTypeApprovedProductRepositoryCustom {
 
-  Collection<FacilityTypeApprovedProduct> searchProducts(UUID facility, UUID program,
+  Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID program,
                                                          boolean fullSupply);
 
   Page<FacilityTypeApprovedProduct> searchProducts(String facilityTypeCode,
