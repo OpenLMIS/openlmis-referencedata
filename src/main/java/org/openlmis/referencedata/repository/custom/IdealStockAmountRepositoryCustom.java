@@ -17,10 +17,10 @@ package org.openlmis.referencedata.repository.custom;
 
 import org.openlmis.referencedata.domain.IdealStockAmount;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface IdealStockAmountRepositoryCustom {
 
-  List<IdealStockAmount> search(Collection<IdealStockAmount> idealStockAmounts);
+  List<IdealStockAmount> search(List<IdealStockAmount> idealStockAmounts);
+
 }

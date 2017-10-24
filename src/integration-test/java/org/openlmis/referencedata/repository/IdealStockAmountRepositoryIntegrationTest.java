@@ -15,6 +15,12 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.CommodityType;
@@ -31,10 +37,8 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class IdealStockAmountRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<IdealStockAmount> {
@@ -124,11 +128,42 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   public void shouldGetListOfIdealStockAmounts() {
     IdealStockAmount isa = generateInstance();
 
-    assertTrue(isaRepository.search(Collections.singletonList(isa)).isEmpty());
+    List<IdealStockAmount> list = isaRepository.search(Collections.singletonList(isa));
+    assertThat(list, hasSize(0));
 
     isa = isaRepository.save(isa);
 
-    assertEquals(1, isaRepository.search(Collections.singletonList(isa)).size());
-    assertEquals(isa, isaRepository.search(Collections.singletonList(isa)).get(0));
+    list = isaRepository.search(Collections.singletonList(isa));
+
+    assertThat(list, hasSize(1));
+
+    IdealStockAmount idealStockAmount = list.get(0);
+    assertThat(idealStockAmount.getAmount(), equalTo(0));
+    assertThat(idealStockAmount.getId(), equalTo(isa.getId()));
+
+    Facility facility = idealStockAmount.getFacility();
+    assertThat(facility, is(notNullValue()));
+    assertThat(facility.getId(), equalTo(this.facility.getId()));
+
+    ProcessingPeriod processingPeriod = idealStockAmount.getProcessingPeriod();
+    assertThat(processingPeriod, is(notNullValue()));
+    assertThat(processingPeriod.getId(), equalTo(period.getId()));
+    assertThat(processingPeriod.getName(), equalTo(period.getName()));
+
+    ProcessingSchedule processingSchedule = processingPeriod.getProcessingSchedule();
+    assertThat(processingSchedule, is(notNullValue()));
+    assertThat(processingSchedule.getCode(), equalTo(schedule.getCode()));
+
+    CommodityType commodityType = idealStockAmount.getCommodityType();
+    assertThat(commodityType, is(notNullValue()));
+    assertThat(commodityType.getId(), equalTo(this.commodityType.getId()));
+    assertThat(
+        commodityType.getClassificationId(),
+        equalTo(this.commodityType.getClassificationId())
+    );
+    assertThat(
+        commodityType.getClassificationSystem(),
+        equalTo(this.commodityType.getClassificationSystem())
+    );
   }
 }

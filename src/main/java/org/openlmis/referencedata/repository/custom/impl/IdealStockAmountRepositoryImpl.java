@@ -15,6 +15,11 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.type.PostgresUUIDType;
+import org.hibernate.type.StringType;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
@@ -22,27 +27,27 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.custom.IdealStockAmountRepositoryCustom;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import javax.persistence.Query;
 
 public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositoryCustom {
 
-  private static final String CODE = "code";
-  private static final String FACILITY = "facility";
-  private static final String PROCESSING_PERIOD = "processingPeriod";
-  private static final String NAME = "name";
-  private static final String PROCESSING_SCHEDULE = "processingSchedule";
-  private static final String COMMODITY_TYPE = "commodityType";
-  private static final String CLASSIFICATION_ID = "classificationId";
-  private static final String CLASSIFICATION_SYSTEM = "classificationSystem";
+  private static final String SEARCH_SQL = "SELECT"
+      + " isa.id AS isa_id, f.id AS facility_id, f.code AS facility_code,"
+      + " c.id AS commodity_id,  c.classificationid AS classification_id,"
+      + " c.classificationsystem AS classification_system, p.id AS period_id,"
+      + " p.name AS period_name, s.code AS schedule_code"
+      + " FROM referencedata.ideal_stock_amounts isa"
+      + " INNER JOIN referencedata.facilities f ON isa.facilityid = f.id"
+      + " INNER JOIN referencedata.commodity_types c ON isa.commoditytypeid = c.id"
+      + " INNER JOIN referencedata.processing_periods p ON isa.processingperiodid = p.id"
+      + " INNER JOIN referencedata.processing_schedules s ON p.processingscheduleid = s.id";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -56,30 +61,80 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
    * @param idealStockAmounts list of ideal stock amounts with required fields
    * @return List of found Ideal Stock Amounts.
    */
-  public List<IdealStockAmount> search(Collection<IdealStockAmount> idealStockAmounts) {
+  public List<IdealStockAmount> search(List<IdealStockAmount> idealStockAmounts) {
+    Query query = createQuery(idealStockAmounts);
+    prepareQuery(query);
 
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<IdealStockAmount> query = builder.createQuery(IdealStockAmount.class);
-    Root<IdealStockAmount> root = query.from(IdealStockAmount.class);
+    // hibernate always returns a list of array of objects
+    @SuppressWarnings("unchecked")
+    List<Object[]> list = Collections.checkedList(query.getResultList(), Object[].class);
 
-    Join<IdealStockAmount, Facility> facilityJoin = root.join(FACILITY);
-    Join<IdealStockAmount, ProcessingPeriod> periodJoin = root.join(PROCESSING_PERIOD);
-    Join<IdealStockAmount, ProcessingSchedule> scheduleJoin = periodJoin.join(PROCESSING_SCHEDULE);
-    Join<IdealStockAmount, CommodityType> commodityTypeJoin = root.join(COMMODITY_TYPE);
+    return list.stream().map(this::toIsa).collect(Collectors.toList());
+  }
 
-    List<Predicate> predicates = new ArrayList<>();
-    for (IdealStockAmount isa : idealStockAmounts) {
-      predicates.add(builder.and(builder.equal(facilityJoin.get(CODE), isa.getFacility().getCode()),
-          builder.equal(periodJoin.get(NAME), isa.getProcessingPeriod().getName()),
-          builder.equal(scheduleJoin.get(CODE),
-              isa.getProcessingPeriod().getProcessingSchedule().getCode()),
-          builder.equal(commodityTypeJoin.get(CLASSIFICATION_ID),
-              isa.getCommodityType().getClassificationId()),
-          builder.equal(commodityTypeJoin.get(CLASSIFICATION_SYSTEM),
-              isa.getCommodityType().getClassificationSystem())));
+  private IdealStockAmount toIsa(Object[] values) {
+    Facility facility = new Facility((String) values[2]);
+    facility.setId((UUID) values[1]);
+
+    ProcessingSchedule schedule = new ProcessingSchedule();
+    schedule.setCode((String) values[8]);
+
+    ProcessingPeriod period = new ProcessingPeriod();
+    period.setId((UUID) values[6]);
+    period.setName((String) values[7]);
+    period.setProcessingSchedule(schedule);
+
+    CommodityType commodityType = new CommodityType();
+    commodityType.setId((UUID) values[3]);
+    commodityType.setClassificationId((String) values[4]);
+    commodityType.setClassificationSystem((String) values[5]);
+
+    IdealStockAmount result = new IdealStockAmount(facility, commodityType, period, 0);
+    result.setId((UUID) values[0]);
+
+    return result;
+  }
+
+  private void prepareQuery(Query query) {
+    SQLQuery sql = query.unwrap(SQLQuery.class);
+    sql.addScalar("isa_id", PostgresUUIDType.INSTANCE);
+    sql.addScalar("facility_id", PostgresUUIDType.INSTANCE);
+    sql.addScalar("facility_code", StringType.INSTANCE);
+    sql.addScalar("commodity_id", PostgresUUIDType.INSTANCE);
+    sql.addScalar("classification_id", StringType.INSTANCE);
+    sql.addScalar("classification_system", StringType.INSTANCE);
+    sql.addScalar("period_id", PostgresUUIDType.INSTANCE);
+    sql.addScalar("period_name", StringType.INSTANCE);
+    sql.addScalar("schedule_code", StringType.INSTANCE);
+  }
+
+  private Query createQuery(List<IdealStockAmount> idealStockAmounts) {
+    StringBuilder builder = new StringBuilder(SEARCH_SQL);
+
+    if (!isEmpty(idealStockAmounts)) {
+      builder.append(" WHERE");
+
+      for (int i = 0, size = idealStockAmounts.size(); i < size; ++i) {
+        IdealStockAmount isa = idealStockAmounts.get(i);
+        builder
+            .append(" (f.code = '")
+            .append(isa.getFacility().getCode())
+            .append("' AND c.classificationid = '")
+            .append(isa.getCommodityType().getClassificationId())
+            .append("' AND c.classificationsystem = '")
+            .append(isa.getCommodityType().getClassificationSystem())
+            .append("' AND p.name = '")
+            .append(isa.getProcessingPeriod().getName())
+            .append("' AND s.code = '")
+            .append(isa.getProcessingPeriod().getProcessingSchedule().getCode())
+            .append("')");
+
+        if (i + 1 < size) {
+          builder.append(" OR");
+        }
+      }
     }
 
-    query.where(builder.or(predicates.toArray(new Predicate[idealStockAmounts.size()])));
-    return entityManager.createQuery(query).getResultList();
+    return entityManager.createNativeQuery(builder.toString());
   }
 }
