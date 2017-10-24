@@ -122,14 +122,14 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldDownloadCsvWithAllPossibleFields() throws IOException {
 
-    when(idealStockAmountRepository.findAll()).thenReturn(Arrays.asList(isa));
+    when(idealStockAmountRepository.search(null)).thenReturn(Arrays.asList(isa));
 
     String csvContent = download()
         .then()
         .statusCode(200)
         .extract().body().asString();
 
-    verify(idealStockAmountRepository).findAll();
+    verify(idealStockAmountRepository).search(null);
     assertEquals("Facility Code,Commodity Type,Period,Ideal Stock Amount\r\n"
         + joinWith(",", facility.getCode(),
         StringUtils.joinWith("|", commodityType.getClassificationSystem(),
@@ -142,7 +142,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldDownloadCsvWithHeadersOnly() throws IOException {
 
-    when(idealStockAmountRepository.findAll())
+    when(idealStockAmountRepository.search(null))
         .thenReturn(Collections.emptyList());
 
     String csvContent = download()
@@ -150,7 +150,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .statusCode(200)
         .extract().body().asString();
 
-    verify(idealStockAmountRepository).findAll();
+    verify(idealStockAmountRepository).search(null);
     assertEquals("Facility Code,Commodity Type,Period,Ideal Stock Amount\r\n",
         csvContent);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());

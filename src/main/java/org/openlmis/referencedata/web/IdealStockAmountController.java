@@ -129,7 +129,7 @@ public class IdealStockAmountController extends BaseController {
     }
 
     profiler.start("FIND_ALL_IDEAL_STOCK_AMOUNTS");
-    Iterable<IdealStockAmount> list = repository.findAll();
+    Iterable<IdealStockAmount> list = repository.search(null);
 
     profiler.start("CONVERT_IDEAL_STOCK_AMOUNTS_TO_DTO");
     List<IdealStockAmountCsvModel> items = toCsvDto(list);
