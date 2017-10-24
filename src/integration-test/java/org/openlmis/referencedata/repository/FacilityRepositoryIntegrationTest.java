@@ -21,12 +21,10 @@ import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -34,6 +32,11 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
@@ -304,6 +307,26 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     assertTrue(repository.findByCode(facility.getCode()).isPresent());
     assertEquals(facility, repository.findByCode(facility.getCode()).get());
   }
+
+  @Test
+  public void shouldFindAllByIds() {
+    // given facilities I want
+    Facility facility = generateInstance();
+    facility = repository.save(facility);
+    Facility facility2 = generateInstance();
+    facility2 = repository.save(facility2);
+
+    // given a facility I don't want
+    repository.save(generateInstance());
+
+    // when
+    Set<UUID> ids = Sets.newHashSet(facility.getId(), facility2.getId());
+    List<Facility> found = repository.findAllByIds(ids);
+
+    // then
+    assertEquals(2, found.size());
+  }
+
 
   @Override
   Facility generateInstance() {

@@ -35,13 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -76,6 +77,26 @@ public class FacilityService {
    * @param queryMap request parameters (code, name, zone, type, recurse) and JSON extraData.
    * @return List of facilities
    */
+  public List<Facility> getFacilities(MultiValueMap<String, Object> queryMap) {
+
+    if (MapUtils.isEmpty(queryMap)) {
+      return Lists.newArrayList(facilityRepository.findAll());
+    }
+
+    Set<UUID> ids = UuidUtil.getIds(queryMap);
+    if (!ids.isEmpty()) {
+      return facilityRepository.findAllByIds(ids);
+    } else {
+      return searchFacilities(queryMap.toSingleValueMap());
+    }
+  }
+
+  /**
+   * Method returns all facilities with matched parameters.
+   *
+   * @param queryMap request parameters (code, name, zone, type, recurse) and JSON extraData.
+   * @return List of facilities
+   */
   public List<Facility> searchFacilities(Map<String, Object> queryMap) {
 
     if ( MapUtils.isEmpty(queryMap) ) {
@@ -85,9 +106,8 @@ public class FacilityService {
     String code = MapUtils.getString(queryMap, CODE, null);
     String name = MapUtils.getString(queryMap, NAME, null);
     String facilityTypeCode = MapUtils.getString(queryMap, FACILITY_TYPE_CODE, null);
-    Optional<UUID> zoneId = UuidUtil.fromString(MapUtils.getObject(queryMap,
-        ZONE_ID,
-        "").toString());
+    Optional<UUID> zoneId = UuidUtil.fromString(
+        MapUtils.getObject(queryMap, ZONE_ID, "").toString());
     final boolean recurse = MapUtils.getBooleanValue(queryMap, RECURSE);
 
     // validate query parameters

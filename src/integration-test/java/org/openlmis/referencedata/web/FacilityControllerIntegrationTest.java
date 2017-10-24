@@ -71,12 +71,14 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String PROGRAM_ID = "programId";
-  static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
+  private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String MINIMAL_URL = RESOURCE_URL + "/minimal";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -114,14 +116,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
 
-    List<SupplyLine> searchedSupplyLines = new ArrayList<>();
-    for (int i = 0; i < searchedFacilitiesAmt; i++) {
-      SupplyLine supplyLine = generateSupplyLine();
-      supplyLine.setProgram(program);
-      supplyLine.setSupervisoryNode(searchedSupervisoryNode);
-
-      searchedSupplyLines.add(supplyLine);
-    }
+    List<SupplyLine> searchedSupplyLines =
+        generateSupplyLines(searchedFacilitiesAmt, searchedSupervisoryNode);
 
     given(programRepository.findOne(programId)).willReturn(program);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
@@ -195,7 +191,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
-    
     String similarCode = "Facility";
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("code", similarCode);
@@ -357,13 +352,42 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void getAllShouldGetAllFacilities() {
+  public void shouldSearchWithEmptyParamsWhenNoParamsProvided() {
     List<Facility> storedFacilities = Arrays.asList(facility, generateFacility());
-    given(facilityRepository.findAll()).willReturn(storedFacilities);
+    given(facilityService.getFacilities(new LinkedMultiValueMap<>()))
+        .willReturn(storedFacilities);
 
     FacilityDto[] response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(FacilityDto[].class);
+
+    List<FacilityDto> facilities = Arrays.asList(response);
+    assertThat(facilities.size(), is(2));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(rightService);
+  }
+
+  @Test
+  public void shouldSearchWithParamsWhenParamsProvided() {
+    List<Facility> storedFacilities = Arrays.asList(facility, generateFacility());
+    MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    UUID facilityIdOne = UUID.randomUUID();
+    UUID facilityIdTwo = UUID.randomUUID();
+    queryMap.add("id", facilityIdOne.toString());
+    queryMap.add("id", facilityIdTwo.toString());
+
+    given(facilityService.getFacilities(queryMap)).willReturn(storedFacilities);
+
+    FacilityDto[] response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam("id", facilityIdOne)
+        .queryParam("id", facilityIdTwo)
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -772,6 +796,19 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private List<SupplyLine> generateSupplyLines(int searchedFacilitiesAmt,
+                                               SupervisoryNode searchedSupervisoryNode) {
+    List<SupplyLine> searchedSupplyLines = new ArrayList<>();
+    for (int i = 0; i < searchedFacilitiesAmt; i++) {
+      SupplyLine supplyLine = generateSupplyLine();
+      supplyLine.setProgram(program);
+      supplyLine.setSupervisoryNode(searchedSupervisoryNode);
+
+      searchedSupplyLines.add(supplyLine);
+    }
+    return searchedSupplyLines;
   }
 
   private SupplyLine generateSupplyLine() {

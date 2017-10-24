@@ -63,7 +63,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -131,18 +133,6 @@ public class FacilityController extends BaseController {
     newFacility = facilityRepository.save(newFacility);
     LOGGER.debug("Created new facility with id: ", facilityDto.getId());
     return toDto(newFacility);
-  }
-
-  /**
-   * Get all facilities.
-   *
-   * @return Facilities.
-   */
-  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<FacilityDto> getAllFacilities() {
-    return toDto(facilityRepository.findAll());
   }
 
   /**
@@ -364,6 +354,22 @@ public class FacilityController extends BaseController {
     List<Facility> facilities = supplyLines.stream()
         .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
     return toDto(facilities);
+  }
+
+  /**
+   * Retrieves all facilities that are matching given request parameters.
+   * If no parameters, all facilities are returned.
+   *
+   * @param requestParams request parameters (id, code, name, zone, recurse).
+   * @return List of wanted Facilities matching query parameters.
+   */
+  @GetMapping(value = RESOURCE_PATH)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<FacilityDto> getFacilities(
+      @RequestParam MultiValueMap<String, Object> requestParams) {
+
+    return toDto(facilityService.getFacilities(requestParams));
   }
 
   /**

@@ -1421,7 +1421,38 @@ resourceTypes:
       displayName: Facility
       get:
           is: [ secured ]
-          description: Get all facilities.
+          description: Get all facilities that are matching given request parameters. If no parameters, all facilities are returned.
+          queryParameters:
+              id:
+                  description: Facility id
+                  type: string
+                  required: false
+                  repeat: true
+              code:
+                  description: Facility code
+                  type: string
+                  required: false
+                  repeat: false
+              name:
+                  description: Facility name
+                  type: string
+                  required: false
+                  repeat: false
+              zone:
+                  description: Facility zone id
+                  type: string
+                  required: false
+                  repeat: false
+              type:
+                  description: Facility type code
+                  type: string
+                  required: false
+                  repeat: false
+              recurse:
+                  description: The recurse option should be given when a zone is also given, and it means that the search should also include all children of the given zone.
+                  type: boolean
+                  required: false
+                  repeat: false
           responses:
               "200":
                   body:

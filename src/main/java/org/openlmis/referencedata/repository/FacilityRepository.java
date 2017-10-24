@@ -16,10 +16,6 @@
 package org.openlmis.referencedata.repository;
 
 import com.vividsolutions.jts.geom.Polygon;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.dto.NamedResource;
@@ -27,6 +23,10 @@ import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface FacilityRepository
@@ -55,4 +55,8 @@ public interface FacilityRepository
   Set<NamedResource> findSupervisionFacilitiesByUser(@Param("userId") UUID userId);
 
   boolean existsByCode(String code);
+
+  @Query("SELECT f FROM Facility f WHERE f.id in ?1")
+  List<Facility> findAllByIds(Iterable<UUID> ids);
+
 }
