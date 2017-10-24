@@ -22,6 +22,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-3209](https://openlmis.atlassian.net/browse/OLMIS-3209): Fixed problem with parsing orderable DTO when it contains several program orderables.
 * [OLMIS-3290](https://openlmis.atlassian.net/browse/OLMIS-3290): Fixed searching Orderables by code and name.
 * [OLMIS-3291](https://openlmis.atlassian.net/browse/OLMIS-3291): Fixed searching RequisitionGroups by supervisoryNode.
+* [OLMIS-3346](https://openlmis.atlassian.net/browse/OLMIS-3346): Decreased number of database calls to retrieve Facility Type Approved Products  
 
 8.0.1 / 2017-09-05
 

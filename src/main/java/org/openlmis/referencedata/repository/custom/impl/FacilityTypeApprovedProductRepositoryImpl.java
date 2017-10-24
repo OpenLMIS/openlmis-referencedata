@@ -32,14 +32,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
@@ -49,17 +48,22 @@ import javax.persistence.criteria.Root;
 public class FacilityTypeApprovedProductRepositoryImpl
     implements FacilityTypeApprovedProductRepositoryCustom {
 
-  private static final String SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL = "SELECT ftap.*"
-      + " FROM referencedata.facility_type_approved_products ftap"
-      + " INNER JOIN referencedata.orderables o ON ftap.orderableId = o.id"
-      + " INNER JOIN referencedata.program_orderables po ON po.orderableId = o.id"
-      + " WHERE ftap.facilityTypeId = :facilityTypeId"
+  private static final String SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL = "SELECT ftap"
+      + " FROM FacilityTypeApprovedProduct ftap"
+      + " INNER JOIN FETCH ftap.orderable o"
+      + " INNER JOIN FETCH ftap.program p"
+      + " INNER JOIN FETCH ftap.facilityType ft"
+      + " INNER JOIN FETCH o.programOrderables po"
+      + " INNER JOIN FETCH po.program pop"
+      + " INNER JOIN FETCH po.orderableDisplayCategory"
+      + " LEFT OUTER JOIN FETCH o.identifiers"
+      + " WHERE ft.id = :facilityTypeId"
       + " AND po.fullSupply = :fullSupply"
-      + " AND po.active IS TRUE"
-      + " AND po.programId = ftap.programId";
+      + " AND po.active = TRUE"
+      + " AND pop.id = p.id";
 
   private static final String SEARCH_PRODUCTS_WITH_PROGRAM_SQL =
-      SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL + " AND ftap.programId = :programId";
+      SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL + " AND p.id = :programId";
 
   private static final String PROGRAM = "program";
   private static final String FACILITY_TYPE = "facilityType";
@@ -72,14 +76,14 @@ public class FacilityTypeApprovedProductRepositoryImpl
   @Override
   public Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID programId,
                                                                 boolean fullSupply) {
-    Query query;
+    TypedQuery<FacilityTypeApprovedProduct> query;
 
     if (null == programId) {
-      query = entityManager.createNativeQuery(
+      query = entityManager.createQuery(
           SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL, FacilityTypeApprovedProduct.class
       );
     } else {
-      query = entityManager.createNativeQuery(
+      query = entityManager.createQuery(
           SEARCH_PRODUCTS_WITH_PROGRAM_SQL, FacilityTypeApprovedProduct.class
       );
       query.setParameter("programId", programId);
@@ -88,7 +92,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     query.setParameter("facilityTypeId", facilityTypeId);
     query.setParameter("fullSupply", fullSupply);
 
-    return Collections.checkedCollection(query.getResultList(), FacilityTypeApprovedProduct.class);
+    return query.getResultList();
   }
 
   @Override
