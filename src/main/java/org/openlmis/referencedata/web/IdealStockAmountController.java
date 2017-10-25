@@ -31,6 +31,7 @@ import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.i18n.MessageService;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
+import org.openlmis.referencedata.service.IdealStockAmountService;
 import org.openlmis.referencedata.util.IdealStockAmountDtoBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -70,6 +71,9 @@ public class IdealStockAmountController extends BaseController {
 
   @Autowired
   private IdealStockAmountRepository repository;
+
+  @Autowired
+  private IdealStockAmountService service;
 
   @Autowired
   private CsvFormatter csvFormatter;
@@ -129,7 +133,7 @@ public class IdealStockAmountController extends BaseController {
     }
 
     profiler.start("FIND_ALL_IDEAL_STOCK_AMOUNTS");
-    Iterable<IdealStockAmount> list = repository.search(null);
+    Iterable<IdealStockAmount> list = service.search();
 
     profiler.start("CONVERT_IDEAL_STOCK_AMOUNTS_TO_DTO");
     List<IdealStockAmountCsvModel> items = toCsvDto(list);

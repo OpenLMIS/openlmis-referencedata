@@ -32,8 +32,8 @@ import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
+import org.openlmis.referencedata.service.IdealStockAmountService;
 import org.openlmis.referencedata.validate.IdealStockAmountValidator;
 
 import java.util.Collections;
@@ -57,7 +57,7 @@ public class IdealStockAmountProcessorTest {
   private FacilityRepository facilityRepository;
 
   @Mock
-  private IdealStockAmountRepository idealStockAmountRepository;
+  private IdealStockAmountService service;
 
   @Mock
   private ProcessingPeriodRepository processingPeriodRepository;
@@ -92,7 +92,7 @@ public class IdealStockAmountProcessorTest {
 
     idealStockAmount = new IdealStockAmount(facility, commodityType, processingPeriod, 1);
 
-    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+    when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
 
     when(facilityRepository.findByCode(FACILITY_CODE)).thenReturn(Optional.of(facility));
@@ -104,7 +104,7 @@ public class IdealStockAmountProcessorTest {
 
   @Test
   public void shouldUseExistingObject() {
-    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+    when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.singletonList(idealStockAmount));
 
     processAndCheckIsa();
@@ -112,7 +112,7 @@ public class IdealStockAmountProcessorTest {
 
   @Test
   public void shouldCreateNewObject() {
-    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+    when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
 
     processAndCheckIsa();
@@ -123,7 +123,7 @@ public class IdealStockAmountProcessorTest {
     IdealStockAmountCsvModel isa = createIsaDto();
 
     idealStockAmountsValidator.validate(isa);
-    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+    when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
     when(facilityRepository.findByCode(FACILITY_CODE)).thenReturn(Optional.empty());
 
@@ -135,7 +135,7 @@ public class IdealStockAmountProcessorTest {
     IdealStockAmountCsvModel isa = createIsaDto();
 
     idealStockAmountsValidator.validate(isa);
-    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+    when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
     when(processingPeriodRepository.findByNameAndProcessingScheduleCode(PERIOD, SCHEDULE))
         .thenReturn(Optional.empty());
@@ -148,7 +148,7 @@ public class IdealStockAmountProcessorTest {
     IdealStockAmountCsvModel isa = createIsaDto();
 
     idealStockAmountsValidator.validate(isa);
-    when(idealStockAmountRepository.search(anyListOf(IdealStockAmount.class)))
+    when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
     when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(ID, SYSTEM))
         .thenReturn(Optional.empty());
@@ -179,7 +179,7 @@ public class IdealStockAmountProcessorTest {
         .process(Collections.singletonList(isa));
 
     verify(idealStockAmountsValidator).validate(isa);
-    verify(idealStockAmountRepository).search(anyListOf(IdealStockAmount.class));
+    verify(service).search(anyListOf(IdealStockAmount.class));
 
     assertEquals(result.get(0).getFacility(), facility);
     assertEquals(result.get(0).getAmount(), new Integer(1212));

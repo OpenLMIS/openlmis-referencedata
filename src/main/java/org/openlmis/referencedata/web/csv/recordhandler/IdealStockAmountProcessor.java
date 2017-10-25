@@ -24,8 +24,8 @@ import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
+import org.openlmis.referencedata.service.IdealStockAmountService;
 import org.openlmis.referencedata.util.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class IdealStockAmountProcessor
   private static final Logger LOGGER = LoggerFactory.getLogger(IdealStockAmountProcessor.class);
 
   @Autowired
-  private IdealStockAmountRepository idealStockAmountRepository;
+  private IdealStockAmountService idealStockAmountService;
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -73,7 +73,7 @@ public class IdealStockAmountProcessor
     profiler.start("SEARCH_EXISTING_ISA");
     List<IdealStockAmount> idealStockAmounts = convert(records);
     Map<Integer, IdealStockAmount> isaMap = new HashMap<>();
-    for (IdealStockAmount isa : idealStockAmountRepository.search(idealStockAmounts)) {
+    for (IdealStockAmount isa : idealStockAmountService.search(idealStockAmounts)) {
       isaMap.put(hash(isa), isa);
     }
 
