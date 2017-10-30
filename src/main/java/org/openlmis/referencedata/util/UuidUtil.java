@@ -47,7 +47,13 @@ public class UuidUtil {
   }
 
   /**
-   * Gets a set of UUIDs from query multi value map.
+   * Gets a set of UUIDs from query multi value map. Returns empty set if no {@code id} key.
+   *
+   * @param queryMap a multi value map that should contain {@code id} as key
+   *                 and some UUID string as value.
+   * @return a set of {@link UUID} extracted from map where key is {@code id}.
+   * @throws ClassCastException when value for key {@code id} is not {@code String}
+   * @throws IllegalArgumentException when value for key {@code id} is not parsable to {@link UUID}
    */
   public static Set<UUID> getIds(MultiValueMap<String, Object> queryMap) {
     Set<UUID> ids = new HashSet<>();
