@@ -104,11 +104,17 @@ public class FacilityServiceTest {
     when(parent.getId()).thenReturn(zoneUuid);
   }
 
-  @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionIfZoneCodeAndNameNotProvidedForSearch() {
+  @Test
+  public void shouldReturnAllIfZoneCodeAndNameNotProvidedForSearch() {
+    when(facilityRepository.findAll()).thenReturn(facilityList);
+
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put(RECURSE, false);
-    facilityService.searchFacilities(searchParams);
+    List<Facility> actual = facilityService.searchFacilities(searchParams);
+
+    verify(facilityRepository).findAll();
+    assertEquals(facilityList, actual);
+
   }
 
   @Test

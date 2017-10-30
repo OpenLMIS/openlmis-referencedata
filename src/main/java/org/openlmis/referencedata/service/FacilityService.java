@@ -17,7 +17,6 @@ package org.openlmis.referencedata.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Facility;
@@ -28,7 +27,6 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.UuidUtil;
-import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.Logger;
@@ -78,11 +76,6 @@ public class FacilityService {
    * @return List of facilities
    */
   public List<Facility> getFacilities(MultiValueMap<String, Object> queryMap) {
-
-    if (MapUtils.isEmpty(queryMap)) {
-      return Lists.newArrayList(facilityRepository.findAll());
-    }
-
     Set<UUID> ids = UuidUtil.getIds(queryMap);
     if (!ids.isEmpty()) {
       return facilityRepository.findAllByIds(ids);
@@ -99,10 +92,6 @@ public class FacilityService {
    */
   public List<Facility> searchFacilities(Map<String, Object> queryMap) {
 
-    if ( MapUtils.isEmpty(queryMap) ) {
-      return Lists.newArrayList(facilityRepository.findAll());
-    }
-
     String code = MapUtils.getString(queryMap, CODE, null);
     String name = MapUtils.getString(queryMap, NAME, null);
     String facilityTypeCode = MapUtils.getString(queryMap, FACILITY_TYPE_CODE, null);
@@ -111,13 +100,10 @@ public class FacilityService {
     final boolean recurse = MapUtils.getBooleanValue(queryMap, RECURSE);
 
     // validate query parameters
-    if (StringUtils.isEmpty(code)
-        && StringUtils.isEmpty(name)
-        && StringUtils.isEmpty(facilityTypeCode)
-        && !zoneId.isPresent()) {
+    if (MapUtils.isEmpty(queryMap)
+        || (isEmpty(code, name, facilityTypeCode) && !zoneId.isPresent())) {
 
-      throw new ValidationMessageException(
-          FacilityMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
+      return facilityRepository.findAll();
     }
 
     // find zone if given
@@ -145,6 +131,12 @@ public class FacilityService {
         (Map<String, String>) queryMap.get(EXTRA_DATA));
 
     return Optional.ofNullable(foundFacilities).orElse(Collections.emptyList());
+  }
+
+  private boolean isEmpty(String code, String name, String facilityTypeCode) {
+    return StringUtils.isEmpty(code)
+        && StringUtils.isEmpty(name)
+        && StringUtils.isEmpty(facilityTypeCode);
   }
 
   /**
