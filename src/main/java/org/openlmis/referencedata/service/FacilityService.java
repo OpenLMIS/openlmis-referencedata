@@ -70,9 +70,11 @@ public class FacilityService {
   private ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * Method returns all facilities with matched parameters.
+   * Method returns all facilities with matched parameters. When no valid parameters
+   * are given, returns all facilities.
    *
-   * @param queryMap request parameters (code, name, zone, type, recurse) and JSON extraData.
+   * @param queryMap request parameters (id, code, name, zone, type, recurse)
+   *                 and JSON extraData. (not {@code null})
    * @return List of facilities
    */
   public List<Facility> getFacilities(MultiValueMap<String, Object> queryMap) {
@@ -85,7 +87,8 @@ public class FacilityService {
   }
 
   /**
-   * Method returns all facilities with matched parameters.
+   * Method returns all facilities with matched parameters. When no valid params are given,
+   * returns all facilities
    *
    * @param queryMap request parameters (code, name, zone, type, recurse) and JSON extraData.
    * @return List of facilities
@@ -101,7 +104,7 @@ public class FacilityService {
 
     // validate query parameters
     if (MapUtils.isEmpty(queryMap)
-        || (isEmpty(code, name, facilityTypeCode) && !zoneId.isPresent())) {
+        || (StringUtils.isAllEmpty(code, name, facilityTypeCode) && !zoneId.isPresent())) {
 
       return facilityRepository.findAll();
     }
@@ -131,12 +134,6 @@ public class FacilityService {
         (Map<String, String>) queryMap.get(EXTRA_DATA));
 
     return Optional.ofNullable(foundFacilities).orElse(Collections.emptyList());
-  }
-
-  private boolean isEmpty(String code, String name, String facilityTypeCode) {
-    return StringUtils.isEmpty(code)
-        && StringUtils.isEmpty(name)
-        && StringUtils.isEmpty(facilityTypeCode);
   }
 
   /**
