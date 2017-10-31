@@ -73,8 +73,9 @@ public class FacilityService {
    * Method returns all facilities with matched parameters. When no valid parameters
    * are given, returns all facilities.
    *
-   * @param queryMap request parameters (id, code, name, zone, type, recurse)
-   *                 and JSON extraData. (not {@code null})
+   * @param queryMap multi map with request parameters (id, code, name, zone, type, recurse)
+   *                 and JSON extraData. (not {@code null}). There can be multiple id params,
+   *                 if other params has multiple values, the first one is used
    * @return List of facilities
    */
   public List<Facility> getFacilities(MultiValueMap<String, Object> queryMap) {
