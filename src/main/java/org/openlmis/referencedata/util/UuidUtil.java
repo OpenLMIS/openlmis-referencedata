@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.util;
 
 import org.springframework.util.MultiValueMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -51,12 +52,16 @@ public class UuidUtil {
    * all values associated with that key parsed to UUIDS.
    *
    * @param queryMap a multi value map that should contain {@code id} as key
-   *                 and some UUID string as value.
-   * @return a set of {@link UUID} extracted from map where key is {@code id}.
+   *                 and UUID strings as values for that key. May be null
+   * @return a set of {@link UUID} extracted from map where key is {@code id}. Empty set when query
+   *     map is null or no results found.
    * @throws ClassCastException when value for key {@code id} is not {@code String}
    * @throws IllegalArgumentException when value for key {@code id} is not parsable to {@link UUID}
    */
   public static Set<UUID> getIds(MultiValueMap<String, Object> queryMap) {
+    if (queryMap == null) {
+      return Collections.emptySet();
+    }
     Set<UUID> ids = new HashSet<>();
     queryMap.forEach((key, value) -> {
       if (Objects.equals(key, ID)) {

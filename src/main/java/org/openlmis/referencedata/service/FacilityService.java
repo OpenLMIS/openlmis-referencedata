@@ -74,16 +74,17 @@ public class FacilityService {
    * are given, returns all facilities.
    *
    * @param queryMap multi map with request parameters (id, code, name, zone, type, recurse)
-   *                 and JSON extraData. (not {@code null}). There can be multiple id params,
-   *                 if other params has multiple values, the first one is used
-   * @return List of facilities
+   *                 and JSON extraData. There can be multiple id params,
+   *                 if other params has multiple values, the first one is used.
+   *                 May be null or empty
+   * @return List of facilities. All facilities will be returned when map is null or empty
    */
   public List<Facility> getFacilities(MultiValueMap<String, Object> queryMap) {
     Set<UUID> ids = UuidUtil.getIds(queryMap);
     if (!ids.isEmpty()) {
       return facilityRepository.findAllByIds(ids);
     } else {
-      return searchFacilities(queryMap.toSingleValueMap());
+      return searchFacilities(queryMap != null ? queryMap.toSingleValueMap() : null);
     }
   }
 
@@ -92,7 +93,8 @@ public class FacilityService {
    * returns all facilities
    *
    * @param queryMap request parameters (code, name, zone, type, recurse) and JSON extraData.
-   * @return List of facilities
+   *                 May be null or empty
+   * @return List of facilities. All facilities will be returned when map is null or empty
    */
   public List<Facility> searchFacilities(Map<String, Object> queryMap) {
 
