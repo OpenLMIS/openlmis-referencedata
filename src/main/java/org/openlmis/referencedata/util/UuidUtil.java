@@ -47,7 +47,8 @@ public class UuidUtil {
   }
 
   /**
-   * Gets a set of UUIDs from query multi value map. Returns empty set if no {@code id} key.
+   * Gets a set of UUID from the query multi value map. It looks up the map key "id" and returns
+   * all values associated with that key parsed to UUIDS.
    *
    * @param queryMap a multi value map that should contain {@code id} as key
    *                 and some UUID string as value.
