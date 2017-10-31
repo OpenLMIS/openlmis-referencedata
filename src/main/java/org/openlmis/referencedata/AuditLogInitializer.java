@@ -18,12 +18,16 @@ package org.openlmis.referencedata;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
 
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Resource;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.BaseEntity;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
@@ -43,9 +47,10 @@ import org.springframework.stereotype.Component;
  * <a href="https://github.com/javers/javers/issues/214">this issue</a>.
  */
 @Component
-@Profile("!test")
+@Profile("refresh-db")
 @Order(20)
 public class AuditLogInitializer implements CommandLineRunner {
+  private static final XLogger LOGGER = XLoggerFactory.getXLogger(AuditLogInitializer.class);
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -58,10 +63,25 @@ public class AuditLogInitializer implements CommandLineRunner {
    * @param args Main method arguments.
    */
   public void run(String... args) {
-    applicationContext
-        .getBeansWithAnnotation(JaversSpringDataAuditable.class)
-        .values()
-        .forEach(this::createSnapshots);
+    LOGGER.entry();
+    Profiler profiler = new Profiler("RUN_AUDIT_LOG_INIT");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("GET_AUDITABLE_REPOSITORIES");
+    //Get all JaVers repositories.
+    Map<String,Object> repositoryMap =
+        applicationContext.getBeansWithAnnotation(JaversSpringDataAuditable.class);
+
+    //For each one...
+    for (Map.Entry<String, Object> entry : repositoryMap.entrySet()) {
+      String beanName = entry.getKey();
+      Object bean = entry.getValue();
+      profiler.start("CREATE_SNAPSHOTS_OF_" + beanName);
+      createSnapshots(bean);
+    }
+
+    profiler.stop().log();
+    LOGGER.exit();
   }
 
   private void createSnapshots(Object bean) {
