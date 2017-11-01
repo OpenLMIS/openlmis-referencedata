@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.AllArgsConstructor;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.FacilityTypeDto;
 import org.openlmis.referencedata.dto.OrderableDto;
@@ -39,6 +40,7 @@ import javax.persistence.UniqueConstraint;
     uniqueConstraints = @UniqueConstraint(name = "unq_ftap",
         columnNames = { "orderableId", "programId", "facilityTypeId" }))
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TypeName("FacilityTypeApprovedProduct")
 public class FacilityTypeApprovedProduct extends BaseEntity {

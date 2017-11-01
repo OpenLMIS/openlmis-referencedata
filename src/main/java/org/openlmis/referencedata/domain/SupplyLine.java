@@ -15,15 +15,13 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.javers.core.metamodel.annotation.TypeName;
 import java.util.Objects;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -33,6 +31,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "supply_lines", schema = "referencedata")
 @NoArgsConstructor
+@AllArgsConstructor
 @TypeName("SupplyLine")
 public class SupplyLine extends BaseEntity {
 

@@ -34,7 +34,32 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import guru.nidi.ramltester.junit.RamlMatchers;
-import java.time.LocalDate;
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.MinimalFacilityDto;
+import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,34 +70,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Dispensable;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.domain.SupplyLine;
-import org.openlmis.referencedata.domain.SupportedProgram;
-import org.openlmis.referencedata.dto.FacilityDto;
-import org.openlmis.referencedata.dto.MinimalFacilityDto;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.utils.AuditLogHelper;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -87,7 +84,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String BYBOUNDARY_URL = RESOURCE_URL + "/byBoundary";
   private static final String NAME_KEY = "name";
 
-  private Integer currentInstanceNumber;
   private UUID programId;
   private UUID supervisoryNodeId;
   private Program program;
@@ -103,10 +99,10 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Before
   public void setUp() {
-    currentInstanceNumber = 0;
-    program = generateProgram();
     programId = UUID.randomUUID();
-    facility = generateFacility();
+    program = new ProgramDataBuilder().withId(programId).build();
+    facility = new FacilityDataBuilder()
+        .withSupportedProgram(program).build();
   }
 
   @Test
@@ -114,19 +110,22 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     int searchedFacilitiesAmt = 3;
 
-    SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
+    SupervisoryNode searchedSupervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .build();
 
     List<SupplyLine> searchedSupplyLines =
         generateSupplyLines(searchedFacilitiesAmt, searchedSupervisoryNode);
 
     given(programRepository.findOne(programId)).willReturn(program);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
+    given(supervisoryNodeRepository.findOne(searchedSupervisoryNode.getId()))
+        .willReturn(searchedSupervisoryNode);
     given(supplyLineService.searchSupplyLines(program, searchedSupervisoryNode))
         .willReturn(searchedSupplyLines);
 
     FacilityDto[] response = restAssured.given()
         .queryParam(PROGRAM_ID, programId)
-        .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
+        .queryParam(SUPERVISORY_NODE_ID, searchedSupervisoryNode.getId())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SUPPLYING_URL)
@@ -172,14 +171,17 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingProgram() {
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    SupervisoryNode searchedSupervisoryNode = generateSupervisoryNode();
+    SupervisoryNode searchedSupervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .build();
 
     given(programRepository.findOne(programId)).willReturn(null);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(searchedSupervisoryNode);
+    given(supervisoryNodeRepository.findOne(searchedSupervisoryNode.getId()))
+        .willReturn(searchedSupervisoryNode);
 
     restAssured.given()
         .queryParam(PROGRAM_ID, programId)
-        .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
+        .queryParam(SUPERVISORY_NODE_ID, searchedSupervisoryNode.getId())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(SUPPLYING_URL)
@@ -317,7 +319,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
     when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
-        eq(false))).thenReturn(generateFacilityTypeApprovedProducts());
+        eq(false))).thenReturn(Collections.singletonList(
+            new FacilityTypeApprovedProductsDataBuilder().build()));
 
     List<Map<String, ?>> productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
@@ -353,7 +356,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldSearchWithEmptyParamsWhenNoParamsProvided() {
-    List<Facility> storedFacilities = Arrays.asList(facility, generateFacility());
+    List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
+        .withSupportedProgram(program).build());
     given(facilityService.getFacilities(new LinkedMultiValueMap<>()))
         .willReturn(storedFacilities);
 
@@ -374,7 +378,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldSearchWithParamsWhenParamsProvided() {
-    List<Facility> storedFacilities = Arrays.asList(facility, generateFacility());
+    List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
+        .withSupportedProgram(program).build());
     MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     UUID facilityIdOne = UUID.randomUUID();
     UUID facilityIdTwo = UUID.randomUUID();
@@ -402,7 +407,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAllShouldGetAllFacilitiesWithMinimalRepresentation() {
-    List<Facility> storedFacilities = Arrays.asList(facility, generateFacility());
+    List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
+        .withSupportedProgram(program).build());
     given(facilityRepository.findAll()).willReturn(storedFacilities);
 
     MinimalFacilityDto[] response = restAssured
@@ -802,107 +808,13 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
                                                SupervisoryNode searchedSupervisoryNode) {
     List<SupplyLine> searchedSupplyLines = new ArrayList<>();
     for (int i = 0; i < searchedFacilitiesAmt; i++) {
-      SupplyLine supplyLine = generateSupplyLine();
-      supplyLine.setProgram(program);
-      supplyLine.setSupervisoryNode(searchedSupervisoryNode);
-
+      SupplyLine supplyLine = new SupplyLineDataBuilder()
+          .withProgram(program)
+          .withSupplyingFacility(facility)
+          .withSupervisoryNode(searchedSupervisoryNode)
+          .build();
       searchedSupplyLines.add(supplyLine);
     }
     return searchedSupplyLines;
-  }
-
-  private SupplyLine generateSupplyLine() {
-    SupplyLine supplyLine = new SupplyLine();
-    supplyLine.setProgram(program);
-    supplyLine.setSupervisoryNode(generateSupervisoryNode());
-    supplyLine.setSupplyingFacility(facility);
-    return supplyLine;
-  }
-
-  private SupervisoryNode generateSupervisoryNode() {
-    SupervisoryNode supervisoryNode = new SupervisoryNode();
-    supervisoryNodeId = UUID.randomUUID();
-    supervisoryNode.setId(supervisoryNodeId);
-    supervisoryNode.setCode("SupervisoryNode " + generateInstanceNumber());
-    supervisoryNode.setFacility(facility);
-    return supervisoryNode;
-  }
-
-  private Program generateProgram() {
-    Program program = new Program("Program " + generateInstanceNumber());
-    programId = UUID.randomUUID();
-    program.setId(programId);
-    program.setPeriodsSkippable(false);
-    return program;
-  }
-
-  private Facility generateFacility() {
-    Integer instanceNumber = generateInstanceNumber();
-    GeographicLevel geographicLevel = generateGeographicLevel();
-    GeographicZone geographicZone = generateGeographicZone(geographicLevel);
-    FacilityType facilityType = generateFacilityType();
-    Facility facility = new Facility("FacilityCode " + instanceNumber);
-    facility.setType(facilityType);
-    facility.setGeographicZone(geographicZone);
-    facility.setName("FacilityName " + instanceNumber);
-    facility.setDescription("FacilityDescription " + instanceNumber);
-    facility.setEnabled(true);
-    facility.setActive(true);
-    facility.setGoLiveDate(LocalDate.now());
-    facility.setGoDownDate(LocalDate.now().plusMonths(1));
-    SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
-        program, true, LocalDate.now());
-    facility.addSupportedProgram(supportedProgram);
-    return facility;
-  }
-
-  private GeographicLevel generateGeographicLevel() {
-    GeographicLevel geographicLevel = new GeographicLevel();
-    geographicLevel.setCode("GeographicLevel " + generateInstanceNumber());
-    geographicLevel.setLevelNumber(1);
-    geographicLevel.setId(UUID.randomUUID());
-    return geographicLevel;
-  }
-
-  private GeographicZone generateGeographicZone(GeographicLevel geographicLevel) {
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode("GeographicZone " + generateInstanceNumber());
-    geographicZone.setLevel(geographicLevel);
-    geographicZone.setId(UUID.randomUUID());
-    return geographicZone;
-  }
-
-  private FacilityType generateFacilityType() {
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode("FacilityType " + generateInstanceNumber());
-    return facilityType;
-  }
-
-  private List<FacilityTypeApprovedProduct> generateFacilityTypeApprovedProducts() {
-    OrderableDisplayCategory category = OrderableDisplayCategory.createNew(Code.code("gloves"));
-    category.setId(UUID.randomUUID());
-
-    HashMap<String, String> identificators = new HashMap<>();
-    HashMap<String, String> extraData = new HashMap<>();
-    identificators.put("cSys", "cSysId");
-    Orderable orderable = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
-        "Gloves", "description", 6, 3, false, Collections.emptySet(), identificators, extraData);
-    orderable.setId(UUID.randomUUID());
-    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
-    ftap.setProgram(program);
-    ftap.setOrderable(orderable);
-    ftap.setId(UUID.randomUUID());
-    ftap.setMinPeriodsOfStock(1d);
-    ftap.setMaxPeriodsOfStock(3d);
-    ftap.setFacilityType(generateFacilityType());
-    ftap.setEmergencyOrderPoint(1d);
-    List<FacilityTypeApprovedProduct> products = new ArrayList<>();
-    products.add(ftap);
-    return products;
-  }
-
-  private Integer generateInstanceNumber() {
-    currentInstanceNumber += 1;
-    return currentInstanceNumber;
   }
 }
