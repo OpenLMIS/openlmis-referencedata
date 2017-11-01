@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.AllArgsConstructor;
 import org.javers.core.metamodel.annotation.TypeName;
 
 import lombok.Getter;
@@ -31,6 +32,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "geographic_levels", schema = "referencedata")
 @NoArgsConstructor
+@AllArgsConstructor
 @TypeName("GeographicLevel")
 public class GeographicLevel extends BaseEntity {
 

@@ -17,6 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
+import lombok.AllArgsConstructor;
 import org.javers.core.metamodel.annotation.TypeName;
 
 import lombok.Getter;
@@ -34,6 +35,7 @@ import javax.persistence.Table;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
 @Table(name = "programs", schema = "referencedata")
 @TypeName("Program")
 public class Program extends BaseEntity {
