@@ -90,4 +90,11 @@ public class FacilityDataBuilder {
     supportedPrograms.add(program);
     return this;
   }
+
+  public FacilityDataBuilder withGeographicZoneWithParent() {
+    GeographicZone parent = new GeographicZoneDataBuilder().build();
+    this.geographicZone = new GeographicZoneDataBuilder()
+        .withParent(parent).build();
+    return this;
+  }
 }

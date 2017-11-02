@@ -56,4 +56,9 @@ public class GeographicZoneDataBuilder {
 
     return zone;
   }
+
+  public GeographicZoneDataBuilder withParent(GeographicZone zone) {
+    this.parent = zone;
+    return this;
+  }
 }
