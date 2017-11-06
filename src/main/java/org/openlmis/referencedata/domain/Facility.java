@@ -18,7 +18,6 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vividsolutions.jts.geom.Point;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -50,7 +49,6 @@ import javax.persistence.Table;
 @Entity
 @TypeName("Facility")
 @Table(name = "facilities", schema = "referencedata")
-@AllArgsConstructor
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @NamedNativeQueries({
     @NamedNativeQuery(name = "Facility.findSupervisionFacilitiesByUser",

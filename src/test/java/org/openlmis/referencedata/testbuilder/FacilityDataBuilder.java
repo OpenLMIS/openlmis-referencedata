@@ -21,7 +21,6 @@ import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.SupportedProgram;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
@@ -71,14 +70,29 @@ public class FacilityDataBuilder {
    * Builds instance of {@link Facility}.
    */
   public Facility build() {
-    Facility facility = new Facility(code, name, description, geographicZone, type, operator,
-        active, goLiveDate, goDownDate, comment, enabled, openLmisAccessible, new HashSet<>(),
-        location, extraData);
+
+    //TODO: add new constructor, AllArgsConstructor fails 1 integration test
+    Facility facility = new Facility(code);
     facility.setId(id);
+    facility.setName(name);
+    facility.setDescription(description);
+    facility.setGeographicZone(geographicZone);
+    facility.setType(type);
+    facility.setOperator(operator);
+    facility.setActive(active);
+    facility.setGoLiveDate(goLiveDate);
+    facility.setGoDownDate(goDownDate);
+    facility.setComment(comment);
+    facility.setEnabled(enabled);
+    facility.setOpenLmisAccessible(openLmisAccessible);
+    facility.setLocation(location);
+    facility.setExtraData(extraData);
 
     supportedPrograms.stream()
-        .forEach(p -> facility.addSupportedProgram(SupportedProgram.newSupportedProgram(facility,
-            p, true, LocalDate.now())));
+        .forEach(p -> facility.addSupportedProgram(new SupportedProgramDataBuilder()
+            .withProgram(p)
+            .withFacility(facility)
+            .build()));
 
     return facility;
   }
@@ -91,6 +105,9 @@ public class FacilityDataBuilder {
     return this;
   }
 
+  /**
+   * Adds geographic zone with parent for new {@link Facility}.
+   */
   public FacilityDataBuilder withGeographicZoneWithParent() {
     GeographicZone parent = new GeographicZoneDataBuilder().build();
     this.geographicZone = new GeographicZoneDataBuilder()
