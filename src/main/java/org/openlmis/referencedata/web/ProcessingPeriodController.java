@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toList;
+import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_MUST_BE_PROVIDED;
 
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
@@ -298,12 +299,12 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<ProcessingPeriodDto> searchPeriodsByUuidAndDate(
-      @RequestParam(value = "processingScheduleId", required = true) UUID processingScheduleId,
+      @RequestParam(value = "processingScheduleId", required = false) UUID processingScheduleId,
       @RequestParam(value = "startDate", required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
 
     if (processingScheduleId == null) {
-      throw new ValidationMessageException("Processing Schedule id must be provided");
+      throw new ValidationMessageException(ERROR_SCHEDULE_ID_MUST_BE_PROVIDED);
     }
 
     ProcessingSchedule processingSchedule =

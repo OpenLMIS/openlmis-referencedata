@@ -20,12 +20,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 
 import java.util.Set;
 
 public class RoleTest {
+
+  @Rule
+  public final ExpectedException expectedEx = ExpectedException.none();
 
   private String roleName = "role";
 
@@ -48,14 +53,23 @@ public class RoleTest {
     assertTrue(rights.contains(right2));
   }
 
-  @Test(expected = ValidationMessageException.class)
+  @Test
   public void shouldNotGroupRightsOfDifferentTypes() {
     //given
     Right right1 = Right.newRight(right1Name, RightType.ORDER_FULFILLMENT);
     Right right2 = Right.newRight(right2Name, RightType.SUPERVISION);
 
-    //when
+    //when and then
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage("referenceData.error.role.rightsAreDifferentTypes");
     Role.newRole(roleName, right1, right2);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenNoRightsProvided() {
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage("referenceData.error.role.mustHaveARight");
+    Role.newRole(roleName);
   }
 
   @Test
@@ -73,12 +87,15 @@ public class RoleTest {
     assertTrue(rights.contains(additionalRight));
   }
 
-  @Test(expected = ValidationMessageException.class)
+  @Test
   public void shouldNotBeAbleToAddRightsOfDifferentTypeToExistingRole() {
     //given
     Role role = Role.newRole(roleName, Right.newRight(right1Name, RightType.SUPERVISION));
 
-    //when
+    //when and then
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage("referenceData.error.role.rightsAreDifferentTypes");
+
     Right rightOfDifferentType = Right.newRight(right2Name, RightType.ORDER_FULFILLMENT);
     role.add(rightOfDifferentType);
   }

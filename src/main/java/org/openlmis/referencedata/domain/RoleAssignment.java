@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.openlmis.referencedata.util.messagekeys.RoleAssignmentMessageKeys.ERROR_TYPE_NOT_ACCEPTABLE;
+
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +39,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 
 @Entity
 @Table(name = "role_assignments", schema = "referencedata")
@@ -94,7 +97,8 @@ public abstract class RoleAssignment extends BaseEntity {
     boolean roleTypeAcceptable = acceptableRightTypes.stream()
         .anyMatch(rightType -> rightType == role.getRightType());
     if (!roleTypeAcceptable) {
-      throw new ValidationMessageException("referencedata.error.type-not-in-acceptable-types");
+      throw new ValidationMessageException(
+          new Message(ERROR_TYPE_NOT_ACCEPTABLE, role.getRightType(), acceptableRightTypes));
     }
 
     this.role = role;

@@ -18,6 +18,8 @@ package org.openlmis.referencedata.domain;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
+import static org.openlmis.referencedata.util.messagekeys.RoleMessageKeys.ERROR_MUST_HAVE_A_RIGHT;
+import static org.openlmis.referencedata.util.messagekeys.RoleMessageKeys.ERROR_RIGHTS_ARE_DIFFERENT_TYPES;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
@@ -92,8 +94,8 @@ public class Role extends BaseEntity {
    * @throws ValidationMessageException if the rights do not have the same right type
    */
   public static Role newRole(Importer importer) {
-    Set<Right> importedRights = importer.getRights().stream().map(
-        rightImporter -> Right.newRight(rightImporter))
+    Set<Right> importedRights = importer.getRights().stream()
+        .map(Right::newRight)
         .collect(toSet());
 
     Role newRole = new Role(importer.getName(),
@@ -115,13 +117,13 @@ public class Role extends BaseEntity {
     Set<Right> rightsList = new HashSet<>(asList(rights));
     if (rightsList.size() == 0) {
       throw new ValidationMessageException(
-          new Message("referencedata.error.role-must-have-a-right"));
+          new Message(ERROR_MUST_HAVE_A_RIGHT));
     }
     if (checkRightTypesMatch(rightsList)) {
       this.rights = rightsList;
     } else {
       throw new ValidationMessageException(
-          new Message("referencedata.error.rights-are-different-types"));
+          new Message(ERROR_RIGHTS_ARE_DIFFERENT_TYPES));
     }
   }
 
@@ -145,14 +147,14 @@ public class Role extends BaseEntity {
    * @throws ValidationMessageException if the resulting rights do not have the same right type
    */
   public void add(Right... additionalRights) {
-    Set<Right> allRights = concat(rights.stream(), asList(additionalRights).stream())
+    Set<Right> allRights = concat(rights.stream(), Arrays.stream(additionalRights))
         .collect(toSet());
 
     if (checkRightTypesMatch(allRights)) {
       rights.addAll(Arrays.asList(additionalRights));
     } else {
       throw new ValidationMessageException(
-          new Message("referencedata.error.rights-are-different-types" ));
+          new Message(ERROR_RIGHTS_ARE_DIFFERENT_TYPES));
     }
   }
 

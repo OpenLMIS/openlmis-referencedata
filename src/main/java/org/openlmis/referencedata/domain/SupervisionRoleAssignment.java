@@ -89,12 +89,12 @@ public class SupervisionRoleAssignment extends RoleAssignment {
     return singleton(SUPERVISION);
   }
 
-  @Override
   /**
-   * Check if this role assignment has a right based on specified criteria. For supervision, 
-   * check also that program matches and facility was found, either from the supervisory node or 
+   * Check if this role assignment has a right based on specified criteria. For supervision,
+   * check also that program matches and facility was found, either from the supervisory node or
    * the user's home facility.
    */
+  @Override
   public boolean hasRight(RightQuery rightQuery) {
     boolean roleContainsRight = role.contains(rightQuery.getRight());
     boolean programMatches = program.equals(rightQuery.getProgram());

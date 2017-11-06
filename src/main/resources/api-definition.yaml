@@ -571,6 +571,10 @@ resourceTypes:
                       body:
                         application/json:
                           schema: processingPeriodArray
+                  "400":
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
                   "404":
                       body:
                         application/json:

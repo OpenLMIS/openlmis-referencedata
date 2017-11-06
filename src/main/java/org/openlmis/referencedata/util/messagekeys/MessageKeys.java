@@ -54,11 +54,14 @@ public abstract class MessageKeys {
   protected static final String INVALID = "invalid";
   protected static final String LACKS_PARAMETERS = "lacksParameters";
   protected static final String MUST_BE_UNIQUE = "mustBeUnique";
+  protected static final String MUST_BE_PROVIDED = "mustBeProvided";
 
   // Entities
   protected static final String LOT = "lot";
   protected static final String USER = "user";
   protected static final String ROLE = "role";
+  protected static final String ROLE_ASSIGNMENT = "roleAssignment";
+  protected static final String ROLE_TYPE = "roleType";
   protected static final String RIGHT = "right";
   protected static final String PROGRAM = "program";
   protected static final String PRODUCT = "product";

@@ -15,12 +15,9 @@
 
 package org.openlmis.referencedata.util.messagekeys;
 
-public abstract class RoleMessageKeys extends MessageKeys {
-  private static final String ERROR = join(SERVICE_ERROR, ROLE);
+public abstract class RoleAssignmentMessageKeys extends MessageKeys {
+  private static final String ERROR = join(SERVICE_ERROR, ROLE_ASSIGNMENT);
 
-  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_DUPLICATED = join(ERROR, DUPLICATED);
-  public static final String ERROR_MUST_HAVE_A_RIGHT = join(ERROR, "mustHaveARight");
-  public static final String ERROR_RIGHTS_ARE_DIFFERENT_TYPES =
-      join(ERROR, "rightsAreDifferentTypes");
+  public static final String ERROR_TYPE_NOT_ACCEPTABLE =
+      join(ERROR, ROLE_TYPE, "notInAcceptableTypes");
 }

@@ -159,9 +159,7 @@ public class User extends BaseEntity {
    * @param roleAssignments role assignments to add
    */
   public void assignRoles(RoleAssignment... roleAssignments) {
-    for (RoleAssignment roleAssignment : Arrays.asList(roleAssignments)) {
-      this.roleAssignments.add(roleAssignment);
-    }
+    this.roleAssignments.addAll(Arrays.asList(roleAssignments));
   }
 
   /**

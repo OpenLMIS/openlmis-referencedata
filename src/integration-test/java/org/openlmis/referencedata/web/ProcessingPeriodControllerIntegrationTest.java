@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 import com.google.common.collect.Sets;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -45,9 +46,6 @@ import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -252,6 +250,21 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
           period.getProcessingSchedule().getId(),
           firstPeriod.getProcessingSchedule().getId());
     }
+  }
+
+  @Test
+  public void shouldReturnBadRequestIfScheduleIsNotProvided() {
+    restAssured.given()
+        .queryParam(START_DATE, secondPeriod.getStartDate().toString())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(SEARCH_BY_UUID_AND_DATE_URL)
+        .then()
+        .statusCode(400)
+        .body("messageKey",
+            equalTo("referenceData.error.processingPeriod.processingSchedule.id.mustBeProvided"));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }
 
   @Test
