@@ -33,7 +33,7 @@ import java.util.UUID;
 @Table(name = "ideal_stock_amounts", schema = "referencedata")
 @AllArgsConstructor
 @NoArgsConstructor
-public class IdealStockAmount extends BaseEntity {
+public class  IdealStockAmount extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "facilityid", nullable = false)

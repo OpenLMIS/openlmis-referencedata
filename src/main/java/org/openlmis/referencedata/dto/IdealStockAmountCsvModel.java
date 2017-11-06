@@ -92,7 +92,7 @@ public class IdealStockAmountCsvModel extends BaseDto
   @Override
   public void setProcessingPeriod(ProcessingPeriod processingPeriod) {
     if (processingPeriod != null) {
-      this.processingPeriod = new ProcessingPeriodDto();
+      this.processingPeriod = new IsaProcessingPeriodDto();
       processingPeriod.export(this.processingPeriod);
     } else {
       this.processingPeriod = null;

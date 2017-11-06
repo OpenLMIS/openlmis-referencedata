@@ -122,7 +122,9 @@ public class ProcessingPeriod extends BaseEntity {
     exporter.setDescription(description);
     exporter.setStartDate(startDate);
     exporter.setEndDate(endDate);
-    exporter.setDurationInMonths(getDurationInMonths());
+    if (exporter.supportsDurationInMonths()) {
+      exporter.setDurationInMonths(getDurationInMonths());
+    }
   }
 
   @Override
@@ -157,6 +159,8 @@ public class ProcessingPeriod extends BaseEntity {
     void setEndDate(LocalDate endDate);
 
     void setDurationInMonths(Integer duration);
+
+    boolean supportsDurationInMonths();
   }
 
   public interface Importer {
