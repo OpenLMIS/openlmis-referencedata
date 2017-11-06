@@ -18,12 +18,13 @@ package org.openlmis.referencedata.domain;
 import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.domain.RightType.GENERAL_ADMIN;
 import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
+import static org.openlmis.referencedata.util.messagekeys.RoleAssignmentMessageKeys.ERROR_TYPE_NOT_ACCEPTABLE;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,7 @@ public class RoleAssignmentTest {
   private static final String ROLE_NAME = "role";
 
   private static class TestStub extends RoleAssignment {
-    public TestStub(Role role, User user) {
+    TestStub(Role role, User user) {
       super(role, user);
     }
 
@@ -60,11 +61,11 @@ public class RoleAssignmentTest {
   }
 
   @Test
-  @Ignore
   public void shouldNotAllowCreationWithMismatchingRoleTypes() {
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage("referencedata.error.roleAssignment.roleType.notInAcceptableTypes: "
-        + ORDER_FULFILLMENT + ", " + Collections.singletonList(GENERAL_ADMIN));
+    expectedEx.expectMessage(
+        new Message(ERROR_TYPE_NOT_ACCEPTABLE, ORDER_FULFILLMENT,
+            Collections.singleton(GENERAL_ADMIN)).toString());
     new TestStub(Role.newRole(ROLE_NAME, Right.newRight("fulfillmentRight1", ORDER_FULFILLMENT)),
         mock(User.class));
   }
