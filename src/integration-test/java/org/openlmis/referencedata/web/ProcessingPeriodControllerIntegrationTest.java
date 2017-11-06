@@ -24,6 +24,7 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_MUST_BE_PROVIDED;
 
 import com.google.common.collect.Sets;
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -262,7 +263,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .then()
         .statusCode(400)
         .body(MESSAGE_KEY,
-            equalTo("referenceData.error.processingPeriod.processingSchedule.id.mustBeProvided"));
+            equalTo(ERROR_SCHEDULE_ID_MUST_BE_PROVIDED));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }
