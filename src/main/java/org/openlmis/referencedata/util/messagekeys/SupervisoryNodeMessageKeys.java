@@ -17,8 +17,12 @@ package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class SupervisoryNodeMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, SUPERVISORY_NODE);
+  private static final String CODE = "code";
 
+  public static final String ERROR_NULL = join(ERROR, NULL);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
   public static final String ERROR_SEARCH_LACKS_PARAMS = join(ERROR, SEARCH, LACKS_PARAMETERS);
+  public static final String ERROR_CODE_REQUIRED = join(ERROR, CODE, REQUIRED);
+  public static final String ERROR_CODE_MUST_BE_UNIQUE = join(ERROR, CODE, MUST_BE_UNIQUE);
 }

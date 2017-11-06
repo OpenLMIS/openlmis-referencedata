@@ -18,12 +18,6 @@ package org.openlmis.referencedata.web;
 import static java.util.stream.Collectors.toSet;
 import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
@@ -44,6 +38,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
+import org.openlmis.referencedata.validate.SupervisoryNodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -54,6 +49,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +57,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @Transactional
@@ -89,6 +92,9 @@ public class SupervisoryNodeController extends BaseController {
   @Autowired
   private RightAssignmentService rightAssignmentService;
 
+  @Autowired
+  private SupervisoryNodeValidator validator;
+
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
    *
@@ -99,8 +105,13 @@ public class SupervisoryNodeController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public SupervisoryNodeDto createSupervisoryNode(
-      @RequestBody SupervisoryNodeDto supervisoryNodeDto) {
+      @RequestBody SupervisoryNodeDto supervisoryNodeDto,
+      BindingResult bindingResult) {
+
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
+    validator.validate(supervisoryNodeDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
 
     supervisoryNodeDto.setId(null);
     SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
@@ -161,7 +172,8 @@ public class SupervisoryNodeController extends BaseController {
   @ResponseBody
   public SupervisoryNodeDto updateSupervisoryNode(
       @RequestBody SupervisoryNodeDto supervisoryNodeDto,
-      @PathVariable("id") UUID supervisoryNodeId) {
+      @PathVariable("id") UUID supervisoryNodeId,
+      BindingResult bindingResult) {
 
     Profiler profiler = new Profiler("UPDATE_SUPERVISORY_NODE");
     profiler.setLogger(LOGGER);
@@ -169,6 +181,10 @@ public class SupervisoryNodeController extends BaseController {
     profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
     LOGGER.info("Updating supervisoryNode with id: {}", supervisoryNodeId);
+
+    profiler.start("VALIDATE_SUPERVISORY_NODE");
+    validator.validate(supervisoryNodeDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
 
     profiler.start("FIND_SUPERVISORY_NODE");
     SupervisoryNode supervisoryNodeToUpdate =

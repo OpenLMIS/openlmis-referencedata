@@ -205,6 +205,40 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectPostSupervisoryNodeIfCodeIsMissing() {
+    supervisoryNodeDto.setCode(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(supervisoryNodeDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPostSupervisoryNodeIfCodeIsDuplicated() {
+    given(supervisoryNodeRepository.existsByCode(supervisoryNodeDto.getCode())).willReturn(true);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(supervisoryNodeDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPutSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
@@ -250,6 +284,42 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .path(MESSAGE_KEY);
 
     assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutSupervisoryNodeIfCodeIsMissing() {
+    supervisoryNodeDto.setCode(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .body(supervisoryNodeDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutSupervisoryNodeIfCodeIsDuplicated() {
+    given(supervisoryNodeRepository.existsByCode(supervisoryNodeDto.getCode())).willReturn(true);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .body(supervisoryNodeDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(400);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

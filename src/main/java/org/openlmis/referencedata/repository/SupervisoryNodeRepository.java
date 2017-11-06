@@ -15,15 +15,18 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface SupervisoryNodeRepository
     extends JpaRepository<SupervisoryNode, UUID>, SupervisoryNodeRepositoryCustom {
 
   <S extends SupervisoryNode> S findByCode(String code);
+
+  boolean existsByCode(String code);
 }

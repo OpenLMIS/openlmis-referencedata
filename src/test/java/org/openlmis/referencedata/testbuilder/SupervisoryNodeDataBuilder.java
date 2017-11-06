@@ -67,4 +67,24 @@ public class SupervisoryNodeDataBuilder {
     this.facility = facility;
     return this;
   }
+
+  /**
+   * Sets code for new {@link SupervisoryNode}.
+   *
+   * @param code  the code to be set
+   * @return the builder instance
+   */
+  public SupervisoryNodeDataBuilder withCode(String code) {
+    this.code = code;
+    return this;
+  }
+
+  /**
+   * Sets the code to null for new {@link SupervisoryNode}.
+   *
+   * @return the builder instance
+   */
+  public SupervisoryNodeDataBuilder withoutCode() {
+    return withCode(null);
+  }
 }
