@@ -261,7 +261,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .get(SEARCH_BY_UUID_AND_DATE_URL)
         .then()
         .statusCode(400)
-        .body("messageKey",
+        .body(MESSAGE_KEY,
             equalTo("referenceData.error.processingPeriod.processingSchedule.id.mustBeProvided"));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
