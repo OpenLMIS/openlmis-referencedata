@@ -15,6 +15,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-3200](https://openlmis.atlassian.net/browse/OLMIS-3200): Designed and added new demo data for EPI (Vaccines) program.
 * [OLMIS-3254](https://openlmis.atlassian.net/browse/OLMIS-3254): Un-restrict most GET APIs for most resources.
 * [OLMIS-3351](https://openlmis.atlassian.net/browse/OLMIS-3351): Added search by ids to /api/facilities endpoint.
+* [OLMIS-3512](https://openlmis.atlassian.net/browse/OLMIS-3512): Added code validation for supervisory node create and update endpoints.
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-2857](https://openlmis.atlassian.net/browse/OLMIS-2857): Refactored user search repository method to user database pagination and sorting.
