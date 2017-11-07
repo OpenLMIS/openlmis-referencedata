@@ -26,6 +26,7 @@ public abstract class MessageKeys {
 
   protected static final String NON_EXISTENT = "nonExistent";
   protected static final String UNAUTHORIZED = "unauthorized";
+  protected static final String CONSTRAINT = "constraint";
   protected static final String DUPLICATED = "duplicated";
   protected static final String VALIDATION = "validation";
   protected static final String NOT_FOUND = "notFound";

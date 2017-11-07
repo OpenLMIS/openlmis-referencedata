@@ -15,16 +15,18 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.UUID;
+
 import org.junit.Before;
+import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
-
-import java.util.UUID;
 
 public class SupervisoryNodeRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<SupervisoryNode> {
@@ -80,5 +82,20 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   SupervisoryNode generateInstance() {
     int instanceNumber = this.getNextInstanceNumber();
     return SupervisoryNode.newSupervisoryNode("Code #" + instanceNumber, facility);
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void duplicateCodeShouldThrowException() {
+    // given a SN in the db
+    SupervisoryNode sn1 = generateInstance();
+    supervisoryNodeRepository.save(sn1);
+
+    // when a new SN is made with the same code
+    SupervisoryNode sn2 = generateInstance();
+    sn2.setCode(sn1.getCode());
+    supervisoryNodeRepository.save(sn2);
+
+    // then a DB constraint is found
+    supervisoryNodeRepository.flush();
   }
 }

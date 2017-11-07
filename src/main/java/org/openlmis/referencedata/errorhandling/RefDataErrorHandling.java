@@ -21,8 +21,11 @@ import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.LocalizedMessage;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,6 +49,19 @@ public class RefDataErrorHandling extends BaseHandler {
   public LocalizedMessage handleDataIntegrityViolation(IntegrityViolationException ex) {
     LOGGER.error(ex.getMessage());
     return getLocalizedMessage(ex.getMessage());
+  }
+
+  /**
+   * Handles data integrity violation exception.
+   * @param dive the data integrity exception
+   * @return the user-oriented error message.
+   */
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  @ResponseBody
+  public LocalizedMessage handleDataIntegrityViolation(DataIntegrityViolationException dive) {
+    LOGGER.info(dive.getMessage());
+    return getLocalizedMessage(new Message(SystemMessageKeys.ERROR_CONSTRAINT));
   }
 
   /**

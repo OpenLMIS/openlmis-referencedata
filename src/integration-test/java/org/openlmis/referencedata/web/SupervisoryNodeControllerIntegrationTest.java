@@ -24,8 +24,17 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
-import com.jayway.restassured.response.ValidatableResponse;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
+import com.jayway.restassured.response.ValidatableResponse;
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.hamcrest.Matchers;
 import org.javers.common.collections.Sets;
 import org.junit.Test;
@@ -53,17 +62,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegrationTest {
