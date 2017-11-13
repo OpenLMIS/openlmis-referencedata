@@ -343,6 +343,20 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetSupervisoryNode() {
 
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
@@ -359,6 +373,21 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .extract().as(SupervisoryNodeDto.class);
 
     assertEquals(supervisoryNodeDto, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -512,6 +541,23 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     Map<String, String> foundSupervisoryNode = (LinkedHashMap) response.getContent().get(0);
 
     assertEquals(supervisoryNode.getCode(), foundSupervisoryNode.get("code"));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void searchShouldReturnUnauthorizedWithoutAuthorization() {
+
+    HashMap<String, Object> queryParams = new HashMap<>();
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(queryParams)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

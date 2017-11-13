@@ -238,6 +238,20 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetRequisitionGroup() {
 
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
@@ -254,6 +268,21 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
         .extract().as(RequisitionGroupDto.class);
 
     assertEquals(requisitionGroupDto, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", requisitionGroupId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -390,6 +419,20 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     Map<String, String> foundRequisitionGroup = (LinkedHashMap) response.getContent().get(0);
     assertEquals(1, response.getContent().size());
     assertEquals(requisitionGroup.getCode(), foundRequisitionGroup.get("code"));
+  }
+
+  @Test
+  public void searchShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .body(new HashMap<>())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test

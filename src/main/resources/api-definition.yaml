@@ -981,6 +981,9 @@ resourceTypes:
               "200":
                   body:
                     application/json:
+              401:
+                  body:
+                      application/json:
       post:
           is: [ secured ]
           description: Creates new supplyLine.
@@ -1025,6 +1028,9 @@ resourceTypes:
                   "200":
                       body:
                         application/json:
+                  401:
+                      body:
+                          application/json:
                   "404":
                       body:
                         application/json:
@@ -1065,6 +1071,9 @@ resourceTypes:
                       body:
                           application/json:
                               schema: localizedErrorResponse
+                  401:
+                      body:
+                          application/json:
       /searchByUUID:
           get:
               is: [ secured ]
@@ -2354,6 +2363,9 @@ resourceTypes:
                 "200":
                     body:
                         application/json:
+                401:
+                    body:
+                        application/json:
 
       /{id}:
             uriParameters:
@@ -2388,6 +2400,9 @@ resourceTypes:
                 description: Get chosen supervisoryNode.
                 responses:
                     "200":
+                        body:
+                            application/json:
+                    401:
                         body:
                             application/json:
                     "404":
@@ -2460,6 +2475,9 @@ resourceTypes:
                         body:
                           application/json:
                             schema: errorResponse
+                    401:
+                        body:
+                            application/json:
   /roles:
       displayName: Role
       post:
@@ -2679,6 +2697,9 @@ resourceTypes:
                 "200":
                     body:
                         application/json:
+                401:
+                    body:
+                        application/json:
       /{id}:
             uriParameters:
               id:
@@ -2708,6 +2729,9 @@ resourceTypes:
                 description: Get chosen requisitionGroup.
                 responses:
                     "200":
+                        body:
+                            application/json:
+                    401:
                         body:
                             application/json:
                     "404":
@@ -2746,6 +2770,9 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
+                  401:
+                      body:
+                          application/json:
 
   /currencySettings:
       displayName: Currency settings
