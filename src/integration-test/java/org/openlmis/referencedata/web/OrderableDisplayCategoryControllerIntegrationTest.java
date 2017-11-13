@@ -108,6 +108,19 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   }
 
   @Test
+  public void searchShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .when()
+        .get(SEARCH_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldDeleteOrderableDisplayCategory() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
@@ -259,6 +272,20 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   }
 
   @Test
+  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetOrderableDisplayCategory() {
 
     given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategoryId)).willReturn(
@@ -276,6 +303,21 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
         .extract().as(OrderableDisplayCategoryDto.class);
 
     assertEquals(OrderableDisplayCategoryDto.newInstance(orderableDisplayCategory), response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", orderableDisplayCategoryId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

@@ -616,6 +616,9 @@ resourceTypes:
                     body:
                         application/json:
                             schema: orderableDisplayCategoryArray
+                401:
+                    body:
+                      application/json:
       /{id}:
             uriParameters:
               id:
@@ -649,6 +652,9 @@ resourceTypes:
                         body:
                             application/json:
                                 schema: orderableDisplayCategory
+                    401:
+                        body:
+                          application/json:
                     "404":
                         body:
                             application/json:
@@ -686,6 +692,9 @@ resourceTypes:
                       body:
                         application/json:
                           schema: orderableDisplayCategoryArray
+                  401:
+                      body:
+                        application/json:
 
   /orderables:
       displayName: Orderable Product
@@ -794,6 +803,9 @@ resourceTypes:
                   body:
                     application/json:
                       schema: tradeItemPage
+              401:
+                  body:
+                    application/json:
       /{id}/auditLog:
           type: instanceAuditLog
 
@@ -842,6 +854,9 @@ resourceTypes:
                       body:
                         application/json:
                           schema: uuidArray
+                  401:
+                      body:
+                        application/json:
                   "404":
                       body:
                         application/json:
@@ -2277,7 +2292,9 @@ resourceTypes:
                 body:
                   application/json:
                     schema: localizedErrorResponse
-
+            401:
+                body:
+                  application/json:
       /{id}:
             uriParameters:
               id:
@@ -2314,6 +2331,9 @@ resourceTypes:
                     "200":
                         body:
                             application/json:
+                    401:
+                        body:
+                          application/json:
                     "404":
                         body:
                           application/json:
@@ -2844,6 +2864,9 @@ resourceTypes:
                         body:
                           application/json:
                             schema: lotDto
+                    401:
+                        body:
+                          application/json:
                     "404":
                         body:
                           application/json:
@@ -2878,6 +2901,9 @@ resourceTypes:
                       body:
                         application/json:
                           schema: localizedErrorResponse
+                  401:
+                      body:
+                        application/json:
   /idealStockAmounts:
       displayName: Ideal Stock Amounts
       get:
@@ -2899,6 +2925,9 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
+              401:
+                  body:
+                    application/json:
       post:
           is: [ secured ]
           description: Creates given ISA items if possible.

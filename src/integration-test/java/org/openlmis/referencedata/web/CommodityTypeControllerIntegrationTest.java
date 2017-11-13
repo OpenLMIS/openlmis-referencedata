@@ -211,7 +211,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldRetrieveCommodityTypes() {
-    
+
     CommodityTypeDto commodityType2 = new CommodityTypeDto("name2", "csys2", "csysid2", null);
 
     List<CommodityType> commodityTypes = Arrays.asList(
@@ -319,6 +319,21 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     assertEquals(2, uuids.size());
     assertTrue(uuids.contains(tradeItem.getId()));
     assertTrue(uuids.contains(anotherTradeItem.getId()));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getTradeItemsShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", commodityTypeId)
+        .when()
+        .get(TRADE_ITEMS_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

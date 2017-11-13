@@ -251,6 +251,19 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void searchShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+            .given()
+            .when()
+            .get(SEARCH_URL)
+            .then()
+            .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetLot() {
 
     when(lotRepository.findOne(lotId)).thenReturn(lot);
@@ -272,6 +285,20 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(lot.getTradeItem().getId(), response.getTradeItemId());
     assertTrue(lot.getExpirationDate().isEqual(response.getExpirationDate()));
     assertTrue(lot.getManufactureDate().isEqual(response.getManufactureDate()));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .pathParam("id", lotId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

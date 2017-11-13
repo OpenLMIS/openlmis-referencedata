@@ -262,6 +262,20 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   }
 
   @Test
+  public void getShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnBadRequestForDuplicateFtapPut() {
     mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
@@ -396,6 +410,19 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertEquals(1, response.getNumberOfElements());
     assertEquals(10, response.getSize());
     assertEquals(0, response.getNumber());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

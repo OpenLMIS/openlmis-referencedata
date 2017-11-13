@@ -181,6 +181,19 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
     doNothing()
         .when(rightService)

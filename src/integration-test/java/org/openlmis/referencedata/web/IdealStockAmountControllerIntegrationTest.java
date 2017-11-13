@@ -157,6 +157,22 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void downloadShouldReturnUnauthorizedWithoutAuthorization() throws IOException {
+
+    restAssured.given()
+        .contentType("text/csv")
+        .queryParam("format", "csv")
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    // changed to responseChecks because file parameter is required
+    // and RAML check does not recognizes it in request
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
+  }
+
+  @Test
   public void shouldUploadCsvWithAllFields() throws IOException {
     ClassPathResource fullCsvToUpload =
         new ClassPathResource("csv/idealStockAmounts/csvWithAllColumns.csv");
