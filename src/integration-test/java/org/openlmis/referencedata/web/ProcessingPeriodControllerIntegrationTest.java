@@ -393,6 +393,19 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
+  public void getDurationShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .pathParam("id", firstPeriodId)
+        .when()
+        .get(DIFFERENCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnUnauthorizedOnDeletePeriodIfUserHasNoRight() {
     mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
@@ -421,6 +434,33 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .put(ID_URL)
         .then()
         .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAllPeriodsShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getChosenPeriodShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", firstPeriodId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

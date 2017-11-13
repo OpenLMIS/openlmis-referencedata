@@ -432,14 +432,17 @@ resourceTypes:
                   required: false
                   repeat: false
           responses:
-              "400":
-                  body:
-                    application/json:
-                      schema: localizedErrorResponse
               "200":
                   body:
                     application/json:
                       schema: processingPeriodArray
+              "400":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+              401:
+                  body:
+                    application/json:
       post:
           is: [ secured ]
           description: Creates given processingPeriod if possible.
@@ -486,6 +489,9 @@ resourceTypes:
                       body:
                         application/json:
                           schema: processingPeriod
+                  401:
+                      body:
+                        application/json:
                   "404":
                       body:
                         application/json:
@@ -524,6 +530,9 @@ resourceTypes:
                         application/json:
                           schema: integerResult
                   "400":
+                      body:
+                        application/json:
+                  401:
                       body:
                         application/json:
       /{id}/auditLog:
@@ -866,6 +875,9 @@ resourceTypes:
               "200":
                   body:
                     application/json:
+              401:
+                  body:
+                    application/json:
       post:
           is: [ secured ]
           description: Creates new processingSchedule.
@@ -934,6 +946,9 @@ resourceTypes:
               description: Get chosen processingSchedule.
               responses:
                   "200":
+                      body:
+                        application/json:
+                  401:
                       body:
                         application/json:
                   "404":
