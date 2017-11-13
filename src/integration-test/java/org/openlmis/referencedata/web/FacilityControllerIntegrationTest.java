@@ -147,6 +147,20 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void getSupplyingDepotsShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam(SUPERVISORY_NODE_ID, UUID.randomUUID())
+        .when()
+        .get(SUPPLYING_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingSupervisorNode() {
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
 
@@ -215,6 +229,20 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     Map<String, String> foundFacility = (LinkedHashMap) response.getContent().get(0);
     assertEquals(1, response.getContent().size());
     assertEquals(facility.getCode(), foundFacility.get("code"));
+  }
+
+  @Test
+  public void searchShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .body(new HashMap<>())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_FACILITIES)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
@@ -333,6 +361,20 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(List.class);
 
     assertEquals(1, productDtos.size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getApprovedProductsShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam("fullSupply", false)
+        .when()
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

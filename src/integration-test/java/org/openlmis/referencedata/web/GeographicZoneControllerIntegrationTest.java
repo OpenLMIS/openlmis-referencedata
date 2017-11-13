@@ -259,7 +259,53 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     assertEquals(countryZone, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-  
+
+  @Test
+  public void getShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", countryZone.getId())
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void searchShouldReturnUnauthorizedWithoutAuthorization() {
+
+    Map<String, Object> requestBody = getSearchBody();
+
+    restAssured
+        .given()
+        .body(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
   @Test
   public void searchShouldReturnBadRequestOnException() {
     Map<String, Object> requestBody = getSearchBody();

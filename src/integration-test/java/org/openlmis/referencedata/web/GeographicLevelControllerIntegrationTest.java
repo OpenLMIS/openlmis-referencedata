@@ -204,6 +204,20 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetGeographicLevel() {
 
     given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
@@ -220,6 +234,21 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
         .extract().as(GeographicLevel.class);
 
     assertEquals(geographicLevel, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", geographicLevelId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

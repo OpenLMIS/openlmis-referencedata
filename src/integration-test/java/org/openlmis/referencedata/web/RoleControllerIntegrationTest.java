@@ -89,6 +89,19 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetRole() {
 
     given(roleRepository.findOne(roleId)).willReturn(role);
@@ -104,6 +117,20 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(RoleDto.class);
 
     assertEquals(roleDto, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .pathParam("id", roleId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(401);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
