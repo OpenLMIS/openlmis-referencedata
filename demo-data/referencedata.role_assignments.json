@@ -654,5 +654,20 @@
     "warehouse": { "id": "482591f1-33c8-4004-bc24-29931fc0c630" },
     "user": { "id": "ce962fad-c872-4244-92fe-2f70995d311a" },
     "role": {"id": "e16d802b-8eb1-43f7-adf8-ef123227cb88"}
+  },
+  {
+    "id": "1fca066a-6b01-4fb5-980b-c5e78187027e",
+    "type": "supervision",
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "c6f44c75-d2d3-4ca9-b5e8-7eb3bf1ff31f" },
+    "role": { "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c" }
+  },
+  {
+    "id": "2f9ab0d0-1e6d-44d9-b30b-a6731179d6a7",
+    "type": "supervision",
+    "supervisoryNode": { "id": "9f470265-0770-4dd1-bd5a-cf8fe3734d79" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "8837b2e3-64ff-4059-9280-e045cf28b82a" },
+    "role": { "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c" }
   }
 ]

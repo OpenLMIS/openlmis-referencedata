@@ -220,6 +220,31 @@
     "timeZone": "CET"
   },
   {
+    "id": "c6f44c75-d2d3-4ca9-b5e8-7eb3bf1ff31f",
+    "username": "divo3",
+    "email": "divo3@openlmis.org",
+    "firstName": "Karissa",
+    "lastName": "Ware",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "allowNotify": "true",
+    "homefacilityid": { "id": "13037147-1769-4735-90a7-b9b310d128b8" },
+    "timeZone": "CET"
+  },
+  {
+    "id": "8837b2e3-64ff-4059-9280-e045cf28b82a",
+    "username": "divo4",
+    "email": "divo4@openlmis.org",
+    "firstName": "Francene",
+    "lastName": "Caulfield",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "allowNotify": "true",
+    "timeZone": "CET"
+  },
+  {
     "id": "211a6b4d-3c59-4fb2-8075-eedb79a18103",
     "username": "vsrmanager1",
     "email": "vsrmanager1@openlmis.org",
