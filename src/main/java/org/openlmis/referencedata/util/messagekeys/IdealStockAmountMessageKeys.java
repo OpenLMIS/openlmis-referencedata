@@ -24,7 +24,7 @@ import static org.openlmis.referencedata.util.messagekeys.MessageKeys.SERVICE_ER
 import static org.openlmis.referencedata.util.messagekeys.MessageKeys.join;
 
 public class IdealStockAmountMessageKeys {
-  private static final String ERROR = join(SERVICE_ERROR, "ideaStockAmount");
+  private static final String ERROR = join(SERVICE_ERROR, "idealStockAmount");
 
   public static final String ERROR_FORMAT_NOT_ALLOWED = join(ERROR, "format.notAllowed");
   public static final String ERROR_FROM_FIELD_REQUIRED = join(ERROR, "field", REQUIRED);
