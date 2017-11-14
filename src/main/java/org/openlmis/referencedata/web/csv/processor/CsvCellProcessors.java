@@ -18,11 +18,9 @@ package org.openlmis.referencedata.web.csv.processor;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.Trim;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +35,7 @@ public class CsvCellProcessors {
   public static final String FACILITY_TYPE = "Facility";
   public static final String COMMODITY_TYPE = "CommodityType";
   public static final String PROCESSING_PERIOD_TYPE = "ProcessingPeriod";
-  public static final String INT_TYPE = "int";
+  public static final String POSITIVE_INT = "int";
 
   private static final Map<String, CellProcessor> typeParseMappings = new HashMap<>();
   private static final Map<String, CellProcessor> typeExportMappings = new HashMap<>();
@@ -50,7 +48,7 @@ public class CsvCellProcessors {
     typeParseMappings.put(FACILITY_TYPE, new ParseFacility());
     typeParseMappings.put(COMMODITY_TYPE, new ParseCommodityType());
     typeParseMappings.put(PROCESSING_PERIOD_TYPE, new ParseProcessingPeriod());
-    typeParseMappings.put(INT_TYPE, new ParseInt());
+    typeParseMappings.put(POSITIVE_INT, new ParseAmount());
   }
 
   /**

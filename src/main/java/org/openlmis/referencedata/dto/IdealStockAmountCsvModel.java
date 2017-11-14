@@ -15,6 +15,11 @@
 
 package org.openlmis.referencedata.dto;
 
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.COMMODITY_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.FACILITY_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POSITIVE_INT;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.PROCESSING_PERIOD_TYPE;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,11 +29,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.web.csv.model.ImportField;
-
-import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.COMMODITY_TYPE;
-import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.FACILITY_TYPE;
-import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.INT_TYPE;
-import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.PROCESSING_PERIOD_TYPE;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -54,7 +54,7 @@ public class IdealStockAmountCsvModel extends BaseDto
   private ProcessingPeriodDto processingPeriod;
 
   @Getter
-  @ImportField(name = IDEAL_STOCK_AMOUNT, type = INT_TYPE, mandatory = true)
+  @ImportField(name = IDEAL_STOCK_AMOUNT, type = POSITIVE_INT, mandatory = true)
   private Integer amount;
 
   public void setFacility(BasicFacilityDto facility) {

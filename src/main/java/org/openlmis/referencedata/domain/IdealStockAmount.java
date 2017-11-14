@@ -53,7 +53,7 @@ public class  IdealStockAmount extends BaseEntity {
   @Setter
   private ProcessingPeriod processingPeriod;
 
-  @Column(nullable = false)
+  @Column
   @Getter
   @Setter
   private Integer amount;

@@ -138,7 +138,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
     assertThat(list, hasSize(1));
 
     IdealStockAmount idealStockAmount = list.get(0);
-    assertThat(idealStockAmount.getAmount(), equalTo(0));
+    assertThat(idealStockAmount.getAmount(), equalTo(1000));
     assertThat(idealStockAmount.getId(), equalTo(isa.getId()));
 
     Facility facility = idealStockAmount.getFacility();

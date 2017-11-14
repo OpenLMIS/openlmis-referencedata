@@ -18,6 +18,7 @@ package org.openlmis.referencedata.repository.custom.impl;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import org.hibernate.SQLQuery;
+import org.hibernate.type.IntegerType;
 import org.hibernate.type.PostgresUUIDType;
 import org.hibernate.type.StringType;
 import org.openlmis.referencedata.domain.CommodityType;
@@ -39,7 +40,8 @@ import javax.persistence.Query;
 public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositoryCustom {
 
   private static final String SEARCH_SQL = "SELECT"
-      + " isa.id AS isa_id, f.id AS facility_id, f.code AS facility_code,"
+      + " isa.id AS isa_id, isa.amount as isa_amount,"
+      + " f.id AS facility_id, f.code AS facility_code,"
       + " c.id AS commodity_id,  c.classificationid AS classification_id,"
       + " c.classificationsystem AS classification_system, p.id AS period_id,"
       + " p.name AS period_name, s.code AS schedule_code"
@@ -73,23 +75,24 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
   }
 
   private IdealStockAmount toIsa(Object[] values) {
-    Facility facility = new Facility((String) values[2]);
-    facility.setId((UUID) values[1]);
+    Facility facility = new Facility((String) values[3]);
+    facility.setId((UUID) values[2]);
 
     ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode((String) values[8]);
+    schedule.setCode((String) values[9]);
 
     ProcessingPeriod period = new ProcessingPeriod();
-    period.setId((UUID) values[6]);
-    period.setName((String) values[7]);
+    period.setId((UUID) values[7]);
+    period.setName((String) values[8]);
     period.setProcessingSchedule(schedule);
 
     CommodityType commodityType = new CommodityType();
-    commodityType.setId((UUID) values[3]);
-    commodityType.setClassificationId((String) values[4]);
-    commodityType.setClassificationSystem((String) values[5]);
+    commodityType.setId((UUID) values[4]);
+    commodityType.setClassificationId((String) values[5]);
+    commodityType.setClassificationSystem((String) values[6]);
 
-    IdealStockAmount result = new IdealStockAmount(facility, commodityType, period, 0);
+    IdealStockAmount result = new IdealStockAmount(facility, commodityType,
+        period, (Integer) values[1]);
     result.setId((UUID) values[0]);
 
     return result;
@@ -98,6 +101,7 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
   private void prepareQuery(Query query) {
     SQLQuery sql = query.unwrap(SQLQuery.class);
     sql.addScalar("isa_id", PostgresUUIDType.INSTANCE);
+    sql.addScalar("isa_amount", IntegerType.INSTANCE);
     sql.addScalar("facility_id", PostgresUUIDType.INSTANCE);
     sql.addScalar("facility_code", StringType.INSTANCE);
     sql.addScalar("commodity_id", PostgresUUIDType.INSTANCE);
