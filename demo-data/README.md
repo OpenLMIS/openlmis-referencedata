@@ -40,7 +40,7 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
   * type: District Hospital
   * programs: Family Planning and Essential Meds
   * zone: Balaka District
-  * this is the home facility for the _dsrmanager_ and _divo3_ users
+  * this is the home facility for the _dsrmanager_ user
   * this facility is in the requisition group RGEM1 and RGFP2
 6. WH01/Ntcheu District Warehouse
   * type: Warehouse
@@ -66,7 +66,7 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
 * Dep—sito Distrital Cuamba (D001)
   * type: District Store
   * zone: Cuamba District
-  * this is the home facility for the _divo1_ user
+  * this is the home facility for the _divo1_ and _vsrmanager2 users
   * this facility is in the requisition RGEPI1
 * Dep—sito Distrital Lichinga (D002)
   * type: District Store
@@ -364,9 +364,9 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
     * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
     * divo2 - has this role for EPI at Lichinga district approval point (SN-LICHINGA-DIST)
-    * divo3 - has this role for Family Planning at home facility
-    * divo4 - has this role for Family Planning at FP approval sub point
     * rivo - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
+    * vsrmanager1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
+    * vsrmanager2 - has this role for EPI at home facility
 
 
 Passwords for these user accounts come from the
