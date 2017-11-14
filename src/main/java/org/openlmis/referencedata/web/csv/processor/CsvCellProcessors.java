@@ -48,7 +48,7 @@ public class CsvCellProcessors {
     typeParseMappings.put(FACILITY_TYPE, new ParseFacility());
     typeParseMappings.put(COMMODITY_TYPE, new ParseCommodityType());
     typeParseMappings.put(PROCESSING_PERIOD_TYPE, new ParseProcessingPeriod());
-    typeParseMappings.put(POSITIVE_INT, new ParseAmount());
+    typeParseMappings.put(POSITIVE_INT, new ParsePositiveInteger());
   }
 
   /**

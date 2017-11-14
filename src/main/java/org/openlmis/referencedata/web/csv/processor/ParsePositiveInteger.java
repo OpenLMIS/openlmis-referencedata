@@ -24,30 +24,28 @@ import org.supercsv.util.CsvContext;
  * This is a custom cell processor used to parse amount value.
  * This is used in {@link CsvCellProcessors}.
  */
-public class ParseAmount extends CellProcessorAdaptor implements StringCellProcessor {
+public class ParsePositiveInteger extends CellProcessorAdaptor implements StringCellProcessor {
 
   @Override
   public Object execute(Object value, CsvContext context) {
+    validateInputNotNull(value, context);
 
-    Integer result = null;
+    Integer result;
+    if (value instanceof String) {
+      String textValue = String.valueOf(value);
 
-    if (value != null) {
-      if (value instanceof String) {
-        String textValue = String.valueOf(value);
-
-        try {
-          result = Integer.valueOf(textValue);
-        } catch (NumberFormatException ex) {
-          throw getSuperCsvCellProcessorException(textValue, context, ex);
-        }
-
-        if (result < 0) {
-          throw new SuperCsvCellProcessorException(
-              String.format("'%s' is lesser than 0", value), context, this, null);
-        }
-      } else {
-        throw getSuperCsvCellProcessorException(value, context, null);
+      try {
+        result = Integer.valueOf(textValue);
+      } catch (NumberFormatException ex) {
+        throw getSuperCsvCellProcessorException(textValue, context, ex);
       }
+
+      if (result < 0) {
+        throw new SuperCsvCellProcessorException(
+            String.format("'%s' is lesser than 0", value), context, this, null);
+      }
+    } else {
+      throw getSuperCsvCellProcessorException(value, context, null);
     }
 
     return next.execute(result, context);

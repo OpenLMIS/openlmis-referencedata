@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
-public class ParseAmountTest {
+public class ParsePositiveIntegerTest {
 
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
@@ -33,23 +33,17 @@ public class ParseAmountTest {
   @Mock
   private CsvContext csvContext;
 
-  private ParseAmount parseAmount;
+  private ParsePositiveInteger parseAmount;
 
   @Before
   public void beforeEach() {
-    parseAmount = new ParseAmount();
+    parseAmount = new ParsePositiveInteger();
   }
 
   @Test
   public void shouldParseValidAmount() throws Exception {
     Integer result = (Integer) parseAmount.execute("1000", csvContext);
     assertEquals(Integer.valueOf(1000), result);
-  }
-
-  @Test
-  public void shouldParseValidNullAmount() throws Exception {
-    Integer result = (Integer) parseAmount.execute(null, csvContext);
-    assertEquals(null, result);
   }
 
   @Test
@@ -60,6 +54,15 @@ public class ParseAmountTest {
     parseAmount.execute("abc", csvContext);
   }
 
+  @Test
+  public void shouldThrownExceptionWhenParameterIsNull() {
+    expectedEx.expect(SuperCsvCellProcessorException.class);
+    expectedEx.expectMessage("this processor does not accept null input - "
+        + "if the column is optional then chain an Optional() processor before this one");
+
+    parseAmount.execute(null, csvContext);
+  }
+  
   @Test
   public void shouldThrownExceptionWhenParameterIsNegativeInteger() {
     expectedEx.expect(SuperCsvCellProcessorException.class);

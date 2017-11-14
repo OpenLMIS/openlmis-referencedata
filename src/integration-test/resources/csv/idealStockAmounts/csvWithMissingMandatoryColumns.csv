@@ -1,2 +1,2 @@
-Facility Code, Commodity Type, Period
-facility-code, system|id, schedule|period
+Facility Code, Commodity Type, Ideal Stock Amount
+facility-code, system|id, 1000

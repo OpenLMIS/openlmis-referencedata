@@ -54,7 +54,7 @@ public class IdealStockAmountCsvModel extends BaseDto
   private ProcessingPeriodDto processingPeriod;
 
   @Getter
-  @ImportField(name = IDEAL_STOCK_AMOUNT, type = POSITIVE_INT, mandatory = true)
+  @ImportField(name = IDEAL_STOCK_AMOUNT, type = POSITIVE_INT)
   private Integer amount;
 
   public void setFacility(BasicFacilityDto facility) {
