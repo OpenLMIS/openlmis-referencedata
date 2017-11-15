@@ -1,4 +1,5 @@
 9.0.0 / 2017-11-09
+==================
 
 Breaking changes:
 * [OLMIS-3116](https://openlmis.atlassian.net/browse/OLMIS-3116): User DTO now returns home facility UUID instead of Facility object.
@@ -27,6 +28,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-3346](https://openlmis.atlassian.net/browse/OLMIS-3346): Decreased number of database calls to retrieve Facility Type Approved Products  
 
 8.0.1 / 2017-09-05
+==================
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-3130](https://openlmis.atlassian.net/browse/OLMIS-3130): Fixed high memory usage during right assignment migration.
