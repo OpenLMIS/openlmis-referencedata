@@ -88,6 +88,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -181,20 +183,55 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetAllUsers() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    Set<User> storedUsers = newHashSet(user1, generateUser());
-    given(userRepository.findAll()).willReturn(storedUsers);
+    MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
+        .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser())));
 
-    UserDto[] response = restAssured
+    PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(UserDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    List<UserDto> users = asList(response);
-    assertThat(users.size(), is(2));
+    assertThat(response.getContent().size(), is(2));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindUsersByQueryParamsAndPaginate() {
+    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+
+    MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    String uuidOne = UUID.randomUUID().toString();
+    queryMap.add("id", uuidOne);
+    String uuidTwo = UUID.randomUUID().toString();
+    queryMap.add("id", uuidTwo);
+    given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
+        .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser()), null, 4));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .queryParam("page", 0)
+        .queryParam("size", 2)
+        .queryParam("id", uuidOne)
+        .queryParam("id", uuidTwo)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(2, response.getContent().size());
+    assertEquals(4, response.getTotalElements());
+    assertEquals(2, response.getTotalPages());
+    assertEquals(2, response.getNumberOfElements());
+    assertEquals(2, response.getSize());
+    assertEquals(0, response.getNumber());
+    assertThat(response.getContent().size(), is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

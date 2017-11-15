@@ -24,9 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
-import java.util.Collections;
-import java.util.Set;
-import java.util.UUID;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -57,8 +55,17 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.validate.UserValidator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class UserControllerTest {
@@ -95,8 +102,14 @@ public class UserControllerTest {
   @Mock
   private RoleAssignmentRepository roleAssignmentRepository;
 
+  @Mock
+  private UserService userService;
+
   @InjectMocks
   private UserController controller = new UserController();
+
+  @Mock
+  private Pageable pageable;
 
   private UUID homeFacilityId;
   private Facility homeFacility;
@@ -183,14 +196,17 @@ public class UserControllerTest {
   @Test
   public void shouldGetAllUsers() {
     //given
-    Set<UserDto> expectedUserDtos = Sets.newHashSet(user1Dto, user2Dto);
-    when(repository.findAll()).thenReturn(users);
+    List<UserDto> expectedUserDtos = Lists.newArrayList(user1Dto, user2Dto);
+    List<User> foundUsers = Lists.newArrayList(user1, user2);
+    MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    when(userService.searchUsers(queryMap, pageable))
+        .thenReturn(Pagination.getPage(foundUsers));
 
     //when
-    Set<UserDto> userDtos = controller.getAllUsers();
+    Page<UserDto> userDtos = controller.getUsers(queryMap, pageable);
 
     //then
-    assertEquals(expectedUserDtos, userDtos);
+    assertEquals(expectedUserDtos, userDtos.getContent());
   }
 
   @Test

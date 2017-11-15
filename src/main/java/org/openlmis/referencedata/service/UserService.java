@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +84,30 @@ public class UserService {
   private SupervisoryNodeRepository supervisoryNodeRepository;
   
   private ObjectMapper mapper = new ObjectMapper();
+
+  /**
+   * Method returns users with matched parameters or all users if no params provided.
+   *
+   * @param queryMap multi map with request parameters (username, firstName, lastName, email,
+   *                 homeFacility, active, verified, loginRestricted).
+   *                 There can be multiple id params, other params are ignored if id is
+   *                 provided. When id is not provided and if other params have multiple values,
+   *                 the first one is used.
+   *                 May be null or empty.
+   * @param pageable pagination parameters.
+   * @return Page of users. All users will be returned when map is null or empty.
+   */
+  public Page<User> searchUsers(MultiValueMap<String, Object> queryMap, Pageable pageable) {
+    if (MapUtils.isEmpty(queryMap)) {
+      return userRepository.findAll(pageable);
+    }
+    Set<UUID> ids = UuidUtil.getIds(queryMap);
+    if (!ids.isEmpty()) {
+      return userRepository.findAllByIds(ids, pageable);
+    } else {
+      return searchUsers(queryMap.toSingleValueMap(), pageable);
+    }
+  }
 
   /**
    * Method returns all users with matched parameters.

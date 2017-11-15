@@ -1124,13 +1124,69 @@ resourceTypes:
   /users:
       displayName: User
       get:
-          is: [ secured ]
-          description: Retrieve all users in the system.
+          is: [ secured, paginated ]
+          description: >
+              Retrieve all users in the system or search users, matching all parameters
+              specified. Returns paginated user list. For firstName, lastName, email: matches
+              values that equal or contain the searched value. Case insensitive.
+              Other fields: entered string value must equal searched value.
+              There can be multiple id params, other params are ignored if id is
+              provided. When id is not provided and if other params have multiple values,
+              the first one is used.
+          queryParameters:
+              id:
+                displayName: id
+                description: user id
+                type: string
+                required: false
+                repeat: true
+              username:
+                displayName: username
+                description: username
+                type: string
+                required: false
+                repeat: false
+              firstName:
+                displayName: firstName
+                description: first name
+                type: string
+                required: false
+                repeat: false
+              lastName:
+                displayName: lastName
+                description: last name
+                type: string
+                required: false
+                repeat: false
+              homeFacilityId:
+                displayName: homeFacilityId
+                description: home facility id
+                type: string
+                required: false
+                repeat: false
+              verified:
+                displayName: verified
+                description: is user verfied
+                type: boolean
+                required: false
+                repeat: false
+              active:
+                displayName: active
+                description: is user active
+                type: boolean
+                required: false
+                repeat: false
+              loginRestricted:
+                displayName: loginRestricted
+                description: is login restricted
+                type: boolean
+                required: false
+                repeat: false
           responses:
               "200":
                   body:
                     application/json:
-                      schema: userArray
+                      schema: userPage
               "403":
                   body:
                     application/json:

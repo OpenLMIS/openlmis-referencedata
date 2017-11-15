@@ -16,9 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -80,6 +78,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
@@ -196,26 +195,49 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Get all users and their roles.
+   * Returns all matching users. If no params provided, returns all users.
+   *
+   * @param requestParams request parameters (id, username, firstName, lastName, email,
+   *                      homeFacility, active, verified, loginRestricted).
+   *                      There can be multiple id params. Other params are ignored if id is
+   *                      provided. When id is not provided and if other params have multiple
+   *                      values, the first one is used.
+   *
+   *                      For firstName, lastName, email: finds any values that have entered
+   *                      string value in any position of searched field. Not case sensitive.
+   *
+   *                      Other fields: entered string value must equal to searched value.
+   *
+   * @param pageable Pageable object that allows client to optionally add "page" (page number).
+   *                 "size" (page size) and "sort" (with values "property,asc/desc")
+   *                 query parameters to the request.
    *
    * @return the Users.
    */
   @RequestMapping(value = "/users", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Set<UserDto> getAllUsers() {
+  public Page<UserDto> getUsers(@RequestParam MultiValueMap<String, Object> requestParams,
+                                Pageable pageable) {
     Profiler profiler = new Profiler("GET_USERS");
     profiler.setLogger(LOGGER);
+
+    requestParams.remove("page");
+    requestParams.remove("size");
+    requestParams.remove("sort");
 
     profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     LOGGER.debug("Getting all users");
-    profiler.start("GET_ALL_USERS");
-    Set<User> users = Sets.newHashSet(userRepository.findAll());
+    profiler.start("SEARCH_USERS");
+    Page<User> result = userService.searchUsers(requestParams, pageable);
+
+    profiler.start("EXPORT_TO_DTOS");
+    Page<UserDto> userDtos = exportUsersToDtos(result, pageable);
 
     profiler.stop().log();
-    return users.stream().map(this::exportUserToDto).collect(toSet());
+    return userDtos;
   }
 
   /**
