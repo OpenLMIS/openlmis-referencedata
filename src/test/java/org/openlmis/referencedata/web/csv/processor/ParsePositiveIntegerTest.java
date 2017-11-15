@@ -66,7 +66,7 @@ public class ParsePositiveIntegerTest {
   @Test
   public void shouldThrownExceptionWhenParameterIsNegativeInteger() {
     expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage("'-1000' is lesser than 0");
+    expectedEx.expectMessage("'-1000' is less than 0");
 
     parseAmount.execute("-1000", csvContext);
   }

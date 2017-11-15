@@ -42,7 +42,7 @@ public class ParsePositiveInteger extends CellProcessorAdaptor implements String
 
       if (result < 0) {
         throw new SuperCsvCellProcessorException(
-            String.format("'%s' is lesser than 0", value), context, this, null);
+            String.format("'%s' is less than 0", value), context, this, null);
       }
     } else {
       throw getSuperCsvCellProcessorException(value, context, null);
