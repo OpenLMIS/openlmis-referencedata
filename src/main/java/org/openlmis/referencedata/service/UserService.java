@@ -17,8 +17,6 @@ package org.openlmis.referencedata.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.commons.collections4.MapUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
@@ -45,9 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,41 +81,37 @@ public class UserService {
   private ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * Method returns users with matched parameters or all users if no params provided.
+   * Method returns users with matched parameters or all users if params are empty.
    *
-   * @param queryMap multi map with request parameters (username, firstName, lastName, email,
-   *                 homeFacility, active, verified, loginRestricted).
-   *                 There can be multiple id params, other params are ignored if id is
-   *                 provided. When id is not provided and if other params have multiple values,
-   *                 the first one is used.
-   *                 May be null or empty.
+   * @param searchParams {@link UserSearchParams}.
+   *                     There can be multiple id params, other params are ignored if id is
+   *                     provided. When id is not provided and if other params have multiple values,
+   *                     the first one is used. Empty params are allowed. {@code not null}.
    * @param pageable pagination parameters.
    * @return Page of users. All users will be returned when map is null or empty.
    */
-  public Page<User> searchUsers(MultiValueMap<String, Object> queryMap, Pageable pageable) {
-    if (MapUtils.isEmpty(queryMap)) {
+  public Page<User> searchUsersById(UserSearchParams searchParams, Pageable pageable) {
+    if (searchParams.isEmpty()) {
       return userRepository.findAll(pageable);
     }
-    Set<UUID> ids = UuidUtil.getIds(queryMap);
+    Set<UUID> ids = searchParams.getIds();
     if (!ids.isEmpty()) {
       return userRepository.findAllByIds(ids, pageable);
     } else {
-      return searchUsers(queryMap.toSingleValueMap(), pageable);
+      return searchUsers(searchParams, pageable);
     }
   }
 
   /**
    * Method returns all users with matched parameters.
    *
-   * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
+   * @param searchParams request parameters (username, firstName, lastName, email, homeFacility,
    *                 active, verified, loginRestricted) and JSON extraData.
    * @param pageable pagination parameters
    * @return Page of users
    */
-  public Page<User> searchUsers(Map<String, Object> queryMap, Pageable pageable) {
-
-    Map<String, Object> regularQueryMap = new HashMap<>(queryMap);
-    Map<String, String> extraData = (Map<String, String>) regularQueryMap.remove(EXTRA_DATA);
+  public Page<User> searchUsers(UserSearchParams searchParams, Pageable pageable) {
+    Map<String, String> extraData = searchParams.extraData;
 
     List<User> foundUsers = null;
     if (extraData != null && !extraData.isEmpty()) {
@@ -136,16 +127,14 @@ public class UserService {
     }
 
     return userRepository.searchUsers(
-        (String) queryMap.get(USERNAME),
-        (String) queryMap.get(FIRST_NAME),
-        (String) queryMap.get(LAST_NAME),
-        (String) queryMap.get(EMAIL),
-        UuidUtil
-            .fromString(MapUtils.getObject(queryMap, HOME_FACILITY_ID, "").toString())
-            .orElse(null),
-        (Boolean) queryMap.get(ACTIVE),
-        (Boolean) queryMap.get(VERIFIED),
-        (Boolean) queryMap.get(LOGIN_RESTRICTED),
+        searchParams.username,
+        searchParams.firstName,
+        searchParams.lastName,
+        searchParams.email,
+        getHomeFacilityUuid(searchParams),
+        searchParams.active,
+        searchParams.verified,
+        searchParams.loginRestricted,
         foundUsers,
         pageable);
   }
@@ -176,6 +165,16 @@ public class UserService {
     } else {
       return userRepository.findUsersByDirectRight(right);
     }
+  }
+
+  private UUID getHomeFacilityUuid(UserSearchParams searchParams) {
+    UUID homeFacilityId = null;
+    if (searchParams.homeFacilityId != null) {
+      homeFacilityId = UuidUtil
+          .fromString(searchParams.homeFacilityId)
+          .orElse(null);
+    }
+    return homeFacilityId;
   }
 
   private Set<User> searchByFulfillmentRight(Right right, UUID warehouseId) {

@@ -16,6 +16,10 @@
       "type": "string",
       "title": "lastName"
     },
+    "email": {
+      "type": "string",
+      "title": "email"
+    },
     "homeFacilityId": {
       "type": "string",
       "title": "homeFacilityId"

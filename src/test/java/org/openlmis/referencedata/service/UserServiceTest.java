@@ -24,20 +24,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.service.UserService.ACTIVE;
-import static org.openlmis.referencedata.service.UserService.EMAIL;
-import static org.openlmis.referencedata.service.UserService.EXTRA_DATA;
-import static org.openlmis.referencedata.service.UserService.FIRST_NAME;
-import static org.openlmis.referencedata.service.UserService.HOME_FACILITY_ID;
-import static org.openlmis.referencedata.service.UserService.LAST_NAME;
-import static org.openlmis.referencedata.service.UserService.LOGIN_RESTRICTED;
-import static org.openlmis.referencedata.service.UserService.USERNAME;
-import static org.openlmis.referencedata.service.UserService.VERIFIED;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,15 +48,14 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -124,20 +113,18 @@ public class UserServiceTest {
   private User user;
   private User user2;
 
-  private Map<String, Object> userSearch;
+  private UserSearchParams userSearch;
   private Map<String, String> extraData;
   private ObjectMapper mapper = new ObjectMapper();
   private String extraDataString;
-  private Map<String, Object> queryMap;
 
   @Before
   public void setUp() throws JsonProcessingException {
     user = generateUser();
     user2 = mock(User.class);
-    userSearch = Collections.singletonMap(FIRST_NAME, FIRST_NAME_SEARCH);
+    userSearch = new UserSearchParams(FIRST_NAME_SEARCH);
     extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
     extraDataString = mapper.writeValueAsString(extraData);
-    queryMap = new HashMap<>();
     when(pageable.getPageSize()).thenReturn(10);
     when(pageable.getPageNumber()).thenReturn(1);
   }
@@ -158,12 +145,10 @@ public class UserServiceTest {
             any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
-    queryMap.putAll(userSearch);
-    queryMap.put(EXTRA_DATA, extraData);
-
+    userSearch.extraData = extraData;
     when(userRepository.findByExtraData(any(String.class))).thenReturn(Arrays.asList(user, user2));
 
-    Page<User> receivedUsers = userService.searchUsers(queryMap, pageable);
+    Page<User> receivedUsers = userService.searchUsers(userSearch, pageable);
 
     assertEquals(2, receivedUsers.getContent().size());
     verify(userRepository).findByExtraData(extraDataString);
@@ -196,12 +181,11 @@ public class UserServiceTest {
             any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
-    queryMap.putAll(userSearch);
-    queryMap.put(EXTRA_DATA, extraData);
+    userSearch.extraData = extraData;
 
     when(userRepository.findByExtraData(any(String.class))).thenReturn(Collections.emptyList());
 
-    Page<User> receivedUsers = userService.searchUsers(queryMap, pageable);
+    Page<User> receivedUsers = userService.searchUsers(userSearch, pageable);
 
     assertEquals(0, receivedUsers.getContent().size());
     verify(userRepository).findByExtraData(extraDataString);
@@ -234,9 +218,7 @@ public class UserServiceTest {
             any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
-    queryMap.putAll(userSearch);
-
-    Page<User> receivedUsers = userService.searchUsers(queryMap, pageable);
+    Page<User> receivedUsers = userService.searchUsers(userSearch, pageable);
 
     assertEquals(2, receivedUsers.getContent().size());
     assertTrue(receivedUsers.getContent().contains(user));
@@ -271,44 +253,33 @@ public class UserServiceTest {
             any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
-    final String username = "user";
-    final String lastName = "last-name";
-    final String email = "user@mail.com";
-    final UUID homeFacilityId = UUID.randomUUID();
-    final Boolean active = true;
-    final Boolean verified = true;
-    final Boolean loginRestricted = true;
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder()
+        .withFirstName(FIRST_NAME_SEARCH)
+        .withExtraData(extraData)
+        .build();
 
     Facility homeFacility = new Facility("some-code");
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
+    when(facilityRepository.findOne(UUID.fromString(searchParams.homeFacilityId)))
+        .thenReturn(homeFacility);
 
-    when(userRepository.findByExtraData(any(String.class))).thenReturn(Arrays.asList(user, user2));
+    List<User> foundUsers = Arrays.asList(user, user2);
+    when(userRepository.findByExtraData(any(String.class))).thenReturn(foundUsers);
 
-    queryMap.putAll(userSearch);
-    queryMap.put(USERNAME, username);
-    queryMap.put(LAST_NAME, lastName);
-    queryMap.put(EMAIL, email);
-    queryMap.put(HOME_FACILITY_ID, homeFacilityId.toString());
-    queryMap.put(ACTIVE, active);
-    queryMap.put(VERIFIED, verified);
-    queryMap.put(LOGIN_RESTRICTED, loginRestricted);
-    queryMap.put(EXTRA_DATA, extraData);
-
-    Page<User> receivedUsers = userService.searchUsers(queryMap, pageable);
+    Page<User> receivedUsers = userService.searchUsers(searchParams, pageable);
 
     assertEquals(2, receivedUsers.getContent().size());
     assertTrue(receivedUsers.getContent().contains(user));
     assertTrue(receivedUsers.getContent().contains(user2));
     verify(userRepository).searchUsers(
-        username,
+        searchParams.username,
         FIRST_NAME_SEARCH,
-        lastName,
-        email,
-        homeFacilityId,
-        active,
-        verified,
-        loginRestricted,
-        Arrays.asList(user, user2),
+        searchParams.lastName,
+        searchParams.email,
+        UUID.fromString(searchParams.homeFacilityId),
+        searchParams.active,
+        searchParams.verified,
+        searchParams.loginRestricted,
+        foundUsers,
         pageable);
   }
 

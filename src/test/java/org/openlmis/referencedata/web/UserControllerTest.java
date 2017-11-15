@@ -54,13 +54,13 @@ import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.openlmis.referencedata.validate.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import java.util.Collections;
 import java.util.List;
@@ -198,12 +198,12 @@ public class UserControllerTest {
     //given
     List<UserDto> expectedUserDtos = Lists.newArrayList(user1Dto, user2Dto);
     List<User> foundUsers = Lists.newArrayList(user1, user2);
-    MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    when(userService.searchUsers(queryMap, pageable))
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder().build();
+    when(userService.searchUsersById(searchParams, pageable))
         .thenReturn(Pagination.getPage(foundUsers));
 
     //when
-    Page<UserDto> userDtos = controller.getUsers(queryMap, pageable);
+    Page<UserDto> userDtos = controller.getUsers(searchParams, pageable);
 
     //then
     assertEquals(expectedUserDtos, userDtos.getContent());

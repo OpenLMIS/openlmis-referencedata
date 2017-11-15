@@ -43,12 +43,11 @@ import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_INVALID;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.restassured.response.Response;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -79,21 +78,19 @@ import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -186,8 +183,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetAllUsers() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
+    UserSearchParams queryMap = new UserSearchParams();
+    given(userService.searchUsersById(eq(queryMap), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser())));
 
     PageImplRepresentation response = restAssured
@@ -204,15 +201,17 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldFindUsersByQueryParamsAndPaginate() {
+  public void shouldGetUsersByQueryParamsAndPaginate() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     String uuidOne = UUID.randomUUID().toString();
-    queryMap.add(ID, uuidOne);
     String uuidTwo = UUID.randomUUID().toString();
-    queryMap.add(ID, uuidTwo);
-    given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
+    Set<String> ids = new HashSet<>(2);
+    ids.add(uuidOne);
+    ids.add(uuidTwo);
+
+    UserSearchParams userSearchParams = new UserSearchParams(ids);
+    given(userService.searchUsersById(eq(userSearchParams), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser()), null, 4));
 
     PageImplRepresentation response = restAssured
@@ -834,19 +833,19 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldFindUsers() throws JsonProcessingException {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    Map<String, Object> queryMap = new HashMap<>();
-    queryMap.put(USERNAME, user1.getUsername());
-    Map<String, String> extraData = Collections.singletonMap("color", "orange");
-    queryMap.put("extraData", extraData);
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder()
+        .withUsername(user1.getUsername())
+        .withExtraData(Collections.singletonMap("color", "orange"))
+        .build();
 
-    given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
+    given(userService.searchUsers(eq(searchParams), any(Pageable.class)))
         .willReturn(Pagination.getPage(singletonList(user1)));
 
     PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(queryMap)
+        .body(searchParams)
         .when()
         .post(SEARCH_URL)
         .then()
@@ -861,14 +860,13 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldPaginateFindUsers() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    Map<String, Object> queryMap = new HashMap<>();
-    queryMap.put(TIMEZONE, user1.getTimezone());
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder().build();
 
     User user2 = generateUser();
     user2.setId(UUID.randomUUID());
     assignUserRoles(user2);
 
-    given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
+    given(userService.searchUsers(eq(searchParams), any(Pageable.class)))
         .willReturn(Pagination.getPage(asList(user1), null, 2));
 
     PageImplRepresentation response = restAssured
@@ -877,7 +875,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .queryParam(SIZE, 1)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(queryMap)
+        .body(searchParams)
         .when()
         .post(SEARCH_URL)
         .then()

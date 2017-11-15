@@ -1158,6 +1158,12 @@ resourceTypes:
                 type: string
                 required: false
                 repeat: false
+              email:
+                displayName: email
+                description: user email
+                type: string
+                required: false
+                repeat: false
               homeFacilityId:
                 displayName: homeFacilityId
                 description: home facility id

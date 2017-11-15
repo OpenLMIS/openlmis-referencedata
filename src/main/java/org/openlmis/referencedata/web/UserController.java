@@ -17,16 +17,6 @@ package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
@@ -57,6 +47,7 @@ import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -78,7 +69,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
@@ -90,6 +80,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
@@ -217,21 +216,17 @@ public class UserController extends BaseController {
   @RequestMapping(value = "/users", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<UserDto> getUsers(@RequestParam MultiValueMap<String, Object> requestParams,
+  public Page<UserDto> getUsers(UserSearchParams requestParams,
                                 Pageable pageable) {
     Profiler profiler = new Profiler("GET_USERS");
     profiler.setLogger(LOGGER);
-
-    requestParams.remove("page");
-    requestParams.remove("size");
-    requestParams.remove("sort");
 
     profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     LOGGER.debug("Getting all users");
     profiler.start("SEARCH_USERS");
-    Page<User> result = userService.searchUsers(requestParams, pageable);
+    Page<User> result = userService.searchUsersById(requestParams, pageable);
 
     profiler.start("EXPORT_TO_DTOS");
     Page<UserDto> userDtos = exportUsersToDtos(result, pageable);
@@ -324,7 +319,7 @@ public class UserController extends BaseController {
   /**
    * Returns all matching users sorted by username in alphabetically descending order.
    *
-   * @param queryMap request parameters (username, firstName, lastName, email, homeFacility,
+   * @param queryParams request parameters (username, firstName, lastName, email, homeFacility,
    *                 active, verified, loginRestricted) and JSON extraData.
    *
    *                 For firstName, lastName, email: finds any values that have entered
@@ -340,7 +335,7 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<UserDto> searchUsers(
-      @RequestBody Map<String, Object> queryMap, Pageable pageable) {
+      @RequestBody UserSearchParams queryParams, Pageable pageable) {
 
     Profiler profiler = new Profiler("POST_USER_SEARCH");
     profiler.setLogger(LOGGER);
@@ -349,7 +344,7 @@ public class UserController extends BaseController {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     profiler.start("SEARCH_USERS");
-    Page<User> result = userService.searchUsers(queryMap, pageable);
+    Page<User> result = userService.searchUsers(queryParams, pageable);
 
     profiler.start("EXPORT_TO_DTOS");
     Page<UserDto> userDtos = exportUsersToDtos(result, pageable);
