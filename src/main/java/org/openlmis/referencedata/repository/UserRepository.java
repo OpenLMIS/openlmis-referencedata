@@ -88,7 +88,7 @@ public interface UserRepository extends
       nativeQuery = true)
   Set<User> findUsersByDirectRight(@Param("right") Right right);
 
-  @Query("SELECT u FROM User u WHERE u.id in ?1")
-  Page<User> findAllByIds(Iterable<UUID> ids, Pageable pageable);
+  @Query("SELECT u FROM User u WHERE u.id in :ids")
+  Page<User> findAllByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
 
 }
