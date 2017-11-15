@@ -133,6 +133,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final UUID SUPERVISORY_NODE_ID = UUID.randomUUID();
   private static final UUID PROGRAM_ID = UUID.randomUUID();
   private static final UUID WAREHOUSE_ID = UUID.randomUUID();
+  private static final String PAGE = "page";
+  private static final String SIZE = "size";
+  private static final String ID = "id";
 
   private User user1;
   private User user2;
@@ -206,18 +209,18 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     String uuidOne = UUID.randomUUID().toString();
-    queryMap.add("id", uuidOne);
+    queryMap.add(ID, uuidOne);
     String uuidTwo = UUID.randomUUID().toString();
-    queryMap.add("id", uuidTwo);
+    queryMap.add(ID, uuidTwo);
     given(userService.searchUsers(eq(queryMap), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser()), null, 4));
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam("page", 0)
-        .queryParam("size", 2)
-        .queryParam("id", uuidOne)
-        .queryParam("id", uuidTwo)
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 2)
+        .queryParam(ID, uuidOne)
+        .queryParam(ID, uuidTwo)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
@@ -870,8 +873,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam("page", 0)
-        .queryParam("size", 1)
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 1)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(queryMap)
