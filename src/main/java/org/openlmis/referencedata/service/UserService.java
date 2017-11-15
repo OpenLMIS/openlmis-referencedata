@@ -18,6 +18,7 @@ package org.openlmis.referencedata.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.collections4.MapUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
@@ -32,6 +33,7 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
@@ -113,7 +115,9 @@ public class UserService {
         (String) queryMap.get(FIRST_NAME),
         (String) queryMap.get(LAST_NAME),
         (String) queryMap.get(EMAIL),
-        (UUID) queryMap.get(HOME_FACILITY_ID),
+        UuidUtil
+            .fromString(MapUtils.getObject(queryMap, HOME_FACILITY_ID, "").toString())
+            .orElse(null),
         (Boolean) queryMap.get(ACTIVE),
         (Boolean) queryMap.get(VERIFIED),
         (Boolean) queryMap.get(LOGIN_RESTRICTED),

@@ -280,7 +280,7 @@ public class UserServiceTest {
     final Boolean loginRestricted = true;
 
     Facility homeFacility = new Facility("some-code");
-    when(facilityRepository.findOne(eq(homeFacilityId))).thenReturn(homeFacility);
+    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
 
     when(userRepository.findByExtraData(any(String.class))).thenReturn(Arrays.asList(user, user2));
 
@@ -288,7 +288,7 @@ public class UserServiceTest {
     queryMap.put(USERNAME, username);
     queryMap.put(LAST_NAME, lastName);
     queryMap.put(EMAIL, email);
-    queryMap.put(HOME_FACILITY_ID, homeFacilityId);
+    queryMap.put(HOME_FACILITY_ID, homeFacilityId.toString());
     queryMap.put(ACTIVE, active);
     queryMap.put(VERIFIED, verified);
     queryMap.put(LOGIN_RESTRICTED, loginRestricted);
