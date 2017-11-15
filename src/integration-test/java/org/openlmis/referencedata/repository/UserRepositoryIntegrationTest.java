@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -396,6 +398,26 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     assertThat(reportUsers, hasItems(user1, user2));
     assertThat(adminUsers, hasSize(1));
     assertThat(adminUsers, hasItem(user1));
+  }
+
+  @Test
+  public void shouldFindAllByIds() {
+    // given users I want
+    User user1 = generateInstance();
+    user1 = repository.save(user1);
+    User user2 = generateInstance();
+    user2 = repository.save(user2);
+
+    // given a user I don't want
+    repository.save(generateInstance());
+
+    // when
+    Set<UUID> ids = Sets.newHashSet(user1.getId(), user2.getId());
+    Page<User> found = repository.findAllByIds(ids, pageable);
+
+    // then
+    assertEquals(2, found.getContent().size());
+    assertThat(found.getContent(), hasItems(user1, user2));
   }
 
   private User cloneUser(User user) {
