@@ -1,3 +1,9 @@
+9.0.1 / WIP
+==================
+
+Bug fixes that are backwards-compatible:
+* [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
+
 9.0.0 / 2017-11-09
 ==================
 
