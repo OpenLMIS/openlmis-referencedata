@@ -89,7 +89,10 @@ public class UserSearchParams {
   }
 
   /**
-   * Gets home facility id id parsed to UUIDs.
+   * Gets home facility id parsed to UUID.
+   *
+   * @return home facility id parsed to UUID
+   * @throws ValidationMessageException when home facility id is not valid UUID.
    */
   public UUID getHomeFacilityUuid() {
     if (this.homeFacilityId == null) {
