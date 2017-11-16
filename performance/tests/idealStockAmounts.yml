@@ -3,7 +3,7 @@ execution:
     hold-for: 1m
     scenario: download-ideal-stock-amounts-csv
   - concurreny: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: upload-ideal-stock-amounts-csv
 
 scenarios:
@@ -47,4 +47,4 @@ reporting:
     - module: passfail
       criteria:
         Download Ideal Stock Amounts too slow: p90 of GetAnIdealStockAmountCSV>1100ms
-        Upload Ideal Stock Amounts too slow: p90 of UploadIdealStockAmounts>500ms
+        Upload Ideal Stock Amounts too slow: p90 of UploadIdealStockAmounts>3000ms
