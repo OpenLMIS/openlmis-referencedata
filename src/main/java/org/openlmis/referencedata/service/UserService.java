@@ -31,7 +31,6 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
@@ -131,7 +130,7 @@ public class UserService {
         searchParams.firstName,
         searchParams.lastName,
         searchParams.email,
-        getHomeFacilityUuid(searchParams),
+        searchParams.getHomeFacilityUuid(),
         searchParams.active,
         searchParams.verified,
         searchParams.loginRestricted,
@@ -165,16 +164,6 @@ public class UserService {
     } else {
       return userRepository.findUsersByDirectRight(right);
     }
-  }
-
-  private UUID getHomeFacilityUuid(UserSearchParams searchParams) {
-    UUID homeFacilityId = null;
-    if (searchParams.homeFacilityId != null) {
-      homeFacilityId = UuidUtil
-          .fromString(searchParams.homeFacilityId)
-          .orElse(null);
-    }
-    return homeFacilityId;
   }
 
   private Set<User> searchByFulfillmentRight(Right right, UUID warehouseId) {

@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.openlmis.referencedata.util.UuidUtil;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -82,6 +83,18 @@ public class UserSearchParams {
     id.forEach(id -> ids.add(UUID.fromString((String)id)));
 
     return ids;
+  }
+
+  /**
+   * Gets home facility id id parsed to UUIDs.
+   */
+  public UUID getHomeFacilityUuid() {
+    if (this.homeFacilityId == null) {
+      return null;
+    }
+    return UuidUtil
+        .fromString(this.homeFacilityId)
+        .orElse(null);
   }
 
 }
