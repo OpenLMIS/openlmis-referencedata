@@ -1,5 +1,9 @@
-9.0.1 / WIP
-==================
+10.0.0 / WIP
+============
+
+Breaking changes:
+* [OLMIS-3600](https://openlmis.atlassian.net/browse/OLMIS-3600): Paginate and add get by ids
+parameters to get users endpoint
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
