@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
 import org.junit.Test;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -98,6 +99,14 @@ public class UserSearchParamsTest {
     userSearchParams.setHomeFacilityId(id.toString());
 
     assertEquals(id, userSearchParams.getHomeFacilityUuid());
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIdHomeFacilityUuidIsNotValid() {
+    UserSearchParams userSearchParams = new UserSearchParams();
+    userSearchParams.setHomeFacilityId("123");
+
+    userSearchParams.getHomeFacilityUuid();
   }
 
 }

@@ -24,10 +24,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.UuidUtil;
+import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -92,9 +95,11 @@ public class UserSearchParams {
     if (this.homeFacilityId == null) {
       return null;
     }
-    return UuidUtil
-        .fromString(this.homeFacilityId)
-        .orElse(null);
+    Optional<UUID> uuid = UuidUtil.fromString(this.homeFacilityId);
+    if (!uuid.isPresent()) {
+      throw new ValidationMessageException(UserMessageKeys.ERROR_HOME_FACILITY_ID_INVALID);
+    }
+    return uuid.get();
   }
 
 }
