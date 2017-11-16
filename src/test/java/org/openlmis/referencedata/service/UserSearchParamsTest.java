@@ -17,23 +17,67 @@ package org.openlmis.referencedata.service;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
 import org.junit.Test;
+import java.util.Collections;
 import java.util.UUID;
 
-/**
- * Created by pawel on 16.11.17.
- */
 public class UserSearchParamsTest {
+
+  public static final String TEST = "test";
 
   @Test
   public void shouldReturnTrueIfAllFieldsAreEmpty() {
     UserSearchParams userSearchParams = new UserSearchParams();
 
     assertTrue(userSearchParams.isEmpty());
+  }
+
+  @Test
+  public void shouldReturnFalseIfAnyFieldIsEmpty() {
+    UserSearchParams userSearchParams = new UserSearchParams();
+    userSearchParams.id = Collections.singleton(TEST);
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.username = TEST;
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.firstName = TEST;
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.lastName = TEST;
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.email = TEST;
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.homeFacilityId = TEST;
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.verified = true;
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.active = true;
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.loginRestricted = true;
+    assertFalse(userSearchParams.isEmpty());
+
+    userSearchParams = new UserSearchParams();
+    userSearchParams.extraData = Collections.singletonMap(TEST, TEST);
+    assertFalse(userSearchParams.isEmpty());
   }
 
   @Test

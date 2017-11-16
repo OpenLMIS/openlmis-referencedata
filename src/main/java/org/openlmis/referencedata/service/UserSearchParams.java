@@ -67,7 +67,7 @@ public class UserSearchParams {
    * Check if all params are empty.
    */
   public boolean isEmpty() {
-    return CollectionUtils.isEmpty(id) && isNull(username) && isNull(firstName)
+    return CollectionUtils.isEmpty(id) && isNull(username) && isNull(firstName) && isNull(email)
         && isNull(lastName) && isNull(homeFacilityId) && isNull(verified)
         && isNull(active) && isNull(loginRestricted) && MapUtils.isEmpty(extraData);
   }
