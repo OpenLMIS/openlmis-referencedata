@@ -34,6 +34,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -119,10 +120,11 @@ public class RequisitionGroupRepositoryIntegrationTest
     facility.setEnabled(true);
     facilityRepository.save(facility);
 
-    supervisoryNode = new SupervisoryNode();
-    supervisoryNode.setName("node");
-    supervisoryNode.setCode(CODE);
-    supervisoryNode.setFacility(facility);
+    supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withoutId()
+        .withCode(CODE)
+        .withFacility(facility)
+        .build();
     supervisoryNodeRepository.save(supervisoryNode);
 
     ProcessingSchedule schedule = new ProcessingSchedule("SCH-1", "Monthly Schedule");
@@ -331,19 +333,19 @@ public class RequisitionGroupRepositoryIntegrationTest
     RequisitionGroup requisitionGroup = generateInstance();
     repository.save(requisitionGroup);
 
-    SupervisoryNode supervisoryNode1 = new SupervisoryNode();
-    supervisoryNode1.setName("node1");
-    supervisoryNode1.setCode("some-code");
-    supervisoryNode1.setFacility(facility);
+    SupervisoryNode supervisoryNode1 = new SupervisoryNodeDataBuilder()
+        .withoutId()
+        .withFacility(facility)
+        .build();
     supervisoryNodeRepository.save(supervisoryNode1);
     RequisitionGroup requisitionGroup1 = generateInstance();
     requisitionGroup1.setSupervisoryNode(supervisoryNode1);
     repository.save(requisitionGroup1);
 
-    SupervisoryNode supervisoryNode2 = new SupervisoryNode();
-    supervisoryNode2.setName("node2");
-    supervisoryNode2.setCode("other-code");
-    supervisoryNode2.setFacility(facility);
+    SupervisoryNode supervisoryNode2 = new SupervisoryNodeDataBuilder()
+        .withoutId()
+        .withFacility(facility)
+        .build();
     supervisoryNodeRepository.save(supervisoryNode2);
     RequisitionGroup requisitionGroup2 = generateInstance();
     requisitionGroup2.setSupervisoryNode(supervisoryNode2);

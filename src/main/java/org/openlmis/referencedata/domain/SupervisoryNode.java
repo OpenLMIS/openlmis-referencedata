@@ -77,13 +77,6 @@ public class SupervisoryNode extends BaseEntity {
   @Setter
   private RequisitionGroup requisitionGroup;
 
-  private SupervisoryNode(String name, String code, Facility facility) {
-    this.name = name;
-    this.code = code;
-    this.facility = facility;
-    this.childNodes = new HashSet<>();
-  }
-
   /**
    * Static factory method for constructing a new supervisory node using an importer (DTO).
    *
@@ -96,29 +89,25 @@ public class SupervisoryNode extends BaseEntity {
       facility = Facility.newFacility(importer.getFacility());
     }
 
-    SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getName(),
-        importer.getCode(), facility);
-    newSupervisoryNode.id = importer.getId();
-    newSupervisoryNode.description = importer.getDescription();
-
+    SupervisoryNode parentNode = null;
     if (importer.getParentNode() != null) {
-      newSupervisoryNode.parentNode = SupervisoryNode.newSupervisoryNode(importer.getParentNode());
+      parentNode = SupervisoryNode.newSupervisoryNode(importer.getParentNode());
     }
 
+    RequisitionGroup requisitionGroup = null;
     if (importer.getRequisitionGroup() != null) {
-      newSupervisoryNode.requisitionGroup =
-          RequisitionGroup.newRequisitionGroup(importer.getRequisitionGroup());
+      requisitionGroup = RequisitionGroup.newRequisitionGroup(importer.getRequisitionGroup());
     }
 
+    Set<SupervisoryNode> childNodes = new HashSet<>();
     if (importer.getChildNodes() != null) {
-      Set<SupervisoryNode> childNodes = new HashSet<>();
-
       for (Importer childNodeImporter : importer.getChildNodes()) {
         childNodes.add(SupervisoryNode.newSupervisoryNode(childNodeImporter));
       }
-
-      newSupervisoryNode.childNodes = childNodes;
     }
+
+    SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getCode(), importer.getName(),
+        importer.getDescription(), facility, parentNode, childNodes, requisitionGroup);
 
     return newSupervisoryNode;
   }
