@@ -130,6 +130,7 @@ public class SupplyLineRepositoryIntegrationTest
 
   private SupervisoryNode generateSupervisoryNode() {
     SupervisoryNode supervisoryNode = new SupervisoryNode();
+    supervisoryNode.setName("node" + this.getNextInstanceNumber());
     supervisoryNode.setCode("code" + this.getNextInstanceNumber());
     supervisoryNode.setFacility(generateFacility());
     supervisoryNodeRepository.save(supervisoryNode);

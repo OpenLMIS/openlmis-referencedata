@@ -1456,7 +1456,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     program2Id = UUID.randomUUID();
     supervisionRightId = UUID.randomUUID();
     supervisionRight.setId(supervisionRightId);
-    supervisoryNode = SupervisoryNode.newSupervisoryNode(SUPERVISORY_NODE_CODE,
+    supervisoryNode = SupervisoryNode.newSupervisoryNode("node", SUPERVISORY_NODE_CODE,
         generateFacility("F1"));
     RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);
     supervisionGroup.setMemberFacilities(newHashSet(generateFacility("F2"),

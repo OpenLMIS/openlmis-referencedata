@@ -323,7 +323,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Right right = saveNewRight("right", SUPERVISION);
     Role role = saveNewRole("role", right);
     Program program = saveNewProgram("P1");
-    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
+    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("node1", "SN1", generateFacility(10));
 
     User supervisingUser = repository.findOneByUsername(USER_1);
     supervisingUser = assignRoleToUser(supervisingUser,
@@ -344,7 +344,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Right supervisionRight = saveNewRight("supervisionRight", SUPERVISION);
     Role supervisionRole = saveNewRole("supervisionRole", supervisionRight);
     Program program = saveNewProgram("P1");
-    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
+    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("node1", "SN1", generateFacility(10));
 
     User supervisingUser = repository.findOneByUsername(USER_1);
     assignRoleToUser(supervisingUser, new SupervisionRoleAssignment(
@@ -495,8 +495,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     return programRepository.save(program);
   }
 
-  private SupervisoryNode saveNewSupervisoryNode(String code, Facility facility) {
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(code, facility);
+  private SupervisoryNode saveNewSupervisoryNode(String name, String code, Facility facility) {
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(name, code, facility);
     return supervisoryNodeRepository.save(supervisoryNode);
   }
 

@@ -95,7 +95,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     facility.setType(facilityType);
     facility.setOperator(facilityOperator);
 
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", facility);
+    supervisoryNode = SupervisoryNode.newSupervisoryNode("node", "SN1", facility);
     supervisoryNode.setId(UUID.randomUUID());
 
     program = new Program("PRO-1");

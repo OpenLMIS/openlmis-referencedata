@@ -105,7 +105,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     facility.setOperator(facilityOperator);
     facility.setEnabled(true);
 
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("supervisoryNodeCode", facility);
+    supervisoryNode = SupervisoryNode.newSupervisoryNode("node", "supervisoryNodeCode", facility);
     supervisoryNodeDto = new SupervisoryNodeDto();
     supervisoryNode.export(supervisoryNodeDto);
     supervisoryNodeId = UUID.randomUUID();
@@ -325,7 +325,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldGetAllSupervisoryNodes() {
 
     List<SupervisoryNode> storedSupervisoryNodes = Arrays.asList(supervisoryNode,
-        SupervisoryNode.newSupervisoryNode("SN2", new Facility("F2")));
+        SupervisoryNode.newSupervisoryNode("node", "SN2", new Facility("F2")));
     given(supervisoryNodeRepository.findAll()).willReturn(storedSupervisoryNodes);
 
     SupervisoryNodeDto[] response = restAssured

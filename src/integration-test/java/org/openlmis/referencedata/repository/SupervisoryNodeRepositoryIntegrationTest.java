@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.UUID;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -27,6 +25,7 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
+import java.util.UUID;
 
 public class SupervisoryNodeRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<SupervisoryNode> {
@@ -81,7 +80,8 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   @Override
   SupervisoryNode generateInstance() {
     int instanceNumber = this.getNextInstanceNumber();
-    return SupervisoryNode.newSupervisoryNode("Code #" + instanceNumber, facility);
+    return SupervisoryNode.newSupervisoryNode("node " + instanceNumber,
+        "Code #" + instanceNumber, facility);
   }
 
   @Test(expected = DataIntegrityViolationException.class)
@@ -94,6 +94,28 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     SupervisoryNode sn2 = generateInstance();
     sn2.setCode(sn1.getCode());
     supervisoryNodeRepository.save(sn2);
+
+    // then a DB constraint is found
+    supervisoryNodeRepository.flush();
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void nameWithNullValueShouldThrowException() {
+    // given a SN in the db
+    SupervisoryNode sn = generateInstance();
+    sn.setName(null);
+    supervisoryNodeRepository.save(sn);
+
+    // then a DB constraint is found
+    supervisoryNodeRepository.flush();
+  }
+
+  @Test
+  public void nullFacilityShouldNotThrowException() {
+    // given a SN in the db
+    SupervisoryNode sn = generateInstance();
+    sn.setFacility(null);
+    supervisoryNodeRepository.save(sn);
 
     // then a DB constraint is found
     supervisoryNodeRepository.flush();

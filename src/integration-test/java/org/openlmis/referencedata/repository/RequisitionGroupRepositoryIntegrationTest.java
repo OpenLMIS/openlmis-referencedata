@@ -120,6 +120,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     facilityRepository.save(facility);
 
     supervisoryNode = new SupervisoryNode();
+    supervisoryNode.setName("node");
     supervisoryNode.setCode(CODE);
     supervisoryNode.setFacility(facility);
     supervisoryNodeRepository.save(supervisoryNode);
@@ -331,6 +332,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     repository.save(requisitionGroup);
 
     SupervisoryNode supervisoryNode1 = new SupervisoryNode();
+    supervisoryNode1.setName("node1");
     supervisoryNode1.setCode("some-code");
     supervisoryNode1.setFacility(facility);
     supervisoryNodeRepository.save(supervisoryNode1);
@@ -339,6 +341,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     repository.save(requisitionGroup1);
 
     SupervisoryNode supervisoryNode2 = new SupervisoryNode();
+    supervisoryNode2.setName("node2");
     supervisoryNode2.setCode("other-code");
     supervisoryNode2.setFacility(facility);
     supervisoryNodeRepository.save(supervisoryNode2);

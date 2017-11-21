@@ -190,7 +190,8 @@ public class UserTest {
         Sets.newHashSet(newSupportedProgram(facility, new Program("P10"), true))
     );
 
-    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("DN", new Facility("C1"));
+    SupervisoryNode districtNode = SupervisoryNode.newSupervisoryNode("node", "DN",
+        new Facility("C1"));
     RequisitionGroup districtGroup = new RequisitionGroup("DG", "DGN", districtNode);
     districtGroup.setMemberFacilities(Sets.newHashSet(new Facility("C2")));
     addSupportedPrograms(districtGroup);
@@ -203,9 +204,11 @@ public class UserTest {
         Collections.singletonList(districtGroupProgramSchedule));
     districtNode.setRequisitionGroup(districtGroup);
 
-    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("PN", new Facility("C3"));
+    SupervisoryNode provinceNode = SupervisoryNode.newSupervisoryNode("node", "PN",
+        new Facility("C3"));
     RequisitionGroup provinceGroup = new RequisitionGroup("PG", "PGN", provinceNode);
-    provinceGroup.setMemberFacilities(Sets.newHashSet(new Facility("C4"), new Facility("C5")));
+    provinceGroup.setMemberFacilities(Sets.newHashSet(new Facility("C4"),
+        new Facility("C5")));
     addSupportedPrograms(provinceGroup);
     RequisitionGroupProgramSchedule provinceGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(

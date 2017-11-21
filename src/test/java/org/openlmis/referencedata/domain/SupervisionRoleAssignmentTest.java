@@ -59,7 +59,7 @@ public class SupervisionRoleAssignmentTest {
 
     homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, user, program);
 
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("SN1", new Facility("F2"));
+    supervisoryNode = SupervisoryNode.newSupervisoryNode("node", "SN1", new Facility("F2"));
     RequisitionGroup requisitionGroup = new RequisitionGroup("RG1", "RGN1", supervisoryNode);
     supervisedFacility = new Facility("F2");
     SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(

@@ -7,6 +7,7 @@ parameters to get users endpoint
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
+* [OLMIS-2419](https://openlmis.atlassian.net/browse/OLMIS-2419): Supervisory Node name is now required and facility is not required.
 
 9.0.0 / 2017-11-09
 ==================

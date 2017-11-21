@@ -16,19 +16,16 @@
 package org.openlmis.referencedata.domain;
 
 import lombok.AllArgsConstructor;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -49,7 +46,7 @@ public class SupervisoryNode extends BaseEntity {
   @Setter
   private String code;
 
-  @Column(columnDefinition = "text")
+  @Column(nullable = false, columnDefinition = "text")
   @Getter
   @Setter
   private String name;
@@ -60,7 +57,7 @@ public class SupervisoryNode extends BaseEntity {
   private String description;
 
   @ManyToOne
-  @JoinColumn(nullable = false, name = "facilityid")
+  @JoinColumn(name = "facilityid")
   @Getter
   @Setter
   private Facility facility;
@@ -80,7 +77,8 @@ public class SupervisoryNode extends BaseEntity {
   @Setter
   private RequisitionGroup requisitionGroup;
 
-  private SupervisoryNode(String code, Facility facility) {
+  private SupervisoryNode(String name, String code, Facility facility) {
+    this.name = name;
     this.code = code;
     this.facility = facility;
     this.childNodes = new HashSet<>();
@@ -92,8 +90,8 @@ public class SupervisoryNode extends BaseEntity {
    * @param facility facility associated with this supervisory node
    * @return a new SupervisoryNode
    */
-  public static SupervisoryNode newSupervisoryNode(String code, Facility facility) {
-    return new SupervisoryNode(code, facility);
+  public static SupervisoryNode newSupervisoryNode(String name, String code, Facility facility) {
+    return new SupervisoryNode(name, code, facility);
   }
 
   /**
@@ -108,9 +106,9 @@ public class SupervisoryNode extends BaseEntity {
       facility = Facility.newFacility(importer.getFacility());
     }
 
-    SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getCode(), facility);
+    SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getName(),
+        importer.getCode(), facility);
     newSupervisoryNode.id = importer.getId();
-    newSupervisoryNode.name = importer.getName();
     newSupervisoryNode.description = importer.getDescription();
 
     if (importer.getParentNode() != null) {

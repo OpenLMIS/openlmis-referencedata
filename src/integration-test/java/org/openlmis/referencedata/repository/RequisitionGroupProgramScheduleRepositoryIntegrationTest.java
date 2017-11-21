@@ -127,7 +127,7 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     facility.setEnabled(true);
     facilityRepository.save(facility);
 
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(code, facility);
+    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("node", code, facility);
     supervisoryNodeRepository.save(supervisoryNode);
 
     requisitionGroup = new RequisitionGroup(code, code, supervisoryNode);
