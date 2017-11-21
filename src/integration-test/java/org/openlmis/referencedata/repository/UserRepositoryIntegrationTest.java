@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.repository;
 
-
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -55,6 +54,7 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -323,7 +323,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Right right = saveNewRight("right", SUPERVISION);
     Role role = saveNewRole("role", right);
     Program program = saveNewProgram("P1");
-    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("node1", "SN1", generateFacility(10));
+    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
 
     User supervisingUser = repository.findOneByUsername(USER_1);
     supervisingUser = assignRoleToUser(supervisingUser,
@@ -344,7 +344,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Right supervisionRight = saveNewRight("supervisionRight", SUPERVISION);
     Role supervisionRole = saveNewRole("supervisionRole", supervisionRight);
     Program program = saveNewProgram("P1");
-    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("node1", "SN1", generateFacility(10));
+    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
 
     User supervisingUser = repository.findOneByUsername(USER_1);
     assignRoleToUser(supervisingUser, new SupervisionRoleAssignment(
@@ -495,8 +495,12 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     return programRepository.save(program);
   }
 
-  private SupervisoryNode saveNewSupervisoryNode(String name, String code, Facility facility) {
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(name, code, facility);
+  private SupervisoryNode saveNewSupervisoryNode(String code, Facility facility) {
+    SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withCode(code)
+        .withFacility(facility)
+        .withoutId()
+        .build();
     return supervisoryNodeRepository.save(supervisoryNode);
   }
 

@@ -56,8 +56,6 @@ import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
@@ -79,6 +77,9 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.service.UserSearchParams;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
@@ -167,7 +168,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
    */
   public UserControllerIntegrationTest() {
     homeFacilityId = UUID.randomUUID();
-    homeFacility = generateFacility(HOME_FACILITY_CODE);
+    homeFacility = new FacilityDataBuilder().withCode(HOME_FACILITY_CODE).build();
     homeFacility.setId(homeFacilityId);
 
     userId = UUID.randomUUID();
@@ -1395,42 +1396,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .createUser();
   }
 
-  private Facility generateFacility(String facilityCode) {
-    FacilityType facilityType = generateFacilityType();
-    Facility facility = new Facility(facilityCode);
-    facility.setId(UUID.randomUUID());
-    facility.setType(facilityType);
-    GeographicLevel geographicLevel = generateGeographicLevel();
-    GeographicZone geographicZone = generateGeographicZone(geographicLevel);
-    facility.setGeographicZone(geographicZone);
-    Integer instanceNumber = +generateInstanceNumber();
-    facility.setName("FacilityName" + instanceNumber);
-    facility.setDescription("FacilityDescription" + instanceNumber);
-    facility.setActive(true);
-    facility.setEnabled(true);
-    return facility;
-  }
-
-  private GeographicLevel generateGeographicLevel() {
-    GeographicLevel geographicLevel = new GeographicLevel();
-    geographicLevel.setCode("GeographicLevel" + generateInstanceNumber());
-    geographicLevel.setLevelNumber(1);
-    return geographicLevel;
-  }
-
-  private GeographicZone generateGeographicZone(GeographicLevel geographicLevel) {
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode("GeographicZone" + generateInstanceNumber());
-    geographicZone.setLevel(geographicLevel);
-    return geographicZone;
-  }
-
-  private FacilityType generateFacilityType() {
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode("FacilityType" + generateInstanceNumber());
-    return facilityType;
-  }
-
   private static Integer generateInstanceNumber() {
     currentInstanceNumber += 1;
     return currentInstanceNumber;
@@ -1456,11 +1421,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     program2Id = UUID.randomUUID();
     supervisionRightId = UUID.randomUUID();
     supervisionRight.setId(supervisionRightId);
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("node", SUPERVISORY_NODE_CODE,
-        generateFacility("F1"));
+    supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(new FacilityDataBuilder().build())
+        .withCode(SUPERVISORY_NODE_CODE)
+        .build();
     RequisitionGroup supervisionGroup = new RequisitionGroup("SGC", "SGN", supervisoryNode);
-    supervisionGroup.setMemberFacilities(newHashSet(generateFacility("F2"),
-        generateFacility("F3")));
+    supervisionGroup.setMemberFacilities(newHashSet(
+        new FacilityDataBuilder().build(),
+        new FacilityDataBuilder().build()));
     addSupportedPrograms(supervisionGroup, program2);
     RequisitionGroupProgramSchedule supervisionGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
@@ -1477,7 +1445,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     FacilityType warehouseType = new FacilityType("warehouse");
     warehouse = new Facility(WAREHOUSE_CODE);
     warehouse.setType(warehouseType);
-    warehouse.setGeographicZone(generateGeographicZone(generateGeographicLevel()));
+    warehouse.setGeographicZone(new GeographicZoneDataBuilder().build());
     warehouse.setActive(true);
     warehouse.setEnabled(true);
 

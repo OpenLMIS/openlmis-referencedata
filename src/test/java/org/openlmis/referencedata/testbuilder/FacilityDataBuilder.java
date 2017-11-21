@@ -98,6 +98,14 @@ public class FacilityDataBuilder {
   }
 
   /**
+   * Adds code for new {@link Facility}.
+   */
+  public FacilityDataBuilder withCode(String code) {
+    this.code = code;
+    return this;
+  }
+
+  /**
    * Adds supported program for new {@link Facility}.
    */
   public FacilityDataBuilder withSupportedProgram(Program program) {

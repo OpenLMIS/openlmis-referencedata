@@ -61,6 +61,14 @@ public class SupervisoryNodeDataBuilder {
   }
 
   /**
+   * Sets id with null value for new {@link SupervisoryNode}.
+   */
+  public SupervisoryNodeDataBuilder withoutId() {
+    this.id = null;
+    return this;
+  }
+
+  /**
    * Sets facility for new {@link SupervisoryNode}.
    */
   public SupervisoryNodeDataBuilder withFacility(Facility facility) {

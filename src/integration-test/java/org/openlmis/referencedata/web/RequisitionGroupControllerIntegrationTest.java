@@ -52,6 +52,7 @@ import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
@@ -95,7 +96,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     facility.setType(facilityType);
     facility.setOperator(facilityOperator);
 
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("node", "SN1", facility);
+    supervisoryNode = new SupervisoryNodeDataBuilder().withFacility(facility).build();
     supervisoryNode.setId(UUID.randomUUID());
 
     program = new Program("PRO-1");

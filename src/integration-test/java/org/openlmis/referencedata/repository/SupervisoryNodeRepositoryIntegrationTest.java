@@ -22,6 +22,7 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
@@ -79,9 +80,10 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
 
   @Override
   SupervisoryNode generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
-    return SupervisoryNode.newSupervisoryNode("node " + instanceNumber,
-        "Code #" + instanceNumber, facility);
+    return new SupervisoryNodeDataBuilder()
+        .withoutId()
+        .withFacility(facility)
+        .build();
   }
 
   @Test(expected = DataIntegrityViolationException.class)

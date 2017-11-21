@@ -17,11 +17,6 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FORMAT_NOT_ALLOWED;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-import javax.servlet.http.HttpServletResponse;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
@@ -59,6 +54,11 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @Transactional

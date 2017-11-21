@@ -85,16 +85,6 @@ public class SupervisoryNode extends BaseEntity {
   }
 
   /**
-   * Create a new supervisory node.
-   *
-   * @param facility facility associated with this supervisory node
-   * @return a new SupervisoryNode
-   */
-  public static SupervisoryNode newSupervisoryNode(String name, String code, Facility facility) {
-    return new SupervisoryNode(name, code, facility);
-  }
-
-  /**
    * Static factory method for constructing a new supervisory node using an importer (DTO).
    *
    * @param importer the supervisory node importer (DTO)

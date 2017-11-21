@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 
 import java.util.Collections;
 import java.util.Set;
@@ -40,7 +41,7 @@ public class SupervisoryNodeTest {
   public void setUp() {
     program = new Program("P1");
     facility2 = new Facility("C2");
-    supervisoryNode1 = SupervisoryNode.newSupervisoryNode("node", "SN1", new Facility("C1"));
+    supervisoryNode1 = new SupervisoryNodeDataBuilder().build();
     requisitionGroup1 = new RequisitionGroup("RG1", "RGN1", supervisoryNode1);
     requisitionGroup1.setMemberFacilities(Sets.newHashSet(facility2, new Facility("C3")));
     addSupportedPrograms(requisitionGroup1);
@@ -65,8 +66,7 @@ public class SupervisoryNodeTest {
   @Test
   public void shouldGetAllIndirectSupervisedFacilities() {
     //given
-    SupervisoryNode supervisoryNode2 =
-        SupervisoryNode.newSupervisoryNode("node", "SN2", new Facility("C4"));
+    SupervisoryNode supervisoryNode2 = new SupervisoryNodeDataBuilder().build();
     RequisitionGroup requisitionGroup2 = new RequisitionGroup("RG2", "RGN2", supervisoryNode2);
     requisitionGroup2.setMemberFacilities(Sets.newHashSet(new Facility("C5")));
     addSupportedPrograms(requisitionGroup2);

@@ -58,6 +58,7 @@ import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
@@ -105,7 +106,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     facility.setOperator(facilityOperator);
     facility.setEnabled(true);
 
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("node", "supervisoryNodeCode", facility);
+    supervisoryNode = new SupervisoryNodeDataBuilder().withoutId().withFacility(facility).build();
     supervisoryNodeDto = new SupervisoryNodeDto();
     supervisoryNode.export(supervisoryNodeDto);
     supervisoryNodeId = UUID.randomUUID();
@@ -325,7 +326,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldGetAllSupervisoryNodes() {
 
     List<SupervisoryNode> storedSupervisoryNodes = Arrays.asList(supervisoryNode,
-        SupervisoryNode.newSupervisoryNode("node", "SN2", new Facility("F2")));
+        new SupervisoryNodeDataBuilder().withCode("SN2").build());
     given(supervisoryNodeRepository.findAll()).willReturn(storedSupervisoryNodes);
 
     SupervisoryNodeDto[] response = restAssured

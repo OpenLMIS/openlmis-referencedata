@@ -25,6 +25,7 @@ import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 import com.google.common.collect.Sets;
 import java.util.UUID;
 import org.junit.Test;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 
 import java.util.Collections;
 import java.util.Set;
@@ -59,7 +60,7 @@ public class SupervisionRoleAssignmentTest {
 
     homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, user, program);
 
-    supervisoryNode = SupervisoryNode.newSupervisoryNode("node", "SN1", new Facility("F2"));
+    supervisoryNode = new SupervisoryNodeDataBuilder().build();
     RequisitionGroup requisitionGroup = new RequisitionGroup("RG1", "RGN1", supervisoryNode);
     supervisedFacility = new Facility("F2");
     SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(

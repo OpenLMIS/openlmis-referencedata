@@ -35,6 +35,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 
@@ -127,7 +128,9 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     facility.setEnabled(true);
     facilityRepository.save(facility);
 
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode("node", code, facility);
+    SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .build();
     supervisoryNodeRepository.save(supervisoryNode);
 
     requisitionGroup = new RequisitionGroup(code, code, supervisoryNode);
