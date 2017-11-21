@@ -90,5 +90,15 @@ public class SupervisoryNodeValidatorTest {
     assertErrorMessage(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
   }
 
+  @Test
+  public void shouldRejectIfNameIsNull() {
+    new SupervisoryNodeDataBuilder()
+        .withoutCode()
+        .build()
+        .export(dto);
 
+    validator.validate(dto, errors);
+
+    assertErrorMessage(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_REQUIRED);
+  }
 }

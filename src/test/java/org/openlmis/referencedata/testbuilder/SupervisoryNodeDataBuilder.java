@@ -95,4 +95,24 @@ public class SupervisoryNodeDataBuilder {
   public SupervisoryNodeDataBuilder withoutCode() {
     return withCode(null);
   }
+
+  /**
+   * Sets name for new {@link SupervisoryNode}.
+   *
+   * @param name the name to be set
+   * @return the builder instance
+   */
+  public SupervisoryNodeDataBuilder withName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Sets the name to null for new {@link SupervisoryNode}.
+   *
+   * @return the builder instance
+   */
+  public SupervisoryNodeDataBuilder withoutName() {
+    return withName(null);
+  }
 }

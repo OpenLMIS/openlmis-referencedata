@@ -30,6 +30,7 @@ import org.springframework.validation.Validator;
 public class SupervisoryNodeValidator implements BaseValidator {
 
   private static final String CODE = "code";
+  private static final String NAME = "name";
 
   @Autowired
   private SupervisoryNodeRepository repository;
@@ -59,6 +60,7 @@ public class SupervisoryNodeValidator implements BaseValidator {
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors, SupervisoryNodeMessageKeys.ERROR_NULL);
     rejectIfEmptyOrWhitespace(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, NAME, SupervisoryNodeMessageKeys.ERROR_NAME_REQUIRED);
 
     SupervisoryNodeDto node = (SupervisoryNodeDto) target;
 
@@ -66,5 +68,4 @@ public class SupervisoryNodeValidator implements BaseValidator {
       rejectValue(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
     }
   }
-
 }
