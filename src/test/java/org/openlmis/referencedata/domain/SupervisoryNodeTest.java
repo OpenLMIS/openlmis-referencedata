@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -24,11 +25,13 @@ import com.google.common.collect.Sets;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 
 import java.util.Collections;
 import java.util.Set;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisoryNodeTest {
 
   private SupervisoryNode supervisoryNode1;
@@ -52,6 +55,36 @@ public class SupervisoryNodeTest {
     requisitionGroup1.setRequisitionGroupProgramSchedules(
         Collections.singletonList(requisitionGroupProgramSchedule1));
     supervisoryNode1.setRequisitionGroup(requisitionGroup1);
+  }
+
+  @Test
+  public void shouldExportInstance() throws Exception {
+    SupervisoryNodeDto dto = new SupervisoryNodeDto();
+    supervisoryNode1.export(dto);
+
+    assertThat(dto.getId(), equalTo(supervisoryNode1.getId()));
+    assertThat(dto.getCode(), equalTo(supervisoryNode1.getCode()));
+    assertThat(dto.getName(), equalTo(supervisoryNode1.getName()));
+    assertThat(dto.getDescription(), equalTo(supervisoryNode1.getDescription()));
+    assertThat(dto.getFacility().getId(), equalTo(supervisoryNode1.getFacility().getId()));
+    assertThat(
+        dto.getRequisitionGroup().getId(),
+        equalTo(supervisoryNode1.getRequisitionGroup().getId())
+    );
+  }
+
+  @Test
+  public void shouldCreateInstanceFromImporter() throws Exception {
+    SupervisoryNodeDto dto = new SupervisoryNodeDto();
+    supervisoryNode1.export(dto);
+
+    SupervisoryNode sn = SupervisoryNode.newSupervisoryNode(dto);
+    assertThat(sn.getId(), equalTo(dto.getId()));
+    assertThat(sn.getCode(), equalTo(dto.getCode()));
+    assertThat(sn.getName(), equalTo(dto.getName()));
+    assertThat(sn.getDescription(), equalTo(dto.getDescription()));
+    assertThat(sn.getFacility().getId(), equalTo(dto.getFacility().getId()));
+    assertThat(sn.getRequisitionGroup().getId(), equalTo(dto.getRequisitionGroup().getId()));
   }
 
   @Test

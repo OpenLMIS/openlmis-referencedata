@@ -108,6 +108,7 @@ public class SupervisoryNode extends BaseEntity {
 
     SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getCode(), importer.getName(),
         importer.getDescription(), facility, parentNode, childNodes, requisitionGroup);
+    newSupervisoryNode.setId(importer.getId());
 
     return newSupervisoryNode;
   }
