@@ -138,13 +138,17 @@ public class FacilityController extends BaseController {
   /**
    * Get all facilities with minimal representation (id, name).
    *
+   * @param pageable A Pageable object that allows client to optionally add "page" (page number)
+   *             and "size" (page size) query parameters to the request.
    * @return Facilities.
    */
   @RequestMapping(value = RESOURCE_PATH + "/minimal", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<MinimalFacilityDto> getMinimalFacilities() {
-    return toMinimalDto(facilityRepository.findAll());
+  public Page<MinimalFacilityDto> getMinimalFacilities(Pageable pageable) {
+    Page<Facility> facilities = facilityRepository.findAll(pageable);
+    List<MinimalFacilityDto> minimalFacilities = toMinimalDto(facilities.getContent());
+    return Pagination.getPage(minimalFacilities, pageable);
   }
 
 
