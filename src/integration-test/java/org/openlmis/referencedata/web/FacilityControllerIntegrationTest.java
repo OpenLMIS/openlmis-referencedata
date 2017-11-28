@@ -55,7 +55,10 @@ import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
@@ -451,19 +454,20 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getAllShouldGetAllFacilitiesWithMinimalRepresentation() {
     List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
-    given(facilityRepository.findAll()).willReturn(storedFacilities);
+    given(facilityRepository.findAll(any(Pageable.class))).willReturn(
+        Pagination.getPage(storedFacilities));
 
-    MinimalFacilityDto[] response = restAssured
+    Page<MinimalFacilityDto> response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(MINIMAL_URL)
         .then()
         .statusCode(200)
-        .extract().as(MinimalFacilityDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    List<MinimalFacilityDto> facilities = Arrays.asList(response);
-    assertThat(facilities.size(), is(2));
+    assertEquals(storedFacilities.size(), response.getContent().size());
+    assertEquals(storedFacilities.size(), response.getNumberOfElements());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     verifyZeroInteractions(rightService);
   }

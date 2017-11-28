@@ -4,6 +4,7 @@
 Breaking changes:
 * [OLMIS-3600](https://openlmis.atlassian.net/browse/OLMIS-3600): Paginate and add get by ids
 parameters to get users endpoint
+* [OLMIS-3448](https://openlmis.atlassian.net/browse/OLMIS-3448): Paginate minimal facilities endpoint
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id

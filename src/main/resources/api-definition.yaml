@@ -70,11 +70,7 @@ schemas:
 
   - minimalFacilityDto: !include schemas/minimalFacilityDto.json
 
-  - minimalFacilityArray: |
-        {
-            "type": "array",
-            "items": { "type": "object", "$ref":"schemas/minimalFacilityDto.json" }
-        }
+  - minimalFacilityDtoPage: !include schemas/minimalFacilityDtoPage.json
 
   - namedResourceArray: |
       {
@@ -1724,7 +1720,7 @@ resourceTypes:
                   200:
                       body:
                         application/json:
-                            schema: minimalFacilityArray
+                            schema: minimalFacilityDtoPage
       /byBoundary:
           post:
               is: [ secured, paginated ]
