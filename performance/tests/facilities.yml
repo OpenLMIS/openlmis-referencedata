@@ -277,3 +277,18 @@ scenarios:
           Content-Type: application/json
         body:
           type: "health_center"
+
+reporting:
+    - module: passfail
+      criteria:
+        Create Facility too slow: p90 of CreateFacility>500ms
+        Get All Minimal Facilities too slow: p90 of GetAllMinimalFacilities>500ms
+        Get Facility Audit Log too slow: p90 of GetFacilityAuditLog>500ms
+        Update Facility too slow: p90 of UpdateFacility>500ms
+        Get Facility too slow: p90 of GetFacility>500ms
+        Get Facilities By Boundary too slow: p90 of GetFacilitiesByBoundary>500ms
+        Delete Facility too slow: p90 of DeleteFacility>500ms
+        Get Supplying Facilities too slow: p90 of GetSupplyingFacilities>500ms
+        Get All Facilities too slow: p90 of GetAllFacilities>500ms
+        Find All Health Center Facilities too slow: p90 of FindAllHealthCenterFacilities>500ms
+        Find First Ten Health Center Facilities too slow: p90 of FindFirstTenHealthCenterFacilities>500ms
