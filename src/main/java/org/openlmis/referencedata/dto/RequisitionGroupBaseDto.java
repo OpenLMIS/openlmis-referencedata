@@ -98,11 +98,11 @@ public class RequisitionGroupBaseDto extends BaseDto implements RequisitionGroup
       return false;
     }
     RequisitionGroupBaseDto that = (RequisitionGroupBaseDto) obj;
-    return Objects.equals(id, that.id) && Objects.equals(code, that.code);
+    return Objects.equals(getId(), that.getId()) && Objects.equals(code, that.code);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, code);
+    return Objects.hash(getId(), code);
   }
 }

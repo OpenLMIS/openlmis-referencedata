@@ -56,7 +56,7 @@ public class SupportedProgramDto extends BaseDto implements SupportedProgram.Exp
 
   @Override
   public void setProgram(Program program) {
-    id = program.getId();
+    setId(program.getId());
     code = program.getCode().toString();
     name = program.getName();
     description = program.getDescription();

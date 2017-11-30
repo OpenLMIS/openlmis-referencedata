@@ -25,7 +25,9 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -54,6 +56,16 @@ public abstract class BaseController {
 
   @Resource(name = "javersProvider")
   private Javers javers;
+
+  protected void checkAdminRight(String rightName, Profiler profiler) {
+    profiler.start("CHECK_ADMIN");
+    rightService.checkAdminRight(rightName);
+  }
+
+  protected <T> Page<T> toPage(List<T> originalList, Pageable pageable, Profiler profiler) {
+    profiler.start("CREATE_PAGE");
+    return Pagination.getPage(originalList, pageable);
+  }
 
   protected ResponseEntity<String> getAuditLogResponse(Class type, UUID id, String author,
                                                        String changedPropertyName,

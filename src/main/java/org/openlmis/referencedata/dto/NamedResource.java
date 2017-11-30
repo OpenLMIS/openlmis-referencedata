@@ -30,7 +30,7 @@ public class NamedResource extends BaseDto {
   private String name;
   
   public NamedResource(UUID id, String name) {
-    this.id = id;
+    super(id);
     this.name = name;
   }
 }

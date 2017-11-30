@@ -17,14 +17,7 @@ package org.openlmis.referencedata.web;
 
 
 import com.vividsolutions.jts.geom.Polygon;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -48,7 +41,6 @@ import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
@@ -73,6 +65,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @Transactional
@@ -118,37 +118,55 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public FacilityDto createFacility(@RequestBody FacilityDto facilityDto,
                                     BindingResult bindingResult) {
+    Profiler profiler = new Profiler("CREATE_FACILITY");
+    profiler.setLogger(LOGGER);
 
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
+    profiler.start("VALIDATE_FACILITY_DTO");
     facilityValidator.validate(facilityDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
     LOGGER.debug("Creating new facility");
+    profiler.start("IMPORT_FACILITY_FROM_DTO");
     facilityDto.setId(null);
     Facility newFacility = Facility.newFacility(facilityDto);
 
+    profiler.start("ADD_SUPPORTED_PROGRAMS");
     addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(), newFacility);
 
+    profiler.start("SAVE");
     newFacility = facilityRepository.save(newFacility);
     LOGGER.debug("Created new facility with id: ", facilityDto.getId());
-    return toDto(newFacility);
+
+    FacilityDto dto = toDto(newFacility, profiler);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**
    * Get all facilities with minimal representation (id, name).
    *
-   * @param pageable A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
+   * @param pageable A Pageable object that allows client to optionally add "page" (page number) and
+   *                 "size" (page size) query parameters to the request.
    * @return Facilities.
    */
   @RequestMapping(value = RESOURCE_PATH + "/minimal", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<MinimalFacilityDto> getMinimalFacilities(Pageable pageable) {
+    Profiler profiler = new Profiler("GET_MINIMAL_FACILITIES");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("FIND_ALL");
     Page<Facility> facilities = facilityRepository.findAll(pageable);
-    List<MinimalFacilityDto> minimalFacilities = toMinimalDto(facilities.getContent());
-    return Pagination.getPage(minimalFacilities, pageable);
+
+    List<MinimalFacilityDto> minimalFacilities = toMinimalDto(facilities.getContent(), profiler);
+    Page<MinimalFacilityDto> page = toPage(minimalFacilities, pageable, profiler);
+
+    profiler.stop().log();
+    return page;
   }
 
 
@@ -173,17 +191,21 @@ public class FacilityController extends BaseController {
           @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
                         boolean returnJson,
           Pageable page) {
+    Profiler profiler = new Profiler("GET_AUDIT_LOG");
+    profiler.setLogger(LOGGER);
 
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
     //Return a 404 if the specified facility can't be found
-    Facility facility = facilityRepository.findOne(id);
-    if (facility == null) {
-      throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
-    }
+    findFacility(id, profiler);
 
-    return getAuditLogResponse(Facility.class, id, author, changedPropertyName, page,
-        returnJson);
+    profiler.start("GET_AUDIT_LOG");
+    ResponseEntity<String> response = getAuditLogResponse(
+        Facility.class, id, author, changedPropertyName, page, returnJson
+    );
+
+    profiler.stop().log();
+    return response;
   }
 
 
@@ -205,8 +227,7 @@ public class FacilityController extends BaseController {
     Profiler profiler = new Profiler("UPDATE_FACILITY");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
     profiler.start("VALIDATE_FACILITY_DTO");
     facilityValidator.validate(facilityDto, bindingResult);
@@ -226,9 +247,8 @@ public class FacilityController extends BaseController {
     rightAssignmentService.regenerateRightAssignments();
 
     LOGGER.info("Saved facility with id: {}", facilityToSave.getId());
-    profiler.start("EXPORT_FACILITY_TO_DTO");
-    FacilityDto dto = toDto(facilityToSave);
-    
+    FacilityDto dto = toDto(facilityToSave, profiler);
+
     profiler.stop().log();
     return dto;
   }
@@ -243,12 +263,14 @@ public class FacilityController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityDto getFacility(@PathVariable("id") UUID facilityId) {
-    Facility facility = facilityRepository.findOne(facilityId);
-    if (facility == null) {
-      throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      return toDto(facility);
-    }
+    Profiler profiler = new Profiler("GET_FACILITY");
+    profiler.setLogger(LOGGER);
+
+    Facility facility = findFacility(facilityId, profiler);
+    FacilityDto dto = toDto(facility, profiler);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**
@@ -283,8 +305,7 @@ public class FacilityController extends BaseController {
     Collection<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
         .searchProducts(facility.getType().getId(), programId, fullSupply);
 
-    profiler.start("CONVERT_TO_DTO");
-    List<ApprovedProductDto> list = toDto(products);
+    List<ApprovedProductDto> list = toDto(products, profiler);
 
     profiler.stop().log();
     return list;
@@ -306,16 +327,13 @@ public class FacilityController extends BaseController {
     profiler.setLogger(LOGGER);
 
     profiler.start("CHECK_ADMIN_RIGHT");
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
     profiler.start("DB_CALL");
     List<Facility> foundFacilities = facilityRepository.findByBoundary(boundary);
 
-    profiler.start("CONVERT_TO_DTO");
-    List<FacilityDto> facilityDtos = toDto(foundFacilities);
-
-    profiler.start("CREATE_PAGE");
-    Page<FacilityDto> page = Pagination.getPage(facilityDtos, pageable);
+    List<FacilityDto> facilityDtos = toDto(foundFacilities, profiler);
+    Page<FacilityDto> page = toPage(facilityDtos, pageable, profiler);
 
     profiler.stop().log();
     return page;
@@ -329,15 +347,15 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacility(@PathVariable("id") UUID facilityId) {
+    Profiler profiler = new Profiler("DELETE_FACILITY");
+    profiler.setLogger(LOGGER);
 
-    rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
-    Facility facility = facilityRepository.findOne(facilityId);
-    if (facility == null) {
-      throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      facilityRepository.delete(facility);
-    }
+    Facility facility = findFacility(facilityId, profiler);
+
+    profiler.start("DELETE_FACILITY");
+    facilityRepository.delete(facility);
   }
 
   /**
@@ -353,23 +371,41 @@ public class FacilityController extends BaseController {
   public List<FacilityDto> getSupplyingDepots(
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
+    Profiler profiler = new Profiler("GET_SUPPLYING_DEPOTS");
+    profiler.setLogger(LOGGER);
 
+    profiler.start("FIND_PROGRAM");
     Program program = programRepository.findOne(programId);
+
+    profiler.start("FIND_SUPERVISORY_NODE");
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
 
     if (program == null) {
+      profiler.stop().log();
       throw new ValidationMessageException(
           new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
+
     if (supervisoryNode == null) {
+      profiler.stop().log();
       throw new ValidationMessageException(
           new Message(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_ID, supervisoryNodeId));
     }
 
+    profiler.start("SEARCH_SUPPLY_LINES");
     List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, supervisoryNode);
-    List<Facility> facilities = supplyLines.stream()
-        .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
-    return toDto(facilities);
+
+    profiler.start("RETRIEVE_SUPPLYING_FACILITIES");
+    List<Facility> facilities = supplyLines
+        .stream()
+        .map(SupplyLine::getSupplyingFacility)
+        .distinct()
+        .collect(Collectors.toList());
+
+    List<FacilityDto> dto = toDto(facilities, profiler);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**
@@ -384,8 +420,16 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public List<FacilityDto> getFacilities(
       @RequestParam MultiValueMap<String, Object> requestParams) {
+    Profiler profiler = new Profiler("GET_FACILITIES");
+    profiler.setLogger(LOGGER);
 
-    return toDto(facilityService.getFacilities(requestParams));
+    profiler.start("FIND_FACILITIES");
+    List<Facility> facilities = facilityService.getFacilities(requestParams);
+
+    List<FacilityDto> dto = toDto(facilities, profiler);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**
@@ -407,31 +451,42 @@ public class FacilityController extends BaseController {
     profiler.start("SERVICE_SEARCH");
     List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
 
-    profiler.start("CONVERT_TO_DTO");
-    List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities);
-
-    profiler.start("CREATE_PAGE");
-    Page<BasicFacilityDto> page = Pagination.getPage(facilityDtos, pageable);
+    List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities, profiler);
+    Page<BasicFacilityDto> page = toPage(facilityDtos, pageable, profiler);
 
     profiler.stop().log();
     return page;
   }
 
-  private FacilityDto toDto(Facility facility) {
-    FacilityDto dto = new FacilityDto();
-    facility.export(dto);
+  private Facility findFacility(UUID id, Profiler profiler) {
+    profiler.start("FIND_FACILITY");
+    Facility facility = facilityRepository.findOne(id);
 
-    return dto;
+    if (facility == null) {
+      profiler.stop().log();
+      throw new NotFoundException(FacilityMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    return facility;
   }
 
-  private List<FacilityDto> toDto(List<Facility> facilities) {
+  private FacilityDto toDto(Facility facility, Profiler profiler) {
+    profiler.start("EXPORT_FACILITY_TO_DTO");
+    return FacilityDto.newInstance(facility);
+  }
+
+  private List<FacilityDto> toDto(List<Facility> facilities, Profiler profiler) {
+    profiler.start("EXPORT_FACILITIES_TO_DTO");
     return facilities
         .stream()
-        .map(this::toDto)
+        .map(FacilityDto::newInstance)
         .collect(Collectors.toList());
   }
 
-  private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> products) {
+  private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> products,
+                                         Profiler profiler) {
+    profiler.start("EXPORT_PRODUCTS_TO_DTO");
+
     List<ApprovedProductDto> productDtos = new ArrayList<>();
     for (FacilityTypeApprovedProduct product : products) {
       ApprovedProductDto productDto = new ApprovedProductDto();
@@ -442,31 +497,19 @@ public class FacilityController extends BaseController {
     return productDtos;
   }
 
-  private MinimalFacilityDto toMinimalDto(Facility facility) {
-    MinimalFacilityDto dto = new MinimalFacilityDto();
-    facility.export(dto);
-
-    return dto;
-  }
-
-  private List<MinimalFacilityDto> toMinimalDto(Iterable<Facility> facilities) {
-    return StreamSupport
-        .stream(facilities.spliterator(), false)
-        .map(this::toMinimalDto)
+  private List<MinimalFacilityDto> toMinimalDto(List<Facility> facilities, Profiler profiler) {
+    profiler.start("EXPORT_FACILITIES_TO_MINIMAL_DTO");
+    return facilities
+        .stream()
+        .map(MinimalFacilityDto::newInstance)
         .collect(Collectors.toList());
   }
 
-  private BasicFacilityDto toBasicDto(Facility facility) {
-    BasicFacilityDto dto = new BasicFacilityDto();
-    facility.export(dto);
-
-    return dto;
-  }
-
-  private List<BasicFacilityDto> toBasicDto(Iterable<Facility> facilities) {
-    return StreamSupport
-        .stream(facilities.spliterator(), false)
-        .map(this::toBasicDto)
+  private List<BasicFacilityDto> toBasicDto(List<Facility> facilities, Profiler profiler) {
+    profiler.start("EXPORT_FACILITIES_TO_BASIC_DTO");
+    return facilities
+        .stream()
+        .map(BasicFacilityDto::newInstance)
         .collect(Collectors.toList());
   }
 

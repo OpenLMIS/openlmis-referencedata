@@ -17,35 +17,20 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Objects;
 import java.util.UUID;
 
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class BaseDto {
-  
-  @Getter
-  @Setter
-  protected UUID id;
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-
-    if (!(obj instanceof BaseDto)) {
-      return false;
-    }
-
-    BaseDto that = (BaseDto) obj;
-    return Objects.equals(id, that.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return id != null ? id.hashCode() : 0;
-  }
+  private UUID id;
 }

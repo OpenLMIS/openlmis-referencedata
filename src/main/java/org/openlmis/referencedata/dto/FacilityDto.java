@@ -23,13 +23,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupportedProgram;
 
 @NoArgsConstructor
@@ -37,18 +36,13 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
-public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.Importer {
-  private String code;
-  private String name;
+@EqualsAndHashCode(callSuper = true)
+public final class FacilityDto extends BasicFacilityDto {
   private String description;
-  private GeographicZoneSimpleDto geographicZone;
-  private FacilityTypeDto type;
   private FacilityOperatorDto operator;
-  private Boolean active;
   private LocalDate goLiveDate;
   private LocalDate goDownDate;
   private String comment;
-  private Boolean enabled;
   private Boolean openLmisAccessible;
   private Point location;
   private Map<String, String> extraData;
@@ -56,21 +50,18 @@ public class FacilityDto extends BaseDto implements Facility.Exporter, Facility.
   @Getter
   private Set<SupportedProgramDto> supportedPrograms;
 
+  /**
+   * Creates new instance of {@link FacilityDto} based on passed facility.
+   */
+  public static FacilityDto newInstance(Facility facility) {
+    FacilityDto dto = new FacilityDto();
+    facility.export(dto);
+
+    return dto;
+  }
+
   public FacilityDto(UUID id) {
     setId(id);
-  }
-
-  @Override
-  public void setGeographicZone(GeographicZone geographicZone) {
-    this.geographicZone = new GeographicZoneSimpleDto();
-    geographicZone.export(this.geographicZone);
-  }
-
-  @Override
-  public void setType(FacilityType type) {
-    this.type = new FacilityTypeDto();
-    type.export(this.type);
-
   }
 
   @Override

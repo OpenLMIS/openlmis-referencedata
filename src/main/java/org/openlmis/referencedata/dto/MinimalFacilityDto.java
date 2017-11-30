@@ -31,14 +31,24 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
+  @Getter
+  @Setter
   private String name;
+
+  /**
+   * Creates new instance of {@link MinimalFacilityDto} based on passed facility.
+   */
+  public static MinimalFacilityDto newInstance(Facility facility) {
+    MinimalFacilityDto dto = new MinimalFacilityDto();
+    facility.export(dto);
+
+    return dto;
+  }
 
   @Override
   public void setGeographicZone(GeographicZone geographicZone) {

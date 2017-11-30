@@ -15,28 +15,23 @@
 
 package org.openlmis.referencedata.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
-import java.util.UUID;
+import org.junit.Test;
 
-public class ObjectReferenceDto extends BaseDto {
+public class MinimalFacilityDtoTest {
 
-  private static final String SEPARATOR = "/";
-
-  @Getter
-  @Setter
-  private String href;
-
-  /**
-   * Returns new object reference.
-   *
-   * @param path resource path
-   * @param id   object id
-   */
-  public ObjectReferenceDto(String serviceUrl, String path, UUID id) {
-    super(id);
-    this.href = StringUtils.joinWith(SEPARATOR, serviceUrl + path, id);
+  @Test
+  public void euqlasContract() throws Exception {
+    EqualsVerifier
+        .forClass(MinimalFacilityDto.class)
+        .withRedefinedSuperclass()
+        .withRedefinedSubclass(BasicFacilityDto.class)
+        .withRedefinedSubclass(FacilityDto.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
   }
+
+
 }

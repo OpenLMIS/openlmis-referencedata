@@ -117,13 +117,14 @@ public class RequisitionGroupProgramScheduleBaseDto extends BaseDto implements
       return false;
     }
     RequisitionGroupProgramScheduleBaseDto that = (RequisitionGroupProgramScheduleBaseDto) obj;
-    return Objects.equals(id, that.id) && Objects.equals(requisitionGroup, that.requisitionGroup)
+    return Objects.equals(getId(), that.getId())
+        && Objects.equals(requisitionGroup, that.requisitionGroup)
         && Objects.equals(program, that.program)
         && Objects.equals(processingSchedule, that.processingSchedule);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, requisitionGroup, program, processingSchedule);
+    return Objects.hash(getId(), requisitionGroup, program, processingSchedule);
   }
 }

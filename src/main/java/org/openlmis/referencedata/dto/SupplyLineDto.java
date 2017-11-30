@@ -91,13 +91,14 @@ public class SupplyLineDto extends BaseDto implements SupplyLine.Exporter, Suppl
       return false;
     }
     SupplyLineDto that = (SupplyLineDto) obj;
-    return Objects.equals(id, that.id) && Objects.equals(supervisoryNode, that.supervisoryNode)
+    return Objects.equals(getId(), that.getId())
+        && Objects.equals(supervisoryNode, that.supervisoryNode)
         && Objects.equals(program, that.program)
         && Objects.equals(supplyingFacility, that.supplyingFacility);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, supervisoryNode, program, supplyingFacility);
+    return Objects.hash(getId(), supervisoryNode, program, supplyingFacility);
   }
 }

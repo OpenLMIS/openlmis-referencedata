@@ -76,6 +76,7 @@ dependencies {
     testCompile "junit:junit:4.+"
     testCompile "org.powermock:powermock-api-mockito:1.7.+"
     testCompile "org.powermock:powermock-module-junit4:1.7.+"
+    testCompile "nl.jqno.equalsverifier:equalsverifier:2.4"
 }
 
 idea {
