@@ -165,15 +165,22 @@ public class UserController extends BaseController {
   @ResponseBody
   public UserDto saveUser(@RequestBody @Valid UserDto userDto,
                           BindingResult bindingResult) {
+    Profiler profiler = new Profiler("GET_USERS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
+    profiler.start("VALIDATE_USER");
     userValidator.validate(userDto, bindingResult);
     if (bindingResult.hasErrors()) {
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
 
+    profiler.start("CREATE_USER_FROM_DTO");
     User userToSave = User.newUser(userDto);
 
+    profiler.start("ASSIGN_ROLES_TO_USER");
     Set<RoleAssignmentDto> roleAssignmentDtos = userDto.getRoleAssignments();
     if (roleAssignmentDtos != null) {
 
@@ -185,10 +192,15 @@ public class UserController extends BaseController {
 
       assignRolesToUser(roleAssignmentDtos, userToSave);
     }
+
+    profiler.start("SAVE_USER");
     userRepository.save(userToSave);
 
+    profiler.start("TO_DTO");
     UserDto responseDto = exportUserToDto(userToSave);
     addRoleAssignmentIdsToUserDto(responseDto);
+
+    profiler.stop().log();
 
     return responseDto;
   }
@@ -306,14 +318,21 @@ public class UserController extends BaseController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
   public void deleteUser(@PathVariable("userId") UUID userId) {
+    Profiler profiler = new Profiler("DELETE_USER");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
 
+    profiler.start("FIND_USER");
     User user = userRepository.findOne(userId);
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
+      profiler.start("DELETE_USER");
       userRepository.delete(userId);
     }
+    profiler.stop().log();
   }
 
   /**

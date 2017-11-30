@@ -23,6 +23,24 @@ execution:
   - concurrency: 1
     hold-for: 1m
     scenario: users-get-one-supervised-facilities
+  - concurrency: 1
+    hold-for: 1m
+    scenario: create-user
+  - concurrency: 1
+    hold-for: 1m
+    scenario: delete-user
+  - concurrency: 1
+    hold-for: 1m
+    scenario: users-get-one-supported-programs
+  - concurrency: 1
+    hold-for: 1m
+    scenario: users-get-one-fulfillment-facilities
+  - concurrency: 1
+    hold-for: 1m
+    scenario: users-get-one-role-assignments
+  - concurrency: 1
+    hold-for: 1m
+    scenario: users-search-by-right
 
 scenarios:
   get-user-token:
@@ -65,6 +83,42 @@ scenarios:
         headers:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
+  create-user:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users
+        method: PUT
+        label: CreateUser
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonOutput;
+
+            def random = new Random();
+
+            def user = [
+              username: "user" + random.nextInt(),
+              firstName: "first-name",
+              lastName: "last-name",
+              verified: true,
+              active: true
+            ];
+
+            vars.put("user", JsonOutput.toJson(user));
+        body: ${user}
+        extract-jsonpath:
+          user_id: $.id
+  delete-user:
+      requests:
+        - include-scenario: create-user
+        - url: ${__P(base-uri)}/api/users/${user_id}
+          method: DELETE
+          label: DeleteUser
+          headers:
+            Authorization: Bearer ${access_token}
   users-has-right:
     requests:
       - include-scenario: get-user-token
@@ -102,6 +156,14 @@ scenarios:
         label: GetAdministratorUserPrograms
         headers:
           Authorization: Bearer ${access_token}
+  users-get-one-supported-programs:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/supportedPrograms
+        method: GET
+        label: GetAdministratorUserSupportedPrograms
+        headers:
+          Authorization: Bearer ${access_token}
   users-get-one-facilities:
     requests:
       - include-scenario: get-user-token
@@ -119,11 +181,47 @@ scenarios:
         label: GetAdministratorSupervisedFacilities
         headers:
           Authorization: Bearer ${access_token}
+  users-get-one-fulfillment-facilities:
+    requests:
+      - include-scenario: get-user-token
+      # Right = ORDERS_VIEW
+      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/fulfillmentFacilities?rightId=7b2da074-b754-4e49-bad3-2520651e5107
+        method: GET
+        label: GetAdministratorFulfillmentFacilities
+        headers:
+          Authorization: Bearer ${access_token}
+  users-get-one-role-assignments:
+      requests:
+        - include-scenario: get-user-token
+        - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/roleAssignments
+          method: GET
+          label: GetAdministratorRoleAssignments
+          headers:
+            Authorization: Bearer ${access_token}
+  users-search-by-right:
+      requests:
+      # Right = REQUISITION_CREATE
+        - include-scenario: get-user-token
+        - url: ${__P(base-uri)}/api/users/rightSearch?rightId=9ade922b-3523-4582-bef4-a47701f7df14
+          method: GET
+          label: GetUsersByRight
+          headers:
+            Authorization: Bearer ${access_token}
 
 reporting:
     - module: passfail
       criteria:
+        90% of get user fail to get in 500 milliseconds: p90 of GetAdministratorUser>500ms
+        90% of get all users fail to get in 500 milliseconds: p90 of GetAllUsers>500ms
+        90% of get page of 10 users fail to get in 500 milliseconds: p90 of GetAUserPageOfTen>500ms
+        90% of user has right fail to get in 500 milliseconds: p90 of AdministratorUserHasRight>500ms
         90% of get permission strings for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserPermissionStrings>500ms
         90% of get programs for administrator user fail to get in 250 milliseconds: p90 of GetAdministratorUserPrograms>250ms
+        90% of get supported programs for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserSupportedPrograms>500ms
         90% of get facilities for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserFacilities>500ms
         90% of get supervised facilities for administrator user fail to get in 2000 milliseconds: p90 of GetAdministratorSupervisedFacilities>2000ms
+        90% of get fulfillment facilities for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorFulfillmentFacilities>500ms
+        90% of get role assignments for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorRoleAssignments>500ms
+        90% of craete user fail to get in 500 milliseconds: p90 of CreateUser>500ms
+        90% of delete user fail to get in 500 milliseconds: p90 of DeleteUser>500ms
+        90% of users search based on right fail to get in 500 milliseconds: p90 of GetUsersByRight>500ms
