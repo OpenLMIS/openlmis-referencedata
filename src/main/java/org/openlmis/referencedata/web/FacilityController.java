@@ -302,11 +302,23 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public Page<FacilityDto> findFacilitiesByBoundary(@RequestBody Polygon boundary, 
       Pageable pageable) {
+    Profiler profiler = new Profiler("GET_FACILITIES_BY_BOUNDARY");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN_RIGHT");
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
+    profiler.start("DB_CALL");
     List<Facility> foundFacilities = facilityRepository.findByBoundary(boundary);
+
+    profiler.start("CONVERT_TO_DTO");
     List<FacilityDto> facilityDtos = toDto(foundFacilities);
-    return Pagination.getPage(facilityDtos, pageable);
+
+    profiler.start("CREATE_PAGE");
+    Page<FacilityDto> page = Pagination.getPage(facilityDtos, pageable);
+
+    profiler.stop().log();
+    return page;
   }
 
   /**
@@ -402,9 +414,9 @@ public class FacilityController extends BaseController {
     return dto;
   }
 
-  private List<FacilityDto> toDto(Iterable<Facility> facilities) {
-    return StreamSupport
-        .stream(facilities.spliterator(), false)
+  private List<FacilityDto> toDto(List<Facility> facilities) {
+    return facilities
+        .stream()
         .map(this::toDto)
         .collect(Collectors.toList());
   }
