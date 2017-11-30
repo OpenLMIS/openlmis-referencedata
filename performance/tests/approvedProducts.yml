@@ -1,6 +1,6 @@
 execution:
   - concurreny: 1
-    iterations: 10
+    hold-for: 2m
     scenario: approved-products
 
 scenarios:
@@ -20,7 +20,7 @@ scenarios:
             jsonpath: $.access_token
       - url: ${__P(base-uri)}/api/facilities/search
         method: POST
-        label: GetAllFacilities
+        label: FindHealthClinic
         body:
           code: HC01
         headers:
@@ -36,6 +36,11 @@ scenarios:
             vars.put("facuuid", uuid);
       - url: ${__P(base-uri)}/api/facilities/${facuuid}/approvedProducts?fullSupply=true
         method: GET
-        label: GetFacilitiesApprovedFullSupplyProducts
+        label: GetApprovedFullSupplyProductsForHealthClinic
         headers:
           Authorization: Bearer ${access_token}
+
+reporting:
+    - module: passfail
+      criteria:
+        Get Approved Full Supply Products For Health Clinic too slow: p90 of GetApprovedFullSupplyProductsForHealthClinic>500ms

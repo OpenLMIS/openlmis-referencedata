@@ -1,9 +1,9 @@
 execution:
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: full-supply-approved-products
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: non-full-supply-approved-products
 
 scenarios:
@@ -26,7 +26,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=true&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
-        label: GetFacilitiesApprovedFullSupplyProducts
+        label: GetApprovedFullSupplyProductsForDistrictHospital
         headers:
           Authorization: Bearer ${access_token}
   non-full-supply-approved-products:
@@ -34,12 +34,12 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=false&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
-        label: GetFacilitiesApprovedNonFullSupplyProducts
+        label: GetApprovedNonFullSupplyProductsForDistrictHospital
         headers:
           Authorization: Bearer ${access_token}
 
 reporting:
     - module: passfail
       criteria:
-        90% of get facilities approved full supply products fail to get in 1500ms milliseconds: p90 of GetFacilitiesApprovedFullSupplyProducts>1500ms, continue as failed
-        90% of get facilities approved non-full supply products fail to get in 2500ms milliseconds: p90 of GetFacilitiesApprovedNonFullSupplyProducts>2500ms, continue as failed
+        Get Approved Full Supply Products For District Hospital too slow: p90 of GetApprovedFullSupplyProductsForDistrictHospital>500ms
+        Get Approved Non Full Supply Products For District Hospital too slow: p90 of GetApprovedNonFullSupplyProductsForDistrictHospital>500ms
