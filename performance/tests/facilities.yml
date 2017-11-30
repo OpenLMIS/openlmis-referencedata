@@ -17,7 +17,10 @@ execution:
     scenario: facilities-get-one
   - concurrency: 1
     hold-for: 2m
-    scenario: facilities-get-by-boundary
+    scenario: facilities-get-by-boundary-all
+  - concurrency: 1
+    hold-for: 2m
+    scenario: facilities-get-by-boundary-one-page
   - concurrency: 1
     hold-for: 2m
     scenario: facilities-delete-one
@@ -202,12 +205,41 @@ scenarios:
         headers:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
-  facilities-get-by-boundary:
+  facilities-get-by-boundary-all:
     requests:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/facilities/byBoundary
         method: POST
-        label: GetFacilitiesByBoundary
+        label: GetAllFacilitiesByBoundary
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonOutput
+
+            def boundary = [
+              type: "Polygon",
+              coordinates: [
+                [
+                  [ 7.3828125 , -20.13847031245114 ],
+                  [ 44.6484375, -20.13847031245114 ],
+                  [ 44.6484375, -6.664607562172573 ],
+                  [ 7.3828125 , -6.664607562172573 ],
+                  [ 7.3828125 , -20.13847031245114 ]
+                ]
+              ]
+            ]
+
+            vars.put("boundary", JsonOutput.toJson(boundary))
+        body: ${boundary}
+  facilities-get-by-boundary-one-page:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/facilities/byBoundary?page=0&size=10
+        method: POST
+        label: GetFirstTenFacilitiesByBoundary
         headers:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
@@ -286,7 +318,8 @@ reporting:
         Get Facility Audit Log too slow: p90 of GetFacilityAuditLog>500ms
         Update Facility too slow: p90 of UpdateFacility>500ms
         Get Facility too slow: p90 of GetFacility>500ms
-        Get Facilities By Boundary too slow: p90 of GetFacilitiesByBoundary>500ms
+        Get All Facilities By Boundary too slow: p90 of GetAllFacilitiesByBoundary>500ms
+        Get First ten Facilities By Boundary too slow: p90 of GetFirstTenFacilitiesByBoundary>500ms
         Delete Facility too slow: p90 of DeleteFacility>500ms
         Get Supplying Facilities too slow: p90 of GetSupplyingFacilities>500ms
         Get All Facilities too slow: p90 of GetAllFacilities>500ms
