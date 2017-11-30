@@ -5,7 +5,10 @@ execution:
     scenario: facility-create
   - concurrency: 1
     hold-for: 2m
-    scenario: facilities-get-all-minimal
+    scenario: facilities-get-minimal-all
+  - concurrency: 1
+    hold-for: 2m
+    scenario: facilities-get-minimal-one-page
   - concurrency: 1
     hold-for: 2m
     scenario: facilities-get-audit-log
@@ -155,12 +158,21 @@ scenarios:
         body: ${facility}
         extract-jsonpath:
           facility_id: $.id
-  facilities-get-all-minimal:
+  facilities-get-minimal-all:
     requests:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/facilities/minimal
         method: GET
         label: GetAllMinimalFacilities
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+  facilities-get-minimal-one-page:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/facilities/minimal?page=0&size=10
+        method: GET
+        label: GetFirstTenMinimalFacilities
         headers:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
@@ -315,6 +327,7 @@ reporting:
       criteria:
         Create Facility too slow: p90 of CreateFacility>500ms
         Get All Minimal Facilities too slow: p90 of GetAllMinimalFacilities>500ms
+        Get First Ten Minimal Facilities too slow: p90 of GetFirstTenMinimalFacilities>500ms
         Get Facility Audit Log too slow: p90 of GetFacilityAuditLog>500ms
         Update Facility too slow: p90 of UpdateFacility>500ms
         Get Facility too slow: p90 of GetFacility>500ms
