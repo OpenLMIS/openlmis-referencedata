@@ -401,10 +401,20 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public Page<BasicFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
                                                  Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_FACILITIES");
+    profiler.setLogger(LOGGER);
 
+    profiler.start("SERVICE_SEARCH");
     List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
+
+    profiler.start("CONVERT_TO_DTO");
     List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities);
-    return Pagination.getPage(facilityDtos, pageable);
+
+    profiler.start("CREATE_PAGE");
+    Page<BasicFacilityDto> page = Pagination.getPage(facilityDtos, pageable);
+
+    profiler.stop().log();
+    return page;
   }
 
   private FacilityDto toDto(Facility facility) {
