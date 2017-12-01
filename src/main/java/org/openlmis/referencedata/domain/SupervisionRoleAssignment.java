@@ -18,6 +18,12 @@ package org.openlmis.referencedata.domain;
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -26,15 +32,14 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
 @DiscriminatorValue("supervision")
 @NoArgsConstructor
 @TypeName("SupervisionRoleAssignment")
 public class SupervisionRoleAssignment extends RoleAssignment {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionRoleAssignment.class);
 
   @ManyToOne
   @JoinColumn(name = "programid")
@@ -96,17 +101,28 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    */
   @Override
   public boolean hasRight(RightQuery rightQuery) {
-    boolean roleContainsRight = role.contains(rightQuery.getRight());
-    boolean programMatches = program.equals(rightQuery.getProgram());
+    Profiler profiler = new Profiler("HAS_RIGHT_FOR_RIGHT_QUERY");
+    profiler.setLogger(LOGGER);
 
+    profiler.start("SUPERVISES");
     boolean facilityFound;
     if (supervisoryNode != null) {
+      profiler.start("CHECK_FOR_NODE");
       facilityFound = supervisoryNode.supervises(rightQuery.getFacility(), rightQuery.getProgram());
     } else if (user.getHomeFacilityId() != null && rightQuery.getFacility() != null) {
+      profiler.start("CHECK_FOR_HOME_FACILITY");
       facilityFound = user.getHomeFacilityId().equals(rightQuery.getFacility().getId());
     } else {
       facilityFound = false;
     }
+
+    profiler.start("CONTAINS_RIGHT_CHECK");
+    boolean roleContainsRight = role.contains(rightQuery.getRight());
+
+    profiler.start("CONTAINS_PROGRAM_CHECK");
+    boolean programMatches = program.equals(rightQuery.getProgram());
+
+    profiler.stop().log();
 
     return roleContainsRight && programMatches && facilityFound;
   }
@@ -134,17 +150,26 @@ public class SupervisionRoleAssignment extends RoleAssignment {
    * @return set of supervised facilities
    */
   public Set<Facility> getSupervisedFacilities(Right right, Program program) {
+    Profiler profiler = new Profiler("GET_SUPERVISED_FACILITIES_FOR_RIGHT_AND_PROGRAM");
+    profiler.setLogger(LOGGER);
+
     Set<Facility> possibleFacilities = new HashSet<>();
     
     if (supervisoryNode == null) {
       return possibleFacilities;
     }
 
+    profiler.start("CHECK_ADMIN");
     possibleFacilities = supervisoryNode.getAllSupervisedFacilities(program);
 
-    return possibleFacilities.stream()
+    profiler.start("HAS_RIGHT_CHECK");
+    Set<Facility> facilities = possibleFacilities.stream()
         .filter(possibleFacility -> hasRight(new RightQuery(right, program, possibleFacility)))
         .collect(Collectors.toSet());
+
+    profiler.stop().log();
+
+    return facilities;
   }
 
   /**

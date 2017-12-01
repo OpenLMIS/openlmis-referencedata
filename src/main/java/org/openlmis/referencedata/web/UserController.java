@@ -302,11 +302,17 @@ public class UserController extends BaseController {
     User user = userRepository.findOne(userId);
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
-      profiler.stop().log();
-      return exportRoleAssignmentsToDtos(roleAssignments);
     }
+
+    profiler.start("USER_GET_ROLE_ASSIGNMENTS");
+    Set<RoleAssignment> roleAssignments = user.getRoleAssignments();
+
+    profiler.start("EXPORT_TO_DTO");
+    Set<DetailedRoleAssignmentDto> result =  exportRoleAssignmentsToDtos(roleAssignments);
+
+    profiler.stop().log();
+
+    return result;
   }
 
   /**
@@ -561,8 +567,11 @@ public class UserController extends BaseController {
     profiler.start("GET_SUPERVISED_FACILITIES");
     Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
 
+    profiler.start("TO_DTO");
+    Set<FacilityDto> result = facilitiesToDto(supervisedFacilities);
+
     profiler.stop().log();
-    return facilitiesToDto(supervisedFacilities);
+    return result;
   }
 
   /**
@@ -594,8 +603,12 @@ public class UserController extends BaseController {
     profiler.start("GET_FULFILLMENT_FACILITIES");
     Set<Facility> facilities = user.getFulfillmentFacilities(right);
 
+    profiler.start("TO_DTO");
+    Set<FacilityDto> facilityDtos = facilitiesToDto(facilities);
+
     profiler.stop().log();
-    return facilitiesToDto(facilities);
+
+    return facilityDtos;
   }
 
   /**
@@ -615,13 +628,13 @@ public class UserController extends BaseController {
                                    @RequestParam(required = false) UUID programId,
                                    @RequestParam(required = false) UUID supervisoryNodeId,
                                    @RequestParam(required = false) UUID warehouseId) {
-    Profiler profiler = new Profiler("GET_USER_RIGHT_SEARCH");
+    Profiler profiler = new Profiler("GET_USERS_BY_RIGHT");
     profiler.setLogger(LOGGER);
 
     profiler.start("CHECK_ADMIN");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
-    profiler.start("RIGHT_SEARCH");
+    profiler.start("USERS_BY_RIGHT_SEARCH");
     Set<User> users = userService.rightSearch(rightId, programId,
         supervisoryNodeId, warehouseId);
 

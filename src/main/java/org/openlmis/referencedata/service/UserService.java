@@ -112,7 +112,7 @@ public class UserService {
    */
   public Page<User> searchUsers(UserSearchParams searchParams, Pageable pageable) {
 
-    Profiler profiler = new Profiler("POST_USER_SEARCH");
+    Profiler profiler = new Profiler("SERVICE_USER_SEARCH");
     profiler.setLogger(LOGGER);
 
     profiler.start("GET_EXTRA_DATA_FROM_PARAMS");

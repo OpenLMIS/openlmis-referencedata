@@ -34,6 +34,9 @@ import lombok.Setter;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.util.View;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @Entity
@@ -41,6 +44,8 @@ import org.openlmis.util.View;
 @Table(name = "users", schema = "referencedata")
 @NoArgsConstructor
 public class User extends BaseEntity {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 
   @JsonView(View.BasicInformation.class)
   @Column(nullable = false, unique = true, columnDefinition = "text")
@@ -180,14 +185,21 @@ public class User extends BaseEntity {
    * @return set of supervised facilities
    */
   public Set<Facility> getSupervisedFacilities(Right right, Program program) {
+    Profiler profiler = new Profiler("GET_SUPERVISED_FACILITIES_FOR_RIGHT_AND_PROGRAM");
+    profiler.setLogger(LOGGER);
+
     Set<Facility> supervisedFacilities = new HashSet<>();
 
+    profiler.start("FOR_EACH_ROLE_ASSIGNMENT");
     for (RoleAssignment roleAssignment : roleAssignments) {
       if (roleAssignment instanceof SupervisionRoleAssignment) {
+        profiler.start("GET_FACILITIES_FOR_RIGHT");
         supervisedFacilities.addAll((
             (SupervisionRoleAssignment) roleAssignment).getSupervisedFacilities(right, program));
       }
     }
+
+    profiler.stop().log();
 
     return supervisedFacilities;
   }
@@ -211,18 +223,28 @@ public class User extends BaseEntity {
    * @return set of facilities
    */
   public Set<Facility> getFulfillmentFacilities(Right right) {
+    Profiler profiler = new Profiler("GET_USER_FULFILLMENT_FACILITIES_BY_RIGHT");
+    profiler.setLogger(LOGGER);
+
     Set<Facility> fulfillmentFacilities = new HashSet<>();
 
+    profiler.start("FOR_EACH_ROLE_ASSIGNMENT");
     for (RoleAssignment roleAssignment : roleAssignments) {
       if (roleAssignment instanceof FulfillmentRoleAssignment) {
+        profiler.start("GET_WAREHOUSE");
         Facility warehouse = ((FulfillmentRoleAssignment) roleAssignment).getWarehouse();
 
+        profiler.start("NEW_RIGHT_QUERY");
         RightQuery rightQuery = new RightQuery(right, warehouse);
+
+        profiler.start("HAS_RIGHT");
         if (roleAssignment.hasRight(rightQuery)) {
           fulfillmentFacilities.add(warehouse);
         }
       }
     }
+
+    profiler.stop().log();
 
     return fulfillmentFacilities;
   }
