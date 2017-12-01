@@ -1,0 +1,1 @@
+CREATE INDEX ON referencedata.facilities USING GIST (location);
