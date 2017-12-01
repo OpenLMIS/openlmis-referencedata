@@ -15,28 +15,35 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import com.google.common.collect.Sets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
@@ -225,8 +232,10 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // then
     assertEquals(2, foundFacilties.size());
-    assertEquals(facilityWithCodeAndName.getId(), foundFacilties.get(0).getId());
-    assertEquals(facilityWithCode.getId(), foundFacilties.get(1).getId());
+    assertThat(
+        foundFacilties.stream().map(BaseEntity::getId).collect(Collectors.toSet()),
+        hasItems(facilityWithCode.getId(), facilityWithCodeAndName.getId())
+    );
   }
   
   @Test
