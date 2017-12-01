@@ -165,7 +165,7 @@ public class UserController extends BaseController {
   @ResponseBody
   public UserDto saveUser(@RequestBody @Valid UserDto userDto,
                           BindingResult bindingResult) {
-    Profiler profiler = new Profiler("GET_USERS");
+    Profiler profiler = new Profiler("CREATE_USER");
     profiler.setLogger(LOGGER);
 
     profiler.start("CHECK_ADMIN");
@@ -258,7 +258,7 @@ public class UserController extends BaseController {
   @ResponseBody
   public UserDto getUser(@PathVariable("userId") UUID userId) {
     XLOGGER.entry(userId);
-    Profiler profiler = new Profiler("GET_USER");
+    Profiler profiler = new Profiler("GET_SINGLE_USER");
     profiler.setLogger(LOGGER);
 
     profiler.start("CHECK_ADMIN");
@@ -329,7 +329,7 @@ public class UserController extends BaseController {
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
-      profiler.start("DELETE_USER");
+      profiler.start("DELETE_USER_FROM_DB");
       userRepository.delete(userId);
     }
     profiler.stop().log();

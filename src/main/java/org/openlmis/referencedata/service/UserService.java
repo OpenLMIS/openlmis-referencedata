@@ -38,6 +38,7 @@ import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -110,11 +111,18 @@ public class UserService {
    * @return Page of users
    */
   public Page<User> searchUsers(UserSearchParams searchParams, Pageable pageable) {
+
+    Profiler profiler = new Profiler("POST_USER_SEARCH");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("GET_EXTRA_DATA_FROM_PARAMS");
     Map<String, String> extraData = searchParams.extraData;
 
+    profiler.start("SEARCHING_BY_EXTRA_DATA");
     List<User> foundUsers = null;
     if (extraData != null && !extraData.isEmpty()) {
       try {
+        profiler.start("SEARCHING_BY_EXTRA_DATA_IN_REPOSITORY");
         String extraDataString = mapper.writeValueAsString(extraData);
         foundUsers = userRepository.findByExtraData(extraDataString);
         if (foundUsers.isEmpty()) {
@@ -125,7 +133,8 @@ public class UserService {
       }
     }
 
-    return userRepository.searchUsers(
+    profiler.start("SEARCH_IN_DB");
+    Page<User> result = userRepository.searchUsers(
         searchParams.username,
         searchParams.firstName,
         searchParams.lastName,
@@ -136,6 +145,10 @@ public class UserService {
         searchParams.loginRestricted,
         foundUsers,
         pageable);
+
+    profiler.stop().log();
+
+    return result;
   }
 
   /**
