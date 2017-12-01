@@ -326,7 +326,6 @@ public class FacilityController extends BaseController {
     Profiler profiler = new Profiler("GET_FACILITIES_BY_BOUNDARY");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN_RIGHT");
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
     profiler.start("DB_CALL");
