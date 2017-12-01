@@ -100,10 +100,9 @@ scenarios:
             def random = new Random();
 
             def user = [
-              username: abs(random.nextInt()).toString(),
+              username: random.nextInt().abs().toString(),
               firstName: "first-name",
-              lastName: "last-name",
-              active: "true"
+              lastName: "last-name"
             ];
 
             vars.put("user", JsonOutput.toJson(user));
