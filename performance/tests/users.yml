@@ -1,45 +1,45 @@
 execution:
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-one
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-all
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-search-one-page
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-has-right
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-one-permission-strings
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-one-programs
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-one-facilities
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-one-supervised-facilities
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: create-user
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: delete-user
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-one-supported-programs
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-one-fulfillment-facilities
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-get-one-role-assignments
   - concurrency: 1
-    hold-for: 1m
+    hold-for: 2m
     scenario: users-search-by-right
 
 scenarios:
@@ -62,7 +62,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb
         method: GET
-        label: GetAdministratorUser
+        label: GetUser
         headers:
           Authorization: Bearer ${access_token}
   users-get-all:
@@ -100,11 +100,10 @@ scenarios:
             def random = new Random();
 
             def user = [
-              username: "user" + random.nextInt(),
+              username: abs(random.nextInt()).toString(),
               firstName: "first-name",
               lastName: "last-name",
-              verified: true,
-              active: true
+              active: "true"
             ];
 
             vars.put("user", JsonOutput.toJson(user));
@@ -137,7 +136,7 @@ scenarios:
             vars.put("rightUuid", uuid);
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/hasRight?rightId=${rightUuid}
         method: GET
-        label: AdministratorUserHasRight
+        label: UserHasRight
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-permission-strings:
@@ -145,7 +144,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/permissionStrings
         method: GET
-        label: GetAdministratorUserPermissionStrings
+        label: GetUserPermissionStrings
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-programs:
@@ -153,7 +152,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/programs
         method: GET
-        label: GetAdministratorUserPrograms
+        label: GetUserPrograms
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-supported-programs:
@@ -161,7 +160,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/supportedPrograms
         method: GET
-        label: GetAdministratorUserSupportedPrograms
+        label: GetUserSupportedPrograms
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-facilities:
@@ -169,7 +168,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/facilities
         method: GET
-        label: GetAdministratorUserFacilities
+        label: GetUserFacilities
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-supervised-facilities:
@@ -178,7 +177,7 @@ scenarios:
       # Program = Family Planning, Right = REQUISITION_CREATE
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/supervisedFacilities?programId=dce17f2e-af3e-40ad-8e00-3496adef44c3&rightId=9ade922b-3523-4582-bef4-a47701f7df14
         method: GET
-        label: GetAdministratorSupervisedFacilities
+        label: GetUserSupervisedFacilities
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-fulfillment-facilities:
@@ -187,7 +186,7 @@ scenarios:
       # Right = ORDERS_VIEW
       - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/fulfillmentFacilities?rightId=7b2da074-b754-4e49-bad3-2520651e5107
         method: GET
-        label: GetAdministratorFulfillmentFacilities
+        label: GetUserFulfillmentFacilities
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-role-assignments:
@@ -195,14 +194,14 @@ scenarios:
         - include-scenario: get-user-token
         - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/roleAssignments
           method: GET
-          label: GetAdministratorRoleAssignments
+          label: GetUserRoleAssignments
           headers:
             Authorization: Bearer ${access_token}
   users-search-by-right:
       requests:
-      # Right = REQUISITION_CREATE
+      # Right = USERS_MANAGE
         - include-scenario: get-user-token
-        - url: ${__P(base-uri)}/api/users/rightSearch?rightId=9ade922b-3523-4582-bef4-a47701f7df14
+        - url: ${__P(base-uri)}/api/users/rightSearch?rightId=3687ea98-8a1e-4347-984c-3fd97d072066
           method: GET
           label: GetUsersByRight
           headers:
@@ -211,17 +210,17 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-        90% of get user fail to get in 500 milliseconds: p90 of GetAdministratorUser>500ms
-        90% of get all users fail to get in 500 milliseconds: p90 of GetAllUsers>500ms
-        90% of get page of 10 users fail to get in 500 milliseconds: p90 of GetAUserPageOfTen>500ms
-        90% of user has right fail to get in 500 milliseconds: p90 of AdministratorUserHasRight>500ms
-        90% of get permission strings for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserPermissionStrings>500ms
-        90% of get programs for administrator user fail to get in 250 milliseconds: p90 of GetAdministratorUserPrograms>250ms
-        90% of get supported programs for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserSupportedPrograms>500ms
-        90% of get facilities for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorUserFacilities>500ms
-        90% of get supervised facilities for administrator user fail to get in 2000 milliseconds: p90 of GetAdministratorSupervisedFacilities>2000ms
-        90% of get fulfillment facilities for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorFulfillmentFacilities>500ms
-        90% of get role assignments for administrator user fail to get in 500 milliseconds: p90 of GetAdministratorRoleAssignments>500ms
-        90% of craete user fail to get in 500 milliseconds: p90 of CreateUser>500ms
-        90% of delete user fail to get in 500 milliseconds: p90 of DeleteUser>500ms
-        90% of users search based on right fail to get in 500 milliseconds: p90 of GetUsersByRight>500ms
+        Get User too slow: p90 of GetUser>500ms
+        Get All Users too slow: p90 of GetAllUsers>500ms
+        Get a User Page of Ten too slow: p90 of GetAUserPageOfTen>500ms
+        User Has Right too slow: p90 of UserHasRight>500ms
+        Get User Permission Strings too slow: p90 of GetUserPermissionStrings>500ms
+        Get User Programs too slow: p90 of GetUserPrograms>250ms
+        Get User Supported Programs too slow: p90 of GetUserSupportedPrograms>500ms
+        Get User Facilities too slow: p90 of GetUserFacilities>500ms
+        Get User Supervised Facilities too slow: p90 of GetUserSupervisedFacilities>2000ms
+        Get User Fulfillment Facilities too slow: p90 of GetUserFulfillmentFacilities>500ms
+        Get User Role Assignments too slow: p90 of GetUserRoleAssignments>500ms
+        Create User too slow: p90 of CreateUser>500ms
+        Delete User too slow: p90 of DeleteUser>500ms
+        Get Users By Right too slow: p90 of GetUsersByRight>500ms
