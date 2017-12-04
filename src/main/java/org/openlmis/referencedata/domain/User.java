@@ -230,35 +230,23 @@ public class User extends BaseEntity {
 
     profiler.start("FOR_EACH_ROLE_ASSIGNMENT");
     for (RoleAssignment roleAssignment : roleAssignments) {
-      profiler.start("GET_WAREHOUSE");
-      getFacility(roleAssignment, right, fulfillmentFacilities);
+      if (roleAssignment instanceof FulfillmentRoleAssignment) {
+        profiler.start("GET_WAREHOUSE");
+        Facility warehouse = ((FulfillmentRoleAssignment) roleAssignment).getWarehouse();
+
+        profiler.start("NEW_RIGHT_QUERY");
+        RightQuery rightQuery = new RightQuery(right, warehouse);
+
+        profiler.start("HAS_RIGHT");
+        if (roleAssignment.hasRight(rightQuery)) {
+          fulfillmentFacilities.add(warehouse);
+        }
+      }
     }
 
     profiler.stop().log();
 
     return fulfillmentFacilities;
-  }
-
-  private void getFacility(RoleAssignment roleAssignment, Right right,
-                               Set<Facility> fulfillmentFacilities) {
-    Profiler profiler = new Profiler("GET_WAREHOUSE_FOR_RIGHT_AND_ROLE");
-    profiler.setLogger(LOGGER);
-
-    profiler.start("INSTANCE_OF");
-    if (roleAssignment instanceof FulfillmentRoleAssignment) {
-      profiler.start("GET_WAREHOUSE");
-      Facility warehouse = ((FulfillmentRoleAssignment) roleAssignment).getWarehouse();
-
-      profiler.start("NEW_RIGHT_QUERY");
-      RightQuery rightQuery = new RightQuery(right, warehouse);
-
-      profiler.start("HAS_RIGHT");
-      if (roleAssignment.hasRight(rightQuery)) {
-        fulfillmentFacilities.add(warehouse);
-      }
-    }
-
-    profiler.stop().log();
   }
 
   /**
