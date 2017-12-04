@@ -158,6 +158,7 @@ public class SupervisoryNode extends BaseEntity {
     profiler.start("GET_FACILITIES_FROM_CHILD_NODES");
     if (childNodes != null) {
       for (SupervisoryNode childNode : childNodes) {
+        profiler.start("GET_SUPERVISED_FACILITIES_FROM_NODE");
         supervisedFacilities.addAll(childNode.getAllSupervisedFacilities(program));
       }
     }

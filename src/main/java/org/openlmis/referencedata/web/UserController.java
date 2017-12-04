@@ -816,22 +816,31 @@ public class UserController extends BaseController {
 
   private Set<DetailedRoleAssignmentDto> exportRoleAssignmentsToDtos(
       Set<RoleAssignment> roleAssignments) {
+    Profiler profiler = new Profiler("EXPORT_USER_ROLE_ASSIGNMENTS_TO_DTO");
+    profiler.setLogger(LOGGER);
 
     Set<DetailedRoleAssignmentDto> assignmentDtos = new HashSet<>();
 
+    profiler.start("FOR_EACH_ROLE_ASSIGNMENT");
     for (RoleAssignment assignment : roleAssignments) {
       DetailedRoleAssignmentDto assignmentDto = new DetailedRoleAssignmentDto();
 
       if (assignment instanceof SupervisionRoleAssignment) {
+        profiler.start("EXPORT_SUPERVISION_ASSIGNMENT");
         ((SupervisionRoleAssignment) assignment).export(assignmentDto);
       } else if (assignment instanceof FulfillmentRoleAssignment) {
+        profiler.start("EXPORT_FULFILLMENT_ASSIGNMENT");
         ((FulfillmentRoleAssignment) assignment).export(assignmentDto);
       } else {
+        profiler.start("EXPORT_DIRECT_ASSIGNMENT");
         ((DirectRoleAssignment) assignment).export(assignmentDto);
       }
 
+      profiler.start("ADD_DTO_ASSIGNMENT_TO_LIST");
       assignmentDtos.add(assignmentDto);
     }
+
+    profiler.stop().log();
 
     return assignmentDtos;
   }
