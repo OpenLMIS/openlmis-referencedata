@@ -58,9 +58,11 @@ scenarios:
           access_token:
             jsonpath: $.access_token
   users-get-one:
+    variables:
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+      - url: ${__P(base-uri)}/api/users/${user_id}
         method: GET
         label: GetUser
         headers:
@@ -118,6 +120,9 @@ scenarios:
           headers:
             Authorization: Bearer ${access_token}
   users-has-right:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
     requests:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/rights
@@ -133,78 +138,105 @@ scenarios:
             String uuid = vars.get("rightUuid");
             uuid = uuid.replaceAll(/"|\[|\]/, "");
             vars.put("rightUuid", uuid);
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/hasRight?rightId=${rightUuid}
+      - url: ${__P(base-uri)}/api/users/${user_id}/hasRight?rightId=${rightUuid}
         method: GET
         label: UserHasRight
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-permission-strings:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/permissionStrings
+      - url: ${__P(base-uri)}/api/users/${user_id}/permissionStrings
         method: GET
         label: GetUserPermissionStrings
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-programs:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/programs
+      - url: ${__P(base-uri)}/api/users/${user_id}/programs
         method: GET
         label: GetUserPrograms
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-supported-programs:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/supportedPrograms
+      - url: ${__P(base-uri)}/api/users/${user_id}/supportedPrograms
         method: GET
         label: GetUserSupportedPrograms
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-facilities:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/facilities
+      - url: ${__P(base-uri)}/api/users/${user_id}/facilities
         method: GET
         label: GetUserFacilities
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-supervised-facilities:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+      # Family Planning
+      program_id: dce17f2e-af3e-40ad-8e00-3496adef44c3
+      # REQUISITION_CREATE
+      right_id: 9ade922b-3523-4582-bef4-a47701f7df14
     requests:
       - include-scenario: get-user-token
-      # Program = Family Planning, Right = REQUISITION_CREATE
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/supervisedFacilities?programId=dce17f2e-af3e-40ad-8e00-3496adef44c3&rightId=9ade922b-3523-4582-bef4-a47701f7df14
+      - url: ${__P(base-uri)}/api/users/${user_id}/supervisedFacilities?programId=${program_id}&rightId=${right_id}
         method: GET
         label: GetUserSupervisedFacilities
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-fulfillment-facilities:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+      # ORDERS_VIEW
+      right_id: 7b2da074-b754-4e49-bad3-2520651e5107
     requests:
       - include-scenario: get-user-token
-      # Right = ORDERS_VIEW
-      - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/fulfillmentFacilities?rightId=7b2da074-b754-4e49-bad3-2520651e5107
+      - url: ${__P(base-uri)}/api/users/${user_id}/fulfillmentFacilities?rightId=${right_id}
         method: GET
         label: GetUserFulfillmentFacilities
         headers:
           Authorization: Bearer ${access_token}
   users-get-one-role-assignments:
-      requests:
-        - include-scenario: get-user-token
-        - url: ${__P(base-uri)}/api/users/a337ec45-31a0-4f2b-9b2e-a105c4b669bb/roleAssignments
-          method: GET
-          label: GetUserRoleAssignments
-          headers:
-            Authorization: Bearer ${access_token}
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/${user_id}/roleAssignments
+        method: GET
+        label: GetUserRoleAssignments
+        headers:
+          Authorization: Bearer ${access_token}
   users-search-by-right:
-      requests:
-      # Right = USERS_MANAGE
-        - include-scenario: get-user-token
-        - url: ${__P(base-uri)}/api/users/rightSearch?rightId=3687ea98-8a1e-4347-984c-3fd97d072066
-          method: GET
-          label: GetUsersByRight
-          headers:
-            Authorization: Bearer ${access_token}
+    variables:
+      # USERS_MANAGE
+      right_id: 3687ea98-8a1e-4347-984c-3fd97d072066
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/rightSearch?rightId=${right_id}
+        method: GET
+        label: GetUsersByRight
+        headers:
+          Authorization: Bearer ${access_token}
 
 reporting:
     - module: passfail
