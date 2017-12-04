@@ -185,7 +185,7 @@ public class User extends BaseEntity {
    * @return set of supervised facilities
    */
   public Set<Facility> getSupervisedFacilities(Right right, Program program) {
-    Profiler profiler = new Profiler("GET_SUPERVISED_FACILITIES_FOR_RIGHT_AND_PROGRAM");
+    Profiler profiler = new Profiler("GET_SUPERVISED_FACILITIES_FOR_USER");
     profiler.setLogger(LOGGER);
 
     Set<Facility> supervisedFacilities = new HashSet<>();

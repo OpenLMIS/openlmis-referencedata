@@ -21,6 +21,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -40,6 +43,8 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @TypeName("SupervisoryNode")
 public class SupervisoryNode extends BaseEntity {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisoryNode.class);
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
@@ -134,9 +139,14 @@ public class SupervisoryNode extends BaseEntity {
    * @return all supervised facilities
    */
   public Set<Facility> getAllSupervisedFacilities(Program program) {
+    Profiler profiler = new Profiler("SUPERVISORY_NODE_GET_FACILITIES_FOR_PROGRAM");
+    profiler.setLogger(LOGGER);
+
     Set<Facility> supervisedFacilities = new HashSet<>();
 
+    profiler.start("CHECK_IF_REQ_GROUP_SUPPORTS_PROGRAM");
     if (requisitionGroup != null && requisitionGroup.supports(program)) {
+      profiler.start("REQ_GROUP_GET_MEMBER_FACILITIES");
       Set<Facility> facilities = requisitionGroup
           .getMemberFacilities()
           .stream()
@@ -145,11 +155,14 @@ public class SupervisoryNode extends BaseEntity {
       supervisedFacilities.addAll(facilities);
     }
 
+    profiler.start("GET_FACILITIES_FROM_CHILD_NODES");
     if (childNodes != null) {
       for (SupervisoryNode childNode : childNodes) {
         supervisedFacilities.addAll(childNode.getAllSupervisedFacilities(program));
       }
     }
+
+    profiler.stop().log();
 
     return supervisedFacilities;
   }

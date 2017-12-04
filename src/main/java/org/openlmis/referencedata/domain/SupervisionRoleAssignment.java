@@ -159,7 +159,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
       return possibleFacilities;
     }
 
-    profiler.start("CHECK_ADMIN");
+    profiler.start("GET_ALL_SUPERVISED_FACILITIES_FROM_NODE");
     possibleFacilities = supervisoryNode.getAllSupervisedFacilities(program);
 
     profiler.start("HAS_RIGHT_CHECK");
