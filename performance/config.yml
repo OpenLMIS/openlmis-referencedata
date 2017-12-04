@@ -5,6 +5,8 @@ modules:
       basic-auth: user-client:changeme
       username: administrator
       password: password
+      # this property should always be expressed in unit of seconds.
+      scenario-duration: 120
     xml-jtl-flags:
       responseData: true
 reporting:

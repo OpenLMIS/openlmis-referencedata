@@ -1,6 +1,6 @@
 execution:
   - concurreny: 1
-    iterations: 20
+    hold-for: ${__P(scenario-duration,60)}
     scenario: orderables-get-first-10
 
 scenarios:

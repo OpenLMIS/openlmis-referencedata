@@ -1,6 +1,6 @@
 execution:
   - concurrency: 1
-    hold-for: 1m
+    hold-for: ${__P(scenario-duration,60)}
     scenario: ftaps-get-first-10
 
 scenarios:

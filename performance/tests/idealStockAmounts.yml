@@ -1,9 +1,9 @@
 execution:
   - concurreny: 1
-    hold-for: 1m
+    hold-for: ${__P(scenario-duration,60)}
     scenario: download-ideal-stock-amounts-csv
   - concurreny: 1
-    hold-for: 2m
+    hold-for: ${__P(scenario-duration,60)}
     scenario: upload-ideal-stock-amounts-csv
 
 scenarios:
