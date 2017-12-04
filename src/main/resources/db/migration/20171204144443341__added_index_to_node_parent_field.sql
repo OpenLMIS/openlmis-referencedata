@@ -1,1 +1,1 @@
-CREATE INDEX ON supervisory_nodes (parent);
+CREATE INDEX ON supervisory_nodes (parentid);
