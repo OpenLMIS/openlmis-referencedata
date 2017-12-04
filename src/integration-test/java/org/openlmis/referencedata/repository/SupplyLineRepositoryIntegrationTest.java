@@ -81,7 +81,7 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void testSearchSupplyLinesByAllParameters() {
+  public void shouldSearchSupplyLinesByAllParameters() {
     SupplyLine supplyLine = cloneSupplyLine(supplyLines.get(0));
     List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
             supplyLine.getProgram(), supplyLine.getSupervisoryNode(), null);
@@ -98,7 +98,7 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void testSearchSupplyLinesWhenAllParametersAreNull() {
+  public void shouldSearchSupplyLinesWhenAllParametersAreNull() {
     List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
             null, null, null);
 
@@ -106,7 +106,7 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void testSearchSupplyLinesByProgram() {
+  public void shouldSearchSupplyLinesByProgram() {
     SupplyLine supplyLine = cloneSupplyLine(supplyLines.get(0));
     List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
             supplyLine.getProgram(), null, null);
@@ -120,7 +120,7 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void testFindSupplyLinesByProgramAndSupervisoryNode() {
+  public void shouldFindSupplyLinesByProgramAndSupervisoryNode() {
     for (SupplyLine supplyLine : supplyLines) {
       List<SupplyLine> received = repository.findByProgramAndSupervisoryNode(
           supplyLine.getProgram(), supplyLine.getSupervisoryNode());
