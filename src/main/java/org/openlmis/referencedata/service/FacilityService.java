@@ -15,12 +15,17 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.apache.commons.collections4.MapUtils.isEmpty;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isAllEmpty;
+
+import com.google.common.collect.Lists;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -34,8 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
-import java.util.ArrayList;
-import java.util.Collection;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -80,12 +84,16 @@ public class FacilityService {
    * @return List of facilities. All facilities will be returned when map is null or empty
    */
   public List<Facility> getFacilities(MultiValueMap<String, Object> queryMap) {
+    if (isEmpty(queryMap)) {
+      return facilityRepository.findAll();
+    }
+
     Set<UUID> ids = UuidUtil.getIds(queryMap);
     if (!ids.isEmpty()) {
-      return facilityRepository.findAllByIds(ids);
-    } else {
-      return searchFacilities(queryMap != null ? queryMap.toSingleValueMap() : null);
+      return facilityRepository.findAll(ids);
     }
+
+    return searchFacilities(queryMap.toSingleValueMap());
   }
 
   /**
@@ -106,9 +114,7 @@ public class FacilityService {
     final boolean recurse = MapUtils.getBooleanValue(queryMap, RECURSE);
 
     // validate query parameters
-    if (MapUtils.isEmpty(queryMap)
-        || (StringUtils.isAllEmpty(code, name, facilityTypeCode) && !zoneId.isPresent())) {
-
+    if (isEmpty(queryMap) || (isAllEmpty(code, name, facilityTypeCode) && !zoneId.isPresent())) {
       return facilityRepository.findAll();
     }
 
@@ -116,79 +122,50 @@ public class FacilityService {
     GeographicZone zone = null;
     if (zoneId.isPresent()) {
       zone = geographicZoneRepository.findOne(zoneId.get());
+
       if (zone == null) {
         throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
       }
     }
 
     // find facility type if given
-    FacilityType facilityType = null;
-    if (facilityTypeCode != null) {
-      facilityType = facilityTypeRepository.findOneByCode(facilityTypeCode);
-      if (facilityType == null) {
-        throw new ValidationMessageException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
-      }
+    if (facilityTypeCode != null && !facilityTypeRepository.existsByCode(facilityTypeCode)) {
+      throw new ValidationMessageException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     }
 
-    List<Facility> foundFacilities = findFacilitiesBasedOnZone(zone, code, name,
-            facilityType, recurse);
+    List<Facility> facilities = findFacilities(zone, code, name, facilityTypeCode, recurse);
+    filterByExtraData(facilities, (Map) queryMap.get(EXTRA_DATA));
 
-    foundFacilities = filterByExtraData(foundFacilities,
-        (Map<String, String>) queryMap.get(EXTRA_DATA));
-
-    return Optional.ofNullable(foundFacilities).orElse(Collections.emptyList());
+    return Optional.ofNullable(facilities).orElse(Collections.emptyList());
   }
 
-  /**
-   * Method returns all facilities within the geographic zone (non-recursive).
-   *
-   * @param zone requested geographic zone.
-   * @return List of facilities
-   */
-  public List<Facility> findFacilitiesBasedOnlyOnZone(GeographicZone zone) {
-    return findFacilitiesBasedOnZone(zone, null, null, null, false);
-  }
+  private List<Facility> findFacilities(GeographicZone zone, String code, String name,
+                                        String facilityTypeCode, boolean recurse) {
+    List<GeographicZone> zones = Lists.newArrayList();
 
-  private List<Facility> findFacilitiesBasedOnZone(GeographicZone zone, String code, String name,
-                                                   FacilityType facilityType, boolean recurse) {
-    List<Facility> foundFacilities = new ArrayList<>();
+    if (null != zone) {
+      zones.add(zone);
+    }
 
     if (recurse) {
-      Collection<GeographicZone> foundZones = geographicZoneService.getAllZonesInHierarchy(zone);
-      foundZones.add(zone);
-
-      for (GeographicZone foundZone : foundZones) {
-        foundFacilities.addAll(facilityRepository.search(code, name, foundZone, facilityType));
-      }
-    } else {
-      foundFacilities.addAll(facilityRepository.search(code, name, zone, facilityType));
+      zones.addAll(geographicZoneService.getAllZonesInHierarchy(zone));
     }
 
-    return foundFacilities;
+    return facilityRepository.search(code, name, zones, facilityTypeCode);
   }
 
-  private List<Facility> filterByExtraData(List<Facility> foundFacilities,
-                                           Map<String, String> extraData) {
-
-    if (extraData != null && !extraData.isEmpty()) {
-      String extraDataString;
+  private void filterByExtraData(List<Facility> foundFacilities, Map extraData) {
+    if (isNotEmpty(extraData)) {
       try {
-        extraDataString = mapper.writeValueAsString(extraData);
+        String extraDataString = mapper.writeValueAsString(extraData);
         List<Facility> extraDataResults = facilityRepository.findByExtraData(extraDataString);
 
-        if (foundFacilities != null) {
-          // intersection between two lists
-          foundFacilities.retainAll(extraDataResults);
-        } else {
-          foundFacilities = extraDataResults;
-        }
+        // intersection between two lists
+        foundFacilities.retainAll(extraDataResults);
       } catch (JsonProcessingException jpe) {
         LOGGER.debug("Cannot serialize extra data query request body into JSON");
       }
     }
-
-    return foundFacilities;
   }
-
 
 }

@@ -15,12 +15,17 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,6 +53,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
 
+  private static final String CODE = "FacilityRepositoryIntegrationTest";
   private static final String TYPE = "type";
 
   @Autowired
@@ -74,14 +80,14 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Before
   public void setUp() {
-    this.facilityType.setCode("FacilityRepositoryIntegrationTest");
+    this.facilityType.setCode(CODE);
     facilityTypeRepository.save(this.facilityType);
 
-    geographicLevel.setCode("FacilityRepositoryIntegrationTest");
+    geographicLevel.setCode(CODE);
     geographicLevel.setLevelNumber(1);
     geographicLevelRepository.save(geographicLevel);
 
-    this.geographicZone.setCode("FacilityRepositoryIntegrationTest");
+    this.geographicZone.setCode(CODE);
     this.geographicZone.setLevel(geographicLevel);
     geographicZoneRepository.save(geographicZone);
   }
@@ -175,7 +181,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(invalidFacility);
 
     // when
-    List<Facility> foundFacilties = repository.search(null, null, null, vaildFacilityType);
+    List<Facility> foundFacilties = repository
+        .search(null, null, null, vaildFacilityType.getCode());
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -200,7 +207,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(invalidFacility);
 
     // when
-    List<Facility> foundFacilties = repository.search(null, null, validZone, null);
+    List<Facility> foundFacilties = repository
+        .search(null, null, ImmutableList.of(validZone), null);
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -227,8 +235,10 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facilityWithCode);
 
     // when
-    List<Facility> foundFacilties = repository
-        .search(facilityWithCodeAndName.getCode(), "Facility", validZone, vaildFacilityType);
+    List<Facility> foundFacilties = repository.search(
+        facilityWithCodeAndName.getCode(), "Facility", ImmutableList.of(validZone),
+        vaildFacilityType.getCode()
+    );
 
     // then
     assertEquals(2, foundFacilties.size());
@@ -237,21 +247,21 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
         hasItems(facilityWithCode.getId(), facilityWithCodeAndName.getId())
     );
   }
-  
+
   @Test
   public void shouldFindFacilitiesByBoundary() {
     // given
     GeometryFactory gf = new GeometryFactory();
-    
+
     Facility facilityInsideBoundary = generateInstance();
     facilityInsideBoundary.setLocation(gf.createPoint(new Coordinate(1, 1)));
     facilityInsideBoundary = repository.save(facilityInsideBoundary);
-    
+
     Facility facilityOutsideBoundary = generateInstance();
     facilityOutsideBoundary.setLocation(gf.createPoint(new Coordinate(-1, 1)));
     repository.save(facilityOutsideBoundary);
 
-    Coordinate[] coords  = new Coordinate[] {
+    Coordinate[] coords = new Coordinate[]{
         new Coordinate(0, 0),
         new Coordinate(2, 0),
         new Coordinate(2, 2),
@@ -259,7 +269,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
         new Coordinate(0, 0)
     };
     Polygon boundary = gf.createPolygon(coords);
-    
+
     // when
     List<Facility> foundFacilities = repository.findByBoundary(boundary);
 
@@ -330,7 +340,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     Set<UUID> ids = Sets.newHashSet(facility.getId(), facility2.getId());
-    List<Facility> found = repository.findAllByIds(ids);
+    List<Facility> found = repository.findAll(ids);
 
     // then
     assertEquals(2, found.size());
@@ -356,11 +366,9 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   private void searchFacilityAndCheckResults(String code, String name, Facility facility,
-                                             FacilityType type, int expectedSize) {
-    List<Facility> foundFacilities = repository.search(code, name, null, type);
-
-    assertEquals(expectedSize, foundFacilities.size());
-
-    assertEquals(facility.getName(), foundFacilities.get(0).getName());
+                                             String facilityTypeCode, int expectedSize) {
+    List<Facility> foundFacilities = repository.search(code, name, null, facilityTypeCode);
+    assertThat(foundFacilities, hasSize(expectedSize));
+    assertThat(foundFacilities, hasItem(hasProperty("name", equalTo(facility.getName()))));
   }
 }

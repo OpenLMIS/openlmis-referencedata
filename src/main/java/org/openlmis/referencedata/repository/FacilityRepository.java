@@ -56,7 +56,4 @@ public interface FacilityRepository
 
   boolean existsByCode(String code);
 
-  @Query("SELECT f FROM Facility f WHERE f.id in ?1")
-  List<Facility> findAllByIds(Iterable<UUID> ids);
-
 }

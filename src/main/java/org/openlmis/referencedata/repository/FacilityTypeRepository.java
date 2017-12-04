@@ -32,4 +32,6 @@ public interface FacilityTypeRepository extends PagingAndSortingRepository<Facil
   <S extends FacilityType> Iterable<S> save(Iterable<S> entities);
 
   FacilityType findOneByCode(@Param("code") String code);
+
+  boolean existsByCode(@Param("code") String code);
 }

@@ -15,24 +15,41 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.TypedQuery;
 
 public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
-  private static final String GEOGRAPHIC_ZONE = "geographicZone";
-  private static final String FACILITY_TYPE = "type";
+  private static final String SELECT = "SELECT f"
+      + " FROM Facility AS f"
+      + " INNER JOIN FETCH f.geographicZone AS g"
+      + " INNER JOIN FETCH f.type AS t"
+      + " LEFT OUTER JOIN FETCH f.operator AS o"
+      + " LEFT OUTER JOIN FETCH f.supportedPrograms AS sp";
+
+  private static final String WHERE = "WHERE";
+  private static final String OR = " OR ";
+
+  private static final String WITH_CODE = "upper(f.code) LIKE :code";
+  private static final String WITH_NAME = "upper(f.name) LIKE :name";
+  private static final String WITH_ZONE = "g.id IN (:zones)";
+  private static final String WITH_TYPE = "t.code = :typeCode";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -40,52 +57,51 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
   /**
    * This method is supposed to retrieve all facilities with matched parameters.
    * Method is ignoring case for facility code and name.
-   * To find all wanted Facilities by conde and name we use criteria query and like operator.
    *
    * @param code Part of wanted code.
    * @param name Part of wanted name.
-   * @param zone Geographic zone of facility location.
-   * @param facilityType Wanted facility type.
+   * @param zones Geographic zones.
+   * @param facilityTypeCode Wanted facility type.
+   *
    * @return List of Facilities matching the parameters.
    */
-  public List<Facility> search(String code, String name,
-                               GeographicZone zone, FacilityType facilityType) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Facility> query = builder.createQuery(Facility.class);
-    Root<Facility> root = query.from(Facility.class);
-    Predicate predicate = builder.disjunction();
+  public List<Facility> search(String code, String name, List<GeographicZone> zones,
+                               String facilityTypeCode) {
+    List<String> hql = Lists.newArrayList(SELECT);
+    List<String> where = Lists.newArrayList();
+    Map<String, Object> params = Maps.newHashMap();
 
-    if (code != null) {
-      predicate = builder.or(predicate,
-          builder.like(builder.upper(root.get("code")), "%" + code.toUpperCase() + "%"));
+
+    if (null != code) {
+      where.add(WITH_CODE);
+      params.put("code", "%" + code.toUpperCase() + "%");
     }
 
-    if (name != null) {
-      predicate = builder.or(predicate,
-              builder.like(builder.upper(root.get("name")), "%" + name.toUpperCase() + "%"));
+    if (null != name) {
+      where.add(WITH_NAME);
+      params.put("name", "%" + name.toUpperCase() + "%");
     }
 
-    if (facilityType != null) {
-      predicate = addPredicate(predicate, builder, facilityType, root, FACILITY_TYPE,
-              name == null && code == null);
+    if (null != facilityTypeCode) {
+      where.add(WITH_TYPE);
+      params.put("typeCode", facilityTypeCode);
     }
 
-    if (zone != null) {
-      predicate = addPredicate(predicate, builder, zone, root, GEOGRAPHIC_ZONE,
-              name == null && code == null && facilityType == null);
+    if (isNotEmpty(zones)) {
+      where.add(WITH_ZONE);
+      params.put("zones", zones.stream().map(BaseEntity::getId).collect(Collectors.toSet()));
     }
 
-    query.where(predicate);
-    return entityManager.createQuery(query).getResultList();
-  }
-
-  private Predicate addPredicate(Predicate predicate, CriteriaBuilder builder, Object value,
-                                 Root<Facility> root, String fieldName,
-                                 boolean areOtherParamsPresent) {
-    if (areOtherParamsPresent) {
-      return builder.or(predicate, builder.equal(root.get(fieldName), value));
-    } else {
-      return builder.and(predicate, builder.equal(root.get(fieldName), value));
+    if (!where.isEmpty()) {
+      hql.add(WHERE);
+      hql.add(Joiner.on(OR).join(where));
     }
+
+    String query = Joiner.on(' ').join(hql);
+
+    TypedQuery<Facility> typed = entityManager.createQuery(query, Facility.class);
+    params.forEach(typed::setParameter);
+
+    return typed.getResultList();
   }
 }

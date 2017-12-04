@@ -15,26 +15,26 @@
 
 package org.openlmis.referencedata.service;
 
+import static com.google.common.collect.ImmutableList.of;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -42,6 +42,7 @@ import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,9 +71,6 @@ public class FacilityServiceTest {
 
   @Mock
   private FacilityTypeRepository facilityTypeRepository;
-
-  @Mock
-  private FacilityType facilityType;
 
   @Mock
   private GeographicZone parent;
@@ -158,19 +156,19 @@ public class FacilityServiceTest {
 
   @Test
   public void shouldReturnByIdsWhenIdProvidedInQueryMap() {
-    when(facilityRepository.findAllByIds(anyCollectionOf(UUID.class))).thenReturn(facilityList);
+    when(facilityRepository.findAll(anyCollectionOf(UUID.class))).thenReturn(facilityList);
 
     MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     UUID uuid = UUID.randomUUID();
     queryMap.add("id", uuid.toString());
     List<Facility> actual = facilityService.getFacilities(queryMap);
-    verify(facilityRepository).findAllByIds(Sets.newHashSet(uuid));
+    verify(facilityRepository).findAll(Sets.newHashSet(uuid));
     assertEquals(facilityList, actual);
   }
 
   @Test
   public void shouldReturnByIdsWhenIdsProvidedInQueryMap() {
-    when(facilityRepository.findAllByIds(anyCollectionOf(UUID.class))).thenReturn(facilityList);
+    when(facilityRepository.findAll(anyCollectionOf(UUID.class))).thenReturn(facilityList);
 
     MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     UUID uuid = UUID.randomUUID();
@@ -178,7 +176,7 @@ public class FacilityServiceTest {
     queryMap.add("id", uuid.toString());
     queryMap.add("id", uuid2.toString());
     List<Facility> actual = facilityService.getFacilities(queryMap);
-    verify(facilityRepository).findAllByIds(Sets.newHashSet(uuid, uuid2));
+    verify(facilityRepository).findAll(Sets.newHashSet(uuid, uuid2));
     assertEquals(facilityList, actual);
   }
 
@@ -259,18 +257,15 @@ public class FacilityServiceTest {
   public void shouldSearchForFacilitiesWithExtraData() {
     final String code = "FAC1";
     final String name = "Facility";
-    final String type = "facility-type";
 
     when(geographicZoneRepository.findOne(zoneUuid)).thenReturn(parent);
     when(geographicZoneService.getAllZonesInHierarchy(parent)).thenReturn(Lists.newArrayList(
         child1, child2));
 
-    when(facilityTypeRepository.findOneByCode(type)).thenReturn(facilityType);
+    when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
 
-    when(facilityRepository.search(code, name, parent, facilityType))
-            .thenReturn(Lists.newArrayList(facility));
-    when(facilityRepository.search(code, name, child2, facilityType))
-            .thenReturn(Lists.newArrayList(facility2));
+    when(facilityRepository.search(code, name, of(parent, child1, child2), FACILITY_TYPE))
+        .thenReturn(Lists.newArrayList(facility, facility2));
 
     when(facilityRepository.findByExtraData(anyString())).thenReturn(Lists.newArrayList(facility2));
 
@@ -281,7 +276,7 @@ public class FacilityServiceTest {
     params.put(RECURSE, true);
     params.put(CODE, code);
     params.put(NAME, name);
-    params.put(FACILITY_TYPE_CODE, type);
+    params.put(FACILITY_TYPE_CODE, FACILITY_TYPE);
     params.put(ZONE_ID, zoneUuid);
     params.put("extraData", extraData);
 
@@ -296,21 +291,16 @@ public class FacilityServiceTest {
     when(geographicZoneService.getAllZonesInHierarchy(parent)).thenReturn(Lists.newArrayList(
         child1, child2));
 
-    when(facilityTypeRepository.findOneByCode(FACILITY_TYPE)).thenReturn(facilityType);
+    when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
 
-    when(facilityRepository.search(FACILITY_CODE, FACILITY_NAME, parent, facilityType))
-        .thenReturn(Lists.newArrayList(facility));
-    when(facilityRepository.search(FACILITY_CODE, FACILITY_NAME, child2, facilityType))
-        .thenReturn(Lists.newArrayList(facility2));
+    when(facilityRepository
+        .search(FACILITY_CODE, FACILITY_NAME, of(parent, child1, child2), FACILITY_TYPE))
+        .thenReturn(Lists.newArrayList(facility, facility2));
   }
 
   private void verifyAfterSearchWithRecurse(List<Facility> actual) {
     verify(facilityRepository)
-        .search(eq(FACILITY_CODE), eq(FACILITY_NAME), eq(parent), eq(facilityType));
-    verify(facilityRepository)
-        .search(eq(FACILITY_CODE), eq(FACILITY_NAME), eq(child1), eq(facilityType));
-    verify(facilityRepository)
-        .search(eq(FACILITY_CODE), eq(FACILITY_NAME), eq(child2), eq(facilityType));
+        .search(FACILITY_CODE, FACILITY_NAME, of(parent, child1, child2), FACILITY_TYPE);
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(facility));
@@ -320,15 +310,14 @@ public class FacilityServiceTest {
   private void prepareForSearchWithoutRecurse() {
     when(geographicZoneRepository.findOne(zoneUuid)).thenReturn(parent);
 
-    when(facilityTypeRepository.findOneByCode(FACILITY_TYPE)).thenReturn(facilityType);
+    when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
 
-    when(facilityRepository.search(FACILITY_CODE, FACILITY_NAME, parent, facilityType))
+    when(facilityRepository.search(FACILITY_CODE, FACILITY_NAME, of(parent), FACILITY_TYPE))
         .thenReturn(Lists.newArrayList(facility));
   }
 
   private void verifyAfterSearchWithoutRecurse(List<Facility> actual) {
-    verify(facilityRepository)
-        .search(eq(FACILITY_CODE), eq(FACILITY_NAME), eq(parent), eq(facilityType));
+    verify(facilityRepository).search(FACILITY_CODE, FACILITY_NAME, of(parent), FACILITY_TYPE);
     verifyNoMoreInteractions(facilityRepository);
 
     assertEquals(1, actual.size());
