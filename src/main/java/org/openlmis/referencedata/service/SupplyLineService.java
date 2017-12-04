@@ -64,17 +64,6 @@ public class SupplyLineService {
    *
    * @param program           program of searched Supply Lines.
    * @param supervisoryNode   supervisoryNode of searched Supply Lines.
-   * @return list of Supply Lines with matched parameters.
-   */
-  public List<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode) {
-    return searchSupplyLines(program, supervisoryNode, null);
-  }
-
-  /**
-   * Method returns all Supply Lines with matched parameters.
-   *
-   * @param program           program of searched Supply Lines.
-   * @param supervisoryNode   supervisoryNode of searched Supply Lines.
    * @param supplyingFacility supplyingFacility of searched Supply Lines.
    * @return list of Supply Lines with matched parameters.
    */
