@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +63,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -123,7 +126,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(programRepository.findOne(programId)).willReturn(program);
     given(supervisoryNodeRepository.findOne(searchedSupervisoryNode.getId()))
         .willReturn(searchedSupervisoryNode);
-    given(supplyLineService.searchSupplyLines(program, searchedSupervisoryNode))
+    given(supplyLineRepository.findByProgramAndSupervisoryNode(program, searchedSupervisoryNode))
         .willReturn(searchedSupplyLines);
 
     FacilityDto[] response = restAssured.given()

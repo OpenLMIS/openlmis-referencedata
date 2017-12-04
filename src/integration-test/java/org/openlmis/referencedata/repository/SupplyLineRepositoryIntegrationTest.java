@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -115,6 +116,16 @@ public class SupplyLineRepositoryIntegrationTest
       Assert.assertEquals(
               supplyLine.getProgram().getId(),
               receivedSupplyLine.getProgram().getId());
+    }
+  }
+
+  @Test
+  public void testFindSupplyLinesByProgramAndSupervisoryNode() {
+    for (SupplyLine supplyLine : supplyLines) {
+      List<SupplyLine> received = repository.findByProgramAndSupervisoryNode(
+          supplyLine.getProgram(), supplyLine.getSupervisoryNode());
+
+      Assert.assertThat(received, Matchers.hasItem(supplyLine));
     }
   }
 

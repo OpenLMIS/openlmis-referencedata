@@ -37,9 +37,9 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.RightAssignmentService;
-import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
@@ -96,7 +96,7 @@ public class FacilityController extends BaseController {
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
-  private SupplyLineService supplyLineService;
+  private SupplyLineRepository supplyLineRepository;
 
   @Autowired
   private FacilityService facilityService;
@@ -392,7 +392,8 @@ public class FacilityController extends BaseController {
     }
 
     profiler.start("SEARCH_SUPPLY_LINES");
-    List<SupplyLine> supplyLines = supplyLineService.searchSupplyLines(program, supervisoryNode);
+    List<SupplyLine> supplyLines = supplyLineRepository
+        .findByProgramAndSupervisoryNode(program, supervisoryNode);
 
     profiler.start("RETRIEVE_SUPPLYING_FACILITIES");
     List<Facility> facilities = supplyLines
