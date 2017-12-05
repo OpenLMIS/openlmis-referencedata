@@ -9,6 +9,11 @@ parameters to get users endpoint
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
 * [OLMIS-2419](https://openlmis.atlassian.net/browse/OLMIS-2419): Supervisory Node name is now required and facility is not required.
+* [OLMIS-3625](https://openlmis.atlassian.net/browse/OLMIS-3625): Increase performance of facility endpoints
+  * added several indexes on foreign keys on facility and related tables
+  * use HQL to retrieve facilities instead of creating query from scratch
+  * set lazy loading on some relations so related entities will be retrieved only when there is a need
+  * modified /api/facilities/supplying to retrieve facilities directly from the database
 
 9.0.0 / 2017-11-09
 ==================
