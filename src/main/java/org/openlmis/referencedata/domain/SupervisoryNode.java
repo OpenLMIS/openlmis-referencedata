@@ -76,7 +76,7 @@ public class SupervisoryNode extends BaseEntity {
   @Getter
   private SupervisoryNode parentNode;
 
-  @OneToMany(mappedBy = "parentNode", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "parentNode")
   @Getter
   @DiffIgnore
   private Set<SupervisoryNode> childNodes;
