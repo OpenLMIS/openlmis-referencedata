@@ -15,22 +15,26 @@
 
 package org.openlmis.referencedata.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -61,23 +65,23 @@ public class SupervisoryNode extends BaseEntity {
   @Setter
   private String description;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "facilityid")
   @Getter
   @Setter
   private Facility facility;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "parentid")
   @Getter
   private SupervisoryNode parentNode;
 
-  @OneToMany(mappedBy = "parentNode")
+  @OneToMany(mappedBy = "parentNode", fetch = FetchType.LAZY)
   @Getter
   @DiffIgnore
   private Set<SupervisoryNode> childNodes;
 
-  @OneToOne(mappedBy = "supervisoryNode")
+  @OneToOne(mappedBy = "supervisoryNode", fetch = FetchType.LAZY)
   @Getter
   @Setter
   private RequisitionGroup requisitionGroup;
