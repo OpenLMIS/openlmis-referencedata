@@ -16,10 +16,10 @@
 package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
@@ -122,12 +122,17 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<SupplyLine> searchedSupplyLines =
         generateSupplyLines(searchedFacilitiesAmt, searchedSupervisoryNode);
+    List<Facility> facilities = searchedSupplyLines
+        .stream()
+        .map(SupplyLine::getSupplyingFacility)
+        .distinct()
+        .collect(Collectors.toList());
 
-    given(programRepository.findOne(programId)).willReturn(program);
-    given(supervisoryNodeRepository.findOne(searchedSupervisoryNode.getId()))
-        .willReturn(searchedSupervisoryNode);
-    given(supplyLineRepository.findByProgramAndSupervisoryNode(program, searchedSupervisoryNode))
-        .willReturn(searchedSupplyLines);
+    given(programRepository.exists(programId)).willReturn(true);
+    given(supervisoryNodeRepository.exists(searchedSupervisoryNode.getId()))
+        .willReturn(true);
+    given(supplyLineRepository.findSupplyingFacilities(programId, searchedSupervisoryNode.getId()))
+        .willReturn(facilities);
 
     FacilityDto[] response = restAssured.given()
         .queryParam(PROGRAM_ID, programId)
@@ -141,15 +146,14 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
 
-    List<Facility> expectedFacilities = searchedSupplyLines.stream()
-        .map(SupplyLine::getSupplyingFacility).distinct().collect(Collectors.toList());
+    assertThat(response.length, is(facilities.size()));
 
-    assertEquals(expectedFacilities.size(), response.length);
+    Facility[] responseFacilities = Arrays
+        .stream(response)
+        .map(Facility::newFacility)
+        .toArray(Facility[]::new);
 
-    for (FacilityDto facilityDto : response) {
-      Facility facility = Facility.newFacility(facilityDto);
-      assertTrue(expectedFacilities.contains(facility));
-    }
+    assertThat(facilities, hasItems(responseFacilities));
   }
 
   @Test
@@ -172,8 +176,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     supervisoryNodeId = UUID.randomUUID();
 
-    given(programRepository.findOne(programId)).willReturn(program);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(null);
+    given(programRepository.exists(programId)).willReturn(true);
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
 
     restAssured.given()
         .queryParam(PROGRAM_ID, programId)
@@ -195,9 +199,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .withFacility(facility)
         .build();
 
-    given(programRepository.findOne(programId)).willReturn(null);
-    given(supervisoryNodeRepository.findOne(searchedSupervisoryNode.getId()))
-        .willReturn(searchedSupervisoryNode);
+    given(programRepository.exists(programId)).willReturn(false);
 
     restAssured.given()
         .queryParam(PROGRAM_ID, programId)

@@ -16,11 +16,12 @@
 package org.openlmis.referencedata.repository;
 
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.custom.SupplyLineRepositoryCustom;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +31,8 @@ public interface SupplyLineRepository extends
         PagingAndSortingRepository<SupplyLine, UUID>,
     SupplyLineRepositoryCustom {
 
-  List<SupplyLine> findByProgramAndSupervisoryNode(Program program,
-                                                   SupervisoryNode supervisoryNode);
+  @Query(name = "SupplyLine.findSupplyingFacilities")
+  List<Facility> findSupplyingFacilities(@Param("programId") UUID programId,
+                                         @Param("supervisoryNodeId") UUID supervisoryNodeId);
 
 }

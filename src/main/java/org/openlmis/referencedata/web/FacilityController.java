@@ -23,8 +23,6 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.BasicFacilityDto;
@@ -373,34 +371,23 @@ public class FacilityController extends BaseController {
     Profiler profiler = new Profiler("GET_SUPPLYING_DEPOTS");
     profiler.setLogger(LOGGER);
 
-    profiler.start("FIND_PROGRAM");
-    Program program = programRepository.findOne(programId);
-
-    profiler.start("FIND_SUPERVISORY_NODE");
-    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
-
-    if (program == null) {
+    profiler.start("EXISTS_PROGRAM");
+    if (!programRepository.exists(programId)) {
       profiler.stop().log();
       throw new ValidationMessageException(
           new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
 
-    if (supervisoryNode == null) {
+    profiler.start("EXISTS_SUPERVISORY_NODE");
+    if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
       profiler.stop().log();
       throw new ValidationMessageException(
           new Message(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_ID, supervisoryNodeId));
     }
 
-    profiler.start("SEARCH_SUPPLY_LINES");
-    List<SupplyLine> supplyLines = supplyLineRepository
-        .findByProgramAndSupervisoryNode(program, supervisoryNode);
-
-    profiler.start("RETRIEVE_SUPPLYING_FACILITIES");
-    List<Facility> facilities = supplyLines
-        .stream()
-        .map(SupplyLine::getSupplyingFacility)
-        .distinct()
-        .collect(Collectors.toList());
+    profiler.start("FIND_SUPPLYING_FACILITIES");
+    List<Facility> facilities = supplyLineRepository
+        .findSupplyingFacilities(programId, supervisoryNodeId);
 
     List<FacilityDto> dto = toDto(facilities, profiler);
 

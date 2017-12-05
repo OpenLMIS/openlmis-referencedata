@@ -120,12 +120,12 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindSupplyLinesByProgramAndSupervisoryNode() {
+  public void shouldFindSupplyingFacilities() {
     for (SupplyLine supplyLine : supplyLines) {
-      List<SupplyLine> received = repository.findByProgramAndSupervisoryNode(
-          supplyLine.getProgram(), supplyLine.getSupervisoryNode());
+      List<Facility> received = repository.findSupplyingFacilities(
+          supplyLine.getProgram().getId(), supplyLine.getSupervisoryNode().getId());
 
-      Assert.assertThat(received, Matchers.hasItem(supplyLine));
+      Assert.assertThat(received, Matchers.hasItem(supplyLine.getSupplyingFacility()));
     }
   }
 

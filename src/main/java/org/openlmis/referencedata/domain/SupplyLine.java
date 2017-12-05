@@ -15,17 +15,22 @@
 
 package org.openlmis.referencedata.domain;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.javers.core.metamodel.annotation.TypeName;
+
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
@@ -33,6 +38,12 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("SupplyLine")
+@NamedQueries({
+    @NamedQuery(name = "SupplyLine.findSupplyingFacilities",
+        query = "SELECT DISTINCT sl.supplyingFacility"
+            + " FROM SupplyLine AS sl"
+            + " WHERE sl.program.id = :programId AND sl.supervisoryNode.id = :supervisoryNodeId")
+    })
 public class SupplyLine extends BaseEntity {
 
   @ManyToOne
