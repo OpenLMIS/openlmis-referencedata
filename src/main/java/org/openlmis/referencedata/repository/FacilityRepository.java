@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import com.vividsolutions.jts.geom.Polygon;
+
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.dto.NamedResource;
@@ -23,6 +24,7 @@ import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,13 +33,6 @@ import java.util.UUID;
 @JaversSpringDataAuditable
 public interface FacilityRepository
     extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom {
-
-  @Query(value = "SELECT f.*"
-      + " FROM referencedata.facilities f"
-      + " WHERE f.extradata @> (:extraData)\\:\\:jsonb",
-      nativeQuery = true
-  )
-  List<Facility> findByExtraData(@Param("extraData") String extraData);
 
   @Query(value = "SELECT f.*"
       + " FROM referencedata.facilities f"

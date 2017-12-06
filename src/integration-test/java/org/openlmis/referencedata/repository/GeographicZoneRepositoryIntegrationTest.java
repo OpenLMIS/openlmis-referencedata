@@ -29,7 +29,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -38,6 +37,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class GeographicZoneRepositoryIntegrationTest
@@ -132,16 +135,16 @@ public class GeographicZoneRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindByParent() {
+  public void shouldFindIdByParent() {
     // given
     generateInstance();
 
     // when
-    List<GeographicZone> zones = repository.findByParent(regionZone.getParent());
+    Set<UUID> zones = repository.findIdsByParent(regionZone.getParent().getId());
 
     // then
     assertEquals(1, zones.size());
-    assertEquals(regionZone.getId(), zones.get(0).getId());
+    assertEquals(regionZone.getId(), zones.iterator().next());
   }
 
   @Test

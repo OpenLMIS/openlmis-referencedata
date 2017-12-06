@@ -16,13 +16,14 @@
 package org.openlmis.referencedata.repository.custom;
 
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.GeographicZone;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public interface FacilityRepositoryCustom {
 
-  List<Facility> search(String code, String name, List<GeographicZone> zones,
-                        String facilityTypeCode);
+  List<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
+                        String facilityTypeCode, String extraData);
 
 }

@@ -14,6 +14,8 @@ Bug fixes that are backwards-compatible:
   * use HQL to retrieve facilities instead of creating query from scratch
   * set lazy loading on some relations so related entities will be retrieved only when there is a need
   * modified /api/facilities/supplying to retrieve facilities directly from the database
+  * improved Get Facilities and Search Facility endpoints by using geographic zone IDs instead of full representation.
+  * create single query to retrieve facilities by all parameters
 
 9.0.0 / 2017-11-09
 ==================

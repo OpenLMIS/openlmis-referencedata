@@ -16,8 +16,6 @@
 package org.openlmis.referencedata.repository;
 
 import com.vividsolutions.jts.geom.Point;
-import java.util.List;
-import java.util.UUID;
 
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -26,6 +24,10 @@ import org.openlmis.referencedata.repository.custom.GeographicZoneRepositoryCust
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface GeographicZoneRepository extends PagingAndSortingRepository<GeographicZone, UUID>,
@@ -39,7 +41,8 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
 
   List<GeographicZone> findByParentAndLevel(GeographicZone parent, GeographicLevel level);
 
-  List<GeographicZone> findByParent(GeographicZone parent);
+  @Query(name = "GeographicZone.findIdsByParent")
+  Set<UUID> findIdsByParent(@Param("parentId") UUID parentId);
 
   List<GeographicZone> findByLevel(GeographicLevel level);
 

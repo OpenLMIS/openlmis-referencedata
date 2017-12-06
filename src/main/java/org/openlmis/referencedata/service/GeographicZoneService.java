@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.service;
 
+import com.google.common.collect.Sets;
+
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -31,10 +33,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -86,17 +87,17 @@ public class GeographicZoneService {
   }
 
   /**
-   * Retrieves recursively all geographic zones that are descendants of the given one.
+   * Retrieves recursively all geographic zone IDs that are descendants of the given one.
    *
    * @param root root of zone hierarchy
-   * @return collection with all descendant zones.
+   * @return collection with all descendant zone IDs.
    */
-  public Collection<GeographicZone> getAllZonesInHierarchy(GeographicZone root) {
-    Collection<GeographicZone> children = geographicZoneRepository.findByParent(root);
-    Collection<GeographicZone> result = new ArrayList<>(children);
+  public Set<UUID> getAllZonesInHierarchy(UUID root) {
+    Set<UUID> children = geographicZoneRepository.findIdsByParent(root);
+    Set<UUID> result = Sets.newHashSet(children);
 
-    for (GeographicZone zone : children) {
-      Collection<GeographicZone> descendants = getAllZonesInHierarchy(zone);
+    for (UUID zone : children) {
+      Set<UUID> descendants = getAllZonesInHierarchy(zone);
       result.addAll(descendants);
     }
 

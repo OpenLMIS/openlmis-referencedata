@@ -17,10 +17,10 @@ package org.openlmis.referencedata.domain;
 
 import com.vividsolutions.jts.geom.Polygon;
 
-import lombok.AllArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.TypeName;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,8 +30,11 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
@@ -39,6 +42,10 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("GeographicZone")
+@NamedQueries({
+    @NamedQuery(name = "GeographicZone.findIdsByParent",
+        query = "SELECT DISTINCT id FROM GeographicZone WHERE parent.id = :parentId")
+    })
 public class GeographicZone extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
@@ -51,13 +58,13 @@ public class GeographicZone extends BaseEntity {
   @Setter
   private String name;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "levelid", nullable = false)
   @Getter
   @Setter
   private GeographicLevel level;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "parentid")
   @Getter
   @Setter

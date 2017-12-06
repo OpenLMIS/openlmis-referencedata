@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -158,7 +158,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Test
   public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
-    List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null, null);
+    List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null, null, null);
 
     assertEquals(0, foundFacilties.size());
   }
@@ -182,7 +182,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     List<Facility> foundFacilties = repository
-        .search(null, null, null, vaildFacilityType.getCode());
+        .search(null, null, null, vaildFacilityType.getCode(), null);
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -208,7 +208,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     List<Facility> foundFacilties = repository
-        .search(null, null, ImmutableList.of(validZone), null);
+        .search(null, null, ImmutableSet.of(validZone.getId()), null, null);
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -216,7 +216,37 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
-  public void shouldFindFacilitiesByAllParams() {
+  public void shouldFindFacilitiesUsingExtraData() throws JsonProcessingException {
+    // given
+    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
+    validZone = geographicZoneRepository.save(validZone);
+
+    Map<String, String> extraDataRural = new HashMap<>();
+    extraDataRural.put(TYPE, "rural");
+
+    Facility facility = generateInstance();
+    facility.setGeographicZone(validZone);
+    facility.setExtraData(extraDataRural);
+    repository.save(facility);
+
+    Map<String, String> extraDataUrban = new HashMap<>();
+    extraDataUrban.put(TYPE, "urban");
+
+    Facility facility2 = generateInstance();
+    facility2.setGeographicZone(validZone);
+    facility2.setExtraData(extraDataUrban);
+    repository.save(facility2);
+
+    // when
+    String extraDataJson = mapper.writeValueAsString(extraDataRural);
+    List<Facility> foundFacilties = repository.search(null, null, null, null, extraDataJson);
+
+    assertThat(foundFacilties, hasSize(1));
+    assertThat(foundFacilties, hasItem(facility));
+  }
+
+  @Test
+  public void shouldFindFacilitiesByAllParams() throws JsonProcessingException {
     // given
     GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
     validZone = geographicZoneRepository.save(validZone);
@@ -229,15 +259,20 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     facilityWithCodeAndName.setType(vaildFacilityType);
     repository.save(facilityWithCodeAndName);
 
+    Map<String, String> extraDataUrban = new HashMap<>();
+    extraDataUrban.put(TYPE, "urban");
+
     Facility facilityWithCode = generateInstance();
     facilityWithCode.setGeographicZone(validZone);
     facilityWithCode.setType(vaildFacilityType);
+    facilityWithCode.setExtraData(extraDataUrban);
     repository.save(facilityWithCode);
 
     // when
+    String extraDataJson = mapper.writeValueAsString(extraDataUrban);
     List<Facility> foundFacilties = repository.search(
-        facilityWithCodeAndName.getCode(), "Facility", ImmutableList.of(validZone),
-        vaildFacilityType.getCode()
+        facilityWithCodeAndName.getCode(), "Facility", ImmutableSet.of(validZone.getId()),
+        vaildFacilityType.getCode(), extraDataJson
     );
 
     // then
@@ -276,36 +311,6 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // then
     assertEquals(1, foundFacilities.size());
     assertEquals(facilityInsideBoundary.getId(), foundFacilities.get(0).getId());
-  }
-
-  @Test
-  public void shouldFindFacilitiesUsingExtraData() throws JsonProcessingException {
-    // given
-    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
-    validZone = geographicZoneRepository.save(validZone);
-
-    Map<String, String> extraDataRural = new HashMap<>();
-    extraDataRural.put(TYPE, "rural");
-
-    Facility facility = generateInstance();
-    facility.setGeographicZone(validZone);
-    facility.setExtraData(extraDataRural);
-    repository.save(facility);
-
-    Map<String, String> extraDataUrban = new HashMap<>();
-    extraDataUrban.put(TYPE, "urban");
-
-    Facility facility2 = generateInstance();
-    facility2.setGeographicZone(validZone);
-    facility2.setExtraData(extraDataUrban);
-    repository.save(facility2);
-
-    // when
-    String extraDataJson = mapper.writeValueAsString(extraDataRural);
-    List<Facility> foundFacilties = repository.findByExtraData(extraDataJson);
-
-    assertEquals(1, foundFacilties.size());
-    assertEquals("rural", foundFacilties.get(0).getExtraData().get(TYPE));
   }
 
   @Test
@@ -367,7 +372,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   private void searchFacilityAndCheckResults(String code, String name, Facility facility,
                                              String facilityTypeCode, int expectedSize) {
-    List<Facility> foundFacilities = repository.search(code, name, null, facilityTypeCode);
+    List<Facility> foundFacilities = repository.search(code, name, null, facilityTypeCode, null);
     assertThat(foundFacilities, hasSize(expectedSize));
     assertThat(foundFacilities, hasItem(hasProperty("name", equalTo(facility.getName()))));
   }

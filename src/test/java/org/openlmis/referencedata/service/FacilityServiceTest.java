@@ -15,13 +15,12 @@
 
 package org.openlmis.referencedata.service;
 
-import static com.google.common.collect.ImmutableList.of;
+import static com.google.common.collect.ImmutableSet.of;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -35,7 +34,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
@@ -73,22 +71,16 @@ public class FacilityServiceTest {
   private FacilityTypeRepository facilityTypeRepository;
 
   @Mock
-  private GeographicZone parent;
-
-  @Mock
-  private GeographicZone child1;
-
-  @Mock
-  private GeographicZone child2;
-
-  @Mock
   private Facility facility;
 
   @Mock
   private Facility facility2;
 
-  private UUID facilityUuid = UUID.randomUUID();
-  private UUID zoneUuid = UUID.randomUUID();
+  private UUID facility1Id = UUID.randomUUID();
+  private UUID facility2Id = UUID.randomUUID();
+  private UUID parentId = UUID.randomUUID();
+  private UUID childId = UUID.randomUUID();
+  private UUID childOfChildId = UUID.randomUUID();
   private List<Facility> facilityList;
 
   @InjectMocks
@@ -98,8 +90,8 @@ public class FacilityServiceTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     facilityList = Lists.newArrayList(facility, facility2);
-    when(facility.getId()).thenReturn(facilityUuid);
-    when(parent.getId()).thenReturn(zoneUuid);
+    when(facility.getId()).thenReturn(facility1Id);
+    when(facility2.getId()).thenReturn(facility2Id);
   }
 
   @Test
@@ -189,7 +181,7 @@ public class FacilityServiceTest {
     params.add(CODE, FACILITY_CODE);
     params.add(NAME, FACILITY_NAME);
     params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.add(ZONE_ID, zoneUuid);
+    params.add(ZONE_ID, parentId);
 
     final List<Facility> actual = facilityService.getFacilities(params);
 
@@ -205,7 +197,7 @@ public class FacilityServiceTest {
     params.add(CODE, FACILITY_CODE);
     params.add(NAME, FACILITY_NAME);
     params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.add(ZONE_ID, zoneUuid);
+    params.add(ZONE_ID, parentId);
 
     List<Facility> actual = facilityService.getFacilities(params);
 
@@ -230,7 +222,7 @@ public class FacilityServiceTest {
     params.put(CODE, FACILITY_CODE);
     params.put(NAME, FACILITY_NAME);
     params.put(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.put(ZONE_ID, zoneUuid);
+    params.put(ZONE_ID, parentId);
 
     final List<Facility> actual = facilityService.searchFacilities(params);
 
@@ -246,7 +238,7 @@ public class FacilityServiceTest {
     params.put(CODE, FACILITY_CODE);
     params.put(NAME, FACILITY_NAME);
     params.put(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.put(ZONE_ID, zoneUuid);
+    params.put(ZONE_ID, parentId);
 
     List<Facility> actual = facilityService.searchFacilities(params);
 
@@ -258,16 +250,16 @@ public class FacilityServiceTest {
     final String code = "FAC1";
     final String name = "Facility";
 
-    when(geographicZoneRepository.findOne(zoneUuid)).thenReturn(parent);
-    when(geographicZoneService.getAllZonesInHierarchy(parent)).thenReturn(Lists.newArrayList(
-        child1, child2));
+    when(geographicZoneRepository.exists(parentId)).thenReturn(true);
+    when(geographicZoneService.getAllZonesInHierarchy(parentId))
+        .thenReturn(Sets.newHashSet(childId, childOfChildId));
 
     when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
 
-    when(facilityRepository.search(code, name, of(parent, child1, child2), FACILITY_TYPE))
-        .thenReturn(Lists.newArrayList(facility, facility2));
-
-    when(facilityRepository.findByExtraData(anyString())).thenReturn(Lists.newArrayList(facility2));
+    when(facilityRepository
+        .search(code, name, of(parentId, childId, childOfChildId),
+            FACILITY_TYPE, "{\"type\":\"rural\"}"))
+        .thenReturn(Lists.newArrayList(facility2));
 
     Map<String, String> extraData = new HashMap<>();
     extraData.put("type", "rural");
@@ -277,7 +269,7 @@ public class FacilityServiceTest {
     params.put(CODE, code);
     params.put(NAME, name);
     params.put(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.put(ZONE_ID, zoneUuid);
+    params.put(ZONE_ID, parentId);
     params.put("extraData", extraData);
 
     List<Facility> actual = facilityService.searchFacilities(params);
@@ -287,20 +279,24 @@ public class FacilityServiceTest {
   }
 
   private void prepareForSearchWithRecurse() {
-    when(geographicZoneRepository.findOne(zoneUuid)).thenReturn(parent);
-    when(geographicZoneService.getAllZonesInHierarchy(parent)).thenReturn(Lists.newArrayList(
-        child1, child2));
+
+    when(geographicZoneRepository.exists(parentId)).thenReturn(true);
+    when(geographicZoneService.getAllZonesInHierarchy(parentId))
+        .thenReturn(Sets.newHashSet(childId, childOfChildId));
 
     when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
 
     when(facilityRepository
-        .search(FACILITY_CODE, FACILITY_NAME, of(parent, child1, child2), FACILITY_TYPE))
+        .search(
+            FACILITY_CODE, FACILITY_NAME,
+            of(parentId, childId, childOfChildId), FACILITY_TYPE, null))
         .thenReturn(Lists.newArrayList(facility, facility2));
   }
 
   private void verifyAfterSearchWithRecurse(List<Facility> actual) {
     verify(facilityRepository)
-        .search(FACILITY_CODE, FACILITY_NAME, of(parent, child1, child2), FACILITY_TYPE);
+        .search(FACILITY_CODE, FACILITY_NAME,
+            of(parentId, childId, childOfChildId), FACILITY_TYPE, null);
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(facility));
@@ -308,16 +304,18 @@ public class FacilityServiceTest {
   }
 
   private void prepareForSearchWithoutRecurse() {
-    when(geographicZoneRepository.findOne(zoneUuid)).thenReturn(parent);
+    when(geographicZoneRepository.exists(parentId)).thenReturn(true);
 
     when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
 
-    when(facilityRepository.search(FACILITY_CODE, FACILITY_NAME, of(parent), FACILITY_TYPE))
+    when(facilityRepository
+        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null))
         .thenReturn(Lists.newArrayList(facility));
   }
 
   private void verifyAfterSearchWithoutRecurse(List<Facility> actual) {
-    verify(facilityRepository).search(FACILITY_CODE, FACILITY_NAME, of(parent), FACILITY_TYPE);
+    verify(facilityRepository)
+        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null);
     verifyNoMoreInteractions(facilityRepository);
 
     assertEquals(1, actual.size());

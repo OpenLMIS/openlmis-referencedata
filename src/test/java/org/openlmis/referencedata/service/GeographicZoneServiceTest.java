@@ -15,7 +15,10 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -26,6 +29,8 @@ import static org.openlmis.referencedata.service.GeographicZoneService.NAME;
 import static org.openlmis.referencedata.service.GeographicZoneService.PARENT;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,15 +47,14 @@ import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("PMD.TooManyMethods")
 public class GeographicZoneServiceTest {
 
   @Mock
@@ -69,9 +73,6 @@ public class GeographicZoneServiceTest {
   private GeographicZone secondChild;
 
   @Mock
-  private GeographicZone childOfChild;
-
-  @Mock
   private GeographicLevel level;
 
   @Mock
@@ -80,7 +81,9 @@ public class GeographicZoneServiceTest {
   @InjectMocks
   private GeographicZoneService geographicZoneService;
 
-  private UUID zoneId = UUID.randomUUID();
+  private UUID parentId = UUID.randomUUID();
+  private UUID childId = UUID.randomUUID();
+  private UUID childOfChildId = UUID.randomUUID();
   private List<GeographicZone> geographicZones;
 
   @Before
@@ -97,48 +100,28 @@ public class GeographicZoneServiceTest {
 
   @Test
   public void shouldRetrieveOneDescendantWhenParentHasOneChild() {
-    when(geographicZoneRepository.findByParent(parent))
-        .thenReturn(Collections.singletonList(child));
-
-    Collection<GeographicZone> allZonesInHierarchy =
-        geographicZoneService.getAllZonesInHierarchy(parent);
-
-    assertEquals(Collections.singletonList(child), allZonesInHierarchy);
+    mockFindIdByParent(parentId, childId);
+    assertGetAllZonesInHierarchy(parentId, childId);
   }
 
   @Test
   public void shouldRetrieveManyDescendantsWhenTheChildHasAChild() {
-    when(geographicZoneRepository.findByParent(parent))
-        .thenReturn(Collections.singletonList(child));
-    when(geographicZoneRepository.findByParent(child))
-        .thenReturn(Collections.singletonList(childOfChild));
+    mockFindIdByParent(parentId, childId);
+    mockFindIdByParent(childId, childOfChildId);
 
-    Collection<GeographicZone> allZonesInHierarchy =
-        geographicZoneService.getAllZonesInHierarchy(parent);
-
-    assertEquals(Arrays.asList(child, childOfChild), allZonesInHierarchy);
+    assertGetAllZonesInHierarchy(parentId, childId, childOfChildId);
   }
 
   @Test
   public void shouldRetrieveManyDescendantsWhenParentHasManyChildren() {
-    when(geographicZoneRepository.findByParent(parent))
-        .thenReturn(Arrays.asList(child, secondChild));
-
-    Collection<GeographicZone> allZonesInHierarchy =
-        geographicZoneService.getAllZonesInHierarchy(parent);
-
-    assertEquals(Arrays.asList(child, secondChild), allZonesInHierarchy);
+    mockFindIdByParent(parentId, childId, childOfChildId);
+    assertGetAllZonesInHierarchy(parentId, childId, childOfChildId);
   }
 
   @Test
   public void shouldNotRetrieveAnyDescendantsWhenParentHasNoChildren() {
-    when(geographicZoneRepository.findByParent(parent))
-        .thenReturn(Collections.emptyList());
-
-    Collection<GeographicZone> allZonesInHierarchy =
-        geographicZoneService.getAllZonesInHierarchy(parent);
-
-    assertEquals(Collections.emptyList(), allZonesInHierarchy);
+    mockFindIdByParent(parentId);
+    assertGetAllZonesInHierarchy(parentId);
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -178,7 +161,7 @@ public class GeographicZoneServiceTest {
 
   @Test
   public void shouldSearchForRequisitionGroupsWithAllParametersProvided() {
-    when(geographicZoneRepository.findOne(zoneId)).thenReturn(parent);
+    when(geographicZoneRepository.findOne(parentId)).thenReturn(parent);
     when(geographicLevelRepository.findByLevelNumber(1)).thenReturn(level);
     when(geographicZoneRepository.search(eq("name"), eq("code"),
         eq(parent), eq(level), any(Pageable.class)))
@@ -187,11 +170,22 @@ public class GeographicZoneServiceTest {
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put(NAME, "name");
     searchParams.put(CODE, "code");
-    searchParams.put(PARENT, zoneId.toString());
+    searchParams.put(PARENT, parentId.toString());
     searchParams.put(LEVEL_NUMBER, "1");
 
     Page<GeographicZone> actual = geographicZoneService.search(searchParams, pageable);
     verify(geographicZoneRepository).search("name", "code", parent, level, pageable);
     assertEquals(geographicZones, actual.getContent());
+  }
+
+  private void mockFindIdByParent(UUID parentId, UUID... children) {
+    when(geographicZoneRepository.findIdsByParent(parentId))
+        .thenReturn(Sets.newHashSet(children));
+  }
+
+  private void assertGetAllZonesInHierarchy(UUID parentId, UUID... expected) {
+    Set<UUID> actual = geographicZoneService.getAllZonesInHierarchy(parentId);
+    assertThat(actual, hasSize(expected.length));
+    assertThat(actual, hasItems(expected));
   }
 }

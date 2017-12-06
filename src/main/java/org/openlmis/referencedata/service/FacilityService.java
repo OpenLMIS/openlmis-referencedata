@@ -19,14 +19,13 @@ import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isAllEmpty;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.collections4.MapUtils;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
@@ -109,23 +108,19 @@ public class FacilityService {
     String code = MapUtils.getString(queryMap, CODE, null);
     String name = MapUtils.getString(queryMap, NAME, null);
     String facilityTypeCode = MapUtils.getString(queryMap, FACILITY_TYPE_CODE, null);
-    Optional<UUID> zoneId = UuidUtil.fromString(
-        MapUtils.getObject(queryMap, ZONE_ID, "").toString());
+    UUID zoneId = UuidUtil
+        .fromString(MapUtils.getObject(queryMap, ZONE_ID, "").toString())
+        .orElse(null);
     final boolean recurse = MapUtils.getBooleanValue(queryMap, RECURSE);
 
     // validate query parameters
-    if (isEmpty(queryMap) || (isAllEmpty(code, name, facilityTypeCode) && !zoneId.isPresent())) {
+    if (isEmpty(queryMap) || (isAllEmpty(code, name, facilityTypeCode) && null == zoneId)) {
       return facilityRepository.findAll();
     }
 
     // find zone if given
-    GeographicZone zone = null;
-    if (zoneId.isPresent()) {
-      zone = geographicZoneRepository.findOne(zoneId.get());
-
-      if (zone == null) {
-        throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
-      }
+    if (null != zoneId && !geographicZoneRepository.exists(zoneId)) {
+      throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     }
 
     // find facility type if given
@@ -133,15 +128,19 @@ public class FacilityService {
       throw new ValidationMessageException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     }
 
-    List<Facility> facilities = findFacilities(zone, code, name, facilityTypeCode, recurse);
-    filterByExtraData(facilities, (Map) queryMap.get(EXTRA_DATA));
+    Map extraData = (Map) queryMap.get(EXTRA_DATA);
+
+    List<Facility> facilities = findFacilities(
+        zoneId, code, name, facilityTypeCode, extraData, recurse
+    );
 
     return Optional.ofNullable(facilities).orElse(Collections.emptyList());
   }
 
-  private List<Facility> findFacilities(GeographicZone zone, String code, String name,
-                                        String facilityTypeCode, boolean recurse) {
-    List<GeographicZone> zones = Lists.newArrayList();
+  private List<Facility> findFacilities(UUID zone, String code, String name,
+                                        String facilityTypeCode, Map extraData,
+                                        boolean recurse) {
+    Set<UUID> zones = Sets.newHashSet();
 
     if (null != zone) {
       zones.add(zone);
@@ -151,21 +150,18 @@ public class FacilityService {
       zones.addAll(geographicZoneService.getAllZonesInHierarchy(zone));
     }
 
-    return facilityRepository.search(code, name, zones, facilityTypeCode);
-  }
+    String extraDataString = null;
 
-  private void filterByExtraData(List<Facility> foundFacilities, Map extraData) {
     if (isNotEmpty(extraData)) {
       try {
-        String extraDataString = mapper.writeValueAsString(extraData);
-        List<Facility> extraDataResults = facilityRepository.findByExtraData(extraDataString);
-
-        // intersection between two lists
-        foundFacilities.retainAll(extraDataResults);
+        extraDataString = mapper.writeValueAsString(extraData);
       } catch (JsonProcessingException jpe) {
         LOGGER.debug("Cannot serialize extra data query request body into JSON");
+        extraDataString = null;
       }
     }
+
+    return facilityRepository.search(code, name, zones, facilityTypeCode, extraDataString);
   }
 
 }
