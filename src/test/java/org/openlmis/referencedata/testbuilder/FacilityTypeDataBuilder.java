@@ -43,10 +43,17 @@ public class FacilityTypeDataBuilder {
   }
 
   /**
+   * Builds instance of {@link FacilityType} without id.
+   */
+  public FacilityType buildAsNew() {
+    return new FacilityType(code, name, description, displayOrder, active);
+  }
+
+  /**
    * Builds instance of {@link FacilityType}.
    */
   public FacilityType build() {
-    FacilityType type = new FacilityType(code, name, description, displayOrder, active);
+    FacilityType type = buildAsNew();
     type.setId(id);
 
     return type;

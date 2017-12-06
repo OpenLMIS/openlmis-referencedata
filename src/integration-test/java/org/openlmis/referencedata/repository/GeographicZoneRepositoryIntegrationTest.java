@@ -15,7 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
@@ -33,6 +36,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,9 +59,15 @@ public class GeographicZoneRepositoryIntegrationTest
   @Autowired
   private GeographicZoneRepository repository;
 
-  private GeographicLevel countryLevel = new GeographicLevel("country", 1);
-  private GeographicLevel regionLevel = new GeographicLevel("region", 2);
-  private GeographicLevel districtLevel = new GeographicLevel("district", 3);
+  private GeographicLevel countryLevel = new GeographicLevelDataBuilder()
+      .withLevelNumber(1)
+      .buildAsNew();
+  private GeographicLevel regionLevel = new GeographicLevelDataBuilder()
+      .withLevelNumber(2)
+      .buildAsNew();
+  private GeographicLevel districtLevel = new GeographicLevelDataBuilder()
+      .withLevelNumber(3)
+      .buildAsNew();
 
   private GeographicZone countryZone;
   private GeographicZone regionZone;
@@ -71,18 +82,19 @@ public class GeographicZoneRepositoryIntegrationTest
 
   @Before
   public void setUp() {
+    geographicLevelRepository.deleteAll();
+    repository.deleteAll();
+
     geographicLevelRepository.save(countryLevel);
     geographicLevelRepository.save(regionLevel);
     geographicLevelRepository.save(districtLevel);
     gf = new GeometryFactory();
+
+    repository.save(generateInstance());
   }
 
   @Override
   GeographicZone generateInstance() {
-
-    countryZone = new GeographicZone();
-    countryZone.setCode("C" + this.getNextInstanceNumber());
-    countryZone.setLevel(countryLevel);
     Coordinate[] regionAndCountryCoords  = new Coordinate[] {
         new Coordinate(0, 0),
         new Coordinate(4, 0),
@@ -91,23 +103,18 @@ public class GeographicZoneRepositoryIntegrationTest
         new Coordinate(0, 0)
     };
     Polygon regionAndCountryBoundary = gf.createPolygon(regionAndCountryCoords);
-    countryZone.setBoundary(regionAndCountryBoundary);
 
-    repository.save(countryZone);
+    countryZone = new GeographicZoneDataBuilder()
+        .withLevel(countryLevel)
+        .withBoundary(regionAndCountryBoundary)
+        .buildAsNew();
 
-    regionZone = new GeographicZone();
-    regionZone.setCode("R" + this.getNextInstanceNumber());
-    regionZone.setLevel(regionLevel);
-    regionZone.setParent(countryZone);
-    regionZone.setBoundary(regionAndCountryBoundary);
+    regionZone = new GeographicZoneDataBuilder()
+        .withLevel(regionLevel)
+        .withParent(countryZone)
+        .withBoundary(regionAndCountryBoundary)
+        .buildAsNew();
 
-    repository.save(regionZone);
-
-    districtZone = new GeographicZone();
-    districtZone.setCode("D" + this.getNextInstanceNumber());
-    districtZone.setName(ZONE + this.getNextInstanceNumber());
-    districtZone.setLevel(districtLevel);
-    districtZone.setParent(regionZone);
     Coordinate[] districtCoords  = new Coordinate[] {
         new Coordinate(0, 0),
         new Coordinate(2, 0),
@@ -115,19 +122,22 @@ public class GeographicZoneRepositoryIntegrationTest
         new Coordinate(0, 2),
         new Coordinate(0, 0)
     };
-    districtZone.setBoundary(gf.createPolygon(districtCoords));
 
+    districtZone = new GeographicZoneDataBuilder()
+        .withLevel(districtLevel)
+        .withParent(regionZone)
+        .withBoundary(gf.createPolygon(districtCoords))
+        .buildAsNew();
+
+    repository.save(countryZone);
+    repository.save(regionZone);
     return districtZone;
   }
 
   @Test
   public void shouldFindByParentAndLevel() {
-    // given
-    generateInstance();
-
     // when
-    List<GeographicZone> zones = repository.findByParentAndLevel(
-        regionZone.getParent(), regionZone.getLevel());
+    List<GeographicZone> zones = repository.findByParentAndLevel(countryZone, regionLevel);
 
     // then
     assertEquals(1, zones.size());
@@ -136,11 +146,8 @@ public class GeographicZoneRepositoryIntegrationTest
 
   @Test
   public void shouldFindIdByParent() {
-    // given
-    generateInstance();
-
     // when
-    Set<UUID> zones = repository.findIdsByParent(regionZone.getParent().getId());
+    Set<UUID> zones = repository.findIdsByParent(countryZone.getId());
 
     // then
     assertEquals(1, zones.size());
@@ -149,11 +156,8 @@ public class GeographicZoneRepositoryIntegrationTest
 
   @Test
   public void shouldFindByLevel() {
-    // given
-    generateInstance();
-
     // when
-    List<GeographicZone> zones = repository.findByLevel(regionZone.getLevel());
+    List<GeographicZone> zones = repository.findByLevel(regionLevel);
 
     // then
     assertEquals(1, zones.size());
@@ -163,112 +167,67 @@ public class GeographicZoneRepositoryIntegrationTest
   @Test
   public void shouldFindByLocation() {
     // given
-    generateInstance();
-
-    GeographicZone district2Zone = new GeographicZone();
-    district2Zone.setCode("D" + this.getNextInstanceNumber());
-    district2Zone.setLevel(districtLevel);
-    district2Zone.setParent(regionZone);
-    Coordinate[] district2Coords  = new Coordinate[] {
-        new Coordinate(2, 0),
-        new Coordinate(4, 0),
-        new Coordinate(4, 2),
-        new Coordinate(2, 2),
-        new Coordinate(2, 0)
-    };
-    district2Zone.setBoundary(gf.createPolygon(district2Coords));
-    repository.save(district2Zone);
-    
-    // Location is in district2Zone, regionZone, countryZone, but not districtZone
+    // Location is in regionZone, countryZone, but not districtZone
     Point location = gf.createPoint(new Coordinate(3, 1));
     
     // when
     List<GeographicZone> zones = repository.findByLocation(location);
 
     // then
-    assertEquals(3, zones.size());
-    assertThat(zones, hasItem(district2Zone));
+    assertEquals(2, zones.size());
     assertThat(zones, hasItem(regionZone));
     assertThat(zones, hasItem(countryZone));
   }
 
   @Test
   public void shouldFindGeographicZonesWithSimilarCode() {
-    GeographicZone geographicZone = generateInstance();
-    repository.save(geographicZone);
-    GeographicZone geographicZone1 = generateInstance();
-    repository.save(geographicZone1);
-
     Pageable pageable = mockPageable(0, 10);
 
-    searchZonesAndCheckResults(null, geographicZone.getCode(), null, null,
-        pageable, 1, geographicZone);
+    searchZonesAndCheckResults(null, districtZone.getCode(), null, null,
+        pageable, 1, districtZone);
   }
 
   @Test
   public void shouldFindGeographicZonesWithSimilarCodeIgnoringCase() {
-    GeographicZone geographicZone = generateInstance();
-    geographicZone = repository.save(geographicZone);
-
     Pageable pageable = mockPageable(0, 10);
 
-    searchZonesAndCheckResults(null, geographicZone.getCode().toUpperCase(), null, null,
-        pageable, 1, geographicZone);
-    searchZonesAndCheckResults(null, geographicZone.getCode().toLowerCase(), null, null,
-        pageable, 1, geographicZone);
-    searchZonesAndCheckResults(null, "d", null, null, pageable, 1, geographicZone);
-    searchZonesAndCheckResults(null, "D", null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(null, districtZone.getCode().toUpperCase(), null, null,
+        pageable, 1, districtZone);
+    searchZonesAndCheckResults(null, districtZone.getCode().toLowerCase(), null, null,
+        pageable, 1, districtZone);
+    searchZonesAndCheckResults(null, "gz", null, null, pageable, 3, districtZone);
+    searchZonesAndCheckResults(null, "gZ", null, null, pageable, 3, districtZone);
+    searchZonesAndCheckResults(null, "Gz", null, null, pageable, 3, districtZone);
+    searchZonesAndCheckResults(null, "GZ", null, null, pageable, 3, districtZone);
   }
 
   @Test
   public void shouldFindGeographicZonesWithSimilarName() {
-    GeographicZone geographicZone = generateInstance();
-    geographicZone = repository.save(geographicZone);
-
     Pageable pageable = mockPageable(0, 10);
-
-    searchZonesAndCheckResults(ZONE, null, null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(ZONE, null, null, null, pageable, 3, districtZone);
   }
 
   @Test
   public void shouldFindGeographicZonesWithSimilarNameIgnoringCase() {
-    GeographicZone geographicZone = generateInstance();
-    geographicZone = repository.save(geographicZone);
-
     Pageable pageable = mockPageable(0, 10);
 
-    searchZonesAndCheckResults(ZONE, null, null, null, pageable, 1, geographicZone);
-    searchZonesAndCheckResults("ZONE", null, null, null, pageable, 1, geographicZone);
-    searchZonesAndCheckResults("ZoNe", null, null, null, pageable, 1, geographicZone);
-    searchZonesAndCheckResults("zONe", null, null, null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(ZONE, null, null, null, pageable, 3, districtZone);
+    searchZonesAndCheckResults("ZONE", null, null, null, pageable, 3, districtZone);
+    searchZonesAndCheckResults("ZoNe", null, null, null, pageable, 3, districtZone);
+    searchZonesAndCheckResults("zONe", null, null, null, pageable, 3, districtZone);
   }
 
   @Test
   public void shouldFindGeographicZonesWithSimilarCodeOrName() {
-    GeographicZone geographicZone = generateInstance();
-    geographicZone = repository.save(geographicZone);
-    GeographicZone geographicZone1 = generateInstance();
-    repository.save(geographicZone1);
-
     Pageable pageable = mockPageable(0, 10);
-
-    searchZonesAndCheckResults(ZONE, "D", null, null,
-        pageable, 2, geographicZone);
+    searchZonesAndCheckResults(ZONE, "GZ", null, null, pageable, 3, districtZone);
   }
 
   @Test
   public void shouldFindGeographicZonesWithSimilarCodeOrNameIgnoringCase() {
-    GeographicZone geographicZone = generateInstance();
-    geographicZone = repository.save(geographicZone);
-    GeographicZone geographicZone1 = generateInstance();
-    repository.save(geographicZone1);
-
     Pageable pageable = mockPageable(0, 10);
-
-    searchZonesAndCheckResults("zon", "d", null, null,
-        pageable, 2, geographicZone);
-    searchZonesAndCheckResults("ZONE", "D", null, null,
-        pageable, 2, geographicZone);
+    searchZonesAndCheckResults("zon", "gz", null, null, pageable, 3, districtZone);
+    searchZonesAndCheckResults("ZONE", "GZ", null, null, pageable, 3, districtZone);
   }
 
   @Test
@@ -282,76 +241,49 @@ public class GeographicZoneRepositoryIntegrationTest
 
   @Test
   public void shouldReturnGeographicZonesWithFullCount() {
-    assertEquals(0, repository.count());
+    Pageable pageable = mockPageable(1, 0);
 
-    for (int i = 0; i < 10; i++) {
-      GeographicZone zone  = generateInstance();
-      repository.save(zone);
-    }
-
-    // different code
-    GeographicZone zone = generateInstance();
-    zone.setCode("XXX");
-    repository.save(zone);
-
-    assertEquals(33, repository.count());
-
-    Pageable pageable = mockPageable(3, 0);
-
-    Page<GeographicZone> result = repository.search(null, "XXX", null, null, pageable);
+    Page<GeographicZone> result = repository.search(
+        null, districtZone.getCode(), null, null, pageable
+    );
 
     assertEquals(1, result.getContent().size());
     assertEquals(1, result.getTotalElements());
 
-    result = repository.search(null, "D", null, null, pageable);
+    result = repository.search(null, "GZ", null, null, pageable);
 
-    assertEquals(3, result.getContent().size());
-    assertEquals(10, result.getTotalElements());
+    assertEquals(1, result.getContent().size());
+    assertEquals(3, result.getTotalElements());
   }
 
   @Test
   public void shouldFindGeographicZonesByParent() {
-
-    GeographicZone geographicZone = generateInstance();
-    geographicZone = repository.save(geographicZone);
-
     Pageable pageable = mockPageable(0, 10);
-
-    searchZonesAndCheckResults(null, null,
-        geographicZone.getParent(),
-        null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(
+        null, null, regionZone, null, pageable, 1, districtZone
+    );
   }
 
   @Test
   public void shouldFindGeographicZonesByLevel() {
-
-    GeographicZone geographicZone = generateInstance();
-    geographicZone = repository.save(geographicZone);
-
     Pageable pageable = mockPageable(0, 10);
-
-    searchZonesAndCheckResults(null, null,
-        geographicZone.getParent(),
-        null, pageable, 1, geographicZone);
+    searchZonesAndCheckResults(
+        null, null, null, districtLevel, pageable, 1, districtZone
+    );
   }
 
   @Test
   public void shouldSortByName() {
-    GeographicZone geographicZone = generateInstance();
-    geographicZone.setName("zone-a");
-    geographicZone = repository.save(geographicZone);
-
-    GeographicZone geographicZone1 = generateInstance();
-    geographicZone1.setName("zone-b");
-    geographicZone1 = repository.save(geographicZone1);
-
     Pageable pageable = mockPageable(0, 10);
 
-    Page<GeographicZone> foundPage = repository.search("zone", null, null,
-        null, pageable);
-    assertEquals(2, foundPage.getContent().size());
-    assertEquals(geographicZone.getName(), foundPage.getContent().get(0).getName());
-    assertEquals(geographicZone1.getName(), foundPage.getContent().get(1).getName());
+    Page<GeographicZone> foundPage = repository.search(
+        "Geographic Zone", null, null, null, pageable
+    );
+
+    assertEquals(3, foundPage.getContent().size());
+    assertEquals(countryZone.getName(), foundPage.getContent().get(0).getName());
+    assertEquals(regionZone.getName(), foundPage.getContent().get(1).getName());
+    assertEquals(districtZone.getName(), foundPage.getContent().get(2).getName());
   }
 
   @Test
@@ -371,13 +303,12 @@ public class GeographicZoneRepositoryIntegrationTest
   private void searchZonesAndCheckResults(String name, String code, GeographicZone parent,
                                           GeographicLevel geographicLevel,
                                           Pageable pageable, int expectedSize,
-                                          GeographicZone geographicZone) {
+                                          GeographicZone zone) {
     Page<GeographicZone> foundPage = repository.search(name, code, parent,
         geographicLevel, pageable);
 
-    assertEquals(expectedSize, foundPage.getContent().size());
-
-    assertEquals(geographicZone.getName(), foundPage.getContent().get(0).getName());
+    assertThat(foundPage.getContent(), hasSize(expectedSize));
+    assertThat(foundPage.getContent(), hasItem(hasProperty("name", equalTo(zone.getName()))));
   }
 
   private Pageable mockPageable(int pageSize, int pageNumber) {
@@ -392,15 +323,15 @@ public class GeographicZoneRepositoryIntegrationTest
   protected void assertInstance(GeographicZone district) {
     super.assertInstance(district);
 
-    assertThat(district.getCode(), startsWith("D"));
+    assertThat(district.getCode(), startsWith("GZ"));
     assertThat(district.getLevel().getLevelNumber(), is(3));
     assertThat(district.getParent().getId(), is(regionZone.getId()));
 
-    assertThat(district.getParent().getCode(), startsWith("R"));
+    assertThat(district.getParent().getCode(), startsWith("GZ"));
     assertThat(district.getParent().getLevel().getLevelNumber(), is(2));
     assertThat(district.getParent().getParent().getId(), is(countryZone.getId()));
 
-    assertThat(district.getParent().getParent().getCode(), startsWith("C"));
+    assertThat(district.getParent().getParent().getCode(), startsWith("GZ"));
     assertThat(district.getParent().getParent().getLevel().getLevelNumber(), is(1));
     assertThat(district.getParent().getParent().getParent(), is(nullValue()));
   }

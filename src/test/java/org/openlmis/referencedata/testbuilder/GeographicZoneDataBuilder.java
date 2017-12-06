@@ -16,8 +16,10 @@
 package org.openlmis.referencedata.testbuilder;
 
 import com.vividsolutions.jts.geom.Polygon;
+
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+
 import java.util.UUID;
 
 public class GeographicZoneDataBuilder {
@@ -42,23 +44,41 @@ public class GeographicZoneDataBuilder {
 
     id = UUID.randomUUID();
     code = "GZ" + instanceNumber;
-    name = "Geographic Zone " + instanceNumber;
+    name = "Geographic Zone #" + instanceNumber;
     level = new GeographicLevelDataBuilder().build();
+  }
+
+  /**
+   * Builds instance of {@link GeographicZone} without id.
+   */
+  public GeographicZone buildAsNew() {
+    return new GeographicZone(code, name, level, parent, catchmentPopulation,
+        latitude, longitude, boundary);
   }
 
   /**
    * Builds instance of {@link GeographicZone}.
    */
   public GeographicZone build() {
-    GeographicZone zone = new GeographicZone(code, name, level, parent, catchmentPopulation,
-        latitude, longitude, boundary);
+    GeographicZone zone = buildAsNew();
     zone.setId(id);
 
     return zone;
   }
 
+  public GeographicZoneDataBuilder withLevel(GeographicLevel level) {
+    this.level = level;
+    return this;
+  }
+
+
   public GeographicZoneDataBuilder withParent(GeographicZone zone) {
     this.parent = zone;
+    return this;
+  }
+
+  public GeographicZoneDataBuilder withBoundary(Polygon boundary) {
+    this.boundary = boundary;
     return this;
   }
 }

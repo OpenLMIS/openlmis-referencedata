@@ -41,9 +41,13 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.testbuilder.ExtraDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,9 +56,6 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
-
-  private static final String CODE = "FacilityRepositoryIntegrationTest";
-  private static final String TYPE = "type";
 
   @Autowired
   private FacilityRepository repository;
@@ -72,170 +73,129 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     return this.repository;
   }
 
-  private FacilityType facilityType = new FacilityType();
-  private GeographicZone geographicZone = new GeographicZone();
-  private GeographicLevel geographicLevel = new GeographicLevel();
+  private FacilityType facilityType = new FacilityTypeDataBuilder().buildAsNew();
+  private GeographicLevel geographicLevel = new GeographicLevelDataBuilder().buildAsNew();
+  private GeographicZone geographicZone = new GeographicZoneDataBuilder()
+      .withLevel(geographicLevel)
+      .buildAsNew();
 
   private ObjectMapper mapper = new ObjectMapper();
 
+  private Facility facility;
+  private Facility facility1;
+
   @Before
   public void setUp() {
-    this.facilityType.setCode(CODE);
-    facilityTypeRepository.save(this.facilityType);
+    facilityTypeRepository.deleteAll();
+    geographicLevelRepository.deleteAll();
+    geographicZoneRepository.deleteAll();
+    repository.deleteAllInBatch();
 
-    geographicLevel.setCode(CODE);
-    geographicLevel.setLevelNumber(1);
+    facilityTypeRepository.save(facilityType);
     geographicLevelRepository.save(geographicLevel);
-
-    this.geographicZone.setCode(CODE);
-    this.geographicZone.setLevel(geographicLevel);
     geographicZoneRepository.save(geographicZone);
+
+    facility = generateInstance();
+    facility1 = generateInstance();
+
+    repository.save(facility);
+    repository.save(facility1);
   }
 
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
-    Facility facility = generateInstance();
-    repository.save(facility);
-    Facility facility1 = generateInstance();
-    repository.save(facility1);
-
-    searchFacilityAndCheckResults(facility.getCode(), null, facility, null, 1);
+    searchFacilityAndCheckResults(facility.getCode(), null, facility, 1);
   }
 
   @Test
   public void shouldFindFacilitiesWithSimilarCodeIgnoringCase() {
-    Facility facility = generateInstance();
-    repository.save(facility);
-
-    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), null, facility, null, 1);
-    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), null, facility, null, 1);
-    searchFacilityAndCheckResults("f", null, facility, null, 1);
-    searchFacilityAndCheckResults("F", null, facility, null, 1);
+    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), null, facility, 1);
+    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), null, facility, 1);
+    searchFacilityAndCheckResults("f", null, facility, 2);
+    searchFacilityAndCheckResults("F", null, facility, 2);
   }
 
   @Test
   public void shouldFindFacilitiesWithSimilarName() {
-    Facility facility = generateInstance();
-    repository.save(facility);
-
-    searchFacilityAndCheckResults(null, "Facil", facility, null, 1);
+    searchFacilityAndCheckResults(null, "Facil", facility, 2);
   }
 
   @Test
   public void shouldFindFacilitiesWithSimilarNameIgnoringCase() {
-    Facility facility = generateInstance();
-    repository.save(facility);
-
-    searchFacilityAndCheckResults(null, "facil", facility, null, 1);
-    searchFacilityAndCheckResults(null, "FACIL", facility, null, 1);
-    searchFacilityAndCheckResults(null, "fAcIl", facility, null, 1);
-    searchFacilityAndCheckResults(null, "FAciL", facility, null, 1);
+    searchFacilityAndCheckResults(null, "facil", facility, 2);
+    searchFacilityAndCheckResults(null, "FACIL", facility, 2);
+    searchFacilityAndCheckResults(null, "fAcIl", facility, 2);
+    searchFacilityAndCheckResults(null, "FAciL", facility, 2);
   }
 
   @Test
   public void shouldFindFacilitiesWithSimilarCodeOrName() {
-    Facility facility = generateInstance();
-    repository.save(facility);
-    Facility facility1 = generateInstance();
-    repository.save(facility1);
-
-    searchFacilityAndCheckResults(facility.getCode(), "Facil", facility, null, 2);
+    searchFacilityAndCheckResults(facility.getCode(), "Facil", facility, 2);
   }
 
   @Test
   public void shouldFindFacilitiesWithSimilarCodeOrNameIgnoringCase() {
-    Facility facility = generateInstance();
-    repository.save(facility);
-    Facility facility1 = generateInstance();
-    repository.save(facility1);
-
-    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), "facil", facility, null, 2);
-    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), "FACIL", facility, null, 2);
-    searchFacilityAndCheckResults("f", "fAcIl", facility, null, 2);
-    searchFacilityAndCheckResults("F", "FAciL", facility, null, 2);
+    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), "facil", facility, 2);
+    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), "FACIL", facility, 2);
+    searchFacilityAndCheckResults("f", "fAcIl", facility, 2);
+    searchFacilityAndCheckResults("F", "FAciL", facility, 2);
     repository.save(facility);
   }
 
   @Test
   public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
     List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null, null, null);
-
     assertEquals(0, foundFacilties.size());
   }
 
   @Test
   public void shouldFindFacilitiesByFacilityType() {
     // given
-    FacilityType vaildFacilityType = new FacilityType(TYPE);
-    vaildFacilityType = facilityTypeRepository.save(vaildFacilityType);
+    FacilityType anotherType = new FacilityTypeDataBuilder().buildAsNew();
+    facilityTypeRepository.save(anotherType);
 
-    Facility validFacility = generateInstance();
-    validFacility.setType(vaildFacilityType);
-    repository.save(validFacility);
-
-    FacilityType invaildfacilityType = new FacilityType("other-type");
-    invaildfacilityType = facilityTypeRepository.save(invaildfacilityType);
-
-    Facility invalidFacility = generateInstance();
-    invalidFacility.setType(invaildfacilityType);
-    repository.save(invalidFacility);
+    facility1.setType(anotherType);
+    repository.save(facility1);
 
     // when
     List<Facility> foundFacilties = repository
-        .search(null, null, null, vaildFacilityType.getCode(), null);
+        .search(null, null, null, facilityType.getCode(), null);
 
     // then
     assertEquals(1, foundFacilties.size());
-    assertEquals(validFacility.getId(), foundFacilties.get(0).getId());
+    assertEquals(facility.getId(), foundFacilties.get(0).getId());
   }
 
   @Test
   public void shouldFindFacilitiesByGeographicZone() {
     // given
-    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
-    validZone = geographicZoneRepository.save(validZone);
+    GeographicZone anotherZone = new GeographicZoneDataBuilder()
+        .withLevel(geographicLevel)
+        .buildAsNew();
+    geographicZoneRepository.save(anotherZone);
 
-    Facility validFacility = generateInstance();
-    validFacility.setGeographicZone(validZone);
-    repository.save(validFacility);
-
-    GeographicZone invalidZone = new GeographicZone("invalidZone", geographicLevel);
-    invalidZone = geographicZoneRepository.save(invalidZone);
-
-    Facility invalidFacility = generateInstance();
-    invalidFacility.setGeographicZone(invalidZone);
-    repository.save(invalidFacility);
+    facility1.setGeographicZone(anotherZone);
+    repository.save(facility1);
 
     // when
     List<Facility> foundFacilties = repository
-        .search(null, null, ImmutableSet.of(validZone.getId()), null, null);
+        .search(null, null, ImmutableSet.of(geographicZone.getId()), null, null);
 
     // then
     assertEquals(1, foundFacilties.size());
-    assertEquals(validFacility.getId(), foundFacilties.get(0).getId());
+    assertEquals(facility.getId(), foundFacilties.get(0).getId());
   }
 
   @Test
   public void shouldFindFacilitiesUsingExtraData() throws JsonProcessingException {
     // given
-    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
-    validZone = geographicZoneRepository.save(validZone);
+    Map<String, String> extraDataRural = new ExtraDataBuilder().add("type", "rural").build();
+    Map<String, String> extraDataUrban = new ExtraDataBuilder().add("type", "urban").build();
 
-    Map<String, String> extraDataRural = new HashMap<>();
-    extraDataRural.put(TYPE, "rural");
-
-    Facility facility = generateInstance();
-    facility.setGeographicZone(validZone);
     facility.setExtraData(extraDataRural);
+    facility1.setExtraData(extraDataUrban);
     repository.save(facility);
-
-    Map<String, String> extraDataUrban = new HashMap<>();
-    extraDataUrban.put(TYPE, "urban");
-
-    Facility facility2 = generateInstance();
-    facility2.setGeographicZone(validZone);
-    facility2.setExtraData(extraDataUrban);
-    repository.save(facility2);
+    repository.save(facility1);
 
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataRural);
@@ -248,38 +208,22 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   @Test
   public void shouldFindFacilitiesByAllParams() throws JsonProcessingException {
     // given
-    GeographicZone validZone = new GeographicZone("validZone", geographicLevel);
-    validZone = geographicZoneRepository.save(validZone);
-
-    FacilityType vaildFacilityType = new FacilityType(TYPE);
-    vaildFacilityType = facilityTypeRepository.save(vaildFacilityType);
-
-    Facility facilityWithCodeAndName = generateInstance();
-    facilityWithCodeAndName.setGeographicZone(validZone);
-    facilityWithCodeAndName.setType(vaildFacilityType);
-    repository.save(facilityWithCodeAndName);
-
-    Map<String, String> extraDataUrban = new HashMap<>();
-    extraDataUrban.put(TYPE, "urban");
-
-    Facility facilityWithCode = generateInstance();
-    facilityWithCode.setGeographicZone(validZone);
-    facilityWithCode.setType(vaildFacilityType);
-    facilityWithCode.setExtraData(extraDataUrban);
-    repository.save(facilityWithCode);
+    Map<String, String> extraDataUrban = new ExtraDataBuilder().add("type", "urban").build();
+    facility1.setExtraData(extraDataUrban);
+    repository.save(facility1);
 
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataUrban);
     List<Facility> foundFacilties = repository.search(
-        facilityWithCodeAndName.getCode(), "Facility", ImmutableSet.of(validZone.getId()),
-        vaildFacilityType.getCode(), extraDataJson
+        facility.getCode(), "Facility", ImmutableSet.of(geographicZone.getId()),
+        facilityType.getCode(), extraDataJson
     );
 
     // then
     assertEquals(2, foundFacilties.size());
     assertThat(
         foundFacilties.stream().map(BaseEntity::getId).collect(Collectors.toSet()),
-        hasItems(facilityWithCode.getId(), facilityWithCodeAndName.getId())
+        hasItems(facility1.getId(), facility.getId())
     );
   }
 
@@ -288,13 +232,11 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // given
     GeometryFactory gf = new GeometryFactory();
 
-    Facility facilityInsideBoundary = generateInstance();
-    facilityInsideBoundary.setLocation(gf.createPoint(new Coordinate(1, 1)));
-    facilityInsideBoundary = repository.save(facilityInsideBoundary);
+    facility.setLocation(gf.createPoint(new Coordinate(1, 1)));
+    repository.save(facility);
 
-    Facility facilityOutsideBoundary = generateInstance();
-    facilityOutsideBoundary.setLocation(gf.createPoint(new Coordinate(-1, 1)));
-    repository.save(facilityOutsideBoundary);
+    facility1.setLocation(gf.createPoint(new Coordinate(-1, 1)));
+    repository.save(facility1);
 
     Coordinate[] coords = new Coordinate[]{
         new Coordinate(0, 0),
@@ -310,23 +252,17 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // then
     assertEquals(1, foundFacilities.size());
-    assertEquals(facilityInsideBoundary.getId(), foundFacilities.get(0).getId());
+    assertEquals(facility.getId(), foundFacilities.get(0).getId());
   }
 
   @Test
   public void shouldCheckIfFacilityExistsByCode() {
-    Facility facility = generateInstance();
-    repository.save(facility);
-
     assertFalse(repository.existsByCode("some-random-code"));
     assertTrue(repository.existsByCode(facility.getCode()));
   }
 
   @Test
   public void shouldGetFacilityByCode() {
-    Facility facility = generateInstance();
-    facility = repository.save(facility);
-
     assertFalse(repository.findByCode("some-random-code").isPresent());
     assertTrue(repository.findByCode(facility.getCode()).isPresent());
     assertEquals(facility, repository.findByCode(facility.getCode()).get());
@@ -334,17 +270,11 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Test
   public void shouldFindAllByIds() {
-    // given facilities I want
-    Facility facility = generateInstance();
-    facility = repository.save(facility);
-    Facility facility2 = generateInstance();
-    facility2 = repository.save(facility2);
-
     // given a facility I don't want
     repository.save(generateInstance());
 
     // when
-    Set<UUID> ids = Sets.newHashSet(facility.getId(), facility2.getId());
+    Set<UUID> ids = Sets.newHashSet(facility.getId(), facility1.getId());
     List<Facility> found = repository.findAll(ids);
 
     // then
@@ -354,25 +284,16 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Override
   Facility generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
-    Facility facility = generateInstanceWithRequiredFields(geographicZone, "F" + instanceNumber);
-    facility.setName("Facility #" + instanceNumber);
-    facility.setDescription("Test facility");
-    return facility;
-  }
-
-  private Facility generateInstanceWithRequiredFields(GeographicZone zone, String code) {
-    Facility secondFacility = new Facility(code);
-    secondFacility.setGeographicZone(zone);
-    secondFacility.setActive(true);
-    secondFacility.setEnabled(true);
-    secondFacility.setType(this.facilityType);
-    return secondFacility;
+    return new FacilityDataBuilder()
+        .withGeographicZone(geographicZone)
+        .withType(facilityType)
+        .withoutOperator()
+        .buildAsNew();
   }
 
   private void searchFacilityAndCheckResults(String code, String name, Facility facility,
-                                             String facilityTypeCode, int expectedSize) {
-    List<Facility> foundFacilities = repository.search(code, name, null, facilityTypeCode, null);
+                                             int expectedSize) {
+    List<Facility> foundFacilities = repository.search(code, name, null, null, null);
     assertThat(foundFacilities, hasSize(expectedSize));
     assertThat(foundFacilities, hasItem(hasProperty("name", equalTo(facility.getName()))));
   }

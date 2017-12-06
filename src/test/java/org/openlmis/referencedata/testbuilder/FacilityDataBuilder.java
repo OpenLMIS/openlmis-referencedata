@@ -56,7 +56,8 @@ public class FacilityDataBuilder {
 
     id = UUID.randomUUID();
     code = "F" + instanceNumber;
-    name = "Facility " + instanceNumber;
+    name = "Facility #" + instanceNumber;
+    description = "Test facility";
     geographicZone = new GeographicZoneDataBuilder().build();
     type = new FacilityTypeDataBuilder().build();
     operator = new FacilityOperatorDataBuilder().build();
@@ -67,13 +68,12 @@ public class FacilityDataBuilder {
   }
 
   /**
-   * Builds instance of {@link Facility}.
+   * Builds instance of {@link Facility} without id.
    */
-  public Facility build() {
+  public Facility buildAsNew() {
 
     //TODO: add new constructor, AllArgsConstructor fails 1 integration test
     Facility facility = new Facility(code);
-    facility.setId(id);
     facility.setName(name);
     facility.setDescription(description);
     facility.setGeographicZone(geographicZone);
@@ -88,11 +88,21 @@ public class FacilityDataBuilder {
     facility.setLocation(location);
     facility.setExtraData(extraData);
 
-    supportedPrograms.stream()
+    supportedPrograms
         .forEach(p -> facility.addSupportedProgram(new SupportedProgramDataBuilder()
             .withProgram(p)
             .withFacility(facility)
             .build()));
+
+    return facility;
+  }
+
+  /**
+   * Builds instance of {@link Facility}.
+   */
+  public Facility build() {
+    Facility facility = buildAsNew();
+    facility.setId(id);
 
     return facility;
   }
@@ -113,6 +123,11 @@ public class FacilityDataBuilder {
     return this;
   }
 
+  public FacilityDataBuilder withGeographicZone(GeographicZone geographicZone) {
+    this.geographicZone = geographicZone;
+    return this;
+  }
+
   /**
    * Adds geographic zone with parent for new {@link Facility}.
    */
@@ -120,6 +135,16 @@ public class FacilityDataBuilder {
     GeographicZone parent = new GeographicZoneDataBuilder().build();
     this.geographicZone = new GeographicZoneDataBuilder()
         .withParent(parent).build();
+    return this;
+  }
+
+  public FacilityDataBuilder withType(FacilityType type) {
+    this.type = type;
+    return this;
+  }
+
+  public FacilityDataBuilder withoutOperator() {
+    this.operator = null;
     return this;
   }
 }

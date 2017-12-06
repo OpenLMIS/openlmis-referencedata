@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.testbuilder;
 
 import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
+
 import java.util.UUID;
 
 public class GeographicLevelDataBuilder {
@@ -40,10 +42,17 @@ public class GeographicLevelDataBuilder {
   }
 
   /**
+   * Builds instance of {@link GeographicZone} without id.
+   */
+  public GeographicLevel buildAsNew() {
+    return new GeographicLevel(code, name, levelNumber);
+  }
+
+  /**
    * Builds instance of {@link GeographicLevel}.
    */
   public GeographicLevel build() {
-    GeographicLevel level = new GeographicLevel(code, name, levelNumber);
+    GeographicLevel level = buildAsNew();
     level.setId(id);
 
     return level;
