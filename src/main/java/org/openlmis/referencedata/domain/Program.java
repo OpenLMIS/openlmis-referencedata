@@ -17,9 +17,9 @@ package org.openlmis.referencedata.domain;
 
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
-import lombok.AllArgsConstructor;
 import org.javers.core.metamodel.annotation.TypeName;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,6 +55,9 @@ public class Program extends BaseEntity {
   @Column(nullable = false)
   private Boolean periodsSkippable;
 
+  @Column(nullable = false)
+  private Boolean skipAuthorization;
+
   private Boolean showNonFullSupplyTab;
 
   @Column(nullable = false)
@@ -84,11 +87,14 @@ public class Program extends BaseEntity {
 
   @PrePersist
   private void prePersist() {
-    if (this.periodsSkippable == null) {
-      this.periodsSkippable = false;
+    if (periodsSkippable == null) {
+      periodsSkippable = false;
     }
-    if (this.enableDatePhysicalStockCountCompleted == null) {
-      this.enableDatePhysicalStockCountCompleted = false;
+    if (enableDatePhysicalStockCountCompleted == null) {
+      enableDatePhysicalStockCountCompleted = false;
+    }
+    if (skipAuthorization == null) {
+      skipAuthorization = false;
     }
   }
 
@@ -127,6 +133,7 @@ public class Program extends BaseEntity {
     program.setDescription(importer.getDescription());
     program.setActive(importer.getActive());
     program.setPeriodsSkippable(importer.getPeriodsSkippable());
+    program.setSkipAuthorization(importer.getSkipAuthorization());
     program.setShowNonFullSupplyTab(importer.getShowNonFullSupplyTab());
     program.setEnableDatePhysicalStockCountCompleted(
         importer.getEnableDatePhysicalStockCountCompleted());
@@ -149,6 +156,7 @@ public class Program extends BaseEntity {
     exporter.setDescription(description);
     exporter.setActive(active);
     exporter.setPeriodsSkippable(periodsSkippable);
+    exporter.setSkipAuthorization(skipAuthorization);
     exporter.setShowNonFullSupplyTab(showNonFullSupplyTab);
     exporter.setEnableDatePhysicalStockCountCompleted(enableDatePhysicalStockCountCompleted);
   }
@@ -166,6 +174,8 @@ public class Program extends BaseEntity {
     void setActive(Boolean active);
 
     void setPeriodsSkippable(Boolean periodsSkippable);
+
+    void setSkipAuthorization(Boolean skipAuthorization);
 
     void setShowNonFullSupplyTab(Boolean showNonFullSupplyTab);
 
@@ -185,6 +195,8 @@ public class Program extends BaseEntity {
     Boolean getActive();
 
     Boolean getPeriodsSkippable();
+
+    Boolean getSkipAuthorization();
 
     Boolean getShowNonFullSupplyTab();
 

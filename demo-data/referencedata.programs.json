@@ -5,6 +5,7 @@
     "name": "Family Planning",
     "active": "true",
     "periodsSkippable": "true",
+    "skipAuthorization": "false",
     "showNonFullSupplyTab": "true",
     "enableDatePhysicalStockCountCompleted": "false"
   },
@@ -14,6 +15,7 @@
     "name": "Essential Meds",
     "active": "true",
     "periodsSkippable": "false",
+    "skipAuthorization": "false",
     "enableDatePhysicalStockCountCompleted": "false"
   },
   {
@@ -22,6 +24,7 @@
     "name": "New Program",
     "active": "true",
     "periodsSkippable": "false",
+    "skipAuthorization": "false",
     "enableDatePhysicalStockCountCompleted": "false"
   },
   {
@@ -30,6 +33,7 @@
     "name": "EPI",
     "active": "true",
     "periodsSkippable": "false",
+    "skipAuthorization": "false",
     "enableDatePhysicalStockCountCompleted": "false"
   }
 ]

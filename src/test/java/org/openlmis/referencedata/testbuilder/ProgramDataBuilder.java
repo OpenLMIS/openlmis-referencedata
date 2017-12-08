@@ -29,6 +29,7 @@ public class ProgramDataBuilder {
   private String description;
   private Boolean active;
   private Boolean periodSkippable;
+  private Boolean skipAuthorization;
   private Boolean showNonFullSupplyTab;
   private Boolean enableDatePhysicalStockCountCompleted;
 
@@ -43,6 +44,7 @@ public class ProgramDataBuilder {
     name = "Program " + instanceNumber;
     active = true;
     periodSkippable = true;
+    skipAuthorization = false;
     showNonFullSupplyTab = true;
     enableDatePhysicalStockCountCompleted = false;
   }
@@ -52,7 +54,7 @@ public class ProgramDataBuilder {
    */
   public Program build() {
     Program program = new Program(code, name, description, active, periodSkippable,
-        showNonFullSupplyTab, enableDatePhysicalStockCountCompleted);
+        skipAuthorization, showNonFullSupplyTab, enableDatePhysicalStockCountCompleted);
     program.setId(id);
 
     return program;
