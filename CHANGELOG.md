@@ -6,6 +6,9 @@ Breaking changes:
 parameters to get users endpoint
 * [OLMIS-3448](https://openlmis.atlassian.net/browse/OLMIS-3448): Paginate minimal facilities endpoint
 
+New functionality added in a backwards-compatible manner:
+* [OLMIS-3782](https://openlmis.atlassian.net/browse/OLMIS-3782): Ability to set up program to skip requisition authorization step
+
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
 * [OLMIS-2419](https://openlmis.atlassian.net/browse/OLMIS-2419): Supervisory Node name is now required and facility is not required.
