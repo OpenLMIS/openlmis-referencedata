@@ -320,6 +320,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * divo1 - has this role for EPI at home facility
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
+    * administrator - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
 8. Requisition Viewer
   * rights:
     * Requisition View
