@@ -15,31 +15,31 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
 1. HC01/Comfort Health Clinic
   * type: Health Center
   * programs: Family Planning and Essential Meds
-  * zone: Balaka (City)
+  * zone: Neno District
   * this is the home facility for _administrator_, _srmanager2_ and _smanager2_ users
   * this facility is in the requisition group RGFP1 and RGEM1
 2. HF01/Kankao Health Facility
   * type: Health Center
   * programs: Family Planning and Essential Meds
-  * zone: Southern Region
+  * zone: Zomba District
   * this is the home facility for _srmanager4_ and _smanager4_ users
   * this facility is in the requisition group RGEM1 and RGFP2
 3. HC02/Nandumbo Health Center
   * type: Health Center
   * programs: Family Planning
-  * zone: Southern Region
+  * zone: Phalombe District
   * this is the home facility for _srmanager1_ and _smanager1_ users
   * this facility is in the requisition group RGFP1
 4. HC03/Kalembo Health Center
   * type: Health Center
   * programs: Essential Meds
-  * zone: Southern Region
+  * zone: Thyolo District
   * this is the home facility for _srmanager3_ and _smanager3_ users
   * this facility is in the requisition group RGEM1
 5. DH01/Balaka District Hospital
   * type: District Hospital
   * programs: Family Planning and Essential Meds
-  * zone: Balaka District
+  * zone: Balaka (City)
   * this is the home facility for the _dsrmanager_ user
   * this facility is in the requisition group RGEM1 and RGFP2
 6. WH01/Ntcheu District Warehouse
