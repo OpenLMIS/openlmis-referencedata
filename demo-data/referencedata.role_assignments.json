@@ -156,6 +156,14 @@
     "role": {"id": "185db8f7-ee35-44d0-8b40-6de12489ae77"}
   },
   {
+    "id": "d47ad878-bd48-4ef0-8e30-b40d0982aa93",
+    "type": "supervision",
+    "supervisoryNode": { "id": "219cf7dd-b60a-4c25-ae4e-bf035f357bb4" },
+    "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": { "id": "d8ff49b1-96e7-4710-9511-289f490f7577" }
+  },
+  {
     "id": "27c94f92-b8aa-11e6-80f5-76304dec7eb7",
     "type": "direct",
     "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
