@@ -50,7 +50,7 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
 7. WH02/Balaka District Warehouse
   * type: Warehouse
   * programs: Family Planning and Essential Meds
-  * zone: Balaka District
+  * zone: Balaka (City)
   * this is the home facility for _wclerk2_ user
 
 **For EPI (Vaccines) Program**
