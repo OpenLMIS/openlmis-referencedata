@@ -15,31 +15,23 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import nl.jqno.equalsverifier.EqualsVerifier;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
+import org.openlmis.referencedata.testbuilder.ServiceAccountDataBuilder;
 
-import java.util.UUID;
+public class CreationDetailsTest {
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+  @Test
+  public void equalsContract() {
+    EqualsVerifier.forClass(CreationDetails.class).verify();
+  }
 
-@MappedSuperclass
-@EqualsAndHashCode
-public abstract class BaseEntity {
-  static final String UUID_TYPE = "pg-uuid";
-
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.referencedata.util.ConditionalUuidGenerator")
-  @Type(type = UUID_TYPE)
-  @Getter
-  @Setter
-  protected UUID id;
+  @Test
+  public void shouldImplementToString() {
+    ServiceAccount account = new ServiceAccountDataBuilder().build();
+    ToStringTestUtils.verify(CreationDetails.class, account.getCreationDetails());
+  }
 
 }

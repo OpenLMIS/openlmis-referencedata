@@ -83,6 +83,7 @@ public abstract class MessageKeys {
   protected static final String ORDERABLE_DISPLAY_CATEGORY = "orderableDisplayCategory";
   protected static final String FACILITY_TYPE_APPROVED_PRODUCT = "facilityTypeApprovedProduct";
   protected static final String SUPPORTED_PROGRAMS = "supportedPrograms";
+  protected static final String SERVICE_ACCOUNT = "serviceAccount";
 
   // Common to subclasses
   protected static final String EMAIL = "email";
@@ -98,11 +99,11 @@ public abstract class MessageKeys {
 
   public static final String ERROR_IO = SERVICE_ERROR + ".io";
 
-  protected static String join(String... params) {
-    return String.join(DELIMITER, Arrays.asList(params));
-  }
-
   protected MessageKeys() {
     throw new UnsupportedOperationException();
+  }
+
+  protected static String join(String... params) {
+    return String.join(DELIMITER, Arrays.asList(params));
   }
 }

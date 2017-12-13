@@ -13,33 +13,19 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.domain;
+package org.openlmis.referencedata;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import be.joengenduvel.java.verifiers.ToStringVerifier;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+public class ToStringTestUtils {
 
-import java.util.UUID;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-
-@MappedSuperclass
-@EqualsAndHashCode
-public abstract class BaseEntity {
-  static final String UUID_TYPE = "pg-uuid";
-
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.referencedata.util.ConditionalUuidGenerator")
-  @Type(type = UUID_TYPE)
-  @Getter
-  @Setter
-  protected UUID id;
-
+  /**
+   * Checks if given class has proper toString method.
+   */
+  public static <T> void verify(Class<T> clazz, T object) {
+    ToStringVerifier
+        .forClass(clazz)
+        .ignore("$jacocoData") // external library is checking for this field, has to be ignored
+        .containsAllPrivateFields(object);
+  }
 }

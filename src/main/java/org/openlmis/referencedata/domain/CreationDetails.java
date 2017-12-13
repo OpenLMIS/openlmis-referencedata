@@ -15,31 +15,37 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
-@MappedSuperclass
+@Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
-public abstract class BaseEntity {
-  static final String UUID_TYPE = "pg-uuid";
+@ToString
+@Getter
+public final class CreationDetails {
 
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.referencedata.util.ConditionalUuidGenerator")
-  @Type(type = UUID_TYPE)
-  @Getter
-  @Setter
-  protected UUID id;
+  @Column(nullable = false)
+  @Type(type = BaseEntity.UUID_TYPE)
+  private UUID createdBy;
+
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private ZonedDateTime createdDate;
+
+  public CreationDetails(UUID createdBy) {
+    this(createdBy, ZonedDateTime.now());
+  }
 
 }

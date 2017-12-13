@@ -13,33 +13,37 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.domain;
+package org.openlmis.referencedata.dto;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.openlmis.referencedata.domain.ServiceAccount;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString
+public final class ServiceAccountDto
+    extends BaseDto
+    implements ServiceAccount.Importer, ServiceAccount.Exporter {
 
-@MappedSuperclass
-@EqualsAndHashCode
-public abstract class BaseEntity {
-  static final String UUID_TYPE = "pg-uuid";
+  private String login;
+  private UUID createdBy;
+  private ZonedDateTime createdDate;
 
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.referencedata.util.ConditionalUuidGenerator")
-  @Type(type = UUID_TYPE)
-  @Getter
-  @Setter
-  protected UUID id;
+  /**
+   * Creates new instance of {@link ServiceAccountDto} based on passed service account.
+   */
+  public static ServiceAccountDto newInstance(ServiceAccount serviceAccount) {
+    ServiceAccountDto dto = new ServiceAccountDto();
+    serviceAccount.export(dto);
 
+    return dto;
+  }
 }

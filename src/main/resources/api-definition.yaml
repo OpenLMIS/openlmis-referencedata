@@ -262,6 +262,9 @@ schemas:
   
   - geoJsonPolygon: !include schemas/geoJsonPolygon.json
 
+  - serviceAccount: !include schemas/serviceAccount.json
+  - serviceAccountPage: !include schemas/serviceAccountPage.json
+
   - stringArray: |
       {
           "type": "array",
@@ -3016,3 +3019,59 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
+
+  /serviceAccounts:
+      displayName: Service Accounts
+      get:
+          is: [ secured, paginated ]
+          description: Returns all Service Accounts.
+          responses:
+              200:
+                  body:
+                      application/json:
+                          schema: serviceAccountPage
+              401:
+                  body:
+                    application/json:
+              403:
+                  body:
+                      application/json:
+                          schema: localizedErrorResponse
+      post:
+          is: [ secured ]
+          description: Create a new Service Account.
+          responses:
+              201:
+                  body:
+                    application/json:
+                      schema: serviceAccount
+              401:
+                  body:
+                    application/json:
+              403:
+                  body:
+                      application/json:
+                          schema: localizedErrorResponse
+      /{id}:
+          uriParameters:
+              id:
+                  displayName: id
+                  type: string
+                  required: true
+                  repeat: false
+          delete:
+              is: [ secured ]
+              description: "Completely removes Service Account. This action is not recoverable."
+              responses:
+                  204:
+                  401:
+                      body:
+                        application/json:
+                  403:
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse
+                  404:
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse

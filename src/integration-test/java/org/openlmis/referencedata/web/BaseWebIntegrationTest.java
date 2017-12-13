@@ -36,11 +36,7 @@ import com.jayway.restassured.config.ObjectMapperConfig;
 import com.jayway.restassured.config.RestAssuredConfig;
 import com.jayway.restassured.response.ExtractableResponse;
 import com.jayway.restassured.response.Response;
-import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.RamlLoaders;
-import guru.nidi.ramltester.restassured.RestAssuredClient;
-import java.util.UUID;
-import javax.annotation.PostConstruct;
+
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -59,14 +55,15 @@ import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
+import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.repository.ServiceAccountRepository;
 import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
@@ -97,6 +94,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlLoaders;
+import guru.nidi.ramltester.restassured.RestAssuredClient;
+
+import java.util.UUID;
+
+import javax.annotation.PostConstruct;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -118,6 +123,8 @@ public abstract class BaseWebIntegrationTest {
 
   static final String MESSAGE_KEY = "messageKey";
   static final String MESSAGE = "message";
+
+  static final String ID = "id";
 
   protected RestAssuredClient restAssured;
 
@@ -265,6 +272,9 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected IdealStockAmountRepository idealStockAmountRepository;
+
+  @MockBean
+  protected ServiceAccountRepository serviceAccountRepository;
 
   /**
    * Constructor for test.
