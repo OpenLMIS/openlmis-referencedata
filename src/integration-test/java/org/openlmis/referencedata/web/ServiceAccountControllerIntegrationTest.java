@@ -27,6 +27,8 @@ import static org.openlmis.referencedata.domain.RightName.SERVICE_ACCOUNTS_MANAG
 import static org.openlmis.referencedata.util.messagekeys.ServiceAccountMessageKeys.ERROR_NOT_FOUND;
 import static org.openlmis.referencedata.util.messagekeys.SystemMessageKeys.ERROR_UNAUTHORIZED;
 
+import com.jayway.restassured.response.ValidatableResponse;
+
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,13 +42,13 @@ import org.openlmis.referencedata.testbuilder.ServiceAccountDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.UUID;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/serviceAccounts";
   private static final String ID_URL = RESOURCE_URL + "/{apiKey}";
@@ -86,12 +88,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldCreateServiceAccount() {
-    ServiceAccountDto response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .post(RESOURCE_URL)
-        .then()
+    ServiceAccountDto response = post()
         .statusCode(HttpStatus.CREATED.value())
         .extract()
         .as(ServiceAccountDto.class);
@@ -110,12 +107,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldReturnForbiddenForCreateServiceAccountEndpointWhenUserHasNoRight() {
     mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
 
-    String response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .post(RESOURCE_URL)
-        .then()
+    String response = post()
         .statusCode(HttpStatus.FORBIDDEN.value())
         .extract()
         .path(MESSAGE_KEY);
@@ -143,12 +135,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
     given(serviceAccountRepository.findAll(any(Pageable.class)))
         .willReturn(new PageImplRepresentation<>(Lists.newArrayList(account)));
 
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL)
-        .then()
+    get()
         .statusCode(HttpStatus.OK.value())
         .body("content.size()", is(1))
         .body("content[0].apiKey", is(account.getApiKey().toString()));
@@ -160,12 +147,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldReturnForbiddenForGetServiceAccountsEndpointWhenUserHasNoRight() {
     mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
 
-    String response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL)
-        .then()
+    String response = get()
         .statusCode(HttpStatus.FORBIDDEN.value())
         .extract()
         .path(MESSAGE_KEY);
@@ -192,14 +174,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
     given(serviceAccountRepository.findOne(account.getApiKey()))
         .willReturn(account);
 
-    restAssured
-        .given()
-        .pathParam(API_KEY, account.getApiKey())
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .delete(ID_URL)
-        .then()
-        .statusCode(HttpStatus.NO_CONTENT.value());
+    delete().statusCode(HttpStatus.NO_CONTENT.value());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     verify(authService).removeApiKey(account.getApiKey());
@@ -209,13 +184,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldReturnForbiddenForDeleteServiceAccountEndpointWhenUserHasNoRight() {
     mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
 
-    String response = restAssured
-        .given()
-        .pathParam(API_KEY, account.getApiKey())
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .delete(ID_URL)
-        .then()
+    String response = delete()
         .statusCode(HttpStatus.FORBIDDEN.value())
         .extract()
         .path(MESSAGE_KEY);
@@ -230,13 +199,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
     given(serviceAccountRepository.findOne(account.getApiKey()))
         .willReturn(null);
 
-    String response = restAssured
-        .given()
-        .pathParam(API_KEY, account.getApiKey())
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .delete(ID_URL)
-        .then()
+    String response = delete()
         .statusCode(HttpStatus.NOT_FOUND.value())
         .extract()
         .path(MESSAGE_KEY);
@@ -260,4 +223,25 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
     verifyZeroInteractions(authService);
   }
 
+  private ValidatableResponse post() {
+    return startRequest(getTokenHeader())
+        .when()
+        .post(RESOURCE_URL)
+        .then();
+  }
+
+  private ValidatableResponse get() {
+    return startRequest(getTokenHeader())
+        .when()
+        .get(RESOURCE_URL)
+        .then();
+  }
+
+  private ValidatableResponse delete() {
+    return startRequest(getTokenHeader())
+        .pathParam(API_KEY, account.getApiKey())
+        .when()
+        .delete(ID_URL)
+        .then();
+  }
 }

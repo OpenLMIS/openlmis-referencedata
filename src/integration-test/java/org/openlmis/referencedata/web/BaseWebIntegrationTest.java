@@ -36,8 +36,10 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.config.ObjectMapperConfig;
 import com.jayway.restassured.config.RestAssuredConfig;
+import com.jayway.restassured.filter.log.LogDetail;
 import com.jayway.restassured.response.ExtractableResponse;
 import com.jayway.restassured.response.Response;
+import com.jayway.restassured.specification.RequestSpecification;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -323,6 +325,7 @@ public abstract class BaseWebIntegrationTest {
     RestAssured.config = RestAssuredConfig.config().objectMapperConfig(
         new ObjectMapperConfig().jackson2ObjectMapperFactory((clazz, charset) -> objectMapper)
     );
+    RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
     restAssured = ramlDefinition.createRestAssured();
   }
 
@@ -401,6 +404,19 @@ public abstract class BaseWebIntegrationTest {
 
     assertThat(messageKey, is(Matchers.equalTo(code)));
     assertFalse(message.equals(messageKey));
+  }
+
+  RequestSpecification startRequest(String token) {
+    RequestSpecification request = restAssured
+        .given()
+        .log()
+        .ifValidationFails(LogDetail.ALL, true);
+
+    if (null != token) {
+      request = request.header(HttpHeaders.AUTHORIZATION, token);
+    }
+
+    return request;
   }
 
   static class SaveAnswer<T extends BaseEntity> implements Answer<T> {

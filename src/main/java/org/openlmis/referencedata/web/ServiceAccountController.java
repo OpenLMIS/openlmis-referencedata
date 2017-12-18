@@ -117,29 +117,29 @@ public class ServiceAccountController extends BaseController {
   /**
    * Allows deleting service account.
    *
-   * @param id UUID of service account which we want to delete
+   * @param apiKey UUID of API key which we want to delete
    */
-  @RequestMapping(value = "/serviceAccounts/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/serviceAccounts/{apiKey}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable("id") UUID id) {
+  public void delete(@PathVariable("apiKey") UUID apiKey) {
     Profiler profiler = new Profiler("DELETE_SERVICE_ACCOUNT");
     profiler.setLogger(LOGGER);
 
     checkAdminRight(SERVICE_ACCOUNTS_MANAGE, profiler);
 
     profiler.start("FIND_SERVICE_ACCOUNT");
-    ServiceAccount account = serviceAccountRepository.findOne(id);
+    ServiceAccount account = serviceAccountRepository.findOne(apiKey);
 
     if (null == account) {
       profiler.stop().log();
       throw new NotFoundException(ServiceAccountMessageKeys.ERROR_NOT_FOUND);
     }
 
-    profiler.start("DELETE_API_KEY");
-    authService.removeApiKey(account.getApiKey());
-
     profiler.start("DELETE_SERVICE_ACCOUNT");
     serviceAccountRepository.delete(account);
+
+    profiler.start("DELETE_API_KEY");
+    authService.removeApiKey(account.getApiKey());
 
     profiler.stop().log();
   }
