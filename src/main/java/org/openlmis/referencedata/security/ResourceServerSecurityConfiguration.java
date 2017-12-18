@@ -31,7 +31,6 @@ import org.springframework.security.oauth2.provider.authentication.TokenExtracto
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
-import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -99,27 +98,17 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
         .antMatchers("/**").fullyAuthenticated();
   }
 
-  /**
-   * AccessTokenConverter bean initializer that utilizes custom UserTokenConverter.
-   * @return token converter
-   */
   @Bean
   public AccessTokenConverter accessTokenConverter() {
-    DefaultAccessTokenConverter accessTokenConverter = new DefaultAccessTokenConverter();
-    accessTokenConverter.setUserTokenConverter(userAuthenticationConverter());
-    return accessTokenConverter;
-  }
-
-  @Bean
-  public UserAuthenticationConverter userAuthenticationConverter() {
-    return new UserTokenConverter();
+    return new DefaultAccessTokenConverter();
   }
 
   /**
    * RemoteTokenServices bean initializer.
+   *
    * @param checkTokenUrl url to check tokens against
-   * @param clientId client's id
-   * @param clientSecret client's secret
+   * @param clientId      client's id
+   * @param clientSecret  client's secret
    * @return token services
    */
   @Bean
@@ -127,7 +116,7 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
   public RemoteTokenServices remoteTokenServices(@Value("${auth.server.url}") String checkTokenUrl,
                                                  @Value("${auth.server.clientId}") String clientId,
                                                  @Value("${auth.server.clientSecret}")
-                                                       String clientSecret) {
+                                                     String clientSecret) {
     final RemoteTokenServices remoteTokenServices = new RemoteTokenServices();
     remoteTokenServices.setCheckTokenEndpointUrl(checkTokenUrl);
     remoteTokenServices.setClientId(clientId);
