@@ -27,15 +27,22 @@ public class OAuth2AuthenticationDataBuilder {
   public static final String SERVICE_CLIENT_ID = "trusted-client";
   private static final String API_KEY_CLIENT_ID = "api-key-client-20171214111354128";
 
-  public static OAuth2Authentication asClient(UUID userId) {
+  private UUID userId = UUID.randomUUID();
+
+  public OAuth2AuthenticationDataBuilder withUserId(UUID userId) {
+    this.userId = userId;
+    return this;
+  }
+
+  public OAuth2Authentication buildUserAuthentication() {
     return new DummyOAuth2Authentication(CLIENT_CLIENT_ID, userId);
   }
 
-  public static OAuth2Authentication asService() {
+  public OAuth2Authentication buildServiceAuthentication() {
     return new DummyOAuth2Authentication(SERVICE_CLIENT_ID);
   }
 
-  public static OAuth2Authentication asApiKey() {
+  public OAuth2Authentication buildApiKeyAuthentication() {
     return new DummyOAuth2Authentication(API_KEY_CLIENT_ID);
   }
 

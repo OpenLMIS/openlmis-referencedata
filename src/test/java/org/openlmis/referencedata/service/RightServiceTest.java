@@ -19,9 +19,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.SERVICE_CLIENT_ID;
-import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.asApiKey;
-import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.asClient;
-import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.asService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +31,7 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -71,9 +69,9 @@ public class RightServiceTest {
     userId = UUID.randomUUID();
     when(user.getId()).thenReturn(userId);
 
-    trustedClient = asService();
-    userClient = asClient(userId);
-    apiKeyClient = asApiKey();
+    trustedClient = new OAuth2AuthenticationDataBuilder().buildServiceAuthentication();
+    userClient = new OAuth2AuthenticationDataBuilder().withUserId(userId).buildUserAuthentication();
+    apiKeyClient = new OAuth2AuthenticationDataBuilder().buildApiKeyAuthentication();
 
     ReflectionTestUtils.setField(rightService, "serviceTokenClientId", SERVICE_CLIENT_ID);
   }
