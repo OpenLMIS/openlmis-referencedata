@@ -46,6 +46,9 @@ public class RightService {
   @Autowired
   private RightAssignmentRepository rightAssignmentRepository;
 
+  @Autowired
+  private AuthenticationHelper authenticationHelper;
+
   @Value("${auth.server.clientId}")
   private String serviceTokenClientId;
 
@@ -98,7 +101,7 @@ public class RightService {
         return;
       }
     } else {
-      if (checkUserToken(rightName, allowUserTokens, authentication, expectedUserId)) {
+      if (checkUserToken(rightName, allowUserTokens, expectedUserId)) {
         XLOGGER.exit("User has right");
         return;
       }
@@ -120,15 +123,13 @@ public class RightService {
     checkAdminRight(null, false, true, false, null);
   }
 
-  private boolean checkUserToken(String rightName, boolean allowUserTokens,
-                                 OAuth2Authentication authentication, UUID expectedUserId) {
+  private boolean checkUserToken(String rightName, boolean allowUserTokens, UUID expectedUserId) {
     if (!allowUserTokens) {
       return false;
     }
 
-    UUID userId = (UUID) authentication.getPrincipal();
+    UUID userId = authenticationHelper.getCurrentUser().getId();
 
-    // bypass the right check if user id matches
     if (null != expectedUserId
         && userId.equals(expectedUserId)
         && userRepository.exists(userId)) {

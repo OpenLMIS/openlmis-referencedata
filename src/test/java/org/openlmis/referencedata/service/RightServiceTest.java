@@ -50,6 +50,9 @@ public class RightServiceTest {
   @Mock
   private RightAssignmentRepository rightAssignmentRepository;
 
+  @Mock
+  private AuthenticationHelper authenticationHelper;
+
   @InjectMocks
   private RightService rightService;
 
@@ -68,6 +71,8 @@ public class RightServiceTest {
     user = mock(User.class);
     userId = UUID.randomUUID();
     when(user.getId()).thenReturn(userId);
+
+    when(authenticationHelper.getCurrentUser()).thenReturn(user);
 
     trustedClient = new OAuth2AuthenticationDataBuilder().buildServiceAuthentication();
     userClient = new OAuth2AuthenticationDataBuilder().withUserId(userId).buildUserAuthentication();

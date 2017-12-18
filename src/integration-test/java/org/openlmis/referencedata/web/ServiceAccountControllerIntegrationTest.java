@@ -37,7 +37,6 @@ import org.openlmis.referencedata.domain.ServiceAccount;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ServiceAccountDto;
 import org.openlmis.referencedata.service.AuthService;
-import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.testbuilder.ServiceAccountDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -53,9 +52,6 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   private static final String RESOURCE_URL = "/api/serviceAccounts";
   private static final String ID_URL = RESOURCE_URL + "/{apiKey}";
   private static final String API_KEY = "apiKey";
-
-  @MockBean
-  private AuthenticationHelper authenticationHelper;
 
   @MockBean
   private AuthService authService;

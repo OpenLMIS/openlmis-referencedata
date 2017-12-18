@@ -48,6 +48,7 @@ import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
@@ -74,6 +75,7 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.service.OrderableService;
@@ -84,6 +86,7 @@ import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.SupervisoryNodeService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
@@ -283,6 +286,9 @@ public abstract class BaseWebIntegrationTest {
   @MockBean
   protected ServiceAccountRepository serviceAccountRepository;
 
+  @MockBean
+  protected AuthenticationHelper authenticationHelper;
+
   /**
    * Constructor for test.
    */
@@ -335,6 +341,8 @@ public abstract class BaseWebIntegrationTest {
     given(userRepository.exists(ADMIN_ID)).willReturn(true);
     given(rightAssignmentRepository.existsByUserIdAndRightName(eq(ADMIN_ID), anyString()))
         .willReturn(false);
+
+    mockUserAuthenticated();
   }
 
   /**
@@ -355,6 +363,13 @@ public abstract class BaseWebIntegrationTest {
    */
   String getClientTokenHeader() {
     return CLIENT_ACCESS_TOKEN_HEADER;
+  }
+
+  protected void mockUserAuthenticated() {
+    User user = new UserDataBuilder().buildAsNew();
+    user.setId(ADMIN_ID);
+
+    given(authenticationHelper.getCurrentUser()).willReturn(user);
   }
 
   protected void mockUserHasRight(String rightName) {

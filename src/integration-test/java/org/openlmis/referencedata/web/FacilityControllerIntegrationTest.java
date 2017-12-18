@@ -25,10 +25,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.domain.RightName.FACILITIES_MANAGE_RIGHT;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -41,20 +41,17 @@ import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.MinimalFacilityDto;
-import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
-import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Page;
@@ -104,11 +101,16 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   };
 
   @Before
+  @Override
   public void setUp() {
+    super.setUp();
+
     programId = UUID.randomUUID();
     program = new ProgramDataBuilder().withId(programId).build();
     facility = new FacilityDataBuilder()
         .withSupportedProgram(program).build();
+
+    mockUserHasRight(FACILITIES_MANAGE_RIGHT);
   }
 
   @Test
@@ -172,8 +174,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingSupervisorNode() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     supervisoryNodeId = UUID.randomUUID();
 
     given(programRepository.exists(programId)).willReturn(true);
@@ -193,8 +193,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingProgram() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     SupervisoryNode searchedSupervisoryNode = new SupervisoryNodeDataBuilder()
         .withFacility(facility)
         .build();
@@ -388,8 +386,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(null);
 
     restAssured.given()
@@ -501,7 +497,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+        .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
     restAssured
@@ -521,7 +517,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+        .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
 
     restAssured
@@ -538,10 +534,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void deleteShouldReturnForbiddenForUnauthorizedToken() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(FACILITIES_MANAGE_RIGHT);
 
     restAssured
         .given()
@@ -558,9 +551,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getFacilityAuditLogShouldReturnNotFoundIfFacilityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -574,7 +564,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+        .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
     restAssured
@@ -594,7 +584,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+        .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(program);
@@ -620,7 +610,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+        .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(null);
@@ -640,11 +630,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void postShouldReturnForbiddenForUnauthorizedToken() {
-
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
 
@@ -663,10 +649,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void putShouldSaveFacility() {
-
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(program);
@@ -693,7 +675,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+        .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
     given(programRepository.findByCode(any(Code.class))).willReturn(null);
@@ -714,11 +696,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void putShouldReturnForbiddenForUnauthorizedToken() {
-
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.FACILITIES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
 
@@ -749,7 +727,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private void testSaveForSupportedPrograms(Set<SupportedProgram> programs) {
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+        .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
 
@@ -774,9 +752,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void findByBoundaryShouldFindFacilities() {
-
-    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-
     Polygon boundary = gf.createPolygon(coords);
     given(facilityRepository.findByBoundary(boundary))
         .willReturn(Collections.singletonList(facility));
@@ -800,7 +775,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void findByBoundaryShouldReturnForbiddenForUnauthorizedToken() {
 
-    mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(FACILITIES_MANAGE_RIGHT);
 
     Polygon boundary = gf.createPolygon(coords);
 
@@ -823,7 +798,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+        .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -833,9 +808,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
+    mockUserHasNoRight(FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -845,9 +818,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
     given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
