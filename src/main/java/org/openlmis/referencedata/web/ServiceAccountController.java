@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 @Controller
 @Transactional
 public class ServiceAccountController extends BaseController {
-  private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ServiceAccountController.class);
 
   @Autowired
   private ServiceAccountRepository serviceAccountRepository;
