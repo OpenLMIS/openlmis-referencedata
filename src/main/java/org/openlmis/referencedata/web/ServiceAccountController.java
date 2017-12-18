@@ -71,7 +71,7 @@ public class ServiceAccountController extends BaseController {
     Profiler profiler = new Profiler("CREATE_SERVICE_ACCOUNT");
     profiler.setLogger(LOGGER);
 
-    checkAdminRight(SERVICE_ACCOUNTS_MANAGE, profiler);
+    checkAdminRight(SERVICE_ACCOUNTS_MANAGE, false, profiler);
 
     profiler.start("GET_CURRENT_USER");
     User user = authenticationHelper.getCurrentUser();
@@ -125,7 +125,7 @@ public class ServiceAccountController extends BaseController {
     Profiler profiler = new Profiler("DELETE_SERVICE_ACCOUNT");
     profiler.setLogger(LOGGER);
 
-    checkAdminRight(SERVICE_ACCOUNTS_MANAGE, profiler);
+    checkAdminRight(SERVICE_ACCOUNTS_MANAGE, false, profiler);
 
     profiler.start("FIND_SERVICE_ACCOUNT");
     ServiceAccount account = serviceAccountRepository.findOne(apiKey);

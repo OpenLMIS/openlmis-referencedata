@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_FILE_IS_EMPTY;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_INCORRECT_FILE_FORMAT;
+import static org.openlmis.referencedata.web.BaseController.API_PATH;
+
 import org.apache.commons.lang3.StringUtils;
 import org.javers.core.Javers;
 import org.javers.core.changelog.SimpleTextChangeLog;
@@ -42,10 +46,6 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_FILE_IS_EMPTY;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_INCORRECT_FILE_FORMAT;
-import static org.openlmis.referencedata.web.BaseController.API_PATH;
-
 @RequestMapping(API_PATH)
 public abstract class BaseController {
 
@@ -58,8 +58,12 @@ public abstract class BaseController {
   private Javers javers;
 
   protected void checkAdminRight(String rightName, Profiler profiler) {
+    checkAdminRight(rightName, true, profiler);
+  }
+
+  protected void checkAdminRight(String rightName, boolean allowServiceTokens, Profiler profiler) {
     profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(rightName);
+    rightService.checkAdminRight(rightName, allowServiceTokens);
   }
 
   protected <T> Page<T> toPage(List<T> originalList, Pageable pageable, Profiler profiler) {
