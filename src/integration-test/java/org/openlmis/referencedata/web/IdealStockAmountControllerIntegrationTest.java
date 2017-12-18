@@ -29,15 +29,7 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
-import guru.nidi.ramltester.junit.RamlMatchers;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -57,6 +49,17 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -101,6 +104,8 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .thenReturn(Optional.of(period));
     when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(any(String.class),
         any(String.class))).thenReturn(Optional.of(commodityType));
+
+    mockUserHasRight(RightName.SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE);
   }
 
   @Test

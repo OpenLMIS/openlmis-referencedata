@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
@@ -23,6 +25,7 @@ import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
@@ -34,14 +37,17 @@ public class RightService {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(RightService.class);
 
   private static final String MESSAGEKEY_ERROR_UNAUTHORIZED = SystemMessageKeys.ERROR_UNAUTHORIZED;
-  private static final String MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC = 
+  private static final String MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC =
       SystemMessageKeys.ERROR_UNAUTHORIZED_GENERIC;
-  
+
   @Autowired
   private UserRepository userRepository;
 
   @Autowired
   private RightAssignmentRepository rightAssignmentRepository;
+
+  @Value("${auth.server.clientId}")
+  private String serviceTokenClientId;
 
   /**
    * Check the client has the admin right specified.
@@ -55,13 +61,17 @@ public class RightService {
 
   /**
    * Check the client has the admin right specified.
-   * 
+   *
    * @param rightName the name of the right to check
    * @param allowServiceTokens whether to allow service-level tokens with root access
    * @throws UnauthorizedException in case the client has got no right to access the resource
    */
   public void checkAdminRight(String rightName, boolean allowServiceTokens) {
     checkAdminRight(rightName, allowServiceTokens, null);
+  }
+
+  public void checkAdminRight(String rightName, boolean allowServiceTokens, UUID expectedUserId) {
+    checkAdminRight(rightName, true, allowServiceTokens, false, expectedUserId);
   }
 
   /**
@@ -73,32 +83,22 @@ public class RightService {
    *                       e.g. to retrieve his own info
    * @throws UnauthorizedException in case the client has got no right to access the resource
    */
-  public void checkAdminRight(String rightName, boolean allowServiceTokens, UUID expectedUserId) {
-    XLOGGER.entry(rightName, allowServiceTokens, expectedUserId);
+  private void checkAdminRight(String rightName, boolean allowUserTokens,
+                               boolean allowServiceTokens, boolean allowApiKey,
+                               UUID expectedUserId) {
+    XLOGGER.entry(rightName, allowUserTokens, allowServiceTokens, allowApiKey, expectedUserId);
 
-    OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext()
+    OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder
+        .getContext()
         .getAuthentication();
 
-    if (allowServiceTokens && authentication.isClientOnly()) {
-      // service-level tokens allowed and no user associated with the request
-      XLOGGER.exit("service token");
-      return;
-    } else if (!allowServiceTokens && authentication.isClientOnly()) {
-      // service-level tokens not allowed and no user associated with the request
-      XLOGGER.exit("service token not allowed, and no user");
-      throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
-    } else { // user-based client, check if user has right
-      UUID userId = (UUID) authentication.getPrincipal();
-
-      // bypass the right check if user id matches
-      if (null != expectedUserId
-          && userId.equals(expectedUserId)
-          && userRepository.exists(userId)) {
-        XLOGGER.exit("user id allowed to bypass right check");
+    if (authentication.isClientOnly()) {
+      if (checkServiceToken(allowServiceTokens, allowApiKey, authentication)) {
+        XLOGGER.exit("service token or API Key");
         return;
       }
-
-      if (rightAssignmentRepository.existsByUserIdAndRightName(userId, rightName)) {
+    } else {
+      if (checkUserToken(rightName, allowUserTokens, authentication, expectedUserId)) {
         XLOGGER.exit("User has right");
         return;
       }
@@ -106,20 +106,51 @@ public class RightService {
 
     // at this point, token is unauthorized
     XLOGGER.exit("Token not valid");
-    throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName));
+    Message message = isBlank(rightName)
+        ? new Message(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC)
+        : new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName);
+
+    throw new UnauthorizedException(message);
   }
 
   /**
    * Check the client is a trusted client ("root" access).
    */
   public void checkRootAccess() {
-    OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext()
-        .getAuthentication();
-    if (authentication.isClientOnly()) { // trusted client
-      return;
+    checkAdminRight(null, false, true, false, null);
+  }
+
+  private boolean checkUserToken(String rightName, boolean allowUserTokens,
+                                 OAuth2Authentication authentication, UUID expectedUserId) {
+    if (!allowUserTokens) {
+      return false;
     }
 
-    // at this point, token is unauthorized
-    throw new UnauthorizedException(new Message(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC));
+    UUID userId = (UUID) authentication.getPrincipal();
+
+    // bypass the right check if user id matches
+    if (null != expectedUserId
+        && userId.equals(expectedUserId)
+        && userRepository.exists(userId)) {
+      XLOGGER.exit("user id allowed to bypass right check");
+      return true;
+    }
+
+    if (rightAssignmentRepository.existsByUserIdAndRightName(userId, rightName)) {
+      XLOGGER.exit("User has right");
+      return true;
+    }
+
+    return false;
   }
+
+  private boolean checkServiceToken(boolean allowServiceTokens, boolean allowApiKey,
+                                    OAuth2Authentication authentication) {
+    String clientId = authentication.getOAuth2Request().getClientId();
+    boolean isServiceToken = serviceTokenClientId.equals(clientId);
+
+    return isServiceToken ? allowServiceTokens : allowApiKey;
+  }
+
+
 }

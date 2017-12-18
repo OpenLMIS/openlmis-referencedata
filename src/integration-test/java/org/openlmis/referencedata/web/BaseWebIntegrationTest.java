@@ -23,8 +23,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -38,6 +40,7 @@ import com.jayway.restassured.response.ExtractableResponse;
 import com.jayway.restassured.response.Response;
 
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
@@ -130,6 +133,8 @@ public abstract class BaseWebIntegrationTest {
 
   private static final RamlDefinition ramlDefinition =
       RamlLoaders.fromClasspath().load("api-definition-raml.yaml").ignoringXheaders();
+
+  private static final UUID ADMIN_ID = UUID.fromString("35316636-6264-6331-2d34-3933322d3462");
 
   private static final String MOCK_USER_CHECK_RESULT = "{\n"
       + "  \"aud\": [\n"
@@ -321,6 +326,14 @@ public abstract class BaseWebIntegrationTest {
     restAssured = ramlDefinition.createRestAssured();
   }
 
+  @Before
+  public void setUp() {
+    // by default user has no access to resources
+    given(userRepository.exists(ADMIN_ID)).willReturn(true);
+    given(rightAssignmentRepository.existsByUserIdAndRightName(eq(ADMIN_ID), anyString()))
+        .willReturn(false);
+  }
+
   /**
    * Get a user access token. An arbitrary UUID string is returned and the tests assume it is a
    * valid one for an admin user.
@@ -342,7 +355,7 @@ public abstract class BaseWebIntegrationTest {
   }
 
   protected void mockUserHasRight(String rightName) {
-    doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), any());
+    doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), any(UUID.class));
     doNothing().when(rightService).checkAdminRight(rightName);
   }
 

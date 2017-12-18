@@ -113,6 +113,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     // used in deserialization
     given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
+
+    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
   }
 
   @Test
@@ -277,8 +279,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturnBadRequestForDuplicateFtapPut() {
-    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
-
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(UUID.randomUUID());
@@ -305,8 +305,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturnBadRequestForDuplicateFtapPost() {
-    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
-
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(UUID.randomUUID());
@@ -332,8 +330,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldUpdateExistingFtap() {
-    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
-
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(facilityTypeAppProdId);
@@ -428,8 +424,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturn400WhenInvalidSearchParamsAreProvided() {
-    mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
-
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())

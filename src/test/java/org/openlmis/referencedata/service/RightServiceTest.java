@@ -18,6 +18,10 @@ package org.openlmis.referencedata.service;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.SERVICE_CLIENT_ID;
+import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.asApiKey;
+import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.asClient;
+import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.asService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,14 +31,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;
 
@@ -55,6 +58,7 @@ public class RightServiceTest {
   private SecurityContext securityContext;
   private OAuth2Authentication trustedClient;
   private OAuth2Authentication userClient;
+  private OAuth2Authentication apiKeyClient;
   private User user;
   private UUID userId;
   
@@ -62,11 +66,16 @@ public class RightServiceTest {
   public void setUp() {
     securityContext = mock(SecurityContext.class);
     SecurityContextHolder.setContext(securityContext);
-    trustedClient = new OAuth2Authentication(mock(OAuth2Request.class), null);
-    userClient = new OAuth2Authentication(mock(OAuth2Request.class), mock(Authentication.class));
+
     user = mock(User.class);
     userId = UUID.randomUUID();
     when(user.getId()).thenReturn(userId);
+
+    trustedClient = asService();
+    userClient = asClient(userId);
+    apiKeyClient = asApiKey();
+
+    ReflectionTestUtils.setField(rightService, "serviceTokenClientId", SERVICE_CLIENT_ID);
   }
   
   @Test
@@ -83,10 +92,16 @@ public class RightServiceTest {
     rightService.checkAdminRight(RIGHT_NAME, false);
   }
 
+  @Test(expected = UnauthorizedException.class)
+  public void checkAdminRightShouldThrowExceptionWhenApiKeyNotAllowed() {
+    when(securityContext.getAuthentication()).thenReturn(apiKeyClient);
+
+    rightService.checkAdminRight(RIGHT_NAME);
+  }
+
   @Test
   public void checkAdminRightShouldAllowUserWhoHasRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
-    when(userClient.getPrincipal()).thenReturn(userId);
     when(rightAssignmentRepository.existsByUserIdAndRightName(user.getId(), RIGHT_NAME))
         .thenReturn(true);
 
@@ -96,7 +111,6 @@ public class RightServiceTest {
   @Test
   public void checkAdminRightShouldAllowRequesterWithSpecifiedUserId() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
-    when(userClient.getPrincipal()).thenReturn(userId);
     when(userRepository.exists(any(UUID.class))).thenReturn(true);
     when(userRepository.findOne(any(UUID.class))).thenReturn(user);
     when(user.hasRight(any(RightQuery.class))).thenReturn(false);
@@ -107,7 +121,6 @@ public class RightServiceTest {
   @Test(expected = UnauthorizedException.class)
   public void checkAdminRightShouldThrowUnauthorizedExceptionForUserWhoDoesNotHaveRight() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
-    when(userClient.getPrincipal()).thenReturn(userId);
     when(rightAssignmentRepository.existsByUserIdAndRightName(user.getId(), RIGHT_NAME))
         .thenReturn(false);
 
@@ -124,6 +137,13 @@ public class RightServiceTest {
   @Test(expected = UnauthorizedException.class)
   public void checkRootAccessShouldNotAllowUserClients() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
+
+    rightService.checkRootAccess();
+  }
+
+  @Test(expected = UnauthorizedException.class)
+  public void checkRootAccessShouldNotAllowApiKeys() {
+    when(securityContext.getAuthentication()).thenReturn(apiKeyClient);
 
     rightService.checkRootAccess();
   }
