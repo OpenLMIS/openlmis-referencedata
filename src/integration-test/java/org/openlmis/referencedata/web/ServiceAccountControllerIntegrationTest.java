@@ -104,7 +104,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   }
 
   @Test
-  public void shouldReturnForbiddenForCreateServiceAccountEndpoint() {
+  public void shouldReturnForbiddenForCreateServiceAccountEndpointWhenUserHasNoRight() {
     mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
 
     String response = restAssured
@@ -154,7 +154,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   }
 
   @Test
-  public void shouldReturnForbiddenForGetServiceAccountsEndpoint() {
+  public void shouldReturnForbiddenForGetServiceAccountsEndpointWhenUserHasNoRight() {
     mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
 
     String response = restAssured
@@ -203,7 +203,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   }
 
   @Test
-  public void shouldReturnForbiddenForDeleteServiceAccountEndpoint() {
+  public void shouldReturnForbiddenForDeleteServiceAccountEndpointWhenUserHasNoRight() {
     mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
 
     String response = restAssured
