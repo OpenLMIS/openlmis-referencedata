@@ -13,23 +13,13 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.testbuilder;
+package org.openlmis.referencedata.domain;
 
-import org.openlmis.referencedata.domain.CreationDetails;
-import org.openlmis.referencedata.domain.ServiceAccount;
-
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public class ServiceAccountDataBuilder {
-  private UUID login = UUID.randomUUID();
-  private UUID createdBy = UUID.randomUUID();
-  private ZonedDateTime createdDate = ZonedDateTime.now();
+public interface Entity {
+  String UUID_TYPE = "pg-uuid";
 
-  /**
-   * Builds instance of {@link ServiceAccount}.
-   */
-  public ServiceAccount build() {
-    return new ServiceAccount(login, new CreationDetails(createdBy, createdDate));
-  }
+  UUID getId();
+
 }

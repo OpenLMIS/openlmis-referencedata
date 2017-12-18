@@ -17,9 +17,8 @@ package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toList;
 
-import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
+import org.openlmis.referencedata.domain.Entity;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
 import org.openlmis.referencedata.domain.Program;
@@ -80,6 +79,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import lombok.NoArgsConstructor;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -88,6 +90,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import javax.validation.Valid;
 
 @NoArgsConstructor
@@ -765,11 +768,11 @@ public class UserController extends BaseController {
   }
 
   // finds a given entity by id, wrapping any null in an Optional
-  private Optional<BaseEntity> validateId(
+  private Optional<Entity> validateId(
       UUID id,
-      PagingAndSortingRepository<? extends BaseEntity, UUID> repository) {
+      PagingAndSortingRepository<? extends Entity, UUID> repository) {
 
-    BaseEntity entity = repository.findOne(id);
+    Entity entity = repository.findOne(id);
     return (null != entity) ? Optional.of(entity) : Optional.empty();
   }
 

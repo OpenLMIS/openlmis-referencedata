@@ -29,20 +29,23 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @TypeName("ServiceAccount")
 @Table(name = "service_accounts", schema = "referencedata")
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @ToString
 @Getter
-public final class ServiceAccount extends BaseEntity {
+public final class ServiceAccount implements org.openlmis.referencedata.domain.Entity {
 
-  @Column(nullable = false)
-  private String login;
+  @Id
+  @Column(nullable = false, unique = true)
+  private UUID apiKey;
 
   @Embedded
   private CreationDetails creationDetails;
@@ -58,10 +61,13 @@ public final class ServiceAccount extends BaseEntity {
         importer.getCreatedBy(), importer.getCreatedDate()
     );
 
-    ServiceAccount account = new ServiceAccount(importer.getLogin(), creationDetails);
-    account.setId(importer.getId());
+    return new ServiceAccount(importer.getApiKey(), creationDetails);
+  }
 
-    return account;
+  @Override
+  @Transient
+  public UUID getId() {
+    return apiKey;
   }
 
   /**
@@ -70,17 +76,14 @@ public final class ServiceAccount extends BaseEntity {
    * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
-    exporter.setId(id);
-    exporter.setLogin(login);
+    exporter.setApiKey(apiKey);
     exporter.setCreatedBy(creationDetails.getCreatedBy());
     exporter.setCreatedDate(creationDetails.getCreatedDate());
   }
 
   public interface Exporter {
 
-    void setId(UUID id);
-
-    void setLogin(String login);
+    void setApiKey(UUID apiKey);
 
     void setCreatedBy(UUID createdBy);
 
@@ -90,9 +93,7 @@ public final class ServiceAccount extends BaseEntity {
 
   public interface Importer {
 
-    UUID getId();
-
-    String getLogin();
+    UUID getApiKey();
 
     UUID getCreatedBy();
 

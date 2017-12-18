@@ -30,8 +30,7 @@ import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
 @EqualsAndHashCode
-public abstract class BaseEntity {
-  static final String UUID_TYPE = "pg-uuid";
+public abstract class BaseEntity implements Entity {
 
   @Id
   @GeneratedValue(generator = "uuid-gen")

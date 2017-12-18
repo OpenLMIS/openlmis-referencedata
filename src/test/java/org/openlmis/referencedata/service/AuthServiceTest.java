@@ -35,6 +35,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.exception.ExternalApiException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -99,22 +100,33 @@ public class AuthServiceTest {
 
   @Test
   public void shouldCreateApiKey() {
-    String expectedKey = UUID.randomUUID().toString();
+    UUID expectedKey = UUID.randomUUID();
     ResponseEntity<String> response = mock(ResponseEntity.class);
 
-    when(response.getBody()).thenReturn(expectedKey);
+    when(response.getBody()).thenReturn(expectedKey.toString());
     when(restTemplate.postForEntity(eq(AUTH_ENDPOINT), any(HttpEntity.class), eq(String.class)))
         .thenReturn(response);
 
-    String apiKey = authService.createApiKey();
+    UUID apiKey = authService.createApiKey();
     assertThat(apiKey, is(equalTo(expectedKey)));
 
     verify(restTemplate).postForEntity(eq(AUTH_ENDPOINT), any(HttpEntity.class), eq(String.class));
   }
 
+  @Test(expected = ExternalApiException.class)
+  public void shouldThrowExceptionIfApiKeyCouldNotBeRetrieved() {
+    ResponseEntity<String> response = mock(ResponseEntity.class);
+
+    when(response.getBody()).thenReturn("");
+    when(restTemplate.postForEntity(eq(AUTH_ENDPOINT), any(HttpEntity.class), eq(String.class)))
+        .thenReturn(response);
+
+    authService.createApiKey();
+  }
+
   @Test
   public void shouldDeleteApiKey() {
-    String key = UUID.randomUUID().toString();
+    UUID key = UUID.randomUUID();
     authService.removeApiKey(key);
 
     String url = AUTH_ENDPOINT + "/" + key;

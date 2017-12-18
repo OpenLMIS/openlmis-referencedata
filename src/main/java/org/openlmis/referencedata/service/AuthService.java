@@ -17,8 +17,11 @@ package org.openlmis.referencedata.service;
 
 import static org.openlmis.referencedata.service.RequestHelper.createEntity;
 import static org.openlmis.referencedata.service.RequestHelper.createUri;
+import static org.openlmis.referencedata.util.messagekeys.ServiceAccountMessageKeys.ERROR_API_KEY_REQUIRED;
 
 import org.apache.commons.codec.binary.Base64;
+import org.openlmis.referencedata.exception.ExternalApiException;
+import org.openlmis.referencedata.util.UuidUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +32,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -53,16 +57,22 @@ public class AuthService {
    *
    * @return created API key.
    */
-  public String createApiKey() {
-    return restTemplate
-        .postForEntity(getUrl(), createEntity(obtainAccessToken()), String.class)
-        .getBody();
+  public UUID createApiKey() {
+    String url = getUrl();
+    HttpEntity entity = createEntity(obtainAccessToken());
+
+    ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+
+    String body = response.getBody();
+    return UuidUtil
+        .fromString(body)
+        .orElseThrow(() -> new ExternalApiException(ERROR_API_KEY_REQUIRED));
   }
 
   /**
    * Removes API key. This method will call the auth service.
    */
-  public void removeApiKey(String key) {
+  public void removeApiKey(UUID key) {
     HttpEntity body = createEntity(obtainAccessToken());
     String url = getUrl() + "/" + key;
 

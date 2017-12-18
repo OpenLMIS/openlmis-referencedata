@@ -77,7 +77,7 @@ public class ServiceAccountController extends BaseController {
     User user = authenticationHelper.getCurrentUser();
 
     profiler.start("GET_API_KEY");
-    String key = authService.createApiKey();
+    UUID key = authService.createApiKey();
 
     profiler.start("CREATE_NEW_INSTANCE");
     CreationDetails creationDetails = new CreationDetails(user.getId());
@@ -136,7 +136,7 @@ public class ServiceAccountController extends BaseController {
     }
 
     profiler.start("DELETE_API_KEY");
-    authService.removeApiKey(account.getLogin());
+    authService.removeApiKey(account.getApiKey());
 
     profiler.start("DELETE_SERVICE_ACCOUNT");
     serviceAccountRepository.delete(account);

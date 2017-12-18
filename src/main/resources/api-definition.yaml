@@ -3052,10 +3052,11 @@ resourceTypes:
                   body:
                       application/json:
                           schema: localizedErrorResponse
-      /{id}:
+      /{apiKey}:
           uriParameters:
-              id:
-                  displayName: id
+              apiKey:
+                  displayName: apiKey
+                  description: Generated API Key.
                   type: string
                   required: true
                   repeat: false

@@ -38,14 +38,10 @@ public class ServiceAccountTest {
   public void shouldCreateInstanceBasedOnImporter() {
     ServiceAccount expected = new ServiceAccountDataBuilder().build();
     ServiceAccount.Importer importer = new ServiceAccount.Importer() {
-      @Override
-      public UUID getId() {
-        return expected.getId();
-      }
 
       @Override
-      public String getLogin() {
-        return expected.getLogin();
+      public UUID getApiKey() {
+        return expected.getApiKey();
       }
 
       @Override
@@ -67,14 +63,10 @@ public class ServiceAccountTest {
   public void shouldExportValues() {
     Map<String, Object> values = Maps.newHashMap();
     ServiceAccount.Exporter exporter = new ServiceAccount.Exporter() {
-      @Override
-      public void setId(UUID id) {
-        values.put("id", id);
-      }
 
       @Override
-      public void setLogin(String login) {
-        values.put("login", login);
+      public void setApiKey(UUID apiKey) {
+        values.put("apiKey", apiKey);
       }
 
       @Override
@@ -91,8 +83,7 @@ public class ServiceAccountTest {
     ServiceAccount account = new ServiceAccountDataBuilder().build();
     account.export(exporter);
 
-    assertThat(values, hasEntry("id", account.getId()));
-    assertThat(values, hasEntry("login", account.getLogin()));
+    assertThat(values, hasEntry("apiKey", account.getApiKey()));
     assertThat(values, hasEntry("createdBy", account.getCreationDetails().getCreatedBy()));
     assertThat(values, hasEntry("createdDate", account.getCreationDetails().getCreatedDate()));
   }

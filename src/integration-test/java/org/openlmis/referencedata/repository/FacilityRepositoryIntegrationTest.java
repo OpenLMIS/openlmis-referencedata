@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.Entity;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -222,7 +222,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // then
     assertEquals(2, foundFacilties.size());
     assertThat(
-        foundFacilties.stream().map(BaseEntity::getId).collect(Collectors.toSet()),
+        foundFacilties.stream().map(Entity::getId).collect(Collectors.toSet()),
         hasItems(facility1.getId(), facility.getId())
     );
   }

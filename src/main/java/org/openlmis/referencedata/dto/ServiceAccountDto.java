@@ -27,13 +27,11 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @ToString
-public final class ServiceAccountDto
-    extends BaseDto
-    implements ServiceAccount.Importer, ServiceAccount.Exporter {
+public final class ServiceAccountDto implements ServiceAccount.Importer, ServiceAccount.Exporter {
 
-  private String login;
+  private UUID apiKey;
   private UUID createdBy;
   private ZonedDateTime createdDate;
 

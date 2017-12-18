@@ -38,8 +38,7 @@ public class ServiceAccountRepositoryIntegrationTest
 
   @Before
   public void setUp() {
-    account = new ServiceAccountDataBuilder()
-        .buildAsNew();
+    account = new ServiceAccountDataBuilder().build();
   }
 
   @Override
@@ -53,9 +52,13 @@ public class ServiceAccountRepositoryIntegrationTest
   }
 
   @Override
+  protected void assertBefore(ServiceAccount instance) {
+    assertThat(instance.getApiKey(), is(notNullValue()));
+  }
+
+  @Override
   protected void assertInstance(ServiceAccount instance) {
-    assertThat(instance.getId(), is(notNullValue()));
-    assertThat(instance.getLogin(), is(equalTo(account.getLogin())));
+    assertThat(instance.getApiKey(), is(equalTo(account.getApiKey())));
     assertThat(
         instance.getCreationDetails().getCreatedBy(),
         is(equalTo(account.getCreationDetails().getCreatedBy()))

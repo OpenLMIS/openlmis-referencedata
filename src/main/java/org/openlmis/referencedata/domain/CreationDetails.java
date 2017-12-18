@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.openlmis.referencedata.domain.Entity.UUID_TYPE;
+
 import org.hibernate.annotations.Type;
 
 import lombok.AllArgsConstructor;
@@ -38,7 +40,7 @@ import javax.persistence.Embeddable;
 public final class CreationDetails {
 
   @Column(nullable = false)
-  @Type(type = BaseEntity.UUID_TYPE)
+  @Type(type = UUID_TYPE)
   private UUID createdBy;
 
   @Column(columnDefinition = "timestamp with time zone", nullable = false)

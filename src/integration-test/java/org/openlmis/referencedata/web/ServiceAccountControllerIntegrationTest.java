@@ -49,7 +49,8 @@ import java.util.UUID;
 
 public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/serviceAccounts";
-  private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String ID_URL = RESOURCE_URL + "/{apiKey}";
+  private static final String API_KEY = "apiKey";
 
   @MockBean
   private AuthenticationHelper authenticationHelper;
@@ -62,17 +63,20 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   private User user = new UserDataBuilder().build();
 
-  private String apiKey = UUID.randomUUID().toString();
+  private UUID apiKey = UUID.randomUUID();
 
   @Before
+  @Override
   public void setUp() {
+    super.setUp();
+
     accountDto = new ServiceAccountDto();
 
     account = new ServiceAccountDataBuilder().build();
     account.export(accountDto);
 
     given(serviceAccountRepository.save(any(ServiceAccount.class)))
-        .willAnswer(new SaveAnswer<>());
+        .willAnswer(invocation -> invocation.getArguments()[0]);
 
     given(authenticationHelper.getCurrentUser()).willReturn(user);
     given(authService.createApiKey()).willReturn(apiKey);
@@ -94,8 +98,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
 
-    assertThat(response.getId(), is(notNullValue()));
-    assertThat(response.getLogin(), is(equalTo(apiKey)));
+    assertThat(response.getApiKey(), is(equalTo(apiKey)));
     assertThat(response.getCreatedBy(), is(equalTo(user.getId())));
     assertThat(response.getCreatedDate(), is(notNullValue()));
 
@@ -148,7 +151,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
         .then()
         .statusCode(HttpStatus.OK.value())
         .body("content.size()", is(1))
-        .body("content[0].login", is(account.getLogin()));
+        .body("content[0].apiKey", is(account.getApiKey().toString()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -186,12 +189,12 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldDeleteServiceAccount() {
-    given(serviceAccountRepository.findOne(account.getId()))
+    given(serviceAccountRepository.findOne(account.getApiKey()))
         .willReturn(account);
 
     restAssured
         .given()
-        .pathParam(ID, account.getId())
+        .pathParam(API_KEY, account.getApiKey())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .delete(ID_URL)
@@ -199,7 +202,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
         .statusCode(HttpStatus.NO_CONTENT.value());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    verify(authService).removeApiKey(account.getLogin());
+    verify(authService).removeApiKey(account.getApiKey());
   }
 
   @Test
@@ -208,7 +211,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
     String response = restAssured
         .given()
-        .pathParam(ID, account.getId())
+        .pathParam(API_KEY, account.getApiKey())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .delete(ID_URL)
@@ -224,12 +227,12 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldReturnNotFoundIfAccountNotExistForDeleteServiceAccountEndpoint() {
-    given(serviceAccountRepository.findOne(account.getId()))
+    given(serviceAccountRepository.findOne(account.getApiKey()))
         .willReturn(null);
 
     String response = restAssured
         .given()
-        .pathParam(ID, account.getId())
+        .pathParam(API_KEY, account.getApiKey())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .delete(ID_URL)
@@ -247,7 +250,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldReturnUnauthorizedWithoutAuthorizationForDeleteServiceAccountEndpoint() {
     restAssured
         .given()
-        .pathParam(ID, account.getId())
+        .pathParam(API_KEY, account.getApiKey())
         .when()
         .delete(ID_URL)
         .then()
