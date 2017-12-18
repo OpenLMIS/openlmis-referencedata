@@ -58,7 +58,7 @@ public class AuthService {
    * @return created API key.
    */
   public UUID createApiKey() {
-    String url = getUrl();
+    String url = getApiKeyUrl();
     HttpEntity entity = createEntity(obtainAccessToken());
 
     ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
@@ -74,7 +74,7 @@ public class AuthService {
    */
   public void removeApiKey(UUID key) {
     HttpEntity body = createEntity(obtainAccessToken());
-    String url = getUrl() + "/" + key;
+    String url = getApiKeyUrl() + "/" + key;
 
     restTemplate.exchange(url, HttpMethod.DELETE, body, Object.class);
   }
@@ -101,8 +101,8 @@ public class AuthService {
     return String.valueOf(response.getBody().get(ACCESS_TOKEN));
   }
 
-  private String getUrl() {
-    return authUrl + "/api/serviceAccounts";
+  private String getApiKeyUrl() {
+    return authUrl + "/api/apiKeys";
   }
 
 }
