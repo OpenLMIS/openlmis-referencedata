@@ -8,6 +8,8 @@ parameters to get users endpoint
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-3782](https://openlmis.atlassian.net/browse/OLMIS-3782): Ability to set up program to skip requisition authorization step
+* [OLMIS-3135](https://openlmis.atlassian.net/browse/OLMIS-3135): Ability to create, use and delete API keys.
+  * Handle API Key requests. (For now all requests are blocked.)
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
