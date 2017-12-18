@@ -67,7 +67,7 @@ public class ServiceAccountController extends BaseController {
   @RequestMapping(value = "/serviceAccounts", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public ServiceAccountDto create() {
+  public ServiceAccountDto createServiceAccount() {
     Profiler profiler = new Profiler("CREATE_SERVICE_ACCOUNT");
     profiler.setLogger(LOGGER);
 
@@ -76,7 +76,7 @@ public class ServiceAccountController extends BaseController {
     profiler.start("GET_CURRENT_USER");
     User user = authenticationHelper.getCurrentUser();
 
-    profiler.start("GET_API_KEY");
+    profiler.start("CREATE_API_KEY");
     UUID key = authService.createApiKey();
 
     profiler.start("CREATE_NEW_INSTANCE");
@@ -93,7 +93,7 @@ public class ServiceAccountController extends BaseController {
   /**
    * Retrieves all service accounts.
    *
-   * @return List of service accounts.
+   * @return Page of service accounts.
    */
   @RequestMapping(value = "/serviceAccounts", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
