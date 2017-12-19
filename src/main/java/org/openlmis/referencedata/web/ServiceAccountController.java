@@ -98,7 +98,7 @@ public class ServiceAccountController extends BaseController {
   @RequestMapping(value = "/serviceAccounts", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<ServiceAccountDto> getAll(Pageable pageable) {
+  public Page<ServiceAccountDto> getServiceAccounts(Pageable pageable) {
     Profiler profiler = new Profiler("GET_SERVICE_ACCOUNTS");
     profiler.setLogger(LOGGER);
 
@@ -121,7 +121,7 @@ public class ServiceAccountController extends BaseController {
    */
   @RequestMapping(value = "/serviceAccounts/{apiKey}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable("apiKey") UUID apiKey) {
+  public void deleteServiceAccount(@PathVariable("apiKey") UUID apiKey) {
     Profiler profiler = new Profiler("DELETE_SERVICE_ACCOUNT");
     profiler.setLogger(LOGGER);
 
