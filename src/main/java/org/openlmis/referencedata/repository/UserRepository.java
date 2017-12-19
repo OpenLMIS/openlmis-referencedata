@@ -44,7 +44,7 @@ public interface UserRepository extends
   @Override
   <S extends User> Iterable<S> save(Iterable<S> entities);
 
-  User findOneByUsername(@Param("username") String username);
+  User findOneByUsernameIgnoreCase(@Param("username") String username);
 
   User findOneByEmail(@Param("email") String email);
 

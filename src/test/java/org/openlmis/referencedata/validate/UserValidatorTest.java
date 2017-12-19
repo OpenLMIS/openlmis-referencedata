@@ -80,7 +80,7 @@ public class UserValidatorTest {
     userDto.setId(null);
     doReturn(mock(User.class))
         .when(userRepository)
-        .findOneByUsername(userDto.getUsername());
+        .findOneByUsernameIgnoreCase(userDto.getUsername());
 
     validator.validate(userDto, errors);
 
@@ -94,7 +94,7 @@ public class UserValidatorTest {
 
     doReturn(old)
         .when(userRepository)
-        .findOneByUsername(userDto.getUsername());
+        .findOneByUsernameIgnoreCase(userDto.getUsername());
 
     validator.validate(userDto, errors);
     assertThat(errors.hasFieldErrors(USERNAME), is(false));
@@ -107,7 +107,7 @@ public class UserValidatorTest {
 
     doReturn(old)
         .when(userRepository)
-        .findOneByUsername(userDto.getUsername());
+        .findOneByUsernameIgnoreCase(userDto.getUsername());
 
     validator.validate(userDto, errors);
     assertErrorMessage(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_DUPLICATED);

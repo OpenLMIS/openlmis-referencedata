@@ -95,7 +95,7 @@ public class UserValidator implements BaseValidator {
     }
 
     // user name cannot be duplicated
-    User db = userRepository.findOneByUsername(username);
+    User db = userRepository.findOneByUsernameIgnoreCase(username);
 
     if (null != db && (null == id || !id.equals(db.getId()))) {
       rejectValue(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_DUPLICATED);

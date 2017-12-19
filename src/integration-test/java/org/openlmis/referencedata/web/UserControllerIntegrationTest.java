@@ -43,11 +43,12 @@ import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_INVALID;
 import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_USERNAME_REQUIRED;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.restassured.response.Response;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -88,6 +89,9 @@ import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -415,7 +419,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     User user = new User();
     user.setId(UUID.randomUUID());
-    given(userRepository.findOneByUsername(user1.getUsername())).willReturn(user);
+    given(userRepository.findOneByUsernameIgnoreCase(user1.getUsername())).willReturn(user);
 
     String messageKey = putUser(null)
         .then()
