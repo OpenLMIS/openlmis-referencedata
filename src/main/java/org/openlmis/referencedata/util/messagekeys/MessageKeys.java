@@ -22,7 +22,7 @@ public abstract class MessageKeys {
 
   // General
   private static final String SERVICE = "referenceData";
-  public static final String SERVICE_ERROR = join(SERVICE, "error");
+  protected static final String SERVICE_ERROR = join(SERVICE, "error");
 
   protected static final String NON_EXISTENT = "nonExistent";
   protected static final String UNAUTHORIZED = "unauthorized";

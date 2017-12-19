@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.errorhandling;
 
-import static org.openlmis.referencedata.util.messagekeys.MessageKeys.SERVICE_ERROR;
+import static org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys.ERROR_CODE_DUPLICATED;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
@@ -33,11 +33,18 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class RefDataErrorHandling extends BaseHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RefDataErrorHandling.class);
+
+  private static final Map<String, String> CONSTRAINT_MAP = new HashMap<String, String>() {{
+      put("unq_program_code", ERROR_CODE_DUPLICATED);
+    }
+  };
 
   /**
    * Handles data integrity violation and returns status 409 CONFLICT.
@@ -67,8 +74,10 @@ public class RefDataErrorHandling extends BaseHandler {
 
     if (dive.getCause() instanceof ConstraintViolationException) {
       ConstraintViolationException cause = (ConstraintViolationException) dive.getCause();
-      message = getLocalizedMessage(
-          new Message(String.join(".", SERVICE_ERROR, cause.getConstraintName())));
+      String messageKey = CONSTRAINT_MAP.get(cause.getConstraintName());
+      if (messageKey != null) {
+        message = getLocalizedMessage(new Message(messageKey));
+      }
     }
 
     return message;

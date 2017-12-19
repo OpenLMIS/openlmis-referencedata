@@ -19,11 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -35,7 +31,12 @@ import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Program> {
@@ -66,21 +67,24 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
   @Autowired
   private RightRepository rightRepository;
 
-  String programCode;
-  String programName;
-
   ProgramRepository getRepository() {
     return this.repository;
   }
 
   Program generateInstance() {
-    programCode = String.valueOf(this.getNextInstanceNumber());
-    Program program = new Program(programCode);
-    programName = "Program Name";
-    program.setName(programName);
-    program.setPeriodsSkippable(true);
-    program.setEnableDatePhysicalStockCountCompleted(true);
-    return program;
+    return new ProgramDataBuilder()
+        .withoutId()
+        .build();
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldThrowExceptionWhenCodeIsDuplicated() {
+    Program program1 = this.generateInstance();
+    repository.saveAndFlush(program1);
+
+    Program program2 = this.generateInstance();
+    program2.setCode(program1.getCode());
+    repository.saveAndFlush(program2);
   }
 
   @Test
@@ -100,13 +104,11 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
   public void testEnableDatePhysicalStockCountCompletedEdit() {
     Program testProgram = this.generateInstance();
     testProgram = repository.save(testProgram);
-    testProgram = repository.findOne(testProgram.getId());
-    assertTrue(testProgram.getEnableDatePhysicalStockCountCompleted());
-
-    testProgram.setEnableDatePhysicalStockCountCompleted(false);
-    testProgram = repository.save(testProgram);
-    testProgram = repository.findOne(testProgram.getId());
     assertFalse(testProgram.getEnableDatePhysicalStockCountCompleted());
+
+    testProgram.setEnableDatePhysicalStockCountCompleted(true);
+    testProgram = repository.save(testProgram);
+    assertTrue(testProgram.getEnableDatePhysicalStockCountCompleted());
   }
   
   @Test
@@ -116,7 +118,7 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     repository.save(program);
 
     //when
-    Program foundProgram = repository.findByCode(Code.code(programCode));
+    Program foundProgram = repository.findByCode(program.getCode());
 
     //then
     assertEquals(program, foundProgram);

@@ -19,23 +19,19 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-
 import java.util.Set;
 import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface ProgramRepository
-    extends PagingAndSortingRepository<Program, UUID>, ProgramRepositoryCustom {
+    extends JpaRepository<Program, UUID>, ProgramRepositoryCustom {
   // Add custom Program related members here. See UserRepository.java for examples.
 
   @Override
   <S extends Program> S save(S entity);
-
-  @Override
-  <S extends Program> Iterable<S> save(Iterable<S> entities);
 
   <S extends Program> S findByCode(Code code);
 

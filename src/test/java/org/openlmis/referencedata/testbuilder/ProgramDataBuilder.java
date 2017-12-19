@@ -67,4 +67,11 @@ public class ProgramDataBuilder {
     this.id = id;
     return this;
   }
+
+  /**
+   * Sets null id for new {@link Program}.
+   */
+  public ProgramDataBuilder withoutId() {
+    return withId(null);
+  }
 }
