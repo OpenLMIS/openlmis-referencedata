@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
-import static org.openlmis.referencedata.domain.Entity.UUID_TYPE;
+import static org.openlmis.referencedata.domain.BaseEntity.UUID_TYPE;
 
 import org.hibernate.annotations.Type;
 

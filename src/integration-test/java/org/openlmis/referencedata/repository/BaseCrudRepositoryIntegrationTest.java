@@ -18,7 +18,7 @@ package org.openlmis.referencedata.repository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openlmis.referencedata.domain.Entity;
+import org.openlmis.referencedata.domain.Identifiable;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public abstract class BaseCrudRepositoryIntegrationTest<T extends Entity> {
+public abstract class BaseCrudRepositoryIntegrationTest<T extends Identifiable> {
 
   abstract CrudRepository<T, UUID> getRepository();
 

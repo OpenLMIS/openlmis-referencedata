@@ -41,7 +41,7 @@ import javax.persistence.Transient;
 @EqualsAndHashCode
 @ToString
 @Getter
-public final class ServiceAccount implements org.openlmis.referencedata.domain.Entity {
+public final class ServiceAccount implements Identifiable {
 
   @Id
   @Column(nullable = false, unique = true)

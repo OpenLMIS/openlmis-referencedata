@@ -18,9 +18,9 @@ package org.openlmis.referencedata.web;
 import static java.util.stream.Collectors.toList;
 
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
-import org.openlmis.referencedata.domain.Entity;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
+import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
@@ -63,7 +63,7 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -768,12 +768,12 @@ public class UserController extends BaseController {
   }
 
   // finds a given entity by id, wrapping any null in an Optional
-  private Optional<Entity> validateId(
+  private Optional<Identifiable> validateId(
       UUID id,
-      PagingAndSortingRepository<? extends Entity, UUID> repository) {
+      CrudRepository<? extends Identifiable, UUID> repository) {
 
-    Entity entity = repository.findOne(id);
-    return (null != entity) ? Optional.of(entity) : Optional.empty();
+    Identifiable identifiable = repository.findOne(id);
+    return (null != identifiable) ? Optional.of(identifiable) : Optional.empty();
   }
 
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user) {

@@ -17,8 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import java.util.UUID;
 
-public interface Entity {
-  String UUID_TYPE = "pg-uuid";
+public interface Identifiable {
 
   UUID getId();
 
