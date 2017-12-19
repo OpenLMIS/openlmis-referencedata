@@ -32,7 +32,6 @@ import com.jayway.restassured.response.ValidatableResponse;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.ServiceAccount;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ServiceAccountDto;
@@ -40,6 +39,7 @@ import org.openlmis.referencedata.service.AuthService;
 import org.openlmis.referencedata.testbuilder.ServiceAccountDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
@@ -129,12 +129,21 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   @Test
   public void shouldRetrieveServiceAccounts() {
     given(serviceAccountRepository.findAll(any(Pageable.class)))
-        .willReturn(new PageImplRepresentation<>(Lists.newArrayList(account)));
+        .willReturn(new PageImpl<>(Lists.newArrayList(account, account, account)));
 
-    get()
-        .statusCode(HttpStatus.OK.value())
-        .body("content.size()", is(1))
-        .body("content[0].apiKey", is(account.getApiKeyId().toString()));
+    ValidatableResponse response = get(10).statusCode(HttpStatus.OK.value());
+    checkPageBody(response, 0, 10, 3, 3, 1);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRetrieveOnePageOfServiceAccounts() {
+    given(serviceAccountRepository.findAll(any(Pageable.class)))
+        .willReturn(new PageImpl<>(Lists.newArrayList(account, account, account)));
+
+    ValidatableResponse response = get(1).statusCode(HttpStatus.OK.value());
+    checkPageBody(response, 0, 1, 1, 3, 3);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -143,7 +152,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldReturnForbiddenForGetServiceAccountsEndpointWhenUserHasNoRight() {
     mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
 
-    String response = get()
+    String response = get(10)
         .statusCode(HttpStatus.FORBIDDEN.value())
         .extract()
         .path(MESSAGE_KEY);
@@ -226,8 +235,10 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
         .then();
   }
 
-  private ValidatableResponse get() {
+  private ValidatableResponse get(int pageSize) {
     return startRequest(getTokenHeader())
+        .queryParam("page", 0)
+        .queryParam("size", pageSize)
         .when()
         .get(RESOURCE_URL)
         .then();

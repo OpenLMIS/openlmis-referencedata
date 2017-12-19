@@ -39,6 +39,7 @@ import com.jayway.restassured.config.RestAssuredConfig;
 import com.jayway.restassured.filter.log.LogDetail;
 import com.jayway.restassured.response.ExtractableResponse;
 import com.jayway.restassured.response.Response;
+import com.jayway.restassured.response.ValidatableResponse;
 import com.jayway.restassured.specification.RequestSpecification;
 
 import org.hamcrest.Matchers;
@@ -113,6 +114,7 @@ import javax.annotation.PostConstruct;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@SuppressWarnings({"PMD.TooManyMethods"})
 public abstract class BaseWebIntegrationTest {
 
   private static final String USER_ACCESS_TOKEN = "418c89c5-7f21-4cd1-a63a-38c47892b0fe";
@@ -419,6 +421,17 @@ public abstract class BaseWebIntegrationTest {
 
     assertThat(messageKey, is(Matchers.equalTo(code)));
     assertFalse(message.equals(messageKey));
+  }
+
+  void checkPageBody(ValidatableResponse response, int page, int size, int numberOfElements,
+                     int totalElements, int totalPages) {
+    response
+        .body("number", is(page))
+        .body("size", is(size))
+        .body("numberOfElements", is(numberOfElements))
+        .body("content.size()", is(numberOfElements))
+        .body("totalElements", is(totalElements))
+        .body("totalPages", is(totalPages));
   }
 
   RequestSpecification startRequest(String token) {

@@ -107,7 +107,7 @@ public class ServiceAccountController extends BaseController {
     profiler.start("DB_CALL");
     Page<ServiceAccount> result = serviceAccountRepository.findAll(pageable);
     List<ServiceAccountDto> dtos = toDto(result.getContent(), profiler);
-    Page<ServiceAccountDto> page = toPage(dtos, pageable, profiler);
+    Page<ServiceAccountDto> page = toPage(dtos, pageable, result.getTotalElements(), profiler);
 
     profiler.stop().log();
 
