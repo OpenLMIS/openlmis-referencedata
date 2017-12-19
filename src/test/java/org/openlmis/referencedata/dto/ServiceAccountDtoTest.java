@@ -34,7 +34,7 @@ public class ServiceAccountDtoTest {
     ServiceAccount account = new ServiceAccountDataBuilder().build();
     ServiceAccountDto dto = ServiceAccountDto.newInstance(account);
 
-    assertThat(dto.getApiKey(), is(equalTo(account.getApiKey())));
+    assertThat(dto.getApiKey(), is(equalTo(account.getApiKeyId())));
     assertThat(dto.getCreatedBy(), is(equalTo(account.getCreationDetails().getCreatedBy())));
     assertThat(dto.getCreatedDate(), is(equalTo(account.getCreationDetails().getCreatedDate())));
   }

@@ -134,7 +134,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
     get()
         .statusCode(HttpStatus.OK.value())
         .body("content.size()", is(1))
-        .body("content[0].apiKey", is(account.getApiKey().toString()));
+        .body("content[0].apiKey", is(account.getApiKeyId().toString()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -167,13 +167,13 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldDeleteServiceAccount() {
-    given(serviceAccountRepository.findOne(account.getApiKey()))
+    given(serviceAccountRepository.findOne(account.getApiKeyId()))
         .willReturn(account);
 
     delete().statusCode(HttpStatus.NO_CONTENT.value());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    verify(authService).removeApiKey(account.getApiKey());
+    verify(authService).removeApiKey(account.getApiKeyId());
   }
 
   @Test
@@ -192,7 +192,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldReturnNotFoundIfAccountNotExistForDeleteServiceAccountEndpoint() {
-    given(serviceAccountRepository.findOne(account.getApiKey()))
+    given(serviceAccountRepository.findOne(account.getApiKeyId()))
         .willReturn(null);
 
     String response = delete()
@@ -209,7 +209,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldReturnUnauthorizedWithoutAuthorizationForDeleteServiceAccountEndpoint() {
     restAssured
         .given()
-        .pathParam(API_KEY, account.getApiKey())
+        .pathParam(API_KEY, account.getApiKeyId())
         .when()
         .delete(ID_URL)
         .then()
@@ -235,7 +235,7 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   private ValidatableResponse delete() {
     return startRequest(getTokenHeader())
-        .pathParam(API_KEY, account.getApiKey())
+        .pathParam(API_KEY, account.getApiKeyId())
         .when()
         .delete(ID_URL)
         .then();

@@ -53,12 +53,12 @@ public class ServiceAccountRepositoryIntegrationTest
 
   @Override
   protected void assertBefore(ServiceAccount instance) {
-    assertThat(instance.getApiKey(), is(notNullValue()));
+    assertThat(instance.getApiKeyId(), is(notNullValue()));
   }
 
   @Override
   protected void assertInstance(ServiceAccount instance) {
-    assertThat(instance.getApiKey(), is(equalTo(account.getApiKey())));
+    assertThat(instance.getApiKeyId(), is(equalTo(account.getApiKeyId())));
     assertThat(
         instance.getCreationDetails().getCreatedBy(),
         is(equalTo(account.getCreationDetails().getCreatedBy()))

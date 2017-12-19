@@ -45,7 +45,7 @@ public final class ServiceAccount implements org.openlmis.referencedata.domain.E
 
   @Id
   @Column(nullable = false, unique = true)
-  private UUID apiKey;
+  private UUID apiKeyId;
 
   @Embedded
   private CreationDetails creationDetails;
@@ -67,7 +67,7 @@ public final class ServiceAccount implements org.openlmis.referencedata.domain.E
   @Override
   @Transient
   public UUID getId() {
-    return apiKey;
+    return apiKeyId;
   }
 
   /**
@@ -76,7 +76,7 @@ public final class ServiceAccount implements org.openlmis.referencedata.domain.E
    * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
-    exporter.setApiKey(apiKey);
+    exporter.setApiKey(apiKeyId);
     exporter.setCreatedBy(creationDetails.getCreatedBy());
     exporter.setCreatedDate(creationDetails.getCreatedDate());
   }

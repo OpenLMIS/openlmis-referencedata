@@ -139,7 +139,7 @@ public class ServiceAccountController extends BaseController {
     serviceAccountRepository.delete(account);
 
     profiler.start("DELETE_API_KEY");
-    authService.removeApiKey(account.getApiKey());
+    authService.removeApiKey(account.getApiKeyId());
 
     profiler.stop().log();
   }

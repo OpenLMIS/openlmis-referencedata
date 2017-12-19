@@ -41,7 +41,7 @@ public class ServiceAccountTest {
 
       @Override
       public UUID getApiKey() {
-        return expected.getApiKey();
+        return expected.getApiKeyId();
       }
 
       @Override
@@ -83,7 +83,7 @@ public class ServiceAccountTest {
     ServiceAccount account = new ServiceAccountDataBuilder().build();
     account.export(exporter);
 
-    assertThat(values, hasEntry("apiKey", account.getApiKey()));
+    assertThat(values, hasEntry("apiKey", account.getApiKeyId()));
     assertThat(values, hasEntry("createdBy", account.getCreationDetails().getCreatedBy()));
     assertThat(values, hasEntry("createdDate", account.getCreationDetails().getCreatedDate()));
   }
