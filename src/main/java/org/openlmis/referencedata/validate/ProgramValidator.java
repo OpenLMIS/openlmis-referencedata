@@ -15,17 +15,12 @@
 
 package org.openlmis.referencedata.validate;
 
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import java.util.UUID;
 
 /**
  * A validator for {@link org.openlmis.referencedata.dto.ProgramDto} object.
@@ -35,9 +30,6 @@ public class ProgramValidator implements BaseValidator {
 
   // Program fields
   static final String CODE = "code";
-
-  @Autowired
-  private ProgramRepository programRepository;
 
   /**
    * Checks if the given class definition is supported.
@@ -68,27 +60,11 @@ public class ProgramValidator implements BaseValidator {
   @Override
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors, ProgramMessageKeys.ERROR_NULL);
-
-    ProgramDto program = (ProgramDto) target;
-
     verifyProperties(errors);
-
-    if (!errors.hasErrors()) {
-      verifyCode(program.getId(), Code.code(program.getCode()), errors);
-    }
   }
 
   private void verifyProperties(Errors errors) {
     // the code is required
     rejectIfEmptyOrWhitespace(errors, CODE, ProgramMessageKeys.ERROR_CODE_REQUIRED);
-  }
-
-  private void verifyCode(UUID id, Code code, Errors errors) {
-    // program code cannot be duplicated
-    Program db = programRepository.findByCode(code);
-
-    if (null != db && (null == id || !id.equals(db.getId()))) {
-      rejectValue(errors, CODE, ProgramMessageKeys.ERROR_CODE_DUPLICATED, code.toString());
-    }
   }
 }

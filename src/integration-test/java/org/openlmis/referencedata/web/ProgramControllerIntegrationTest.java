@@ -26,6 +26,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -140,7 +141,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldReturnBadRequestWhenPostWithDuplicatedCode() {
     mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
-    given(programRepository.findByCode(program.getCode())).willReturn(program);
+    given(programRepository.save(program)).willThrow(new DataIntegrityViolationException("error"));
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -204,8 +205,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
     program.setId(UUID.randomUUID());
-    given(programRepository.findOne(programId)).willReturn(program);
-    given(programRepository.findByCode(program.getCode())).willReturn(program);
+    given(programRepository.save(program)).willThrow(new DataIntegrityViolationException("error"));
 
     restAssured
         .given()

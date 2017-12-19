@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.errorhandling;
 
+import static org.openlmis.referencedata.util.messagekeys.MessageKeys.SERVICE_ERROR;
+
+import org.hibernate.exception.ConstraintViolationException;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.InternalErrorException;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -22,7 +25,6 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -57,11 +59,19 @@ public class RefDataErrorHandling extends BaseHandler {
    * @return the user-oriented error message.
    */
   @ExceptionHandler(DataIntegrityViolationException.class)
-  @ResponseStatus(HttpStatus.CONFLICT)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public LocalizedMessage handleDataIntegrityViolation(DataIntegrityViolationException dive) {
     LOGGER.info(dive.getMessage());
-    return getLocalizedMessage(new Message(SystemMessageKeys.ERROR_CONSTRAINT));
+    LocalizedMessage message = getLocalizedMessage(dive.getMessage());
+
+    if (dive.getCause() instanceof ConstraintViolationException) {
+      ConstraintViolationException cause = (ConstraintViolationException) dive.getCause();
+      message = getLocalizedMessage(
+          new Message(String.join(".", SERVICE_ERROR, cause.getConstraintName())));
+    }
+
+    return message;
   }
 
   /**

@@ -1,0 +1,1 @@
+ALTER TABLE programs ADD CONSTRAINT unq_program_code UNIQUE (code);

@@ -18,8 +18,6 @@ package org.openlmis.referencedata.validate;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.openlmis.referencedata.validate.ProgramValidator.CODE;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
@@ -27,12 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
@@ -41,9 +35,6 @@ import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProgramValidatorTest {
-
-  @Mock
-  private ProgramRepository programRepository;
 
   @InjectMocks
   private Validator validator = new ProgramValidator();
@@ -65,44 +56,6 @@ public class ProgramValidatorTest {
     validator.validate(programDto, errors);
 
     assertThat(errors.getErrorCount(), is(equalTo(0)));
-  }
-
-  @Test
-  public void shouldRejectIfCodeIsDuplicated() {
-    doReturn(mock(Program.class))
-        .when(programRepository)
-        .findByCode(Code.code(programDto.getCode()));
-
-    validator.validate(programDto, errors);
-
-    assertErrorMessage(errors, CODE,
-        ProgramMessageKeys.ERROR_CODE_DUPLICATED, programDto.getCode());
-  }
-
-  @Test
-  public void shouldNotRejectIfCodeIsDuplicatedAndIdsAreSame() {
-    Program old = new Program(programDto.getCode());
-    old.setId(programDto.getId());
-
-    doReturn(old)
-        .when(programRepository)
-        .findByCode(Code.code(programDto.getCode()));
-
-    validator.validate(programDto, errors);
-    assertThat(errors.hasFieldErrors(CODE), is(false));
-  }
-
-  @Test
-  public void shouldRejectIfCodeIsDuplicatedAndIdsAreDifferent() {
-    Program old = new Program(programDto.getCode());
-    old.setId(UUID.randomUUID());
-
-    doReturn(old)
-        .when(programRepository)
-        .findByCode(Code.code(programDto.getCode()));
-
-    validator.validate(programDto, errors);
-    assertErrorMessage(errors, CODE, ProgramMessageKeys.ERROR_CODE_DUPLICATED);
   }
 
   @Test

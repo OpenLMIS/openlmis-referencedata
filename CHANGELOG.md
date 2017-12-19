@@ -21,7 +21,7 @@ Bug fixes that are backwards-compatible:
   * modified /api/facilities/supplying to retrieve facilities directly from the database
   * improved Get Facilities and Search Facility endpoints by using geographic zone IDs instead of full representation.
   * create single query to retrieve facilities by all parameters
-* [OLMIS-2666](https://openlmis.atlassian.net/browse/OLMIS-2666): Improved unique program code validation message.
+* [OLMIS-2666](https://openlmis.atlassian.net/browse/OLMIS-2666): Removed java validation for program code uniqueness. 
 
 9.0.0 / 2017-11-09
 ==================

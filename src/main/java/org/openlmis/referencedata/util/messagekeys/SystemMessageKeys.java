@@ -18,5 +18,4 @@ package org.openlmis.referencedata.util.messagekeys;
 public abstract class SystemMessageKeys extends MessageKeys {
   public static final String ERROR_UNAUTHORIZED = join(SERVICE_ERROR, UNAUTHORIZED);
   public static final String ERROR_UNAUTHORIZED_GENERIC = join(ERROR_UNAUTHORIZED, GENERIC);
-  public static final String ERROR_CONSTRAINT = join(SERVICE_ERROR, CONSTRAINT);
 }
