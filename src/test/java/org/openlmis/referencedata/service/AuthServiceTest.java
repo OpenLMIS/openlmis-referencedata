@@ -35,7 +35,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.exception.ExternalApiException;
+import org.openlmis.referencedata.exception.InternalErrorException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -113,7 +113,7 @@ public class AuthServiceTest {
     verify(restTemplate).postForEntity(eq(AUTH_ENDPOINT), any(HttpEntity.class), eq(String.class));
   }
 
-  @Test(expected = ExternalApiException.class)
+  @Test(expected = InternalErrorException.class)
   public void shouldThrowExceptionIfApiKeyCouldNotBeRetrieved() {
     ResponseEntity<String> response = mock(ResponseEntity.class);
 

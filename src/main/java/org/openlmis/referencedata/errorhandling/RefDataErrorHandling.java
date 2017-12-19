@@ -85,7 +85,7 @@ public class RefDataErrorHandling extends BaseHandler {
    * @return the error response for the user
    */
   @ExceptionHandler(InternalErrorException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
   public LocalizedMessage handleInternalErrorException(InternalErrorException ex) {
     LOGGER.info(ex.getMessage());

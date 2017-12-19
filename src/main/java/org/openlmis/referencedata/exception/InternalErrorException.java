@@ -17,7 +17,8 @@ package org.openlmis.referencedata.exception;
 
 public class InternalErrorException extends BaseMessageException {
 
-  public InternalErrorException(String messageKey, Throwable cause) {
-    super(messageKey, cause);
+  public InternalErrorException(String messageKey) {
+    super(messageKey);
   }
+
 }
