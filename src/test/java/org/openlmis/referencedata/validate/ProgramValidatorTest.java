@@ -75,7 +75,8 @@ public class ProgramValidatorTest {
 
     validator.validate(programDto, errors);
 
-    assertErrorMessage(errors, CODE, ProgramMessageKeys.ERROR_CODE_DUPLICATED);
+    assertErrorMessage(errors, CODE,
+        ProgramMessageKeys.ERROR_CODE_DUPLICATED, programDto.getCode());
   }
 
   @Test

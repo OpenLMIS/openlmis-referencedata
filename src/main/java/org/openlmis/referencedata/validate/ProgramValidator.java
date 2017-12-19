@@ -88,7 +88,7 @@ public class ProgramValidator implements BaseValidator {
     Program db = programRepository.findByCode(code);
 
     if (null != db && (null == id || !id.equals(db.getId()))) {
-      rejectValue(errors, CODE, ProgramMessageKeys.ERROR_CODE_DUPLICATED);
+      rejectValue(errors, CODE, ProgramMessageKeys.ERROR_CODE_DUPLICATED, code.toString());
     }
   }
 }

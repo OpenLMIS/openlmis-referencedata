@@ -18,18 +18,26 @@ package org.openlmis.referencedata.validate;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.validation.Errors;
+import java.util.Arrays;
+import java.util.List;
 
 class ValidationTestUtils {
 
-  static void assertErrorMessage(Errors errors, String field, String expectedMessage) {
+  static void assertErrorMessage(Errors errors, String field, String expectedMessage,
+                                 String... parameters) {
     assertThat("There is no errors for field: " + field, errors.hasFieldErrors(field), is(true));
 
     boolean match = errors.getFieldErrors(field)
         .stream()
-        .anyMatch(e -> e.getField().equals(field) && e.getDefaultMessage().equals(expectedMessage));
+        .anyMatch(e -> e.getField().equals(field) && e.getDefaultMessage().equals(expectedMessage)
+            && getList(e.getArguments()).containsAll(getList(parameters)));
 
     assertThat("There is no error with default message: " + expectedMessage, match, is(true));
   }
 
+  private static List<Object> getList(Object[] array) {
+    return Arrays.asList(ArrayUtils.nullToEmpty(array));
+  }
 }
