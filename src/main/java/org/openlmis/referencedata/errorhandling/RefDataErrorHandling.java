@@ -70,17 +70,16 @@ public class RefDataErrorHandling extends BaseHandler {
   @ResponseBody
   public LocalizedMessage handleDataIntegrityViolation(DataIntegrityViolationException dive) {
     LOGGER.info(dive.getMessage());
-    LocalizedMessage message = getLocalizedMessage(dive.getMessage());
 
     if (dive.getCause() instanceof ConstraintViolationException) {
       ConstraintViolationException cause = (ConstraintViolationException) dive.getCause();
       String messageKey = CONSTRAINT_MAP.get(cause.getConstraintName());
       if (messageKey != null) {
-        message = getLocalizedMessage(new Message(messageKey));
+        return getLocalizedMessage(new Message(messageKey));
       }
     }
 
-    return message;
+    return getLocalizedMessage(dive.getMessage());
   }
 
   /**
