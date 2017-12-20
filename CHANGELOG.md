@@ -22,7 +22,7 @@ Bug fixes that are backwards-compatible:
   * improved Get Facilities and Search Facility endpoints by using geographic zone IDs instead of full representation.
   * create single query to retrieve facilities by all parameters
 * [OLMIS-2666](https://openlmis.atlassian.net/browse/OLMIS-2666): Removed java validation and added database constraint for program code uniqueness.
-* [OLMIS-3537](https://openlmis.atlassian.net/browse/OLMIS-3537): Usernames are now case-insensitive.
+* [OLMIS-3537](https://openlmis.atlassian.net/browse/OLMIS-3537): Usernames are now case-insensitive. (Note: Implementations need to handle this before upgrading this component, if they use usernames that differ by letter casing only)
 
 9.0.0 / 2017-11-09
 ==================
