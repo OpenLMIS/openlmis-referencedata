@@ -41,10 +41,11 @@ public class RefDataErrorHandling extends BaseHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RefDataErrorHandling.class);
 
-  private static final Map<String, String> CONSTRAINT_MAP = new HashMap<String, String>() {{
-      put("unq_program_code", ERROR_CODE_DUPLICATED);
-    }
-  };
+  private static final Map<String, String> CONSTRAINT_MAP = new HashMap<>();
+
+  static {
+    CONSTRAINT_MAP.put("unq_program_code", ERROR_CODE_DUPLICATED);
+  }
 
   /**
    * Handles data integrity violation and returns status 409 CONFLICT.
