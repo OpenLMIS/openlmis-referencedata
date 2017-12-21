@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.service;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
@@ -51,6 +52,9 @@ public class RightService {
 
   @Value("${auth.server.clientId}")
   private String serviceTokenClientId;
+
+  @Value("${auth.server.clientId.apiKey.prefix}")
+  private String apiKeyPrefix;
 
   /**
    * Check the client has the admin right specified.
@@ -148,9 +152,16 @@ public class RightService {
   private boolean checkServiceToken(boolean allowServiceTokens, boolean allowApiKey,
                                     OAuth2Authentication authentication) {
     String clientId = authentication.getOAuth2Request().getClientId();
-    boolean isServiceToken = serviceTokenClientId.equals(clientId);
 
-    return isServiceToken ? allowServiceTokens : allowApiKey;
+    if (serviceTokenClientId.equals(clientId)) {
+      return allowServiceTokens;
+    }
+
+    if (startsWith(clientId, apiKeyPrefix)) {
+      return allowApiKey;
+    }
+
+    return false;
   }
 
 

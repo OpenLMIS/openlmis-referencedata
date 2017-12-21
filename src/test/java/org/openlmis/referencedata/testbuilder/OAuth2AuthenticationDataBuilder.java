@@ -23,9 +23,11 @@ import lombok.EqualsAndHashCode;
 import java.util.UUID;
 
 public class OAuth2AuthenticationDataBuilder {
+  public static final String API_KEY_PREFIX = "api-key-client-";
+
   private static final String CLIENT_CLIENT_ID = "user-client";
   public static final String SERVICE_CLIENT_ID = "trusted-client";
-  private static final String API_KEY_CLIENT_ID = "api-key-client-20171214111354128";
+  private static final String API_KEY_CLIENT_ID = API_KEY_PREFIX + "20171214111354128";
 
   private UUID userId = UUID.randomUUID();
 

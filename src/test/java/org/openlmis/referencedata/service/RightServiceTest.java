@@ -18,6 +18,7 @@ package org.openlmis.referencedata.service;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.API_KEY_PREFIX;
 import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.SERVICE_CLIENT_ID;
 
 import org.junit.Before;
@@ -79,6 +80,7 @@ public class RightServiceTest {
     apiKeyClient = new OAuth2AuthenticationDataBuilder().buildApiKeyAuthentication();
 
     ReflectionTestUtils.setField(rightService, "serviceTokenClientId", SERVICE_CLIENT_ID);
+    ReflectionTestUtils.setField(rightService, "apiKeyPrefix", API_KEY_PREFIX);
   }
   
   @Test
