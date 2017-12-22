@@ -18,18 +18,19 @@ package org.openlmis.referencedata.testbuilder;
 import org.openlmis.referencedata.domain.CreationDetails;
 import org.openlmis.referencedata.domain.ServiceAccount;
 
+import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public class ServiceAccountDataBuilder {
-  private UUID login = UUID.randomUUID();
+  private UUID token = UUID.randomUUID();
   private UUID createdBy = UUID.randomUUID();
-  private ZonedDateTime createdDate = ZonedDateTime.now();
+  private ZonedDateTime createdDate = ZonedDateTime.now(Clock.systemUTC());
 
   /**
    * Builds instance of {@link ServiceAccount}.
    */
   public ServiceAccount build() {
-    return new ServiceAccount(login, new CreationDetails(createdBy, createdDate));
+    return new ServiceAccount(token, new CreationDetails(createdBy, createdDate));
   }
 }

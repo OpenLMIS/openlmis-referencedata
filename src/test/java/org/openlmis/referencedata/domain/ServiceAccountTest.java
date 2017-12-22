@@ -40,8 +40,8 @@ public class ServiceAccountTest {
     ServiceAccount.Importer importer = new ServiceAccount.Importer() {
 
       @Override
-      public UUID getApiKey() {
-        return expected.getApiKeyId();
+      public UUID getToken() {
+        return expected.getToken();
       }
 
       @Override
@@ -65,7 +65,7 @@ public class ServiceAccountTest {
     ServiceAccount.Exporter exporter = new ServiceAccount.Exporter() {
 
       @Override
-      public void setApiKey(UUID apiKey) {
+      public void setToken(UUID apiKey) {
         values.put("apiKey", apiKey);
       }
 
@@ -83,7 +83,7 @@ public class ServiceAccountTest {
     ServiceAccount account = new ServiceAccountDataBuilder().build();
     account.export(exporter);
 
-    assertThat(values, hasEntry("apiKey", account.getApiKeyId()));
+    assertThat(values, hasEntry("apiKey", account.getToken()));
     assertThat(values, hasEntry("createdBy", account.getCreationDetails().getCreatedBy()));
     assertThat(values, hasEntry("createdDate", account.getCreationDetails().getCreatedDate()));
   }

@@ -263,6 +263,7 @@ schemas:
   - geoJsonPolygon: !include schemas/geoJsonPolygon.json
 
   - serviceAccount: !include schemas/serviceAccount.json
+  - serviceAccountCreationBody: !include schemas/serviceAccountCreationBody.json
   - serviceAccountPage: !include schemas/serviceAccountPage.json
 
   - stringArray: |
@@ -3022,24 +3023,12 @@ resourceTypes:
 
   /serviceAccounts:
       displayName: Service Accounts
-      get:
-          is: [ secured, paginated ]
-          description: Returns all Service Accounts.
-          responses:
-              200:
-                  body:
-                      application/json:
-                          schema: serviceAccountPage
-              401:
-                  body:
-                    application/json:
-              403:
-                  body:
-                      application/json:
-                          schema: localizedErrorResponse
       post:
           is: [ secured ]
           description: Create a new Service Account.
+          body:
+              application/json:
+                schema: serviceAccountCreationBody
           responses:
               201:
                   body:
@@ -3052,14 +3041,59 @@ resourceTypes:
                   body:
                       application/json:
                           schema: localizedErrorResponse
-      /{apiKey}:
+      /{token}:
           uriParameters:
-              apiKey:
-                  displayName: apiKey
+              token:
+                  displayName: token
                   description: Generated API Key.
                   type: string
                   required: true
                   repeat: false
+          get:
+              is: [ secured ]
+              description: "Get Service Account."
+              responses:
+                  200:
+                      body:
+                        application/json:
+                            schema: serviceAccount
+                  401:
+                      body:
+                        application/json:
+                  403:
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse
+                  404:
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse
+          put:
+              is: [ secured ]
+              description: "Update Service Account."
+              body:
+                  application/json:
+                      schema: serviceAccount
+              responses:
+                  200:
+                      body:
+                        application/json:
+                            schema: serviceAccount
+                  401:
+                      body:
+                        application/json:
+                  400:
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse
+                  403:
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse
+                  404:
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse
           delete:
               is: [ secured ]
               description: "Completely removes Service Account. This action is not recoverable."

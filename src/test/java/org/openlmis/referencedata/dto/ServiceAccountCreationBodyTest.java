@@ -15,32 +15,29 @@
 
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.ServiceAccount;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
-public final class ServiceAccountDto implements ServiceAccount.Importer, ServiceAccount.Exporter {
-  private UUID token;
-  private UUID createdBy;
-  private ZonedDateTime createdDate;
+public class ServiceAccountCreationBodyTest {
 
-  /**
-   * Creates new instance of {@link ServiceAccountDto} based on passed service account.
-   */
-  public static ServiceAccountDto newInstance(ServiceAccount serviceAccount) {
-    ServiceAccountDto dto = new ServiceAccountDto();
-    serviceAccount.export(dto);
-
-    return dto;
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(ServiceAccountCreationBody.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS) // DTO fields cannot be final
+        .verify();
   }
+
+  @Test
+  public void shouldImplementToString() {
+    ServiceAccountCreationBody body = new ServiceAccountCreationBody(UUID.randomUUID());
+    ToStringTestUtils.verify(ServiceAccountCreationBody.class, body);
+  }
+
 }

@@ -45,7 +45,7 @@ public final class ServiceAccount implements Identifiable {
 
   @Id
   @Column(nullable = false, unique = true)
-  private UUID apiKeyId;
+  private UUID token;
 
   @Embedded
   private CreationDetails creationDetails;
@@ -61,13 +61,13 @@ public final class ServiceAccount implements Identifiable {
         importer.getCreatedBy(), importer.getCreatedDate()
     );
 
-    return new ServiceAccount(importer.getApiKey(), creationDetails);
+    return new ServiceAccount(importer.getToken(), creationDetails);
   }
 
   @Override
   @Transient
   public UUID getId() {
-    return apiKeyId;
+    return token;
   }
 
   /**
@@ -76,14 +76,14 @@ public final class ServiceAccount implements Identifiable {
    * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
-    exporter.setApiKey(apiKeyId);
+    exporter.setToken(token);
     exporter.setCreatedBy(creationDetails.getCreatedBy());
     exporter.setCreatedDate(creationDetails.getCreatedDate());
   }
 
   public interface Exporter {
 
-    void setApiKey(UUID apiKey);
+    void setToken(UUID token);
 
     void setCreatedBy(UUID createdBy);
 
@@ -93,7 +93,7 @@ public final class ServiceAccount implements Identifiable {
 
   public interface Importer {
 
-    UUID getApiKey();
+    UUID getToken();
 
     UUID getCreatedBy();
 

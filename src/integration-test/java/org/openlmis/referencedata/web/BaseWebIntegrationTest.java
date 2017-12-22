@@ -438,7 +438,8 @@ public abstract class BaseWebIntegrationTest {
     RequestSpecification request = restAssured
         .given()
         .log()
-        .ifValidationFails(LogDetail.ALL, true);
+        .ifValidationFails(LogDetail.ALL, true)
+        .contentType(MediaType.APPLICATION_JSON_VALUE);
 
     if (null != token) {
       request = request.header(HttpHeaders.AUTHORIZATION, token);

@@ -56,6 +56,7 @@ public abstract class MessageKeys {
   protected static final String LACKS_PARAMETERS = "lacksParameters";
   protected static final String MUST_BE_UNIQUE = "mustBeUnique";
   protected static final String MUST_BE_PROVIDED = "mustBeProvided";
+  protected static final String MISMATCH = "mismatch";
 
   // Entities
   protected static final String LOT = "lot";

@@ -15,32 +15,19 @@
 
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.ServiceAccount;
-
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public final class ServiceAccountDto implements ServiceAccount.Importer, ServiceAccount.Exporter {
+public final class ServiceAccountCreationBody {
   private UUID token;
-  private UUID createdBy;
-  private ZonedDateTime createdDate;
-
-  /**
-   * Creates new instance of {@link ServiceAccountDto} based on passed service account.
-   */
-  public static ServiceAccountDto newInstance(ServiceAccount serviceAccount) {
-    ServiceAccountDto dto = new ServiceAccountDto();
-    serviceAccount.export(dto);
-
-    return dto;
-  }
 }

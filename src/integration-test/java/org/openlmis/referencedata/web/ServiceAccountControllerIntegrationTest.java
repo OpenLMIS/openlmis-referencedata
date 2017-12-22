@@ -15,32 +15,27 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Matchers.any;
 import static org.openlmis.referencedata.domain.RightName.SERVICE_ACCOUNTS_MANAGE;
 import static org.openlmis.referencedata.util.messagekeys.ServiceAccountMessageKeys.ERROR_NOT_FOUND;
+import static org.openlmis.referencedata.util.messagekeys.ServiceAccountMessageKeys.ERROR_TOKEN_MISMATCH;
 import static org.openlmis.referencedata.util.messagekeys.SystemMessageKeys.ERROR_UNAUTHORIZED;
 
 import com.jayway.restassured.response.ValidatableResponse;
 
-import org.assertj.core.util.Lists;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.ServiceAccount;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.ServiceAccountCreationBody;
 import org.openlmis.referencedata.dto.ServiceAccountDto;
-import org.openlmis.referencedata.service.AuthService;
 import org.openlmis.referencedata.testbuilder.ServiceAccountDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -50,36 +45,36 @@ import java.util.UUID;
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/serviceAccounts";
-  private static final String ID_URL = RESOURCE_URL + "/{apiKey}";
-  private static final String API_KEY = "apiKey";
+  private static final String TOKEN_URL = RESOURCE_URL + "/{token}";
 
-  @MockBean
-  private AuthService authService;
-
-  private ServiceAccount account;
-  private ServiceAccountDto accountDto;
+  private static final String TOKEN = "token";
 
   private User user = new UserDataBuilder().build();
+  private ServiceAccount account = new ServiceAccountDataBuilder().build();
+  private ServiceAccountCreationBody body = new ServiceAccountCreationBody(account.getToken());
 
-  private UUID apiKey = UUID.randomUUID();
+  private ServiceAccountDto accountDto = new ServiceAccountDto();
 
   @Before
   @Override
   public void setUp() {
     super.setUp();
 
-    accountDto = new ServiceAccountDto();
-
-    account = new ServiceAccountDataBuilder().build();
     account.export(accountDto);
 
     given(serviceAccountRepository.save(any(ServiceAccount.class)))
         .willAnswer(invocation -> invocation.getArguments()[0]);
+    given(serviceAccountRepository.findOne(account.getToken()))
+        .willReturn(account);
 
     given(authenticationHelper.getCurrentUser()).willReturn(user);
-    given(authService.createApiKey()).willReturn(apiKey);
 
     mockUserHasRight(SERVICE_ACCOUNTS_MANAGE);
+  }
+
+  @After
+  public void tearDown() {
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
@@ -89,14 +84,9 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
         .extract()
         .as(ServiceAccountDto.class);
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-
-    assertThat(response.getApiKey(), is(equalTo(apiKey)));
-    assertThat(response.getCreatedBy(), is(equalTo(user.getId())));
+    assertThat(response.getToken(), is(account.getToken()));
+    assertThat(response.getCreatedBy(), is(user.getId()));
     assertThat(response.getCreatedDate(), is(notNullValue()));
-
-    verify(authenticationHelper).getCurrentUser();
-    verify(authService).createApiKey();
   }
 
   @Test
@@ -108,81 +98,133 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
         .extract()
         .path(MESSAGE_KEY);
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertThat(response, is(equalTo(ERROR_UNAUTHORIZED)));
-    verifyZeroInteractions(authService);
+    assertThat(response, is(ERROR_UNAUTHORIZED));
   }
 
   @Test
   public void shouldReturnUnauthorizedWithoutAuthorizationForCreateServiceAccountEndpoint() {
-    restAssured
-        .given()
+    startRequest(null)
         .when()
+        .body(body)
         .post(RESOURCE_URL)
         .then()
         .statusCode(HttpStatus.UNAUTHORIZED.value());
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    verifyZeroInteractions(authService);
   }
 
   @Test
-  public void shouldRetrieveServiceAccounts() {
-    given(serviceAccountRepository.findAll(any(Pageable.class)))
-        .willReturn(new PageImpl<>(Lists.newArrayList(account, account, account)));
+  public void shouldRetrieveServiceAccount() {
+    ServiceAccountDto response = get()
+        .statusCode(HttpStatus.OK.value())
+        .extract()
+        .as(ServiceAccountDto.class);
 
-    ValidatableResponse response = get(10).statusCode(HttpStatus.OK.value());
-    checkPageBody(response, 0, 10, 3, 3, 1);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertThat(response.getToken(), is(account.getToken()));
+    assertThat(response.getCreatedBy(), is(account.getCreationDetails().getCreatedBy()));
   }
 
   @Test
-  public void shouldRetrieveOnePageOfServiceAccounts() {
-    given(serviceAccountRepository.findAll(any(Pageable.class)))
-        .willReturn(new PageImpl<>(Lists.newArrayList(account, account, account)));
-
-    ValidatableResponse response = get(1).statusCode(HttpStatus.OK.value());
-    checkPageBody(response, 0, 1, 1, 3, 3);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnForbiddenForGetServiceAccountsEndpointWhenUserHasNoRight() {
+  public void shouldReturnForbiddenForGetServiceAccountEndpointWhenUserHasNoRight() {
     mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
 
-    String response = get(10)
+    String response = get()
         .statusCode(HttpStatus.FORBIDDEN.value())
         .extract()
         .path(MESSAGE_KEY);
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertThat(response, is(equalTo(ERROR_UNAUTHORIZED)));
-    verifyZeroInteractions(authService);
+    assertThat(response, is(ERROR_UNAUTHORIZED));
   }
 
   @Test
-  public void shouldReturnUnauthorizedWithoutAuthorizationForGetServiceAccountsEndpoint() {
-    restAssured
-        .given()
+  public void shouldReturnUnauthorizedWithoutAuthorizationForGetServiceAccountEndpoint() {
+    startRequest(null)
+        .pathParam(TOKEN, account.getToken())
         .when()
-        .get(RESOURCE_URL)
+        .get(TOKEN_URL)
         .then()
         .statusCode(HttpStatus.UNAUTHORIZED.value());
+  }
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  @Test
+  public void shouldReturnNotFoundIfAccountNotExistForGetServiceAccountEndpoint() {
+    given(serviceAccountRepository.findOne(account.getToken()))
+        .willReturn(null);
+
+    String response = get()
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(response, is(ERROR_NOT_FOUND));
+  }
+
+  @Test
+  public void shouldUpdateAccount() {
+    ServiceAccount other = new ServiceAccountDataBuilder().build();
+
+    ServiceAccountDto putBody = new ServiceAccountDto();
+    other.export(putBody);
+    putBody.setToken(account.getToken());
+
+    ServiceAccountDto response = put(putBody)
+        .statusCode(HttpStatus.OK.value())
+        .extract()
+        .as(ServiceAccountDto.class);
+
+    assertThat(response.getToken(), is(account.getToken()));
+    assertThat(response.getCreatedBy(), is(account.getCreationDetails().getCreatedBy()));
+  }
+
+  @Test
+  public void shouldReturnForbiddenForPutServiceAccountEndpointWhenUserHasNoRight() {
+    mockUserHasNoRight(SERVICE_ACCOUNTS_MANAGE);
+
+    String response = put(accountDto)
+        .statusCode(HttpStatus.FORBIDDEN.value())
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(response, is(ERROR_UNAUTHORIZED));
+  }
+
+  @Test
+  public void shouldReturnUnauthorizedWithoutAuthorizationForPutServiceAccountEndpoint() {
+    startRequest(null)
+        .pathParam(TOKEN, account.getToken())
+        .when()
+        .body(accountDto)
+        .put(TOKEN_URL)
+        .then()
+        .statusCode(HttpStatus.UNAUTHORIZED.value());
+  }
+
+  @Test
+  public void shouldReturnNotFoundIfAccountNotExistForPutServiceAccountEndpoint() {
+    given(serviceAccountRepository.findOne(account.getToken()))
+        .willReturn(null);
+
+    String response = put(accountDto)
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(response, is(ERROR_NOT_FOUND));
+  }
+
+  @Test
+  public void shouldReturnBadRequestIfTokenMismatchForPutServiceAccountEndpoint() {
+    accountDto.setToken(UUID.randomUUID());
+
+    String response = put(accountDto)
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(response, is(ERROR_TOKEN_MISMATCH));
   }
 
   @Test
   public void shouldDeleteServiceAccount() {
-    given(serviceAccountRepository.findOne(account.getApiKeyId()))
-        .willReturn(account);
-
     delete().statusCode(HttpStatus.NO_CONTENT.value());
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    verify(authService).removeApiKey(account.getApiKeyId());
   }
 
   @Test
@@ -194,14 +236,12 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
         .extract()
         .path(MESSAGE_KEY);
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertThat(response, is(equalTo(ERROR_UNAUTHORIZED)));
-    verifyZeroInteractions(authService);
+    assertThat(response, is(ERROR_UNAUTHORIZED));
   }
 
   @Test
   public void shouldReturnNotFoundIfAccountNotExistForDeleteServiceAccountEndpoint() {
-    given(serviceAccountRepository.findOne(account.getApiKeyId()))
+    given(serviceAccountRepository.findOne(account.getToken()))
         .willReturn(null);
 
     String response = delete()
@@ -209,46 +249,49 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
         .extract()
         .path(MESSAGE_KEY);
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertThat(response, is(equalTo(ERROR_NOT_FOUND)));
-    verifyZeroInteractions(authService);
+    assertThat(response, is(ERROR_NOT_FOUND));
   }
 
   @Test
   public void shouldReturnUnauthorizedWithoutAuthorizationForDeleteServiceAccountEndpoint() {
-    restAssured
-        .given()
-        .pathParam(API_KEY, account.getApiKeyId())
+    startRequest(null)
+        .pathParam(TOKEN, account.getToken())
         .when()
-        .delete(ID_URL)
+        .delete(TOKEN_URL)
         .then()
         .statusCode(HttpStatus.UNAUTHORIZED.value());
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    verifyZeroInteractions(authService);
   }
 
   private ValidatableResponse post() {
     return startRequest(getTokenHeader())
         .when()
+        .body(body)
         .post(RESOURCE_URL)
         .then();
   }
 
-  private ValidatableResponse get(int pageSize) {
+  private ValidatableResponse get() {
     return startRequest(getTokenHeader())
-        .queryParam("page", 0)
-        .queryParam("size", pageSize)
+        .pathParam(TOKEN, account.getToken())
         .when()
-        .get(RESOURCE_URL)
+        .get(TOKEN_URL)
+        .then();
+  }
+
+  private ValidatableResponse put(ServiceAccountDto putBody) {
+    return startRequest(getTokenHeader())
+        .pathParam(TOKEN, account.getToken())
+        .when()
+        .body(putBody)
+        .put(TOKEN_URL)
         .then();
   }
 
   private ValidatableResponse delete() {
     return startRequest(getTokenHeader())
-        .pathParam(API_KEY, account.getApiKeyId())
+        .pathParam(TOKEN, account.getToken())
         .when()
-        .delete(ID_URL)
+        .delete(TOKEN_URL)
         .then();
   }
 }

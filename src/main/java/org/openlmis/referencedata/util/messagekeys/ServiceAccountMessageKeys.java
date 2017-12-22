@@ -17,9 +17,9 @@ package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class ServiceAccountMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, SERVICE_ACCOUNT);
-  private static final String API_KEY = "apiKey";
+  private static final String TOKEN = "token";
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
 
-  public static final String ERROR_API_KEY_REQUIRED = join(ERROR, API_KEY, REQUIRED);
+  public static final String ERROR_TOKEN_MISMATCH = join(ERROR, TOKEN, MISMATCH);
 }
