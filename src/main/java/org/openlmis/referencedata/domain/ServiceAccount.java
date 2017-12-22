@@ -45,7 +45,7 @@ import javax.persistence.Transient;
 public final class ServiceAccount implements Identifiable {
 
   @Id
-  @Column(nullable = false, unique = true)
+  @Column(name = "id", nullable = false, unique = true)
   private UUID token;
 
   @Embedded
