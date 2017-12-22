@@ -42,7 +42,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Controller
@@ -125,7 +124,7 @@ public class ServiceAccountController extends BaseController {
     profiler.start("DB_CALL");
     ServiceAccount account = findAccount(token, profiler);
 
-    if (!Objects.equals(account.getToken(), body.getToken())) {
+    if (!account.hasToken(body.getToken())) {
       throw new ValidationMessageException(ERROR_TOKEN_MISMATCH);
     }
 

@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -68,6 +69,10 @@ public final class ServiceAccount implements Identifiable {
   @Transient
   public UUID getId() {
     return token;
+  }
+
+  public boolean hasToken(UUID token) {
+    return Objects.equals(this.token, token);
   }
 
   /**
