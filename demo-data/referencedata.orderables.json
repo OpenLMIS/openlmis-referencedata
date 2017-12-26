@@ -621,6 +621,159 @@
     }
   },
   {
+    "id": "8ef9d4da-b6e5-401c-b433-765a5fd8a0cc",
+    "code": "bcg20-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "BCG",
+    "netContent": 20,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "93664367-c870-46ba-92fb-b4e5252b5db1"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "b8ff7c36-2003-46d6-a687-551bdd521a9e",
+    "code": "ipv5-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "IPV",
+    "netContent": 5,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "7e8fe526-5b81-440d-a04f-1dea877b5ef6"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "f8e6ea34-0ad8-43d5-96d7-a6f8b14ff210",
+    "code": "polio20-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "Polio (20 dose)",
+    "netContent": 20,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "5612fe9d-451e-4e46-a813-125044f9dc7f"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "5f0dd194-aae1-490c-8b51-3cf0c87af983",
+    "code": "penta1-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "Pentavalent (1 dose)",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "b1eadac7-7380-4a2e-b648-43db0b069d79"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "c0d41166-01fd-4a28-ae2f-46f867ffb368",
+    "code": "penta10-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "Pentavalent (10 dose)",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "bd9340e8-efbb-4118-9ccd-8b50308eeb89"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "72971f1d-dd20-4373-aa94-f9615777581b",
+    "code": "pcv10-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "PCV10",
+    "netContent": 2,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "a94c9ecf-4f00-44af-84ea-02938d72d397"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "b61c652d-2259-41d7-8bb6-fc5fcdd95626",
+    "code": "rota1-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "Rotavirus",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "01014c20-c7ae-41ec-a206-24bb3ebfacab"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "b918c3a4-7d12-4be3-854d-d1792cf3b33b",
+    "code": "measles10-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "Measles",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "5cfe2dc7-4fd6-4697-b2bb-9e14034f6ae0"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "e217910c-3364-46b3-92cd-8dd8acf0c557",
+    "code": "tetanus10-ct",
+    "dispensingUnit": "each",
+    "fullProductName": "VAT",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "aacd2540-7c07-44e2-ad51-8751dd8e22ee"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
     "id": "170738eb-6364-4d2a-98cf-1ea54cc5a61a",
     "code": "syringe5ml",
     "dispensingUnit": "each",
