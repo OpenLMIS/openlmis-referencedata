@@ -52,5 +52,35 @@
     "tradeItemId": "bcfdc9f3-e7e2-4bbf-879a-6d27942e7f2a",
     "classificationSystem": "UNSPSC",
     "classificationId": "51201621"
+  },
+  {
+    "id": "ff9e6079-7928-455a-b81f-6b75da4923af",
+    "tradeItemId": "b00693f5-84af-466a-ab49-c9f7ce02e26c",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "42142609"
+  },
+  {
+    "id": "398a08f7-1055-48e1-9da1-4a4664dde2a1",
+    "tradeItemId": "ee97e45f-6cb7-4bcc-988f-56d6e440c20b",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "42142609"
+  },
+  {
+    "id": "76ea5737-d90e-4ff4-a7aa-85950d693b92",
+    "tradeItemId": "b6898d6b-30ef-4877-b7dd-57ea11bbaa7e",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "42142609"
+  },
+  {
+    "id": "ef56b6ed-0786-4397-a011-2c6db35dc3fd",
+    "tradeItemId": "62626fba-536a-4b70-81bf-97430c86bca7",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "42142529"
+  },
+  {
+    "id": "65018af8-9e9b-4e91-b28b-62a769df48c8",
+    "tradeItemId": "4fb83a7e-08a2-4e7f-8e69-e1a6e0cca3a1",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "24111802"
   }
 ]
