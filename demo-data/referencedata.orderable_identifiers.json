@@ -75,6 +75,31 @@
     "orderableId": "e217910c-3364-46b3-92cd-8dd8acf0c557"
   },
   {
+    "key": "commodityType",
+    "value": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "orderableId": "bb66a9c4-8443-42ee-b701-caf00061f4df"
+  },
+  {
+    "key": "commodityType",
+    "value": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "orderableId": "1a354c78-33e5-423d-a8d8-a8ebfa08e117"
+  },
+  {
+    "key": "commodityType",
+    "value": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "orderableId": "22dbc5cf-2b86-4763-afc7-e730a2750146"
+  },
+  {
+    "key": "commodityType",
+    "value": "84424b30-093e-4e70-a0f7-78f38d6265d8",
+    "orderableId": "6fc0455a-d572-4503-bedf-f3872536c2ad"
+  },
+  {
+    "key": "commodityType",
+    "value": "1365c88e-af9b-4b47-804a-b29b7ee59abe",
+    "orderableId": "ce5ef390-4e4c-477e-a894-ac831be4d012"
+  },
+  {
     "key": "tradeItem",
     "value": "4e59b2cb-c9fb-4103-9ac7-f087cec868c5",
     "orderableId": "9c3bea84-487b-4e22-8759-3fe93f8201d9"

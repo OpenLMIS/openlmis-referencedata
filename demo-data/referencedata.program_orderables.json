@@ -462,6 +462,61 @@
     "pricePerPack" : 6
   },
   {
+    "id": "b3c3bc1c-fb2f-431e-9284-799b01c05ad9",
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "orderableId": { "id": "170738eb-6364-4d2a-98cf-1ea54cc5a61a" },
+    "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
+    "dosesPerPatient": 1,
+    "active": true,
+    "fullSupply": true,
+    "displayOrder": 5,
+    "pricePerPack" : 9
+  },
+  {
+    "id": "e5fabbc8-8edc-47fb-a8d9-069dc8c52fca",
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "orderableId": { "id": "bfc1bfee-d6bb-4254-8bc9-5a0d962fce97" },
+    "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
+    "dosesPerPatient": 1,
+    "active": true,
+    "fullSupply": true,
+    "displayOrder": 5,
+    "pricePerPack" : 4
+  },
+  {
+    "id": "defadd1a-90a7-43f8-ad87-f382df45c40f",
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "orderableId": { "id": "4457d688-9617-4594-bb54-03f98cabf84d" },
+    "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
+    "dosesPerPatient": 1,
+    "active": true,
+    "fullSupply": true,
+    "displayOrder": 5,
+    "pricePerPack" : 4.2
+  },
+  {
+    "id": "fb28e397-ea2c-474a-8312-536ae55bca17",
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "orderableId": { "id": "7d5a1795-b219-465c-ba78-f5187b65d7f9" },
+    "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
+    "dosesPerPatient": 1,
+    "active": true,
+    "fullSupply": true,
+    "displayOrder": 5,
+    "pricePerPack" : 1.35
+  },
+  {
+    "id": "b601feb7-108f-436d-b90d-6bc6106f3da1",
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "orderableId": { "id": "4a05482a-68b8-4064-979f-6bfadf464481" },
+    "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
+    "dosesPerPatient": 1,
+    "active": true,
+    "fullSupply": true,
+    "displayOrder": 5,
+    "pricePerPack" : 4.8
+  },
+  {
     "id": "93664367-c870-46ba-92fb-b4e5252b5db1",
     "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
     "orderableId": { "id": "8ef9d4da-b6e5-401c-b433-765a5fd8a0cc" },
@@ -561,9 +616,9 @@
     "pricePerPack" : 6
   },
   {
-    "id": "b3c3bc1c-fb2f-431e-9284-799b01c05ad9",
+    "id": "0c263b63-8836-49d9-86fb-37e5b78a7b75",
     "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "orderableId": { "id": "170738eb-6364-4d2a-98cf-1ea54cc5a61a" },
+    "orderableId": { "id": "bb66a9c4-8443-42ee-b701-caf00061f4df" },
     "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
     "dosesPerPatient": 1,
     "active": true,
@@ -572,9 +627,9 @@
     "pricePerPack" : 9
   },
   {
-    "id": "e5fabbc8-8edc-47fb-a8d9-069dc8c52fca",
+    "id": "10b8aaca-61ea-4a71-b5a7-bdbfd965eb40",
     "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "orderableId": { "id": "bfc1bfee-d6bb-4254-8bc9-5a0d962fce97" },
+    "orderableId": { "id": "1a354c78-33e5-423d-a8d8-a8ebfa08e117" },
     "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
     "dosesPerPatient": 1,
     "active": true,
@@ -583,9 +638,9 @@
     "pricePerPack" : 4
   },
   {
-    "id": "defadd1a-90a7-43f8-ad87-f382df45c40f",
+    "id": "85b1a585-7f10-4792-a3b2-7504a9b88b91",
     "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "orderableId": { "id": "4457d688-9617-4594-bb54-03f98cabf84d" },
+    "orderableId": { "id": "22dbc5cf-2b86-4763-afc7-e730a2750146" },
     "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
     "dosesPerPatient": 1,
     "active": true,
@@ -594,9 +649,9 @@
     "pricePerPack" : 4.2
   },
   {
-    "id": "fb28e397-ea2c-474a-8312-536ae55bca17",
+    "id": "bf352543-38ba-4d09-9fc7-75f969a3ec48",
     "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "orderableId": { "id": "7d5a1795-b219-465c-ba78-f5187b65d7f9" },
+    "orderableId": { "id": "6fc0455a-d572-4503-bedf-f3872536c2ad" },
     "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
     "dosesPerPatient": 1,
     "active": true,
@@ -605,9 +660,9 @@
     "pricePerPack" : 1.35
   },
   {
-    "id": "b601feb7-108f-436d-b90d-6bc6106f3da1",
+    "id": "6e705316-39d6-4308-80c1-0b9e06ff34b3",
     "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "orderableId": { "id": "4a05482a-68b8-4064-979f-6bfadf464481" },
+    "orderableId": { "id": "ce5ef390-4e4c-477e-a894-ac831be4d012" },
     "orderableDisplayCategoryId": { "id": "16173fd0-f439-4222-931e-91c413a495c3" },
     "dosesPerPatient": 1,
     "active": true,

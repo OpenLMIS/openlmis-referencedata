@@ -40,5 +40,23 @@
     "name": "Tetanus",
     "classificationSystem": "UNSPSC",
     "classificationId": "51201621"
+  },
+  {
+    "id": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "name": "Syringe",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "42142609"
+  },
+  {
+    "id": "84424b30-093e-4e70-a0f7-78f38d6265d8",
+    "name": "Safety Box",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "42142529"
+  },
+  {
+    "id": "1365c88e-af9b-4b47-804a-b29b7ee59abe",
+    "name": "Gas (Cylinder)",
+    "classificationSystem": "UNSPSC",
+    "classificationId": "24111802"
   }
 ]
