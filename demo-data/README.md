@@ -346,6 +346,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * User Roles Manage
     * System Ideal Stock Amounts Manage
     * CCE Manage
+    * Service Accounts Manage
   * users:
     * administrator
     * admin
