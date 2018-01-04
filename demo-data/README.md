@@ -299,6 +299,8 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
   * rights:
     * Orders View
     * Orders Edit (Requisition Convert to Order)
+    * Shipments View
+    * Shipments Edit
     * PoDs Manage
   * users:
     * administrator - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse

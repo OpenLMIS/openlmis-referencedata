@@ -94,5 +94,13 @@
   {
     "roleId": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c",
     "rightId": "9440fbe1-fd9b-4e9a-abb9-108263f92506"
+  },
+  {
+    "roleId": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
+    "rightId": "f0d1de5b-fdee-41ef-bcbb-eb5522b7f66a"
+  },
+  {
+    "roleId": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
+    "rightId": "1b0df657-c569-4b44-8236-c035ffdff667"
   }
 ]
