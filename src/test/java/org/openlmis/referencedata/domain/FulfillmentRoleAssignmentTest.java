@@ -20,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 
 import org.junit.Test;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 
 public class FulfillmentRoleAssignmentTest {
 
@@ -50,8 +49,8 @@ public class FulfillmentRoleAssignmentTest {
     new FulfillmentRoleAssignment(Role.newRole(roleName, right), user, warehouse);
   }
 
-  @Test(expected = ValidationMessageException.class)
-  public void shouldNotAllowCreationWithNonWarehouseFacilityType() {
+  @Test
+  public void shouldAllowCreationWithNonWarehouseFacilityType() {
     new FulfillmentRoleAssignment(Role.newRole(roleName, right), user, hospital);
   }
 

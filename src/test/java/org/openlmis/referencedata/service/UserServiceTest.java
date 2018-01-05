@@ -371,20 +371,16 @@ public class UserServiceTest {
     }
   }
 
-  @Test(expected = ValidationMessageException.class)
-  public void rightSearchShouldThrowExceptionForNonWarehouseFacility() {
+  @Test
+  public void rightSearchShouldNotThrowExceptionForNonWarehouseFacility() {
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.ORDER_FULFILLMENT);
     when(facilityRepository.findOne(WAREHOUSE_ID)).thenReturn(warehouse);
     when(warehouse.isWarehouse()).thenReturn(false);
 
-    try {
-      userService.rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID);
-    } finally {
-      verify(warehouse).isWarehouse();
-      verifyZeroInteractions(supervisoryNodeRepository, programRepository,
-          userRepository);
-    }
+    userService.rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID);
+
+    verify(userRepository).findUsersByFulfillmentRight(right, warehouse);
   }
 
   @Test(expected = ValidationMessageException.class)

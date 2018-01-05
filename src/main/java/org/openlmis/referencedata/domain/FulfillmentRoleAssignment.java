@@ -26,8 +26,6 @@ import javax.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 
 @Entity
 @DiscriminatorValue("fulfillment")
@@ -45,22 +43,14 @@ public class FulfillmentRoleAssignment extends RoleAssignment {
   }
 
   /**
-   * Default constructor. Must always have a role, a user and a facility, which must be of type
-   * 'warehouse'.
+   * Default constructor. Must always have a role, a user and a facility.
    *
    * @param role      the role being assigned
    * @param user      the user to which the role is being assigned
    * @param warehouse the warehouse where the role applies
-   * @throws org.openlmis.referencedata.exception.ValidationMessageException if role passed in
-   *      has rights which are not an acceptable right type, or the facility is not a type of
-   *      'warehouse'
    */
   public FulfillmentRoleAssignment(Role role, User user, Facility warehouse) {
     this(role, user);
-
-    if (!warehouse.isWarehouse()) {
-      throw new ValidationMessageException(FacilityMessageKeys.ERROR_MUST_BE_WAREHOUSE);
-    }
 
     this.warehouse = warehouse;
 

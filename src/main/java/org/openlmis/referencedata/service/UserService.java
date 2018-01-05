@@ -190,10 +190,6 @@ public class UserService {
       throw new ValidationMessageException(new Message(
           FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, warehouseId));
     }
-    if (!warehouse.isWarehouse()) {
-      throw new ValidationMessageException(
-          FacilityMessageKeys.ERROR_MUST_BE_WAREHOUSE);
-    }
 
     return userRepository.findUsersByFulfillmentRight(right, warehouse);
   }

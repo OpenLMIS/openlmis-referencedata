@@ -605,6 +605,20 @@
     "role": { "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c" }
   },
   {
+    "id": "c5e4d4ed-469b-499f-8a67-7632284426c3",
+    "type": "fulfillment",
+    "warehouse": { "id": "c62dea9b-6974-4101-ba39-b09914165967" },
+    "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },
+    "role": {"id": "e16d802b-8eb1-43f7-adf8-ef123227cb88"}
+  },
+  {
+    "id": "78898595-c1f4-49dc-815f-a2241a65e858",
+    "type": "fulfillment",
+    "warehouse": { "id": "2b6a845a-1bc0-4208-a1a5-c2a09171d707" },
+    "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },
+    "role": {"id": "e16d802b-8eb1-43f7-adf8-ef123227cb88"}
+  },
+  {
     "id": "9b756cc3-37cc-4f0e-a057-70d27874b9fa",
     "type": "supervision",
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
