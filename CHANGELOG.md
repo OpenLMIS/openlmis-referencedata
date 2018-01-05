@@ -11,6 +11,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-3135](https://openlmis.atlassian.net/browse/OLMIS-3135): Ability to create, use and delete API keys.
   * Handle API Key requests. (For now all requests are blocked.)
 * [OLMIS-3726](https://openlmis.atlassian.net/browse/OLMIS-3726): Ability to have a fulfillment roles by non-warehouses.
+* [OLMIS-3818](https://openlmis.atlassian.net/browse/OLMIS-3818): Added new fulfillment role to rivo for the Niassa Provincial Store.
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
