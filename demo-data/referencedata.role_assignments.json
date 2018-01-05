@@ -615,7 +615,7 @@
     "id": "78898595-c1f4-49dc-815f-a2241a65e858",
     "type": "fulfillment",
     "warehouse": { "id": "2b6a845a-1bc0-4208-a1a5-c2a09171d707" },
-    "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },
+    "user": { "id": "0053b56d-be93-4d82-a021-b713dbaae2a9" },
     "role": {"id": "e16d802b-8eb1-43f7-adf8-ef123227cb88"}
   },
   {
