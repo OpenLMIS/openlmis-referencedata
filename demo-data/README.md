@@ -304,6 +304,9 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * PoDs Manage
   * users:
     * administrator - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
+    * divo1 - has this role at D001/Dep—sito Distrital Cuamba
+    * divo2 - has this role at D002/Dep—sito Distrital Lichinga
+    * rivo - has this role at P001/Dep—sito Provincial Niassa
     * wclerk1 - has this role for WH01/Ntcheu District Warehouse
     * wclerk2 - has this role for WH02/Balaka District Warehouse
     * vwclerk1 - has this role at Mozambique Central Warehouse (W001)
