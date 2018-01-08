@@ -24,6 +24,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -53,6 +55,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
@@ -269,6 +273,28 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
+  public void shouldFindActiveFacilities() {
+    Pageable pageable = mockPageable(2, 1);
+    Page<Facility> facilities = repository.findByActive(true, pageable);
+    assertEquals(facilities.getContent().size(), 2);
+  }
+
+  @Test
+  public void shouldFindInactiveFacilities() {
+    Facility inactive = new FacilityDataBuilder()
+        .withGeographicZone(geographicZone)
+        .withType(facilityType)
+        .withoutOperator()
+        .nonActive()
+        .buildAsNew();
+    repository.save(inactive);
+
+    Pageable pageable = mockPageable(1, 1);
+    Page<Facility> facilities = repository.findByActive(false, pageable);
+    assertEquals(facilities.getContent().size(), 1);
+  }
+
+  @Test
   public void shouldFindAllByIds() {
     // given a facility I don't want
     repository.save(generateInstance());
@@ -296,5 +322,13 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     List<Facility> foundFacilities = repository.search(code, name, null, null, null);
     assertThat(foundFacilities, hasSize(expectedSize));
     assertThat(foundFacilities, hasItem(hasProperty("name", equalTo(facility.getName()))));
+  }
+
+  private Pageable mockPageable(int pageSize, int pageNumber) {
+    Pageable pageable = mock(Pageable.class);
+    given(pageable.getPageNumber()).willReturn(pageNumber);
+    given(pageable.getPageSize()).willReturn(pageSize);
+    given(pageable.getSort()).willReturn(null);
+    return pageable;
   }
 }

@@ -148,35 +148,32 @@ public class FacilityController extends BaseController {
    *
    * @param pageable A Pageable object that allows client to optionally add "page" (page number) and
    *                 "size" (page size) query parameters to the request.
-   * @param activeOnly True if only active facilities should be returned.
+   * @param active True if only active facilities should be returned.
    * @return Facilities.
    */
   @RequestMapping(value = RESOURCE_PATH + "/minimal", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<MinimalFacilityDto> getMinimalFacilities(
-      @RequestParam(name = "activeOnly", required = false, defaultValue = "false")
-          boolean activeOnly,
+      @RequestParam(required = false) Boolean active,
       Pageable pageable) {
     Profiler profiler = new Profiler("GET_MINIMAL_FACILITIES");
     profiler.setLogger(LOGGER);
 
-    profiler.start("FIND_ALL");
-    Page<Facility> facilities = facilityRepository.findAll(pageable);
+    Page<Facility> facilities;
 
-    List<MinimalFacilityDto> minimalFacilities;
-
-    if (activeOnly) {
-      List<Facility> activeFacilities = getActiveFacilities(facilities.getContent());
-      minimalFacilities = toMinimalDto(activeFacilities, profiler);
+    if (active != null) {
+      profiler.start("FIND_BY_ACTIVE");
+      facilities = facilityRepository.findByActive(active, pageable);
     } else {
-      minimalFacilities = toMinimalDto(facilities.getContent(), profiler);
+      profiler.start("FIND_ALL");
+      facilities = facilityRepository.findAll(pageable);
     }
 
-    Page<MinimalFacilityDto> page = toPage(minimalFacilities, pageable, profiler);
+    Page<MinimalFacilityDto> minimalFacilities = toMinimalDto(facilities, profiler, pageable);
 
     profiler.stop().log();
-    return page;
+    return minimalFacilities;
   }
 
 
@@ -496,12 +493,16 @@ public class FacilityController extends BaseController {
     return productDtos;
   }
 
-  private List<MinimalFacilityDto> toMinimalDto(List<Facility> facilities, Profiler profiler) {
+  private Page<MinimalFacilityDto> toMinimalDto(Page<Facility> facilities, Profiler profiler,
+                                                Pageable pageable) {
     profiler.start("EXPORT_FACILITIES_TO_MINIMAL_DTO");
-    return facilities
+    List<MinimalFacilityDto> minimalFacilityDtos = facilities
+        .getContent()
         .stream()
         .map(MinimalFacilityDto::newInstance)
         .collect(Collectors.toList());
+
+    return toPage(minimalFacilityDtos, pageable, profiler);
   }
 
   private List<BasicFacilityDto> toBasicDto(List<Facility> facilities, Profiler profiler) {
@@ -532,10 +533,5 @@ public class FacilityController extends BaseController {
         facility.addSupportedProgram(supportedProgram);
       }
     }
-  }
-
-  private List<Facility> getActiveFacilities(List<Facility> facilities) {
-    return facilities.stream().filter(facility -> facility.getActive().equals(true)).collect(
-        Collectors.toList());
   }
 }

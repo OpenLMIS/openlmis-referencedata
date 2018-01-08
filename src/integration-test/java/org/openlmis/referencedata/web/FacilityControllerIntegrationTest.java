@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
+import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -452,17 +453,36 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldReturnActiveFacilitiesWithMinimalRepresentation() {
+  public void shouldReturnInactiveFacilitiesWithMinimalRepresentation() {
     facility = new FacilityDataBuilder()
-        .withSupportedProgram(program).withoutActiveFlag().build();
-    List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
-        .withSupportedProgram(program).build());
-    given(facilityRepository.findAll(any(Pageable.class))).willReturn(
-        Pagination.getPage(storedFacilities));
+        .withSupportedProgram(program).nonActive().build();
+    given(facilityRepository.findByActive(eq(false), any(Pageable.class))).willReturn(
+        Pagination.getPage(Lists.newArrayList(facility)));
 
     PageImplRepresentation response = restAssured
         .given()
-        .queryParam("activeOnly", true)
+        .queryParam("active", false)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(MINIMAL_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(response.getContent().size(), 1);
+    assertEquals(response.getNumberOfElements(), 1);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(rightService);
+  }
+
+  @Test
+  public void shouldReturnActiveFacilitiesWithMinimalRepresentation() {
+    given(facilityRepository.findByActive(eq(true), any(Pageable.class))).willReturn(
+        Pagination.getPage(Lists.newArrayList(facility)));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .queryParam("active", true)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(MINIMAL_URL)

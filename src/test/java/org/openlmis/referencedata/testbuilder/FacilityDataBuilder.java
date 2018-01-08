@@ -116,9 +116,9 @@ public class FacilityDataBuilder {
   }
 
   /**
-   * Adds active for new {@link Facility}.
+   * Set active as false for new {@link Facility}.
    */
-  public FacilityDataBuilder withoutActiveFlag() {
+  public FacilityDataBuilder nonActive() {
     this.active = false;
     return this;
   }

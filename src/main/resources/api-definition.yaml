@@ -1721,8 +1721,8 @@ resourceTypes:
               is: [ secured ]
               description: Returns all facilities with id and name fields.
               queryParameters:
-                activeOnly:
-                    displayName: activeOnly
+                active:
+                    displayName: active
                     type: boolean
                     required: false
                     repeat: false
