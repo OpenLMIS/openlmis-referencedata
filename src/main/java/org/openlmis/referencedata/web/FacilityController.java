@@ -148,19 +148,31 @@ public class FacilityController extends BaseController {
    *
    * @param pageable A Pageable object that allows client to optionally add "page" (page number) and
    *                 "size" (page size) query parameters to the request.
+   * @param activeOnly True if only active facilities should be returned.
    * @return Facilities.
    */
   @RequestMapping(value = RESOURCE_PATH + "/minimal", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<MinimalFacilityDto> getMinimalFacilities(Pageable pageable) {
+  public Page<MinimalFacilityDto> getMinimalFacilities(
+      @RequestParam(name = "activeOnly", required = false, defaultValue = "false")
+          boolean activeOnly,
+      Pageable pageable) {
     Profiler profiler = new Profiler("GET_MINIMAL_FACILITIES");
     profiler.setLogger(LOGGER);
 
     profiler.start("FIND_ALL");
     Page<Facility> facilities = facilityRepository.findAll(pageable);
 
-    List<MinimalFacilityDto> minimalFacilities = toMinimalDto(facilities.getContent(), profiler);
+    List<MinimalFacilityDto> minimalFacilities;
+
+    if (activeOnly) {
+      List<Facility> activeFacilities = getActiveFacilities(facilities.getContent());
+      minimalFacilities = toMinimalDto(activeFacilities, profiler);
+    } else {
+      minimalFacilities = toMinimalDto(facilities.getContent(), profiler);
+    }
+
     Page<MinimalFacilityDto> page = toPage(minimalFacilities, pageable, profiler);
 
     profiler.stop().log();
@@ -520,5 +532,10 @@ public class FacilityController extends BaseController {
         facility.addSupportedProgram(supportedProgram);
       }
     }
+  }
+
+  private List<Facility> getActiveFacilities(List<Facility> facilities) {
+    return facilities.stream().filter(facility -> facility.getActive().equals(true)).collect(
+        Collectors.toList());
   }
 }

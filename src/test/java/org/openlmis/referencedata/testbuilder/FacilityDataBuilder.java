@@ -116,6 +116,14 @@ public class FacilityDataBuilder {
   }
 
   /**
+   * Adds active for new {@link Facility}.
+   */
+  public FacilityDataBuilder withoutActiveFlag() {
+    this.active = false;
+    return this;
+  }
+
+  /**
    * Adds supported program for new {@link Facility}.
    */
   public FacilityDataBuilder withSupportedProgram(Program program) {

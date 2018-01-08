@@ -452,6 +452,31 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldReturnActiveFacilitiesWithMinimalRepresentation() {
+    facility = new FacilityDataBuilder()
+        .withSupportedProgram(program).withoutActiveFlag().build();
+    List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
+        .withSupportedProgram(program).build());
+    given(facilityRepository.findAll(any(Pageable.class))).willReturn(
+        Pagination.getPage(storedFacilities));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .queryParam("activeOnly", true)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(MINIMAL_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(response.getContent().size(), 1);
+    assertEquals(response.getNumberOfElements(), 1);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(rightService);
+  }
+
+  @Test
   public void getAllShouldGetAllFacilitiesWithMinimalRepresentation() {
     List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
