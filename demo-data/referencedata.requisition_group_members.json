@@ -202,5 +202,37 @@
   {
     "requisitionGroupId": "748f2602-9ffa-4ddc-9647-8bfde04f13c1",
     "facilityId": "2b6a845a-1bc0-4208-a1a5-c2a09171d707"
+  },
+  {
+    "requisitionGroupId": "84b33e28-f537-4a76-8895-9d4d564a623a",
+    "facilityId": "9318b2ea-9ae0-42b2-a7e1-353683f54000"
+  },
+  {
+    "requisitionGroupId": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05",
+    "facilityId": "9318b2ea-9ae0-42b2-a7e1-353683f54000"
+  },
+  {
+    "requisitionGroupId": "e90da490-a371-4c2f-83c3-7c1dc9748d48",
+    "facilityId": "19121381-9f3d-4e77-b9e5-d3f59fc1639e"
+  },
+  {
+    "requisitionGroupId": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05",
+    "facilityId": "19121381-9f3d-4e77-b9e5-d3f59fc1639e"
+  },
+  {
+    "requisitionGroupId": "748f2602-9ffa-4ddc-9647-8bfde04f13c1",
+    "facilityId": "19121381-9f3d-4e77-b9e5-d3f59fc1639e"
+  },
+  {
+    "requisitionGroupId": "84b33e28-f537-4a76-8895-9d4d564a623a",
+    "facilityId": "19121381-9f3d-4e77-b9e5-d3f59fc1639e"
+  },
+  {
+    "requisitionGroupId": "8c3cc51e-9471-4d05-857f-67958f5cd171",
+    "facilityId": "19121381-9f3d-4e77-b9e5-d3f59fc1639e"
+  },
+  {
+    "requisitionGroupId": "f3ff98db-6254-4d3e-a501-01874ed4d184",
+    "facilityId": "19121381-9f3d-4e77-b9e5-d3f59fc1639e"
   }
 ]
