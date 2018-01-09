@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -22,23 +23,24 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -132,22 +134,26 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldGetAllProcessingSchedules() {
+    ProcessingScheduleDto dto = new ProcessingScheduleDto();
+    schedule.export(dto);
+    PageRequest pageRequest = new PageRequest(1, 10);
+    given(scheduleRepository.findAll(pageRequest))
+        .willReturn(Pagination.getPage(Collections.singletonList(schedule), pageRequest, 11));
 
-    List<ProcessingSchedule> storedProcessingSchedules = Arrays.asList(schedule,
-        new ProcessingSchedule("PS2", "Schedule2"));
-    given(scheduleRepository.findAll()).willReturn(storedProcessingSchedules);
-
-    ProcessingSchedule[] response = restAssured
+    PageImplRepresentation<LinkedHashMap> response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam("page", 1)
+        .queryParam("size", 10)
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(ProcessingSchedule[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    assertEquals(storedProcessingSchedules.size(), response.length);
+    assertEquals(1, response.getContent().size());
+    assertEquals(dto.getId().toString(), response.getContent().get(0).get("id").toString());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -177,7 +183,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
-        program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
+        program, facility)).willReturn(singletonList(requisitionGroupProgramSchedule));
 
     ProcessingSchedule[] response = restAssured
         .given()
@@ -201,7 +207,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(null);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
-        program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
+        program, facility)).willReturn(singletonList(requisitionGroupProgramSchedule));
 
     restAssured
         .given()
@@ -223,7 +229,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(facilityRepository.findOne(facilityId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
-        program, facility)).willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
+        program, facility)).willReturn(singletonList(requisitionGroupProgramSchedule));
 
     restAssured
         .given()

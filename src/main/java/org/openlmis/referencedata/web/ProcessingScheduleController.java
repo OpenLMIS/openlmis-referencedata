@@ -33,12 +33,15 @@ import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,10 +49,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @Transactional
@@ -112,17 +115,21 @@ public class ProcessingScheduleController extends BaseController {
    *
    * @return the ProcessingSchedules.
    */
-  @RequestMapping(value = "/processingSchedules", method = RequestMethod.GET)
+  @GetMapping(value = "/processingSchedules")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<ProcessingSchedule> getAllProcessingSchedules() {
+  public Page<ProcessingScheduleDto> getAll(Pageable pageable) {
+    Profiler profiler = new Profiler("GET_ALL_PROCESSING_SCHEDULES");
+    profiler.setLogger(LOGGER);
 
-    Iterable<ProcessingSchedule> schedules = scheduleRepository.findAll();
-    if (schedules == null) {
-      throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      return schedules;
-    }
+    profiler.start("GET_SCHEDULES");
+    Page<ProcessingSchedule> processingSchedulePage = scheduleRepository.findAll(pageable);
+
+    profiler.start("TO_DTO");
+    Page<ProcessingScheduleDto> dtos = exportToDto(processingSchedulePage, pageable, profiler);
+    profiler.stop().log();
+
+    return dtos;
   }
 
   /**
@@ -241,5 +248,14 @@ public class ProcessingScheduleController extends BaseController {
     ProcessingScheduleDto processingScheduleDto = new ProcessingScheduleDto();
     processingSchedule.export(processingScheduleDto);
     return processingScheduleDto;
+  }
+
+  private Page<ProcessingScheduleDto> exportToDto(Page<ProcessingSchedule> page, Pageable pageable,
+                                                  Profiler profiler) {
+    List<ProcessingScheduleDto> processingScheduleDtos = page.getContent()
+        .stream()
+        .map(this::exportToDto)
+        .collect(Collectors.toList());
+    return toPage(processingScheduleDtos, pageable, page.getTotalElements(), profiler);
   }
 }

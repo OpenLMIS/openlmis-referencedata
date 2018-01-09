@@ -884,7 +884,7 @@ resourceTypes:
   /processingSchedules:
       displayName: Processing Schedule
       get:
-          is: [ secured ]
+          is: [ secured, paginated ]
           description: Get all schedules.
           responses:
               "200":

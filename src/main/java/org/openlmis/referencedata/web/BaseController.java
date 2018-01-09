@@ -74,8 +74,7 @@ public abstract class BaseController {
   protected <T> Page<T> toPage(List<T> originalList, Pageable pageable, long totalElements,
                                Profiler profiler) {
     profiler.start("CREATE_PAGE");
-    List<T> subList = Pagination.getPage(originalList, pageable).getContent();
-    return Pagination.getPage(subList, pageable, totalElements);
+    return Pagination.getPage(originalList, pageable, totalElements);
   }
 
   protected ResponseEntity<String> getAuditLogResponse(Class type, UUID id, String author,
