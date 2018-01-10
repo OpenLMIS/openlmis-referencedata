@@ -5,6 +5,7 @@ Breaking changes:
 * [OLMIS-3600](https://openlmis.atlassian.net/browse/OLMIS-3600): Paginate and add get by ids
 parameters to get users endpoint
 * [OLMIS-3448](https://openlmis.atlassian.net/browse/OLMIS-3448): Paginate minimal facilities endpoint
+* [OLMIS-2695](https://openlmis.atlassian.net/browse/OLMIS-2695): Paginate get all processing schedules endpoint.
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-3782](https://openlmis.atlassian.net/browse/OLMIS-3782): Ability to set up program to skip requisition authorization step
