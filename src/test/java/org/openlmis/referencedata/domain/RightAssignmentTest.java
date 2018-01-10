@@ -21,6 +21,7 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -57,13 +58,13 @@ public class RightAssignmentTest {
 
   @Test
   public void equalsShouldReturnFalseForDifferentNameFacilityOrProgram() {
-    assertNotEquals(rightAssignmentA, rightAssignmentB);
+    assertFalse(rightAssignmentA.equals(rightAssignmentB));
 
     rightAssignmentB = new RightAssignment(null, rightName, UUID.randomUUID(), programId);
-    assertNotEquals(rightAssignmentA, rightAssignmentB);
+    assertFalse(rightAssignmentA.equals(rightAssignmentB));
 
     rightAssignmentB = new RightAssignment(null, rightName, facilityId, UUID.randomUUID());
-    assertNotEquals(rightAssignmentA, rightAssignmentB);
+    assertFalse(rightAssignmentA.equals(rightAssignmentB));
   }
 
   @Test
