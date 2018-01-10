@@ -15,12 +15,12 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.EqualsAndHashCode;
 import org.javers.core.metamodel.annotation.TypeName;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -33,6 +33,7 @@ import javax.persistence.Table;
 @Table(name = "right_assignments")
 @NoArgsConstructor
 @TypeName("RightAssignment")
+@EqualsAndHashCode(of = {"rightName", "facilityId", "programId"}, callSuper = false)
 public class RightAssignment extends BaseEntity {
 
   @ManyToOne
@@ -65,27 +66,6 @@ public class RightAssignment extends BaseEntity {
   public RightAssignment(User user, String rightName, UUID facilityId, UUID programId) {
     this(user, rightName, facilityId);
     this.programId = programId;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-
-    if (!(obj instanceof RightAssignment)) {
-      return false;
-    }
-
-    RightAssignment that = (RightAssignment) obj;
-    return Objects.equals(rightName, that.rightName)
-            && Objects.equals(facilityId, that.facilityId)
-            && Objects.equals(programId, that.programId);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(rightName, facilityId, programId);
   }
 
   @Override
