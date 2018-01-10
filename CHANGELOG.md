@@ -29,6 +29,7 @@ Bug fixes that are backwards-compatible:
 * [OLMIS-3537](https://openlmis.atlassian.net/browse/OLMIS-3537): Usernames are now case-insensitive. (Note: Implementations need to handle this before upgrading this component, if they use usernames that differ by letter casing only)
 * [OLMIS-3614](https://openlmis.atlassian.net/browse/OLMIS-3614): Added ftaps with warehouse facility type to demo data
 * [OLMIS-3819](https://openlmis.atlassian.net/browse/OLMIS-3819): Fix orderable demo data to only be backed by commodity type or trade item, not both.
+* [OLMIS-3838](https://openlmis.atlassian.net/browse/OLMIS-3838): Ensure right assignments are updated properly when user is saved.
 
 9.0.0 / 2017-11-09
 ==================
