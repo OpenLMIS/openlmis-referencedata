@@ -22,6 +22,7 @@ import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import java.util.UUID;
 
 @Component
 public class AuthenticationHelper {
@@ -36,9 +37,8 @@ public class AuthenticationHelper {
    * @throws NotFoundException if user cannot be found.
    */
   public User getCurrentUser() {
-    String username =
-        (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findOneByUsernameIgnoreCase(username);
+    UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User user = userRepository.findOne(userId);
 
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
