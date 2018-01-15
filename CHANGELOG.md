@@ -30,6 +30,7 @@ Bug fixes that are backwards-compatible:
 * [OLMIS-3614](https://openlmis.atlassian.net/browse/OLMIS-3614): Added ftaps with warehouse facility type to demo data
 * [OLMIS-3819](https://openlmis.atlassian.net/browse/OLMIS-3819): Fix orderable demo data to only be backed by commodity type or trade item, not both.
 * [OLMIS-3838](https://openlmis.atlassian.net/browse/OLMIS-3838): Ensure right assignments are updated properly when user is saved.
+* [OLMIS-3778](https://openlmis.atlassian.net/browse/OLMIS-3778): Fixed service checks the rights of a wrong user
 
 9.0.0 / 2017-11-09
 ==================
