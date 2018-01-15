@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.errorhandling;
 
-import static org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys.ERROR_CODE_DUPLICATED;
-
 import org.hibernate.exception.ConstraintViolationException;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.InternalErrorException;
@@ -25,6 +23,8 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -44,7 +44,11 @@ public class RefDataErrorHandling extends BaseHandler {
   private static final Map<String, String> CONSTRAINT_MAP = new HashMap<>();
 
   static {
-    CONSTRAINT_MAP.put("unq_program_code", ERROR_CODE_DUPLICATED);
+    CONSTRAINT_MAP.put("unq_program_code", ProgramMessageKeys.ERROR_CODE_DUPLICATED);
+    CONSTRAINT_MAP.put("unq_processing_schedule_name",
+        ProcessingScheduleMessageKeys.ERROR_NAME_DUPLICATED);
+    CONSTRAINT_MAP.put("unq_processing_schedule_code",
+        ProcessingScheduleMessageKeys.ERROR_CODE_DUPLICATED);
   }
 
   /**
