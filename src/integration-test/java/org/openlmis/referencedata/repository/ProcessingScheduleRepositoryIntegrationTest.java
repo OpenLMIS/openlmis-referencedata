@@ -15,27 +15,31 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.dao.DataIntegrityViolationException;
 import java.time.ZonedDateTime;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ProcessingScheduleRepositoryIntegrationTest
       extends BaseCrudRepositoryIntegrationTest<ProcessingSchedule> {
 
   @Autowired
-  ProcessingScheduleRepository repository;
+  private ProcessingScheduleRepository repository;
+
+  private ProcessingSchedule schedule;
 
   @Before
   public void setUp() {
-    repository.save(getExampleSchedule());
+    schedule = generateInstance();
+    repository.save(schedule);
   }
 
   @Override
@@ -45,12 +49,12 @@ public class ProcessingScheduleRepositoryIntegrationTest
 
   @Override
   ProcessingSchedule generateInstance() {
-    return getExampleSchedule();
+    return new ProcessingScheduleDataBuilder().buildWithoutId();
   }
 
   @Test
   public void testGetAllSchedules() {
-    repository.save(getExampleSchedule());
+    repository.save(generateInstance());
     Iterable<ProcessingSchedule> result = repository.findAll();
     int size = Lists.newArrayList(result).size();
     assertEquals(2, size);
@@ -72,12 +76,29 @@ public class ProcessingScheduleRepositoryIntegrationTest
     assertEquals(newDescription, scheduleFromRepo.getDescription());
   }
 
-  private ProcessingSchedule getExampleSchedule() {
-    int instanceNumber = this.getNextInstanceNumber();
-    ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode("code" + instanceNumber);
-    schedule.setName("schedule#" + instanceNumber);
-    schedule.setDescription("Test schedule");
-    return schedule;
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldThrowExceptionIfCodeIsDuplicatedCaseInsensitive() {
+    ProcessingSchedule scheduleLowerCase = new ProcessingScheduleDataBuilder()
+        .withCode("abc")
+        .buildWithoutId();
+    repository.saveAndFlush(scheduleLowerCase);
+
+    ProcessingSchedule scheduleUpperCase = new ProcessingScheduleDataBuilder()
+        .withCode("ABC")
+        .buildWithoutId();
+    repository.saveAndFlush(scheduleUpperCase);
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldThrowExceptionIfNameIsDuplicatedCaseInsensitive() {
+    ProcessingSchedule scheduleLowerCase = new ProcessingScheduleDataBuilder()
+        .withName("some-name")
+        .buildWithoutId();
+    repository.saveAndFlush(scheduleLowerCase);
+
+    ProcessingSchedule scheduleUpperCase = new ProcessingScheduleDataBuilder()
+        .withName("SOME-NAME")
+        .buildWithoutId();
+    repository.saveAndFlush(scheduleUpperCase);
   }
 }

@@ -45,9 +45,9 @@ public class RefDataErrorHandling extends BaseHandler {
 
   static {
     CONSTRAINT_MAP.put("unq_program_code", ProgramMessageKeys.ERROR_CODE_DUPLICATED);
-    CONSTRAINT_MAP.put("unq_processing_schedule_name",
+    CONSTRAINT_MAP.put("processing_schedule_name_unique_idx",
         ProcessingScheduleMessageKeys.ERROR_NAME_DUPLICATED);
-    CONSTRAINT_MAP.put("unq_processing_schedule_code",
+    CONSTRAINT_MAP.put("processing_schedule_code_unique_idx",
         ProcessingScheduleMessageKeys.ERROR_CODE_DUPLICATED);
   }
 
