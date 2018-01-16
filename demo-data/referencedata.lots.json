@@ -126,5 +126,13 @@
     "manufactureDate": "2017-07-01",
     "tradeItemId": "2f8ab876-dc49-43df-b79b-36c12a210db8",
     "active": "true"
+  },
+  {
+    "id": "edd308be-dcdc-4841-be05-d577a668fd09",
+    "lotCode": "ROTAM2017C",
+    "expirationDate": "2019-06-01",
+    "manufactureDate": "2017-08-01",
+    "tradeItemId": "2f8ab876-dc49-43df-b79b-36c12a210db8",
+    "active": "true"
   }
 ]
