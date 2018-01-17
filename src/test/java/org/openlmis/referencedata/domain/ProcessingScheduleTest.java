@@ -13,39 +13,20 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.dto;
+package org.openlmis.referencedata.domain;
 
-import org.openlmis.referencedata.domain.ProcessingSchedule;
+import static org.junit.Assert.assertTrue;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.junit.Test;
 
-import java.util.Objects;
+public class ProcessingScheduleTest {
 
-@Getter
-@Setter
-public class ProcessingScheduleDto extends BaseDto
-    implements ProcessingSchedule.Exporter, ProcessingSchedule.Importer {
+  @Test
+  public void shouldBeEqualByCode() {
+    ProcessingSchedule schedule = new ProcessingSchedule("code", "name");
+    ProcessingSchedule scheduleDupe = new ProcessingSchedule("CODE", "name");
 
-  private String code;
-  private String description;
-  private String name;
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof ProcessingScheduleDto)) {
-      return false;
-    }
-    ProcessingScheduleDto that = (ProcessingScheduleDto) obj;
-    return Objects.equals(code != null ? code.toLowerCase() : null,
-        that.code != null ? that.code.toLowerCase() : null);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(code != null ? code.toLowerCase() : null);
+    assertTrue(schedule.equals(scheduleDupe));
+    assertTrue(scheduleDupe.equals(schedule));
   }
 }

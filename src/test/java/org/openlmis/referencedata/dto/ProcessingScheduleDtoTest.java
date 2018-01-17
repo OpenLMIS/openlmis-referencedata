@@ -15,37 +15,20 @@
 
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.ProcessingSchedule;
+import static org.junit.Assert.assertTrue;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.junit.Test;
 
-import java.util.Objects;
+public class ProcessingScheduleDtoTest {
 
-@Getter
-@Setter
-public class ProcessingScheduleDto extends BaseDto
-    implements ProcessingSchedule.Exporter, ProcessingSchedule.Importer {
+  @Test
+  public void shouldBeEqualByCode() {
+    ProcessingScheduleDto schedule = new ProcessingScheduleDto();
+    schedule.setCode("code");
+    ProcessingScheduleDto scheduleDupe = new ProcessingScheduleDto();
+    scheduleDupe.setCode("CODE");
 
-  private String code;
-  private String description;
-  private String name;
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof ProcessingScheduleDto)) {
-      return false;
-    }
-    ProcessingScheduleDto that = (ProcessingScheduleDto) obj;
-    return Objects.equals(code != null ? code.toLowerCase() : null,
-        that.code != null ? that.code.toLowerCase() : null);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(code != null ? code.toLowerCase() : null);
+    assertTrue(schedule.equals(scheduleDupe));
+    assertTrue(scheduleDupe.equals(schedule));
   }
 }

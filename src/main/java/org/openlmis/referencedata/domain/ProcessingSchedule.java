@@ -108,12 +108,13 @@ public class ProcessingSchedule extends BaseEntity {
       return false;
     }
     ProcessingSchedule that = (ProcessingSchedule) obj;
-    return Objects.equals(code, that.code);
+    return Objects.equals(code != null ? code.toLowerCase() : null,
+        that.code != null ? that.code.toLowerCase() : null);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(code);
+    return Objects.hash(code != null ? code.toLowerCase() : null);
   }
 
   public interface Exporter {
