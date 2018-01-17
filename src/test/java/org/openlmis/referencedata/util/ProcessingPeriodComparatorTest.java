@@ -19,29 +19,35 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
+import static org.springframework.data.domain.Sort.Direction.ASC;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 
-public class ProcessingPeriodDtoComparatorTest {
+public class ProcessingPeriodComparatorTest {
 
-  private ProcessingPeriodDto firstPeriod;
-  private ProcessingPeriodDto secondPeriod;
-  private ProcessingPeriodDtoComparator comparator;
+  private ProcessingPeriod firstPeriod;
+  private ProcessingPeriod secondPeriod;
+  private ProcessingPeriodComparator comparator;
+  private Pageable pageable;
 
   @Before
   public void setUp() {
-    firstPeriod = new ProcessingPeriodDto();
-    secondPeriod = new ProcessingPeriodDto();
+    firstPeriod = new ProcessingPeriod();
+    secondPeriod = new ProcessingPeriod();
+    pageable = new PageRequest(0, 10, new Sort(new Sort.Order(ASC, "startDate")));
   }
 
   @Test
   public void shouldReturnNegativeIntWhenFirstStartDateBeforeSecond() {
-    comparator = new ProcessingPeriodDtoComparator("startDate");
+    comparator = new ProcessingPeriodComparator(pageable);
 
     firstPeriod.setStartDate(LocalDate.of(2016, 1, 1));
     secondPeriod.setStartDate(LocalDate.of(2016, 2, 1));
@@ -51,7 +57,7 @@ public class ProcessingPeriodDtoComparatorTest {
 
   @Test
   public void shouldReturnPositiveIntWhenFirstStartDateAfterSecond() {
-    comparator = new ProcessingPeriodDtoComparator("startDate");
+    comparator = new ProcessingPeriodComparator(pageable);
 
     firstPeriod.setStartDate(LocalDate.of(2016, 2, 1));
     secondPeriod.setStartDate(LocalDate.of(2016, 1, 1));
@@ -61,7 +67,7 @@ public class ProcessingPeriodDtoComparatorTest {
 
   @Test
   public void shouldReturnZeroWhenFirstStartDateEqualsSecond() {
-    comparator = new ProcessingPeriodDtoComparator("startDate");
+    comparator = new ProcessingPeriodComparator(pageable);
 
     firstPeriod.setStartDate(LocalDate.of(2016, 1, 1));
     secondPeriod.setStartDate(LocalDate.of(2016, 1, 1));
@@ -71,7 +77,8 @@ public class ProcessingPeriodDtoComparatorTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionWhenInvalidSortingColumn() {
-    comparator = new ProcessingPeriodDtoComparator("");
+    pageable = new PageRequest(0, 10, new Sort(new Sort.Order(ASC, "abc")));
+    comparator = new ProcessingPeriodComparator(pageable);
 
     firstPeriod.setStartDate(LocalDate.of(2016, 1, 1));
     secondPeriod.setStartDate(LocalDate.of(2016, 1, 1));

@@ -65,6 +65,7 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
 import org.openlmis.referencedata.repository.RightRepository;
@@ -80,7 +81,6 @@ import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.service.OrderableService;
-import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.openlmis.referencedata.service.RequisitionGroupService;
 import org.openlmis.referencedata.service.RightService;
@@ -238,7 +238,7 @@ public abstract class BaseWebIntegrationTest {
   protected ProcessingScheduleRepository scheduleRepository;
 
   @MockBean
-  protected ProcessingPeriodService periodService;
+  protected RequisitionGroupProgramScheduleRepository requisitionGroupProgramScheduleRepository;
 
   @MockBean(name = "beforeSavePeriodValidator")
   protected ProcessingPeriodValidator periodValidator;

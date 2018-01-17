@@ -19,6 +19,10 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCustom;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -27,9 +31,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositoryCustom {
 
@@ -65,7 +66,6 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
                       root.get("startDate"), toDate));
     }
     query.where(predicate);
-    query.orderBy(builder.asc(root.get("startDate")));
 
     return entityManager.createQuery(query).getResultList();
   }

@@ -20,16 +20,20 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
+import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProcessingPeriodService {
@@ -39,11 +43,19 @@ public class ProcessingPeriodService {
   private ProcessingPeriodRepository periodRepository;
 
   @Autowired
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
+
+  @Autowired
+  private ProcessingScheduleRepository processingScheduleRepository;
+
+  @Autowired
   private RequisitionGroupProgramScheduleRepository repository;
 
   /**
-   * Finds Periods matching all of provided parameters and
-   * ordered ascending by their start date.
+   * Finds Periods matching all of provided parameters.
    *
    * @param processingSchedule processingSchedule of searched Periods.
    * @param toDate             to which day shall Period start.
@@ -55,22 +67,33 @@ public class ProcessingPeriodService {
   }
 
   /**
-   * Get Processing Periods matching all of provided parameters.
-   *
-   * @param program  Program of searched period.
-   * @param facility Facility of searched period.
-   * @return Collection of Processing Periods.
+   * Finds all ProcessingPeriods matching all of provided parameters.
    */
-  public List<ProcessingPeriod> filterPeriods(Program program, Facility facility) {
-    List<RequisitionGroupProgramSchedule> schedules =
-        repository.searchRequisitionGroupProgramSchedules(program, facility);
+  public List<ProcessingPeriod> searchPeriods(ProcessingPeriodSearchParams params) {
+    params.validate();
 
-    if (schedules.isEmpty()) {
-      LOGGER.warn("Cannot find Requisition Group Program Schedule for program {} and facility {}",
-          program.getId(), facility.getId());
-      return Collections.emptyList();
+    Program program = getById(programRepository, params.getProgramId());
+    Facility facility = getById(facilityRepository, params.getFacilityId());
+    ProcessingSchedule schedule = null;
+
+    if (null != program && null != facility) {
+      List<RequisitionGroupProgramSchedule> schedules = repository
+          .searchRequisitionGroupProgramSchedules(program, facility);
+
+      if (schedules.isEmpty()) {
+        LOGGER.warn("Cannot find Requisition Group Program Schedule for program {} and facility {}",
+            program.getId(), facility.getId());
+      } else {
+        schedule = schedules.get(0).getProcessingSchedule();
+      }
+    } else {
+      schedule = getById(processingScheduleRepository, params.getProcessingScheduleId());
     }
 
-    return searchPeriods(schedules.get(0).getProcessingSchedule(), null);
+    return searchPeriods(schedule, params.getStartDate());
+  }
+
+  private <T> T getById(CrudRepository<T, UUID> repository, UUID id) {
+    return null == id ? null : repository.findOne(id);
   }
 }

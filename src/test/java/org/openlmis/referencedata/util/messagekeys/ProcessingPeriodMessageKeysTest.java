@@ -41,8 +41,8 @@ public class ProcessingPeriodMessageKeysTest {
         ProcessingPeriodMessageKeys.ERROR_INVALID_SORTING_COLUMN);
     assertEquals("referenceData.error.processingPeriod.notFound",
         ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
-    assertEquals("referenceData.error.processingPeriod.processingSchedule.id.mustBeProvided",
-        ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_MUST_BE_PROVIDED);
+    assertEquals("referenceData.error.processingPeriod.processingSchedule.id.singleParameter",
+        ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER);
   }
 
 }

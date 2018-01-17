@@ -23,25 +23,35 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
+import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProcessingPeriodDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
+@RunWith(MockitoJUnitRunner.class)
 public class ProcessingPeriodServiceTest {
 
   @InjectMocks
@@ -54,28 +64,29 @@ public class ProcessingPeriodServiceTest {
   private RequisitionGroupProgramScheduleRepository repository;
 
   @Mock
+  private ProgramRepository programRepository;
+
+  @Mock
+  private FacilityRepository facilityRepository;
+
+  @Mock
+  private ProcessingScheduleRepository processingScheduleRepository;
+
+  @Mock
   private RequisitionGroupProgramSchedule requisitionGroupProgramSchedule;
 
-  @Mock
-  private ProcessingPeriod period;
-
-  @Mock
-  private ProcessingSchedule schedule;
-
-  @Mock
-  private Program program;
-
-  @Mock
-  private Facility facility;
-
-  private List<ProcessingPeriod> periods;
+  private ProcessingPeriod period = new ProcessingPeriodDataBuilder().build();
+  private ProcessingSchedule schedule = new ProcessingScheduleDataBuilder().build();
+  private Program program = new ProgramDataBuilder().build();
+  private Facility facility = new FacilityDataBuilder().build();
+  private List<ProcessingPeriod> periods = generateInstances();
 
   @Before
   public void setUp() {
-    periods = new ArrayList<>();
-    MockitoAnnotations.initMocks(this);
     when(requisitionGroupProgramSchedule.getProcessingSchedule()).thenReturn(schedule);
-    generateInstances();
+    when(facilityRepository.findOne(facility.getId())).thenReturn(facility);
+    when(programRepository.findOne(program.getId())).thenReturn(program);
+    when(processingScheduleRepository.findOne(schedule.getId())).thenReturn(schedule);
   }
 
   @Test
@@ -84,9 +95,26 @@ public class ProcessingPeriodServiceTest {
           .searchRequisitionGroupProgramSchedules(program, facility);
     doReturn(Arrays.asList(period)).when(periodRepository).searchPeriods(schedule, null);
 
-    periodService.filterPeriods(program, facility);
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
+        program.getId(), facility.getId(), null, null
+    );
+
+    periodService.searchPeriods(params);
 
     verify(repository).searchRequisitionGroupProgramSchedules(program, facility);
+    verify(periodRepository).searchPeriods(schedule, null);
+  }
+
+  @Test
+  public void shouldFindPeriodsBySchedule() {
+    doReturn(Arrays.asList(period)).when(periodRepository).searchPeriods(schedule, null);
+
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
+        null, null, schedule.getId(), null
+    );
+
+    periodService.searchPeriods(params);
+
     verify(periodRepository).searchPeriods(schedule, null);
   }
 
@@ -109,22 +137,20 @@ public class ProcessingPeriodServiceTest {
     }
   }
 
-  private void generateInstances() {
-    final int periodCount = 5;
-    for (int i = 0; i < periodCount; i++) {
-      periods.add(generatePeriod(i));
-    }
+  private List<ProcessingPeriod> generateInstances() {
+    return IntStream
+        .range(0, 5)
+        .mapToObj(this::generatePeriod)
+        .collect(Collectors.toList());
   }
 
   private ProcessingPeriod generatePeriod(int instanceNumber) {
-    ProcessingPeriod period = new ProcessingPeriod();
-    period.setId(UUID.randomUUID());
-    period.setName("PeriodName" + instanceNumber);
-    period.setDescription("PeriodDescription" + instanceNumber);
-    period.setEndDate(LocalDate.now().plusDays(instanceNumber));
-    period.setStartDate(LocalDate.now().minusDays(instanceNumber));
-    period.setProcessingSchedule(schedule);
-    return period;
+    LocalDate now = LocalDate.now();
+
+    return new ProcessingPeriodDataBuilder()
+        .withSchedule(schedule)
+        .withPeriod(now.minusDays(instanceNumber), now.plusDays(instanceNumber))
+        .build();
   }
 
 }

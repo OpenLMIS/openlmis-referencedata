@@ -126,11 +126,7 @@ schemas:
 
   - processingPeriod: !include schemas/processingPeriod.json
 
-  - processingPeriodArray: |
-      {
-          "type": "array",
-          "items": { "type": "object", "$ref": "schemas/processingPeriod.json" }
-      }
+  - processingPeriodPage: !include schemas/processingPeriodPage.json
 
   - orderableDisplayCategory: !include schemas/orderableDisplayCategory.json
 
@@ -423,19 +419,38 @@ resourceTypes:
   /processingPeriods:
       displayName: Processing Period
       get:
-          is: [ secured ]
-          description: Get all periods.
+          is: [ secured, paginated, sorted ]
+          description: >
+              Get all processing periods that match the given parameters. The processingScheduleId
+              parameter should not be used together with facilityId and programId parameters because
+              all of them are used to find a processing schedule. Also the facilityId and programId
+              parameters must be used together.
           queryParameters:
-              sort:
-                  displayName: sort
-                  type: string
-                  required: false
-                  repeat: false
+              programId:
+                      displayName: program
+                      type: string
+                      required: false
+                      repeat: false
+              facilityId:
+                      displayName: facility
+                      type: string
+                      required: false
+                      repeat: false
+              processingScheduleId:
+                      displayName: processingSchedule
+                      type: string
+                      required: false
+                      repeat: false
+              startDate:
+                      displayName: startDate
+                      type: string
+                      required: false
+                      repeat: false
           responses:
               "200":
                   body:
                     application/json:
-                      schema: processingPeriodArray
+                      schema: processingPeriodPage
               "400":
                   body:
                     application/json:
@@ -537,56 +552,6 @@ resourceTypes:
                         application/json:
       /{id}/auditLog:
           type: instanceAuditLog
-      /search:
-          get:
-              is: [ secured ]
-              description: Find periods with matched parameters.
-              queryParameters:
-                  programId:
-                          displayName: program
-                          type: string
-                          required: true
-                          repeat: false
-                  facilityId:
-                          displayName: facility
-                          type: string
-                          required: true
-                          repeat: false
-              responses:
-                  "200":
-                      body:
-                        application/json:
-                          schema: processingPeriodArray
-                  "404":
-                      body:
-                        application/json:
-      /searchByScheduleAndDate:
-          get:
-              is: [ secured ]
-              description: Find periods with matched parameters.
-              queryParameters:
-                  processingScheduleId:
-                          displayName: processingSchedule
-                          type: string
-                          required: true
-                          repeat: false
-                  startDate:
-                          displayName: startDate
-                          type: string
-                          required: false
-                          repeat: false
-              responses:
-                  "200":
-                      body:
-                        application/json:
-                          schema: processingPeriodArray
-                  "400":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-                  "404":
-                      body:
-                        application/json:
 
   /orderableDisplayCategories:
       displayName: Product Categories

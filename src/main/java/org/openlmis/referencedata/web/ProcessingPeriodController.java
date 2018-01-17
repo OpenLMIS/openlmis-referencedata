@@ -16,32 +16,27 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toList;
-import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_MUST_BE_PROVIDED;
 
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
-import org.openlmis.referencedata.domain.ProcessingSchedule;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.service.ProcessingPeriodSearchParams;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.ProcessingPeriodDtoComparator;
+import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.ProcessingPeriodComparator;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -56,8 +51,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,49 +71,6 @@ public class ProcessingPeriodController extends BaseController {
 
   @Autowired
   private ProcessingPeriodService periodService;
-
-  @Autowired
-  private ProcessingScheduleRepository processingScheduleRepository;
-
-  @Autowired
-  private ProgramRepository programRepository;
-
-  @Autowired
-  private FacilityRepository facilityRepository;
-
-  /**
-   * Finds ProcessingPeriod matching all of provided parameters.
-   *
-   * @param programId  program of searched ProcessingPeriods.
-   * @param facilityId facility of searched ProcessingPeriods.
-   * @return a list of all ProcessingPeriods matching provided parameters.
-   */
-  @RequestMapping(value = RESOURCE_PATH + "/search", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<ProcessingPeriodDto> searchProcessingPeriods(
-      @RequestParam(value = "programId", required = true) UUID programId,
-      @RequestParam(value = "facilityId", required = true) UUID facilityId) {
-
-    if (programId == null) {
-      throw new ValidationMessageException(ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL);
-    }
-
-    if (facilityId == null) {
-      throw new ValidationMessageException(ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL);
-    }
-
-    Program program = programRepository.findOne(programId);
-    Facility facility = facilityRepository.findOne(facilityId);
-
-    List<ProcessingPeriod> periods = new ArrayList<>();
-
-    if (program != null && facility != null) {
-      periods = periodService.filterPeriods(program, facility);
-    }
-
-    return exportToDtos(periods);
-  }
 
   /**
    * Create a new processing period using the provided processing period DTO.
@@ -149,26 +99,21 @@ public class ProcessingPeriodController extends BaseController {
   }
 
   /**
-   * Get all ProcessingPeriods.
+   * Get all ProcessingPeriods matching all of provided parameters.
    *
    * @return the ProcessingPeriods.
    */
   @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<ProcessingPeriodDto> getAllProcessingPeriods(
-      @RequestParam(value = "sort", required = false) String sort)  {
+  public Page<ProcessingPeriodDto> getAllProcessingPeriods(ProcessingPeriodSearchParams params,
+                                                           Pageable pageable)  {
+    List<ProcessingPeriod> periods = periodService.searchPeriods(params);
+    periods.sort(new ProcessingPeriodComparator(pageable));
 
-    List<ProcessingPeriodDto> periodDtos = new ArrayList<>();
+    List<ProcessingPeriodDto> data = exportToDtos(periods);
 
-    Iterable<ProcessingPeriod> processingPeriods = periodRepository.findAll();
-    processingPeriods.forEach(period -> periodDtos.add(exportToDto(period)));
-
-    if (sort != null) {
-      periodDtos.sort(new ProcessingPeriodDtoComparator(sort));
-    }
-
-    return periodDtos;
+    return Pagination.getPage(data, pageable);
   }
 
   /**
@@ -286,37 +231,6 @@ public class ProcessingPeriodController extends BaseController {
 
     return getAuditLogResponse(ProcessingPeriod.class, id, author, changedPropertyName, page,
         returnJson);
-  }
-
-  /**
-   * Returns chosen ProcessingPeriods.
-   *
-   * @param processingScheduleId processing schedule of searched ProcessingPeriods.
-   * @param startDate            which day shall ProcessingPeriod start.
-   * @return a list of ProcessingPeriods.
-   */
-  @RequestMapping(value = RESOURCE_PATH + "/searchByScheduleAndDate", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<ProcessingPeriodDto> searchPeriodsByUuidAndDate(
-      @RequestParam(value = "processingScheduleId", required = false) UUID processingScheduleId,
-      @RequestParam(value = "startDate", required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
-
-    if (processingScheduleId == null) {
-      throw new ValidationMessageException(ERROR_SCHEDULE_ID_MUST_BE_PROVIDED);
-    }
-
-    ProcessingSchedule processingSchedule =
-        processingScheduleRepository.findOne(processingScheduleId);
-
-    List<ProcessingPeriod> periods = new ArrayList<>();
-
-    if (processingSchedule != null) {
-      periods = periodService.searchPeriods(processingSchedule, startDate);
-    }
-
-    return exportToDtos(periods);
   }
 
   private ProcessingPeriodDto exportToDto(ProcessingPeriod period) {

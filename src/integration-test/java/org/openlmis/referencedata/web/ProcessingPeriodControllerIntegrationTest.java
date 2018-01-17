@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -24,16 +25,14 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_MUST_BE_PROVIDED;
+import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER;
 
-import com.google.common.collect.Sets;
-import guru.nidi.ramltester.junit.RamlMatchers;
+import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
@@ -42,16 +41,20 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 
@@ -59,9 +62,6 @@ import java.util.UUID;
 public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/processingPeriods";
-  private static final String SEARCH_URL = RESOURCE_URL + "/search";
-  private static final String SEARCH_BY_UUID_AND_DATE_URL =
-      RESOURCE_URL + "/searchByScheduleAndDate";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String DIFFERENCE_URL = RESOURCE_URL + "/{id}/duration";
   private static final String PROGRAM = "programId";
@@ -208,62 +208,64 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .willReturn(requisitionGroupProgramSchedule.getProgram());
     given(facilityRepository.findOne(facilityId))
         .willReturn(requisitionGroupProgramSchedule.getDropOffFacility());
+    given(requisitionGroupProgramScheduleRepository
+        .searchRequisitionGroupProgramSchedules(requisitionGroupProgramSchedule.getProgram(),
+            requisitionGroupProgramSchedule.getDropOffFacility()))
+        .willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
 
-    given(periodService.filterPeriods(requisitionGroupProgramSchedule.getProgram(),
-        requisitionGroupProgramSchedule.getDropOffFacility()))
+    given(periodRepository.searchPeriods(schedule, null))
         .willReturn(Arrays.asList(firstPeriod, secondPeriod));
 
-    ProcessingPeriodDto[] response = restAssured.given()
+    PageImplRepresentation<ProcessingPeriodDto> response = restAssured.given()
         .queryParam(PROGRAM, programId)
         .queryParam(FACILITY, facilityId)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
-        .get(SEARCH_URL)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(ProcessingPeriodDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertEquals(2, response.length);
+    assertEquals(2, response.getContent().size());
   }
 
   @Test
   public void shouldFindPeriodsByScheduleAndDate() {
-
     given(scheduleRepository.findOne(scheduleId)).willReturn(schedule);
-    given(periodService.searchPeriods(schedule, secondPeriod.getStartDate()))
+    given(periodRepository.searchPeriods(schedule, secondPeriod.getStartDate()))
         .willReturn(Arrays.asList(secondPeriod, firstPeriod));
 
-    ProcessingPeriodDto[] response = restAssured.given()
+    String expectedId = firstPeriod.getProcessingSchedule().getId().toString();
+    restAssured.given()
         .queryParam(PROCESSING_SCHEDULE, scheduleId)
         .queryParam(START_DATE, secondPeriod.getStartDate().toString())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
-        .get(SEARCH_BY_UUID_AND_DATE_URL)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(ProcessingPeriodDto[].class);
+        .body("content.size()", is(2))
+        .body("content[0].processingSchedule.id", is(expectedId))
+        .body("content[1].processingSchedule.id", is(expectedId));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertEquals(2, response.length);
-    for (ProcessingPeriodDto period : response) {
-      assertEquals(
-          period.getProcessingSchedule().getId(),
-          firstPeriod.getProcessingSchedule().getId());
-    }
   }
 
   @Test
-  public void shouldReturnBadRequestIfScheduleIsNotProvided() {
+  public void shouldReturnBadRequestIfProgramIdFacilityIdScheduleIdAreProvided() {
     restAssured.given()
-        .queryParam(START_DATE, secondPeriod.getStartDate().toString())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PROGRAM, programId)
+        .queryParam(FACILITY, facilityId)
+        .queryParam(PROCESSING_SCHEDULE, scheduleId)
+        .queryParam(START_DATE, secondPeriod.getStartDate().toString())
         .when()
-        .get(SEARCH_BY_UUID_AND_DATE_URL)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(400)
         .body(MESSAGE_KEY,
-            equalTo(ERROR_SCHEDULE_ID_MUST_BE_PROVIDED));
+            equalTo(ERROR_SCHEDULE_ID_SINGLE_PARAMETER));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }
@@ -311,31 +313,33 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldGetAllPeriods() {
+    List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
+        firstPeriod, secondPeriod, thirdPeriod
+    );
+    given(periodRepository.searchPeriods(null, null)).willReturn(storedPeriods);
 
-    Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
-    given(periodRepository.findAll()).willReturn(storedPeriods);
-
-    ProcessingPeriodDto[] response = restAssured.given()
+    PageImplRepresentation<ProcessingPeriodDto> response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(ProcessingPeriodDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    List<ProcessingPeriodDto> periods = Arrays.asList(response);
+    List<ProcessingPeriodDto> periods = response.getContent();
     assertEquals(3, periods.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldGetAllPeriodsSortedByStartDate() {
+    List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
+        firstPeriod, secondPeriod, thirdPeriod
+    );
+    given(periodRepository.searchPeriods(null, null)).willReturn(storedPeriods);
 
-    Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
-    given(periodRepository.findAll()).willReturn(storedPeriods);
-
-    ProcessingPeriodDto[] response = restAssured.given()
+    restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("sort", "startDate")
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -343,21 +347,20 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(ProcessingPeriodDto[].class);
+        .body("content.size()", is(3))
+        .body("content[0].startDate", is(firstPeriod.getStartDate().toString()))
+        .body("content[1].startDate", is(secondPeriod.getStartDate().toString()))
+        .body("content[2].startDate", is(thirdPeriod.getStartDate().toString()));
 
-    List<ProcessingPeriodDto> periods = Arrays.asList(response);
-    assertEquals(3, periods.size());
-    assertEquals(firstPeriod.getStartDate(), periods.get(0).getStartDate());
-    assertEquals(secondPeriod.getStartDate(), periods.get(1).getStartDate());
-    assertEquals(thirdPeriod.getStartDate(), periods.get(2).getStartDate());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldRespondWithBadRequestWhenInvalidSortProperty() {
-
-    Set<ProcessingPeriod> storedPeriods = Sets.newHashSet(firstPeriod, secondPeriod, thirdPeriod);
-    given(periodRepository.findAll()).willReturn(storedPeriods);
+    List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
+        firstPeriod, secondPeriod, thirdPeriod
+    );
+    given(periodRepository.searchPeriods(null, null)).willReturn(storedPeriods);
 
     restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -523,43 +526,13 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   private Program generateProgram() {
     Program program = new Program("PROG" + generateInstanceNumber());
+    program.setId(UUID.randomUUID());
     program.setName("name");
     return program;
   }
 
   private Facility generateFacility() {
-    Facility facility = new Facility("F" + generateInstanceNumber());
-    FacilityType facilityType = generateFacilityType();
-    GeographicZone geographicZone = generateGeographicZone();
-
-    facility.setType(facilityType);
-    facility.setGeographicZone(geographicZone);
-    facility.setName("facilityName");
-    facility.setDescription("Test facility");
-    facility.setActive(true);
-    facility.setEnabled(true);
-    return facility;
-  }
-
-  private FacilityType generateFacilityType() {
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode("FT" + generateInstanceNumber());
-    return facilityType;
-  }
-
-  private GeographicLevel generateGeographicLevel() {
-    GeographicLevel level = new GeographicLevel();
-    level.setCode("GL" + generateInstanceNumber());
-    level.setLevelNumber(1);
-    return level;
-  }
-
-  private GeographicZone generateGeographicZone() {
-    GeographicZone geographicZone = new GeographicZone();
-    GeographicLevel level = generateGeographicLevel();
-    geographicZone.setLevel(level);
-    geographicZone.setCode("GZ" + generateInstanceNumber());
-    return geographicZone;
+    return new FacilityDataBuilder().build();
   }
 
   private Integer generateInstanceNumber() {
