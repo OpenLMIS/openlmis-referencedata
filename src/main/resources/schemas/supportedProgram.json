@@ -36,6 +36,10 @@
       "type": "boolean",
       "title": "supportActive"
     },
+    "supportLocallyFulfilled": {
+      "type": "boolean",
+      "title": "supportLocallyFulfilled"
+    },
     "supportStartDate": {
       "type": "string",
       "title": "supportStartDate"

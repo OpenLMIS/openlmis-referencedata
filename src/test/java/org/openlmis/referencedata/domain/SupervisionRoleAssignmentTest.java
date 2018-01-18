@@ -23,12 +23,14 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import com.google.common.collect.Sets;
-import java.util.UUID;
+
 import org.junit.Test;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisionRoleAssignmentTest {
@@ -63,9 +65,10 @@ public class SupervisionRoleAssignmentTest {
     supervisoryNode = new SupervisoryNodeDataBuilder().build();
     RequisitionGroup requisitionGroup = new RequisitionGroup("RG1", "RGN1", supervisoryNode);
     supervisedFacility = new Facility("F2");
-    SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(
-        supervisedFacility, program, true
-    );
+    SupportedProgram supportedProgram = new SupportedProgramDataBuilder()
+        .withFacility(supervisedFacility)
+        .withProgram(program)
+        .build();
     supervisedFacility.setSupportedPrograms(Sets.newHashSet(supportedProgram));
     requisitionGroup.setMemberFacilities(Sets.newHashSet(supervisedFacility));
     ProcessingSchedule processingSchedule = new ProcessingSchedule("PS1", "Schedule1");

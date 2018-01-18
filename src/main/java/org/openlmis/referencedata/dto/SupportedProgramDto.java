@@ -18,6 +18,7 @@ package org.openlmis.referencedata.dto;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,32 +26,24 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.Optional;
 
+@Getter
 @NoArgsConstructor
-public class SupportedProgramDto extends BaseDto implements SupportedProgram.Exporter {
+@EqualsAndHashCode(callSuper = true)
+public final class SupportedProgramDto extends BaseDto implements SupportedProgram.Exporter {
 
-  @Getter
   private String code;
-
-  @Getter
   private String name;
-
-  @Getter
   private String description;
-
-  @Getter
   private boolean programActive;
-
-  @Getter
   private boolean periodsSkippable;
-
-  @Getter
   private boolean showNonFullSupplyTab;
 
-  @Getter
   @Setter
   private boolean supportActive;
 
-  @Getter
+  @Setter
+  private boolean supportLocallyFulfilled;
+
   @Setter
   private LocalDate supportStartDate;
 

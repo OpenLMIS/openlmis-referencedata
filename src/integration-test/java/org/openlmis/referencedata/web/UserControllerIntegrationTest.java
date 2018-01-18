@@ -68,10 +68,10 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
+import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -81,6 +81,7 @@ import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
@@ -700,10 +701,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserSupervisedFacilities() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    Facility[] response = getUserSupervisedFacilities()
+    FacilityDto[] response = getUserSupervisedFacilities()
         .then()
         .statusCode(200)
-        .extract().as(Facility[].class);
+        .extract().as(FacilityDto[].class);
 
     assertThat(response.length, is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -713,10 +714,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserSupervisedFacilitiesWithNoRightIfUserRequestsTheirOwnRecord() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
-    Facility[] response = getUserSupervisedFacilities()
+    FacilityDto[] response = getUserSupervisedFacilities()
         .then()
         .statusCode(200)
-        .extract().as(Facility[].class);
+        .extract().as(FacilityDto[].class);
 
     assertThat(response.length, is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -1469,7 +1470,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .getMemberFacilities()
         .forEach(facility -> facility
             .setSupportedPrograms(
-                Sets.newHashSet(SupportedProgram.newSupportedProgram(facility, program, true))
+                Sets.newHashSet(new SupportedProgramDataBuilder()
+                    .withFacility(facility)
+                    .withProgram(program)
+                    .build())
             ));
   }
 

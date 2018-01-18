@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
@@ -27,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 
 import java.util.Collections;
 import java.util.Set;
@@ -183,8 +185,7 @@ public class SupervisoryNodeTest {
     group
         .getMemberFacilities()
         .forEach(facility -> facility
-            .setSupportedPrograms(
-                Sets.newHashSet(SupportedProgram.newSupportedProgram(facility, program, true))
-            ));
+            .setSupportedPrograms(newHashSet(new SupportedProgramDataBuilder()
+                .withFacility(facility).withProgram(program).build())));
   }
 }

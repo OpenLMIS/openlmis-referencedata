@@ -15,20 +15,22 @@
 
 package org.openlmis.referencedata.domain;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.domain.SupportedProgram.newSupportedProgram;
 
-import com.google.common.collect.Sets;
-import java.util.Collections;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
+
+import java.util.Collections;
+import java.util.Set;
 
 public class UserTest {
 
@@ -186,14 +188,11 @@ public class UserTest {
   }
 
   private SupervisoryNode getSupervisoryHierarchy() {
-    Facility facility = new Facility("F10");
-    facility.setSupportedPrograms(
-        Sets.newHashSet(newSupportedProgram(facility, new Program("P10"), true))
-    );
+    Facility facility = new FacilityDataBuilder().build();
 
     SupervisoryNode districtNode = new SupervisoryNodeDataBuilder().build();
     RequisitionGroup districtGroup = new RequisitionGroup("DG", "DGN", districtNode);
-    districtGroup.setMemberFacilities(Sets.newHashSet(new Facility("C2")));
+    districtGroup.setMemberFacilities(newHashSet(new Facility("C2")));
     addSupportedPrograms(districtGroup);
     districtGroup.getMemberFacilities().add(facility);
     ProcessingSchedule processingSchedule = new ProcessingSchedule("PS1", "Schedule1");
@@ -206,7 +205,7 @@ public class UserTest {
 
     SupervisoryNode provinceNode = new SupervisoryNodeDataBuilder().build();
     RequisitionGroup provinceGroup = new RequisitionGroup("PG", "PGN", provinceNode);
-    provinceGroup.setMemberFacilities(Sets.newHashSet(new Facility("C4"),
+    provinceGroup.setMemberFacilities(newHashSet(new Facility("C4"),
         new Facility("C5")));
     addSupportedPrograms(provinceGroup);
     RequisitionGroupProgramSchedule provinceGroupProgramSchedule =
@@ -225,6 +224,7 @@ public class UserTest {
     group
         .getMemberFacilities()
         .forEach(facility -> facility
-            .setSupportedPrograms(Sets.newHashSet(newSupportedProgram(facility, program, true))));
+            .setSupportedPrograms(newHashSet(new SupportedProgramDataBuilder()
+                .withFacility(facility).withProgram(program).build())));
   }
 }

@@ -32,8 +32,10 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -296,8 +298,13 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     facility.setGeographicZone(geographicZone);
     facility.setType(facilityType);
     if (program != null) {
-      facility.addSupportedProgram(SupportedProgram.newSupportedProgram(
-          facility, program, isSupportActive));
+      SupportedProgram supportedProgram = new SupportedProgramDataBuilder()
+          .withFacility(facility)
+          .withProgram(program)
+          .withActiveFlag(isSupportActive)
+          .build();
+
+      facility.addSupportedProgram(supportedProgram);
     }
 
     facilityRepository.save(facility);

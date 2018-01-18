@@ -18,10 +18,12 @@ package org.openlmis.referencedata.domain;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.openlmis.referencedata.domain.SupportedProgram.newSupportedProgram;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 
 public class FacilityTest {
   private Facility facility;
@@ -29,10 +31,8 @@ public class FacilityTest {
 
   @Before
   public void setUp() throws Exception {
-    program = new Program("P1");
-
-    facility = new Facility("F1");
-    facility.setSupportedPrograms(newHashSet(newSupportedProgram(facility, program, true)));
+    program = new ProgramDataBuilder().build();
+    facility = new FacilityDataBuilder().withSupportedProgram(program).build();
   }
 
   @Test
@@ -42,12 +42,17 @@ public class FacilityTest {
 
   @Test
   public void supportsShouldReturnFalseIfDoesNotSupportProgram() throws Exception {
-    assertThat(facility.supports(new Program("P2")), is(false));
+    Program otherProgram = new ProgramDataBuilder().build();
+    assertThat(facility.supports(otherProgram), is(false));
   }
 
   @Test
   public void supportsShouldReturnFalseIfSupportsProgramButSupportNotActive() {
-    facility.setSupportedPrograms(newHashSet(newSupportedProgram(facility, program, false)));
+    SupportedProgram supportedProgram = new SupportedProgramDataBuilder()
+        .withFacility(facility)
+        .withProgram(program)
+        .buildAsInactive();
+    facility.setSupportedPrograms(newHashSet(supportedProgram));
     assertThat(facility.supports(program), is(false));
   }
 }

@@ -528,8 +528,9 @@ public class FacilityController extends BaseController {
         if (program == null) {
           throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
         }
-        SupportedProgram supportedProgram = SupportedProgram.newSupportedProgram(facility,
-            program, dto.isSupportActive(), dto.getSupportStartDate());
+        SupportedProgram supportedProgram = new SupportedProgram(
+            facility, program, dto.isSupportActive(),
+            dto.isSupportLocallyFulfilled(), dto.getSupportStartDate());
         facility.addSupportedProgram(supportedProgram);
       }
     }

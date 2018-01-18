@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
+
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -56,12 +57,14 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.openlmis.referencedata.validate.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.BindingResult;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -497,8 +500,11 @@ public class UserControllerTest {
   }
 
   private void setProgramSupportedAndActive() {
-    SupportedProgram supportedProgram =
-        SupportedProgram.newSupportedProgram(homeFacility, program1, true);
+    SupportedProgram supportedProgram = new SupportedProgramDataBuilder()
+        .withFacility(homeFacility)
+        .withProgram(program1)
+        .build();
+
     program1.setActive(true);
     homeFacility.setSupportedPrograms(Sets.newHashSet(supportedProgram));
   }

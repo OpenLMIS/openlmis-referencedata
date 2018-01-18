@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class FacilityDataBuilder {
 
@@ -87,12 +88,13 @@ public class FacilityDataBuilder {
     facility.setOpenLmisAccessible(openLmisAccessible);
     facility.setLocation(location);
     facility.setExtraData(extraData);
-
-    supportedPrograms
-        .forEach(p -> facility.addSupportedProgram(new SupportedProgramDataBuilder()
+    facility.setSupportedPrograms(supportedPrograms
+        .stream()
+        .map(p -> new SupportedProgramDataBuilder()
             .withProgram(p)
             .withFacility(facility)
-            .build()));
+            .build())
+        .collect(Collectors.toSet()));
 
     return facility;
   }

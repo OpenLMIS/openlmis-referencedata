@@ -20,12 +20,12 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import org.javers.core.metamodel.annotation.TypeName;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -38,6 +38,7 @@ import javax.persistence.Table;
 @Table(name = "supported_programs", schema = "referencedata")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @NoArgsConstructor
+@AllArgsConstructor
 @TypeName("SupportedProgram")
 public class SupportedProgram extends BaseEntity {
 
@@ -57,29 +58,11 @@ public class SupportedProgram extends BaseEntity {
   @Getter
   private Boolean active;
 
+  @Column(nullable = false)
+  @Getter
+  private Boolean locallyFulfilled;
+
   private LocalDate startDate;
-
-  private SupportedProgram(Facility facility, Program program, boolean active) {
-    this.facility = Objects.requireNonNull(facility);
-    this.program = Objects.requireNonNull(program);
-    this.active = active;
-  }
-
-  private SupportedProgram(Facility facility, Program program, boolean active,
-                           LocalDate startDate) {
-    this(facility, program, active);
-    this.startDate = startDate;
-  }
-
-  public static SupportedProgram newSupportedProgram(Facility facility, Program program,
-                                                     boolean active) {
-    return new SupportedProgram(facility, program, active);
-  }
-
-  public static SupportedProgram newSupportedProgram(Facility facility, Program program,
-                                                     boolean active, LocalDate startDate) {
-    return new SupportedProgram(facility, program, active, startDate);
-  }
 
   /**
    * Export this object to the specified exporter (DTO).
@@ -91,6 +74,7 @@ public class SupportedProgram extends BaseEntity {
     exporter.setProgram(program);
     exporter.setSupportActive(active);
     exporter.setSupportStartDate(startDate);
+    exporter.setSupportLocallyFulfilled(locallyFulfilled);
   }
 
   public interface Exporter {
@@ -99,6 +83,8 @@ public class SupportedProgram extends BaseEntity {
     void setProgram(Program program);
 
     void setSupportActive(boolean supportActive);
+
+    void setSupportLocallyFulfilled(boolean supportLocallyFulfilled);
 
     void setSupportStartDate(LocalDate supportStartDate);
   }

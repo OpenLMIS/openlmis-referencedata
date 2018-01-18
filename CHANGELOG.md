@@ -15,6 +15,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-3726](https://openlmis.atlassian.net/browse/OLMIS-3726): Ability to have a fulfillment roles by non-warehouses.
 * [OLMIS-3818](https://openlmis.atlassian.net/browse/OLMIS-3818): Added new role assignment to rivo for the Niassa Provincial Store.
 * [OLMIS-3805](https://openlmis.atlassian.net/browse/OLMIS-3805): Added new param to minimal facilities endpoint which allows returning only active ones.
+* [OLMIS-3918](https://openlmis.atlassian.net/browse/OLMIS-3918): Added locallyFulfilled flag to supported program resource
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id

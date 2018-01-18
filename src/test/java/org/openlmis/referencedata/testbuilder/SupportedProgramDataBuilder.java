@@ -18,12 +18,13 @@ package org.openlmis.referencedata.testbuilder;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
+
 import java.time.LocalDate;
 
 public class SupportedProgramDataBuilder {
-
   private Facility facility;
   private Program program;
+  private boolean active = true;
 
   /**
    * Returns instance of {@link SupportedProgramDataBuilder} with sample data.
@@ -35,8 +36,15 @@ public class SupportedProgramDataBuilder {
    * Builds instance of {@link SupportedProgram}.
    */
   public SupportedProgram build() {
-    return SupportedProgram.newSupportedProgram(facility,
-        program, true, LocalDate.now());
+    return new SupportedProgram(facility, program, active, false, LocalDate.now());
+  }
+
+  /**
+   * Builds instance of {@link SupportedProgram}.
+   */
+  public SupportedProgram buildAsInactive() {
+    this.active = false;
+    return build();
   }
 
   /**
@@ -52,6 +60,11 @@ public class SupportedProgramDataBuilder {
    */
   public SupportedProgramDataBuilder withFacility(Facility facility) {
     this.facility = facility;
+    return this;
+  }
+
+  public SupportedProgramDataBuilder withActiveFlag(boolean active) {
+    this.active = active;
     return this;
   }
 }
