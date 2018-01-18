@@ -3,330 +3,385 @@
     "id": "29172001-809d-45bd-bbae-3a53b544709a",
     "facility": { "id" : "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "a3da399c-547e-4dbe-9b94-8361f626b334",
     "facility": { "id" : "e6799d64-d10d-4011-b8c2-0e4d4a3f65ce" },
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "56615552-9f08-4b2c-8553-562774fd4c94",
     "facility": { "id" : "13037147-1769-4735-90a7-b9b310d128b8" },
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "0f19e23e-207b-41f2-8519-200585197bb9",
     "facility": { "id" : "13037147-1769-4735-90a7-b9b310d128b8" },
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "bbc314ca-dcc3-11e6-bf26-cec0c932ce01",
     "facility": { "id" : "7938919f-6f61-4d1a-a4dc-923c31e9cd45" },
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "c02cf0a8-dcc3-11e6-bf26-cec0c932ce01",
     "facility": { "id" : "7938919f-6f61-4d1a-a4dc-923c31e9cd45" },
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "d49d2a12-dcc3-11e6-bf26-cec0c932ce01",
     "facility": { "id" : "176c4276-1fb1-4507-8ad2-cdfba0f47445" },
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "0494560a-dcc4-11e6-bf26-cec0c932ce01",
     "facility": { "id" : "5b39f0fb-5c47-4551-b983-1e30ac6df65d" },
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "2b0bbdfd-38ed-474f-97d3-41760a92d2c2",
     "facility": { "id" : "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "7f5da365-2c8f-444d-96c3-21e99ea499e8",
     "facility": { "id" : "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
     "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "f380229f-0c7e-4740-bd16-e28ddb15e54d",
     "facility": { "id": "7fc9bda8-ad8a-468d-8244-38e1918527d5" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "985aeb36-94f8-4962-9a0b-d2a04eead793",
     "facility": { "id": "4774fc63-a0c8-4a29-a01d-5b6b48632175" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "592a5c16-09f1-4072-a259-2d274f8237d6",
     "facility": { "id": "a205764b-3998-4c89-afac-2bc9d737c8d3" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "9229e88c-68ca-4949-b659-20fe76817963",
     "facility": { "id": "0509f332-a77e-4bfc-921b-11c46a6bbfd2" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "5981dafe-1b9d-47dc-a0cd-2b2029f4d596",
     "facility": { "id": "19a94b68-e613-4996-9bea-94313e9fa34d" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "b2797f25-9885-4580-9822-f5fa40c5696d",
     "facility": { "id": "6115591d-6e74-4b7f-9f80-f19e42494c99" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "70465ea4-9c4d-4f7b-a1d0-3b5ae5e72d92",
     "facility": { "id": "e21e24ea-2d60-4468-b410-133c51485402" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "9112e45f-5d0c-4f4c-9010-d7b196d2a145",
     "facility": { "id": "5146de1c-f089-43ff-8016-3c9e8f36e014" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "b39a5a05-f65c-4ebc-8a5b-10f97b3a76ce",
     "facility": { "id": "249fbafc-e934-4068-8452-d92381299c40" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "7aa9401a-0af2-457a-a610-063f21aee635",
     "facility": { "id": "6c0de27e-2705-4183-96fc-0905caa34dc2" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "3df940ed-8366-44b9-85c9-194eff67145b",
     "facility": { "id": "97f7c9fb-4d2f-4501-a4bf-f9c365815c20" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "5a8f0497-bc3d-403e-919d-722b4bb886ba",
     "facility": { "id": "e6673cec-c79c-4111-b67c-9b31a1735e27" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "75c51dfe-2e55-40fe-81b2-4e4b3811911e",
     "facility": { "id": "701ee94a-083e-46bb-83b7-d95c3a4c9884" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "6fdf54f3-7174-4446-90a9-9c604da59a9b",
     "facility": { "id": "45870b0b-b77e-446b-beb8-a5061145444a" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "a01c8b3a-a553-428c-b7bb-1677014783a4",
     "facility": { "id": "0fcab1ac-1ddb-408a-8413-feb5ecfc5dc0" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "af977f01-4023-402c-8007-4c920e511cee",
     "facility": { "id": "b25bf57d-43ae-41be-8fa9-6335c6fbe161" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "7d66ce24-b972-4217-a78e-17195e80728e",
     "facility": { "id": "97546f93-ac93-435f-a437-cd629deb7d6d" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "7a498a1d-bd57-4201-aaa0-136a5aecbf5d",
     "facility": { "id": "d473a46c-24f7-4ed0-84c9-dc8941acbf32" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "2547fd48-d726-4612-a503-8d5d34c9c3f2",
     "facility": { "id": "65abb2fb-25ca-429b-add7-d092774e51b8" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "e43d85e3-52d9-4c20-b583-8c23441e6428",
     "facility": { "id": "5feb3242-10bb-41ea-ab94-4fb6b95185b8" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "03ac0d05-7a02-40a9-96a4-7325e35e0945",
     "facility": { "id": "f573c829-bf73-49e7-ac7d-c13567dcd6c2" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "dbed383c-3dd1-4912-94e9-8968d99c3d51",
     "facility": { "id": "88f3adf2-a59a-49f5-9d90-6ee1367262dd" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "bffdf5fd-ed25-4e39-8342-6a108593b969",
     "facility": { "id": "a2d3f399-6862-41ec-9a29-dd41ebd50ed9" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "2271b4dd-9a1a-4e00-855b-0f723c72ce3d",
     "facility": { "id": "c2051128-f6bf-4d84-a33b-1b360a2d87f9" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "9db08f87-caa4-4719-9035-914858e810ac",
     "facility": { "id": "63ab622b-9628-4084-8bc5-ced7cf03a01d" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "da4c4836-5036-4639-b605-d70b9de9b261",
     "facility": { "id": "f7453d96-601f-4e98-9081-43bd1362a828" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "26f86717-ab5c-4b33-aaee-b6e4f7d12f8b",
     "facility": { "id": "e9dbb5af-b6a2-45e8-83be-b94117fa0d71" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "a61c97f4-25d4-4404-9ba4-b437126b5916",
     "facility": { "id": "a7ddecee-5699-450e-bd79-bd1b2d00bbfd" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "346a4f2b-c8af-43ea-acfa-e95db0330157",
     "facility": { "id": "c0d4d66b-d8e9-47e9-92e6-588c88c97c7c" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "4298e97a-62fe-446d-9e35-013e63efebec",
     "facility": { "id": "0267919e-836e-492f-af36-c8c111baaeab" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "1fccd497-d5f4-432d-b0c3-8ac52061ba4d",
     "facility": { "id": "3a41fcaa-4c41-4fa4-8b6b-3b209138ff90" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "7ed5a2c5-7e9d-46ac-a13c-886910ab69de",
     "facility": { "id": "2a536413-1a49-4ea6-a904-a7faca769c16" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "fd39cc8e-654c-4547-909f-80278a93c0f7",
     "facility": { "id": "5f9c60d8-753a-4d34-9769-d08f6703a8ee" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "65e95e5b-e81f-4fa2-8101-5880ad0c486e",
     "facility": { "id": "c5c3706f-2379-4209-aa3e-efd5bba8fad3" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "017ec935-013a-4c9f-9469-a68d86899f9c",
     "facility": { "id": "796ed125-dc1a-4e40-9b50-ed46843de019" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "0d0038d8-b03a-4b9e-b73e-999289d8b702",
     "facility": { "id": "52be842d-4d74-434e-b8bb-cb983462a4ee" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "0ae1abd3-3cb6-46c5-87ca-36edb6ed18f1",
     "facility": { "id": "8adb4ef8-b7ef-4583-91cd-f99c1e4214c7" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "743f4967-9ab3-422e-b6c2-6a2c27835ce5",
     "facility": { "id": "7174e805-4fd7-4ffb-a0d3-dc97452dbe89" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "c4828ef0-9bd6-43ef-996a-e45e865d0d3c",
     "facility": { "id": "c003b16f-a71c-45e8-84bd-e0bbbebd3aef" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "e2032d18-6ee2-4e78-b486-bd04da9c1552",
     "facility": { "id": "6c741c92-6020-47e4-bbd2-1a13d0028c6b" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "2157d3b0-79d6-4578-9e79-66f4e295fbf0",
     "facility": { "id": "2a12b307-cd31-4088-8b2d-b70640eabc3a" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "747d018b-738e-4029-81c6-b8d443529fd1",
     "facility": { "id": "c62dea9b-6974-4101-ba39-b09914165967" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "08911d46-e8cd-4381-bbb6-f563360c4d85",
     "facility": { "id": "2b6a845a-1bc0-4208-a1a5-c2a09171d707" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "ebcf7a01-a9af-4811-bd29-b6d3beb671da",
     "facility": { "id": "0898dcd6-53f2-41b6-ba7d-b2f5122ffb44" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   },
   {
     "id": "2e41afa6-44c0-4446-b86f-073d6da52768",
     "facility": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e"},
     "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3"},
-    "active": true
+    "active": true,
+    "locallyFulfilled": false
   }
 ]
