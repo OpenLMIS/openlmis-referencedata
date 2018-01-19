@@ -34,6 +34,9 @@ Bug fixes that are backwards-compatible:
 * [OLMIS-3838](https://openlmis.atlassian.net/browse/OLMIS-3838): Ensure right assignments are updated properly when user is saved.
 * [OLMIS-3778](https://openlmis.atlassian.net/browse/OLMIS-3778): Fixed service checks the rights of a wrong user
 
+Improvements:
+* [OLMIS-3925](https://openlmis.atlassian.net/browse/OLMIS-3925): Updated requisition approval process to stop at an intermediate supervisory node that has a supply line for the requisition's program.
+
 9.0.0 / 2017-11-09
 ==================
 

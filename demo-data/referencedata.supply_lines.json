@@ -14,13 +14,6 @@
     "description": "Supply Line for Balaka District Warehouse and Essential Meds program"
   },
   {
-    "id": "8850527b-9804-4522-8a9d-aaaada74ef56",
-    "supervisoryNodeId": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
-    "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "supplyingFacilityId": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
-    "description": "Supply Line for Balaka District Warehouse and Family Planning program"
-  },
-  {
     "id": "b5e13bf0-21f0-4270-ba2a-41f910858b7f",
     "supervisoryNodeId": { "id": "219cf7dd-b60a-4c25-ae4e-bf035f357bb4" },
     "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
@@ -29,7 +22,7 @@
   },
   {
     "id": "9c3f3d69-0722-4681-a580-6b27ff353afb",
-    "supervisoryNode": { "id": "219cf7dd-b60a-4c25-ae4e-bf035f357bb4" },
+    "supervisoryNode": { "id": "6f5eae49-bc62-4664-a679-1ef0bfd5b21d" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
     "supplyingFacility": { "id": "c62dea9b-6974-4101-ba39-b09914165967" },
     "description": "Supply Line for Dep—sito Distrital Cuamba and EPI program"
