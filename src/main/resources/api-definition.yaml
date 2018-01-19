@@ -3089,3 +3089,18 @@ resourceTypes:
                       body:
                           application/json:
                               schema: localizedErrorResponse
+  /orderableFulfills:
+      displayName: Orderable Fulfills
+      get:
+          is: [ secured ]
+          description: Get all facilities that are matching given request parameters. If no parameters, all facilities are returned.
+          queryParameters:
+              id:
+                  description: Orderable id
+                  type: string
+                  required: false
+                  repeat: true
+          responses:
+              "200":
+                  body:
+                    application/json:

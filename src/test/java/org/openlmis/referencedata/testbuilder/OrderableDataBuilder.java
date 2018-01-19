@@ -58,14 +58,26 @@ public class OrderableDataBuilder {
     identifiers = new HashMap<>();
   }
 
+  public OrderableDataBuilder withIdentifier(String key, Object valueToString) {
+    this.identifiers.put(key, valueToString.toString());
+    return this;
+  }
+
   /**
    * Builds instance of {@link Orderable}.
    */
   public Orderable build() {
-    Orderable orderable = new Orderable(productCode, dispensable, fullProductName, description,
-        netContent, packRoundingTreshold, roundToZero, programOrderables, identifiers, extraData);
+    Orderable orderable = buildAsNew();
     orderable.setId(id);
 
     return orderable;
+  }
+
+  /**
+   * Builds instance of {@link Orderable} without id field.
+   */
+  public Orderable buildAsNew() {
+    return new Orderable(productCode, dispensable, fullProductName, description,
+        netContent, packRoundingTreshold, roundToZero, programOrderables, identifiers, extraData);
   }
 }

@@ -13,18 +13,17 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.dto;
 
-import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.openlmis.referencedata.domain.CommodityType;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
-@JaversSpringDataAuditable
-public interface CommodityTypeRepository extends PagingAndSortingRepository<CommodityType, UUID> {
-
-  Optional<CommodityType> findByClassificationIdAndClassificationSystem(
-      String classificationId, String classificationSystem);
+@Getter
+@AllArgsConstructor
+public final class OrderableFulfill {
+  private final List<UUID> canFulfillForMe;
+  private final List<UUID> canBeFulfilledByMe;
 }

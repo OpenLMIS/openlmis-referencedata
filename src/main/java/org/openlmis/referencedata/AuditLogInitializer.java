@@ -15,11 +15,8 @@
 
 package org.openlmis.referencedata;
 
-import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
+import static org.openlmis.referencedata.util.Pagination.handlePage;
 
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Resource;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -33,12 +30,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
 
 /**
  * AuditLogInitializer runs after its associated Spring application has loaded.
@@ -93,19 +92,10 @@ public class AuditLogInitializer implements CommandLineRunner {
   }
 
   private void createSnapshots(PagingAndSortingRepository<?, ?> repository) {
-    Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
-
-    while (true) {
-      Page<?> page = repository.findAll(pageable);
-
-      if (!page.hasContent()) {
-        break;
-      }
-
-      page.forEach(this::createSnapshot);
-
-      pageable = pageable.next();
-    }
+    handlePage(
+        repository::findAll,
+        this::createSnapshot
+    );
   }
 
   private void createSnapshots(CrudRepository<?, ?> repository) {
@@ -123,7 +113,7 @@ public class AuditLogInitializer implements CommandLineRunner {
     List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
 
     //If there are no snapshots of the domain object, then take one
-    if (snapshots.size() == 0) {
+    if (snapshots.isEmpty()) {
       javers.commit("System: AuditLogInitializer", baseEntity);
     }
   }

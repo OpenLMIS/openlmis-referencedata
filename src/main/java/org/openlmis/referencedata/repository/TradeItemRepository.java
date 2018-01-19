@@ -19,10 +19,10 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.custom.TradeItemRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
+
 import java.util.UUID;
 
 @JaversSpringDataAuditable
-public interface TradeItemRepository extends CrudRepository<TradeItem, UUID>,
-    JpaRepository<TradeItem, UUID>, TradeItemRepositoryCustom {
+public interface TradeItemRepository
+    extends JpaRepository<TradeItem, UUID>, TradeItemRepositoryCustom {
 }

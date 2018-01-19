@@ -23,7 +23,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -46,4 +48,6 @@ public interface OrderableRepository extends
   @Query("SELECT o FROM Orderable o WHERE o.id in ?1")
   Page<Orderable> findAllByIds(Iterable<UUID> ids, Pageable pageable);
 
+  @Query("SELECT o FROM Orderable o WHERE o.identifiers[:key] = :value")
+  List<Orderable> findAllByIdentifier(@Param("key") String key, @Param("value") String value);
 }

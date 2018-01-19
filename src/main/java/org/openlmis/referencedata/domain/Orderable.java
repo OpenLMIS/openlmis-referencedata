@@ -93,6 +93,7 @@ public class Orderable extends BaseEntity {
   @CollectionTable(
       name = "orderable_identifiers",
       joinColumns = @JoinColumn(name = "orderableId"))
+  @Getter
   private Map<String, String> identifiers;
 
   @Column(name = "extradata", columnDefinition = "jsonb")

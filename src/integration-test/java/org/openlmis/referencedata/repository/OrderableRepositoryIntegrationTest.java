@@ -15,13 +15,20 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
+
 import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -30,6 +37,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +48,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
@@ -389,8 +398,42 @@ public class OrderableRepositoryIntegrationTest
     assertEquals(2, actual.getContent().size());
   }
 
+  @Test
+  public void shouldFindByIdentifier() {
+    String identifierKey = "xyz";
+    String identifierValue1 = "123";
+    String idendifierValue2 = "124";
+
+    Orderable orderable1 = new OrderableDataBuilder()
+        .withIdentifier(identifierKey, identifierValue1)
+        .buildAsNew();
+
+    Orderable orderable2 = new OrderableDataBuilder()
+        .withIdentifier(identifierKey, idendifierValue2)
+        .buildAsNew();
+
+    repository.save(orderable1);
+    repository.save(orderable2);
+
+    assertThat(
+        repository.findAllByIdentifier(identifierKey, identifierValue1),
+        hasItem(allOf(
+            hasProperty("id", is(orderable1.getId())),
+            hasProperty("identifiers", hasEntry(identifierKey, identifierValue1))
+        ))
+    );
+
+    assertThat(
+        repository.findAllByIdentifier(identifierKey, idendifierValue2),
+        hasItem(allOf(
+            hasProperty("id", is(orderable2.getId())),
+            hasProperty("identifiers", hasEntry(identifierKey, idendifierValue2))
+        ))
+    );
+  }
+
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
-                                             Orderable orderable, int expectedSize) {
+                                               Orderable orderable, int expectedSize) {
     Code programCode = null == program ? null : program.getCode();
     Page<Orderable> foundOrderables = repository.search(code, name, programCode, null);
 

@@ -15,12 +15,17 @@
 
 package org.openlmis.referencedata.util;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Pagination {
 
@@ -34,6 +39,9 @@ public class Pagination {
    */
   public static final int NO_PAGINATION = Integer.MAX_VALUE;
 
+  private Pagination() {
+    throw new UnsupportedOperationException();
+  }
 
   /**
    * Returns the pageNumber of the specified pageable.
@@ -61,7 +69,7 @@ public class Pagination {
    * Convenience method for getPage(List originalList, Pageable pageable).
    */
   public static <T> Page<T> getPage(Iterable<T> data, Pageable pageable) {
-    List<T> resultList = new ArrayList<T>();
+    List<T> resultList = new ArrayList<>();
     data.forEach(resultList::add);
     return getPage(resultList, pageable);
   }
@@ -76,8 +84,9 @@ public class Pagination {
 
   /**
    * Returns the Page for a subset of the specified list, determined by the pageable passed in.
+   *
    * @param originalList A list of values, some or all of which should be included in a page.
-   * @param pageable An object used to encapsulate the pagination related values: page and size.
+   * @param pageable     An object used to encapsulate the pagination related values: page and size.
    */
   public static <T> Page<T> getPage(List<T> originalList, Pageable pageable) {
 
@@ -104,7 +113,7 @@ public class Pagination {
 
     List<T> subList = originalList.subList(fromIndex, toIndex);
 
-    return new PageImpl<T>(subList, pageable, originalList.size());
+    return new PageImpl<>(subList, pageable, originalList.size());
   }
 
 
@@ -114,6 +123,30 @@ public class Pagination {
    * no need to return a subset of it.
    */
   public static <T> Page<T> getPage(List<T> subList, Pageable pageable, long fullListSize) {
-    return new PageImpl<T>(subList, pageable, fullListSize);
+    return new PageImpl<>(subList, pageable, fullListSize);
+  }
+
+  /**
+   * Static method that helps do some actions on resources by using page instances.
+   *
+   * @param data       function that will return data based on passed pageable instance.
+   * @param pageAction action that should be executed on each element on the page.
+   * @param <T>        type of resource.
+   */
+  public static <T> void handlePage(Function<Pageable, Page<T>> data,
+                                    Consumer<? super T> pageAction) {
+    Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000, ASC, "id");
+
+    while (true) {
+      Page<T> page = data.apply(pageable);
+
+      if (null == page || !page.hasContent()) {
+        break;
+      }
+
+      page.forEach(pageAction);
+
+      pageable = pageable.next();
+    }
   }
 }
