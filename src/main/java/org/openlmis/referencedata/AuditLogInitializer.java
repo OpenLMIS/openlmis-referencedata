@@ -57,6 +57,9 @@ public class AuditLogInitializer {
   @Resource(name = "javersProvider")
   private Javers javers;
 
+  /**
+   * Creates missing javers snapshots.
+   */
   @PostConstruct
   public void init() {
     LOGGER.entry();
