@@ -26,7 +26,6 @@ import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -37,6 +36,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 /**
@@ -48,7 +48,7 @@ import javax.annotation.Resource;
 @Component
 @Profile("refresh-db")
 @Order(20)
-public class AuditLogInitializer implements CommandLineRunner {
+public class AuditLogInitializer {
   private static final XLogger LOGGER = XLoggerFactory.getXLogger(AuditLogInitializer.class);
 
   @Autowired
@@ -57,11 +57,8 @@ public class AuditLogInitializer implements CommandLineRunner {
   @Resource(name = "javersProvider")
   private Javers javers;
 
-  /**
-   * This method is part of CommandLineRunner and is called automatically by Spring.
-   * @param args Main method arguments.
-   */
-  public void run(String... args) {
+  @PostConstruct
+  public void init() {
     LOGGER.entry();
     Profiler profiler = new Profiler("RUN_AUDIT_LOG_INIT");
     profiler.setLogger(LOGGER);
