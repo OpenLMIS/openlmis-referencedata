@@ -40,8 +40,7 @@ public class ProcessingScheduleDto extends BaseDto
       return false;
     }
     ProcessingScheduleDto that = (ProcessingScheduleDto) obj;
-    return Objects.equals(code != null ? code.toLowerCase() : null,
-        that.code != null ? that.code.toLowerCase() : null);
+    return code.equalsIgnoreCase(that.code);
   }
 
   @Override
