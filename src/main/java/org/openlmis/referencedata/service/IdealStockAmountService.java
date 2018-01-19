@@ -18,8 +18,9 @@ package org.openlmis.referencedata.service;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -34,5 +35,11 @@ public class IdealStockAmountService {
 
   public List<IdealStockAmount> search(List<IdealStockAmount> idealStockAmounts) {
     return repository.search(idealStockAmounts);
+  }
+
+  public Page<IdealStockAmount> search(IdealStockAmountSearchParams requestParams,
+                                       Pageable pageable) {
+    return repository.search(requestParams.facilityId, requestParams.commodityTypeId,
+        requestParams.processingPeriodId, pageable);
   }
 }

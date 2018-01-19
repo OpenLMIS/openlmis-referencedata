@@ -25,7 +25,7 @@ import org.openlmis.referencedata.dto.UploadResultDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.i18n.MessageService;
-import org.openlmis.referencedata.repository.IdealStockAmountRepository;
+import org.openlmis.referencedata.service.IdealStockAmountSearchParams;
 import org.openlmis.referencedata.service.IdealStockAmountService;
 import org.openlmis.referencedata.util.IdealStockAmountDtoBuilder;
 import org.openlmis.referencedata.util.Message;
@@ -72,9 +72,6 @@ public class IdealStockAmountController extends BaseController {
   private static final String CSV = "csv";
 
   @Autowired
-  private IdealStockAmountRepository repository;
-
-  @Autowired
   private IdealStockAmountService service;
 
   @Autowired
@@ -99,20 +96,30 @@ public class IdealStockAmountController extends BaseController {
   private IdealStockAmountDtoBuilder isaDtoBuilder;
 
   /**
-   * Retrieves all Ideal Stock Amounts.
+   * Returns all matching ideal stock amounts. If no params provided, returns all amounts.
    *
-   * @param pageable object used to encapsulate the pagination values: page and size.
-   * @return Page of wanted Ideal Stock Amounts.
+   * @param requestParams request parameters (facilityId, commodityTypeId, processingPeriodId).
+   * @param pageable      Pageable object that allows client to optionally add "page" (page number).
+   *                      "size" (page size).
+   *
+   * @return Page of wanted ideal stock amounts.
    */
   @GetMapping(RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<IdealStockAmountDto> getAll(Pageable pageable) {
-    
-    Page<IdealStockAmount> itemsPage = repository.findAll(pageable);
+  public Page<IdealStockAmountDto> getIsas(IdealStockAmountSearchParams requestParams,
+                                           Pageable pageable) {
+    Profiler profiler = new Profiler("GET_ISAS");
+    profiler.setLogger(LOGGER);
 
-    return Pagination.getPage(toDto(itemsPage.getContent()), pageable,
-        itemsPage.getTotalElements());
+    profiler.start("SEARCH_ISAS");
+    Page<IdealStockAmount> search = service.search(requestParams, pageable);
+
+    profiler.start("EXPORT_TO_DTOS");
+    List<IdealStockAmountDto> userDtos = toDto(search.getContent());
+
+    profiler.stop().log();
+    return Pagination.getPage(userDtos, pageable, search.getTotalElements());
   }
 
   /**

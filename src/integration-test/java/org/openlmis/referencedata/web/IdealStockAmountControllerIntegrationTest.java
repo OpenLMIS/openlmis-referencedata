@@ -15,12 +15,14 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.joinWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,7 +31,7 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -44,19 +46,16 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.UploadResultDto;
-import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.service.IdealStockAmountSearchParams;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -109,32 +108,45 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldRetrieveAllIdealStockAmounts() {
+  public void shouldRetrieveIdealStockAmountsBasedOnParams() {
+    UUID facilityId = UUID.randomUUID();
+    UUID commodityTypeId = UUID.randomUUID();
+    UUID processingPeriodId = UUID.randomUUID();
 
-    when(idealStockAmountRepository.findAll(any(Pageable.class)))
-        .thenReturn(Pagination.getPage(Arrays.asList(isa), null, 1));
+    when(idealStockAmountService
+        .search(any(IdealStockAmountSearchParams.class), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(singletonList(isa)));
 
-    PageImplRepresentation response = getIdealStockAmounts(null, null)
-        .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+    PageImplRepresentation response =
+        getIdealStockAmounts(facilityId, commodityTypeId, processingPeriodId, 2, 10)
+            .then()
+            .statusCode(200)
+            .extract().as(PageImplRepresentation.class);
 
-    assertEquals(response.getContent().size(), 1);
-    verify(idealStockAmountRepository).findAll(any(Pageable.class));
+    assertEquals(10, response.getSize());
+    assertEquals(2, response.getNumber());
+    assertEquals(1, response.getContent().size());
+    assertEquals(1, response.getNumberOfElements());
+    assertEquals(21, response.getTotalElements());
+    assertEquals(3, response.getTotalPages());
+
+    IdealStockAmountSearchParams searchParams =
+        new IdealStockAmountSearchParams(facilityId, commodityTypeId, processingPeriodId);
+    verify(idealStockAmountService).search(refEq(searchParams),any(Pageable.class));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldDownloadCsvWithAllPossibleFields() throws IOException {
 
-    when(idealStockAmountRepository.search(null)).thenReturn(Arrays.asList(isa));
+    when(idealStockAmountService.search()).thenReturn(singletonList(isa));
 
     String csvContent = download()
         .then()
         .statusCode(200)
         .extract().body().asString();
 
-    verify(idealStockAmountRepository).search(null);
+    verify(idealStockAmountService).search();
     assertEquals("Facility Code,Commodity Type,Period,Ideal Stock Amount\r\n"
         + joinWith(",", facility.getCode(),
         StringUtils.joinWith("|", commodityType.getClassificationSystem(),
@@ -147,7 +159,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldDownloadCsvWithHeadersOnly() throws IOException {
 
-    when(idealStockAmountRepository.search(null))
+    when(idealStockAmountService.search())
         .thenReturn(Collections.emptyList());
 
     String csvContent = download()
@@ -155,7 +167,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .statusCode(200)
         .extract().body().asString();
 
-    verify(idealStockAmountRepository).search(null);
+    verify(idealStockAmountService).search();
     assertEquals("Facility Code,Commodity Type,Period,Ideal Stock Amount\r\n",
         csvContent);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -262,11 +274,15 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .post(RESOURCE_URL);
   }
 
-  private Response getIdealStockAmounts(Integer page, Integer size) {
+  private Response getIdealStockAmounts(UUID facilityId, UUID commodityTypeId,
+                                        UUID processingPeriodId, Integer page, Integer size) {
     RequestSpecification request = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE);
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .param("facilityId", facilityId)
+        .param("commodityTypeId", commodityTypeId)
+        .param("processingPeriodId", processingPeriodId);
 
     if (page != null) {
       request = request.param("page", page);

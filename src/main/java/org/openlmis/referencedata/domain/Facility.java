@@ -166,6 +166,10 @@ public class Facility extends BaseEntity {
     this.code = code;
   }
 
+  public Facility(UUID id) {
+    this.id = id;
+  }
+
   /**
    * Equal by a Facility's code.
    *

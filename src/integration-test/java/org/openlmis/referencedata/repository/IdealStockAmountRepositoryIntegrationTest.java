@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
@@ -32,6 +33,8 @@ import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -71,6 +74,10 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   private ProcessingPeriod period;
   private ProcessingSchedule schedule;
   private CommodityType commodityType;
+  private UUID facilityId;
+  private UUID commodityTypeId;
+  private UUID processingPeriodId;
+  private Integer amount;
 
   IdealStockAmountRepository getRepository() {
     return this.isaRepository;
@@ -99,10 +106,10 @@ public class IdealStockAmountRepositoryIntegrationTest extends
     facility.setType(facilityType);
     facility.setName("Facility");
     facility.setDescription("facility description");
-    facilityRepository.save(facility);
+    facilityId = facilityRepository.save(facility).getId();
 
     commodityType = new CommodityType("Name", "cSys", "cId", null, new ArrayList<>());
-    commodityTypeRepository.save(commodityType);
+    commodityTypeId = commodityTypeRepository.save(commodityType).getId();
 
     schedule = new ProcessingSchedule();
     schedule.setCode("schedule-code");
@@ -117,11 +124,13 @@ public class IdealStockAmountRepositoryIntegrationTest extends
     period.setName("period");
     period.setStartDate(LocalDate.of(2017, 8, 25));
     period.setEndDate(LocalDate.of(2017, 9, 25));
-    processingPeriodRepository.save(period);
+    processingPeriodId = processingPeriodRepository.save(period).getId();
+
+    amount = 1000;
   }
 
   IdealStockAmount generateInstance() {
-    return new IdealStockAmount(facility, commodityType, period, 1000);
+    return new IdealStockAmount(facility, commodityType, period, amount);
   }
 
   @Test
@@ -165,5 +174,65 @@ public class IdealStockAmountRepositoryIntegrationTest extends
         commodityType.getClassificationSystem(),
         equalTo(this.commodityType.getClassificationSystem())
     );
+  }
+
+  @Test
+  public void shouldGetPageOfIdealStockAmounts() {
+    isaRepository.save(generateInstance());
+    IdealStockAmount isa = isaRepository.save(generateInstance());
+
+    Page<IdealStockAmount> page = isaRepository
+        .search(facilityId, commodityTypeId, processingPeriodId, new PageRequest(1, 1));
+
+    checkPageProperties(page);
+    checkIsaProperties(isa, page);
+  }
+
+  @Test
+  public void shouldGetEmptyPageOfIdealStockAmountsWhenPageableIsNull() {
+    Page<IdealStockAmount> page = isaRepository
+        .search(null, null, null, null);
+
+    assertEquals(0, page.getContent().size());
+  }
+
+  @Test
+  public void shouldGetAllIdealStockAmountsIfNoParamsProvided() {
+    isaRepository.save(generateInstance());
+    isaRepository.save(generateInstance());
+    isaRepository.save(generateInstance());
+
+    Page<IdealStockAmount> page = isaRepository
+        .search(null, null, null, new PageRequest(0, 10));
+
+    assertEquals(3, page.getContent().size());
+  }
+
+  @Test
+  public void shouldGetEmptyPageOfIdealStockAmountsIfMatchingIsaNotFound() {
+    isaRepository.save(generateInstance());
+
+    Page<IdealStockAmount> page = isaRepository
+        .search(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), new PageRequest(0, 10));
+
+    assertEquals(0, page.getContent().size());
+  }
+
+  private void checkIsaProperties(IdealStockAmount isa, Page<IdealStockAmount> page) {
+    IdealStockAmount idealStockAmount = page.getContent().get(0);
+    assertEquals(isa.getId(), idealStockAmount.getId());
+    assertEquals(amount, idealStockAmount.getAmount());
+    assertEquals(facilityId, idealStockAmount.getFacility().getId());
+    assertEquals(commodityTypeId, idealStockAmount.getCommodityType().getId());
+    assertEquals(processingPeriodId, idealStockAmount.getProcessingPeriod().getId());
+  }
+
+  private void checkPageProperties(Page<IdealStockAmount> page) {
+    assertEquals(1, page.getContent().size());
+    assertEquals(1, page.getSize());
+    assertEquals(1, page.getNumber());
+    assertEquals(1, page.getNumberOfElements());
+    assertEquals(2, page.getTotalElements());
+    assertEquals(2, page.getTotalPages());
   }
 }

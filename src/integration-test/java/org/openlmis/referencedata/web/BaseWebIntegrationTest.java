@@ -80,6 +80,7 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.GeographicZoneService;
+import org.openlmis.referencedata.service.IdealStockAmountService;
 import org.openlmis.referencedata.service.OrderableService;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.openlmis.referencedata.service.RequisitionGroupService;
@@ -291,6 +292,9 @@ public abstract class BaseWebIntegrationTest {
   @MockBean
   protected AuthenticationHelper authenticationHelper;
 
+  @MockBean
+  protected IdealStockAmountService idealStockAmountService;
+
   /**
    * Constructor for test.
    */
@@ -303,7 +307,7 @@ public abstract class BaseWebIntegrationTest {
             .withHeader("Content-Type", "application/json")
             .withBody(MOCK_USER_CHECK_RESULT)));
 
-    // This mocks the auth check to always return valid admin credentials.
+    // This mocks the auth check to always return valid trusted client credentials.
     wireMockRule.stubFor(post(urlEqualTo("/api/oauth/check_token"))
         .withRequestBody(equalTo("token=" + CLIENT_ACCESS_TOKEN))
         .willReturn(aResponse()

@@ -13,19 +13,20 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository.custom;
+package org.openlmis.referencedata.service;
 
-import org.openlmis.referencedata.domain.IdealStockAmount;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.util.UUID;
 
-public interface IdealStockAmountRepositoryCustom {
-
-  List<IdealStockAmount> search(List<IdealStockAmount> idealStockAmounts);
-
-  Page<IdealStockAmount> search(UUID facilityId, UUID commodityTypeId, UUID processingPeriodId,
-                                Pageable pageable);
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class IdealStockAmountSearchParams {
+  UUID facilityId;
+  UUID commodityTypeId;
+  UUID processingPeriodId;
 }
