@@ -126,7 +126,7 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
     @SuppressWarnings("unchecked")
     List<Long> count = countQuery.getResultList();
 
-    if (isEmpty(count)) {
+    if (count.get(0) == 0) {
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
