@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.util;
 
-import static org.springframework.data.domain.Sort.Direction.ASC;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -135,7 +133,7 @@ public class Pagination {
    */
   public static <T> void handlePage(Function<Pageable, Page<T>> data,
                                     Consumer<? super T> pageAction) {
-    Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000, ASC, "id");
+    Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
 
     while (true) {
       Page<T> page = data.apply(pageable);

@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
 import static org.openlmis.referencedata.web.OrderableFulfillController.COMMODITY_TYPE;
 import static org.openlmis.referencedata.web.OrderableFulfillController.TRADE_ITEM;
-import static org.springframework.data.domain.Sort.Direction.ASC;
 
 import com.google.common.collect.Lists;
 
@@ -81,7 +80,7 @@ public class OrderableFulfillControllerTest {
       .withIdentifier(COMMODITY_TYPE, commodityType.getId())
       .build();
 
-  private Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000, ASC, "id");
+  private Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
 
   @Test
   public void shouldCreateResourceForTradeItem() {
