@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import javax.persistence.UniqueConstraint;
 import org.javers.core.metamodel.annotation.TypeName;
 
 import lombok.AllArgsConstructor;
@@ -34,7 +35,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "supply_lines", schema = "referencedata")
+@Table(name = "supply_lines", schema = "referencedata",
+    uniqueConstraints = @UniqueConstraint(name = "supply_line_unique_program_supervisory_node",
+        columnNames = { "supervisoryNodeId", "programId" }))
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("SupplyLine")

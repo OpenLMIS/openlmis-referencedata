@@ -25,6 +25,7 @@ import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -49,6 +50,8 @@ public class RefDataErrorHandling extends BaseHandler {
         ProcessingScheduleMessageKeys.ERROR_NAME_DUPLICATED);
     CONSTRAINT_MAP.put("processing_schedule_code_unique_idx",
         ProcessingScheduleMessageKeys.ERROR_CODE_DUPLICATED);
+    CONSTRAINT_MAP.put("supply_line_unique_program_supervisory_node",
+        SupplyLineMessageKeys.ERROR_PROGRAM_AND_SUPERVISORY_NODE_DUPLICATED);
   }
 
   /**

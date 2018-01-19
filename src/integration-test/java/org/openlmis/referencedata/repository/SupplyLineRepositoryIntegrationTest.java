@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -57,6 +59,9 @@ public class SupplyLineRepositoryIntegrationTest
 
   @Autowired
   private ProgramRepository programRepository;
+
+  @Autowired
+  private EntityManager entityManager;
 
   private List<SupplyLine> supplyLines;
 
@@ -117,6 +122,14 @@ public class SupplyLineRepositoryIntegrationTest
               supplyLine.getProgram().getId(),
               receivedSupplyLine.getProgram().getId());
     }
+  }
+
+  @Test(expected = PersistenceException.class)
+  public void shouldThrowExceptionWhenProgramAndSupervisoryNodeAreDuplicated() {
+    SupplyLine supplyLine = cloneSupplyLine(supplyLines.get(0));
+    supplyLine.setSupervisoryNode(supplyLines.get(0).getSupervisoryNode());
+    repository.save(supplyLine);
+    entityManager.flush();
   }
 
   @Test
