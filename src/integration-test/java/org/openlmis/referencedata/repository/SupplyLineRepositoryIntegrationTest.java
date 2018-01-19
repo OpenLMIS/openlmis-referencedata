@@ -86,7 +86,7 @@ public class SupplyLineRepositoryIntegrationTest
     List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
             supplyLine.getProgram(), supplyLine.getSupervisoryNode(), null);
 
-    Assert.assertEquals(2, receivedSupplyLines.size());
+    Assert.assertEquals(1, receivedSupplyLines.size());
     for (SupplyLine receivedSupplyLine : receivedSupplyLines) {
       Assert.assertEquals(
               supplyLine.getProgram().getId(),
@@ -132,7 +132,7 @@ public class SupplyLineRepositoryIntegrationTest
   private SupplyLine cloneSupplyLine(SupplyLine supplyLine) {
     SupplyLine clonedSupplyLine = new SupplyLine();
     clonedSupplyLine.setProgram(supplyLine.getProgram());
-    clonedSupplyLine.setSupervisoryNode(supplyLine.getSupervisoryNode());
+    clonedSupplyLine.setSupervisoryNode(generateSupervisoryNode());
     clonedSupplyLine.setDescription(supplyLine.getDescription());
     clonedSupplyLine.setSupplyingFacility(supplyLine.getSupplyingFacility());
     repository.save(clonedSupplyLine);
