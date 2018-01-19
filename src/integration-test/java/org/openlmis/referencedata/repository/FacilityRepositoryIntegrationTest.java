@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -38,25 +39,26 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.Identifiable;
+import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.testbuilder.ExtraDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
@@ -307,6 +309,21 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     assertEquals(2, found.size());
   }
 
+  @Test
+  public void shouldSetDefaultValueForSupportedProgramFlags() {
+    facility.setSupportedPrograms(facility
+        .getSupportedPrograms()
+        .stream()
+        // we don't use builder here because we want to have null value for some flags
+        .map(sp -> new SupportedProgram(facility, sp.getProgram(), true, null, null))
+        .collect(Collectors.toSet()));
+
+    repository.save(facility);
+
+    facility
+        .getSupportedPrograms()
+        .forEach(sp -> assertThat(sp.getLocallyFulfilled(), is(false)));
+  }
 
   @Override
   Facility generateInstance() {
