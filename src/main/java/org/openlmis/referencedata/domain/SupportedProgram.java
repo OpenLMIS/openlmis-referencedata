@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.javers.core.metamodel.annotation.TypeName;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,7 +41,8 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("SupportedProgram")
-public class SupportedProgram extends BaseEntity {
+@EqualsAndHashCode(callSuper = false)
+public final class SupportedProgram extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "facilityId", nullable = false)
