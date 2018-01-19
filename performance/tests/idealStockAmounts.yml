@@ -4,23 +4,28 @@ execution:
     scenario: download-ideal-stock-amounts-csv
   - concurreny: 1
     hold-for: ${__P(scenario-duration,60)}
+    scenario: get-ideal-stock-amounts
+  - concurreny: 1
+    hold-for: ${__P(scenario-duration,60)}
     scenario: upload-ideal-stock-amounts-csv
 
 scenarios:
   get-user-token:
     requests:
-      - url: ${__P(base-uri)}/api/oauth/token
-        method: POST
-        label: GetUserToken
-        headers:
-          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
-        body:
-          grant_type: password
-          username: ${__P(username)}
-          password: ${__P(password)}
-        extract-jsonpath:
-          access_token:
-            jsonpath: $.access_token
+      - if: '${__javaScript(vars.get("access_token") == null)}'
+        then:
+          - url: ${__P(base-uri)}/api/oauth/token
+            method: POST
+            label: GetUserToken
+            headers:
+              Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
+            body:
+              grant_type: password
+              username: ${__P(username)}
+              password: ${__P(password)}
+            extract-jsonpath:
+              access_token:
+                jsonpath: $.access_token
 
   download-ideal-stock-amounts-csv:
     requests:
@@ -28,6 +33,19 @@ scenarios:
       - url: ${__P(base-uri)}/api/idealStockAmounts?format=csv
         method: GET
         label: GetAnIdealStockAmountCSV
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-ideal-stock-amounts:
+    variables:
+      facility_id: 7fc9bda8-ad8a-468d-8244-38e1918527d5
+      commodity_type_id: 99ccf663-3304-44ae-b2e0-a67fd5511e2a
+      processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/idealStockAmounts?facilityId=${facility_id}&commodityTypeId=${commodity_type_id}&processingPeriodId=${processing_period_id}
+        method: GET
+        label: GetIdealStockAmounts
         headers:
           Authorization: Bearer ${access_token}
 
@@ -44,7 +62,8 @@ scenarios:
             path: /tmp/resources/isa.csv
 
 reporting:
-    - module: passfail
-      criteria:
-        Download Ideal Stock Amounts too slow: p90 of GetAnIdealStockAmountCSV>1100ms
-        Upload Ideal Stock Amounts too slow: p90 of UploadIdealStockAmounts>3000ms
+  - module: passfail
+    criteria:
+      Download Ideal Stock Amounts too slow: p90 of GetAnIdealStockAmountCSV>1100ms
+      Get Ideal Stock Amounts too slow: p90 of GetIdealStockAmounts>500ms
+      Upload Ideal Stock Amounts too slow: p90 of UploadIdealStockAmounts>3000ms
