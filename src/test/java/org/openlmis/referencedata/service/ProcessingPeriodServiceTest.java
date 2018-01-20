@@ -32,6 +32,7 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
@@ -41,10 +42,11 @@ import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingPeriodDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
-
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,6 +82,7 @@ public class ProcessingPeriodServiceTest {
   private Program program = new ProgramDataBuilder().build();
   private Facility facility = new FacilityDataBuilder().build();
   private List<ProcessingPeriod> periods = generateInstances();
+  private PageRequest pageable = new PageRequest(0, 10);
 
   @Before
   public void setUp() {
@@ -89,33 +92,69 @@ public class ProcessingPeriodServiceTest {
     when(processingScheduleRepository.findOne(schedule.getId())).thenReturn(schedule);
   }
 
+  @Test(expected = NotFoundException.class)
+  public void shouldThrowExceptionWhenProgramWasNotFoundById() {
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
+        program.getId(), facility.getId(), null, null);
+    when(programRepository.findOne(program.getId())).thenReturn(null);
+    periodService.searchPeriods(params, pageable);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void shouldThrowExceptionWhenFacilityWasNotFoundById() {
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
+        program.getId(), facility.getId(), null, null);
+    when(facilityRepository.findOne(facility.getId())).thenReturn(null);
+    periodService.searchPeriods(params, pageable);
+  }
+
+  @Test
+  public void shouldReturnEmptyPageWhenScheduleWasNotFoundForFacilityAndProgram() {
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
+        program.getId(), facility.getId(), null, null);
+    doReturn(Collections.emptyList()).when(repository)
+        .searchRequisitionGroupProgramSchedules(program, facility);
+    Page<ProcessingPeriod> result = periodService.searchPeriods(params, pageable);
+    assertEquals(0, result.getContent().size());
+  }
+
   @Test
   public void shouldFindPeriodsByProgramAndFacility() {
     doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
           .searchRequisitionGroupProgramSchedules(program, facility);
-    doReturn(Arrays.asList(period)).when(periodRepository).searchPeriods(schedule, null);
+    doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
+        .when(periodRepository).findByProcessingSchedule(schedule, pageable);
 
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null
-    );
+        program.getId(), facility.getId(), null, null);
 
-    periodService.searchPeriods(params);
+    periodService.searchPeriods(params, pageable);
 
     verify(repository).searchRequisitionGroupProgramSchedules(program, facility);
-    verify(periodRepository).searchPeriods(schedule, null);
+    verify(periodRepository).findByProcessingSchedule(schedule, pageable);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void shouldThrowExceptionWhenScheduleWasNotFoundById() {
+    doReturn(null).when(processingScheduleRepository).findOne(schedule.getId());
+
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
+        null, null, schedule.getId(), null);
+
+    periodService.searchPeriods(params, pageable);
   }
 
   @Test
   public void shouldFindPeriodsBySchedule() {
-    doReturn(Arrays.asList(period)).when(periodRepository).searchPeriods(schedule, null);
+    doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
+        .when(periodRepository).findByProcessingSchedule(schedule, pageable);
 
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        null, null, schedule.getId(), null
-    );
+        null, null, schedule.getId(), null);
 
-    periodService.searchPeriods(params);
+    periodService.searchPeriods(params, pageable);
 
-    verify(periodRepository).searchPeriods(schedule, null);
+    verify(periodRepository).findByProcessingSchedule(schedule, pageable);
   }
 
   @Test
@@ -123,15 +162,22 @@ public class ProcessingPeriodServiceTest {
     List<ProcessingPeriod> matchedPeriods = new ArrayList<>();
     matchedPeriods.addAll(periods);
     matchedPeriods.remove(periods.get(0));
+
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
+        null, null, schedule.getId(), periods.get(0).getStartDate());
+
     when(periodRepository
-        .searchPeriods(schedule, periods.get(0).getStartDate()))
-        .thenReturn(matchedPeriods);
+        .findByProcessingScheduleAndStartDateLessThanEqual(
+            schedule,
+            periods.get(0).getStartDate(),
+            pageable))
+        .thenReturn(Pagination.getPage(matchedPeriods, pageable, 5));
 
-    List<ProcessingPeriod> receivedPeriods = periodService
-        .searchPeriods(schedule, periods.get(0).getStartDate());
+    Page<ProcessingPeriod> receivedPeriods = periodService
+        .searchPeriods(params, pageable);
 
-    assertEquals(4, receivedPeriods.size());
-    for (ProcessingPeriod period : receivedPeriods) {
+    assertEquals(4, receivedPeriods.getContent().size());
+    for (ProcessingPeriod period : receivedPeriods.getContent()) {
       assertEquals(schedule, period.getProcessingSchedule());
       assertTrue(periods.get(0).getStartDate().isAfter(period.getStartDate()));
     }

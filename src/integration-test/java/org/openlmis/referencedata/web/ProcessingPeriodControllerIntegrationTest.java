@@ -28,10 +28,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER;
 
 import com.google.common.collect.Lists;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
@@ -43,20 +42,19 @@ import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.validation.Errors;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -68,6 +66,10 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   private static final String FACILITY = "facilityId";
   private static final String PROCESSING_SCHEDULE = "processingScheduleId";
   private static final String START_DATE = "startDate";
+  private static final String PAGE = "page";
+  private static final String SIZE = "size";
+  private static final String SORT = "sort";
+  private static final String CONTENT_SIZE = "content.size()";
 
   private ProcessingPeriod firstPeriod;
   private ProcessingPeriod secondPeriod;
@@ -203,7 +205,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldFindPeriodsByProgramAndFacility() {
-
     given(programRepository.findOne(programId))
         .willReturn(requisitionGroupProgramSchedule.getProgram());
     given(facilityRepository.findOne(facilityId))
@@ -212,32 +213,37 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .searchRequisitionGroupProgramSchedules(requisitionGroupProgramSchedule.getProgram(),
             requisitionGroupProgramSchedule.getDropOffFacility()))
         .willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
+    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
+    given(periodRepository.findByProcessingSchedule(schedule, pageable))
+        .willReturn(Pagination.getPage(Arrays.asList(firstPeriod, secondPeriod), pageable, 2));
 
-    given(periodRepository.searchPeriods(schedule, null))
-        .willReturn(Arrays.asList(firstPeriod, secondPeriod));
-
-    PageImplRepresentation<ProcessingPeriodDto> response = restAssured.given()
+    restAssured.given()
         .queryParam(PROGRAM, programId)
         .queryParam(FACILITY, facilityId)
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 10)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .body(CONTENT_SIZE, is(2));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertEquals(2, response.getContent().size());
   }
 
   @Test
   public void shouldFindPeriodsByScheduleAndDate() {
     given(scheduleRepository.findOne(scheduleId)).willReturn(schedule);
-    given(periodRepository.searchPeriods(schedule, secondPeriod.getStartDate()))
-        .willReturn(Arrays.asList(secondPeriod, firstPeriod));
+    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
+    given(periodRepository.findByProcessingScheduleAndStartDateLessThanEqual(schedule,
+        secondPeriod.getStartDate(), pageable))
+        .willReturn(Pagination.getPage(Arrays.asList(secondPeriod, firstPeriod), pageable, 2));
 
     String expectedId = firstPeriod.getProcessingSchedule().getId().toString();
     restAssured.given()
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 10)
         .queryParam(PROCESSING_SCHEDULE, scheduleId)
         .queryParam(START_DATE, secondPeriod.getStartDate().toString())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -245,7 +251,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .body("content.size()", is(2))
+        .body(CONTENT_SIZE, is(2))
         .body("content[0].processingSchedule.id", is(expectedId))
         .body("content[1].processingSchedule.id", is(expectedId));
 
@@ -316,19 +322,21 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
         firstPeriod, secondPeriod, thirdPeriod
     );
-    given(periodRepository.searchPeriods(null, null)).willReturn(storedPeriods);
+    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
+    given(periodRepository.findAll(pageable))
+        .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
-    PageImplRepresentation<ProcessingPeriodDto> response = restAssured.given()
+    restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 10)
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .body(CONTENT_SIZE, is(3));
 
-    List<ProcessingPeriodDto> periods = response.getContent();
-    assertEquals(3, periods.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -337,17 +345,21 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
         firstPeriod, secondPeriod, thirdPeriod
     );
-    given(periodRepository.searchPeriods(null, null)).willReturn(storedPeriods);
+    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
+    given(periodRepository.findAll(pageable))
+        .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
     restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam("sort", "startDate")
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 10)
+        .queryParam(SORT, START_DATE)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .body("content.size()", is(3))
+        .body(CONTENT_SIZE, is(3))
         .body("content[0].startDate", is(firstPeriod.getStartDate().toString()))
         .body("content[1].startDate", is(secondPeriod.getStartDate().toString()))
         .body("content[2].startDate", is(thirdPeriod.getStartDate().toString()));
@@ -356,20 +368,27 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldRespondWithBadRequestWhenInvalidSortProperty() {
+  public void shouldGetAllPeriodsWithDefaultSort() {
     List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
         firstPeriod, secondPeriod, thirdPeriod
     );
-    given(periodRepository.searchPeriods(null, null)).willReturn(storedPeriods);
+    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
+    given(periodRepository.findAll(pageable))
+        .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
     restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam("sort", "invalid")
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 10)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
-        .statusCode(400);
+        .statusCode(200)
+        .body(CONTENT_SIZE, is(3))
+        .body("content[0].startDate", is(firstPeriod.getStartDate().toString()))
+        .body("content[1].startDate", is(secondPeriod.getStartDate().toString()))
+        .body("content[2].startDate", is(thirdPeriod.getStartDate().toString()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

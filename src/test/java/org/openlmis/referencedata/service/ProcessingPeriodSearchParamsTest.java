@@ -19,16 +19,15 @@ import static java.util.UUID.randomUUID;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-
 import java.time.LocalDate;
 
 public class ProcessingPeriodSearchParamsTest {
+
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
@@ -73,8 +72,7 @@ public class ProcessingPeriodSearchParamsTest {
   @Test
   public void shouldImplementToString() {
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        randomUUID(), randomUUID(), randomUUID(), LocalDate.now()
-    );
+        randomUUID(), randomUUID(), randomUUID(), LocalDate.now());
     ToStringTestUtils.verify(ProcessingPeriodSearchParams.class, params);
   }
 

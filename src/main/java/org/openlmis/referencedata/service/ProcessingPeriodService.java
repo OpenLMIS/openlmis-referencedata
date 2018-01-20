@@ -20,18 +20,26 @@ import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,48 +60,51 @@ public class ProcessingPeriodService {
   private ProcessingScheduleRepository processingScheduleRepository;
 
   @Autowired
-  private RequisitionGroupProgramScheduleRepository repository;
-
-  /**
-   * Finds Periods matching all of provided parameters.
-   *
-   * @param processingSchedule processingSchedule of searched Periods.
-   * @param toDate             to which day shall Period start.
-   * @return list of all Periods matching all of provided parameters.
-   */
-  public List<ProcessingPeriod> searchPeriods(ProcessingSchedule processingSchedule,
-                                              LocalDate toDate) {
-    return periodRepository.searchPeriods(processingSchedule, toDate);
-  }
+  private RequisitionGroupProgramScheduleRepository requisitionGroupProgramScheduleRepository;
 
   /**
    * Finds all ProcessingPeriods matching all of provided parameters.
    */
-  public List<ProcessingPeriod> searchPeriods(ProcessingPeriodSearchParams params) {
+  public Page<ProcessingPeriod> searchPeriods(ProcessingPeriodSearchParams params,
+                                              Pageable pageable) {
     params.validate();
 
-    Program program = getById(programRepository, params.getProgramId());
-    Facility facility = getById(facilityRepository, params.getFacilityId());
-    ProcessingSchedule schedule = null;
+    Program program = getById(programRepository, params.getProgramId(),
+        ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID);
+    Facility facility = getById(facilityRepository, params.getFacilityId(),
+        FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID);
+
+    ProcessingSchedule schedule;
+    LocalDate startDate = params.getStartDate();
 
     if (null != program && null != facility) {
-      List<RequisitionGroupProgramSchedule> schedules = repository
+      List<RequisitionGroupProgramSchedule> schedules = requisitionGroupProgramScheduleRepository
           .searchRequisitionGroupProgramSchedules(program, facility);
-
       if (schedules.isEmpty()) {
         LOGGER.warn("Cannot find Requisition Group Program Schedule for program {} and facility {}",
             program.getId(), facility.getId());
+        return Pagination.getPage(Collections.emptyList(), pageable, 0);
       } else {
         schedule = schedules.get(0).getProcessingSchedule();
       }
     } else {
-      schedule = getById(processingScheduleRepository, params.getProcessingScheduleId());
+      schedule = getById(processingScheduleRepository, params.getProcessingScheduleId(),
+          ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_ID);
     }
 
-    return searchPeriods(schedule, params.getStartDate());
+    return null == schedule && null == startDate ? periodRepository.findAll(pageable) :
+        null == schedule ? periodRepository.findByStartDateLessThanEqual(startDate, pageable) :
+            null == startDate ? periodRepository.findByProcessingSchedule(schedule, pageable) :
+                periodRepository
+                    .findByProcessingScheduleAndStartDateLessThanEqual(
+                        schedule, startDate, pageable);
   }
 
-  private <T> T getById(CrudRepository<T, UUID> repository, UUID id) {
-    return null == id ? null : repository.findOne(id);
+  private <T> T getById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {
+    T object = null == id ? null : repository.findOne(id);
+    if (null != id && null == object) {
+      throw new NotFoundException(new Message(errorKey, id));
+    }
+    return object;
   }
 }

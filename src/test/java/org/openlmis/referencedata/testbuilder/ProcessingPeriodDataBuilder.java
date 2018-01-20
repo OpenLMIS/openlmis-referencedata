@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import static org.openlmis.referencedata.domain.ProcessingPeriod.newPeriod;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
@@ -35,6 +37,16 @@ public class ProcessingPeriodDataBuilder {
     return this;
   }
 
+  public ProcessingPeriodDataBuilder withStartDate(LocalDate startDate) {
+    this.startDate = startDate;
+    return this;
+  }
+
+  public ProcessingPeriodDataBuilder withName(String name) {
+    this.name = name;
+    return this;
+  }
+
   /**
    * Set date duration for the given processing period.
    */
@@ -48,13 +60,8 @@ public class ProcessingPeriodDataBuilder {
    * Creates new instance of {@link ProcessingPeriod} without id.
    */
   public ProcessingPeriod buildAsNew() {
-    ProcessingPeriod period = new ProcessingPeriod();
-    period.setProcessingSchedule(processingSchedule);
-    period.setName(name);
+    ProcessingPeriod period = newPeriod(name, processingSchedule, startDate, endDate);
     period.setDescription(description);
-    period.setStartDate(startDate);
-    period.setEndDate(endDate);
-
     return period;
   }
 

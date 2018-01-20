@@ -99,8 +99,10 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .thenAnswer(new SaveAnswer<IdealStockAmount>());
 
     when(facilityRepository.findByCode(any(String.class))).thenReturn(Optional.of(facility));
-    when(periodRepository.findByNameAndProcessingScheduleCode(any(String.class), any(String.class)))
+    when(periodRepository.findOneByNameAndProcessingSchedule(any(String.class),
+        any(ProcessingSchedule.class)))
         .thenReturn(Optional.of(period));
+    when(scheduleRepository.findOneByCode(any(String.class))).thenReturn(Optional.of(schedule));
     when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(any(String.class),
         any(String.class))).thenReturn(Optional.of(commodityType));
 

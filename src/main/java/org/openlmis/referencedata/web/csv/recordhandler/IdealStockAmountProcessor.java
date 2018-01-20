@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.web.csv.recordhandler;
 
+import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_COMMODITY_TYPE_NOT_FOUND;
+import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
+import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_PERIOD_NOT_FOUND;
+
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
@@ -25,23 +29,20 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
+import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.service.IdealStockAmountService;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_COMMODITY_TYPE_NOT_FOUND;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_PERIOD_NOT_FOUND;
 
 /**
  * IdealStockAmountProcessor is used for uploads of Ideal Stock Amount.
@@ -61,6 +62,9 @@ public class IdealStockAmountProcessor
 
   @Autowired
   private ProcessingPeriodRepository processingPeriodRepository;
+
+  @Autowired
+  private ProcessingScheduleRepository processingScheduleRepository;
 
   @Autowired
   private CommodityTypeRepository commodityTypeRepository;
@@ -100,9 +104,15 @@ public class IdealStockAmountProcessor
         .orElseThrow(() -> new ValidationMessageException(new Message(ERROR_FACILITY_NOT_FOUND,
             isa.getFacility().getCode())));
 
-    ProcessingPeriod period = processingPeriodRepository.findByNameAndProcessingScheduleCode(
+    ProcessingSchedule schedule = processingScheduleRepository
+        .findOneByCode(isa.getProcessingPeriod().getProcessingSchedule().getCode())
+        .orElseThrow(() -> new ValidationMessageException(new Message(
+            ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_CODE,
+            isa.getProcessingPeriod().getProcessingSchedule().getCode()
+        )));
+    ProcessingPeriod period = processingPeriodRepository.findOneByNameAndProcessingSchedule(
         isa.getProcessingPeriod().getName(),
-        isa.getProcessingPeriod().getProcessingSchedule().getCode())
+        schedule)
         .orElseThrow(() -> new ValidationMessageException(
             new Message(ERROR_PROCESSING_PERIOD_NOT_FOUND,
             isa.getProcessingPeriod().getName(),

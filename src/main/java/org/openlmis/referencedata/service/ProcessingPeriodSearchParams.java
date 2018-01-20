@@ -19,16 +19,14 @@ import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessag
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER;
 
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.UUID;
 

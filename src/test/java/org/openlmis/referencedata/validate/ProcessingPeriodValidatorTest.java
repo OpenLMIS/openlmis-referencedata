@@ -29,21 +29,16 @@ import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ValidationMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.UUID;
 
 public class ProcessingPeriodValidatorTest {
-
-  @Mock
-  private ProcessingPeriodService processingPeriodService;
 
   @Mock
   private ProcessingSchedule processingSchedule;
@@ -146,7 +141,7 @@ public class ProcessingPeriodValidatorTest {
 
   @Test
   public void shouldRejectPeriodIfItWouldIntroduceGapBetweenPeriods() {
-    when(processingPeriodService.searchPeriods(processingSchedule, null))
+    when(processingPeriodRepository.findByProcessingSchedule(processingSchedule))
         .thenReturn(Collections.singletonList(previousPeriod));
     when(previousPeriod.getEndDate()).thenReturn(LocalDate.of(2016, 5, 27));
 

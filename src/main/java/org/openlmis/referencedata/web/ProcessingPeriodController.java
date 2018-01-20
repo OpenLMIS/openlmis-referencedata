@@ -27,16 +27,16 @@ import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.service.ProcessingPeriodSearchParams;
 import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.util.ProcessingPeriodComparator;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -50,7 +50,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -107,13 +106,18 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<ProcessingPeriodDto> getAllProcessingPeriods(ProcessingPeriodSearchParams params,
-                                                           Pageable pageable)  {
-    List<ProcessingPeriod> periods = periodService.searchPeriods(params);
-    periods.sort(new ProcessingPeriodComparator(pageable));
+                                             @SortDefault(sort = "startDate") Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_PROCESSING_PERIODS");
+    profiler.setLogger(LOGGER);
 
-    List<ProcessingPeriodDto> data = exportToDtos(periods);
+    profiler.start("SEARCH_FOR_PERIODS");
+    Page<ProcessingPeriod> periods = periodService.searchPeriods(params, pageable);
 
-    return Pagination.getPage(data, pageable);
+    profiler.start("EXPORT_PERIODS_TO_DTO");
+    Page<ProcessingPeriodDto> dtos = exportToDto(periods, profiler, pageable);
+
+    profiler.stop().log();
+    return dtos;
   }
 
   /**
@@ -239,7 +243,12 @@ public class ProcessingPeriodController extends BaseController {
     return periodDto;
   }
 
-  private List<ProcessingPeriodDto> exportToDtos(List<ProcessingPeriod> periods) {
-    return periods.stream().map(this::exportToDto).collect(toList());
+  private Page<ProcessingPeriodDto> exportToDto(Page<ProcessingPeriod> periods, Profiler profiler,
+                                                Pageable pageable) {
+    List<ProcessingPeriodDto> dtos = periods.getContent()
+        .stream()
+        .map(this::exportToDto)
+        .collect(toList());
+    return toPage(dtos, pageable, periods.getTotalElements(), profiler);
   }
 }

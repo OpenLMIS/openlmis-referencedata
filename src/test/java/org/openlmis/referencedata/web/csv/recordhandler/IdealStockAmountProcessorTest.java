@@ -33,6 +33,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
+import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.service.IdealStockAmountService;
 import org.openlmis.referencedata.validate.IdealStockAmountValidator;
 
@@ -63,6 +64,9 @@ public class IdealStockAmountProcessorTest {
   private ProcessingPeriodRepository processingPeriodRepository;
 
   @Mock
+  private ProcessingScheduleRepository processingScheduleRepository;
+
+  @Mock
   private CommodityTypeRepository commodityTypeRepository;
 
   @Mock
@@ -75,6 +79,7 @@ public class IdealStockAmountProcessorTest {
   private Facility facility;
   private CommodityType commodityType;
   private ProcessingPeriod processingPeriod;
+  private ProcessingSchedule schedule;
 
   @Before
   public void setUp() {
@@ -84,7 +89,7 @@ public class IdealStockAmountProcessorTest {
     commodityType = new CommodityType();
     commodityType.setClassificationSystem(SYSTEM);
     commodityType.setClassificationId(ID);
-    ProcessingSchedule schedule = new ProcessingSchedule();
+    schedule = new ProcessingSchedule();
     schedule.setCode(SCHEDULE);
     processingPeriod = new ProcessingPeriod();
     processingPeriod.setName(PERIOD);
@@ -96,7 +101,9 @@ public class IdealStockAmountProcessorTest {
         .thenReturn(Collections.emptyList());
 
     when(facilityRepository.findByCode(FACILITY_CODE)).thenReturn(Optional.of(facility));
-    when(processingPeriodRepository.findByNameAndProcessingScheduleCode(PERIOD, SCHEDULE))
+    when(processingScheduleRepository.findOneByCode(schedule.getCode()))
+        .thenReturn(Optional.of(schedule));
+    when(processingPeriodRepository.findOneByNameAndProcessingSchedule(PERIOD, schedule))
         .thenReturn(Optional.of(processingPeriod));
     when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(ID, SYSTEM))
         .thenReturn(Optional.of(commodityType));
@@ -131,13 +138,26 @@ public class IdealStockAmountProcessorTest {
   }
 
   @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfSCheduleNotFound() {
+    IdealStockAmountCsvModel isa = createIsaDto();
+
+    idealStockAmountsValidator.validate(isa);
+    when(service.search(anyListOf(IdealStockAmount.class)))
+        .thenReturn(Collections.emptyList());
+    when(processingScheduleRepository.findOneByCode(schedule.getCode()))
+        .thenReturn(Optional.empty());
+
+    idealStockAmountProcessor.process(Collections.singletonList(isa));
+  }
+
+  @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfPeriodNotFound() {
     IdealStockAmountCsvModel isa = createIsaDto();
 
     idealStockAmountsValidator.validate(isa);
     when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
-    when(processingPeriodRepository.findByNameAndProcessingScheduleCode(PERIOD, SCHEDULE))
+    when(processingPeriodRepository.findOneByNameAndProcessingSchedule(PERIOD, schedule))
         .thenReturn(Optional.empty());
 
     idealStockAmountProcessor.process(Collections.singletonList(isa));

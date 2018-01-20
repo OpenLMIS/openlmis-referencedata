@@ -17,12 +17,10 @@ package org.openlmis.referencedata.validate;
 
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
-import org.openlmis.referencedata.service.ProcessingPeriodService;
 import org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ValidationMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -30,9 +28,6 @@ import java.util.UUID;
 public class ProcessingPeriodValidator implements BaseValidator {
   private static final String START_DATE = "startDate";
   private static final String END_DATE = "endDate";
-
-  @Autowired
-  private ProcessingPeriodService periodService;
 
   @Autowired
   private ProcessingPeriodRepository processingPeriodRepository;
@@ -62,8 +57,8 @@ public class ProcessingPeriodValidator implements BaseValidator {
         rejectIfValueChanged(err, period.getDurationInMonths(),
             existingPeriod.getDurationInMonths(), "durationInMonths");
       }
-      List<ProcessingPeriod> periodList = periodService
-              .searchPeriods(period.getProcessingSchedule(), null);
+      List<ProcessingPeriod> periodList = processingPeriodRepository
+          .findByProcessingSchedule(period.getProcessingSchedule());
 
       LocalDate startDate = period.getStartDate();
       LocalDate endDate = period.getEndDate();

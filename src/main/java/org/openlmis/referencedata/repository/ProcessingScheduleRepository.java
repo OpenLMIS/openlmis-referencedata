@@ -18,9 +18,11 @@ package org.openlmis.referencedata.repository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface ProcessingScheduleRepository
       extends JpaRepository<ProcessingSchedule, UUID> {
+  Optional<ProcessingSchedule> findOneByCode(String name);
 }

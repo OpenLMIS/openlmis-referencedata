@@ -17,13 +17,28 @@ package org.openlmis.referencedata.repository;
 
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
-import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCustom;
-import org.springframework.data.repository.PagingAndSortingRepository;
-
+import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface ProcessingPeriodRepository extends
-    PagingAndSortingRepository<ProcessingPeriod, UUID>,
-    ProcessingPeriodRepositoryCustom {
+    JpaRepository<ProcessingPeriod, UUID> {
+
+  Page<ProcessingPeriod> findByProcessingScheduleAndStartDateLessThanEqual(
+      ProcessingSchedule schedule, LocalDate startDate, Pageable pageable);
+
+  Page<ProcessingPeriod> findByProcessingSchedule(ProcessingSchedule schedule, Pageable pageable);
+
+  List<ProcessingPeriod> findByProcessingSchedule(ProcessingSchedule schedule);
+
+  Page<ProcessingPeriod> findByStartDateLessThanEqual(LocalDate startDate, Pageable pageable);
+
+  Optional<ProcessingPeriod> findOneByNameAndProcessingSchedule(String name,
+                                                                ProcessingSchedule schedule);
 }

@@ -19,6 +19,8 @@ public abstract class ProcessingScheduleMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, PROCESSING_SCHEDULE);
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
+  public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR, NOT_FOUND, WITH, ID);
+  public static final String ERROR_NOT_FOUND_WITH_CODE = join(ERROR, NOT_FOUND, WITH, CODE);
   public static final String ERROR_CODE_DUPLICATED = join(ERROR, CODE, DUPLICATED);
   public static final String ERROR_NAME_DUPLICATED = join(ERROR, NAME, DUPLICATED);
 }
