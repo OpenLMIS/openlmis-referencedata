@@ -87,13 +87,13 @@ public class OrderableFulfillController extends BaseController {
   }
 
   private OrderableFulfill createResource(Orderable orderable) {
-    String tradeItemId = orderable.getIdentifiers().get(TRADE_ITEM);
+    String tradeItemId = orderable.getIdentifier(TRADE_ITEM);
 
     if (isNotBlank(tradeItemId)) {
       return createResourceForTradeItem(tradeItemId);
     }
 
-    String commodityTypeId = orderable.getIdentifiers().get(COMMODITY_TYPE);
+    String commodityTypeId = orderable.getIdentifier(COMMODITY_TYPE);
 
     if (isNotBlank(commodityTypeId)) {
       return createResourceForCommodityType(commodityTypeId);

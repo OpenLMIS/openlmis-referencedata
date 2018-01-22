@@ -93,7 +93,6 @@ public class Orderable extends BaseEntity {
   @CollectionTable(
       name = "orderable_identifiers",
       joinColumns = @JoinColumn(name = "orderableId"))
-  @Getter
   private Map<String, String> identifiers;
 
   @Column(name = "extradata", columnDefinition = "jsonb")
@@ -139,6 +138,10 @@ public class Orderable extends BaseEntity {
     }
 
     return packsToOrder;
+  }
+
+  public String getIdentifier(String key) {
+    return identifiers.get(key);
   }
 
   /**
