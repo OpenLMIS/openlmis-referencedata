@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,7 +26,15 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.ArrayList;
@@ -60,9 +66,6 @@ public class SupplyLineRepositoryIntegrationTest
   @Autowired
   private ProgramRepository programRepository;
 
-  @Autowired
-  private EntityManager entityManager;
-
   private List<SupplyLine> supplyLines;
 
   CrudRepository<SupplyLine, UUID> getRepository() {
@@ -70,11 +73,11 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   SupplyLine generateInstance() {
-    SupplyLine supplyLine = new SupplyLine();
-    supplyLine.setProgram(generateProgram());
-    supplyLine.setSupervisoryNode(generateSupervisoryNode());
-    supplyLine.setSupplyingFacility(generateFacility());
-    return supplyLine;
+    return new SupplyLineDataBuilder()
+        .withProgram(generateProgram())
+        .withSupervisoryNode(generateSupervisoryNode())
+        .withSupplyingFacility(generateFacility())
+        .buildAsNew();
   }
 
   @Before
@@ -124,12 +127,11 @@ public class SupplyLineRepositoryIntegrationTest
     }
   }
 
-  @Test(expected = PersistenceException.class)
+  @Test(expected = DataIntegrityViolationException.class)
   public void shouldThrowExceptionWhenProgramAndSupervisoryNodeAreDuplicated() {
     SupplyLine supplyLine = cloneSupplyLine(supplyLines.get(0));
     supplyLine.setSupervisoryNode(supplyLines.get(0).getSupervisoryNode());
-    repository.save(supplyLine);
-    entityManager.flush();
+    repository.saveAndFlush(supplyLine);
   }
 
   @Test
@@ -153,56 +155,46 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   private SupervisoryNode generateSupervisoryNode() {
-    SupervisoryNode supervisoryNode = new SupervisoryNode();
-    supervisoryNode.setName("node" + this.getNextInstanceNumber());
-    supervisoryNode.setCode("code" + this.getNextInstanceNumber());
-    supervisoryNode.setFacility(generateFacility());
+    SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(generateFacility())
+        .withoutId()
+        .build();
     supervisoryNodeRepository.save(supervisoryNode);
     return supervisoryNode;
   }
 
   private Program generateProgram() {
-    Program program = new Program("code" + this.getNextInstanceNumber());
-    program.setPeriodsSkippable(false);
+    Program program = new ProgramDataBuilder().withoutId().build();
     programRepository.save(program);
     return program;
   }
 
   private Facility generateFacility() {
-    Integer instanceNumber = + this.getNextInstanceNumber();
-    GeographicLevel geographicLevel = generateGeographicLevel();
-    GeographicZone geographicZone = generateGeographicZone(geographicLevel);
-    FacilityType facilityType = generateFacilityType();
-    Facility facility = new Facility("FacilityCode" + instanceNumber);
-    facility.setType(facilityType);
-    facility.setGeographicZone(geographicZone);
-    facility.setName("FacilityName" + instanceNumber);
-    facility.setDescription("FacilityDescription" + instanceNumber);
-    facility.setActive(true);
-    facility.setEnabled(true);
+    Facility facility = new FacilityDataBuilder()
+        .withGeographicZone(generateGeographicZone())
+        .withType(generateFacilityType())
+        .withoutOperator()
+        .buildAsNew();
+
     facilityRepository.save(facility);
     return facility;
   }
 
   private GeographicLevel generateGeographicLevel() {
-    GeographicLevel geographicLevel = new GeographicLevel();
-    geographicLevel.setCode("GeographicLevel" + this.getNextInstanceNumber());
-    geographicLevel.setLevelNumber(1);
+    GeographicLevel geographicLevel = new GeographicLevelDataBuilder().buildAsNew();
     geographicLevelRepository.save(geographicLevel);
     return geographicLevel;
   }
 
-  private GeographicZone generateGeographicZone(GeographicLevel geographicLevel) {
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode("GeographicZone" + this.getNextInstanceNumber());
-    geographicZone.setLevel(geographicLevel);
+  private GeographicZone generateGeographicZone() {
+    GeographicZone geographicZone =
+        new GeographicZoneDataBuilder().withLevel(generateGeographicLevel()).buildAsNew();
     geographicZoneRepository.save(geographicZone);
     return geographicZone;
   }
 
   private FacilityType generateFacilityType() {
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode("FacilityType" + this.getNextInstanceNumber());
+    FacilityType facilityType = new FacilityTypeDataBuilder().buildAsNew();
     facilityTypeRepository.save(facilityType);
     return facilityType;
   }

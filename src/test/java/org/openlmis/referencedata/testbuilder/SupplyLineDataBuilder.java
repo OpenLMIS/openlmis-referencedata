@@ -43,9 +43,18 @@ public class SupplyLineDataBuilder {
    * Builds instance of {@link SupplyLine}.
    */
   public SupplyLine build() {
+    SupplyLine supplyLine = buildAsNew();
+    supplyLine.setId(id);
+
+    return supplyLine;
+  }
+
+  /**
+   * Builds instance of {@link SupplyLine} without id.
+   */
+  public SupplyLine buildAsNew() {
     SupplyLine supplyLine = new SupplyLine(supervisoryNode, description, program,
         supplyingFacility);
-    supplyLine.setId(id);
 
     return supplyLine;
   }
