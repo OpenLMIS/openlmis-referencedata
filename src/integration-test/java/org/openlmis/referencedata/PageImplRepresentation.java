@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.openlmis.referencedata.util.CustomSortDeserializer;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -130,6 +132,7 @@ public class PageImplRepresentation<T> extends PageImpl<T> {
     return sort;
   }
 
+  @JsonDeserialize(using = CustomSortDeserializer.class)
   public void setSort(Sort sort) {
     this.sort = sort;
   }
