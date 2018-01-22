@@ -15,11 +15,19 @@
 
 package org.openlmis.referencedata.util.messagekeys;
 
-public abstract class SupplyLineMessageKeys extends MessageKeys {
-  private static final String ERROR = join(SERVICE_ERROR, SUPPLY_LINE);
+import static org.junit.Assert.assertEquals;
 
-  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_SEARCH_LACKS_PARAMS = join(ERROR, SEARCH, LACKS_PARAMETERS);
-  public static final String ERROR_PROGRAM_SUPERVISORY_NODE_DUPLICATED =
-      join(ERROR, PROGRAM, SUPERVISORY_NODE, DUPLICATED);
+import org.junit.Test;
+
+public class SupplyLineMessageKeysTest {
+
+  @Test
+  public void itShouldHaveValidMessageKeys() {
+    assertEquals("referenceData.error.supplyLine.notFound",
+        SupplyLineMessageKeys.ERROR_NOT_FOUND);
+    assertEquals("referenceData.error.supplyLine.program.supervisoryNode.duplicated",
+        SupplyLineMessageKeys.ERROR_PROGRAM_SUPERVISORY_NODE_DUPLICATED);
+    assertEquals("referenceData.error.supplyLine.search.lacksParameters",
+        SupplyLineMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
+  }
 }

@@ -51,7 +51,7 @@ public class RefDataErrorHandling extends BaseHandler {
     CONSTRAINT_MAP.put("processing_schedule_code_unique_idx",
         ProcessingScheduleMessageKeys.ERROR_CODE_DUPLICATED);
     CONSTRAINT_MAP.put("supply_line_unique_program_supervisory_node",
-        SupplyLineMessageKeys.ERROR_PROGRAM_AND_SUPERVISORY_NODE_DUPLICATED);
+        SupplyLineMessageKeys.ERROR_PROGRAM_SUPERVISORY_NODE_DUPLICATED);
   }
 
   /**
