@@ -108,9 +108,9 @@ public class OrderableFulfillController extends BaseController {
     List<UUID> canBeFulfilledByMe = Lists.newArrayList();
     handlePage(
         commodityTypeRepository::findAll,
-        elem -> {
-          if (tradeItem.canFulfill(elem)) {
-            setList(canBeFulfilledByMe, COMMODITY_TYPE, elem);
+        commodityType -> {
+          if (tradeItem.canFulfill(commodityType)) {
+            setList(canBeFulfilledByMe, COMMODITY_TYPE, commodityType);
           }
         }
     );
@@ -124,9 +124,9 @@ public class OrderableFulfillController extends BaseController {
     List<UUID> canFulfillForMe = Lists.newArrayList();
     handlePage(
         tradeItemRepository::findAll,
-        elem -> {
-          if (elem.canFulfill(commodityType)) {
-            setList(canFulfillForMe, TRADE_ITEM, elem);
+        tradeItem -> {
+          if (tradeItem.canFulfill(commodityType)) {
+            setList(canFulfillForMe, TRADE_ITEM, tradeItem);
           }
         }
     );
