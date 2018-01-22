@@ -105,7 +105,7 @@ public class IdealStockAmountProcessor
             isa.getFacility().getCode())));
 
     ProcessingSchedule schedule = processingScheduleRepository
-        .findOneByCode(isa.getProcessingPeriod().getProcessingSchedule().getCode())
+        .findOneByCode(isa.getProcessingPeriod().getProcessingSchedule().getCode().toString())
         .orElseThrow(() -> new ValidationMessageException(new Message(
             ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_CODE,
             isa.getProcessingPeriod().getProcessingSchedule().getCode()

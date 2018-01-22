@@ -47,7 +47,7 @@ public class ParseProcessingPeriodTest {
     ProcessingPeriodDto result = (ProcessingPeriodDto) parseProcessingPeriod
         .execute("schedule|period", csvContext);
     assertEquals("period", result.getName());
-    assertEquals("schedule", result.getProcessingSchedule().getCode());
+    assertEquals("schedule", result.getProcessingSchedule().getCode().toString());
   }
 
   @Test

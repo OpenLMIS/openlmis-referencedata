@@ -42,7 +42,7 @@ public class ProcessingSchedule extends BaseEntity {
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
   @Setter
-  private String code;
+  private Code code;
 
   @Column(columnDefinition = "text")
   @Getter
@@ -62,20 +62,20 @@ public class ProcessingSchedule extends BaseEntity {
   /**
    * Constructor for processing schedule. Code and name must not be null.
    */
-  public ProcessingSchedule(String code, String name) {
+  public ProcessingSchedule(Code code, String name) {
     this.code = Objects.requireNonNull(code);
     this.name = Objects.requireNonNull(name);
   }
 
   /**
    * Static factory method for constructing a new processing schedule using an importer (DTO). 
-   * Uses the {@link #ProcessingSchedule(String, String)} constructor} to help create the object.
+   * Uses the {@link #ProcessingSchedule(Code, String)} constructor} to help create the object.
    *
    * @param importer the importer (DTO)
    */
   public static ProcessingSchedule newProcessingSchedule(ProcessingSchedule.Importer importer) {
     ProcessingSchedule newProcessingSchedule = new ProcessingSchedule(
-        importer.getCode(), importer.getName());
+        Code.code(importer.getCode()), importer.getName());
     newProcessingSchedule.id = importer.getId();
     newProcessingSchedule.description = importer.getDescription();
     return newProcessingSchedule;
@@ -95,7 +95,7 @@ public class ProcessingSchedule extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setName(name);
-    exporter.setCode(code);
+    exporter.setCode(code.toString());
     exporter.setDescription(description);
   }
 
@@ -108,12 +108,12 @@ public class ProcessingSchedule extends BaseEntity {
       return false;
     }
     ProcessingSchedule that = (ProcessingSchedule) obj;
-    return code.equalsIgnoreCase(that.code);
+    return code.equals(that.code);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(code != null ? code.toLowerCase() : null);
+    return Objects.hash(code.hashCode());
   }
 
   public interface Exporter {

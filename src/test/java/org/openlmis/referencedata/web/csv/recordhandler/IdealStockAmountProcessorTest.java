@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
@@ -90,7 +91,7 @@ public class IdealStockAmountProcessorTest {
     commodityType.setClassificationSystem(SYSTEM);
     commodityType.setClassificationId(ID);
     schedule = new ProcessingSchedule();
-    schedule.setCode(SCHEDULE);
+    schedule.setCode(Code.code(SCHEDULE));
     processingPeriod = new ProcessingPeriod();
     processingPeriod.setName(PERIOD);
     processingPeriod.setProcessingSchedule(schedule);
@@ -101,7 +102,7 @@ public class IdealStockAmountProcessorTest {
         .thenReturn(Collections.emptyList());
 
     when(facilityRepository.findByCode(FACILITY_CODE)).thenReturn(Optional.of(facility));
-    when(processingScheduleRepository.findOneByCode(schedule.getCode()))
+    when(processingScheduleRepository.findOneByCode(schedule.getCode().toString()))
         .thenReturn(Optional.of(schedule));
     when(processingPeriodRepository.findOneByNameAndProcessingSchedule(PERIOD, schedule))
         .thenReturn(Optional.of(processingPeriod));
@@ -144,7 +145,7 @@ public class IdealStockAmountProcessorTest {
     idealStockAmountsValidator.validate(isa);
     when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
-    when(processingScheduleRepository.findOneByCode(schedule.getCode()))
+    when(processingScheduleRepository.findOneByCode(schedule.getCode().toString()))
         .thenReturn(Optional.empty());
 
     idealStockAmountProcessor.process(Collections.singletonList(isa));
@@ -183,7 +184,7 @@ public class IdealStockAmountProcessorTest {
     commodityTypeDto.setClassificationSystem(SYSTEM);
     commodityTypeDto.setClassificationId(ID);
     ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode(SCHEDULE);
+    schedule.setCode(Code.code(SCHEDULE));
     ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto();
     processingPeriodDto.setName(PERIOD);
     processingPeriodDto.setProcessingSchedule(schedule);

@@ -127,7 +127,7 @@ public class RequisitionGroupRepositoryIntegrationTest
         .build();
     supervisoryNodeRepository.save(supervisoryNode);
 
-    ProcessingSchedule schedule = new ProcessingSchedule("SCH-1", "Monthly Schedule");
+    ProcessingSchedule schedule = new ProcessingSchedule(Code.code("SCH-1"), "Monthly Schedule");
     processingScheduleRepository.save(schedule);
   }
 
@@ -140,7 +140,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     RequisitionGroupProgramSchedule actualSchedule = actual
         .getRequisitionGroupProgramSchedules().get(0);
     assertNotNull(actualSchedule.getId());
-    assertEquals("SCH-1", actualSchedule.getProcessingSchedule().getCode());
+    assertEquals("SCH-1", actualSchedule.getProcessingSchedule().getCode().toString());
     assertEquals("PRO-1", actualSchedule.getProgram().getCode().toString());
     assertTrue(actualSchedule.isDirectDelivery());
   }

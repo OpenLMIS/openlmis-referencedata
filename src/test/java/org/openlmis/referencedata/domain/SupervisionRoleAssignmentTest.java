@@ -71,7 +71,7 @@ public class SupervisionRoleAssignmentTest {
         .build();
     supervisedFacility.setSupportedPrograms(Sets.newHashSet(supportedProgram));
     requisitionGroup.setMemberFacilities(Sets.newHashSet(supervisedFacility));
-    ProcessingSchedule processingSchedule = new ProcessingSchedule("PS1", "Schedule1");
+    ProcessingSchedule processingSchedule = new ProcessingSchedule(Code.code("PS1"), "Schedule1");
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
             requisitionGroup, program, processingSchedule, false);

@@ -32,7 +32,7 @@ public class ProcessingPeriodTest {
 
   @Before
   public void initialize() {
-    schedule = new ProcessingSchedule("123", NAME);
+    schedule = new ProcessingSchedule(Code.code("123"), NAME);
   }
 
 

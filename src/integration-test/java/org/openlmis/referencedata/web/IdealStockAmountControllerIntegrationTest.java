@@ -37,6 +37,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -81,7 +82,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
     commodityType = new CommodityType("Name", "cSys", "cId", null, new ArrayList<>());
 
     schedule = new ProcessingSchedule();
-    schedule.setCode("schedule-code");
+    schedule.setCode(Code.code("schedule-code"));
     schedule.setDescription("desc");
     schedule.setId(UUID.randomUUID());
     schedule.setModifiedDate(ZonedDateTime.now());

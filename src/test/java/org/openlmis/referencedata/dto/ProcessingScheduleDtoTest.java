@@ -15,20 +15,18 @@
 
 package org.openlmis.referencedata.dto;
 
-import static org.junit.Assert.assertTrue;
-
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
 public class ProcessingScheduleDtoTest {
 
   @Test
-  public void shouldBeEqualByCode() {
-    ProcessingScheduleDto schedule = new ProcessingScheduleDto();
-    schedule.setCode("code");
-    ProcessingScheduleDto scheduleDupe = new ProcessingScheduleDto();
-    scheduleDupe.setCode("CODE");
-
-    assertTrue(schedule.equals(scheduleDupe));
-    assertTrue(scheduleDupe.equals(schedule));
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(ProcessingScheduleDto.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS) // DTO fields cannot be final
+        .verify();
   }
 }

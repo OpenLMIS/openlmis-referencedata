@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 
 import java.time.ZonedDateTime;
@@ -67,7 +68,8 @@ public class ProcessingScheduleDataBuilder {
    * Returns instance of {@link ProcessingSchedule} with sample data.
    */
   public ProcessingSchedule build() {
-    ProcessingSchedule schedule = new ProcessingSchedule(code, description, modifiedDate, name);
+    ProcessingSchedule schedule = new ProcessingSchedule(Code.code(code), description,
+        modifiedDate, name);
     schedule.setId(id);
     return schedule;
   }

@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -103,7 +104,7 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     programRepository.save(program);
 
     schedule = new ProcessingSchedule();
-    schedule.setCode(code);
+    schedule.setCode(Code.code(code));
     schedule.setName(code);
     scheduleRepository.save(schedule);
 

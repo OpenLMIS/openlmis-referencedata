@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
@@ -526,7 +527,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   private ProcessingSchedule generateSchedule() {
     ProcessingSchedule schedule = new ProcessingSchedule();
     schedule.setId(UUID.randomUUID());
-    schedule.setCode("S" + generateInstanceNumber());
+    schedule.setCode(Code.code("S" + generateInstanceNumber()));
     schedule.setName("schedule");
     schedule.setDescription("Test schedule");
     schedule.setModifiedDate(ZonedDateTime.now());

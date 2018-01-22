@@ -37,6 +37,7 @@ import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -100,7 +101,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     supervisoryNode.setId(UUID.randomUUID());
 
     program = new Program("PRO-1");
-    processingSchedule = new ProcessingSchedule("SCH-1", "Monthly Schedule");
+    processingSchedule = new ProcessingSchedule(Code.code("SCH-1"), "Monthly Schedule");
 
     requisitionGroup = new RequisitionGroup("RG1", "Requisition Group 1", supervisoryNode);
     supervisoryNode.setRequisitionGroup(requisitionGroup);

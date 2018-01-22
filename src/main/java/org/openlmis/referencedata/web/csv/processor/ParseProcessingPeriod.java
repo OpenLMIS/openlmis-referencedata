@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
@@ -47,7 +48,7 @@ public class ParseProcessingPeriod extends CellProcessorAdaptor implements Strin
       result = new ProcessingPeriodDto();
       result.setName(parts[1].trim());
       ProcessingSchedule processingSchedule = new ProcessingSchedule();
-      processingSchedule.setCode(parts[0].trim());
+      processingSchedule.setCode(Code.code(parts[0].trim()));
       result.setProcessingSchedule(processingSchedule);
     } else {
       throw getSuperCsvCellProcessorException(value, context, null);

@@ -22,6 +22,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
@@ -53,7 +54,7 @@ public class IdealStockAmountValidatorTest {
     facility = new BasicFacilityDto();
     facility.setCode("facility-code");
     processingSchedule = new ProcessingSchedule();
-    processingSchedule.setCode("schedule-code");
+    processingSchedule.setCode(Code.code("schedule-code"));
     processingPeriod = new ProcessingPeriodDto();
     processingPeriod.setName("period");
     processingPeriod.setProcessingSchedule(processingSchedule);

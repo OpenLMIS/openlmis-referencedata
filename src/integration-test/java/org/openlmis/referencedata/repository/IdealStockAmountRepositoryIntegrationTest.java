@@ -24,6 +24,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -112,7 +113,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
     commodityTypeId = commodityTypeRepository.save(commodityType).getId();
 
     schedule = new ProcessingSchedule();
-    schedule.setCode("schedule-code");
+    schedule.setCode(Code.code("schedule-code"));
     schedule.setDescription("desc");
     schedule.setId(UUID.randomUUID());
     schedule.setModifiedDate(ZonedDateTime.now());

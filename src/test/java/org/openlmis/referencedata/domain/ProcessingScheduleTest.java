@@ -23,8 +23,8 @@ public class ProcessingScheduleTest {
 
   @Test
   public void shouldBeEqualByCode() {
-    ProcessingSchedule schedule = new ProcessingSchedule("code", "name");
-    ProcessingSchedule scheduleDupe = new ProcessingSchedule("CODE", "name");
+    ProcessingSchedule schedule = new ProcessingSchedule(Code.code("code"), "name");
+    ProcessingSchedule scheduleDupe = new ProcessingSchedule(Code.code("CODE"), "name");
 
     assertTrue(schedule.equals(scheduleDupe));
     assertTrue(scheduleDupe.equals(schedule));

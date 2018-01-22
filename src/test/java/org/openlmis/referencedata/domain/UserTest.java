@@ -195,7 +195,7 @@ public class UserTest {
     districtGroup.setMemberFacilities(newHashSet(new Facility("C2")));
     addSupportedPrograms(districtGroup);
     districtGroup.getMemberFacilities().add(facility);
-    ProcessingSchedule processingSchedule = new ProcessingSchedule("PS1", "Schedule1");
+    ProcessingSchedule processingSchedule = new ProcessingSchedule(Code.code("PS1"), "Schedule1");
     RequisitionGroupProgramSchedule districtGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
             districtGroup, program, processingSchedule, false);

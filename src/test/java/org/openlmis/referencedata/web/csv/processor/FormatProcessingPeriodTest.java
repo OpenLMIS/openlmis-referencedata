@@ -20,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.supercsv.exception.SuperCsvCellProcessorException;
@@ -47,7 +48,7 @@ public class FormatProcessingPeriodTest {
   public void shouldFormatValidProcessingPeriod() throws Exception {
     ProcessingPeriodDto period = new ProcessingPeriodDto();
     ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode("schedule");
+    schedule.setCode(Code.code("schedule"));
     period.setName("period");
     period.setProcessingSchedule(schedule);
 
@@ -82,7 +83,7 @@ public class FormatProcessingPeriodTest {
   public void shouldThrownExceptionWhenScheduleCodeIsNull() {
     ProcessingPeriodDto period = new ProcessingPeriodDto();
     ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode(null);
+    schedule.setCode(Code.code(null));
     period.setProcessingSchedule(schedule);
 
     expectedEx.expect(SuperCsvCellProcessorException.class);

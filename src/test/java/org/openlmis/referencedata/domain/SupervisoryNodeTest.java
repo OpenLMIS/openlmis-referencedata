@@ -50,7 +50,7 @@ public class SupervisoryNodeTest {
     requisitionGroup1 = new RequisitionGroup("RG1", "RGN1", supervisoryNode1);
     requisitionGroup1.setMemberFacilities(Sets.newHashSet(facility2, new Facility("C3")));
     addSupportedPrograms(requisitionGroup1);
-    processingSchedule = new ProcessingSchedule("PS1", "Schedule1");
+    processingSchedule = new ProcessingSchedule(Code.code("PS1"), "Schedule1");
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule1 =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
             requisitionGroup1, program, processingSchedule, false);

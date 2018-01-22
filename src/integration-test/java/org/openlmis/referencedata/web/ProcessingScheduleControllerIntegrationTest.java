@@ -26,6 +26,7 @@ import static org.mockito.Mockito.doThrow;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
@@ -62,7 +63,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
    * Test class constructor.
    */
   public ProcessingScheduleControllerIntegrationTest() {
-    schedule = new ProcessingSchedule("PS1", "Schedule1");
+    schedule = new ProcessingSchedule(Code.code("PS1"), "Schedule1");
     schedule.setId(UUID.randomUUID());
     program = new Program("PRO-1");
     facility = new Facility("FAC-1");

@@ -1437,7 +1437,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     addSupportedPrograms(supervisionGroup, program2);
     RequisitionGroupProgramSchedule supervisionGroupProgramSchedule =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
-            supervisionGroup, program2, new ProcessingSchedule("PS1", "Schedule 1"), false);
+            supervisionGroup, program2, new ProcessingSchedule(Code.code("PS1"), "Schedule 1"),
+            false);
     supervisionGroup.setRequisitionGroupProgramSchedules(
         Collections.singletonList(supervisionGroupProgramSchedule));
     supervisoryNode.setRequisitionGroup(supervisionGroup);

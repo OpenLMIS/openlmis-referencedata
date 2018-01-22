@@ -26,6 +26,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.PostgresUUIDType;
 import org.hibernate.type.StringType;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
@@ -151,7 +152,7 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
     facility.setId((UUID) values[FACILITY_ID]);
 
     ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode((String) values[9]);
+    schedule.setCode(Code.code((String) values[9]));
 
     ProcessingPeriod period = new ProcessingPeriod();
     period.setId((UUID) values[PERIOD_ID]);
