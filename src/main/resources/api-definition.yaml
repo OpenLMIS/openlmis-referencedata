@@ -3093,7 +3093,15 @@ resourceTypes:
       displayName: Orderable Fulfills
       get:
           is: [ secured ]
-          description: Get all facilities that are matching given request parameters. If no parameters, all facilities are returned.
+          description: >
+              This endpoint returns two types of orderable IDs for each orderable. For each
+              orderable, what if returns depends on the orderable: (1) If this orderable ID is a
+              commodityType-backed orderable, the canFulfillForMe property is filled by all
+              tradeItem-backed orderable IDs that can fulfill for this orderable ID;
+              the canBeFulfilledByMe property should be empty. (2) If this orderable ID is a
+              tradeItem-backed orderable, the canBeFulfilledByMe property is filled by all
+              commodityType-backed orderable IDs that this orderable can fulfill for;
+              the canFulfillForMe property should be empty
           queryParameters:
               id:
                   description: Orderable id
@@ -3104,3 +3112,14 @@ resourceTypes:
               "200":
                   body:
                     application/json:
+                      example: |
+                        {
+                          "123": {
+                            "canFulfillForMe": ["124", "125"],
+                            "canBeFulfilledByMe": null
+                          },
+                          "124": {
+                            "canFulfillForMe": null,
+                            "canBeFulfilledByMe": ["123"]
+                          }
+                        }
