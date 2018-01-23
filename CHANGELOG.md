@@ -17,6 +17,9 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-3805](https://openlmis.atlassian.net/browse/OLMIS-3805): Added new param to minimal facilities endpoint which allows returning only active ones.
 * [OLMIS-3918](https://openlmis.atlassian.net/browse/OLMIS-3918): Added locallyFulfilled flag to supported program resource
 * [OLMIS-3947](https://openlmis.atlassian.net/browse/OLMIS-3947): added /api/orderableFulfills endpoint
+  * The response have answers on two questions about the Orderables:
+    * which orderables can fulfill the following orderable
+    * what orderables can be fulfilled by the following orderable
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
