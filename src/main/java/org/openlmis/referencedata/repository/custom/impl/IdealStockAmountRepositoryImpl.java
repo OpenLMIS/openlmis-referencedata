@@ -72,7 +72,7 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
       + " FROM referencedata.ideal_stock_amounts";
 
   private static final String WHERE = "WHERE";
-  private static final String OR = " OR ";
+  private static final String AND = " AND ";
 
   private static final String WITH_FACILITY_ID = "facilityid = :facilityId";
   private static final String WITH_COMMODITYTYPE_ID = "commoditytypeid = :commodityTypeId";
@@ -233,7 +233,7 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
             .append("')");
 
         if (i + 1 < size) {
-          builder.append(" OR");
+          builder.append(" AND");
         }
       }
     }
@@ -264,7 +264,7 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
 
     if (!where.isEmpty()) {
       sql.add(WHERE);
-      sql.add(Joiner.on(OR).join(where));
+      sql.add(Joiner.on(AND).join(where));
     }
 
     String query = Joiner.on(' ').join(sql);
