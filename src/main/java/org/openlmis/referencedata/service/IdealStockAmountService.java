@@ -39,7 +39,7 @@ public class IdealStockAmountService {
 
   public Page<IdealStockAmount> search(IdealStockAmountSearchParams requestParams,
                                        Pageable pageable) {
-    return repository.search(requestParams.facilityId, requestParams.commodityTypeId,
-        requestParams.processingPeriodId, pageable);
+    return repository.search(requestParams.getFacilityId(), requestParams.getCommodityTypeId(),
+        requestParams.getProcessingPeriodId(), pageable);
   }
 }

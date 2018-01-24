@@ -428,13 +428,13 @@ public abstract class BaseWebIntegrationTest {
   }
 
   void checkPageBody(ValidatableResponse response, int page, int size, int numberOfElements,
-                     int totalElements, int totalPages) {
+                     long totalElements, int totalPages) {
     response
         .body("number", is(page))
         .body("size", is(size))
         .body("numberOfElements", is(numberOfElements))
         .body("content.size()", is(numberOfElements))
-        .body("totalElements", is(totalElements))
+        .body("totalElements", is((int)totalElements))
         .body("totalPages", is(totalPages));
   }
 

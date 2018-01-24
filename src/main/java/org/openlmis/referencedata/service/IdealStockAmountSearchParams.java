@@ -26,7 +26,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class IdealStockAmountSearchParams {
-  UUID facilityId;
-  UUID commodityTypeId;
-  UUID processingPeriodId;
+  private UUID facilityId;
+  private UUID commodityTypeId;
+  private UUID processingPeriodId;
 }

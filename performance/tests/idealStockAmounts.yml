@@ -38,8 +38,11 @@ scenarios:
 
   get-ideal-stock-amounts:
     variables:
+      # Cuamba, Cuamba
       facility_id: 7fc9bda8-ad8a-468d-8244-38e1918527d5
+      # BCG
       commodity_type_id: 99ccf663-3304-44ae-b2e0-a67fd5511e2a
+      # Monthly, Jan2017
       processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
     requests:
       - include-scenario: get-user-token

@@ -190,6 +190,38 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   }
 
   @Test
+  public void shouldGetPageOfIdealStockAmountsWhenAnyParameterIsNull() {
+    isaRepository.save(generateInstance());
+
+    PageRequest pageable = new PageRequest(0, 10);
+    Page<IdealStockAmount> page = isaRepository
+        .search(facilityId, commodityTypeId, null, pageable);
+    assertEquals(1, page.getContent().size());
+    page = isaRepository
+        .search(facilityId, null, processingPeriodId, pageable);
+    assertEquals(1, page.getContent().size());
+    page = isaRepository
+        .search(null, commodityTypeId, processingPeriodId, pageable);
+    assertEquals(1, page.getContent().size());
+  }
+
+  @Test
+  public void shouldGetEmptyPageOfIdealStockAmountsWhenAnyParameterIsWrong() {
+    isaRepository.save(generateInstance());
+
+    PageRequest pageable = new PageRequest(0, 10);
+    Page<IdealStockAmount> page = isaRepository
+        .search(facilityId, commodityTypeId, UUID.randomUUID(), pageable);
+    assertEquals(0, page.getContent().size());
+    page = isaRepository
+        .search(facilityId, UUID.randomUUID(), processingPeriodId, pageable);
+    assertEquals(0, page.getContent().size());
+    page = isaRepository
+        .search(UUID.randomUUID(), commodityTypeId, processingPeriodId, pageable);
+    assertEquals(0, page.getContent().size());
+  }
+
+  @Test
   public void shouldGetEmptyPageOfIdealStockAmountsWhenPageableIsNull() {
     Page<IdealStockAmount> page = isaRepository
         .search(null, null, null, null);

@@ -20,6 +20,7 @@ New functionality added in a backwards-compatible manner:
   * The response have answers on two questions about the Orderables:
     * which orderables can fulfill the following orderable
     * what orderables can be fulfilled by the following orderable
+* [OLMIS-3940](https://openlmis.atlassian.net/browse/OLMIS-3940): Added ability to search by facilityId, commodityTypeId and to /api/idealStockAmounts endpoint
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id

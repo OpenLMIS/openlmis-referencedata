@@ -30,13 +30,13 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
 
 import com.jayway.restassured.response.Response;
+import com.jayway.restassured.response.ValidatableResponse;
 import com.jayway.restassured.specification.RequestSpecification;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
@@ -120,22 +120,16 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .search(any(IdealStockAmountSearchParams.class), any(Pageable.class)))
         .thenReturn(new PageImpl<>(singletonList(isa)));
 
-    PageImplRepresentation response =
+    ValidatableResponse validatableResponse =
         getIdealStockAmounts(facilityId, commodityTypeId, processingPeriodId, 2, 10)
             .then()
-            .statusCode(200)
-            .extract().as(PageImplRepresentation.class);
+            .statusCode(200);
 
-    assertEquals(10, response.getSize());
-    assertEquals(2, response.getNumber());
-    assertEquals(1, response.getContent().size());
-    assertEquals(1, response.getNumberOfElements());
-    assertEquals(21, response.getTotalElements());
-    assertEquals(3, response.getTotalPages());
+    checkPageBody(validatableResponse, 2, 10, 1, 21, 3);
 
     IdealStockAmountSearchParams searchParams =
         new IdealStockAmountSearchParams(facilityId, commodityTypeId, processingPeriodId);
-    verify(idealStockAmountService).search(refEq(searchParams),any(Pageable.class));
+    verify(idealStockAmountService).search(refEq(searchParams), any(Pageable.class));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

@@ -2941,10 +2941,28 @@ resourceTypes:
       displayName: Ideal Stock Amounts
       get:
           is: [ secured, paginated ]
-          description: Returns all Ideal Stock Amounts.
+          description: Returns Ideal Stock Amounts.
           queryParameters:
               format:
-                  description: "This parameter specifies return type of this endpoint. If it is not specified json format is returned. Supported formats: csv. Note that other parameters will not work when format is specified."
+                  description: >
+                      This parameter specifies return type of this endpoint. If it is not
+                      specified json format is returned. Supported formats: csv. Note that other
+                      parameters will not work when format is specified.
+                  type: string
+                  required: false
+                  repeat: false
+              facilityId:
+                  displayName: facility id
+                  type: string
+                  required: false
+                  repeat: false
+              commodityTypeId:
+                  displayName: commodity type id
+                  type: string
+                  required: false
+                  repeat: false
+              processingPeriodId:
+                  displayName: processing period id
                   type: string
                   required: false
                   repeat: false
