@@ -48,7 +48,7 @@ public class OrderableFulfillController extends BaseController {
   private OrderableRepository orderableRepository;
 
   @Autowired
-  private OrderableFulfillFactory factory;
+  private OrderableFulfillFactory orderableFulfillFactory;
 
   /**
    * Gets orderable fulfills.
@@ -76,7 +76,7 @@ public class OrderableFulfillController extends BaseController {
 
   private void addEntry(Map<UUID, OrderableFulfill> map, Orderable orderable) {
     Optional
-        .ofNullable(factory.createFor(orderable))
+        .ofNullable(orderableFulfillFactory.createFor(orderable))
         .ifPresent(resource -> map.put(orderable.getId(), resource));
   }
 
