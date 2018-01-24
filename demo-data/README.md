@@ -409,11 +409,14 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
     * program: EPI
   * supply lines:
     * W001/Mozambique Central Warehouse
+  * facility: Dep—sito Provincial Niassa
 5. SN-CUAMBA-DIST/Cuamba district approval point
   * requisition group: RGEPI2
     * program: EPI
   * supply lines:
     * D001/Dep—sito Distrital Cuamba
+  * facility: Dep—sito Distrital Cuamba
+  * parent: SN-NIASSA-PROV/Niassa province approval point
 
 **For EPI (Vaccines) Program**
 
