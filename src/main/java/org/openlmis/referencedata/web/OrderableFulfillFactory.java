@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.dto;
+package org.openlmis.referencedata.web;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
@@ -26,6 +26,7 @@ import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.OrderableFulfill;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;

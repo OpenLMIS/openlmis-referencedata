@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableFulfill;
-import org.openlmis.referencedata.dto.OrderableFulfillFactory;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;

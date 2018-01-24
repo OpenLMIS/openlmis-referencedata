@@ -31,7 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableFulfill;
-import org.openlmis.referencedata.dto.OrderableFulfillFactory;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;

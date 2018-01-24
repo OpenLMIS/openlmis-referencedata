@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.dto;
+package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -35,6 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.OrderableFulfill;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
