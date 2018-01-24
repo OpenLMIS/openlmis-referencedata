@@ -3113,7 +3113,7 @@ resourceTypes:
           is: [ secured ]
           description: >
               This endpoint returns two types of orderable IDs for each orderable. For each
-              orderable, what if returns depends on the orderable: (1) If this orderable ID is a
+              orderable, what it returns depends on the orderable: (1) If this orderable ID is a
               commodityType-backed orderable, the canFulfillForMe property is filled by all
               tradeItem-backed orderable IDs that can fulfill for this orderable ID;
               the canBeFulfilledByMe property should be empty. (2) If this orderable ID is a
@@ -3132,12 +3132,12 @@ resourceTypes:
                     application/json:
                       example: |
                         {
-                          "123": {
-                            "canFulfillForMe": ["124", "125"],
+                          "411779c4-d487-4651-a14a-106d54a91450": {
+                            "canFulfillForMe": ["5a756921-413c-49fd-8a94-7ebf4a646a21", "9024707e-e4d3-4347-8077-44f487476ddc"],
                             "canBeFulfilledByMe": null
                           },
-                          "124": {
+                          "5a756921-413c-49fd-8a94-7ebf4a646a21": {
                             "canFulfillForMe": null,
-                            "canBeFulfilledByMe": ["123"]
+                            "canBeFulfilledByMe": ["411779c4-d487-4651-a14a-106d54a91450"]
                           }
                         }
