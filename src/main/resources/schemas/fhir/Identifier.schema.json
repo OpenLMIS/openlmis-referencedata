@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
+  "allOf": [
+    {
+      "$ref": "Element.schema.json"
+    },
+    {
+      "description": "A technical identifier - identifies some entity uniquely and unambiguously.",
+      "properties": {
+        "use": {
+          "description": "The purpose of this identifier.",
+          "enum": [
+            "usual",
+            "official",
+            "temp",
+            "secondary"
+          ],
+          "type": "string"
+        },
+        "_use": {
+          "description": "Extensions for use",
+          "$ref": "Element.schema.json"
+        },
+        "type": {
+          "description": "A coded type for the identifier that can be used to determine which identifier to use for a specific purpose.",
+          "$ref": "CodeableConcept.schema.json"
+        },
+        "system": {
+          "description": "Establishes the namespace for the value - that is, a URL that describes a set values that are unique.",
+          "type": "string"
+        },
+        "_system": {
+          "description": "Extensions for system",
+          "$ref": "Element.schema.json"
+        },
+        "value": {
+          "description": "The portion of the identifier typically relevant to the user and which is unique within the context of the system.",
+          "type": "string"
+        },
+        "_value": {
+          "description": "Extensions for value",
+          "$ref": "Element.schema.json"
+        },
+        "period": {
+          "description": "Time period during which identifier is/was valid for use.",
+          "$ref": "Period.schema.json"
+        },
+        "assigner": {
+          "description": "Organization that issued/manages the identifier.",
+          "$ref": "Reference.schema.json"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,366 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
+  "oneOf": [
+    {
+      "$ref": "Account.schema.json"
+    },
+    {
+      "$ref": "ActivityDefinition.schema.json"
+    },
+    {
+      "$ref": "AdverseEvent.schema.json"
+    },
+    {
+      "$ref": "AllergyIntolerance.schema.json"
+    },
+    {
+      "$ref": "Appointment.schema.json"
+    },
+    {
+      "$ref": "AppointmentResponse.schema.json"
+    },
+    {
+      "$ref": "AuditEvent.schema.json"
+    },
+    {
+      "$ref": "Basic.schema.json"
+    },
+    {
+      "$ref": "Binary.schema.json"
+    },
+    {
+      "$ref": "BodySite.schema.json"
+    },
+    {
+      "$ref": "Bundle.schema.json"
+    },
+    {
+      "$ref": "CapabilityStatement.schema.json"
+    },
+    {
+      "$ref": "CarePlan.schema.json"
+    },
+    {
+      "$ref": "CareTeam.schema.json"
+    },
+    {
+      "$ref": "ChargeItem.schema.json"
+    },
+    {
+      "$ref": "Claim.schema.json"
+    },
+    {
+      "$ref": "ClaimResponse.schema.json"
+    },
+    {
+      "$ref": "ClinicalImpression.schema.json"
+    },
+    {
+      "$ref": "CodeSystem.schema.json"
+    },
+    {
+      "$ref": "Communication.schema.json"
+    },
+    {
+      "$ref": "CommunicationRequest.schema.json"
+    },
+    {
+      "$ref": "CompartmentDefinition.schema.json"
+    },
+    {
+      "$ref": "Composition.schema.json"
+    },
+    {
+      "$ref": "ConceptMap.schema.json"
+    },
+    {
+      "$ref": "Condition.schema.json"
+    },
+    {
+      "$ref": "Consent.schema.json"
+    },
+    {
+      "$ref": "Contract.schema.json"
+    },
+    {
+      "$ref": "Coverage.schema.json"
+    },
+    {
+      "$ref": "DataElement.schema.json"
+    },
+    {
+      "$ref": "DetectedIssue.schema.json"
+    },
+    {
+      "$ref": "Device.schema.json"
+    },
+    {
+      "$ref": "DeviceComponent.schema.json"
+    },
+    {
+      "$ref": "DeviceMetric.schema.json"
+    },
+    {
+      "$ref": "DeviceRequest.schema.json"
+    },
+    {
+      "$ref": "DeviceUseStatement.schema.json"
+    },
+    {
+      "$ref": "DiagnosticReport.schema.json"
+    },
+    {
+      "$ref": "DocumentManifest.schema.json"
+    },
+    {
+      "$ref": "DocumentReference.schema.json"
+    },
+    {
+      "$ref": "DomainResource.schema.json"
+    },
+    {
+      "$ref": "EligibilityRequest.schema.json"
+    },
+    {
+      "$ref": "EligibilityResponse.schema.json"
+    },
+    {
+      "$ref": "Encounter.schema.json"
+    },
+    {
+      "$ref": "Endpoint.schema.json"
+    },
+    {
+      "$ref": "EnrollmentRequest.schema.json"
+    },
+    {
+      "$ref": "EnrollmentResponse.schema.json"
+    },
+    {
+      "$ref": "EpisodeOfCare.schema.json"
+    },
+    {
+      "$ref": "ExpansionProfile.schema.json"
+    },
+    {
+      "$ref": "ExplanationOfBenefit.schema.json"
+    },
+    {
+      "$ref": "FamilyMemberHistory.schema.json"
+    },
+    {
+      "$ref": "Flag.schema.json"
+    },
+    {
+      "$ref": "Goal.schema.json"
+    },
+    {
+      "$ref": "GraphDefinition.schema.json"
+    },
+    {
+      "$ref": "Group.schema.json"
+    },
+    {
+      "$ref": "GuidanceResponse.schema.json"
+    },
+    {
+      "$ref": "HealthcareService.schema.json"
+    },
+    {
+      "$ref": "ImagingManifest.schema.json"
+    },
+    {
+      "$ref": "ImagingStudy.schema.json"
+    },
+    {
+      "$ref": "Immunization.schema.json"
+    },
+    {
+      "$ref": "ImmunizationRecommendation.schema.json"
+    },
+    {
+      "$ref": "ImplementationGuide.schema.json"
+    },
+    {
+      "$ref": "Library.schema.json"
+    },
+    {
+      "$ref": "Linkage.schema.json"
+    },
+    {
+      "$ref": "List.schema.json"
+    },
+    {
+      "$ref": "Location.schema.json"
+    },
+    {
+      "$ref": "Measure.schema.json"
+    },
+    {
+      "$ref": "MeasureReport.schema.json"
+    },
+    {
+      "$ref": "Media.schema.json"
+    },
+    {
+      "$ref": "Medication.schema.json"
+    },
+    {
+      "$ref": "MedicationAdministration.schema.json"
+    },
+    {
+      "$ref": "MedicationDispense.schema.json"
+    },
+    {
+      "$ref": "MedicationRequest.schema.json"
+    },
+    {
+      "$ref": "MedicationStatement.schema.json"
+    },
+    {
+      "$ref": "MessageDefinition.schema.json"
+    },
+    {
+      "$ref": "MessageHeader.schema.json"
+    },
+    {
+      "$ref": "NamingSystem.schema.json"
+    },
+    {
+      "$ref": "NutritionOrder.schema.json"
+    },
+    {
+      "$ref": "Observation.schema.json"
+    },
+    {
+      "$ref": "OperationDefinition.schema.json"
+    },
+    {
+      "$ref": "OperationOutcome.schema.json"
+    },
+    {
+      "$ref": "Organization.schema.json"
+    },
+    {
+      "$ref": "Parameters.schema.json"
+    },
+    {
+      "$ref": "Parameters.schema.json"
+    },
+    {
+      "$ref": "Patient.schema.json"
+    },
+    {
+      "$ref": "PaymentNotice.schema.json"
+    },
+    {
+      "$ref": "PaymentReconciliation.schema.json"
+    },
+    {
+      "$ref": "Person.schema.json"
+    },
+    {
+      "$ref": "PlanDefinition.schema.json"
+    },
+    {
+      "$ref": "Practitioner.schema.json"
+    },
+    {
+      "$ref": "PractitionerRole.schema.json"
+    },
+    {
+      "$ref": "Procedure.schema.json"
+    },
+    {
+      "$ref": "ProcedureRequest.schema.json"
+    },
+    {
+      "$ref": "ProcessRequest.schema.json"
+    },
+    {
+      "$ref": "ProcessResponse.schema.json"
+    },
+    {
+      "$ref": "Provenance.schema.json"
+    },
+    {
+      "$ref": "Questionnaire.schema.json"
+    },
+    {
+      "$ref": "QuestionnaireResponse.schema.json"
+    },
+    {
+      "$ref": "ReferralRequest.schema.json"
+    },
+    {
+      "$ref": "RelatedPerson.schema.json"
+    },
+    {
+      "$ref": "RequestGroup.schema.json"
+    },
+    {
+      "$ref": "ResearchStudy.schema.json"
+    },
+    {
+      "$ref": "ResearchSubject.schema.json"
+    },
+    {
+      "$ref": "Resource.schema.json"
+    },
+    {
+      "$ref": "RiskAssessment.schema.json"
+    },
+    {
+      "$ref": "Schedule.schema.json"
+    },
+    {
+      "$ref": "SearchParameter.schema.json"
+    },
+    {
+      "$ref": "Sequence.schema.json"
+    },
+    {
+      "$ref": "ServiceDefinition.schema.json"
+    },
+    {
+      "$ref": "Slot.schema.json"
+    },
+    {
+      "$ref": "Specimen.schema.json"
+    },
+    {
+      "$ref": "StructureDefinition.schema.json"
+    },
+    {
+      "$ref": "StructureMap.schema.json"
+    },
+    {
+      "$ref": "Subscription.schema.json"
+    },
+    {
+      "$ref": "Substance.schema.json"
+    },
+    {
+      "$ref": "SupplyDelivery.schema.json"
+    },
+    {
+      "$ref": "SupplyRequest.schema.json"
+    },
+    {
+      "$ref": "Task.schema.json"
+    },
+    {
+      "$ref": "TestReport.schema.json"
+    },
+    {
+      "$ref": "TestScript.schema.json"
+    },
+    {
+      "$ref": "ValueSet.schema.json"
+    },
+    {
+      "$ref": "VisionPrescription.schema.json"
+    }
+  ]
+}

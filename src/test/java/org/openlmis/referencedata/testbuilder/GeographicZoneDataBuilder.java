@@ -17,6 +17,7 @@ package org.openlmis.referencedata.testbuilder;
 
 import com.vividsolutions.jts.geom.Polygon;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 
@@ -46,6 +47,9 @@ public class GeographicZoneDataBuilder {
     code = "GZ" + instanceNumber;
     name = "Geographic Zone #" + instanceNumber;
     level = new GeographicLevelDataBuilder().build();
+    catchmentPopulation = RandomUtils.nextInt(0, 1000);
+    latitude = RandomUtils.nextDouble(0, 200) - 100;
+    longitude = RandomUtils.nextDouble(0, 200) - 100;
   }
 
   /**

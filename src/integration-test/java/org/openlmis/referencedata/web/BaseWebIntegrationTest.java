@@ -30,6 +30,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -99,6 +100,8 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -165,6 +168,8 @@ public abstract class BaseWebIntegrationTest {
       + "  \"authorities\": [\"TRUSTED_CLIENT\"],\n"
       + "  \"client_id\": \"trusted-client\"\n"
       + "}";
+
+  protected Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
 
   @Value("${auth.server.baseUrl}")
   protected String baseUri;

@@ -22,6 +22,10 @@ def ramlToCopy = copySpec {
         include '*.json'
         into 'schemas'
     }
+    from('src/main/resources/schemas/fhir') {
+        include '*.json'
+        into 'schemas/fhir'
+    }
 }
 
 def ramlHtmlToCopy = copySpec {

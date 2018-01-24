@@ -262,6 +262,8 @@ schemas:
   - serviceAccountCreationBody: !include schemas/serviceAccountCreationBody.json
   - serviceAccountPage: !include schemas/serviceAccountPage.json
 
+  - fhirLocation: !include schemas/fhir/Location.schema.json
+
   - stringArray: |
       {
           "type": "array",
@@ -3141,3 +3143,13 @@ resourceTypes:
                             "canBeFulfilledByMe": ["411779c4-d487-4651-a14a-106d54a91450"]
                           }
                         }
+  /Location:
+      displayName: FHIR Location
+      get:
+          is: [ secured ]
+          description: "Get local resources (like geographic zones, facilities) as FHIR Location instances."
+          responses:
+              200:
+                  body:
+                      application/json:
+                          schema: fhirLocation

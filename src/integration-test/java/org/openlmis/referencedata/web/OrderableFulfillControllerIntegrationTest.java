@@ -21,7 +21,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
 
 import com.google.common.collect.Lists;
 
@@ -35,8 +34,6 @@ import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 
 import java.util.UUID;
@@ -46,7 +43,6 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   @MockBean
   private OrderableFulfillFactory factory;
 
-  private Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
   private Orderable orderable = new OrderableDataBuilder().build();
 
   private UUID tradeItemOrderableId = UUID.randomUUID();
