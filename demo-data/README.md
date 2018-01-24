@@ -392,7 +392,6 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
     * program: Family Planning
   * supply lines:
     * WH01/Ntcheu District Warehouse
-    * WH02/Balaka District Warehouse
   * facility: HC01/Comfort Health Clinic
 2. SN1.1/FP Approval sub point
   * requisition group: RGFP2
@@ -403,8 +402,18 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
   * requisition group: RGEM1
     * program: Essential Meds
   * supply lines:
-      * WH02/South Warehouse
+    * WH02/Balaka District Warehouse
   * facility: DH01/Balaka District Hospital
+4. SN-NIASSA-PROV/Niassa province approval point
+  * requisition group: RGEPI1
+    * program: EPI
+  * supply lines:
+    * W001/Mozambique Central Warehouse
+5. SN-CUAMBA-DIST/Cuamba district approval point
+  * requisition group: RGEPI2
+    * program: EPI
+  * supply lines:
+    * D001/Dep—sito Distrital Cuamba
 
 **For EPI (Vaccines) Program**
 
