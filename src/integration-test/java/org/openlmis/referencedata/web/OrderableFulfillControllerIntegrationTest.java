@@ -19,7 +19,6 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
@@ -71,7 +70,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
     String canBeFulfilledByMeField = tradeItemOrderableId + ".canBeFulfilledByMe";
 
     ValidatableResponse response = doRequest();
-    response.body(canFulfillForMeField, is(nullValue()));
+    response.body(canFulfillForMeField, hasSize(0));
     response.body(canBeFulfilledByMeField, hasSize(1));
     response.body(canBeFulfilledByMeField, hasItem(commodityTypeOrderableId.toString()));
   }
@@ -86,7 +85,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
     String canFulfillForMeField = commodityTypeOrderableId + ".canFulfillForMe";
 
     ValidatableResponse response = doRequest();
-    response.body(canBeFulfilledByMeField, is(nullValue()));
+    response.body(canBeFulfilledByMeField, hasSize(0));
     response.body(canFulfillForMeField, hasSize(1));
     response.body(canFulfillForMeField, hasItem(tradeItemOrderableId.toString()));
   }

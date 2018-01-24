@@ -3134,10 +3134,10 @@ resourceTypes:
                         {
                           "411779c4-d487-4651-a14a-106d54a91450": {
                             "canFulfillForMe": ["5a756921-413c-49fd-8a94-7ebf4a646a21", "9024707e-e4d3-4347-8077-44f487476ddc"],
-                            "canBeFulfilledByMe": null
+                            "canBeFulfilledByMe": []
                           },
                           "5a756921-413c-49fd-8a94-7ebf4a646a21": {
-                            "canFulfillForMe": null,
+                            "canFulfillForMe": [],
                             "canBeFulfilledByMe": ["411779c4-d487-4651-a14a-106d54a91450"]
                           }
                         }

@@ -84,7 +84,7 @@ public class OrderableFulfillFactoryTest {
         .thenReturn(Lists.newArrayList(commodityTypeOrderable));
 
     OrderableFulfill response = factory.createFor(tradeItemOrderable);
-    assertThat(response.getCanFulfillForMe(), is(nullValue()));
+    assertThat(response.getCanFulfillForMe(), hasSize(0));
     assertThat(response.getCanBeFulfilledByMe(), hasSize(1));
     assertThat(response.getCanBeFulfilledByMe(), hasItem(commodityTypeOrderable.getId()));
   }
@@ -99,7 +99,7 @@ public class OrderableFulfillFactoryTest {
     OrderableFulfill response = factory.createFor(commodityTypeOrderable);
     assertThat(response.getCanFulfillForMe(), hasSize(1));
     assertThat(response.getCanFulfillForMe(), hasItem(tradeItemOrderable.getId()));
-    assertThat(response.getCanBeFulfilledByMe(), is(nullValue()));
+    assertThat(response.getCanBeFulfilledByMe(), hasSize(0));
   }
 
   @Test

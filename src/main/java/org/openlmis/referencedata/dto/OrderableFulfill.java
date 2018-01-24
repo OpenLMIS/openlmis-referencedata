@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.dto;
 
+import static java.util.Collections.emptyList;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +36,7 @@ public final class OrderableFulfill {
   }
 
   public static OrderableFulfill ofTradeIdem(List<UUID> canBeFulfilledByMe) {
-    return new OrderableFulfill(null, canBeFulfilledByMe);
+    return new OrderableFulfill(emptyList(), canBeFulfilledByMe);
   }
 
   public static OrderableFulfill ofCommodityType(UUID... canFulfillForMe) {
@@ -42,7 +44,7 @@ public final class OrderableFulfill {
   }
 
   public static OrderableFulfill ofCommodityType(List<UUID> canFulfillForMe) {
-    return new OrderableFulfill(canFulfillForMe, null);
+    return new OrderableFulfill(canFulfillForMe, emptyList());
   }
 
 }
