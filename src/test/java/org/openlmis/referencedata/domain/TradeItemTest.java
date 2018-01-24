@@ -22,65 +22,52 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Lists;
-
 import org.junit.Test;
-import org.openlmis.referencedata.testbuilder.CommodityTypeDataBuilder;
-import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TradeItemTest {
-  private static final String CID_1 = "CID1";
-  private static final String CID_2 = "ID2";
 
-  private CommodityType ibuprofen = new CommodityTypeDataBuilder().build();
-  private TradeItem advil = new TradeItemDataBuilder().build();
+  private static final String IBUPROFEN_NAME = "Ibuprofen";
+  private static final String ADVIL_NAME = "Advil";
+  private static final String CLASSIFICATION_SYSTEM = "some-system";
+  private static final String CLASSIFICATION_ID = "some-id";
+  private static final String CID1 = "CID1";
 
-  @Test
-  public void canFulfillWithClassification() {
-    assertFalse(advil.canFulfill(ibuprofen));
+  private CommodityType ibuprofen = new CommodityType(IBUPROFEN_NAME, CLASSIFICATION_SYSTEM,
+      CLASSIFICATION_ID, null, null);
 
-    advil = new TradeItemDataBuilder()
-        .withClassification(ibuprofen)
-        .build();
-
-    assertTrue(advil.canFulfill(ibuprofen));
-  }
+  private TradeItem advil;
 
   @Test
-  public void canFulfillWithChildClassification() {
+  public void canFulfillWithClassification() throws Exception {
+    advil = new TradeItem(ADVIL_NAME, new ArrayList<>());
     assertFalse(advil.canFulfill(ibuprofen));
 
-    CommodityType child = new CommodityTypeDataBuilder().build();
-    assertFalse(advil.canFulfill(child));
-
-    advil.assignCommodityType(child);
-    ibuprofen.setChildren(Lists.newArrayList(child));
-
+    TradeItemClassification classification = new TradeItemClassification();
+    classification.setClassificationSystem(CLASSIFICATION_SYSTEM);
+    classification.setClassificationId(CLASSIFICATION_ID);
+    advil = new TradeItem(ADVIL_NAME, Collections.singletonList(classification));
     assertTrue(advil.canFulfill(ibuprofen));
-    assertTrue(advil.canFulfill(child));
   }
 
   @Test
   public void shouldAssignClassifications() {
-    advil.assignCommodityType("csys", CID_1);
-    advil.assignCommodityType("test sys", CID_2);
+    advil = new TradeItem(ADVIL_NAME, new ArrayList<>());
+
+    advil.assignCommodityType("csys", CID1);
+    advil.assignCommodityType("test sys", "ID2");
 
     assertThat(advil.getClassifications(), hasSize(2));
-
-    assertClassification(CID_1, "csys");
-    assertClassification(CID_2, "test sys");
-
-    advil.assignCommodityType("csys changed", CID_1);
-
-    assertThat(advil.getClassifications(), hasSize(2));
-
-    assertClassification(CID_1, "csys changed");
-    assertClassification(CID_2, "test sys");
-  }
-
-  private void assertClassification(String id, String system) {
-    TradeItemClassification classification = advil.findClassificationById(id);
+    TradeItemClassification classification = advil.findClassificationById(CID1);
     assertNotNull(classification);
-    assertThat(classification.getClassificationSystem(), is(system));
+    assertThat(classification.getClassificationSystem(), is("csys"));
+
+    advil.assignCommodityType("csys changed", CID1);
+
+    assertThat(advil.getClassifications(), hasSize(2));
+    classification = advil.findClassificationById(CID1);
+    assertNotNull(classification);
+    assertThat(classification.getClassificationSystem(), is("csys changed"));
   }
 }

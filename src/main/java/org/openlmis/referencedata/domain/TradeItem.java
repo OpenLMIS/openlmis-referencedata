@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.google.common.collect.ImmutableList;
-
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.TradeItemClassificationDto;
@@ -27,7 +25,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -61,11 +58,10 @@ public final class TradeItem extends BaseEntity {
   private List<TradeItemClassification> classifications;
 
   /**
-   * A trade item may fulfill for a commodity type if the trade item is classified by the
-   * commodity type or one of the commodity type's children.
-   *
+   * A TradeItem can fulfill for the given product if the product is this trade item or if this
+   * product's CommodityType is the given product.
    * @param product the product we'd like to fulfill for.
-   * @return true if we can fulfill the product or product's children, false otherwise.
+   * @return true if we can fulfill for the given product, false otherwise.
    */
   public boolean canFulfill(CommodityType product) {
     for (TradeItemClassification classification : classifications) {
@@ -74,12 +70,7 @@ public final class TradeItem extends BaseEntity {
         return true;
       }
     }
-
-    return Optional
-        .ofNullable(product.getChildren())
-        .orElse(ImmutableList.of())
-        .stream()
-        .anyMatch(this::canFulfill);
+    return false;
   }
 
   /**
