@@ -57,6 +57,8 @@ import javax.persistence.UniqueConstraint;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Orderable extends BaseEntity {
+  public static final String TRADE_ITEM = "tradeItem";
+  public static final String COMMODITY_TYPE = "commodityType";
 
   @Embedded
   @Getter
@@ -140,8 +142,12 @@ public class Orderable extends BaseEntity {
     return packsToOrder;
   }
 
-  public String getIdentifier(String key) {
-    return identifiers.get(key);
+  public String getTradeItemIdentifier() {
+    return identifiers.get(TRADE_ITEM);
+  }
+
+  public String getCommodityTypeIdentifier() {
+    return identifiers.get(COMMODITY_TYPE);
   }
 
   /**

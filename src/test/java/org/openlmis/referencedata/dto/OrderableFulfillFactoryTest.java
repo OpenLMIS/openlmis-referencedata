@@ -13,19 +13,17 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.web;
+package org.openlmis.referencedata.dto;
 
-import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
+import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
-import static org.openlmis.referencedata.web.OrderableFulfillController.COMMODITY_TYPE;
-import static org.openlmis.referencedata.web.OrderableFulfillController.TRADE_ITEM;
 
 import com.google.common.collect.Lists;
 
@@ -37,7 +35,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.OrderableFulfill;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
@@ -49,11 +46,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Map;
-import java.util.UUID;
-
 @RunWith(MockitoJUnitRunner.class)
-public class OrderableFulfillControllerTest {
+public class OrderableFulfillFactoryTest {
 
   @Mock
   private OrderableRepository orderableRepository;
@@ -65,7 +59,7 @@ public class OrderableFulfillControllerTest {
   private CommodityTypeRepository commodityTypeRepository;
 
   @InjectMocks
-  private OrderableFulfillController controller;
+  private OrderableFulfillFactory factory;
 
   private CommodityType commodityType = new CommodityTypeDataBuilder().build();
   private TradeItem tradeItem = new TradeItemDataBuilder()
@@ -84,58 +78,34 @@ public class OrderableFulfillControllerTest {
 
   @Test
   public void shouldCreateResourceForTradeItem() {
-    when(orderableRepository.findAll(pageable)).thenReturn(getPage(tradeItemOrderable));
     when(tradeItemRepository.findOne(tradeItem.getId())).thenReturn(tradeItem);
     when(commodityTypeRepository.findAll(pageable)).thenReturn(getPage(commodityType));
     when(orderableRepository.findAllByIdentifier(COMMODITY_TYPE, commodityType.getId().toString()))
         .thenReturn(Lists.newArrayList(commodityTypeOrderable));
 
-    Map<UUID, OrderableFulfill> response = controller.getOrderableFulfills(null);
-
-    assertThat(response, hasKey(tradeItemOrderable.getId()));
-
-    OrderableFulfill orderableFulfill = response.get(tradeItemOrderable.getId());
-    assertThat(orderableFulfill.getCanFulfillForMe(), is(nullValue()));
-    assertThat(orderableFulfill.getCanBeFulfilledByMe(), hasSize(1));
-    assertThat(orderableFulfill.getCanBeFulfilledByMe(), hasItem(commodityTypeOrderable.getId()));
+    OrderableFulfill response = factory.createFor(tradeItemOrderable);
+    assertThat(response.getCanFulfillForMe(), is(nullValue()));
+    assertThat(response.getCanBeFulfilledByMe(), hasSize(1));
+    assertThat(response.getCanBeFulfilledByMe(), hasItem(commodityTypeOrderable.getId()));
   }
 
   @Test
   public void shouldCreateResourceForCommodityType() {
-    when(orderableRepository.findAll(pageable)).thenReturn(getPage(commodityTypeOrderable));
     when(commodityTypeRepository.findOne(commodityType.getId())).thenReturn(commodityType);
     when(tradeItemRepository.findAll(pageable)).thenReturn(getPage(tradeItem));
     when(orderableRepository.findAllByIdentifier(TRADE_ITEM, tradeItem.getId().toString()))
         .thenReturn(Lists.newArrayList(tradeItemOrderable));
 
-    Map<UUID, OrderableFulfill> response = controller.getOrderableFulfills(null);
-
-    assertThat(response, hasKey(commodityTypeOrderable.getId()));
-
-    OrderableFulfill orderableFulfill = response.get(commodityTypeOrderable.getId());
-    assertThat(orderableFulfill.getCanFulfillForMe(), hasSize(1));
-    assertThat(orderableFulfill.getCanFulfillForMe(), hasItem(tradeItemOrderable.getId()));
-    assertThat(orderableFulfill.getCanBeFulfilledByMe(), is(nullValue()));
+    OrderableFulfill response = factory.createFor(commodityTypeOrderable);
+    assertThat(response.getCanFulfillForMe(), hasSize(1));
+    assertThat(response.getCanFulfillForMe(), hasItem(tradeItemOrderable.getId()));
+    assertThat(response.getCanBeFulfilledByMe(), is(nullValue()));
   }
 
   @Test
-  public void shouldReturnEmptyListIfThereAreNoOrderables() {
-    when(orderableRepository.findAll(pageable)).thenReturn(new PageImpl<>(emptyList()));
-
-    Map<UUID, OrderableFulfill> response = controller.getOrderableFulfills(null);
-    assertThat(response.size(), is(0));
-  }
-
-  @Test
-  public void shouldReturnEmptyListIfOrderableNotHaveIdentifiers() {
-    tradeItemOrderable = new OrderableDataBuilder().build();
-    commodityTypeOrderable = new OrderableDataBuilder().build();
-
-    when(orderableRepository.findAll(pageable))
-        .thenReturn(getPage(tradeItemOrderable, commodityTypeOrderable));
-
-    Map<UUID, OrderableFulfill> response = controller.getOrderableFulfills(null);
-    assertThat(response.size(), is(0));
+  public void shouldNotCreateResourceIfThereAreNoIdentifiers() {
+    OrderableFulfill response = factory.createFor(new OrderableDataBuilder().build());
+    assertThat(response, is(nullValue()));
   }
 
   @SafeVarargs

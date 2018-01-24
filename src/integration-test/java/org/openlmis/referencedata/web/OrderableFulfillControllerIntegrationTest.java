@@ -21,76 +21,74 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
-import static org.openlmis.referencedata.web.OrderableFulfillController.COMMODITY_TYPE;
-import static org.openlmis.referencedata.web.OrderableFulfillController.TRADE_ITEM;
 
 import com.google.common.collect.Lists;
 
 import com.jayway.restassured.response.ValidatableResponse;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.testbuilder.CommodityTypeDataBuilder;
+import org.openlmis.referencedata.dto.OrderableFulfill;
+import org.openlmis.referencedata.dto.OrderableFulfillFactory;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
-import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 
+import java.util.UUID;
+
 public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  private CommodityType commodityType = new CommodityTypeDataBuilder().build();
-  private TradeItem tradeItem = new TradeItemDataBuilder()
-      .withClassification(commodityType)
-      .build();
-
-  private Orderable tradeItemOrderable = new OrderableDataBuilder()
-      .withIdentifier(TRADE_ITEM, tradeItem.getId())
-      .build();
-
-  private Orderable commodityTypeOrderable = new OrderableDataBuilder()
-      .withIdentifier(COMMODITY_TYPE, commodityType.getId())
-      .build();
+  @MockBean
+  private OrderableFulfillFactory factory;
 
   private Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
+  private Orderable orderable = new OrderableDataBuilder().build();
+
+  private UUID tradeItemOrderableId = UUID.randomUUID();
+  private UUID commodityTypeOrderableId = UUID.randomUUID();
+
+  @Override
+  @Before
+  public void setUp() {
+    super.setUp();
+    given(orderableRepository.findAll(pageable)).willReturn(getPage(orderable));
+  }
 
   @Test
   public void shouldCreateResourceForTradeItem() {
-    given(orderableRepository.findAll(pageable)).willReturn(getPage(tradeItemOrderable));
-    given(tradeItemRepository.findOne(tradeItem.getId())).willReturn(tradeItem);
-    given(commodityTypeRepository.findAll(pageable)).willReturn(getPage(commodityType));
-    given(orderableRepository.findAllByIdentifier(COMMODITY_TYPE, commodityType.getId().toString()))
-        .willReturn(Lists.newArrayList(commodityTypeOrderable));
+    orderable.setId(tradeItemOrderableId);
+    given(factory.createFor(orderable))
+        .willReturn(OrderableFulfill.ofTradeIdem(commodityTypeOrderableId));
 
-    String canFulfillForMeField = tradeItemOrderable.getId() + ".canFulfillForMe";
-    String canBeFulfilledByMeField = tradeItemOrderable.getId() + ".canBeFulfilledByMe";
+    String canFulfillForMeField = tradeItemOrderableId + ".canFulfillForMe";
+    String canBeFulfilledByMeField = tradeItemOrderableId + ".canBeFulfilledByMe";
 
-    doRequest()
-        .body(canFulfillForMeField, is(nullValue()))
-        .body(canBeFulfilledByMeField, hasSize(1))
-        .body(canBeFulfilledByMeField, hasItem(commodityTypeOrderable.getId().toString()));
+    ValidatableResponse response = doRequest();
+    response.body(canFulfillForMeField, is(nullValue()));
+    response.body(canBeFulfilledByMeField, hasSize(1));
+    response.body(canBeFulfilledByMeField, hasItem(commodityTypeOrderableId.toString()));
   }
 
   @Test
   public void shouldCreateResourceForCommodityType() {
-    given(orderableRepository.findAll(pageable)).willReturn(getPage(commodityTypeOrderable));
-    given(commodityTypeRepository.findOne(commodityType.getId())).willReturn(commodityType);
-    given(tradeItemRepository.findAll(pageable)).willReturn(getPage(tradeItem));
-    given(orderableRepository.findAllByIdentifier(TRADE_ITEM, tradeItem.getId().toString()))
-        .willReturn(Lists.newArrayList(tradeItemOrderable));
+    orderable.setId(commodityTypeOrderableId);
+    given(factory.createFor(orderable))
+        .willReturn(OrderableFulfill.ofCommodityType(tradeItemOrderableId));
 
-    String canBeFulfilledByMeField = commodityTypeOrderable.getId() + ".canBeFulfilledByMe";
-    String canFulfillForMeField = commodityTypeOrderable.getId() + ".canFulfillForMe";
+    String canBeFulfilledByMeField = commodityTypeOrderableId + ".canBeFulfilledByMe";
+    String canFulfillForMeField = commodityTypeOrderableId + ".canFulfillForMe";
 
-    doRequest()
-        .body(canBeFulfilledByMeField, is(nullValue()))
-        .body(canFulfillForMeField, hasSize(1))
-        .body(canFulfillForMeField, hasItem(tradeItemOrderable.getId().toString()));
+    ValidatableResponse response = doRequest();
+    response.body(canBeFulfilledByMeField, is(nullValue()));
+    response.body(canFulfillForMeField, hasSize(1));
+    response.body(canFulfillForMeField, hasItem(tradeItemOrderableId.toString()));
   }
 
   @Test
@@ -98,17 +96,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
     given(orderableRepository.findAll(pageable)).willReturn(new PageImpl<>(emptyList()));
 
     doRequest().body("isEmpty()", is(true));
-  }
-
-  @Test
-  public void shouldReturnEmptyListIfOrderableNotHaveIdentifiers() {
-    tradeItemOrderable = new OrderableDataBuilder().build();
-    commodityTypeOrderable = new OrderableDataBuilder().build();
-
-    given(orderableRepository.findAll(pageable))
-        .willReturn(getPage(tradeItemOrderable, commodityTypeOrderable));
-
-    doRequest().body("isEmpty()", is(true));
+    verifyZeroInteractions(factory);
   }
 
   @SafeVarargs

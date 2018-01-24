@@ -16,6 +16,7 @@
 package org.openlmis.referencedata;
 
 import com.google.gson.internal.bind.TypeAdapters;
+
 import org.flywaydb.core.Flyway;
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
@@ -52,8 +53,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
-import javax.annotation.PostConstruct;
 import java.util.Locale;
+
+import javax.annotation.PostConstruct;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
 @ImportResource("classpath*:/applicationContext.xml")

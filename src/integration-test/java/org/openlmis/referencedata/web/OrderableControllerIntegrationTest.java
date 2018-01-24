@@ -19,9 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
@@ -32,7 +32,7 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
 import com.google.common.collect.ImmutableMap;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -49,12 +49,14 @@ import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -188,7 +190,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(ORDERABLES_MANAGE);
     orderableDto.setPackRoundingThreshold(null);
 
-    checkBadRequestBody(orderable, ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED, RESOURCE_URL);
+    checkBadRequestBody(orderableDto, ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED, RESOURCE_URL);
   }
 
   @Test

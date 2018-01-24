@@ -15,15 +15,34 @@
 
 package org.openlmis.referencedata.dto;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class OrderableFulfill {
   private final List<UUID> canFulfillForMe;
   private final List<UUID> canBeFulfilledByMe;
+
+  public static OrderableFulfill ofTradeIdem(UUID... canBeFulfilledByMe) {
+    return ofTradeIdem(Arrays.asList(canBeFulfilledByMe));
+  }
+
+  public static OrderableFulfill ofTradeIdem(List<UUID> canBeFulfilledByMe) {
+    return new OrderableFulfill(null, canBeFulfilledByMe);
+  }
+
+  public static OrderableFulfill ofCommodityType(UUID... canFulfillForMe) {
+    return ofCommodityType(Arrays.asList(canFulfillForMe));
+  }
+
+  public static OrderableFulfill ofCommodityType(List<UUID> canFulfillForMe) {
+    return new OrderableFulfill(canFulfillForMe, null);
+  }
+
 }

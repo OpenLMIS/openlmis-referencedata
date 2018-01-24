@@ -23,6 +23,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
+import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
 
 import com.google.common.collect.Sets;
 
@@ -398,30 +400,29 @@ public class OrderableRepositoryIntegrationTest
 
   @Test
   public void shouldFindByIdentifier() {
-    String identifierKey = "xyz";
-    String identifierValue1 = "123";
-    String identifierValue2 = "124";
+    String identifierValue1 = UUID.randomUUID().toString();
+    String identifierValue2 = UUID.randomUUID().toString();
 
     Orderable orderable1 = new OrderableDataBuilder()
-        .withIdentifier(identifierKey, identifierValue1)
+        .withIdentifier(TRADE_ITEM, identifierValue1)
         .buildAsNew();
 
     Orderable orderable2 = new OrderableDataBuilder()
-        .withIdentifier(identifierKey, identifierValue2)
+        .withIdentifier(COMMODITY_TYPE, identifierValue2)
         .buildAsNew();
 
     repository.save(orderable1);
     repository.save(orderable2);
 
-    List<Orderable> orderables = repository.findAllByIdentifier(identifierKey, identifierValue1);
+    List<Orderable> orderables = repository.findAllByIdentifier(TRADE_ITEM, identifierValue1);
     assertThat(orderables, hasSize(1));
     assertThat(orderables.get(0).getId(), is(orderable1.getId()));
-    assertThat(orderables.get(0).getIdentifier(identifierKey), is(identifierValue1));
+    assertThat(orderables.get(0).getTradeItemIdentifier(), is(identifierValue1));
 
-    orderables = repository.findAllByIdentifier(identifierKey, identifierValue2);
+    orderables = repository.findAllByIdentifier(COMMODITY_TYPE, identifierValue2);
     assertThat(orderables, hasSize(1));
     assertThat(orderables.get(0).getId(), is(orderable2.getId()));
-    assertThat(orderables.get(0).getIdentifier(identifierKey), is(identifierValue2));
+    assertThat(orderables.get(0).getCommodityTypeIdentifier(), is(identifierValue2));
   }
 
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
