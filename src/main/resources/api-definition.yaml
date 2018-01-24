@@ -290,7 +290,7 @@ traits:
     - paginated:
           queryParameters:
               page:
-                  description: The page number which should be displayed. Note that the first page is numbered zero rather than one. Additionally, negative and undefined valued are interpreted as zero.
+                  description: The page number which should be displayed. Note that the first page is numbered zero rather than one. Additionally, negative and undefined values are interpreted as zero.
                   type: integer
                   required: false
                   repeat: false
@@ -2948,7 +2948,7 @@ resourceTypes:
               format:
                   description: >
                       This parameter specifies return type of this endpoint. If it is not
-                      specified json format is returned. Supported formats: csv. Note that other
+                      specified, json format is returned. Supported formats: csv. Note that other
                       parameters will not work when format is specified.
                   type: string
                   required: false
