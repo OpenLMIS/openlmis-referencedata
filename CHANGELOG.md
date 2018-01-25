@@ -22,7 +22,7 @@ New functionality added in a backwards-compatible manner:
     * what orderables can be fulfilled by the following orderable
 * [OLMIS-3940](https://openlmis.atlassian.net/browse/OLMIS-3940): Added ability to search by facilityId, commodityTypeId and processingPeriodId to /api/idealStockAmounts endpoint
 * [OLMIS-3387](https://openlmis.atlassian.net/browse/OLMIS-3387): Added /api/Location endpoint
-  * the endpoint will return local resources like geographic zones, facilities as FHIR Location instances
+  * the endpoint will return geographic zones as FHIR Location instances
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
