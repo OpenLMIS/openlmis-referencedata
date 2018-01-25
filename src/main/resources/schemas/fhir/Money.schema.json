@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Quantity.schema.json"
+      "$ref": "Quantity"
     },
     {
       "description": "An amount of economic utility in some recognized currency.",

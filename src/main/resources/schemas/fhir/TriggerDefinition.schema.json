@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "A description of a triggering event.",
@@ -23,7 +23,7 @@
         },
         "_type": {
           "description": "Extensions for type",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "eventName": {
           "description": "The name of the event (if this is a named-event trigger).",
@@ -31,15 +31,15 @@
         },
         "_eventName": {
           "description": "Extensions for eventName",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "eventTimingTiming": {
           "description": "The timing of the event (if this is a period trigger).",
-          "$ref": "Timing.schema.json"
+          "$ref": "Timing"
         },
         "eventTimingReference": {
           "description": "The timing of the event (if this is a period trigger).",
-          "$ref": "Reference.schema.json"
+          "$ref": "Reference"
         },
         "eventTimingDate": {
           "description": "The timing of the event (if this is a period trigger).",
@@ -48,7 +48,7 @@
         },
         "_eventTimingDate": {
           "description": "Extensions for eventTimingDate",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "eventTimingDateTime": {
           "description": "The timing of the event (if this is a period trigger).",
@@ -57,11 +57,11 @@
         },
         "_eventTimingDateTime": {
           "description": "Extensions for eventTimingDateTime",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "eventData": {
           "description": "The triggering data of the event (if this is a data trigger).",
-          "$ref": "DataRequirement.schema.json"
+          "$ref": "DataRequirement"
         }
       }
     }

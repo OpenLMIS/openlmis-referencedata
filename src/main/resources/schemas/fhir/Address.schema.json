@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "An address expressed using postal conventions (as opposed to GPS or other location definition formats).  This data type may be used to convey addresses for use in delivering mail as well as for visiting locations which might not be valid for mail delivery.  There are a variety of postal address formats defined around the world.",
@@ -20,7 +20,7 @@
         },
         "_use": {
           "description": "Extensions for use",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "type": {
           "description": "Distinguishes between physical addresses (those you can visit) and mailing addresses (e.g. PO Boxes and care-of addresses). Most addresses are both.",
@@ -33,7 +33,7 @@
         },
         "_type": {
           "description": "Extensions for type",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "text": {
           "description": "A full text representation of the address.",
@@ -41,7 +41,7 @@
         },
         "_text": {
           "description": "Extensions for text",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "line": {
           "description": "This component contains the house number, apartment number, street name, street direction,  P.O. Box number, delivery hints, and similar address information.",
@@ -54,7 +54,7 @@
           "description": "Extensions for line",
           "type": "array",
           "items": {
-            "$ref": "Element.schema.json"
+            "$ref": "Element"
           }
         },
         "city": {
@@ -63,7 +63,7 @@
         },
         "_city": {
           "description": "Extensions for city",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "district": {
           "description": "The name of the administrative area (county).",
@@ -71,7 +71,7 @@
         },
         "_district": {
           "description": "Extensions for district",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "state": {
           "description": "Sub-unit of a country with limited sovereignty in a federally organized country. A code may be used if codes are in common use (i.e. US 2 letter state codes).",
@@ -79,7 +79,7 @@
         },
         "_state": {
           "description": "Extensions for state",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "postalCode": {
           "description": "A postal code designating a region defined by the postal service.",
@@ -87,7 +87,7 @@
         },
         "_postalCode": {
           "description": "Extensions for postalCode",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "country": {
           "description": "Country - a nation as commonly understood or generally accepted.",
@@ -95,11 +95,11 @@
         },
         "_country": {
           "description": "Extensions for country",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "period": {
           "description": "Time period when address was/is in use.",
-          "$ref": "Period.schema.json"
+          "$ref": "Period"
         }
       }
     }

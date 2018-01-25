@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "Describes a required data item for evaluation in terms of the type of data, and optional code or date-based filters of the data.",
@@ -15,7 +15,7 @@
         },
         "_type": {
           "description": "Extensions for type",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "profile": {
           "description": "The profile of the required data, specified as the uri of the profile definition.",
@@ -28,7 +28,7 @@
           "description": "Extensions for profile",
           "type": "array",
           "items": {
-            "$ref": "Element.schema.json"
+            "$ref": "Element"
           }
         },
         "mustSupport": {
@@ -42,7 +42,7 @@
           "description": "Extensions for mustSupport",
           "type": "array",
           "items": {
-            "$ref": "Element.schema.json"
+            "$ref": "Element"
           }
         },
         "codeFilter": {
@@ -66,7 +66,7 @@
     "DataRequirement_CodeFilter": {
       "allOf": [
         {
-          "$ref": "BackboneElement.schema.json"
+          "$ref": "BackboneElement"
         },
         {
           "description": "Describes a required data item for evaluation in terms of the type of data, and optional code or date-based filters of the data.",
@@ -77,7 +77,7 @@
             },
             "_path": {
               "description": "Extensions for path",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "valueSetString": {
               "description": "The valueset for the code filter. The valueSet and value elements are exclusive. If valueSet is specified, the filter will return only those data items for which the value of the code-valued element specified in the path is a member of the specified valueset.",
@@ -85,11 +85,11 @@
             },
             "_valueSetString": {
               "description": "Extensions for valueSetString",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "valueSetReference": {
               "description": "The valueset for the code filter. The valueSet and value elements are exclusive. If valueSet is specified, the filter will return only those data items for which the value of the code-valued element specified in the path is a member of the specified valueset.",
-              "$ref": "Reference.schema.json"
+              "$ref": "Reference"
             },
             "valueCode": {
               "description": "The codes for the code filter. Only one of valueSet, valueCode, valueCoding, or valueCodeableConcept may be specified. If values are given, the filter will return only those data items for which the code-valued attribute specified by the path has a value that is one of the specified codes.",
@@ -103,21 +103,21 @@
               "description": "Extensions for valueCode",
               "type": "array",
               "items": {
-                "$ref": "Element.schema.json"
+                "$ref": "Element"
               }
             },
             "valueCoding": {
               "description": "The Codings for the code filter. Only one of valueSet, valueCode, valueConding, or valueCodeableConcept may be specified. If values are given, the filter will return only those data items for which the code-valued attribute specified by the path has a value that is one of the specified Codings.",
               "type": "array",
               "items": {
-                "$ref": "Coding.schema.json"
+                "$ref": "Coding"
               }
             },
             "valueCodeableConcept": {
               "description": "The CodeableConcepts for the code filter. Only one of valueSet, valueCode, valueConding, or valueCodeableConcept may be specified. If values are given, the filter will return only those data items for which the code-valued attribute specified by the path has a value that is one of the specified CodeableConcepts.",
               "type": "array",
               "items": {
-                "$ref": "CodeableConcept.schema.json"
+                "$ref": "CodeableConcept"
               }
             }
           }
@@ -127,7 +127,7 @@
     "DataRequirement_DateFilter": {
       "allOf": [
         {
-          "$ref": "BackboneElement.schema.json"
+          "$ref": "BackboneElement"
         },
         {
           "description": "Describes a required data item for evaluation in terms of the type of data, and optional code or date-based filters of the data.",
@@ -138,7 +138,7 @@
             },
             "_path": {
               "description": "Extensions for path",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "valueDateTime": {
               "description": "The value of the filter. If period is specified, the filter will return only those data items that fall within the bounds determined by the Period, inclusive of the period boundaries. If dateTime is specified, the filter will return only those data items that are equal to the specified dateTime. If a Duration is specified, the filter will return only those data items that fall within Duration from now.",
@@ -147,15 +147,15 @@
             },
             "_valueDateTime": {
               "description": "Extensions for valueDateTime",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "valuePeriod": {
               "description": "The value of the filter. If period is specified, the filter will return only those data items that fall within the bounds determined by the Period, inclusive of the period boundaries. If dateTime is specified, the filter will return only those data items that are equal to the specified dateTime. If a Duration is specified, the filter will return only those data items that fall within Duration from now.",
-              "$ref": "Period.schema.json"
+              "$ref": "Period"
             },
             "valueDuration": {
               "description": "The value of the filter. If period is specified, the filter will return only those data items that fall within the bounds determined by the Period, inclusive of the period boundaries. If dateTime is specified, the filter will return only those data items that are equal to the specified dateTime. If a Duration is specified, the filter will return only those data items that fall within Duration from now.",
-              "$ref": "Duration.schema.json"
+              "$ref": "Duration"
             }
           }
         }

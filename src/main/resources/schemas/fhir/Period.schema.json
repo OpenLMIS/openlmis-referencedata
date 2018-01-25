@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "A time period defined by a start and end date and optionally time.",
@@ -15,7 +15,7 @@
         },
         "_start": {
           "description": "Extensions for start",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "end": {
           "description": "The end of the period. If the end of the period is missing, it means that the period is ongoing. The start may be in the past, and the end date in the future, which means that period is expected/planned to end at that time.",
@@ -24,7 +24,7 @@
         },
         "_end": {
           "description": "Extensions for end",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         }
       }
     }

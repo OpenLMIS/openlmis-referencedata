@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "Indicates how the medication is/was taken or should be taken by the patient.",
@@ -15,7 +15,7 @@
         },
         "_sequence": {
           "description": "Extensions for sequence",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "text": {
           "description": "Free text dosage instructions e.g. SIG.",
@@ -23,13 +23,13 @@
         },
         "_text": {
           "description": "Extensions for text",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "additionalInstruction": {
           "description": "Supplemental instruction - e.g. \"with meals\".",
           "type": "array",
           "items": {
-            "$ref": "CodeableConcept.schema.json"
+            "$ref": "CodeableConcept"
           }
         },
         "patientInstruction": {
@@ -38,11 +38,11 @@
         },
         "_patientInstruction": {
           "description": "Extensions for patientInstruction",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "timing": {
           "description": "When medication should be administered.",
-          "$ref": "Timing.schema.json"
+          "$ref": "Timing"
         },
         "asNeededBoolean": {
           "description": "Indicates whether the Medication is only taken when needed within a specific dosing schedule (Boolean option), or it indicates the precondition for taking the Medication (CodeableConcept).",
@@ -50,55 +50,55 @@
         },
         "_asNeededBoolean": {
           "description": "Extensions for asNeededBoolean",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "asNeededCodeableConcept": {
           "description": "Indicates whether the Medication is only taken when needed within a specific dosing schedule (Boolean option), or it indicates the precondition for taking the Medication (CodeableConcept).",
-          "$ref": "CodeableConcept.schema.json"
+          "$ref": "CodeableConcept"
         },
         "site": {
           "description": "Body site to administer to.",
-          "$ref": "CodeableConcept.schema.json"
+          "$ref": "CodeableConcept"
         },
         "route": {
           "description": "How drug should enter body.",
-          "$ref": "CodeableConcept.schema.json"
+          "$ref": "CodeableConcept"
         },
         "method": {
           "description": "Technique for administering medication.",
-          "$ref": "CodeableConcept.schema.json"
+          "$ref": "CodeableConcept"
         },
         "doseRange": {
           "description": "Amount of medication per dose.",
-          "$ref": "Range.schema.json"
+          "$ref": "Range"
         },
         "doseSimpleQuantity": {
           "description": "Amount of medication per dose.",
-          "$ref": "Quantity.schema.json"
+          "$ref": "Quantity"
         },
         "maxDosePerPeriod": {
           "description": "Upper limit on medication per unit of time.",
-          "$ref": "Ratio.schema.json"
+          "$ref": "Ratio"
         },
         "maxDosePerAdministration": {
           "description": "Upper limit on medication per administration.",
-          "$ref": "Quantity.schema.json"
+          "$ref": "Quantity"
         },
         "maxDosePerLifetime": {
           "description": "Upper limit on medication per lifetime of the patient.",
-          "$ref": "Quantity.schema.json"
+          "$ref": "Quantity"
         },
         "rateRatio": {
           "description": "Amount of medication per unit of time.",
-          "$ref": "Ratio.schema.json"
+          "$ref": "Ratio"
         },
         "rateRange": {
           "description": "Amount of medication per unit of time.",
-          "$ref": "Range.schema.json"
+          "$ref": "Range"
         },
         "rateSimpleQuantity": {
           "description": "Amount of medication per unit of time.",
-          "$ref": "Quantity.schema.json"
+          "$ref": "Quantity"
         }
       }
     }

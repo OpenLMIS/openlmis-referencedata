@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "For referring to data content defined in other formats.",
@@ -15,7 +15,7 @@
         },
         "_contentType": {
           "description": "Extensions for contentType",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "language": {
           "description": "The human language of the content. The value can be any valid value according to BCP 47.",
@@ -24,7 +24,7 @@
         },
         "_language": {
           "description": "Extensions for language",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "data": {
           "description": "The actual data of the attachment - a sequence of bytes. In XML, represented using base64.",
@@ -32,7 +32,7 @@
         },
         "_data": {
           "description": "Extensions for data",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "url": {
           "description": "An alternative location where the data can be accessed.",
@@ -40,7 +40,7 @@
         },
         "_url": {
           "description": "Extensions for url",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "size": {
           "description": "The number of bytes of data that make up this attachment (before base64 encoding, if that is done).",
@@ -49,7 +49,7 @@
         },
         "_size": {
           "description": "Extensions for size",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "hash": {
           "description": "The calculated hash of the data using SHA-1. Represented using base64.",
@@ -57,7 +57,7 @@
         },
         "_hash": {
           "description": "Extensions for hash",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "title": {
           "description": "A label or set of text to display in place of the data.",
@@ -65,7 +65,7 @@
         },
         "_title": {
           "description": "Extensions for title",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "creation": {
           "description": "The date that the attachment was first created.",
@@ -74,7 +74,7 @@
         },
         "_creation": {
           "description": "Extensions for creation",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         }
       }
     }

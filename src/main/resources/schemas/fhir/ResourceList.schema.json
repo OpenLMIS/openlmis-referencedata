@@ -3,364 +3,364 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "oneOf": [
     {
-      "$ref": "Account.schema.json"
+      "$ref": "Account"
     },
     {
-      "$ref": "ActivityDefinition.schema.json"
+      "$ref": "ActivityDefinition"
     },
     {
-      "$ref": "AdverseEvent.schema.json"
+      "$ref": "AdverseEvent"
     },
     {
-      "$ref": "AllergyIntolerance.schema.json"
+      "$ref": "AllergyIntolerance"
     },
     {
-      "$ref": "Appointment.schema.json"
+      "$ref": "Appointment"
     },
     {
-      "$ref": "AppointmentResponse.schema.json"
+      "$ref": "AppointmentResponse"
     },
     {
-      "$ref": "AuditEvent.schema.json"
+      "$ref": "AuditEvent"
     },
     {
-      "$ref": "Basic.schema.json"
+      "$ref": "Basic"
     },
     {
-      "$ref": "Binary.schema.json"
+      "$ref": "Binary"
     },
     {
-      "$ref": "BodySite.schema.json"
+      "$ref": "BodySite"
     },
     {
-      "$ref": "Bundle.schema.json"
+      "$ref": "Bundle"
     },
     {
-      "$ref": "CapabilityStatement.schema.json"
+      "$ref": "CapabilityStatement"
     },
     {
-      "$ref": "CarePlan.schema.json"
+      "$ref": "CarePlan"
     },
     {
-      "$ref": "CareTeam.schema.json"
+      "$ref": "CareTeam"
     },
     {
-      "$ref": "ChargeItem.schema.json"
+      "$ref": "ChargeItem"
     },
     {
-      "$ref": "Claim.schema.json"
+      "$ref": "Claim"
     },
     {
-      "$ref": "ClaimResponse.schema.json"
+      "$ref": "ClaimResponse"
     },
     {
-      "$ref": "ClinicalImpression.schema.json"
+      "$ref": "ClinicalImpression"
     },
     {
-      "$ref": "CodeSystem.schema.json"
+      "$ref": "CodeSystem"
     },
     {
-      "$ref": "Communication.schema.json"
+      "$ref": "Communication"
     },
     {
-      "$ref": "CommunicationRequest.schema.json"
+      "$ref": "CommunicationRequest"
     },
     {
-      "$ref": "CompartmentDefinition.schema.json"
+      "$ref": "CompartmentDefinition"
     },
     {
-      "$ref": "Composition.schema.json"
+      "$ref": "Composition"
     },
     {
-      "$ref": "ConceptMap.schema.json"
+      "$ref": "ConceptMap"
     },
     {
-      "$ref": "Condition.schema.json"
+      "$ref": "Condition"
     },
     {
-      "$ref": "Consent.schema.json"
+      "$ref": "Consent"
     },
     {
-      "$ref": "Contract.schema.json"
+      "$ref": "Contract"
     },
     {
-      "$ref": "Coverage.schema.json"
+      "$ref": "Coverage"
     },
     {
-      "$ref": "DataElement.schema.json"
+      "$ref": "DataElement"
     },
     {
-      "$ref": "DetectedIssue.schema.json"
+      "$ref": "DetectedIssue"
     },
     {
-      "$ref": "Device.schema.json"
+      "$ref": "Device"
     },
     {
-      "$ref": "DeviceComponent.schema.json"
+      "$ref": "DeviceComponent"
     },
     {
-      "$ref": "DeviceMetric.schema.json"
+      "$ref": "DeviceMetric"
     },
     {
-      "$ref": "DeviceRequest.schema.json"
+      "$ref": "DeviceRequest"
     },
     {
-      "$ref": "DeviceUseStatement.schema.json"
+      "$ref": "DeviceUseStatement"
     },
     {
-      "$ref": "DiagnosticReport.schema.json"
+      "$ref": "DiagnosticReport"
     },
     {
-      "$ref": "DocumentManifest.schema.json"
+      "$ref": "DocumentManifest"
     },
     {
-      "$ref": "DocumentReference.schema.json"
+      "$ref": "DocumentReference"
     },
     {
-      "$ref": "DomainResource.schema.json"
+      "$ref": "DomainResource"
     },
     {
-      "$ref": "EligibilityRequest.schema.json"
+      "$ref": "EligibilityRequest"
     },
     {
-      "$ref": "EligibilityResponse.schema.json"
+      "$ref": "EligibilityResponse"
     },
     {
-      "$ref": "Encounter.schema.json"
+      "$ref": "Encounter"
     },
     {
-      "$ref": "Endpoint.schema.json"
+      "$ref": "Endpoint"
     },
     {
-      "$ref": "EnrollmentRequest.schema.json"
+      "$ref": "EnrollmentRequest"
     },
     {
-      "$ref": "EnrollmentResponse.schema.json"
+      "$ref": "EnrollmentResponse"
     },
     {
-      "$ref": "EpisodeOfCare.schema.json"
+      "$ref": "EpisodeOfCare"
     },
     {
-      "$ref": "ExpansionProfile.schema.json"
+      "$ref": "ExpansionProfile"
     },
     {
-      "$ref": "ExplanationOfBenefit.schema.json"
+      "$ref": "ExplanationOfBenefit"
     },
     {
-      "$ref": "FamilyMemberHistory.schema.json"
+      "$ref": "FamilyMemberHistory"
     },
     {
-      "$ref": "Flag.schema.json"
+      "$ref": "Flag"
     },
     {
-      "$ref": "Goal.schema.json"
+      "$ref": "Goal"
     },
     {
-      "$ref": "GraphDefinition.schema.json"
+      "$ref": "GraphDefinition"
     },
     {
-      "$ref": "Group.schema.json"
+      "$ref": "Group"
     },
     {
-      "$ref": "GuidanceResponse.schema.json"
+      "$ref": "GuidanceResponse"
     },
     {
-      "$ref": "HealthcareService.schema.json"
+      "$ref": "HealthcareService"
     },
     {
-      "$ref": "ImagingManifest.schema.json"
+      "$ref": "ImagingManifest"
     },
     {
-      "$ref": "ImagingStudy.schema.json"
+      "$ref": "ImagingStudy"
     },
     {
-      "$ref": "Immunization.schema.json"
+      "$ref": "Immunization"
     },
     {
-      "$ref": "ImmunizationRecommendation.schema.json"
+      "$ref": "ImmunizationRecommendation"
     },
     {
-      "$ref": "ImplementationGuide.schema.json"
+      "$ref": "ImplementationGuide"
     },
     {
-      "$ref": "Library.schema.json"
+      "$ref": "Library"
     },
     {
-      "$ref": "Linkage.schema.json"
+      "$ref": "Linkage"
     },
     {
-      "$ref": "List.schema.json"
+      "$ref": "List"
     },
     {
-      "$ref": "Location.schema.json"
+      "$ref": "Location"
     },
     {
-      "$ref": "Measure.schema.json"
+      "$ref": "Measure"
     },
     {
-      "$ref": "MeasureReport.schema.json"
+      "$ref": "MeasureReport"
     },
     {
-      "$ref": "Media.schema.json"
+      "$ref": "Media"
     },
     {
-      "$ref": "Medication.schema.json"
+      "$ref": "Medication"
     },
     {
-      "$ref": "MedicationAdministration.schema.json"
+      "$ref": "MedicationAdministration"
     },
     {
-      "$ref": "MedicationDispense.schema.json"
+      "$ref": "MedicationDispense"
     },
     {
-      "$ref": "MedicationRequest.schema.json"
+      "$ref": "MedicationRequest"
     },
     {
-      "$ref": "MedicationStatement.schema.json"
+      "$ref": "MedicationStatement"
     },
     {
-      "$ref": "MessageDefinition.schema.json"
+      "$ref": "MessageDefinition"
     },
     {
-      "$ref": "MessageHeader.schema.json"
+      "$ref": "MessageHeader"
     },
     {
-      "$ref": "NamingSystem.schema.json"
+      "$ref": "NamingSystem"
     },
     {
-      "$ref": "NutritionOrder.schema.json"
+      "$ref": "NutritionOrder"
     },
     {
-      "$ref": "Observation.schema.json"
+      "$ref": "Observation"
     },
     {
-      "$ref": "OperationDefinition.schema.json"
+      "$ref": "OperationDefinition"
     },
     {
-      "$ref": "OperationOutcome.schema.json"
+      "$ref": "OperationOutcome"
     },
     {
-      "$ref": "Organization.schema.json"
+      "$ref": "Organization"
     },
     {
-      "$ref": "Parameters.schema.json"
+      "$ref": "Parameters"
     },
     {
-      "$ref": "Parameters.schema.json"
+      "$ref": "Parameters"
     },
     {
-      "$ref": "Patient.schema.json"
+      "$ref": "Patient"
     },
     {
-      "$ref": "PaymentNotice.schema.json"
+      "$ref": "PaymentNotice"
     },
     {
-      "$ref": "PaymentReconciliation.schema.json"
+      "$ref": "PaymentReconciliation"
     },
     {
-      "$ref": "Person.schema.json"
+      "$ref": "Person"
     },
     {
-      "$ref": "PlanDefinition.schema.json"
+      "$ref": "PlanDefinition"
     },
     {
-      "$ref": "Practitioner.schema.json"
+      "$ref": "Practitioner"
     },
     {
-      "$ref": "PractitionerRole.schema.json"
+      "$ref": "PractitionerRole"
     },
     {
-      "$ref": "Procedure.schema.json"
+      "$ref": "Procedure"
     },
     {
-      "$ref": "ProcedureRequest.schema.json"
+      "$ref": "ProcedureRequest"
     },
     {
-      "$ref": "ProcessRequest.schema.json"
+      "$ref": "ProcessRequest"
     },
     {
-      "$ref": "ProcessResponse.schema.json"
+      "$ref": "ProcessResponse"
     },
     {
-      "$ref": "Provenance.schema.json"
+      "$ref": "Provenance"
     },
     {
-      "$ref": "Questionnaire.schema.json"
+      "$ref": "Questionnaire"
     },
     {
-      "$ref": "QuestionnaireResponse.schema.json"
+      "$ref": "QuestionnaireResponse"
     },
     {
-      "$ref": "ReferralRequest.schema.json"
+      "$ref": "ReferralRequest"
     },
     {
-      "$ref": "RelatedPerson.schema.json"
+      "$ref": "RelatedPerson"
     },
     {
-      "$ref": "RequestGroup.schema.json"
+      "$ref": "RequestGroup"
     },
     {
-      "$ref": "ResearchStudy.schema.json"
+      "$ref": "ResearchStudy"
     },
     {
-      "$ref": "ResearchSubject.schema.json"
+      "$ref": "ResearchSubject"
     },
     {
-      "$ref": "Resource.schema.json"
+      "$ref": "Resource"
     },
     {
-      "$ref": "RiskAssessment.schema.json"
+      "$ref": "RiskAssessment"
     },
     {
-      "$ref": "Schedule.schema.json"
+      "$ref": "Schedule"
     },
     {
-      "$ref": "SearchParameter.schema.json"
+      "$ref": "SearchParameter"
     },
     {
-      "$ref": "Sequence.schema.json"
+      "$ref": "Sequence"
     },
     {
-      "$ref": "ServiceDefinition.schema.json"
+      "$ref": "ServiceDefinition"
     },
     {
-      "$ref": "Slot.schema.json"
+      "$ref": "Slot"
     },
     {
-      "$ref": "Specimen.schema.json"
+      "$ref": "Specimen"
     },
     {
-      "$ref": "StructureDefinition.schema.json"
+      "$ref": "StructureDefinition"
     },
     {
-      "$ref": "StructureMap.schema.json"
+      "$ref": "StructureMap"
     },
     {
-      "$ref": "Subscription.schema.json"
+      "$ref": "Subscription"
     },
     {
-      "$ref": "Substance.schema.json"
+      "$ref": "Substance"
     },
     {
-      "$ref": "SupplyDelivery.schema.json"
+      "$ref": "SupplyDelivery"
     },
     {
-      "$ref": "SupplyRequest.schema.json"
+      "$ref": "SupplyRequest"
     },
     {
-      "$ref": "Task.schema.json"
+      "$ref": "Task"
     },
     {
-      "$ref": "TestReport.schema.json"
+      "$ref": "TestReport"
     },
     {
-      "$ref": "TestScript.schema.json"
+      "$ref": "TestScript"
     },
     {
-      "$ref": "ValueSet.schema.json"
+      "$ref": "ValueSet"
     },
     {
-      "$ref": "VisionPrescription.schema.json"
+      "$ref": "VisionPrescription"
     }
   ]
 }

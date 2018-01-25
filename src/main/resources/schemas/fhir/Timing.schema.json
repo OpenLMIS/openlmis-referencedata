@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "Specifies an event that may occur multiple times. Timing schedules are used to record when things are planned, expected or requested to occur. The most common usage is in dosage instructions for medications. They are also used when planning care of various kinds, and may be used for reporting the schedule to which past regular activities were carried out.",
@@ -20,7 +20,7 @@
           "description": "Extensions for event",
           "type": "array",
           "items": {
-            "$ref": "Element.schema.json"
+            "$ref": "Element"
           }
         },
         "repeat": {
@@ -29,7 +29,7 @@
         },
         "code": {
           "description": "A code for the timing schedule. Some codes such as BID are ubiquitous, but many institutions define their own additional codes. If a code is provided, the code is understood to be a complete statement of whatever is specified in the structured timing data, and either the code or the data may be used to interpret the Timing, with the exception that .repeat.bounds still applies over the code (and is not contained in the code).",
-          "$ref": "CodeableConcept.schema.json"
+          "$ref": "CodeableConcept"
         }
       }
     }
@@ -38,22 +38,22 @@
     "Timing_Repeat": {
       "allOf": [
         {
-          "$ref": "BackboneElement.schema.json"
+          "$ref": "BackboneElement"
         },
         {
           "description": "Specifies an event that may occur multiple times. Timing schedules are used to record when things are planned, expected or requested to occur. The most common usage is in dosage instructions for medications. They are also used when planning care of various kinds, and may be used for reporting the schedule to which past regular activities were carried out.",
           "properties": {
             "boundsDuration": {
               "description": "Either a duration for the length of the timing schedule, a range of possible length, or outer bounds for start and/or end limits of the timing schedule.",
-              "$ref": "Duration.schema.json"
+              "$ref": "Duration"
             },
             "boundsRange": {
               "description": "Either a duration for the length of the timing schedule, a range of possible length, or outer bounds for start and/or end limits of the timing schedule.",
-              "$ref": "Range.schema.json"
+              "$ref": "Range"
             },
             "boundsPeriod": {
               "description": "Either a duration for the length of the timing schedule, a range of possible length, or outer bounds for start and/or end limits of the timing schedule.",
-              "$ref": "Period.schema.json"
+              "$ref": "Period"
             },
             "count": {
               "description": "A total count of the desired number of repetitions.",
@@ -62,7 +62,7 @@
             },
             "_count": {
               "description": "Extensions for count",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "countMax": {
               "description": "A maximum value for the count of the desired repetitions (e.g. do something 6-8 times).",
@@ -71,7 +71,7 @@
             },
             "_countMax": {
               "description": "Extensions for countMax",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "duration": {
               "description": "How long this thing happens for when it happens.",
@@ -80,7 +80,7 @@
             },
             "_duration": {
               "description": "Extensions for duration",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "durationMax": {
               "description": "The upper limit of how long this thing happens for when it happens.",
@@ -89,7 +89,7 @@
             },
             "_durationMax": {
               "description": "Extensions for durationMax",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "durationUnit": {
               "description": "The units of time for the duration, in UCUM units.",
@@ -106,7 +106,7 @@
             },
             "_durationUnit": {
               "description": "Extensions for durationUnit",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "frequency": {
               "description": "The number of times to repeat the action within the specified period / period range (i.e. both period and periodMax provided).",
@@ -115,7 +115,7 @@
             },
             "_frequency": {
               "description": "Extensions for frequency",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "frequencyMax": {
               "description": "If present, indicates that the frequency is a range - so to repeat between [frequency] and [frequencyMax] times within the period or period range.",
@@ -124,7 +124,7 @@
             },
             "_frequencyMax": {
               "description": "Extensions for frequencyMax",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "period": {
               "description": "Indicates the duration of time over which repetitions are to occur; e.g. to express \"3 times per day\", 3 would be the frequency and \"1 day\" would be the period.",
@@ -133,7 +133,7 @@
             },
             "_period": {
               "description": "Extensions for period",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "periodMax": {
               "description": "If present, indicates that the period is a range from [period] to [periodMax], allowing expressing concepts such as \"do this once every 3-5 days.",
@@ -142,7 +142,7 @@
             },
             "_periodMax": {
               "description": "Extensions for periodMax",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "periodUnit": {
               "description": "The units of time for the period in UCUM units.",
@@ -159,7 +159,7 @@
             },
             "_periodUnit": {
               "description": "Extensions for periodUnit",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             },
             "dayOfWeek": {
               "description": "If one or more days of week is provided, then the action happens only on the specified day(s).",
@@ -173,7 +173,7 @@
               "description": "Extensions for dayOfWeek",
               "type": "array",
               "items": {
-                "$ref": "Element.schema.json"
+                "$ref": "Element"
               }
             },
             "timeOfDay": {
@@ -188,7 +188,7 @@
               "description": "Extensions for timeOfDay",
               "type": "array",
               "items": {
-                "$ref": "Element.schema.json"
+                "$ref": "Element"
               }
             },
             "when": {
@@ -223,7 +223,7 @@
               "description": "Extensions for when",
               "type": "array",
               "items": {
-                "$ref": "Element.schema.json"
+                "$ref": "Element"
               }
             },
             "offset": {
@@ -233,7 +233,7 @@
             },
             "_offset": {
               "description": "Extensions for offset",
-              "$ref": "Element.schema.json"
+              "$ref": "Element"
             }
           }
         }

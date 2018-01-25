@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "This is the base resource type for everything.",
@@ -15,11 +15,11 @@
         },
         "_id": {
           "description": "Extensions for id",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "meta": {
           "description": "The metadata about the resource. This is content that is maintained by the infrastructure. Changes to the content may not always be associated with version changes to the resource.",
-          "$ref": "Meta.schema.json"
+          "$ref": "Meta"
         },
         "implicitRules": {
           "description": "A reference to a set of rules that were followed when the resource was constructed, and which must be understood when processing the content.",
@@ -27,7 +27,7 @@
         },
         "_implicitRules": {
           "description": "Extensions for implicitRules",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "language": {
           "description": "The base language in which the resource is written.",
@@ -36,7 +36,7 @@
         },
         "_language": {
           "description": "Extensions for language",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         }
       }
     }

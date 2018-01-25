@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "A human-readable formatted text, including images.",
@@ -20,7 +20,7 @@
         },
         "_status": {
           "description": "Extensions for status",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "div": {
           "description": "The actual narrative content, a stripped down version of XHTML.",

@@ -3,7 +3,7 @@
   "description": "see http://hl7.org/fhir/json.html#schema for information about the FHIR Json Schemas",
   "allOf": [
     {
-      "$ref": "Element.schema.json"
+      "$ref": "Element"
     },
     {
       "description": "Specifies contact information for a person or organization.",
@@ -14,13 +14,13 @@
         },
         "_name": {
           "description": "Extensions for name",
-          "$ref": "Element.schema.json"
+          "$ref": "Element"
         },
         "telecom": {
           "description": "The contact details for the individual (if a name was provided) or the organization.",
           "type": "array",
           "items": {
-            "$ref": "ContactPoint.schema.json"
+            "$ref": "ContactPoint"
           }
         }
       }
