@@ -22,9 +22,16 @@ def ramlToCopy = copySpec {
         include '*.json'
         into 'schemas'
     }
+    // those files are needed by swagger
     from('src/main/resources/schemas/fhir') {
         include '*.json'
         into 'schemas/fhir'
+    }
+    // those files are needed by IT
+    from('src/main/resources/schemas/fhir') {
+        include '*.json'
+        into 'schemas/fhir'
+        rename '([A-Z][a-z]+).schema.json', '$1'
     }
 }
 
