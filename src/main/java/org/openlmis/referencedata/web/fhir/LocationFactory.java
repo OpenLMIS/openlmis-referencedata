@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web.fhir;
 
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,10 @@ public class LocationFactory {
 
   public Location createFor(GeographicZone zone) {
     return new Location(serviceUrl, zone);
+  }
+
+  public Location createFor(Facility facility) {
+    return new Location(serviceUrl, facility);
   }
 
 }

@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.util.Pagination.handlePage;
 
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.web.fhir.Location;
 import org.openlmis.referencedata.web.fhir.LocationFactory;
@@ -25,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +34,9 @@ public class LocationController extends BaseController {
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
 
   @Autowired
   private LocationFactory locationFactory;
@@ -49,6 +52,10 @@ public class LocationController extends BaseController {
     handlePage(
         geographicZoneRepository::findAll,
         zone -> list.add(locationFactory.createFor(zone))
+    );
+    handlePage(
+        facilityRepository::findAll,
+        facility -> list.add(locationFactory.createFor(facility))
     );
 
     return list;

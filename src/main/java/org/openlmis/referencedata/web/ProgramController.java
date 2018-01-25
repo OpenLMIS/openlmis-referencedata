@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static org.openlmis.referencedata.web.ProgramController.RESOURCE_PATH;
 
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
@@ -36,7 +37,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,10 +51,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Controller
+@RequestMapping(RESOURCE_PATH)
 @Transactional
 public class ProgramController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgramController.class);
+
+  public static final String RESOURCE_PATH = API_PATH + "/programs";
 
   @Autowired
   private ProgramRepository programRepository;
@@ -65,7 +71,7 @@ public class ProgramController extends BaseController {
    * @param program program bound to the request body.
    * @return the created program.
    */
-  @RequestMapping(value = "/programs", method = RequestMethod.POST)
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public Program createProgram(@RequestBody ProgramDto program,
@@ -90,7 +96,7 @@ public class ProgramController extends BaseController {
    *
    * @return the Programs.
    */
-  @RequestMapping(value = "/programs", method = RequestMethod.GET)
+  @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<Program> getAllPrograms() {
@@ -108,7 +114,7 @@ public class ProgramController extends BaseController {
    * @param programId the UUID of program which we want to get.
    * @return the Program.
    */
-  @RequestMapping(value = "/programs/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Program getChosenProgram(@PathVariable("id") UUID programId) {
@@ -125,7 +131,7 @@ public class ProgramController extends BaseController {
    *
    * @param programId UUID of the program which we want to delete.
    */
-  @RequestMapping(value = "/programs/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteProgram(@PathVariable("id") UUID programId) {
     rightService.checkAdminRight(RightName.PROGRAMS_MANAGE);
@@ -143,7 +149,7 @@ public class ProgramController extends BaseController {
    *
    * @param program the DTO class used to update program's code and name.
    */
-  @RequestMapping(value = "/programs/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Program updateProgram(@PathVariable("id") UUID id,
@@ -186,14 +192,13 @@ public class ProgramController extends BaseController {
    * @param programName a part of wanted Program name.
    * @return a list of wanted Programs.
    */
-  @RequestMapping(value = "/programs/search", method = RequestMethod.GET)
+  @RequestMapping(value = "/search", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<Program> findProgramsByName(
       @RequestParam("name") String programName) {
     return programRepository.findProgramsByName(programName);
   }
-
 
   /**
    * Get the audit information related to program.
@@ -204,7 +209,7 @@ public class ProgramController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/programs/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getProgramAuditLog(

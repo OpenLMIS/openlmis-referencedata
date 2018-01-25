@@ -21,25 +21,38 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
-
 import com.jayway.restassured.response.ValidatableResponse;
-
+import com.vividsolutions.jts.geom.Point;
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.web.fhir.Coding;
 import org.openlmis.referencedata.web.fhir.Identifier;
+import org.openlmis.referencedata.web.fhir.Status;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.UUID;
 
 public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/Location";
+  private static final String LOCATION = "Location";
+
+  @Value("${service.url}")
+  private String serviceUrl;
+
+  private UUID supportedProgramId = UUID.randomUUID();
+  private Point location = mock(Point.class);
 
   @Test
   public void shouldReturnGeographicZoneAsLocation() {
@@ -62,10 +75,35 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Test
+  public void shouldReturnFacilityAsLocation() {
+    when(location.getX()).thenReturn(54.5);
+    when(location.getY()).thenReturn(18.5);
+
+    Facility facility = new FacilityDataBuilder()
+        .withSupportedProgram(new ProgramDataBuilder().withId(supportedProgramId).build())
+        .withLocation(location)
+        .buildActive();
+    given(facilityRepository.findAll(pageable))
+        .willReturn(new PageImpl<>(ImmutableList.of(facility)));
+
+    ValidatableResponse response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200);
+
+    assertLocation(response, facility);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
   private void assertLocation(ValidatableResponse response, GeographicZone zone) {
     response
         .body("", hasSize(1))
-        .body("[0].resourceType", is("Location"))
+        .body("[0].resourceType", is(LOCATION))
         .body("[0].id", is(zone.getId().toString()))
         .body("[0].alias", hasSize(1))
         .body("[0].alias[0]", is(zone.getCode()))
@@ -79,6 +117,37 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
         .body("[0].physicalType.coding[0].system", is(Coding.AREA.getSystem()))
         .body("[0].physicalType.coding[0].code", is(Coding.AREA.getCode()))
         .body("[0].physicalType.coding[0].display", is(Coding.AREA.getDisplay()));
+  }
+
+  private void assertLocation(ValidatableResponse response, Facility facility) {
+    response
+        .body("", hasSize(1))
+        .body("[0].resourceType", is(LOCATION))
+        .body("[0].id", is(facility.getId().toString()))
+        .body("[0].alias", hasSize(1))
+        .body("[0].alias[0]", is(facility.getCode()))
+        .body("[0].identifier", hasSize(3))
+        .body("[0].identifier[0].system", is(Identifier.SYSTEM_RFC_3986))
+        .body("[0].identifier[1].system", is(Identifier.SYSTEM_RFC_3986))
+        .body("[0].identifier[2].system", is(Identifier.SYSTEM_RFC_3986))
+        .body("[0].identifier[0].value",
+            is(serviceUrl
+                + ProgramController.RESOURCE_PATH + '/' + supportedProgramId))
+        .body("[0].identifier[1].value",
+    is(serviceUrl
+                + FacilityTypeController.RESOURCE_PATH + '/' + facility.getType().getId()))
+        .body("[0].identifier[2].value",
+    is(serviceUrl
+                + FacilityOperatorController.RESOURCE_PATH + '/' + facility.getOperator().getId()))
+        .body("[0].name", is(facility.getName()))
+        .body("[0].description", is(facility.getDescription()))
+        .body("[0].status", is(Status.ACTIVE.toString()))
+        .body("[0].position.longitude.doubleValue()", closeTo(facility.getLocation().getX(), 0.1))
+        .body("[0].position.latitude.doubleValue()", closeTo(facility.getLocation().getY(), 0.1))
+        .body("[0].physicalType.coding", hasSize(1))
+        .body("[0].physicalType.coding[0].system", is(Coding.SITE.getSystem()))
+        .body("[0].physicalType.coding[0].code", is(Coding.SITE.getCode()))
+        .body("[0].physicalType.coding[0].display", is(Coding.SITE.getDisplay()));
   }
 
 }

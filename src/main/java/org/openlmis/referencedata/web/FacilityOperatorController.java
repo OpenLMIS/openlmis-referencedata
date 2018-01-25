@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.web.FacilityOperatorController.RESOURCE_PATH;
+
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -28,21 +30,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.UUID;
 
 @Controller
+@RequestMapping(RESOURCE_PATH)
 @Transactional
 public class FacilityOperatorController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityOperatorController.class);
+
+  public static final String RESOURCE_PATH = API_PATH + "/facilityOperators";
 
   @Autowired
   private FacilityOperatorRepository facilityOperatorRepository;
@@ -53,7 +59,7 @@ public class FacilityOperatorController extends BaseController {
    * @param facilityOperator A facilityOperator bound to the request body.
    * @return the created facilityOperator.
    */
-  @RequestMapping(value = "/facilityOperators", method = RequestMethod.POST)
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public FacilityOperator createFacilityOperator(
@@ -71,7 +77,7 @@ public class FacilityOperatorController extends BaseController {
    *
    * @return facilityOperators.
    */
-  @RequestMapping(value = "/facilityOperators", method = RequestMethod.GET)
+  @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<FacilityOperator> getAllFacilityOperators() {
@@ -91,7 +97,7 @@ public class FacilityOperatorController extends BaseController {
    * @param facilityOperatorId UUID of facilityOperator which we want to update.
    * @return the updated facilityOperator.
    */
-  @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityOperator updateFacilityOperator(
@@ -108,7 +114,7 @@ public class FacilityOperatorController extends BaseController {
    * @param facilityOperatorId UUID of facilityOperator whose we want to get.
    * @return the facilityOperator.
    */
-  @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityOperator getFacilityOperators(
@@ -127,7 +133,7 @@ public class FacilityOperatorController extends BaseController {
    *
    * @param facilityOperatorId UUID of facilityOperator whose we want to delete.
    */
-  @RequestMapping(value = "/facilityOperators/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacilityOperators(@PathVariable("id") UUID facilityOperatorId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
@@ -149,7 +155,7 @@ public class FacilityOperatorController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/facilityOperators/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getFacilityOperatorAuditLog(

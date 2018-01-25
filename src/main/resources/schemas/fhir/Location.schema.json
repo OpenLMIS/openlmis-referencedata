@@ -22,6 +22,15 @@
             "$ref": "Identifier"
           }
         },
+        "status": {
+          "description": "The status property covers the general availability of the resource, not the current value which may be covered by the operationStatus, or by a schedule/slots if they are configured for the location.",
+          "enum": [
+            "active",
+            "suspended",
+            "inactive"
+          ],
+          "type": "string"
+        },
         "name": {
           "description": "Name of the location as used by humans. Does not need to be unique.",
           "type": "string"
@@ -32,6 +41,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "description": {
+          "description": "Description of the Location, which helps in finding or referencing the place.",
+          "type": "string"
         },
         "physicalType": {
           "description": "Physical form of the location, e.g. building, room, vehicle, road.",

@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class FacilityDataBuilder {
 
   private static int instanceNumber = 0;
@@ -156,5 +157,15 @@ public class FacilityDataBuilder {
   public FacilityDataBuilder withoutOperator() {
     this.operator = null;
     return this;
+  }
+
+  public FacilityDataBuilder withLocation(Point location) {
+    this.location = location;
+    return this;
+  }
+
+  public Facility buildActive() {
+    this.active = true;
+    return build();
   }
 }

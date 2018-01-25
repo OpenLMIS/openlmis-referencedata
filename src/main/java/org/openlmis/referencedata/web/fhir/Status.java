@@ -15,20 +15,17 @@
 
 package org.openlmis.referencedata.web.fhir;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum Coding {
-  AREA("http://hl7.org/fhir/location-physical-type", "area", "Area"),
-  SITE("http://hl7.org/fhir/location-physical-type", "si", "Site");
+public enum Status {
+  ACTIVE("active"), SUSPENDED("suspended"), INACTIVE("inactive");
 
-  private final String system;
-  private final String code;
-  private final String display;
+  private String name;
+
+  @Override
+  public String toString() {
+    return name;
+  }
 }

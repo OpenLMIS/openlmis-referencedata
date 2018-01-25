@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
+import static org.openlmis.referencedata.web.GeographicLevelController.RESOURCE_PATH;
 
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -29,7 +30,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,12 +43,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.UUID;
 
 @Controller
+@RequestMapping(RESOURCE_PATH)
 @Transactional
 public class GeographicLevelController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeographicLevelController.class);
 
-  public static final String RESOURCE_PATH = "/geographicLevels";
+  public static final String RESOURCE_PATH = API_PATH + "/geographicLevels";
 
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
@@ -56,7 +60,7 @@ public class GeographicLevelController extends BaseController {
    * @param geographicLevel A geographicLevel bound to the request body.
    * @return the created geographicLevel.
    */
-  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.POST)
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public GeographicLevel createGeographicLevel(
@@ -75,7 +79,7 @@ public class GeographicLevelController extends BaseController {
    *
    * @return GeographicLevels.
    */
-  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
+  @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<GeographicLevel> getAllGeographicLevels() {
@@ -95,7 +99,7 @@ public class GeographicLevelController extends BaseController {
    * @param geographicLevelId UUID of geographicLevel which we want to update.
    * @return the updated geographicLevel.
    */
-  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicLevel updateGeographicLevel(
@@ -113,7 +117,7 @@ public class GeographicLevelController extends BaseController {
    * @param geographicLevelId UUID of geographicLevel which we want to get
    * @return the geographicLevel.
    */
-  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicLevel getGeographicLevel(
@@ -132,7 +136,7 @@ public class GeographicLevelController extends BaseController {
    *
    * @param geographicLevelId UUID of geographicLevel which we want to delete
    */
-  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteGeographicLevel(
       @PathVariable("id") UUID geographicLevelId) {
@@ -155,7 +159,7 @@ public class GeographicLevelController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getGeographicLevelAuditLog(

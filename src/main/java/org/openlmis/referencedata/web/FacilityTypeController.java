@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.web.FacilityTypeController.RESOURCE_PATH;
+
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
@@ -30,7 +32,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,10 +45,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.UUID;
 
 @Controller
+@RequestMapping(RESOURCE_PATH)
 @Transactional
 public class FacilityTypeController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityTypeController.class);
+
+  public static final String RESOURCE_PATH = API_PATH + "/facilityTypes";
 
   @Autowired
   private FacilityTypeRepository facilityTypeRepository;
@@ -55,7 +62,7 @@ public class FacilityTypeController extends BaseController {
    * @param facilityType A facilityType bound to the request body
    * @return the created facilityType
    */
-  @RequestMapping(value = "/facilityTypes", method = RequestMethod.POST)
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public FacilityType createFacilityType(@RequestBody FacilityType facilityType) {
@@ -72,7 +79,7 @@ public class FacilityTypeController extends BaseController {
    *
    * @return FacilityTypes.
    */
-  @RequestMapping(value = "/facilityTypes", method = RequestMethod.GET)
+  @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<FacilityType> getAllFacilityTypes() {
@@ -87,7 +94,7 @@ public class FacilityTypeController extends BaseController {
    * @param facilityTypeId UUID of facilityType which we want to update
    * @return the updated facilityType
    */
-  @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityType updateFacilityType(
@@ -119,7 +126,7 @@ public class FacilityTypeController extends BaseController {
    * @param facilityTypeId UUID of facilityType which we want to get
    * @return the FacilityType.
    */
-  @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public FacilityType getFacilityType(@PathVariable("id") UUID facilityTypeId) {
@@ -137,7 +144,7 @@ public class FacilityTypeController extends BaseController {
    *
    * @param facilityTypeId UUID of facilityType which we want to delete
    */
-  @RequestMapping(value = "/facilityTypes/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
@@ -163,7 +170,7 @@ public class FacilityTypeController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/facilityTypes/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getFacilityTypeAuditLog(
