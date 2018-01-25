@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
@@ -67,6 +69,7 @@ public class FacilityDataBuilder {
     enabled = true;
     openLmisAccessible = true;
     supportedPrograms = new HashSet<>();
+    location = new GeometryFactory().createPoint(new Coordinate(54.5, 18.5));
   }
 
   /**

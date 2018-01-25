@@ -21,12 +21,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.jayway.restassured.response.ValidatableResponse;
-import com.vividsolutions.jts.geom.Point;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -52,7 +49,6 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
   private String serviceUrl;
 
   private UUID supportedProgramId = UUID.randomUUID();
-  private Point location = mock(Point.class);
 
   @Test
   public void shouldReturnGeographicZoneAsLocation() {
@@ -77,12 +73,8 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnFacilityAsLocation() {
-    when(location.getX()).thenReturn(54.5);
-    when(location.getY()).thenReturn(18.5);
-
     Facility facility = new FacilityDataBuilder()
         .withSupportedProgram(new ProgramDataBuilder().withId(supportedProgramId).build())
-        .withLocation(location)
         .buildActive();
     given(facilityRepository.findAll(pageable))
         .willReturn(new PageImpl<>(ImmutableList.of(facility)));
@@ -134,10 +126,10 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
             is(serviceUrl
                 + ProgramController.RESOURCE_PATH + '/' + supportedProgramId))
         .body("[0].identifier[1].value",
-    is(serviceUrl
+            is(serviceUrl
                 + FacilityTypeController.RESOURCE_PATH + '/' + facility.getType().getId()))
         .body("[0].identifier[2].value",
-    is(serviceUrl
+            is(serviceUrl
                 + FacilityOperatorController.RESOURCE_PATH + '/' + facility.getOperator().getId()))
         .body("[0].name", is(facility.getName()))
         .body("[0].description", is(facility.getDescription()))

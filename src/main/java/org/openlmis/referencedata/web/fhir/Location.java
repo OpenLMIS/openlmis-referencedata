@@ -61,7 +61,7 @@ public final class Location extends Resource {
   }
 
   /**
-   * Creates new instance of Location based on data from {@link GeographicZone}.
+   * Creates new instance of Location based on data from {@link Facility}.
    */
   Location(String serviceUrl, Facility facility) {
     this(facility.getId(), ImmutableList.of(facility.getCode()),
