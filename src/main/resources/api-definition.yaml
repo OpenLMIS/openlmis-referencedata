@@ -263,45 +263,14 @@ schemas:
   - serviceAccountPage: !include schemas/serviceAccountPage.json
 
   #FHIR schemas
-  - Address: !include schemas/fhir/Address.schema.json
-  - Age: !include schemas/fhir/Age.schema.json
-  - Annotation: !include schemas/fhir/Annotation.schema.json
-  - Attachment: !include schemas/fhir/Attachment.schema.json
-  - BackboneElement: !include schemas/fhir/BackboneElement.schema.json
   - CodeableConcept: !include schemas/fhir/CodeableConcept.schema.json
   - Coding: !include schemas/fhir/Coding.schema.json
-  - ContactDetail: !include schemas/fhir/ContactDetail.schema.json
-  - ContactPoint: !include schemas/fhir/ContactPoint.schema.json
-  - Contributor: !include schemas/fhir/Contributor.schema.json
-  - Count: !include schemas/fhir/Count.schema.json
-  - DataRequirement: !include schemas/fhir/DataRequirement.schema.json
-  - Distance: !include schemas/fhir/Distance.schema.json
-  - DomainResource: !include schemas/fhir/DomainResource.schema.json
-  - Dosage: !include schemas/fhir/Dosage.schema.json
-  - Duration: !include schemas/fhir/Duration.schema.json
   - Element: !include schemas/fhir/Element.schema.json
-  - ElementDefinition: !include schemas/fhir/ElementDefinition.schema.json
-  - Extension: !include schemas/fhir/Extension.schema.json
-  - HumanName: !include schemas/fhir/HumanName.schema.json
   - Identifier: !include schemas/fhir/Identifier.schema.json
   - Location: !include schemas/fhir/Location.schema.json
-  - Meta: !include schemas/fhir/Meta.schema.json
-  - Money: !include schemas/fhir/Money.schema.json
-  - Narrative: !include schemas/fhir/Narrative.schema.json
-  - ParameterDefinition: !include schemas/fhir/ParameterDefinition.schema.json
-  - Period: !include schemas/fhir/Period.schema.json
-  - Quantity: !include schemas/fhir/Quantity.schema.json
-  - Range: !include schemas/fhir/Range.schema.json
-  - Ratio: !include schemas/fhir/Ratio.schema.json
+  - LocationPosition: !include schemas/fhir/LocationPosition.schema.json
   - Reference: !include schemas/fhir/Reference.schema.json
-  - RelatedArtifact: !include schemas/fhir/RelatedArtifact.schema.json
   - Resource: !include schemas/fhir/Resource.schema.json
-  - ResourceList: !include schemas/fhir/ResourceList.schema.json
-  - SampledData: !include schemas/fhir/SampledData.schema.json
-  - Signature: !include schemas/fhir/Signature.schema.json
-  - Timing: !include schemas/fhir/Timing.schema.json
-  - TriggerDefinition: !include schemas/fhir/TriggerDefinition.schema.json
-  - UsageContext: !include schemas/fhir/UsageContext.schema.json
 
   - stringArray: |
       {
