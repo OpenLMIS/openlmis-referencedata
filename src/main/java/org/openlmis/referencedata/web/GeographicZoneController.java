@@ -57,6 +57,8 @@ public class GeographicZoneController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeographicZoneController.class);
 
+  public static final String RESOURCE_PATH = "/geographicZones";
+
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
 
@@ -69,7 +71,7 @@ public class GeographicZoneController extends BaseController {
    * @param geographicZoneDto A geographicZone bound to the request body.
    * @return the created geographicZone.
    */
-  @RequestMapping(value = "/geographicZones", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public GeographicZoneDto createGeographicZone(
@@ -89,7 +91,7 @@ public class GeographicZoneController extends BaseController {
    *
    * @return GeographicZones.
    */
-  @RequestMapping(value = "/geographicZones", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<GeographicZoneSimpleDto> getAllGeographicZones(Pageable pageable) {
@@ -104,7 +106,7 @@ public class GeographicZoneController extends BaseController {
    * @param geographicZoneId  UUID of geographicZone which we want to update.
    * @return the ResponseEntity containing the updated geographicZone.
    */
-  @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicZoneDto updateGeographicZone(
@@ -125,7 +127,7 @@ public class GeographicZoneController extends BaseController {
    * @param geographicZoneId UUID of geographicZone which we want to get.
    * @return the geographicZone.
    */
-  @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicZoneDto getGeographicZone(
@@ -144,7 +146,7 @@ public class GeographicZoneController extends BaseController {
    *
    * @param geographicZoneId UUID of geographicZone which we want to delete
    */
-  @RequestMapping(value = "/geographicZones/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteGeographicZone(@PathVariable("id") UUID geographicZoneId) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
@@ -163,7 +165,7 @@ public class GeographicZoneController extends BaseController {
    * @param location GeoJSON point specifying a location
    * @return List of wanted geographic zones to which the location belongs.
    */
-  @RequestMapping(value = "/geographicZones/byLocation", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH + "/byLocation", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<GeographicZoneSimpleDto> findGeographicZonesByLocation(
@@ -181,7 +183,7 @@ public class GeographicZoneController extends BaseController {
    * @param pageable object used to encapsulate the pagination related values: page, size and sort.
    * @return Page of matched geographic zones.
    */
-  @RequestMapping(value = "/geographicZones/search", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH + "/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<GeographicZoneSimpleDto> search(@RequestBody Map<String, Object> queryParams,
@@ -201,7 +203,7 @@ public class GeographicZoneController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/geographicZones/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getGeographicZoneAuditLog(

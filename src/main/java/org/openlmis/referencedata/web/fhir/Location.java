@@ -20,6 +20,7 @@ import static org.openlmis.referencedata.web.fhir.Coding.AREA;
 import com.google.common.collect.ImmutableList;
 
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.web.GeographicZoneController;
 
 import lombok.Getter;
 
@@ -45,9 +46,14 @@ public final class Location extends Resource {
     this.name = zone.getName();
     this.position = new Position(zone.getLongitude(), zone.getLatitude());
     this.physicalType = new PhysicalType(AREA);
-    this.partOf = null == zone.getParent()
-        ? null
-        : new Reference(serviceUrl, "api/geographicZones", zone.getParent().getId());
+
+    if (null == zone.getParent()) {
+      this.partOf = null;
+    } else {
+      this.partOf = new Reference(serviceUrl,
+          GeographicZoneController.RESOURCE_PATH,
+          zone.getParent().getId());
+    }
   }
 
 }
