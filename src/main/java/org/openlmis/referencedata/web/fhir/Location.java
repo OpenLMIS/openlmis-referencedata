@@ -37,7 +37,7 @@ public final class Location extends Resource {
   /**
    * Creates new instance of Location based on data from {@link GeographicZone}.
    */
-  public Location(String serviceUrl, GeographicZone zone) {
+  Location(String serviceUrl, GeographicZone zone) {
     super(zone.getId(), "Location");
 
     this.alias = ImmutableList.of(zone.getCode());
