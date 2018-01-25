@@ -15,8 +15,11 @@
 
 package org.openlmis.referencedata.web.fhir;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.joinWith;
+import static org.openlmis.referencedata.web.BaseController.API_PATH;
+
 import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.web.GeographicLevelController;
 
 import lombok.Getter;
 
@@ -30,7 +33,8 @@ public final class Identifier {
 
   Identifier(String serviceUrl, GeographicLevel level) {
     this.system = SYSTEM_RFC_3986;
-    this.value = StringUtils.joinWith(SEPARATOR, serviceUrl, "api/geographicLevels", level.getId());
+    this.value = joinWith(SEPARATOR, serviceUrl, API_PATH,
+        GeographicLevelController.RESOURCE_PATH, level.getId());
   }
 
 }

@@ -45,6 +45,8 @@ public class GeographicLevelController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeographicLevelController.class);
 
+  public static final String RESOURCE_PATH = "/geographicLevels";
+
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
 
@@ -54,7 +56,7 @@ public class GeographicLevelController extends BaseController {
    * @param geographicLevel A geographicLevel bound to the request body.
    * @return the created geographicLevel.
    */
-  @RequestMapping(value = "/geographicLevels", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public GeographicLevel createGeographicLevel(
@@ -73,7 +75,7 @@ public class GeographicLevelController extends BaseController {
    *
    * @return GeographicLevels.
    */
-  @RequestMapping(value = "/geographicLevels", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Iterable<GeographicLevel> getAllGeographicLevels() {
@@ -93,7 +95,7 @@ public class GeographicLevelController extends BaseController {
    * @param geographicLevelId UUID of geographicLevel which we want to update.
    * @return the updated geographicLevel.
    */
-  @RequestMapping(value = "/geographicLevels/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicLevel updateGeographicLevel(
@@ -111,7 +113,7 @@ public class GeographicLevelController extends BaseController {
    * @param geographicLevelId UUID of geographicLevel which we want to get
    * @return the geographicLevel.
    */
-  @RequestMapping(value = "/geographicLevels/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicLevel getGeographicLevel(
@@ -130,7 +132,7 @@ public class GeographicLevelController extends BaseController {
    *
    * @param geographicLevelId UUID of geographicLevel which we want to delete
    */
-  @RequestMapping(value = "/geographicLevels/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteGeographicLevel(
       @PathVariable("id") UUID geographicLevelId) {
@@ -153,7 +155,7 @@ public class GeographicLevelController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/geographicLevels/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getGeographicLevelAuditLog(
