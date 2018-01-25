@@ -47,7 +47,7 @@ public final class Location extends Resource {
     this.physicalType = new PhysicalType(AREA);
     this.partOf = null == zone.getParent()
         ? null
-        : new Reference(serviceUrl, "geographicZones", zone.getParent().getId());
+        : new Reference(serviceUrl, "api/geographicZones", zone.getParent().getId());
   }
 
 }

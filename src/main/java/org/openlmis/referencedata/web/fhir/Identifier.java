@@ -27,7 +27,7 @@ public final class Identifier {
   private final String value;
 
   Identifier(String serviceUrl, GeographicLevel level) {
-    this.value = StringUtils.joinWith(SEPARATOR, serviceUrl, "geographicLevels", level.getId());
+    this.value = StringUtils.joinWith(SEPARATOR, serviceUrl, "api/geographicLevels", level.getId());
   }
 
 }
