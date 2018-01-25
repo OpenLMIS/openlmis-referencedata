@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.web.fhir.Coding;
+import org.openlmis.referencedata.web.fhir.Identifier;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -69,6 +70,7 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
         .body("[0].alias", hasSize(1))
         .body("[0].alias[0]", is(zone.getCode()))
         .body("[0].identifier", hasSize(1))
+        .body("[0].identifier[0].system", is(Identifier.SYSTEM_RFC_3986))
         .body("[0].identifier[0].value", containsString(zone.getLevel().getId().toString()))
         .body("[0].name", is(zone.getName()))
         .body("[0].position.longitude.doubleValue()", closeTo(zone.getLongitude(),  0.1))

@@ -22,11 +22,14 @@ import lombok.Getter;
 
 @Getter
 public final class Identifier {
+  public static final String SYSTEM_RFC_3986 = "urn:ietf:rfc:3986";
   private static final String SEPARATOR = "/";
 
+  private final String system;
   private final String value;
 
   Identifier(String serviceUrl, GeographicLevel level) {
+    this.system = SYSTEM_RFC_3986;
     this.value = StringUtils.joinWith(SEPARATOR, serviceUrl, "api/geographicLevels", level.getId());
   }
 
