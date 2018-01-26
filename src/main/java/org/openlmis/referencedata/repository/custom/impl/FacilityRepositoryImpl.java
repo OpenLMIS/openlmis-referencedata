@@ -45,7 +45,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       + " INNER JOIN referencedata.geographic_zones AS g ON f.geographiczoneid = g.id"
       + " INNER JOIN referencedata.facility_types AS t ON f.typeid = t.id";
 
-  private static final String HQL_SELECT_BY_IDS = "SELECT f"
+  private static final String HQL_SELECT_BY_IDS = "SELECT DISTINCT f"
       + " FROM Facility AS f"
       + " INNER JOIN FETCH f.geographicZone AS g"
       + " INNER JOIN FETCH f.type AS t"

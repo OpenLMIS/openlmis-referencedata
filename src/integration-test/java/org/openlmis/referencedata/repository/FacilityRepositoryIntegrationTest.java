@@ -28,15 +28,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -44,16 +42,17 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Identifiable;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.testbuilder.ExtraDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,6 +73,9 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private ProgramRepository programRepository;
 
   FacilityRepository getRepository() {
     return this.repository;
@@ -170,6 +172,31 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // then
     assertEquals(1, foundFacilties.size());
     assertEquals(facility.getId(), foundFacilties.get(0).getId());
+  }
+
+  @Test
+  public void shouldFindDistinctFacilitiesByName() {
+    // given
+    // adding multiple supported programs to make sure results are distinct
+    Program program = new ProgramDataBuilder().build();
+    Program programTwo = new ProgramDataBuilder().build();
+
+    programRepository.save(program);
+    programRepository.save(programTwo);
+
+    Facility facility =  getFacilityDataBuilder()
+        .withSupportedProgram(program)
+        .withSupportedProgram(programTwo)
+        .buildAsNew();
+    repository.save(facility);
+
+    // when
+    List<Facility> foundFacilities = repository
+        .search(null, facility.getName(), null, null, null);
+
+    // then
+    assertEquals(1, foundFacilities.size());
+    assertEquals(facility.getId(), foundFacilities.get(0).getId());
   }
 
   @Test
@@ -283,10 +310,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Test
   public void shouldFindInactiveFacilities() {
-    Facility inactive = new FacilityDataBuilder()
-        .withGeographicZone(geographicZone)
-        .withType(facilityType)
-        .withoutOperator()
+    Facility inactive = getFacilityDataBuilder()
         .nonActive()
         .buildAsNew();
     repository.save(inactive);
@@ -327,11 +351,15 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Override
   Facility generateInstance() {
+    return getFacilityDataBuilder()
+        .buildAsNew();
+  }
+
+  private FacilityDataBuilder getFacilityDataBuilder() {
     return new FacilityDataBuilder()
         .withGeographicZone(geographicZone)
         .withType(facilityType)
-        .withoutOperator()
-        .buildAsNew();
+        .withoutOperator();
   }
 
   private void searchFacilityAndCheckResults(String code, String name, Facility facility,
