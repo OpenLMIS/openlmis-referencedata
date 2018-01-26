@@ -16,15 +16,16 @@
 package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.openlmis.referencedata.web.BaseController.API_PATH;
 
 import com.google.common.collect.ImmutableList;
+
 import com.jayway.restassured.response.ValidatableResponse;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
@@ -38,6 +39,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.util.UUID;
 
 public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -58,14 +62,7 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
     given(geographicZoneRepository.findAll(pageable))
         .willReturn(new PageImpl<>(ImmutableList.of(zone)));
 
-    ValidatableResponse response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200);
+    ValidatableResponse response = getLocations();
 
     assertLocation(response, zone);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -79,67 +76,85 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityRepository.findAll(pageable))
         .willReturn(new PageImpl<>(ImmutableList.of(facility)));
 
-    ValidatableResponse response = restAssured
+    ValidatableResponse response = getLocations();
+
+    assertLocation(response, facility);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  private ValidatableResponse getLocations() {
+    return restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
-        .statusCode(200);
-
-    assertLocation(response, facility);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+        .statusCode(200)
+        .body("", hasSize(1))
+        .body("[0].resourceType", is(LOCATION));
   }
 
   private void assertLocation(ValidatableResponse response, GeographicZone zone) {
     response
-        .body("", hasSize(1))
-        .body("[0].resourceType", is(LOCATION))
         .body("[0].id", is(zone.getId().toString()))
         .body("[0].alias", hasSize(1))
         .body("[0].alias[0]", is(zone.getCode()))
         .body("[0].identifier", hasSize(1))
-        .body("[0].identifier[0].system", is(Identifier.SYSTEM_RFC_3986))
-        .body("[0].identifier[0].value", containsString(zone.getLevel().getId().toString()))
-        .body("[0].name", is(zone.getName()))
-        .body("[0].position.longitude.doubleValue()", closeTo(zone.getLongitude(),  0.1))
-        .body("[0].position.latitude.doubleValue()", closeTo(zone.getLatitude(), 0.1))
-        .body("[0].physicalType.coding", hasSize(1))
-        .body("[0].physicalType.coding[0].system", is(Coding.AREA.getSystem()))
-        .body("[0].physicalType.coding[0].code", is(Coding.AREA.getCode()))
-        .body("[0].physicalType.coding[0].display", is(Coding.AREA.getDisplay()));
+        .body("[0].name", is(zone.getName()));
+
+    checkIdentifier(response, 0,
+        GeographicLevelController.RESOURCE_PATH + '/' + zone.getLevel().getId());
+    checkPartOf(response, GeographicZoneController.RESOURCE_PATH + '/' + zone.getParent().getId());
+    checkPosition(response, zone.getLongitude(), zone.getLatitude());
+    checkPhysicalType(response, Coding.AREA);
   }
 
   private void assertLocation(ValidatableResponse response, Facility facility) {
     response
-        .body("", hasSize(1))
-        .body("[0].resourceType", is(LOCATION))
         .body("[0].id", is(facility.getId().toString()))
         .body("[0].alias", hasSize(1))
         .body("[0].alias[0]", is(facility.getCode()))
         .body("[0].identifier", hasSize(3))
-        .body("[0].identifier[0].system", is(Identifier.SYSTEM_RFC_3986))
-        .body("[0].identifier[1].system", is(Identifier.SYSTEM_RFC_3986))
-        .body("[0].identifier[2].system", is(Identifier.SYSTEM_RFC_3986))
-        .body("[0].identifier[0].value",
-            is(serviceUrl
-                + ProgramController.RESOURCE_PATH + '/' + supportedProgramId))
-        .body("[0].identifier[1].value",
-            is(serviceUrl
-                + FacilityTypeController.RESOURCE_PATH + '/' + facility.getType().getId()))
-        .body("[0].identifier[2].value",
-            is(serviceUrl
-                + FacilityOperatorController.RESOURCE_PATH + '/' + facility.getOperator().getId()))
         .body("[0].name", is(facility.getName()))
         .body("[0].description", is(facility.getDescription()))
-        .body("[0].status", is(Status.ACTIVE.toString()))
-        .body("[0].position.longitude.doubleValue()", closeTo(facility.getLocation().getX(), 0.1))
-        .body("[0].position.latitude.doubleValue()", closeTo(facility.getLocation().getY(), 0.1))
+        .body("[0].status", is(Status.ACTIVE.toString()));
+
+    checkIdentifier(response, 0,
+        ProgramController.RESOURCE_PATH + '/' + supportedProgramId);
+    checkIdentifier(response, 1,
+        FacilityTypeController.RESOURCE_PATH + '/' + facility.getType().getId());
+    checkIdentifier(response, 2,
+        FacilityOperatorController.RESOURCE_PATH + '/' + facility.getOperator().getId());
+
+    checkPosition(response, facility.getLocation().getX(), facility.getLocation().getY());
+    checkPhysicalType(response, Coding.SITE);
+  }
+
+  private void checkPartOf(ValidatableResponse response, String path) {
+    response
+        .body("[0].partOf.reference", is(serviceUrl + API_PATH + path));
+  }
+
+  private void checkIdentifier(ValidatableResponse response, int idx, String path) {
+    response
+        .body("[0].identifier[" + idx + "].system", is(Identifier.SYSTEM_RFC_3986))
+        .body("[0].identifier[" + idx + "].value", is(serviceUrl + path));
+  }
+
+  private void checkPosition(ValidatableResponse response, double longitude, double latitude) {
+    response
+        .body("[0].position.longitude.doubleValue()", closeTo(longitude, 0.1))
+        .body("[0].position.latitude.doubleValue()", closeTo(latitude, 0.1));
+  }
+
+
+  private void checkPhysicalType(ValidatableResponse response, Coding coding) {
+    response
         .body("[0].physicalType.coding", hasSize(1))
-        .body("[0].physicalType.coding[0].system", is(Coding.SITE.getSystem()))
-        .body("[0].physicalType.coding[0].code", is(Coding.SITE.getCode()))
-        .body("[0].physicalType.coding[0].display", is(Coding.SITE.getDisplay()));
+        .body("[0].physicalType.coding[0].system", is(coding.getSystem()))
+        .body("[0].physicalType.coding[0].code", is(coding.getCode()))
+        .body("[0].physicalType.coding[0].display", is(coding.getDisplay()));
   }
 
 }

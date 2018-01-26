@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web.fhir;
 
-import static org.apache.commons.lang3.StringUtils.joinWith;
 import static org.openlmis.referencedata.web.BaseController.API_PATH;
 
 import lombok.Getter;
@@ -24,12 +23,10 @@ import java.util.UUID;
 
 @Getter
 public class Reference {
-  private static final String SEPARATOR = "/";
-
   // Literal reference, Relative, internal or absolute URL
   private final String reference;
 
   Reference(String serviceUrl, String path, UUID id) {
-    this.reference = joinWith(SEPARATOR, serviceUrl, API_PATH, path, id);
+    this.reference = serviceUrl + API_PATH + path + '/' + id;
   }
 }
