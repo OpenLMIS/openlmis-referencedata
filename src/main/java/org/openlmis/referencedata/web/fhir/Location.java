@@ -86,7 +86,7 @@ public final class Location extends Resource {
     this.status = status;
   }
 
-  private static ImmutableList<Identifier> getIdentifier(String serviceUrl, GeographicZone zone) {
+  private static List<Identifier> getIdentifier(String serviceUrl, GeographicZone zone) {
     return ImmutableList.of(
         new Identifier(
             serviceUrl,
@@ -114,22 +114,15 @@ public final class Location extends Resource {
   }
 
   private static Reference getGeographicZoneAsReference(String serviceUrl, GeographicZone zone) {
-    if (zone == null) {
-      return null;
-    } else {
-      return new Reference(
-          serviceUrl, GeographicZoneController.RESOURCE_PATH, zone.getId());
-    }
+    return zone != null
+        ? new Reference(serviceUrl, GeographicZoneController.RESOURCE_PATH, zone.getId())
+        : null;
   }
 
   private static Position getPosition(Point location) {
-    Position position;
-    if (location != null) {
-      position = new Position(location.getX(), location.getY());
-    } else {
-      position = null;
-    }
-    return position;
+    return location != null
+        ? new Position(location.getX(), location.getY())
+        : null;
   }
 
   private static String getStatus(Facility facility) {
