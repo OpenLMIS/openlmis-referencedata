@@ -24,6 +24,7 @@ import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.domain.SupportedProgramPrimaryKey;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.FacilityDto;
@@ -529,7 +530,7 @@ public class FacilityController extends BaseController {
           throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
         }
         SupportedProgram supportedProgram = new SupportedProgram(
-            facility, program, dto.isSupportActive(),
+            new SupportedProgramPrimaryKey(facility, program), dto.isSupportActive(),
             dto.isSupportLocallyFulfilled(), dto.getSupportStartDate());
         facility.addSupportedProgram(supportedProgram);
       }

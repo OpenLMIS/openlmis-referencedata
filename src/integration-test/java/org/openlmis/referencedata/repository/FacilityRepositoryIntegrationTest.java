@@ -44,6 +44,7 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.domain.SupportedProgramPrimaryKey;
 import org.openlmis.referencedata.testbuilder.ExtraDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
@@ -339,7 +340,9 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
         .getSupportedPrograms()
         .stream()
         // we don't use builder here because we want to have null value for some flags
-        .map(sp -> new SupportedProgram(facility, sp.getProgram(), true, null, null))
+        .map(sp -> new SupportedProgram(
+            new SupportedProgramPrimaryKey(facility, sp.getFacilityProgram().getProgram()),
+            true, null, null))
         .collect(Collectors.toSet()));
 
     repository.save(facility);

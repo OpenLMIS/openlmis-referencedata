@@ -143,7 +143,7 @@ public class Facility extends BaseEntity {
   @Setter
   private Boolean openLmisAccessible;
 
-  @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true,
+  @OneToMany(mappedBy = "facilityProgram.facility", cascade = CascadeType.ALL, orphanRemoval = true,
       fetch = FetchType.LAZY)
   @DiffIgnore
   @Getter
@@ -286,7 +286,7 @@ public class Facility extends BaseEntity {
   public boolean supports(Program program) {
     return supportedPrograms
         .stream()
-        .anyMatch(supported -> supported.getProgram().equals(program) && supported.getActive());
+        .anyMatch(supported -> supported.isActiveFor(program));
   }
 
   public interface Exporter {

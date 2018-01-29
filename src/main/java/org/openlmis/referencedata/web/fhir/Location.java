@@ -99,7 +99,7 @@ public final class Location extends Resource {
     if (supportedPrograms != null) {
       identifier = new ArrayList<>(supportedPrograms.size() + 2);
       supportedPrograms.forEach(sp -> identifier.add(new Identifier(
-          serviceUrl, ProgramController.RESOURCE_PATH, sp.getProgram().getId())));
+          serviceUrl, ProgramController.RESOURCE_PATH, sp.programId())));
     } else {
       identifier = new ArrayList<>(2);
     }

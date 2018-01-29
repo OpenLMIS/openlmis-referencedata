@@ -15,21 +15,17 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import org.javers.core.metamodel.annotation.TypeName;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
-
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -37,20 +33,12 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("SupportedProgram")
-@EqualsAndHashCode(callSuper = false)
-public final class SupportedProgram extends BaseEntity {
+@EqualsAndHashCode(of = "facilityProgram")
+public final class SupportedProgram implements Serializable {
 
-  @ManyToOne
-  @JoinColumn(name = "facilityId", nullable = false)
+  @EmbeddedId
   @Getter
-  @Setter
-  private Facility facility;
-
-  @ManyToOne
-  @JoinColumn(name = "programId", nullable = false)
-  @Getter
-  @Setter
-  private Program program;
+  private SupportedProgramPrimaryKey facilityProgram;
 
   @Column(nullable = false)
   @Getter
@@ -62,22 +50,27 @@ public final class SupportedProgram extends BaseEntity {
 
   private LocalDate startDate;
 
+  public boolean isActiveFor(Program program) {
+    return facilityProgram.getProgram().equals(program) && active;
+  }
+
+  public UUID programId() {
+    return facilityProgram.getProgram().getId();
+  }
+
   /**
    * Export this object to the specified exporter (DTO).
    *
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setId(id);
-    exporter.setProgram(program);
+    exporter.setProgram(facilityProgram.getProgram());
     exporter.setSupportActive(active);
     exporter.setSupportStartDate(startDate);
     exporter.setSupportLocallyFulfilled(locallyFulfilled);
   }
 
   public interface Exporter {
-    void setId(UUID id);
-
     void setProgram(Program program);
 
     void setSupportActive(boolean supportActive);

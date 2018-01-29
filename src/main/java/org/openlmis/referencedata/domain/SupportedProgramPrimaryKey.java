@@ -15,23 +15,32 @@
 
 package org.openlmis.referencedata.domain;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import java.io.Serializable;
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
-import org.junit.Test;
-import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+@Embeddable
+@AllArgsConstructor
+@EqualsAndHashCode
+public class SupportedProgramPrimaryKey implements Serializable {
 
-public class SupportedProgramTest {
+  @ManyToOne
+  @JoinColumn(name = "facilityId", nullable = false)
+  @Getter
+  private final Facility facility;
 
-  @Test
-  public void equalsContract() {
-    EqualsVerifier
-        .forClass(SupportedProgram.class)
-        .withOnlyTheseFields("facilityProgram")
-        .withPrefabValues(
-            Facility.class,
-            new FacilityDataBuilder().build(),
-            new FacilityDataBuilder().build())
-        .verify();
+  @ManyToOne
+  @JoinColumn(name = "programId", nullable = false)
+  @Getter
+  private final Program program;
+
+  // Default constructor needed by hibernate
+  private SupportedProgramPrimaryKey() {
+    facility = null;
+    program = null;
   }
-
 }

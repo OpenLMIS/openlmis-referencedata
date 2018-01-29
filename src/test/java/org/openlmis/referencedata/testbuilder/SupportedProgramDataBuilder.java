@@ -18,6 +18,7 @@ package org.openlmis.referencedata.testbuilder;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.domain.SupportedProgramPrimaryKey;
 
 import java.time.LocalDate;
 
@@ -36,7 +37,8 @@ public class SupportedProgramDataBuilder {
    * Builds instance of {@link SupportedProgram}.
    */
   public SupportedProgram build() {
-    return new SupportedProgram(facility, program, active, false, LocalDate.now());
+    return new SupportedProgram(new SupportedProgramPrimaryKey(facility, program),
+        active, false, LocalDate.now());
   }
 
   /**
