@@ -32,7 +32,7 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ValidatableResponse;
 import com.jayway.restassured.specification.RequestSpecification;
-import guru.nidi.ramltester.junit.RamlMatchers;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -53,6 +53,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import guru.nidi.ramltester.junit.RamlMatchers;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -103,7 +106,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
     when(periodRepository.findOneByNameAndProcessingSchedule(any(String.class),
         any(ProcessingSchedule.class)))
         .thenReturn(Optional.of(period));
-    when(scheduleRepository.findOneByCode(any(String.class))).thenReturn(Optional.of(schedule));
+    when(scheduleRepository.findOneByCode(any(Code.class))).thenReturn(Optional.of(schedule));
     when(commodityTypeRepository.findByClassificationIdAndClassificationSystem(any(String.class),
         any(String.class))).thenReturn(Optional.of(commodityType));
 

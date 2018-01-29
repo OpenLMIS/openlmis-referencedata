@@ -15,6 +15,11 @@
 
 package org.openlmis.referencedata.web.csv.recordhandler;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -41,11 +46,6 @@ import org.openlmis.referencedata.validate.IdealStockAmountValidator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class IdealStockAmountProcessorTest {
 
@@ -102,7 +102,7 @@ public class IdealStockAmountProcessorTest {
         .thenReturn(Collections.emptyList());
 
     when(facilityRepository.findByCode(FACILITY_CODE)).thenReturn(Optional.of(facility));
-    when(processingScheduleRepository.findOneByCode(schedule.getCode().toString()))
+    when(processingScheduleRepository.findOneByCode(schedule.getCode()))
         .thenReturn(Optional.of(schedule));
     when(processingPeriodRepository.findOneByNameAndProcessingSchedule(PERIOD, schedule))
         .thenReturn(Optional.of(processingPeriod));
@@ -145,7 +145,7 @@ public class IdealStockAmountProcessorTest {
     idealStockAmountsValidator.validate(isa);
     when(service.search(anyListOf(IdealStockAmount.class)))
         .thenReturn(Collections.emptyList());
-    when(processingScheduleRepository.findOneByCode(schedule.getCode().toString()))
+    when(processingScheduleRepository.findOneByCode(schedule.getCode()))
         .thenReturn(Optional.empty());
 
     idealStockAmountProcessor.process(Collections.singletonList(isa));
