@@ -48,6 +48,8 @@ public final class SupportedProgram implements Serializable {
   @Getter
   private Boolean locallyFulfilled;
 
+  @SuppressWarnings("squid:S3437")
+  // https://github.com/jhipster/generator-jhipster/issues/4553
   private LocalDate startDate;
 
   public boolean isActiveFor(Program program) {
