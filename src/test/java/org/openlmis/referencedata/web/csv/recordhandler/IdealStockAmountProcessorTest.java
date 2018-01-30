@@ -35,6 +35,7 @@ import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -183,8 +184,8 @@ public class IdealStockAmountProcessorTest {
     CommodityTypeDto commodityTypeDto = new CommodityTypeDto();
     commodityTypeDto.setClassificationSystem(SYSTEM);
     commodityTypeDto.setClassificationId(ID);
-    ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode(Code.code(SCHEDULE));
+    ProcessingScheduleDto schedule = new ProcessingScheduleDto();
+    schedule.setCode(SCHEDULE);
     ProcessingPeriodDto processingPeriodDto = new ProcessingPeriodDto();
     processingPeriodDto.setName(PERIOD);
     processingPeriodDto.setProcessingSchedule(schedule);

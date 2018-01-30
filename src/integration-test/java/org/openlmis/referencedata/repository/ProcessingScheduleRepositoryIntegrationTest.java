@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,27 @@ public class ProcessingScheduleRepositoryIntegrationTest
     scheduleFromRepo = iterable.iterator().next();
     assertTrue(savingDateTime.isBefore(scheduleFromRepo.getModifiedDate()));
     assertEquals(newDescription, scheduleFromRepo.getDescription());
+  }
+
+  @Test
+  public void shouldGetScheduleByCode() {
+    final String code1 = "code1";
+    final String code2 = "code2";
+    final String code3 = "code3";
+    repository.save(new ProcessingScheduleDataBuilder().withCode(code1).buildWithoutId());
+    repository.save(new ProcessingScheduleDataBuilder().withCode(code2).buildWithoutId());
+    repository.save(new ProcessingScheduleDataBuilder().withCode(code3).buildWithoutId());
+
+    Optional<ProcessingSchedule> actual1 = repository.findOneByCode(Code.code(code1));
+    Optional<ProcessingSchedule> actual2 = repository.findOneByCode(Code.code(code2));
+    Optional<ProcessingSchedule> actual3 = repository.findOneByCode(Code.code(code3));
+
+    assertTrue(actual1.isPresent());
+    assertTrue(actual2.isPresent());
+    assertTrue(actual3.isPresent());
+    assertEquals(code1, actual1.get().getCode().toString());
+    assertEquals(code2, actual2.get().getCode().toString());
+    assertEquals(code3, actual3.get().getCode().toString());
   }
 
   @Test(expected = DataIntegrityViolationException.class)

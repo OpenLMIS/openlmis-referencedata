@@ -19,6 +19,7 @@ import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessag
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FACILITY_NOT_FOUND;
 import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_PROCESSING_PERIOD_NOT_FOUND;
 
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
@@ -108,7 +109,7 @@ public class IdealStockAmountProcessor
         .findOneByCode(isa.getProcessingPeriod().getProcessingSchedule().getCode())
         .orElseThrow(() -> new ValidationMessageException(new Message(
             ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_CODE,
-            isa.getProcessingPeriod().getProcessingSchedule().getCode()
+            isa.getProcessingPeriod().getProcessingSchedule().getCode().toString()
         )));
     ProcessingPeriod period = processingPeriodRepository.findOneByNameAndProcessingSchedule(
         isa.getProcessingPeriod().getName(),
@@ -136,7 +137,7 @@ public class IdealStockAmountProcessor
       final Facility facility = new Facility(isa.getFacility().getCode());
 
       ProcessingSchedule schedule = new ProcessingSchedule();
-      schedule.setCode(isa.getProcessingPeriod().getProcessingSchedule().getCode());
+      schedule.setCode(Code.code(isa.getProcessingPeriod().getProcessingSchedule().getCode()));
       ProcessingPeriod period = new ProcessingPeriod();
       period.setName(isa.getProcessingPeriod().getName());
       period.setProcessingSchedule(schedule);

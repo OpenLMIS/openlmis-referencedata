@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.validate;
 
+import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FROM_FIELD_REQUIRED;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,16 +24,13 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.dto.IdealStockAmountCsvModel;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
-
-import static org.openlmis.referencedata.util.messagekeys.IdealStockAmountMessageKeys.ERROR_FROM_FIELD_REQUIRED;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -45,7 +44,7 @@ public class IdealStockAmountValidatorTest {
 
   private IdealStockAmountCsvModel isa;
   private BasicFacilityDto facility;
-  private ProcessingSchedule processingSchedule;
+  private ProcessingScheduleDto processingSchedule;
   private ProcessingPeriodDto processingPeriod;
   private CommodityTypeDto commodityType;
 
@@ -53,8 +52,8 @@ public class IdealStockAmountValidatorTest {
   public void setUp() {
     facility = new BasicFacilityDto();
     facility.setCode("facility-code");
-    processingSchedule = new ProcessingSchedule();
-    processingSchedule.setCode(Code.code("schedule-code"));
+    processingSchedule = new ProcessingScheduleDto();
+    processingSchedule.setCode("schedule-code");
     processingPeriod = new ProcessingPeriodDto();
     processingPeriod.setName("period");
     processingPeriod.setProcessingSchedule(processingSchedule);

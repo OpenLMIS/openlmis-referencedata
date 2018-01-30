@@ -15,9 +15,8 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
@@ -26,7 +25,7 @@ import org.supercsv.util.CsvContext;
 import java.util.regex.Pattern;
 
 /**
- * This is a custom cell processor used to parse schedule_code|period_name to basic facility dto.
+ * This is a custom cell processor used to parse schedule_code|period_name to processing period dto.
  * This is used in CsvCellProcessors.
  */
 public class ParseProcessingPeriod extends CellProcessorAdaptor implements StringCellProcessor {
@@ -47,9 +46,9 @@ public class ParseProcessingPeriod extends CellProcessorAdaptor implements Strin
 
       result = new ProcessingPeriodDto();
       result.setName(parts[1].trim());
-      ProcessingSchedule processingSchedule = new ProcessingSchedule();
-      processingSchedule.setCode(Code.code(parts[0].trim()));
-      result.setProcessingSchedule(processingSchedule);
+      ProcessingScheduleDto processingScheduleDto = new ProcessingScheduleDto();
+      processingScheduleDto.setCode(parts[0].trim());
+      result.setProcessingSchedule(processingScheduleDto);
     } else {
       throw getSuperCsvCellProcessorException(value, context, null);
     }

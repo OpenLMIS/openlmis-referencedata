@@ -15,18 +15,17 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
-
-import static org.junit.Assert.assertEquals;
 
 public class FormatProcessingPeriodTest {
 
@@ -47,8 +46,8 @@ public class FormatProcessingPeriodTest {
   @Test
   public void shouldFormatValidProcessingPeriod() throws Exception {
     ProcessingPeriodDto period = new ProcessingPeriodDto();
-    ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode(Code.code("schedule"));
+    ProcessingScheduleDto schedule = new ProcessingScheduleDto();
+    schedule.setCode("schedule");
     period.setName("period");
     period.setProcessingSchedule(schedule);
 
@@ -82,8 +81,8 @@ public class FormatProcessingPeriodTest {
   @Test
   public void shouldThrownExceptionWhenScheduleCodeIsNull() {
     ProcessingPeriodDto period = new ProcessingPeriodDto();
-    ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode(Code.code(null));
+    ProcessingScheduleDto schedule = new ProcessingScheduleDto();
+    schedule.setCode(null);
     period.setProcessingSchedule(schedule);
 
     expectedEx.expect(SuperCsvCellProcessorException.class);

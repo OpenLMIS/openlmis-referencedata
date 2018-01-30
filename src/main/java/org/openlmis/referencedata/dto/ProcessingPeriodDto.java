@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.dto;
 
 import org.openlmis.referencedata.domain.ProcessingPeriod;
-import org.openlmis.referencedata.domain.ProcessingSchedule;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,7 +32,7 @@ import java.util.Objects;
 public class ProcessingPeriodDto extends BaseDto
     implements ProcessingPeriod.Exporter, ProcessingPeriod.Importer {
 
-  private ProcessingSchedule processingSchedule;
+  private ProcessingScheduleDto processingSchedule;
   private String name;
   private String description;
   private LocalDate startDate;
