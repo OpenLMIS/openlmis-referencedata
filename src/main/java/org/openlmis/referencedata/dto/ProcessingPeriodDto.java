@@ -66,8 +66,7 @@ public class ProcessingPeriodDto extends BaseDto
 
   @Override
   public void includeProcessingSchedule(ProcessingSchedule.Exporter processingScheduleExporter) {
-    ProcessingScheduleDto scheduleDto = (ProcessingScheduleDto) processingScheduleExporter;
-    processingSchedule = scheduleDto;
+    processingSchedule = (ProcessingScheduleDto) processingScheduleExporter;
   }
 
   @Override
