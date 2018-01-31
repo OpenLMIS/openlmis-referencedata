@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.domain;
 
 import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +24,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -123,10 +123,12 @@ public class ProcessingPeriod extends BaseEntity {
     exporter.setStartDate(startDate);
     exporter.setEndDate(endDate);
 
-    if (processingSchedule != null) {
-      ProcessingScheduleDto processingScheduleDto = new ProcessingScheduleDto();
-      processingSchedule.export(processingScheduleDto);
-      exporter.setProcessingSchedule(processingScheduleDto);
+    Optional<ProcessingSchedule.Exporter> exporterOptional =
+        exporter.provideProcessingScheduleExporter();
+    if (exporterOptional.isPresent()) {
+      ProcessingSchedule.Exporter scheduleExporter = exporterOptional.get();
+      processingSchedule.export(scheduleExporter);
+      exporter.includeProcessingSchedule(scheduleExporter);
     }
 
     if (exporter.supportsDurationInMonths()) {
@@ -157,7 +159,9 @@ public class ProcessingPeriod extends BaseEntity {
 
     void setName(String name);
 
-    void setProcessingSchedule(ProcessingScheduleDto schedule);
+    Optional<ProcessingSchedule.Exporter> provideProcessingScheduleExporter();
+
+    void includeProcessingSchedule(ProcessingSchedule.Exporter processingScheduleExporter);
 
     void setDescription(String description);
 

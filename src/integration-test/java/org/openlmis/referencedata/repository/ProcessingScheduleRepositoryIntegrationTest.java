@@ -15,12 +15,11 @@
 
 package org.openlmis.referencedata.repository;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Lists;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +28,7 @@ import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -125,15 +125,5 @@ public class ProcessingScheduleRepositoryIntegrationTest
         .withName("SOME-NAME")
         .buildWithoutId();
     repository.saveAndFlush(scheduleUpperCase);
-  }
-
-  @Test
-  public void shouldFindByCode() {
-    ProcessingSchedule entity = generateInstance();
-    repository.save(entity);
-
-    Optional<ProcessingSchedule> db = repository.findOneByCode(entity.getCode());
-    assertThat(db.isPresent(), is(true));
-    assertThat(db.get(), is(entity));
   }
 }
