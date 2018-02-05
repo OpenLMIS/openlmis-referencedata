@@ -41,6 +41,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -64,8 +65,9 @@ public class Orderable extends BaseEntity {
   @Getter
   private Code productCode;
 
-  @Embedded
-  @Getter(AccessLevel.PACKAGE)
+  @ManyToOne
+  @JoinColumn(name = "dispensableid", nullable = false)
+  @Getter
   private Dispensable dispensable;
 
   @Getter

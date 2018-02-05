@@ -20,6 +20,8 @@ var filesOrdered = [
     "referencedata.processing_periods",
     "referencedata.commodity_types",
     "referencedata.orderable_display_categories",
+    "referencedata.dispensables",
+    "referencedata.dispensable_attributes",
     "referencedata.orderables",
     "referencedata.programs",
     "referencedata.program_orderables",

@@ -15,26 +15,43 @@
 
 package org.openlmis.referencedata.domain;
 
-import lombok.Getter;
-import javax.persistence.Embeddable;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A Dispensable describes how product is dispensed/given to a patient.
  * Description of the Dispensable contains information about product form,
  * dosage, dispensing unit etc.
  */
-@Embeddable
-public class Dispensable {
+@Entity
+@Table(name = "dispensables")
+public class Dispensable extends BaseEntity {
 
-  @Getter
-  private final String dispensingUnit;
+  private static final String KEY_DISPENSING_UNIT = "dispensingUnit";
+
+  @ElementCollection(fetch = FetchType.EAGER)
+  @MapKeyColumn(name = "key")
+  @Column(name = "value")
+  @CollectionTable(
+      name = "dispensable_attributes",
+      joinColumns = @JoinColumn(name = "dispensableid"))
+  private Map<String, String> attributes;
 
   protected Dispensable() {
-    this.dispensingUnit = "";
+    attributes = new HashMap<>();
   }
 
   private Dispensable(String dispensingUnit) {
-    this.dispensingUnit = dispensingUnit.trim();
+    this();
+    attributes.put(KEY_DISPENSING_UNIT, dispensingUnit);
   }
 
   @Override
@@ -47,17 +64,18 @@ public class Dispensable {
       return false;
     }
 
-    return this.dispensingUnit.equalsIgnoreCase(((Dispensable) object).dispensingUnit);
+    return this.attributes.get(KEY_DISPENSING_UNIT)
+        .equalsIgnoreCase(((Dispensable) object).attributes.get(KEY_DISPENSING_UNIT));
   }
 
   @Override
   public final int hashCode() {
-    return dispensingUnit.toLowerCase().hashCode();
+    return attributes.hashCode();
   }
 
   @Override
   public String toString() {
-    return dispensingUnit;
+    return attributes.getOrDefault(KEY_DISPENSING_UNIT, "");
   }
 
   public static Dispensable createNew(String dispensingUnit) {
@@ -84,7 +102,7 @@ public class Dispensable {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setDispensingUnit(dispensingUnit);
+    exporter.setDispensingUnit(attributes.get(KEY_DISPENSING_UNIT));
   }
 
   public interface Exporter {
