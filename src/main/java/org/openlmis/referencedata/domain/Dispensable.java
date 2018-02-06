@@ -15,11 +15,20 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.Getter;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
+
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
@@ -27,15 +36,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A Dispensable describes how product is dispensed/given to a patient.
- * Description of the Dispensable contains information about product form,
+ * A dispensable describes how product is dispensed/given to a patient.
+ * Description of the dispensable contains information about product form,
  * dosage, dispensing unit etc.
  */
 @Entity
 @Table(name = "dispensables")
-public class Dispensable extends BaseEntity {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("abstract")
+public abstract class Dispensable extends BaseEntity {
 
-  private static final String KEY_DISPENSING_UNIT = "dispensingUnit";
+  public static final String KEY_DISPENSING_UNIT = "dispensingUnit";
+  public static final String KEY_SIZE_CODE = "sizeCode";
+  public static final String KEY_ROUTE_OF_ADMINISTRATION = "routeOfAdministration";
 
   @ElementCollection(fetch = FetchType.EAGER)
   @MapKeyColumn(name = "key")
@@ -43,73 +57,69 @@ public class Dispensable extends BaseEntity {
   @CollectionTable(
       name = "dispensable_attributes",
       joinColumns = @JoinColumn(name = "dispensableid"))
-  private Map<String, String> attributes;
+  @Getter
+  protected Map<String, String> attributes;
 
   protected Dispensable() {
     attributes = new HashMap<>();
   }
 
-  private Dispensable(String dispensingUnit) {
-    this();
-    attributes.put(KEY_DISPENSING_UNIT, dispensingUnit);
-  }
+  public abstract boolean equals(Object object);
 
-  @Override
-  public final boolean equals(Object object) {
-    if (null == object) {
-      return false;
-    }
+  public abstract int hashCode();
 
-    if (!(object instanceof Dispensable)) {
-      return false;
-    }
-
-    return this.attributes.get(KEY_DISPENSING_UNIT)
-        .equalsIgnoreCase(((Dispensable) object).attributes.get(KEY_DISPENSING_UNIT));
-  }
-
-  @Override
-  public final int hashCode() {
-    return attributes.hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return attributes.getOrDefault(KEY_DISPENSING_UNIT, "");
-  }
-
-  public static Dispensable createNew(String dispensingUnit) {
-    String correctDispensingUnit = (null == dispensingUnit) ? "" : dispensingUnit;
-    return new Dispensable(correctDispensingUnit);
-  }
-
-  /**
-   * Creates new instance based on data from {@link Importer}
-   *
-   * @param importer instance of {@link Importer}
-   * @return new instance of Dispensable.
-   */
-  public static Dispensable newInstance(Importer importer) {
-    if (importer == null) {
-      return new Dispensable();
-    }
-    return new Dispensable(importer.getDispensingUnit());
-  }
+  public abstract String toString();
 
   /**
    * Export this object to the specified exporter (DTO).
    *
    * @param exporter exporter to export to
    */
-  public void export(Exporter exporter) {
-    exporter.setDispensingUnit(attributes.get(KEY_DISPENSING_UNIT));
+  public void export(Dispensable.Exporter exporter) {
+    exporter.setAttributes(attributes);
+    exporter.setToString(toString());
   }
 
-  public interface Exporter {
-    void setDispensingUnit(String dispensingUnit);
+  public static Dispensable createNew(String dispensingUnit) {
+    return new DefaultDispensable(dispensingUnit);
+  }
+
+  /**
+   * Create a Dispensable based on a set of dispensable-related attributes. If there is a sizeCode
+   * and a routeOfAdministration, create a VaccineDispensable. If there is just a sizeCode, create
+   * a ContainerDispensable. If there is a dispensingUnit, create a DefaultDispensable. If none of
+   * these are provided, or the Map is null, throw an Exception indicating dispensable is required.
+   *
+   * @param importer instance of {@link Dispensable.Importer}
+   * @return appropriate dispensable
+   */
+  public static Dispensable createNew(Dispensable.Importer importer) {
+    if (null == importer || null == importer.getAttributes()) {
+      throw new ValidationMessageException(OrderableMessageKeys.ERROR_DISPENSABLE_REQUIRED);
+    }
+
+    String sizeCode = importer.getAttributes().get(KEY_SIZE_CODE);
+    String routeOfAdministration = importer.getAttributes().get(KEY_ROUTE_OF_ADMINISTRATION);
+    String dispensingUnit = importer.getAttributes().get(KEY_DISPENSING_UNIT);
+
+    if (null != sizeCode && null != routeOfAdministration) {
+      return new VaccineDispensable(sizeCode, routeOfAdministration);
+    } else if (null != sizeCode) {
+      return new ContainerDispensable(sizeCode);
+    } else if (null != dispensingUnit) {
+      return new DefaultDispensable(dispensingUnit);
+    } else {
+      throw new ValidationMessageException(OrderableMessageKeys.ERROR_DISPENSABLE_REQUIRED);
+    }
   }
 
   public interface Importer {
-    String getDispensingUnit();
+    Map<String, String> getAttributes();
+  }
+
+  public interface Exporter {
+    void setAttributes(Map<String, String> attributes);
+
+    void setToString(String toString);
   }
 }

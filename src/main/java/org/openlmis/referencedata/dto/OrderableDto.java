@@ -20,6 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,5 +80,11 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
     po.export(orderableDto);
 
     return orderableDto;
+  }
+
+  @Override
+  public void setDispensable(Dispensable dispensable) {
+    this.dispensable = new DispensableDto();
+    dispensable.export(this.dispensable);
   }
 }

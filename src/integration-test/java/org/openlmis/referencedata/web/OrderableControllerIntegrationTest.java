@@ -83,8 +83,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Before
   public void setUp() {
-    orderableDto = new OrderableDto("code", new DispensableDto(UNIT), NAME, "description", 0L, 0L,
-        false, Collections.emptySet(), null, null);
+    orderableDto = new OrderableDto("code", new DispensableDto(UNIT, null, null, UNIT),
+        NAME, "description", 0L, 0L, false, Collections.emptySet(), null, null);
 
     orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
         "Abcd", "description", 10, 5, false, Collections.emptySet(), null, null);

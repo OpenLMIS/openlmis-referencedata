@@ -156,63 +156,108 @@
   },
   {
     "dispensableId": "0251c7ba-da9e-4e7e-981d-d3b57d336981",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "20 dose"
+  },
+  {
+    "dispensableId": "0251c7ba-da9e-4e7e-981d-d3b57d336981",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "33259963-6feb-48d6-b29d-d313936cdbb3",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "5 dose"
+  },
+  {
+    "dispensableId": "33259963-6feb-48d6-b29d-d313936cdbb3",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "cb27d04b-b5a3-4b1c-b3f5-e4912f217eba",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "20 dose"
+  },
+  {
+    "dispensableId": "cb27d04b-b5a3-4b1c-b3f5-e4912f217eba",
+    "key": "routeOfAdministration",
+    "value": "oral drop"
   },
   {
     "dispensableId": "30f45eb1-7d68-4962-8927-60f989f78af3",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "1 dose"
+  },
+  {
+    "dispensableId": "30f45eb1-7d68-4962-8927-60f989f78af3",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "bb81110c-7a94-4ac3-9bd5-67184160259d",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "10 dose"
+  },
+  {
+    "dispensableId": "bb81110c-7a94-4ac3-9bd5-67184160259d",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "54d6f74f-2d10-4d69-92ff-31da53c16b46",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "2 dose"
+  },
+  {
+    "dispensableId": "54d6f74f-2d10-4d69-92ff-31da53c16b46",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "b7c4800e-5955-45df-8a4f-4f260f00d493",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "1 dose"
+  },
+  {
+    "dispensableId": "b7c4800e-5955-45df-8a4f-4f260f00d493",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "0198a03d-d138-489d-a1f4-3c4a1719b987",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "10 dose"
+  },
+  {
+    "dispensableId": "0198a03d-d138-489d-a1f4-3c4a1719b987",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "afbd8835-9264-4602-87a4-41f5a752da82",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "10 dose"
+  },
+  {
+    "dispensableId": "afbd8835-9264-4602-87a4-41f5a752da82",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "b9c8ba9b-91ec-4908-9c68-ecbd579036eb",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "5ml"
   },
   {
     "dispensableId": "df396885-aba2-40dc-bfc2-212be35eb9d2",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "0.5ml"
   },
   {
     "dispensableId": "eea1399c-b99d-4e8a-af86-6a8062978bd9",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "0.05ml"
   },
   {
     "dispensableId": "82801936-acf5-47c7-8712-3d518479c941",
@@ -226,63 +271,108 @@
   },
   {
     "dispensableId": "50b7b60f-8ac6-42fe-a74f-bbf8b4e2b570",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "20 dose"
+  },
+  {
+    "dispensableId": "50b7b60f-8ac6-42fe-a74f-bbf8b4e2b570",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "c55bcbff-166e-4486-85e8-0f06acf978fe",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "5 dose"
+  },
+  {
+    "dispensableId": "c55bcbff-166e-4486-85e8-0f06acf978fe",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "9f4336d5-e1da-47f6-bdc1-2470672ca1ef",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "20 dose"
+  },
+  {
+    "dispensableId": "9f4336d5-e1da-47f6-bdc1-2470672ca1ef",
+    "key": "routeOfAdministration",
+    "value": "oral drop"
   },
   {
     "dispensableId": "d18c1b6e-9961-4106-801d-28ce4a71bd47",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "1 dose"
+  },
+  {
+    "dispensableId": "d18c1b6e-9961-4106-801d-28ce4a71bd47",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "915ecc5c-87ff-425e-ac64-45c831b6672b",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "10 dose"
+  },
+  {
+    "dispensableId": "915ecc5c-87ff-425e-ac64-45c831b6672b",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "843457e4-0de6-46c4-aa8a-5df5d00aaa8f",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "2 dose"
+  },
+  {
+    "dispensableId": "843457e4-0de6-46c4-aa8a-5df5d00aaa8f",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "22011f6f-1b25-42cd-aedf-e5e92efa186b",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "1 dose"
+  },
+  {
+    "dispensableId": "22011f6f-1b25-42cd-aedf-e5e92efa186b",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "a3d9fd8a-27a6-4288-93d3-92f941885e5d",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "10 dose"
+  },
+  {
+    "dispensableId": "a3d9fd8a-27a6-4288-93d3-92f941885e5d",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "c05d4177-8844-48f8-94fb-3ecf6b3fb1cc",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "10 dose"
+  },
+  {
+    "dispensableId": "c05d4177-8844-48f8-94fb-3ecf6b3fb1cc",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "d4d15162-5718-4f8d-942a-b8b85f3f78e4",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "5ml"
   },
   {
     "dispensableId": "d88a3cd4-271a-49d3-961a-fbef88a74e4c",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "0.5ml"
   },
   {
     "dispensableId": "7dea5bc1-daf4-4c82-a447-d9393822c4fc",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "0.05ml"
   },
   {
     "dispensableId": "b9c10903-dad3-47b6-b6e5-21dd9d232ad8",
@@ -296,12 +386,22 @@
   },
   {
     "dispensableId": "73d9e5ae-dae2-4578-8952-746cc62067a0",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "20 dose"
+  },
+  {
+    "dispensableId": "73d9e5ae-dae2-4578-8952-746cc62067a0",
+    "key": "routeOfAdministration",
+    "value": "injection"
   },
   {
     "dispensableId": "3722add3-32f4-4b3a-bdd5-ca036ac73624",
-    "key": "dispensingUnit",
-    "value": "each"
+    "key": "sizeCode",
+    "value": "10 dose"
+  },
+  {
+    "dispensableId": "3722add3-32f4-4b3a-bdd5-ca036ac73624",
+    "key": "routeOfAdministration",
+    "value": "injection"
   }
 ]

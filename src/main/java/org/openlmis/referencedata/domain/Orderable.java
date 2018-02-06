@@ -17,7 +17,6 @@ package org.openlmis.referencedata.domain;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
 import lombok.AccessLevel;
@@ -65,7 +64,7 @@ public class Orderable extends BaseEntity {
   @Getter
   private Code productCode;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "dispensableid", nullable = false)
   @Getter
   private Dispensable dispensable;
@@ -179,7 +178,7 @@ public class Orderable extends BaseEntity {
     Orderable orderable = new Orderable();
     orderable.id = importer.getId();
     orderable.productCode = Code.code(importer.getProductCode());
-    orderable.dispensable = Dispensable.newInstance(importer.getDispensable());
+    orderable.dispensable = Dispensable.createNew(importer.getDispensable());
     orderable.fullProductName = importer.getFullProductName();
     orderable.description = importer.getDescription();
     orderable.netContent = importer.getNetContent();
@@ -201,7 +200,7 @@ public class Orderable extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setProductCode(productCode.toString());
-    exporter.setDispensable(DispensableDto.newInstance(dispensable));
+    exporter.setDispensable(dispensable);
     exporter.setFullProductName(fullProductName);
     exporter.setDescription(description);
     exporter.setNetContent(netContent);
@@ -217,7 +216,7 @@ public class Orderable extends BaseEntity {
 
     void setProductCode(String productCode);
 
-    void setDispensable(DispensableDto dispensable);
+    void setDispensable(Dispensable dispensable);
 
     void setFullProductName(String fullProductName);
 
@@ -241,7 +240,7 @@ public class Orderable extends BaseEntity {
 
     String getProductCode();
 
-    DispensableDto getDispensable();
+    Dispensable.Importer getDispensable();
 
     String getFullProductName();
 

@@ -29,6 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
@@ -99,6 +100,7 @@ public class OrderableBuilderTest {
     orderableDto.setPackRoundingThreshold(1L);
     orderableDto.setRoundToZero(true);
     orderableDto.setPrograms(programs);
+    orderableDto.setDispensable(Dispensable.createNew("each"));
 
     return orderableBuilder.newOrderable(orderableDto);
   }

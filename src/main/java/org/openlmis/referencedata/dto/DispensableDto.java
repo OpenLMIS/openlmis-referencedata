@@ -15,36 +15,52 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.openlmis.referencedata.domain.Dispensable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DispensableDto implements Dispensable.Exporter, Dispensable.Importer {
 
   private String dispensingUnit;
+  private String sizeCode;
+  private String routeOfAdministration;
+  private String displayUnit;
 
-  /**
-   * Creates new instance based on given {@link Dispensable}.
-   *
-   * @param dispensable instance of Dispensable.
-   * @return new instance of DispensableDto.
-   */
-  public static DispensableDto newInstance(Dispensable dispensable) {
-    if (dispensable == null) {
-      return null;
-    }
-    DispensableDto dispensableDto = new DispensableDto();
-    dispensable.export(dispensableDto);
+  @Override
+  @JsonIgnore
+  public void setAttributes(Map<String, String> attributes) {
+    dispensingUnit = attributes.get(Dispensable.KEY_DISPENSING_UNIT);
+    sizeCode = attributes.get(Dispensable.KEY_SIZE_CODE);
+    routeOfAdministration = attributes.get(Dispensable.KEY_ROUTE_OF_ADMINISTRATION);
+  }
 
-    return dispensableDto;
+  @Override
+  @JsonIgnore
+  public void setToString(String toString) {
+    displayUnit = toString;
+  }
 
+  @Override
+  @JsonIgnore
+  public Map<String, String> getAttributes() {
+    Map<String, String> attributes = new HashMap<>();
+
+    attributes.put(Dispensable.KEY_DISPENSING_UNIT, dispensingUnit);
+    attributes.put(Dispensable.KEY_SIZE_CODE, sizeCode);
+    attributes.put(Dispensable.KEY_ROUTE_OF_ADMINISTRATION, routeOfAdministration);
+
+    return attributes;
   }
 }

@@ -27,6 +27,7 @@ public abstract class OrderableMessageKeys extends MessageKeys {
       join(ERROR, "roundToZero", REQUIRED);
   public static final String ERROR_NET_CONTENT_REQUIRED =
       join(ERROR, "netContent", REQUIRED);
+  public static final String ERROR_DISPENSABLE_REQUIRED = join(ERROR, "dispensable", REQUIRED);
   public static final String ERROR_SEARCH_LACKS_PARAMS = join(ERROR, SEARCH, LACKS_PARAMETERS);
   public static final String ERROR_DUPLICATED = join(ERROR, DUPLICATED);
 }

@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.CurrencyConfig;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
@@ -31,6 +32,8 @@ import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 public class ProgramOrderableRepositoryIntegrationTest
@@ -55,8 +58,11 @@ public class ProgramOrderableRepositoryIntegrationTest
   }
 
   ProgramOrderable generateInstance() {
+    int instanceNumber = getNextInstanceNumber();
     Program program = generateProgram();
-    Orderable orderable = orderableRepository.save(new Orderable());
+    Orderable orderable = orderableRepository.save(new Orderable(Code.code("code" + instanceNumber),
+        Dispensable.createNew("each"), "name", "description", 10, 5, false, new HashSet<>(),
+        Collections.emptyMap(), Collections.emptyMap()));
     OrderableDisplayCategory orderableDisplayCategory = OrderableDisplayCategory.createNew(
         Code.code("testcat"));
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
