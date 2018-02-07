@@ -12,6 +12,10 @@
       "type": "string",
       "title": "manufacturerOfTradeItem"
     },
+    "gtin": {
+      "type": "string",
+      "title": "gtin"
+    },
     "classifications": {
       "type": "array",
       "title": "classifications",

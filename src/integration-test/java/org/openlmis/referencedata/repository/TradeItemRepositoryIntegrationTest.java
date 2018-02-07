@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.iterableWithSize;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -98,6 +99,20 @@ public class TradeItemRepositoryIntegrationTest extends
     tradeItem.assignCommodityType("cxxx", "bb2");
 
     repository.save(tradeItem);
+
+    repository.flush();
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldNotAllowDuplicateGtin() {
+    TradeItem tradeItem = generateInstance();
+    tradeItem.setGtin(new Gtin("1"));
+
+    TradeItem anotherTradeItem = generateInstance();
+    anotherTradeItem.setGtin(new Gtin("1"));
+
+    repository.save(tradeItem);
+    repository.save(anotherTradeItem);
 
     repository.flush();
   }

@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.Setter;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.TradeItemClassificationDto;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -56,6 +59,17 @@ public final class TradeItem extends BaseEntity {
   @Getter
   @DiffIgnore
   private List<TradeItemClassification> classifications;
+
+  @Column(nullable = true, unique = true, columnDefinition = "text")
+  @Getter
+  @Setter
+  @Embedded
+  private Gtin gtin;
+
+  public TradeItem(String manufacturerOfTradeItem, List<TradeItemClassification> classifications) {
+    this.manufacturerOfTradeItem = manufacturerOfTradeItem;
+    this.classifications = classifications;
+  }
 
   /**
    * A TradeItem can fulfill for the given product if the product is this trade item or if this
@@ -118,6 +132,7 @@ public final class TradeItem extends BaseEntity {
     tradeItem.id = importer.getId();
     tradeItem.manufacturerOfTradeItem = importer.getManufacturerOfTradeItem();
     tradeItem.classifications = new ArrayList<>();
+    tradeItem.gtin = importer.getGtin();
     if (importer.getClassifications() != null) {
       importer.getClassifications().forEach(oe ->
           tradeItem.classifications.add(TradeItemClassification.newInstance(oe, tradeItem)));
@@ -134,6 +149,7 @@ public final class TradeItem extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setManufacturerOfTradeItem(manufacturerOfTradeItem);
+    exporter.setGtin(gtin);
     exporter.setClassifications(TradeItemClassificationDto.newInstance(classifications));
   }
 
@@ -143,6 +159,8 @@ public final class TradeItem extends BaseEntity {
     String getManufacturerOfTradeItem();
 
     List<TradeItemClassificationDto> getClassifications();
+
+    Gtin getGtin();
   }
 
   public interface Exporter {
@@ -151,5 +169,7 @@ public final class TradeItem extends BaseEntity {
     void setManufacturerOfTradeItem(String manufacturerOfTradeItem);
 
     void setClassifications(List<TradeItemClassificationDto> classifications);
+
+    void setGtin(Gtin gtin);
   }
 }

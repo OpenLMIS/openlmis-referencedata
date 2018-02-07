@@ -30,6 +30,7 @@ import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.E
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
+import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemDto;
@@ -62,7 +63,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewTradeItem() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    TradeItem tradeItem = generateItem("item");
+    TradeItem tradeItem = generateItem("item", "123");
 
     when(tradeItemRepository.save(any(TradeItem.class))).thenAnswer(new SaveAnswer<TradeItem>());
 
@@ -94,8 +95,8 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveAllTradeItems() {
 
-    List<TradeItem> items = asList(generateItem("one"),
-        generateItem("two"));
+    List<TradeItem> items = asList(generateItem("one", "111"),
+        generateItem("two", "222"));
 
     when(tradeItemRepository.findAll()).thenReturn(items);
 
@@ -118,8 +119,8 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveTradeItemsByPartialMatch() {
 
-    List<TradeItem> items = asList(generateItem("one"),
-        generateItem("two"));
+    List<TradeItem> items = asList(generateItem("one", "111"),
+        generateItem("two", "222"));
 
     when(tradeItemRepository.findByClassificationIdLike(CID)).thenReturn(items);
 
@@ -143,8 +144,8 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveTradeItemsByFullMatch() {
 
-    List<TradeItem> items = asList(generateItem("one"),
-        generateItem("two"));
+    List<TradeItem> items = asList(generateItem("one", "111"),
+        generateItem("two", "222"));
 
     when(tradeItemRepository.findByClassificationId(CID)).thenReturn(items);
 
@@ -172,7 +173,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .body(generateItem("name"))
+        .body(generateItem("name", null))
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .put(RESOURCE_URL)
@@ -222,17 +223,21 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(generateItem("abc"));
+    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(
+        generateItem("abc", null));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  private TradeItem generateItem(String manufacturer) {
+  private TradeItem generateItem(String manufacturer, String gtin) {
     TradeItem tradeItem = new TradeItem(manufacturer, new ArrayList<>());
     tradeItem.assignCommodityType("sys1", "sys1Id");
     tradeItem.assignCommodityType("sys2", "sys2Id");
+    if (gtin != null) {
+      tradeItem.setGtin(new Gtin(gtin));
+    }
     return tradeItem;
   }
 
@@ -243,6 +248,9 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
       Map<String, String> retrieved = (LinkedHashMap) pageContent.get(i);
       assertEquals(expected.get(i).getManufacturerOfTradeItem(),
           retrieved.get("manufacturerOfTradeItem"));
+      String expectedGtin = (expected.get(i).getGtin() == null)
+          ? null : expected.get(i).getGtin().toString();
+      assertEquals(expectedGtin, retrieved.get("gtin"));
     }
   }
 }

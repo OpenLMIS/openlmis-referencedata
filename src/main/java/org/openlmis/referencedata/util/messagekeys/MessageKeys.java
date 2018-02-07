@@ -40,6 +40,7 @@ public abstract class MessageKeys {
   protected static final String FAILED = "failed";
   protected static final String SAVING = "saving";
   protected static final String NUMBER = "number";
+  protected static final String NUMERIC = "numeric";
   protected static final String EMPTY = "empty";
   protected static final String RESET = "reset";
   protected static final String WRONG = "wrong";
