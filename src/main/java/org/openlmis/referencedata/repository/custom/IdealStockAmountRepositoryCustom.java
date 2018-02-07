@@ -24,7 +24,7 @@ import java.util.UUID;
 
 public interface IdealStockAmountRepositoryCustom {
 
-  List<IdealStockAmount> search(List<IdealStockAmount> idealStockAmounts);
+  List<UUID> search(List<IdealStockAmount> idealStockAmounts);
 
   Page<IdealStockAmount> search(UUID facilityId, UUID commodityTypeId, UUID processingPeriodId,
                                 Pageable pageable);

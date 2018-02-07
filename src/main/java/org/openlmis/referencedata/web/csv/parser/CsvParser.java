@@ -15,8 +15,10 @@
 
 package org.openlmis.referencedata.web.csv.parser;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
+
 import com.google.common.collect.Lists;
-import lombok.NoArgsConstructor;
+
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -33,15 +35,11 @@ import org.springframework.stereotype.Component;
 import org.supercsv.exception.SuperCsvException;
 import org.supercsv.util.CsvContext;
 
+import lombok.NoArgsConstructor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static java.util.concurrent.CompletableFuture.runAsync;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
 
 /**
  * This class has logic to invoke corresponding respective record handler to parse data from input
@@ -57,9 +55,6 @@ public class CsvParser {
 
   @Value("${csvParser.chunkSize}")
   private int chunkSize;
-
-  @Value("${csvParser.poolSize}")
-  private int poolSize;
 
   /**
    * Parses data from input stream into the corresponding model.
@@ -83,31 +78,18 @@ public class CsvParser {
     profiler.start("VALIDATE_HEADERS");
     csvBeanReader.validateHeaders();
 
-    profiler.start("NEW_THREAD_POOL");
-    ExecutorService executor = Executors.newFixedThreadPool(Math.min(1, poolSize));
-    List<CompletableFuture<Void>> futures = Lists.newArrayList();
+    profiler.start("PROCESS_CSV");
+    while (true) {
+      List<D> imported = doRead(csvBeanReader);
 
-    profiler.start("DO_READ");
-    try {
-      while (true) {
-        List<D> imported = doRead(csvBeanReader);
-
-        if (imported.isEmpty()) {
-          break;
-        }
-
-        Runnable runnable = () -> doWrite(processor, writer, imported);
-        CompletableFuture<Void> future = runAsync(runnable, executor);
-        futures.add(future);
+      if (imported.isEmpty()) {
+        break;
       }
-    } finally {
-      profiler.start("JOIN_RESULTS");
 
-      futures.forEach(CompletableFuture::join);
+      doWrite(processor, writer, imported);
     }
 
     profiler.stop().log();
-
     return csvBeanReader.getRowNumber() - 1;
   }
 

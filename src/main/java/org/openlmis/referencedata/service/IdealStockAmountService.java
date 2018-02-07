@@ -15,13 +15,17 @@
 
 package org.openlmis.referencedata.service;
 
+import com.google.common.collect.Lists;
+
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class IdealStockAmountService {
@@ -30,11 +34,12 @@ public class IdealStockAmountService {
   private IdealStockAmountRepository repository;
 
   public List<IdealStockAmount> search() {
-    return repository.search(null);
+    return search(null);
   }
 
   public List<IdealStockAmount> search(List<IdealStockAmount> idealStockAmounts) {
-    return repository.search(idealStockAmounts);
+    List<UUID> uuids = repository.search(idealStockAmounts);
+    return Lists.newArrayList(repository.findAll(uuids));
   }
 
   public Page<IdealStockAmount> search(IdealStockAmountSearchParams requestParams,

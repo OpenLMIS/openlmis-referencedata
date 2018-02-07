@@ -15,6 +15,11 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,13 +31,10 @@ import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.repository.IdealStockAmountRepository;
 
 import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
-public class IdealStockAmountTest {
+public class IdealStockAmountServiceTest {
 
   @Mock
   private IdealStockAmountRepository repository;
@@ -43,26 +45,35 @@ public class IdealStockAmountTest {
   @Mock
   private IdealStockAmount isa;
 
+  private UUID isaId = UUID.randomUUID();
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    when(isa.getId()).thenReturn(isaId);
   }
 
   @Test
   public void shouldCallRepositorySearch() {
     when(repository.search(null))
+        .thenReturn(Collections.singletonList(isaId));
+    when(repository.findAll(any(Iterable.class)))
         .thenReturn(Collections.singletonList(isa));
 
     assertEquals(Collections.singletonList(isa), service.search());
     verify(repository).search(null);
+    verify(repository).findAll(any(Iterable.class));
   }
 
   @Test
   public void shouldCallRepositorySearchWithListParameter() {
     when(repository.search(Collections.singletonList(isa)))
+        .thenReturn(Collections.singletonList(isaId));
+    when(repository.findAll(any(Iterable.class)))
         .thenReturn(Collections.singletonList(isa));
 
     assertEquals(Collections.singletonList(isa), service.search(Collections.singletonList(isa)));
     verify(repository).search(Collections.singletonList(isa));
+    verify(repository).findAll(any(Iterable.class));
   }
 }

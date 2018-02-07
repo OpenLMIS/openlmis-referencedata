@@ -20,39 +20,35 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.PostgresUUIDType;
-import org.hibernate.type.StringType;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
-import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.custom.IdealStockAmountRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositoryCustom {
 
-  private static final String SEARCH_SQL = "SELECT"
-      + " isa.id AS isa_id, isa.amount as isa_amount,"
-      + " f.id AS facility_id, f.code AS facility_code,"
-      + " c.id AS commodity_id,  c.classificationid AS classification_id,"
-      + " c.classificationsystem AS classification_system, p.id AS period_id,"
-      + " p.name AS period_name, s.code AS schedule_code"
+  private static final String ID_SEARCH_SQL = "SELECT"
+      + " isa.id AS isa_id "
       + " FROM referencedata.ideal_stock_amounts isa"
       + " INNER JOIN referencedata.facilities f ON isa.facilityid = f.id"
       + " INNER JOIN referencedata.commodity_types c ON isa.commoditytypeid = c.id"
@@ -88,23 +84,17 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
   private EntityManager entityManager;
 
   /**
-   * This method is supposed to retrieve all IdealStockAmounts that are present in given list.
-   * List does not have to contain whole objects, just properties that will be used:
-   * facility.code, processingPeriod.name, processingPeriod.processingSchedule.code,
-   * commodityType.classificationId, commodityType.classificationSystem
+   * This method is supposed to retrieve all IdealStockAmount IDs based on the passed ISA objects.
+   * It uses the facility, commodity type and processing period data to find correct database
+   * instances and then collects UUIDs of all the instances it found and returns them.
    *
    * @param idealStockAmounts list of ideal stock amounts with required fields
-   * @return List of found Ideal Stock Amounts.
+   * @return List of found Ideal Stock Amount IDs.
    */
-  public List<IdealStockAmount> search(List<IdealStockAmount> idealStockAmounts) {
+  public List<UUID> search(List<IdealStockAmount> idealStockAmounts) {
     Query query = createQuery(idealStockAmounts);
-    prepareQuery(query);
-
-    // hibernate always returns a list of array of objects
-    @SuppressWarnings("unchecked")
-    List<Object[]> list = Collections.checkedList(query.getResultList(), Object[].class);
-
-    return list.stream().map(this::toIsa).collect(Collectors.toList());
+    prepareIdQuery(query);
+    return Collections.checkedList(query.getResultList(), Object[].class);
   }
 
   /**
@@ -147,30 +137,6 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
     return Pagination.getPage(result, pageable, count.get(0));
   }
 
-  private IdealStockAmount toIsa(Object[] values) {
-    Facility facility = new Facility((String) values[5]);
-    facility.setId((UUID) values[FACILITY_ID]);
-
-    ProcessingSchedule schedule = new ProcessingSchedule();
-    schedule.setCode(Code.code((String) values[9]));
-
-    ProcessingPeriod period = new ProcessingPeriod();
-    period.setId((UUID) values[PERIOD_ID]);
-    period.setName((String) values[8]);
-    period.setProcessingSchedule(schedule);
-
-    CommodityType commodityType = new CommodityType();
-    commodityType.setId((UUID) values[COMMODITY_ID]);
-    commodityType.setClassificationId((String) values[6]);
-    commodityType.setClassificationSystem((String) values[7]);
-
-    IdealStockAmount result = new IdealStockAmount(facility, commodityType,
-        period, (Integer) values[ISA_AMOUNT]);
-    result.setId((UUID) values[ISA_ID]);
-
-    return result;
-  }
-
   private IdealStockAmount toMinimalIsa(Object[] values) {
     Facility facility = new Facility((UUID) values[FACILITY_ID]);
 
@@ -187,13 +153,9 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
     return result;
   }
 
-  private void prepareQuery(Query query) {
-    SQLQuery sql = prepareMinimalQuery(query);
-    sql.addScalar("facility_code", StringType.INSTANCE);
-    sql.addScalar("classification_id", StringType.INSTANCE);
-    sql.addScalar("classification_system", StringType.INSTANCE);
-    sql.addScalar("period_name", StringType.INSTANCE);
-    sql.addScalar("schedule_code", StringType.INSTANCE);
+  private void prepareIdQuery(Query query) {
+    SQLQuery sql = query.unwrap(SQLQuery.class);
+    sql.addScalar("isa_id", PostgresUUIDType.INSTANCE);
   }
 
   private SQLQuery prepareMinimalQuery(Query query) {
@@ -212,7 +174,7 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
   }
 
   private Query createQuery(List<IdealStockAmount> idealStockAmounts) {
-    StringBuilder builder = new StringBuilder(SEARCH_SQL);
+    StringBuilder builder = new StringBuilder(ID_SEARCH_SQL);
 
     if (!isEmpty(idealStockAmounts)) {
       builder.append(" WHERE");
@@ -233,7 +195,7 @@ public class IdealStockAmountRepositoryImpl implements IdealStockAmountRepositor
             .append("')");
 
         if (i + 1 < size) {
-          builder.append(" AND");
+          builder.append(" OR");
         }
       }
     }

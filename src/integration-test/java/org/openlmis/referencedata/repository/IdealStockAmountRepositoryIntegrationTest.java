@@ -15,13 +15,12 @@
 
 package org.openlmis.referencedata.repository;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
+import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -40,10 +39,10 @@ import org.springframework.data.domain.PageRequest;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class IdealStockAmountRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<IdealStockAmount> {
 
@@ -73,6 +72,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
 
   private Facility facility;
   private ProcessingPeriod period;
+  private ProcessingPeriod period2;
   private ProcessingSchedule schedule;
   private CommodityType commodityType;
   private UUID facilityId;
@@ -127,6 +127,13 @@ public class IdealStockAmountRepositoryIntegrationTest extends
     period.setEndDate(LocalDate.of(2017, 9, 25));
     processingPeriodId = processingPeriodRepository.save(period).getId();
 
+    period2 = new ProcessingPeriod();
+    period2.setProcessingSchedule(schedule);
+    period2.setName("period2");
+    period2.setStartDate(LocalDate.of(2017, 9, 26));
+    period2.setEndDate(LocalDate.of(2017, 10, 25));
+    processingPeriodRepository.save(period2);
+
     amount = 1000;
   }
 
@@ -135,46 +142,22 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   }
 
   @Test
-  public void shouldGetListOfIdealStockAmounts() {
+  public void shouldGetIdsOfIdealStockAmounts() {
     IdealStockAmount isa = generateInstance();
+    IdealStockAmount isa2 = generateInstance();
+    isa2.setProcessingPeriod(period2);
 
-    List<IdealStockAmount> list = isaRepository.search(Collections.singletonList(isa));
+    List<UUID> list = isaRepository.search(Lists.newArrayList(isa, isa2));
     assertThat(list, hasSize(0));
 
     isa = isaRepository.save(isa);
+    isa2 = isaRepository.save(isa2);
 
-    list = isaRepository.search(Collections.singletonList(isa));
+    list = isaRepository.search(Lists.newArrayList(isa, isa2));
 
-    assertThat(list, hasSize(1));
-
-    IdealStockAmount idealStockAmount = list.get(0);
-    assertThat(idealStockAmount.getAmount(), equalTo(1000));
-    assertThat(idealStockAmount.getId(), equalTo(isa.getId()));
-
-    Facility facility = idealStockAmount.getFacility();
-    assertThat(facility, is(notNullValue()));
-    assertThat(facility.getId(), equalTo(this.facility.getId()));
-
-    ProcessingPeriod processingPeriod = idealStockAmount.getProcessingPeriod();
-    assertThat(processingPeriod, is(notNullValue()));
-    assertThat(processingPeriod.getId(), equalTo(period.getId()));
-    assertThat(processingPeriod.getName(), equalTo(period.getName()));
-
-    ProcessingSchedule processingSchedule = processingPeriod.getProcessingSchedule();
-    assertThat(processingSchedule, is(notNullValue()));
-    assertThat(processingSchedule.getCode(), equalTo(schedule.getCode()));
-
-    CommodityType commodityType = idealStockAmount.getCommodityType();
-    assertThat(commodityType, is(notNullValue()));
-    assertThat(commodityType.getId(), equalTo(this.commodityType.getId()));
-    assertThat(
-        commodityType.getClassificationId(),
-        equalTo(this.commodityType.getClassificationId())
-    );
-    assertThat(
-        commodityType.getClassificationSystem(),
-        equalTo(this.commodityType.getClassificationSystem())
-    );
+    assertEquals(2, list.size());
+    assertTrue(list.contains(isa.getId()));
+    assertTrue(list.contains(isa2.getId()));
   }
 
   @Test
