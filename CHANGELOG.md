@@ -42,6 +42,7 @@ Bug fixes that are backwards-compatible:
 * [OLMIS-3838](https://openlmis.atlassian.net/browse/OLMIS-3838): Ensure right assignments are updated properly when user is saved.
 * [OLMIS-3778](https://openlmis.atlassian.net/browse/OLMIS-3778): Fixed service checks the rights of a wrong user
 * [OLMIS-3845](https://openlmis.atlassian.net/browse/OLMIS-3845): Fixed facility search endpoint returns duplicated values
+* [OLMIS-4038](https://openlmis.atlassian.net/browse/OLMIS-4038): ISA upload works correctly now
 
 Improvements:
 * [OLMIS-3925](https://openlmis.atlassian.net/browse/OLMIS-3925): Added unique constraint on program and supervisory node in supply line.
