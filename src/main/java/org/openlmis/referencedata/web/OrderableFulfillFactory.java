@@ -80,7 +80,7 @@ public class OrderableFulfillFactory {
         }
     );
 
-    return OrderableFulfill.ofTradeIdem(canBeFulfilledByMe);
+    return OrderableFulfill.ofTradeItem(canBeFulfilledByMe);
   }
 
   private OrderableFulfill createForCommodityType(String id, Orderable commodityTypeOrderable) {

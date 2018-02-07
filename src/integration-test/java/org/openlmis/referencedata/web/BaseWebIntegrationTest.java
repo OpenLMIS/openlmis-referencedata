@@ -300,6 +300,9 @@ public abstract class BaseWebIntegrationTest {
   @MockBean
   protected IdealStockAmountService idealStockAmountService;
 
+  @MockBean
+  protected OrderableFulfillFactory factory;
+
   /**
    * Constructor for test.
    */

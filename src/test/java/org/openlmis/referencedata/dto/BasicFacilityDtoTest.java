@@ -25,7 +25,7 @@ import org.junit.Test;
 public class BasicFacilityDtoTest {
 
   @Test
-  public void euqlasContract() throws Exception {
+  public void equalsContract() throws Exception {
 
     EqualsVerifier
         .forClass(BasicFacilityDto.class)

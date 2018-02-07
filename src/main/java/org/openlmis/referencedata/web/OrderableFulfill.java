@@ -31,11 +31,11 @@ public final class OrderableFulfill {
   private final List<UUID> canFulfillForMe;
   private final List<UUID> canBeFulfilledByMe;
 
-  public static OrderableFulfill ofTradeIdem(UUID... canBeFulfilledByMe) {
-    return ofTradeIdem(Arrays.asList(canBeFulfilledByMe));
+  public static OrderableFulfill ofTradeItem(UUID... canBeFulfilledByMe) {
+    return ofTradeItem(Arrays.asList(canBeFulfilledByMe));
   }
 
-  public static OrderableFulfill ofTradeIdem(List<UUID> canBeFulfilledByMe) {
+  public static OrderableFulfill ofTradeItem(List<UUID> canBeFulfilledByMe) {
     return new OrderableFulfill(emptyList(), canBeFulfilledByMe);
   }
 

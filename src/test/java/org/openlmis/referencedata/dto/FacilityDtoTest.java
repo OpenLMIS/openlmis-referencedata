@@ -27,7 +27,7 @@ import org.junit.Test;
 public class FacilityDtoTest {
 
   @Test
-  public void euqlasContract() throws Exception {
+  public void equalsContract() throws Exception {
     EqualsVerifier
         .forClass(FacilityDto.class)
         .withRedefinedSuperclass()

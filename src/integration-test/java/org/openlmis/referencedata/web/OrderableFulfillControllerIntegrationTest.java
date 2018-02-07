@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
@@ -38,9 +37,6 @@ import org.springframework.http.HttpHeaders;
 import java.util.UUID;
 
 public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegrationTest {
-
-  @MockBean
-  private OrderableFulfillFactory factory;
 
   private Orderable orderable = new OrderableDataBuilder().build();
 
@@ -58,7 +54,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   public void shouldCreateResourceForTradeItem() {
     orderable.setId(tradeItemOrderableId);
     given(factory.createFor(orderable))
-        .willReturn(OrderableFulfill.ofTradeIdem(commodityTypeOrderableId));
+        .willReturn(OrderableFulfill.ofTradeItem(commodityTypeOrderableId));
 
     String canFulfillForMeField = tradeItemOrderableId + ".canFulfillForMe";
     String canBeFulfilledByMeField = tradeItemOrderableId + ".canBeFulfilledByMe";

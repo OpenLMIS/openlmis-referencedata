@@ -62,7 +62,7 @@ public class ProcessingPeriodSearchParamsTest {
   }
 
   @Test
-  public void euqlasContract() {
+  public void equalsContract() {
     EqualsVerifier
         .forClass(ProcessingPeriodSearchParams.class)
         .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO

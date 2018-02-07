@@ -23,7 +23,7 @@ import org.junit.Test;
 public class MinimalFacilityDtoTest {
 
   @Test
-  public void euqlasContract() throws Exception {
+  public void equalsContract() throws Exception {
     EqualsVerifier
         .forClass(MinimalFacilityDto.class)
         .withRedefinedSuperclass()
