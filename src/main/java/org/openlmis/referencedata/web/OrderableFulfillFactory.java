@@ -54,19 +54,19 @@ public class OrderableFulfillFactory {
     String tradeItemId = orderable.getTradeItemIdentifier();
 
     if (isNotBlank(tradeItemId)) {
-      return createForTradeItem(tradeItemId);
+      return createForTradeItem(tradeItemId, orderable);
     }
 
     String commodityTypeId = orderable.getCommodityTypeIdentifier();
 
     if (isNotBlank(commodityTypeId)) {
-      return createForCommodityType(commodityTypeId);
+      return createForCommodityType(commodityTypeId, orderable);
     }
 
     return null;
   }
 
-  private OrderableFulfill createForTradeItem(String id) {
+  private OrderableFulfill createForTradeItem(String id, Orderable tradeItemOrderable) {
     TradeItem tradeItem = tradeItemRepository.findOne(UUID.fromString(id));
 
     List<UUID> canBeFulfilledByMe = Lists.newArrayList();
@@ -74,7 +74,8 @@ public class OrderableFulfillFactory {
         commodityTypeRepository::findAll,
         commodityType -> {
           if (tradeItem.canFulfill(commodityType)) {
-            setList(canBeFulfilledByMe, COMMODITY_TYPE, commodityType);
+            addToListIfDispensableMatches(canBeFulfilledByMe, COMMODITY_TYPE, commodityType,
+                tradeItemOrderable);
           }
         }
     );
@@ -82,7 +83,7 @@ public class OrderableFulfillFactory {
     return OrderableFulfill.ofTradeIdem(canBeFulfilledByMe);
   }
 
-  private OrderableFulfill createForCommodityType(String id) {
+  private OrderableFulfill createForCommodityType(String id, Orderable commodityTypeOrderable) {
     CommodityType commodityType = commodityTypeRepository.findOne(UUID.fromString(id));
 
     List<UUID> canFulfillForMe = Lists.newArrayList();
@@ -90,7 +91,8 @@ public class OrderableFulfillFactory {
         tradeItemRepository::findAll,
         tradeItem -> {
           if (tradeItem.canFulfill(commodityType)) {
-            setList(canFulfillForMe, TRADE_ITEM, tradeItem);
+            addToListIfDispensableMatches(canFulfillForMe, TRADE_ITEM, tradeItem,
+                commodityTypeOrderable);
           }
         }
     );
@@ -98,11 +100,18 @@ public class OrderableFulfillFactory {
     return OrderableFulfill.ofCommodityType(canFulfillForMe);
   }
 
-  private void setList(List<UUID> list, String key, BaseEntity entity) {
+  private void addToListIfDispensableMatches(List<UUID> list, String key, BaseEntity entity,
+                                             Orderable orderableToMatch) {
     List<Orderable> orderables = orderableRepository
         .findAllByIdentifier(key, entity.getId().toString());
 
-    orderables.forEach(item -> list.add(item.getId()));
+    orderables.forEach(
+        item -> {
+          if (item.getDispensable().equals(orderableToMatch.getDispensable())) {
+            list.add(item.getId());
+          }
+        }
+    );
   }
 
 }
