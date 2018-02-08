@@ -45,6 +45,7 @@ Bug fixes that are backwards-compatible:
 * [OLMIS-3778](https://openlmis.atlassian.net/browse/OLMIS-3778): Fixed service checks the rights of a wrong user.
 * [OLMIS-3845](https://openlmis.atlassian.net/browse/OLMIS-3845): Fixed facility search endpoint returns duplicated values.
 * [OLMIS-4038](https://openlmis.atlassian.net/browse/OLMIS-4038): In 9.0.0 the ISA upload would always create new entries, even if it was supposed to udpate. This has been fixed and works correctly now.
+* [OLMIS-4064](https://openlmis.atlassian.net/browse/OLMIS-4017): Change Location's partOf to reference a Location, not geographicZone.
 
 Improvements:
 * [OLMIS-3925](https://openlmis.atlassian.net/browse/OLMIS-3925): Added unique constraint on program and supervisory node in supply line.

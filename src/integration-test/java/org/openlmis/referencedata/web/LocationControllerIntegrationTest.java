@@ -105,7 +105,7 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
 
     checkIdentifier(response, 0,
         GeographicLevelController.RESOURCE_PATH + '/' + zone.getLevel().getId());
-    checkPartOf(response, GeographicZoneController.RESOURCE_PATH + '/' + zone.getParent().getId());
+    checkPartOf(response, LocationController.RESOURCE_PATH + '/' + zone.getParent().getId());
     checkPosition(response, zone.getLongitude(), zone.getLatitude());
     checkPhysicalType(response, Coding.AREA);
   }
@@ -126,7 +126,8 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
         FacilityTypeController.RESOURCE_PATH + '/' + facility.getType().getId());
     checkIdentifier(response, 2,
         FacilityOperatorController.RESOURCE_PATH + '/' + facility.getOperator().getId());
-
+    checkPartOf(response,
+        LocationController.RESOURCE_PATH + '/' + facility.getGeographicZone().getId());
     checkPosition(response, facility.getLocation().getX(), facility.getLocation().getY());
     checkPhysicalType(response, Coding.SITE);
   }

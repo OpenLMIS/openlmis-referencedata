@@ -32,6 +32,8 @@ import java.util.List;
 @RestController
 public class LocationController extends BaseController {
 
+  public static final String RESOURCE_PATH = "/Location";
+
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
 
@@ -44,7 +46,7 @@ public class LocationController extends BaseController {
   /**
    * Gets FHIR location.
    */
-  @GetMapping("/Location")
+  @GetMapping(RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
   public List<Location> getLocations() {
     List<Location> list = new ArrayList<>();

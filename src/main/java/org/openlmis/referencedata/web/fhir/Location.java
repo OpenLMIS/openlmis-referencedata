@@ -29,7 +29,7 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.web.FacilityOperatorController;
 import org.openlmis.referencedata.web.FacilityTypeController;
 import org.openlmis.referencedata.web.GeographicLevelController;
-import org.openlmis.referencedata.web.GeographicZoneController;
+import org.openlmis.referencedata.web.LocationController;
 import org.openlmis.referencedata.web.ProgramController;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +115,7 @@ public final class Location extends Resource {
 
   private static Reference getGeographicZoneAsReference(String serviceUrl, GeographicZone zone) {
     return zone != null
-        ? new Reference(serviceUrl, GeographicZoneController.RESOURCE_PATH, zone.getId())
+        ? new Reference(serviceUrl, LocationController.RESOURCE_PATH, zone.getId())
         : null;
   }
 
