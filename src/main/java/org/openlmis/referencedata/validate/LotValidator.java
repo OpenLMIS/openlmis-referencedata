@@ -80,7 +80,7 @@ public class LotValidator implements BaseValidator {
   }
 
   private void verifyCode(LotDto lot, Errors errors) {
-    List<Lot> lots = lotRepository.search(null, null, lot.getLotCode())
+    List<Lot> lots = lotRepository.search(null, null, lot.getLotCode(), null, null).getContent()
         .stream()
         .filter(l -> !l.getId().equals(lot.getId()))
         .collect(Collectors.toList());

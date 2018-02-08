@@ -32,6 +32,7 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -39,6 +40,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -79,6 +81,9 @@ public class LotValidatorTest {
 
   @Test
   public void shouldNotFindErrorsWhenLotIsValid() throws Exception {
+    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
+        .thenReturn(Pagination.getPage(Collections.emptyList()));
+
     validator.validate(lotDto, errors);
 
     assertEquals(0, errors.getErrorCount());
@@ -119,7 +124,8 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.search(null, null, lotDto.getLotCode())).thenReturn(lots);
+    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
+        .thenReturn(Pagination.getPage(lots));
 
     validator.validate(lotDto, errors);
 
@@ -134,7 +140,8 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.search(null, null, lotDto.getLotCode())).thenReturn(lots);
+    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
+        .thenReturn(Pagination.getPage(lots));
 
     validator.validate(lotDto, errors);
 
@@ -143,6 +150,9 @@ public class LotValidatorTest {
 
   @Test
   public void shouldRejectWhenTradeItemIsNull() {
+    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
+        .thenReturn(Pagination.getPage(Collections.emptyList()));
+
     lotDto.setTradeItemId(null);
 
     validator.validate(lotDto, errors);
@@ -152,6 +162,9 @@ public class LotValidatorTest {
 
   @Test
   public void shouldRejectWhenTradeItemDoesNotExist() {
+    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
+        .thenReturn(Pagination.getPage(Collections.emptyList()));
+
     when(tradeItemRepository.findOne(lotDto.getTradeItemId())).thenReturn(null);
 
     validator.validate(lotDto, errors);

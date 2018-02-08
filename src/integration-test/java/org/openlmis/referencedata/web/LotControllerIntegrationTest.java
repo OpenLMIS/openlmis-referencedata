@@ -23,7 +23,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -41,9 +43,13 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -52,6 +58,9 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
@@ -59,7 +68,9 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/lots";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String SEARCH_URL = RESOURCE_URL + "/search";
+  private static final String PAGE = "page";
+  private static final String SIZE = "size";
+  private static final String IDS = "ids";
 
   private Lot lot;
   private UUID lotId;
@@ -84,6 +95,9 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldCreateNewLot() {
     mockUserHasRight(ORDERABLES_MANAGE);
+
+    given(lotRepository.search(null, null, lot.getLotCode(), null, null))
+        .willReturn(Pagination.getPage(Collections.emptyList()));
 
     LotDto response = restAssured
         .given()
@@ -148,6 +162,9 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(ORDERABLES_MANAGE);
     when(lotRepository.findOne(lotId)).thenReturn(lot);
 
+    given(lotRepository.search(null, null, lot.getLotCode(), null, null))
+        .willReturn(Pagination.getPage(Collections.singletonList(lot)));
+
     LotDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -210,8 +227,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindLots() throws JsonProcessingException {
 
-    given(lotRepository.search(any(TradeItem.class), any(LocalDate.class), anyString()))
-        .willReturn(singletonList(lot));
+    given(lotRepository.search(any(TradeItem.class), any(LocalDate.class), anyString(), anyList(),
+        any(Pageable.class))).willReturn(Pagination.getPage(singletonList(lot), pageable));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -221,7 +238,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .queryParam("expirationDate",
             lot.getExpirationDate().format(DateTimeFormatter.ISO_DATE))
         .when()
-        .get(SEARCH_URL)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
@@ -240,7 +257,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("tradeItemId", lot.getTradeItem().getId())
         .when()
-        .get(SEARCH_URL)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(400)
         .extract()
@@ -256,7 +273,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured
             .given()
             .when()
-            .get(SEARCH_URL)
+            .get(RESOURCE_URL)
             .then()
             .statusCode(401);
 
@@ -353,6 +370,66 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindByUUIDs() {
+    List<Lot> lots = Arrays.asList(
+        new LotDataBuilder().build(),
+        new LotDataBuilder().build()
+    );
+
+    given(lotRepository.search(
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(Arrays.asList(lots.get(0).getId(), lots.get(1).getId())),
+        any(Pageable.class)
+    )).willReturn(Pagination.getPage(lots));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(IDS, lots.get(0).getId())
+        .queryParam(IDS, lots.get(1).getId())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(2, response.getContent().size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRespectPaginationParams() {
+    List<Lot> lots = Arrays.asList(
+        new LotDataBuilder().build(),
+        new LotDataBuilder().build()
+    );
+
+    given(lotRepository.search(
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(null),
+        eq(new PageRequest(0, 2))
+    )).willReturn(Pagination.getPage(lots));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 2)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(2, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

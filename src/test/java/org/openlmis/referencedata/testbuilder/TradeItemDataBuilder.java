@@ -45,7 +45,7 @@ public class TradeItemDataBuilder {
   /**
    * Creates a new instance of {@link TradeItem} without id field.
    */
-  private TradeItem buildAsNew() {
+  public TradeItem buildAsNew() {
     return new TradeItem(manufacturerOfTradeItem, classifications);
   }
 

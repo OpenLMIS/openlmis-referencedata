@@ -17,13 +17,19 @@ package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.testbuilder.LotDataBuilder;
+import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
+import java.util.Arrays;
 
 public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Lot> {
 
@@ -41,73 +47,112 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     return this.repository;
   }
 
-  private TradeItem tradeItem;
   private LocalDate now = LocalDate.now();
 
   @Override
   Lot generateInstance() {
-    tradeItem = new TradeItem("manufacturer", null);
-    tradeItem.setId(UUID.randomUUID());
-    tradeItem = tradeItemRepository.save(tradeItem);
+    TradeItem tradeItem = new TradeItemDataBuilder().buildAsNew();
+    tradeItemRepository.save(tradeItem);
 
-    Lot lot = new Lot();
-    int instanceNumber = this.getNextInstanceNumber();
-    lot.setLotCode("code #" + instanceNumber);
-    lot.setActive(true);
-    lot.setTradeItem(tradeItem);
-    lot.setExpirationDate(now);
-    return lot;
+    return new LotDataBuilder()
+        .withTradeItem(tradeItem)
+        .buildAsNew();
+  }
+
+  @Before
+  public void setUp() {
+    lotRepository.save(generateInstance());
+    lotRepository.save(generateInstance());
+    lotRepository.save(generateInstance());
+    lotRepository.save(generateInstance());
+    lotRepository.save(generateInstance());
   }
 
   @Test
   public void shouldFindLotsWithSimilarCode() {
-    lotRepository.save(generateInstance());
+    Lot expected = lotRepository.save(generateInstance());
 
-    List<Lot> lots = lotRepository.search(null, null, "code");
+    Page<Lot> lotPage = lotRepository.search(
+        null,
+        null,
+        expected.getLotCode(),
+        null,
+        null
+    );
 
-    assertEquals(1, lots.size());
+    assertEquals(1, lotPage.getNumberOfElements());
+    assertEquals(expected, lotPage.getContent().get(0));
   }
 
   @Test
   public void shouldFindLotsByExpirationDate() {
-    lotRepository.save(generateInstance());
+    Lot expected = generateInstance();
+    expected.setExpirationDate(now);
+    expected = lotRepository.save(expected);
 
-    List<Lot> lots = lotRepository.search(null, now, null);
+    Page<Lot> lotPage = lotRepository.search(null, now, null, null, null);
 
-    assertEquals(1, lots.size());
+    assertEquals(1, lotPage.getNumberOfElements());
+    assertEquals(expected, lotPage.getContent().get(0));
   }
 
   @Test
   public void shouldFindLotsByTradeItem() {
-    lotRepository.save(generateInstance());
+    Lot expected = lotRepository.save(generateInstance());
 
-    List<Lot> lots = lotRepository.search(tradeItem, null, null);
+    Page<Lot> lotPage = lotRepository.search(
+        expected.getTradeItem(),
+        null,
+        null,
+        null,
+        null
+    );
 
-    assertEquals(1, lots.size());
+    assertEquals(1, lotPage.getNumberOfElements());
+    assertEquals(expected, lotPage.getContent().get(0));
   }
 
   @Test
   public void shouldFindLotsByAllParameters() {
-    Lot instanceOne = generateInstance();
-    instanceOne.setLotCode("code #Instance2");
-    lotRepository.save(instanceOne);
-    Lot instanceTwo = generateInstance();
-    instanceTwo.setExpirationDate(LocalDate.now());
-    lotRepository.save(instanceTwo);
-    lotRepository.save(generateInstance());
+    Lot expected = lotRepository.save(generateInstance());
 
-    List<Lot> lots = lotRepository.search(tradeItem, instanceTwo.getExpirationDate(), "instance2");
+    Page<Lot> lotPage = lotRepository.search(
+        expected.getTradeItem(),
+        expected.getExpirationDate(),
+        expected.getLotCode(),
+        Arrays.asList(expected.getId()),
+        null
+    );
 
-    assertEquals(3, lots.size());
+    assertEquals(1, lotPage.getNumberOfElements());
+    assertEquals(expected, lotPage.getContent().get(0));
   }
 
   @Test
-  public void shouldNotFindLots() {
-    lotRepository.save(generateInstance());
+  public void shouldFindLotsByIds() {
+    Lot instanceOne = generateInstance();
+    repository.save(instanceOne);
 
-    List<Lot> lots = lotRepository.search(null, null, null);
+    Lot instanceTwo = generateInstance();
+    repository.save(instanceTwo);
 
-    assertEquals(0, lots.size());
+    Page<Lot> lotPage = lotRepository.search(
+        null,
+        null,
+        null,
+        Arrays.asList(instanceOne.getId(), instanceTwo.getId()),
+        null
+    );
+
+    assertEquals(2, lotPage.getNumberOfElements());
+    assertEquals(lotPage.getContent(), Arrays.asList(instanceOne, instanceTwo));
+  }
+
+  @Test
+  public void shouldReturnAllIfNoParamIsGiven() {
+    Page<Lot> lotPage = lotRepository.search(null, null, null, null, null);
+
+    assertEquals(5, lotPage.getNumberOfElements());
   }
 
   @Test
@@ -118,9 +163,30 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     entity.setExpirationDate(date);
     lotRepository.save(entity);
 
-    List<Lot> lots = lotRepository.search(null, date, null);
+    Page<Lot> lotPage = lotRepository.search(
+        null,
+        null,
+        entity.getLotCode(),
+        null,
+        null
+    );
 
-    assertEquals(1, lots.size());
-    assertEquals(date, lots.get(0).getExpirationDate());
+    assertEquals(1, lotPage.getNumberOfElements());
+    assertEquals(date, lotPage.getContent().get(0).getExpirationDate());
+  }
+
+  @Test
+  public void shouldRespectPaginationParameters() {
+    Pageable pageable = new PageRequest(1, 3);
+
+    Page<Lot> lotPage = lotRepository.search(
+        null,
+        null,
+        null,
+        null,
+        pageable
+    );
+
+    assertEquals(2, lotPage.getNumberOfElements());
   }
 }

@@ -15,11 +15,18 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.custom.LotRepositoryCustom;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -42,26 +49,58 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
    * @param lotCode Part of wanted code.
    * @return List of Facilities matching the parameters.
    */
-  public List<Lot> search(TradeItem item, LocalDate expirationDate, String lotCode) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Lot> query = builder.createQuery(Lot.class);
-    Root<Lot> root = query.from(Lot.class);
-    Predicate predicate = builder.disjunction();
+  public Page<Lot> search(TradeItem item, LocalDate expirationDate, String lotCode, List<UUID> ids,
+                          Pageable pageable) {
 
-    if (item != null) {
-      predicate = builder.or(predicate, builder.equal(root.get("tradeItem"), item));
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<Lot> lotQuery = builder.createQuery(Lot.class);
+    lotQuery = prepareQuery(lotQuery, item, expirationDate, lotCode, ids, false);
+
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    countQuery = prepareQuery(countQuery, item, expirationDate, lotCode, ids, true);
+
+    Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+    List<Lot> orderableList = entityManager.createQuery(lotQuery)
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
+        .getResultList();
+    return Pagination.getPage(orderableList, pageable, count);
+  }
+
+  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, TradeItem tradeItem,
+                                            LocalDate expirationDate, String lotCode,
+                                            List<UUID> ids, boolean count) {
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Root<Lot> root = query.from(Lot.class);
+
+    if (count) {
+      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
+      query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
+    }
+
+    Predicate predicate = builder.conjunction();
+
+    if (tradeItem != null) {
+      predicate = builder.and(predicate, builder.equal(root.get("tradeItem"), tradeItem));
     }
 
     if (lotCode != null) {
-      predicate = builder.or(predicate,
+      predicate = builder.and(predicate,
           builder.like(builder.upper(root.get("lotCode")), "%" + lotCode.toUpperCase() + "%"));
     }
 
     if (expirationDate != null) {
-      predicate = builder.or(predicate, builder.equal(root.get("expirationDate"), expirationDate));
+      predicate = builder.and(predicate, builder.equal(root.get("expirationDate"), expirationDate));
+    }
+
+    if (ids != null && ids.size() > 0) {
+      predicate = builder.and(predicate, root.get("id").in(ids));
     }
 
     query.where(predicate);
-    return entityManager.createQuery(query).getResultList();
+    return query;
   }
 }

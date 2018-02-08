@@ -2850,6 +2850,46 @@ resourceTypes:
 
   /lots:
       displayName: Lot
+      get:
+          is: [ secured, paginated]
+          description: Find lots with matched parameters. This endpoint is experimental.
+          queryParameters:
+              tradeItemId:
+                      displayName: tradeItemId
+                      description: The UUID of the Trade Item.
+                      type: string
+                      required: false
+                      repeat: false
+              expirationDate:
+                      displayName: expirationDate
+                      description: The expiration date of the Lot.
+                      type: string
+                      required: false
+                      repeat: false
+              lotCode:
+                      displayName: lotCode
+                      description: The code of the Lot.
+                      type: string
+                      required: false
+                      repeat: false
+              ids:
+                      displayName: ids
+                      description: The UUIDs of Lots.
+                      type: string
+                      required: false
+                      repeat: true
+
+          responses:
+              "200":
+                  body:
+                    application/json:
+              "400":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+              401:
+                  body:
+                    application/json:
       post:
             is: [ secured ]
             description: Create new lot. This endpoint is experimental.
@@ -2917,36 +2957,6 @@ resourceTypes:
       /{id}/auditLog:
           type: instanceAuditLog
       /search:
-          get:
-              is: [ secured, paginated]
-              description: Find lots with matched parameters. This endpoint is experimental.
-              queryParameters:
-                  tradeItemId:
-                          displayName: tradeItem
-                          type: string
-                          required: false
-                          repeat: false
-                  expirationDate:
-                          displayName: expirationDate
-                          type: string
-                          required: false
-                          repeat: false
-                  lotCode:
-                          displayName: lotCode
-                          type: string
-                          required: false
-                          repeat: false
-              responses:
-                  "200":
-                      body:
-                        application/json:
-                  "400":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-                  401:
-                      body:
-                        application/json:
   /idealStockAmounts:
       displayName: Ideal Stock Amounts
       get:

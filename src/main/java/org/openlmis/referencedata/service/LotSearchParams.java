@@ -13,20 +13,30 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository.custom;
+package org.openlmis.referencedata.service;
 
-import org.openlmis.referencedata.domain.Lot;
-import org.openlmis.referencedata.domain.TradeItem;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-public interface LotRepositoryCustom {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class LotSearchParams {
 
-  Page<Lot> search(TradeItem item, LocalDate expirationDate, String code, List<UUID> ids,
-                   Pageable pageable);
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  private LocalDate expirationDate;
+
+  private UUID tradeItemId;
+  private String lotCode;
+  private List<UUID> ids;
 
 }

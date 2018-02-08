@@ -15,27 +15,26 @@
 
 package org.openlmis.referencedata.web;
 
-import static java.util.Objects.isNull;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.exception.NotFoundException;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.service.LotSearchParams;
+import org.openlmis.referencedata.service.LotService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.validate.LotValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -50,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -59,7 +57,7 @@ import java.util.UUID;
 @Transactional
 public class LotController extends BaseController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LotController.class);
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(LotController.class);
 
   @Autowired
   private LotRepository lotRepository;
@@ -69,6 +67,9 @@ public class LotController extends BaseController {
 
   @Autowired
   private LotValidator validator;
+
+  @Autowired
+  private LotService lotService;
 
   /**
    * Allows creating new Lots.
@@ -88,7 +89,7 @@ public class LotController extends BaseController {
     Lot lotToSave = Lot.newLot(lotDto, tradeItem);
     lotToSave.setId(null);
 
-    LOGGER.debug("Creating new Lot");
+    //XLOGGER.debug("Creating new Lot");
     lotToSave = lotRepository.save(lotToSave);
     return exportToDto(lotToSave);
   }
@@ -117,7 +118,7 @@ public class LotController extends BaseController {
     Lot lotToSave = Lot.newLot(lotDto, tradeItem);
     lotToSave.setId(lotId);
 
-    LOGGER.debug("Updating Lot");
+    XLOGGER.debug("Updating Lot");
     lotToSave = lotRepository.save(lotToSave);
     return exportToDto(lotToSave);
   }
@@ -146,36 +147,31 @@ public class LotController extends BaseController {
    * in any position of searched field. Not case sensitive.
    * Other fields: entered string value must equal to searched value.
    *
-   * @param tradeItemId UUID of trade item associated with Lot.
-   * @param expirationDate Lot expiration date.
-   * @param lotCode Lot code.
+   * @param requestParams  the request parameters
    * @param pageable Pageable object that allows client to optionally add "page" (page number).
    * @return List of matched Lots.
    */
-  @GetMapping("/lots/search")
+  @GetMapping("/lots")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<LotDto> searchLots(
-      @RequestParam(value = "tradeItemId", required = false) UUID tradeItemId,
-      @RequestParam(value = "expirationDate", required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationDate,
-      @RequestParam(value = "lotCode", required = false) String lotCode,
-      Pageable pageable) {
+  public Page<LotDto> getLots(LotSearchParams requestParams, Pageable pageable) {
+    XLOGGER.entry(requestParams, pageable);
+    Profiler profiler = new Profiler("LOTS_SEARCH");
+    profiler.setLogger(XLOGGER);
 
-    TradeItem tradeItem = null;
-    if (null != tradeItemId) {
-      tradeItem = tradeItemRepository.findOne(tradeItemId);
-      if (isNull(tradeItem)) {
-        throw new ValidationMessageException(
-            new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, tradeItemId));
-      }
-    }
+    profiler.start("LOT_SERVICE_SEARCH");
+    Page<Lot> lotsPage = lotService.search(requestParams, pageable);
 
-    List<LotDto> foundLotDtos =
-        exportToDtos(lotRepository.search(tradeItem, expirationDate, lotCode));
+    profiler.start("LOT_PAGINATION");
+    assert lotsPage != null;
+    Page<LotDto> page = Pagination.getPage(LotDto.newInstance(
+        lotsPage.getContent()),
+        pageable,
+        lotsPage.getTotalElements());
 
-    return Pagination.getPage(foundLotDtos, pageable);
-
+    profiler.stop().log();
+    XLOGGER.exit(page);
+    return page;
   }
 
   /**

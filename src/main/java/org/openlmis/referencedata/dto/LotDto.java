@@ -15,12 +15,16 @@
 
 package org.openlmis.referencedata.dto;
 
+import org.openlmis.referencedata.domain.Lot;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.domain.Lot;
+
 import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -35,6 +39,34 @@ public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
   private UUID tradeItemId;
   private LocalDate expirationDate;
   private LocalDate manufactureDate;
+
+  /**
+   * Create new set of LotDto based on given iterable of {@link Lot}
+   *
+   * @param lots list of {@link Lot}
+   * @return new list of LotDto.
+   */
+  public static List<LotDto> newInstance(Iterable<Lot> lots) {
+    List<LotDto> lotDtos = new LinkedList<>();
+    lots.forEach(oe -> lotDtos.add(newInstance(oe)));
+    return lotDtos;
+  }
+
+  /**
+   * Creates new instance based on given {@link Lot}.
+   *
+   * @param po instance of Lot.
+   * @return new instance of LotDto.
+   */
+  public static LotDto newInstance(Lot po) {
+    if (po == null) {
+      return null;
+    }
+    LotDto lotDto = new LotDto();
+    po.export(lotDto);
+
+    return lotDto;
+  }
 
   @Override
   public boolean equals(Object obj) {
