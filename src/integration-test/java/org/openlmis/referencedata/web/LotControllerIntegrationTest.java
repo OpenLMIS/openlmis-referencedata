@@ -374,7 +374,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldFindByUUIDs() {
+  public void shouldFindByUuids() {
     List<Lot> lots = Arrays.asList(
         new LotDataBuilder().build(),
         new LotDataBuilder().build()
