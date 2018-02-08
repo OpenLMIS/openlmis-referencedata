@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 
@@ -44,6 +45,13 @@ public class GtinTest {
   @Test
   public void shouldNotBeEqual() {
     assertNotEquals(gtin1, gtin2);
+  }
+
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(Gtin.class)
+        .verify();
   }
 
   @Test(expected = ValidationMessageException.class)

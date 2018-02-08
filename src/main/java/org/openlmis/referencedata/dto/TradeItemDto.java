@@ -18,7 +18,6 @@ package org.openlmis.referencedata.dto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.TradeItem;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +31,7 @@ public class TradeItemDto extends BaseDto implements TradeItem.Importer, TradeIt
 
   private List<TradeItemClassificationDto> classifications;
 
-  private Gtin gtin;
+  private String gtin;
 
   /**
    * Create new list of TradeItemDto based on given list of {@link TradeItem}

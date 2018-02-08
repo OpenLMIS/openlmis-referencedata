@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -29,6 +29,7 @@ import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.E
  * Global Trade Item Number, associated with TradeItem.
  */
 @Embeddable
+@EqualsAndHashCode
 public class Gtin {
 
   @Getter
@@ -46,29 +47,5 @@ public class Gtin {
           new Message(ERROR_GTIN_NUMERIC));
     }
     this.gtin = gtin;
-  }
-
-  @Override
-  public boolean equals(Object object) {
-    if (this == object) {
-      return true;
-    }
-    if (!(object instanceof Gtin)) {
-      return false;
-    }
-
-    Gtin that = (Gtin) object;
-    return gtin.equals(that.gtin);
-  }
-
-  @Override
-  public int hashCode() {
-    return gtin.hashCode();
-  }
-
-  @Override
-  @JsonValue
-  public String toString() {
-    return gtin;
   }
 }

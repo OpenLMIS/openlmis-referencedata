@@ -26,6 +26,7 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -52,6 +53,7 @@ public class RefDataErrorHandling extends BaseHandler {
         ProcessingScheduleMessageKeys.ERROR_CODE_DUPLICATED);
     CONSTRAINT_MAP.put("supply_line_unique_program_supervisory_node",
         SupplyLineMessageKeys.ERROR_PROGRAM_SUPERVISORY_NODE_DUPLICATED);
+    CONSTRAINT_MAP.put("uk_tradeitems_grin", TradeItemMessageKeys.ERROR_GTIN_DUPLICATED);
   }
 
   /**
