@@ -25,6 +25,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-3387](https://openlmis.atlassian.net/browse/OLMIS-3387): Added /api/Location endpoint
   * the endpoint will return geographic zones as FHIR Location instances
 * [OLMIS-3389](https://openlmis.atlassian.net/browse/OLMIS-3389): Provide Facility as FHIR Location with /api/Location endpoint
+* [OLMIS-4017](https://openlmis.atlassian.net/browse/OLMIS-4017): Support GTIN attributes in Orderable's dispensable
 
 Bug fixes that are backwards-compatible:
 * [OLMIS-3502](https://openlmis.atlassian.net/browse/OLMIS-3502): fix search users by home facility id
