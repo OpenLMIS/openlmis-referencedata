@@ -64,8 +64,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Before
   public void setUp() {
-    Lot lotOne = generateInstance();
-    Lot lotTwo = generateInstance();
+    lotOne = generateInstance();
+    lotTwo = generateInstance();
 
     lotRepository.save(generateInstance());
     lotRepository.save(generateInstance());
