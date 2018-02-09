@@ -135,7 +135,7 @@ public class LotServiceTest {
     lotService.search(lotSearchParams, pageable);
   }
 
-  @Test(expected = Exception.class)
+  @Test(expected = NullPointerException.class)
   public void searchShouldThrowExceptionIfRequestParamsAreNotGiven() {
     lotService.search(null, pageable);
   }

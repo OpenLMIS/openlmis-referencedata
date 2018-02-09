@@ -18,6 +18,7 @@ package org.openlmis.referencedata.dto;
 import org.openlmis.referencedata.domain.Lot;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +33,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
 
   private String lotCode;
@@ -48,22 +50,22 @@ public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
    */
   public static List<LotDto> newInstance(Iterable<Lot> lots) {
     List<LotDto> lotDtos = new LinkedList<>();
-    lots.forEach(oe -> lotDtos.add(newInstance(oe)));
+    lots.forEach(lot -> lotDtos.add(newInstance(lot)));
     return lotDtos;
   }
 
   /**
    * Creates new instance based on given {@link Lot}.
    *
-   * @param po instance of Lot.
+   * @param lot instance of Lot.
    * @return new instance of LotDto.
    */
-  public static LotDto newInstance(Lot po) {
-    if (po == null) {
+  public static LotDto newInstance(Lot lot) {
+    if (lot == null) {
       return null;
     }
     LotDto lotDto = new LotDto();
-    po.export(lotDto);
+    lot.export(lotDto);
 
     return lotDto;
   }

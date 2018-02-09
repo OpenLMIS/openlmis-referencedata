@@ -49,6 +49,9 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   private LocalDate now = LocalDate.now();
 
+  private Lot lotOne;
+  private Lot lotTwo;
+
   @Override
   Lot generateInstance() {
     TradeItem tradeItem = new TradeItemDataBuilder().buildAsNew();
@@ -61,11 +64,14 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Before
   public void setUp() {
+    Lot lotOne = generateInstance();
+    Lot lotTwo = generateInstance();
+
     lotRepository.save(generateInstance());
     lotRepository.save(generateInstance());
     lotRepository.save(generateInstance());
-    lotRepository.save(generateInstance());
-    lotRepository.save(generateInstance());
+    lotRepository.save(lotOne);
+    lotRepository.save(lotTwo);
   }
 
   @Test
@@ -188,5 +194,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     );
 
     assertEquals(2, lotPage.getNumberOfElements());
+    assertEquals(lotOne, lotPage.getContent().get(0));
+    assertEquals(lotTwo, lotPage.getContent().get(1));
   }
 }

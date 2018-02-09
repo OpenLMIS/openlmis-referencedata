@@ -41,6 +41,11 @@ public class LotDataBuilder {
     return this;
   }
 
+  public LotDataBuilder withLotCode(String lotCode) {
+    this.lotCode = lotCode;
+    return this;
+  }
+
   /**
    * Builds an instance of the {@link Lot} class with populated ID.
    *

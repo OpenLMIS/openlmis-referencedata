@@ -31,6 +31,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import javax.validation.constraints.NotNull;
+
 @Service
 public class LotService {
 
@@ -47,7 +49,7 @@ public class LotService {
    * @param pageable  the page to get, or one page with all if null.
    * @return the Page of lots found, or an empty page.
    */
-  public Page<Lot> search(LotSearchParams requestParams, Pageable pageable) {
+  public Page<Lot> search(@NotNull LotSearchParams requestParams, Pageable pageable) {
 
     TradeItem tradeItem = getTradeItem(requestParams.getTradeItemId());
 
@@ -65,7 +67,6 @@ public class LotService {
       return null;
     }
 
-    System.out.println(id);
     TradeItem tradeItem = tradeItemRepository.findOne(id);
     if (isNull(tradeItem)) {
       throw new ValidationMessageException(
