@@ -210,16 +210,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
         .searchProducts(facility.getType().getId(), program.getId(), null, pageable);
 
     assertThat(page.getContent(), hasSize(2));
-
-    FacilityTypeApprovedProduct ftap = page.iterator().next();
-
-    assertEquals(program, ftap.getProgram());
-    assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
-    assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
-    ProgramOrderable programOrderable = ftap.getOrderable().getProgramOrderable(program);
-    assertEquals(program.getId(), programOrderable.getProgram().getId());
-    assertTrue(programOrderable.isFullSupply());
-    assertTrue(programOrderable.isActive());
   }
 
   @Test

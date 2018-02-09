@@ -355,7 +355,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         eq(false), eq(pageable))).thenReturn(new PageImpl<>(Collections.singletonList(
             new FacilityTypeApprovedProductsDataBuilder().build()), pageable, 1));
 
-    Page<Map<String, ?>> productDtos = restAssured.given()
+    PageImplRepresentation productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
         .queryParam("fullSupply", false)
         .queryParam("size", pageable.getPageSize())
@@ -365,7 +365,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
         .then()
         .statusCode(200)
-        .extract().as(Page.class);
+        .extract().as(PageImplRepresentation.class);
 
     assertEquals(1, productDtos.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());

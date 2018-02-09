@@ -46,24 +46,22 @@ import javax.persistence.criteria.Root;
 public class FacilityTypeApprovedProductRepositoryImpl
     implements FacilityTypeApprovedProductRepositoryCustom {
 
-  private static final String SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL = "SELECT :select"
-      + " FROM FacilityTypeApprovedProduct ftap"
-      + " INNER JOIN FETCH ftap.orderable o"
-      + " INNER JOIN FETCH ftap.program p"
-      + " INNER JOIN FETCH ftap.facilityType ft"
-      + " INNER JOIN FETCH o.programOrderables po"
-      + " INNER JOIN FETCH po.program pop"
-      + " INNER JOIN FETCH po.orderableDisplayCategory"
-      + " LEFT OUTER JOIN FETCH o.identifiers"
+  private static final String COUNT_SELECT = "SELECT COUNT(ftap.id)";
+  private static final String SEARCH_SELECT = "SELECT ftap";
+  private static final String SEARCH_PRODUCTS_SQL = " FROM FacilityTypeApprovedProduct ftap"
+      + " INNER JOIN ftap.orderable o"
+      + " INNER JOIN ftap.program p"
+      + " INNER JOIN ftap.facilityType ft"
+      + " INNER JOIN o.programOrderables po"
+      + " INNER JOIN po.program pop"
+      + " INNER JOIN po.orderableDisplayCategory"
+      + " LEFT OUTER JOIN o.identifiers"
       + " WHERE ft.id = :facilityTypeId"
-      + " AND po.fullSupply = :fullSupply"
       + " AND po.active = TRUE"
       + " AND pop.id = p.id";
 
-  private static final String SEARCH_PRODUCTS_WITH_PROGRAM_SQL =
-      SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL + " AND p.id = :programId";
-
-  private static final String PAGINATION_SQL = " LIMIT :limit OFFSET :offset";
+  private static final String WITH_PROGRAM = " AND p.id = :programId";
+  private static final String WITH_FULL_SUPPLY = " AND po.fullSupply = :fullSupply";
 
   private static final String PROGRAM = "program";
   private static final String FACILITY_TYPE = "facilityType";
@@ -114,26 +112,23 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private TypedQuery createQuery(boolean count, UUID facilityTypeId, UUID programId,
                                         Boolean fullSupply, Pageable pageable) {
     TypedQuery query;
-    String queryString;
-
-    if (null == programId) {
-      queryString = SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL;
-    } else {
-      queryString = SEARCH_PRODUCTS_WITH_PROGRAM_SQL;
+    StringBuilder queryString = new StringBuilder(SEARCH_PRODUCTS_SQL);
+    if (null != programId) {
+      queryString.append(WITH_PROGRAM);
+    }
+    if (null != fullSupply) {
+      queryString.append(WITH_FULL_SUPPLY);
     }
 
     if (count) {
-      query = entityManager.createQuery(queryString, Long.class);
+      query = entityManager.createQuery(COUNT_SELECT + queryString.toString(), Long.class);
 
-      query.setParameter("select", "ftap");
-      query.setParameter("limit", pageable.getPageSize());
-      query.setParameter("offset", pageable.getPageNumber() * pageable.getPageSize());
+      Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+      query.setMaxResults(maxAndFirst.getLeft());
+      query.setFirstResult(maxAndFirst.getRight());
     } else {
-      queryString += PAGINATION_SQL;
-      query = entityManager
-          .createQuery(queryString + PAGINATION_SQL, FacilityTypeApprovedProduct.class);
-
-      query.setParameter("select", "COUNT(id)");
+      query = entityManager.createQuery(SEARCH_SELECT + queryString.toString(),
+          FacilityTypeApprovedProduct.class);
     }
 
     query.setParameter("facilityTypeId", facilityTypeId);

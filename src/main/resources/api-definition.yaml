@@ -60,12 +60,6 @@ schemas:
 
   - approvedProductDtoPage: !include schemas/approvedProductDtoPage.json
 
-  - approvedProductDtoArray: |
-      {
-          "type": "array",
-          "items": { "type": "object", "$ref": "schemas/approvedProductDto.json" }
-      }
-
   - basicFacilityDto: !include schemas/basicFacilityDto.json
 
   - minimalFacilityDto: !include schemas/minimalFacilityDto.json
@@ -1620,7 +1614,7 @@ resourceTypes:
                   required: true
                   repeat: false
           get:
-              is: [ secured ]
+              is: [ secured, paginated ]
               description: Returns a list of full or non-full supply approved products for this facility
               queryParameters:
                   programId:
@@ -1631,13 +1625,13 @@ resourceTypes:
                   fullSupply:
                       displayName: Full-supply orderable
                       type: boolean
-                      required: true
+                      required: false
                       repeat: false
               responses:
                 200:
                     body:
                       application/json:
-                        schema: approvedProductDtoArray
+                        schema: approvedProductDtoPage
                 400:
                     body:
                       application/json:
