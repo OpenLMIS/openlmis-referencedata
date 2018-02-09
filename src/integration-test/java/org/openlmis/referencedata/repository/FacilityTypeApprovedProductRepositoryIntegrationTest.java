@@ -205,6 +205,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   public void shouldGetFullAndNonFullSupply() {
     ftapRepository.save(generateInstance());
     ftapRepository.save(generateProduct(facilityType1, false));
+    ftapRepository.save(generateProduct(facilityType2, true));
+    ftapRepository.save(generateProduct(facilityType2, false));
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
         .searchProducts(facility.getType().getId(), program.getId(), null, pageable);
@@ -215,6 +217,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   @Test
   public void shouldGetFullSupply() {
     ftapRepository.save(generateInstance());
+    ftapRepository.save(generateProduct(facilityType1, false));
+    ftapRepository.save(generateProduct(facilityType2, true));
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
         .searchProducts(facility.getType().getId(), program.getId(), true, pageable);
@@ -236,6 +240,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   public void shouldGetNonFullSupply() {
     // Create a full supply product
     ftapRepository.save(generateInstance());
+    ftapRepository.save(generateProduct(facilityType2, false, program));
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
         .searchProducts(facility.getType().getId(), program.getId(), false, pageable);

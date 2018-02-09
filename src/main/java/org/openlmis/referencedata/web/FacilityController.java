@@ -48,6 +48,7 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -292,7 +293,7 @@ public class FacilityController extends BaseController {
       @PathVariable("id") UUID facilityId,
       @RequestParam(required = false, value = "programId") UUID programId,
       @RequestParam(required = false, value = "fullSupply") Boolean fullSupply,
-      Pageable pageable) {
+      @PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
 
     Profiler profiler = new Profiler("GET_FACILITY_APPROVED_PRODUCTS");
     profiler.setLogger(LOGGER);
