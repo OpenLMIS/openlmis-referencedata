@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
@@ -75,7 +76,7 @@ public class OrderableFulfillFactory {
         commodityType -> {
           if (tradeItem.canFulfill(commodityType)) {
             addToListIfDispensableMatches(canBeFulfilledByMe, COMMODITY_TYPE, commodityType,
-                tradeItemOrderable);
+                tradeItemOrderable.getDispensable());
           }
         }
     );
@@ -92,7 +93,7 @@ public class OrderableFulfillFactory {
         tradeItem -> {
           if (tradeItem.canFulfill(commodityType)) {
             addToListIfDispensableMatches(canFulfillForMe, TRADE_ITEM, tradeItem,
-                commodityTypeOrderable);
+                commodityTypeOrderable.getDispensable());
           }
         }
     );
@@ -101,13 +102,13 @@ public class OrderableFulfillFactory {
   }
 
   private void addToListIfDispensableMatches(List<UUID> list, String key, BaseEntity entity,
-                                             Orderable orderableToMatch) {
+                                             Dispensable dispensableToMatch) {
     List<Orderable> orderables = orderableRepository
         .findAllByIdentifier(key, entity.getId().toString());
 
     orderables.forEach(
         item -> {
-          if (item.getDispensable().equals(orderableToMatch.getDispensable())) {
+          if (item.hasDispensable(dispensableToMatch)) {
             list.add(item.getId());
           }
         }

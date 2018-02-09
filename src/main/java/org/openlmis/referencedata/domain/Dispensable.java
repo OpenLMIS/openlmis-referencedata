@@ -32,6 +32,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,7 +77,7 @@ public abstract class Dispensable extends BaseEntity {
    * @param exporter exporter to export to
    */
   public void export(Dispensable.Exporter exporter) {
-    exporter.setAttributes(attributes);
+    exporter.setAttributes(Collections.unmodifiableMap(new HashMap<>(attributes)));
     exporter.setToString(toString());
   }
 
@@ -98,9 +99,11 @@ public abstract class Dispensable extends BaseEntity {
       throw new ValidationMessageException(OrderableMessageKeys.ERROR_DISPENSABLE_REQUIRED);
     }
 
-    String sizeCode = importer.getAttributes().get(KEY_SIZE_CODE);
-    String routeOfAdministration = importer.getAttributes().get(KEY_ROUTE_OF_ADMINISTRATION);
-    String dispensingUnit = importer.getAttributes().get(KEY_DISPENSING_UNIT);
+    Map<String, String> attributesCopy = new HashMap<>(importer.getAttributes());
+
+    String sizeCode = attributesCopy.get(KEY_SIZE_CODE);
+    String routeOfAdministration = attributesCopy.get(KEY_ROUTE_OF_ADMINISTRATION);
+    String dispensingUnit = attributesCopy.get(KEY_DISPENSING_UNIT);
 
     if (null != sizeCode && null != routeOfAdministration) {
       return new VaccineDispensable(sizeCode, routeOfAdministration);

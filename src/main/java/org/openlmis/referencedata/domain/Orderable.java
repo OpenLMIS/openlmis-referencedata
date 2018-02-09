@@ -151,6 +151,10 @@ public class Orderable extends BaseEntity {
     return identifiers.get(COMMODITY_TYPE);
   }
 
+  public boolean hasDispensable(Dispensable dispensable) {
+    return this.dispensable.equals(dispensable);
+  }
+
   /**
    * Determines equality based on product codes.
    * @param object another Orderable, ideally.
