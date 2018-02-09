@@ -8,6 +8,7 @@ parameters to get users endpoint
 * [OLMIS-2695](https://openlmis.atlassian.net/browse/OLMIS-2695): Paginate get all processing schedules endpoint.
 * [OLMIS-2695](https://openlmis.atlassian.net/browse/OLMIS-2695): Merged processing period search endpoints with get all periods endpoint. Convert endpoint to be pageable.
 * [OLMIS-3821](https://openlmis.atlassian.net/browse/OLMIS-3821): Update search lot endpoint to follow REST
+* [OLMIS-3821](https://openlmis.atlassian.net/browse/OLMIS-4052): Facility approved products endpoint is paginated now and "fullSupply" flag is optional.
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-3782](https://openlmis.atlassian.net/browse/OLMIS-3782): Ability to set up program to skip requisition authorization step

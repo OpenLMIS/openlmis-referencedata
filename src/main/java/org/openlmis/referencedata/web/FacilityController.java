@@ -15,9 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
-
 import com.vividsolutions.jts.geom.Polygon;
-
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -64,9 +62,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -293,10 +288,11 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}/approvedProducts")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<ApprovedProductDto> getApprovedProducts(
+  public Page<ApprovedProductDto> getApprovedProducts(
       @PathVariable("id") UUID facilityId,
       @RequestParam(required = false, value = "programId") UUID programId,
-      @RequestParam(value = "fullSupply") boolean fullSupply) {
+      @RequestParam(required = false, value = "fullSupply") Boolean fullSupply,
+      Pageable pageable) {
 
     Profiler profiler = new Profiler("GET_FACILITY_APPROVED_PRODUCTS");
     profiler.setLogger(LOGGER);
@@ -310,10 +306,10 @@ public class FacilityController extends BaseController {
     }
 
     profiler.start("FIND_APPROVED_PRODUCTS");
-    Collection<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
-        .searchProducts(facility.getType().getId(), programId, fullSupply);
+    Page<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
+        .searchProducts(facility.getType().getId(), programId, fullSupply, pageable);
 
-    List<ApprovedProductDto> list = toDto(products, profiler);
+    Page<ApprovedProductDto> list = toDto(products, pageable, profiler);
 
     profiler.stop().log();
     return list;
@@ -480,18 +476,22 @@ public class FacilityController extends BaseController {
         .collect(Collectors.toList());
   }
 
-  private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> products,
-                                         Profiler profiler) {
+  private Page<ApprovedProductDto> toDto(Page<FacilityTypeApprovedProduct> products,
+                                         Pageable pageable, Profiler profiler) {
     profiler.start("EXPORT_PRODUCTS_TO_DTO");
 
-    List<ApprovedProductDto> productDtos = new ArrayList<>();
-    for (FacilityTypeApprovedProduct product : products) {
-      ApprovedProductDto productDto = new ApprovedProductDto();
-      product.export(productDto);
-      productDtos.add(productDto);
-    }
+    List<ApprovedProductDto> productDtos = products.getContent()
+        .stream()
+        .map(this::toDto)
+        .collect(Collectors.toList());
 
-    return productDtos;
+    return toPage(productDtos, pageable, products.getTotalElements(), profiler);
+  }
+
+  private ApprovedProductDto toDto(FacilityTypeApprovedProduct product) {
+    ApprovedProductDto productDto = new ApprovedProductDto();
+    product.export(productDto);
+    return productDto;
   }
 
   private Page<MinimalFacilityDto> toMinimalDto(Page<Facility> facilities, Profiler profiler,

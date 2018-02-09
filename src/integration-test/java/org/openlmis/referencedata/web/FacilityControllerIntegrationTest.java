@@ -33,7 +33,7 @@ import static org.openlmis.referencedata.domain.RightName.FACILITIES_MANAGE_RIGH
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -56,14 +56,12 @@ import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -354,20 +352,22 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
     when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
-        eq(false))).thenReturn(Collections.singletonList(
-            new FacilityTypeApprovedProductsDataBuilder().build()));
+        eq(false), eq(pageable))).thenReturn(new PageImpl<>(Collections.singletonList(
+            new FacilityTypeApprovedProductsDataBuilder().build()), pageable, 1));
 
-    List<Map<String, ?>> productDtos = restAssured.given()
+    Page<Map<String, ?>> productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
         .queryParam("fullSupply", false)
+        .queryParam("size", pageable.getPageSize())
+        .queryParam("page", pageable.getPageNumber())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
         .then()
         .statusCode(200)
-        .extract().as(List.class);
+        .extract().as(Page.class);
 
-    assertEquals(1, productDtos.size());
+    assertEquals(1, productDtos.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

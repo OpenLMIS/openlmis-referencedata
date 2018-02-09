@@ -29,13 +29,11 @@ import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -48,7 +46,7 @@ import javax.persistence.criteria.Root;
 public class FacilityTypeApprovedProductRepositoryImpl
     implements FacilityTypeApprovedProductRepositoryCustom {
 
-  private static final String SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL = "SELECT ftap"
+  private static final String SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL = "SELECT :select"
       + " FROM FacilityTypeApprovedProduct ftap"
       + " INNER JOIN FETCH ftap.orderable o"
       + " INNER JOIN FETCH ftap.program p"
@@ -65,6 +63,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private static final String SEARCH_PRODUCTS_WITH_PROGRAM_SQL =
       SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL + " AND p.id = :programId";
 
+  private static final String PAGINATION_SQL = " LIMIT :limit OFFSET :offset";
+
   private static final String PROGRAM = "program";
   private static final String FACILITY_TYPE = "facilityType";
   private static final String ORDERED_DISPLAY_VALUE = "orderedDisplayValue";
@@ -74,25 +74,14 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private EntityManager entityManager;
 
   @Override
-  public Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID programId,
-                                                                boolean fullSupply) {
-    TypedQuery<FacilityTypeApprovedProduct> query;
+  public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID programId,
+                                                          Boolean fullSupply, Pageable pageable) {
+    TypedQuery<FacilityTypeApprovedProduct> query = (TypedQuery<FacilityTypeApprovedProduct>)
+        createQuery(false, facilityTypeId, programId, fullSupply, pageable);
+    TypedQuery<Long> countQuery =
+        (TypedQuery<Long>) createQuery(true, facilityTypeId, programId, fullSupply, pageable);
 
-    if (null == programId) {
-      query = entityManager.createQuery(
-          SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL, FacilityTypeApprovedProduct.class
-      );
-    } else {
-      query = entityManager.createQuery(
-          SEARCH_PRODUCTS_WITH_PROGRAM_SQL, FacilityTypeApprovedProduct.class
-      );
-      query.setParameter("programId", programId);
-    }
-
-    query.setParameter("facilityTypeId", facilityTypeId);
-    query.setParameter("fullSupply", fullSupply);
-
-    return query.getResultList();
+    return new PageImpl<>(query.getResultList(), pageable, countQuery.getSingleResult());
   }
 
   @Override
@@ -120,6 +109,42 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
     return Pagination.getPage(resultList, pageable, count);
 
+  }
+
+  private TypedQuery createQuery(boolean count, UUID facilityTypeId, UUID programId,
+                                        Boolean fullSupply, Pageable pageable) {
+    TypedQuery query;
+    String queryString;
+
+    if (null == programId) {
+      queryString = SEARCH_PRODUCTS_WITHOUT_PROGRAM_SQL;
+    } else {
+      queryString = SEARCH_PRODUCTS_WITH_PROGRAM_SQL;
+    }
+
+    if (count) {
+      query = entityManager.createQuery(queryString, Long.class);
+
+      query.setParameter("select", "ftap");
+      query.setParameter("limit", pageable.getPageSize());
+      query.setParameter("offset", pageable.getPageNumber() * pageable.getPageSize());
+    } else {
+      queryString += PAGINATION_SQL;
+      query = entityManager
+          .createQuery(queryString + PAGINATION_SQL, FacilityTypeApprovedProduct.class);
+
+      query.setParameter("select", "COUNT(id)");
+    }
+
+    query.setParameter("facilityTypeId", facilityTypeId);
+    if (null != fullSupply) {
+      query.setParameter("fullSupply", fullSupply);
+    }
+    if (null != programId) {
+      query.setParameter("programId", programId);
+    }
+
+    return query;
   }
 
   private <T> CriteriaQuery<T> prepareQuery(String facilityTypeCode,

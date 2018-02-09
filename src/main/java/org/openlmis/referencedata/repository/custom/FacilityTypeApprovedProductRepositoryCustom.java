@@ -18,17 +18,14 @@ package org.openlmis.referencedata.repository.custom;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Collection;
 import java.util.UUID;
 
 public interface FacilityTypeApprovedProductRepositoryCustom {
 
-  Collection<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID program,
-                                                         boolean fullSupply);
+  Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID program,
+                                                   Boolean fullSupply, Pageable pageable);
 
   Page<FacilityTypeApprovedProduct> searchProducts(String facilityTypeCode,
                                                    String programCode,
                                                    Pageable pageable);
-
 }

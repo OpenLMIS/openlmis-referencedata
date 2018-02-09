@@ -43,17 +43,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
 @SuppressWarnings("PMD.TooManyMethods")
-public class FacilityTypeApprovedProductRepositoryTest extends
+public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
 
   private static final double MAX_PERIODS_OF_STOCK_DELTA = 1e-15;
@@ -102,6 +99,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   private Orderable orderable1;
   private Orderable orderable2;
   private Facility facility;
+  private Pageable pageable;
 
   @Override
   FacilityTypeApprovedProductRepository getRepository() {
@@ -183,6 +181,7 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     facility.setEnabled(true);
     facilityRepository.save(facility);
 
+    pageable = new PageRequest(0, 10);
   }
 
   @Override
@@ -203,15 +202,36 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   }
 
   @Test
+  public void shouldGetFullAndNonFullSupply() {
+    ftapRepository.save(generateInstance());
+    ftapRepository.save(generateProduct(facilityType1, false));
+
+    Page<FacilityTypeApprovedProduct> page = ftapRepository
+        .searchProducts(facility.getType().getId(), program.getId(), null, pageable);
+
+    assertThat(page.getContent(), hasSize(2));
+
+    FacilityTypeApprovedProduct ftap = page.iterator().next();
+
+    assertEquals(program, ftap.getProgram());
+    assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
+    assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
+    ProgramOrderable programOrderable = ftap.getOrderable().getProgramOrderable(program);
+    assertEquals(program.getId(), programOrderable.getProgram().getId());
+    assertTrue(programOrderable.isFullSupply());
+    assertTrue(programOrderable.isActive());
+  }
+
+  @Test
   public void shouldGetFullSupply() {
     ftapRepository.save(generateInstance());
 
-    Collection<FacilityTypeApprovedProduct> list = ftapRepository
-        .searchProducts(facility.getType().getId(), program.getId(), true);
+    Page<FacilityTypeApprovedProduct> page = ftapRepository
+        .searchProducts(facility.getType().getId(), program.getId(), true, pageable);
 
-    assertThat(list, hasSize(1));
+    assertThat(page.getContent(), hasSize(1));
 
-    FacilityTypeApprovedProduct ftap = list.iterator().next();
+    FacilityTypeApprovedProduct ftap = page.iterator().next();
 
     assertEquals(program, ftap.getProgram());
     assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
@@ -227,22 +247,23 @@ public class FacilityTypeApprovedProductRepositoryTest extends
     // Create a full supply product
     ftapRepository.save(generateInstance());
 
-    Collection<FacilityTypeApprovedProduct> actual = ftapRepository
-        .searchProducts(facility.getType().getId(), program.getId(), false);
+    Page<FacilityTypeApprovedProduct> page = ftapRepository
+        .searchProducts(facility.getType().getId(), program.getId(), false, pageable);
 
     // At this point we have no non-full supply products
-    assertEquals(0, actual.size());
+    assertEquals(0, page.getContent().size());
 
     // Create a non-full supply product
     ftapRepository.save(generateProduct(facilityType1, false));
 
-    actual = ftapRepository.searchProducts(facility.getType().getId(), program.getId(), false);
+    page = ftapRepository
+        .searchProducts(facility.getType().getId(), program.getId(), false, pageable);
 
     // We should be able to find non-full supply product we have created
-    assertEquals(1, actual.size());
+    assertEquals(1, page.getContent().size());
 
     // And make sure it returned non-full supply one
-    FacilityTypeApprovedProduct ftap = actual.iterator().next();
+    FacilityTypeApprovedProduct ftap = page.iterator().next();
 
     assertEquals(program, ftap.getProgram());
     assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
@@ -257,15 +278,15 @@ public class FacilityTypeApprovedProductRepositoryTest extends
   public void shouldSkipFilteringWhenProgramIsNotProvided() {
     ftapRepository.save(generateProduct(facilityType1, true));
 
-    Collection<FacilityTypeApprovedProduct> list = ftapRepository
-        .searchProducts(facility.getType().getId(), null, true);
+    Page<FacilityTypeApprovedProduct> page = ftapRepository
+        .searchProducts(facility.getType().getId(), null, true, pageable);
 
-    assertThat(list, hasSize(1));
+    assertThat(page.getContent(), hasSize(1));
 
-    FacilityTypeApprovedProduct ftap = list.iterator().next();
+    FacilityTypeApprovedProduct ftap = page.iterator().next();
     assertFacilityTypeApprovedProduct(ftap);
 
-    ftap = list.iterator().next();
+    ftap = page.iterator().next();
     assertFacilityTypeApprovedProduct(ftap);
   }
 
