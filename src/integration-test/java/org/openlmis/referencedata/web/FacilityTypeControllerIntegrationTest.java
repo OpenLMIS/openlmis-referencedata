@@ -27,6 +27,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.RightName;
@@ -35,10 +36,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
