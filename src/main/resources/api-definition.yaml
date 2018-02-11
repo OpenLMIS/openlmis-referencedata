@@ -1725,7 +1725,13 @@ resourceTypes:
       displayName: Facility Type
       get:
           is: [ secured ]
-          description: Get all facilityTypes.
+          description: Get facilityTypes.
+          queryParameters:
+              id:
+                  displayName: id
+                  type: string
+                  required: false
+                  repeat: true
           responses:
               "200":
                   body:

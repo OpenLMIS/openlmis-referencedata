@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.openlmis.referencedata.web.FacilityTypeController.RESOURCE_PATH;
 
 import org.openlmis.referencedata.domain.FacilityType;
@@ -22,6 +23,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
+import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -82,7 +86,15 @@ public class FacilityTypeController extends BaseController {
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<FacilityType> getAllFacilityTypes() {
+  public Iterable<FacilityType> getFacilityTypes(
+      @RequestParam MultiValueMap<String, Object> requestParams) {
+
+    if (!isEmpty(requestParams)) {
+      Set<UUID> ids = UuidUtil.getIds(requestParams);
+      if (!ids.isEmpty()) {
+        return facilityTypeRepository.findAll(ids);
+      }
+    }
 
     return facilityTypeRepository.findAll();
   }

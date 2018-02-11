@@ -16,8 +16,10 @@
 package org.openlmis.referencedata.web;
 
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -179,13 +181,38 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   @Test
   public void shouldGetAllFacilityTypes() {
 
-    List<FacilityType> storedFacilityTypes = Arrays.asList(facilityType, new FacilityType("code2"));
+    List<FacilityType> storedFacilityTypes = asList(facilityType, new FacilityType("code2"));
     given(facilityTypeRepository.findAll()).willReturn(storedFacilityTypes);
 
     FacilityType[] response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(FacilityType[].class);
+
+    assertEquals(storedFacilityTypes.size(), response.length);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetFacilityTypesByIds() {
+
+    UUID id1 = UUID.randomUUID();
+    UUID id2 = UUID.randomUUID();
+
+    List<FacilityType> storedFacilityTypes = asList(facilityType, new FacilityType("code2"));
+    given(facilityTypeRepository.findAll(asSet(id1, id2))).willReturn(storedFacilityTypes);
+
+    FacilityType[] response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam("id", id1)
+        .queryParam("id", id2)
         .when()
         .get(RESOURCE_URL)
         .then()
