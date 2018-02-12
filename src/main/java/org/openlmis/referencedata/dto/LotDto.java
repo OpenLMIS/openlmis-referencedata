@@ -15,25 +15,23 @@
 
 package org.openlmis.referencedata.dto;
 
-import org.openlmis.referencedata.domain.Lot;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.openlmis.referencedata.domain.Lot;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(of = "lotCode", callSuper = false)
 public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
 
   private String lotCode;
@@ -68,22 +66,5 @@ public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
     lot.export(lotDto);
 
     return lotDto;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof LotDto)) {
-      return false;
-    }
-    LotDto lotDto = (LotDto) obj;
-    return Objects.equals(lotCode, lotDto.lotCode);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(lotCode);
   }
 }

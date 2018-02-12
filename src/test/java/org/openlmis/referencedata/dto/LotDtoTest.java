@@ -15,19 +15,18 @@
 
 package org.openlmis.referencedata.dto;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LotDtoTest {
@@ -66,41 +65,13 @@ public class LotDtoTest {
   }
 
   @Test
-  public void equalsShouldReturnTrueIfLotCodesAreEqual() {
-    LotDto left = LotDto.newInstance(
-        new LotDataBuilder()
-            .withExpirationDate(LocalDate.now())
-            .withLotCode("LC01")
-            .build()
-    );
-
-    LotDto right = LotDto.newInstance(
-        new LotDataBuilder()
-            .withExpirationDate(LocalDate.now().plusDays(1))
-            .withLotCode("LC01")
-            .build()
-    );
-
-    assertTrue(left.equals(right));
-  }
-
-  @Test
-  public void equalsShouldReturnFalseIfLotCodesAreNotEqual() {
-    LotDto left = LotDto.newInstance(
-        new LotDataBuilder()
-            .withExpirationDate(LocalDate.now())
-            .withLotCode("LC01")
-            .build()
-    );
-
-    LotDto right = LotDto.newInstance(
-        new LotDataBuilder()
-            .withExpirationDate(LocalDate.now().plusDays(1))
-            .withLotCode("LC02")
-            .build()
-    );
-
-    assertFalse(left.equals(right));
+  public void equalsContract() {
+    EqualsVerifier.forClass(LotDto.class)
+            .withRedefinedSuperclass()
+            .withOnlyTheseFields("lotCode")
+            .suppress(Warning.STRICT_INHERITANCE)
+            .suppress(Warning.NONFINAL_FIELDS)
+            .verify();
   }
 
 }
