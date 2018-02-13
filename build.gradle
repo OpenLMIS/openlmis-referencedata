@@ -249,8 +249,8 @@ integrationTest.dependsOn copyRamlToBuild
 processResources {
     dependsOn demoDataSeed
 
-    // we want the generated Swagger spec file included in the output jar
-    finalizedBy ramlToSwagger
+    // we want the generated HTML spec file included in the output jar
+    finalizedBy ramlToHtml
 
     // update version information in build
     filesMatching('**/version.properties') {
@@ -262,7 +262,6 @@ apply from: "registration.gradle"
 
 assemble {
     dependsOn ramlToHtml
-    dependsOn ramlToSwagger
     dependsOn copyRamlHtmlToBuild
     dependsOn copyConsulRegistrationToBuild
     dependsOn jacocoTestReport
@@ -275,7 +274,6 @@ build {
 
 check {
     dependsOn ramlToHtml
-    dependsOn ramlToSwagger
     dependsOn copyRamlHtmlToBuild
     dependsOn copyConsulRegistrationToBuild
 }
