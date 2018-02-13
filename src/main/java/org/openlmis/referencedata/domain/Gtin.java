@@ -23,6 +23,7 @@ import org.openlmis.referencedata.util.Message;
 
 import javax.persistence.Embeddable;
 
+import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_GTIN_INVALID_LENGTH;
 import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_GTIN_NUMERIC;
 
 /**
@@ -45,6 +46,10 @@ public class Gtin {
     if (!StringUtils.isNumeric(gtin)) {
       throw new ValidationMessageException(
           new Message(ERROR_GTIN_NUMERIC));
+    }
+    if (gtin.length() < 8 || gtin.length() > 14) {
+      throw new ValidationMessageException(
+          new Message(ERROR_GTIN_INVALID_LENGTH));
     }
     this.gtin = gtin;
   }

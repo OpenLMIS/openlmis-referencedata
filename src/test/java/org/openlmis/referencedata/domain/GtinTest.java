@@ -56,6 +56,16 @@ public class GtinTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfGtinIsNotNumeric() {
-    new Gtin("123ab5");
+    new Gtin("ab12345678ba");
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfGtinIsTooShort() {
+    new Gtin("1234567");
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfGtinIsTooLong() {
+    new Gtin("123456789012345");
   }
 }

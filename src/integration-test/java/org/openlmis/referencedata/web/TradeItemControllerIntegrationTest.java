@@ -63,7 +63,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewTradeItem() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    TradeItem tradeItem = generateItem("item", "123");
+    TradeItem tradeItem = generateItem("item", "12345678");
 
     when(tradeItemRepository.save(any(TradeItem.class))).thenAnswer(new SaveAnswer<TradeItem>());
 
@@ -95,8 +95,8 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveAllTradeItems() {
 
-    List<TradeItem> items = asList(generateItem("one", "111"),
-        generateItem("two", "222"));
+    List<TradeItem> items = asList(generateItem("one", "11111111"),
+        generateItem("two", "22222222"));
 
     when(tradeItemRepository.findAll()).thenReturn(items);
 
@@ -119,8 +119,8 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveTradeItemsByPartialMatch() {
 
-    List<TradeItem> items = asList(generateItem("one", "111"),
-        generateItem("two", "222"));
+    List<TradeItem> items = asList(generateItem("one", "11111111"),
+        generateItem("two", "22222222"));
 
     when(tradeItemRepository.findByClassificationIdLike(CID)).thenReturn(items);
 
@@ -144,8 +144,8 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveTradeItemsByFullMatch() {
 
-    List<TradeItem> items = asList(generateItem("one", "111"),
-        generateItem("two", "222"));
+    List<TradeItem> items = asList(generateItem("one", "11111111"),
+        generateItem("two", "22222222"));
 
     when(tradeItemRepository.findByClassificationId(CID)).thenReturn(items);
 

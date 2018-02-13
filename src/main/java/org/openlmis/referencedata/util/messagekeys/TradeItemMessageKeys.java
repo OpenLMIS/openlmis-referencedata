@@ -25,7 +25,9 @@ public abstract class TradeItemMessageKeys extends MessageKeys {
       join(ERROR, "manufacturerOfTradeItem", REQUIRED);
 
   public static final String ERROR_GTIN_NUMERIC =
-      join(ERROR, "gtin", NUMERIC);
+      join(ERROR, "gtin", INVALID_LENGTH);
+  public static final String ERROR_GTIN_INVALID_LENGTH =
+      join(ERROR, "gtin", INVALID_LENGTH);
   public static final String ERROR_GTIN_DUPLICATED =
       join(ERROR, "gtin", DUPLICATED);
 }

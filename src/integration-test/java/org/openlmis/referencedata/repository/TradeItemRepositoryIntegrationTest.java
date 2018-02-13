@@ -106,10 +106,10 @@ public class TradeItemRepositoryIntegrationTest extends
   @Test(expected = DataIntegrityViolationException.class)
   public void shouldNotAllowDuplicateGtin() {
     TradeItem tradeItem = generateInstance();
-    tradeItem.setGtin(new Gtin("1"));
+    tradeItem.setGtin(new Gtin("12345678"));
 
     TradeItem anotherTradeItem = generateInstance();
-    anotherTradeItem.setGtin(new Gtin("1"));
+    anotherTradeItem.setGtin(new Gtin("12345678"));
 
     repository.save(tradeItem);
     repository.save(anotherTradeItem);

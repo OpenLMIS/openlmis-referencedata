@@ -11,6 +11,7 @@ parameters to get users endpoint
 * [OLMIS-3821](https://openlmis.atlassian.net/browse/OLMIS-4052): Facility approved products endpoint is paginated now, fullSupply" flag is optional and products can be filtered by multiple orderable ids.
 
 New functionality added in a backwards-compatible manner:
+* [OLMIS-3077](https://openlmis.atlassian.net/browse/OLMIS-3077): Added GTIN to TradeItem
 * [OLMIS-3782](https://openlmis.atlassian.net/browse/OLMIS-3782): Ability to set up program to skip requisition authorization step
 * [OLMIS-3135](https://openlmis.atlassian.net/browse/OLMIS-3135): Ability to create, use and delete API keys.
   * Handle API Key requests. (For now all requests are blocked.)
