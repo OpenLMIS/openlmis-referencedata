@@ -123,12 +123,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
     if (count) {
       query = entityManager.createQuery(COUNT_SELECT + queryString.toString(), Long.class);
 
-      Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-      query.setMaxResults(maxAndFirst.getLeft());
-      query.setFirstResult(maxAndFirst.getRight());
     } else {
       query = entityManager.createQuery(SEARCH_SELECT + queryString.toString(),
           FacilityTypeApprovedProduct.class);
+
+      Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+      query.setMaxResults(maxAndFirst.getLeft());
+      query.setFirstResult(maxAndFirst.getRight());
     }
 
     query.setParameter("facilityTypeId", facilityTypeId);

@@ -215,6 +215,21 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   }
 
   @Test
+  public void shouldPaginate() {
+    ftapRepository.save(generateInstance());
+    ftapRepository.save(generateProduct(facilityType1, false));
+    ftapRepository.save(generateProduct(facilityType2, true));
+    ftapRepository.save(generateProduct(facilityType2, false));
+
+    pageable = new PageRequest(0, 1);
+
+    Page<FacilityTypeApprovedProduct> page = ftapRepository
+        .searchProducts(facility.getType().getId(), program.getId(), null, pageable);
+
+    assertThat(page.getContent(), hasSize(1));
+  }
+
+  @Test
   public void shouldGetFullSupply() {
     ftapRepository.save(generateInstance());
     ftapRepository.save(generateProduct(facilityType1, false));
