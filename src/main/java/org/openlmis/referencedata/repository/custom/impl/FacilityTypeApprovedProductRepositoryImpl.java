@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -62,6 +63,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   private static final String WITH_PROGRAM = " AND p.id = :programId";
   private static final String WITH_FULL_SUPPLY = " AND po.fullSupply = :fullSupply";
+  private static final String WITH_ORDERABLE_IDS = " AND o.id in :orderableIds";
 
   private static final String PROGRAM = "program";
   private static final String FACILITY_TYPE = "facilityType";
@@ -72,12 +74,15 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private EntityManager entityManager;
 
   @Override
-  public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID programId,
-                                                          Boolean fullSupply, Pageable pageable) {
+  public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId,
+                                                          UUID programId,
+                                                          Boolean fullSupply,
+                                                          List<UUID> orderableIds,
+                                                          Pageable pageable) {
     TypedQuery<FacilityTypeApprovedProduct> query = (TypedQuery<FacilityTypeApprovedProduct>)
-        createQuery(false, facilityTypeId, programId, fullSupply, pageable);
-    TypedQuery<Long> countQuery =
-        (TypedQuery<Long>) createQuery(true, facilityTypeId, programId, fullSupply, pageable);
+        createQuery(false, facilityTypeId, programId, orderableIds, fullSupply, pageable);
+    TypedQuery<Long> countQuery = (TypedQuery<Long>) createQuery(true, facilityTypeId, programId,
+        orderableIds, fullSupply, pageable);
 
     return new PageImpl<>(query.getResultList(), pageable, countQuery.getSingleResult());
   }
@@ -110,7 +115,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
   }
 
   private TypedQuery createQuery(boolean count, UUID facilityTypeId, UUID programId,
-                                        Boolean fullSupply, Pageable pageable) {
+                                 List<UUID> orderableIds, Boolean fullSupply, Pageable pageable) {
     TypedQuery query;
     StringBuilder queryString = new StringBuilder(SEARCH_PRODUCTS_SQL);
     if (null != programId) {
@@ -118,6 +123,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
     }
     if (null != fullSupply) {
       queryString.append(WITH_FULL_SUPPLY);
+    }
+    if (!isEmpty(orderableIds)) {
+      queryString.append(WITH_ORDERABLE_IDS);
     }
 
     if (count) {
@@ -138,6 +146,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
     }
     if (null != programId) {
       query.setParameter("programId", programId);
+    }
+    if (!isEmpty(orderableIds)) {
+      query.setParameter("orderableIds", orderableIds);
     }
 
     return query;

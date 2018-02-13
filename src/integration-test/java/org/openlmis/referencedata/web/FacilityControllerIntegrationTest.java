@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.Is.is;
@@ -86,8 +87,12 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String SEARCH_FACILITIES = RESOURCE_URL + "/search";
   private static final String BYBOUNDARY_URL = RESOURCE_URL + "/byBoundary";
   private static final String NAME_KEY = "name";
+  private static final String FULL_SUPPLY = "fullSupply";
+  private static final String APPROVED_PRODUCTS = "/approvedProducts";
 
   private UUID programId;
+  private UUID orderableId1;
+  private UUID orderableId2;
   private UUID supervisoryNodeId;
   private Program program;
   private Facility facility;
@@ -106,6 +111,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     super.setUp();
 
     programId = UUID.randomUUID();
+    orderableId1 = UUID.randomUUID();
+    orderableId2 = UUID.randomUUID();
     program = new ProgramDataBuilder().withId(programId).build();
     facility = new FacilityDataBuilder()
         .withSupportedProgram(program).build();
@@ -351,18 +358,45 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindApprovedProductsForFacility() {
     pageable = new PageRequest(0, Integer.MAX_VALUE);
-
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
     when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
-        eq(false), eq(pageable))).thenReturn(new PageImpl<>(Collections.singletonList(
+        eq(false), eq(null), eq(pageable)))
+        .thenReturn(new PageImpl<>(Collections.singletonList(
             new FacilityTypeApprovedProductsDataBuilder().build()), pageable, 1));
 
     PageImplRepresentation productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
-        .queryParam("fullSupply", false)
+        .queryParam(FULL_SUPPLY, false)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
-        .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(1, productDtos.getContent().size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindApprovedProductsForFacilityAndOrderableIds() {
+    pageable = new PageRequest(0, Integer.MAX_VALUE);
+    List<UUID> orderableIds = asList(orderableId1, orderableId2);
+
+    when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
+    when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
+        eq(false), eq(orderableIds), eq(pageable)))
+        .thenReturn(new PageImpl<>(Collections.singletonList(
+            new FacilityTypeApprovedProductsDataBuilder().build()), pageable, 1));
+
+    PageImplRepresentation productDtos = restAssured.given()
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam(FULL_SUPPLY, false)
+        .queryParam("orderableId", orderableId1)
+        .queryParam("orderableId", orderableId2)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
@@ -376,9 +410,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
-        .queryParam("fullSupply", false)
+        .queryParam(FULL_SUPPLY, false)
         .when()
-        .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
         .then()
         .statusCode(401);
 
@@ -391,10 +425,10 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
-        .queryParam("fullSupply", false)
+        .queryParam(FULL_SUPPLY, false)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
-        .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
         .then()
         .statusCode(400);
 
@@ -403,7 +437,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldSearchWithEmptyParamsWhenNoParamsProvided() {
-    List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
+    List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
     given(facilityService.getFacilities(new LinkedMultiValueMap<>()))
         .willReturn(storedFacilities);
@@ -417,7 +451,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(FacilityDto[].class);
 
-    List<FacilityDto> facilities = Arrays.asList(response);
+    List<FacilityDto> facilities = asList(response);
     assertThat(facilities.size(), is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     verifyZeroInteractions(rightService);
@@ -425,7 +459,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldSearchWithParamsWhenParamsProvided() {
-    List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
+    List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
     MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     UUID facilityIdOne = UUID.randomUUID();
@@ -446,7 +480,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(FacilityDto[].class);
 
-    List<FacilityDto> facilities = Arrays.asList(response);
+    List<FacilityDto> facilities = asList(response);
     assertThat(facilities.size(), is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     verifyZeroInteractions(rightService);
@@ -498,7 +532,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAllShouldGetAllFacilitiesWithMinimalRepresentation() {
-    List<Facility> storedFacilities = Arrays.asList(facility, new FacilityDataBuilder()
+    List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
     given(facilityRepository.findAll(any(Pageable.class))).willReturn(
         Pagination.getPage(storedFacilities));

@@ -1627,6 +1627,11 @@ resourceTypes:
                       type: boolean
                       required: false
                       repeat: false
+                  orderableId:
+                      displayName: Orderable id
+                      type: string
+                      required: false
+                      repeat: true
               responses:
                 200:
                     body:
