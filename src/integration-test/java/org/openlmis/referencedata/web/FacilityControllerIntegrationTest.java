@@ -57,6 +57,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -349,6 +350,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindApprovedProductsForFacility() {
+    pageable = new PageRequest(0, Integer.MAX_VALUE);
 
     when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
     when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
@@ -358,8 +360,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     PageImplRepresentation productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, UUID.randomUUID())
         .queryParam("fullSupply", false)
-        .queryParam("size", pageable.getPageSize())
-        .queryParam("page", pageable.getPageNumber())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL + "/" + UUID.randomUUID() + "/approvedProducts")
