@@ -88,7 +88,7 @@ public class LotServiceTest {
         eq(tradeItem),
         eq(lotSearchParams.getExpirationDate()),
         eq(lotSearchParams.getLotCode()),
-        eq(lotSearchParams.getIds()),
+        eq(lotSearchParams.getId()),
         eq(pageable)
     )).thenReturn(expected);
 

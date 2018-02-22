@@ -2860,29 +2860,29 @@ resourceTypes:
           description: Find lots with matched parameters. This endpoint is experimental.
           queryParameters:
               tradeItemId:
-                      displayName: tradeItemId
-                      description: The UUID of the Trade Item.
-                      type: string
-                      required: false
-                      repeat: false
+                  displayName: tradeItemId
+                  description: The UUID of the Trade Item.
+                  type: string
+                  required: false
+                  repeat: false
               expirationDate:
-                      displayName: expirationDate
-                      description: The expiration date of the Lot.
-                      type: string
-                      required: false
-                      repeat: false
+                  displayName: expirationDate
+                  description: The expiration date of the Lot.
+                  type: string
+                  required: false
+                  repeat: false
               lotCode:
-                      displayName: lotCode
-                      description: The code of the Lot.
-                      type: string
-                      required: false
-                      repeat: false
-              ids:
-                      displayName: ids
-                      description: The UUIDs of Lots.
-                      type: string
-                      required: false
-                      repeat: true
+                  displayName: lotCode
+                  description: The code of the Lot.
+                  type: string
+                  required: false
+                  repeat: false
+              id:
+                  displayName: ids
+                  description: The UUIDs of Lots.
+                  type: string
+                  required: false
+                  repeat: true
 
           responses:
               "200":

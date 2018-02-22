@@ -57,7 +57,7 @@ public class LotService {
         tradeItem,
         requestParams.getExpirationDate(),
         requestParams.getLotCode(),
-        requestParams.getIds(),
+        requestParams.getId(),
         pageable
     );
   }

@@ -70,7 +70,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String PAGE = "page";
   private static final String SIZE = "size";
-  private static final String IDS = "ids";
+  private static final String ID = "id";
 
   private Lot lot;
   private UUID lotId;
@@ -391,8 +391,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam(IDS, lots.get(0).getId())
-        .queryParam(IDS, lots.get(1).getId())
+        .queryParam(ID, lots.get(0).getId())
+        .queryParam(ID, lots.get(1).getId())
         .when()
         .get(RESOURCE_URL)
         .then()

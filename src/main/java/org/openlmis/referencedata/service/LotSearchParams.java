@@ -37,6 +37,6 @@ public class LotSearchParams {
 
   private UUID tradeItemId;
   private String lotCode;
-  private List<UUID> ids;
+  private List<UUID> id;
 
 }

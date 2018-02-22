@@ -162,7 +162,7 @@ public class LotController extends BaseController {
     profiler.start("LOT_SERVICE_SEARCH");
     Page<Lot> lotsPage = lotService.search(requestParams, pageable);
 
-    profiler.start("LOT_PAGINATION");
+    profiler.start("LOT_TO_DTO");
     assert lotsPage != null;
     Page<LotDto> page = Pagination.getPage(LotDto.newInstance(
         lotsPage.getContent()),
