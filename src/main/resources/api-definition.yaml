@@ -2878,8 +2878,8 @@ resourceTypes:
                   required: false
                   repeat: false
               id:
-                  displayName: ids
-                  description: The UUIDs of Lots.
+                  displayName: id
+                  description: The UUID of Lot.
                   type: string
                   required: false
                   repeat: true
