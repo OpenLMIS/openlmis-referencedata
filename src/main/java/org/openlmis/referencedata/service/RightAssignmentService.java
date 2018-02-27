@@ -34,6 +34,7 @@ import org.openlmis.referencedata.util.Resource2Db;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -76,6 +77,7 @@ public class RightAssignmentService {
    * very often, and the re-generation could take several seconds to finish.
    */
   @Async
+  @Qualifier("rightAssignmentExecutor")
   @Transactional(isolation = Isolation.READ_COMMITTED)
   public Future<Void> regenerateRightAssignments() {
     XLOGGER.entry();

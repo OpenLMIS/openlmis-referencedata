@@ -1,0 +1,50 @@
+/*
+ * This program is part of the OpenLMIS logistics management information system platform software.
+ * Copyright © 2017 VillageReach
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms
+ * of the GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * See the GNU Affero General Public License for more details. You should have received a copy of
+ * the GNU Affero General Public License along with this program. If not, see
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ */
+
+package org.openlmis.referencedata.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+public class RightAssignmentExecutor {
+
+  @Value("${right-assignments.thread.core-pool}")
+  private int corePoolSize;
+
+  @Value("${right-assignments.thread.max-pool}")
+  private int maxPoolSize;
+
+  @Value("${right-assignments.queue.capacity}")
+  private int queueCapacity;
+
+  @Value("${right-assignments.thread.timeout}")
+  private int threadTimeout;
+
+  /**
+   * Executor for right assignment regeneration task.
+   * Restricts async parameters such as thread pool size. queue capacity or thread timeout.
+   */
+  @Bean
+  public ThreadPoolTaskExecutor rightAssignmentExecutor() {
+    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+    threadPoolTaskExecutor.setCorePoolSize(corePoolSize);
+    threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);
+    threadPoolTaskExecutor.setQueueCapacity(queueCapacity);
+    threadPoolTaskExecutor.setKeepAliveSeconds(threadTimeout);
+
+    return threadPoolTaskExecutor;
+  }
+}
