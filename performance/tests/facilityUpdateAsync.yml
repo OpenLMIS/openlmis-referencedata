@@ -1,0 +1,160 @@
+execution:
+  - concurrency: 30
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facility-update
+
+scenarios:
+  get-user-token:
+    requests:
+      - url: ${__P(base-uri)}/api/oauth/token
+        method: POST
+        label: GetUserToken
+        headers:
+          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
+        body:
+          grant_type: password
+          username: ${__P(username)}
+          password: ${__P(password)}
+        extract-jsonpath:
+          access_token:
+            jsonpath: $.access_token
+  facility-type-get-single:
+    requests:
+      - if: '${__javaScript(vars.get("facility_type") == null)}'
+        then:
+          - url: ${__P(base-uri)}/api/facilityTypes/ac1d268b-ce10-455f-bf87-9c667da8f060
+            method: GET
+            label: GetSingleFacilityType
+            headers:
+              Authorization: Bearer ${access_token}
+              Content-Type: application/json
+            jsr223:
+              script-text: |
+                import groovy.json.JsonSlurper
+                import groovy.json.JsonOutput
+
+                def response = prev.getResponseDataAsString()
+                def jsonSlurper = new JsonSlurper()
+                def facilityType = jsonSlurper.parseText(response)
+
+                vars.put("facility_type", JsonOutput.toJson(facilityType))
+  facility-operator-get-single:
+    requests:
+      - if: '${__javaScript(vars.get("facility_operator") == null)}'
+        then:
+          - url: ${__P(base-uri)}/api/facilityOperators/9456c3e9-c4a6-4a28-9e08-47ceb16a4121
+            method: GET
+            label: GetSingleFacilityOperator
+            headers:
+              Authorization: Bearer ${access_token}
+              Content-Type: application/json
+            jsr223:
+              script-text: |
+                import groovy.json.JsonSlurper
+                import groovy.json.JsonOutput
+
+                def response = prev.getResponseDataAsString()
+                def jsonSlurper = new JsonSlurper()
+                def facilityOperator = jsonSlurper.parseText(response)
+
+                vars.put("facility_operator", JsonOutput.toJson(facilityOperator))
+  geographic-zone-get-single:
+    requests:
+      - if: '${__javaScript(vars.get("geographic_zone") == null)}'
+        then:
+          - url: ${__P(base-uri)}/api/geographicZones/4e471242-da63-436c-8157-ade3e615c848
+            method: GET
+            label: GetSingleGeographicZone
+            headers:
+              Authorization: Bearer ${access_token}
+              Content-Type: application/json
+            jsr223:
+              script-text: |
+                import groovy.json.JsonSlurper
+                import groovy.json.JsonOutput
+
+                def response = prev.getResponseDataAsString()
+                def jsonSlurper = new JsonSlurper()
+                def geographicZone = jsonSlurper.parseText(response)
+
+                vars.put("geographic_zone", JsonOutput.toJson(geographicZone))
+  facility-create:
+    requests:
+      - include-scenario: get-user-token
+      - include-scenario: facility-type-get-single
+      - include-scenario: facility-operator-get-single
+      - include-scenario: geographic-zone-get-single
+      - url: ${__P(base-uri)}/api/facilities
+        method: POST
+        label: CreateFacility
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonSlurper
+            import groovy.json.JsonOutput
+
+            def jsonSlurper = new JsonSlurper()
+            def random = new Random()
+
+            def facility = [
+              code: "TF" + random.nextInt(),
+              name: "Test facility",
+              description: "This is a test facility",
+              geographicZone: jsonSlurper.parseText(vars.get("geographic_zone")),
+              type: jsonSlurper.parseText(vars.get("facility_type")),
+              operator: jsonSlurper.parseText(vars.get("facility_operator")),
+              active: "true",
+              goLiveDate: '2017-11-29',
+              comment: "Test comment",
+              enabled: "true",
+              openLmisAccessible: "true",
+              supportedPrograms: [
+                [ code: "PRG001", active: "true" ],
+                [ code: "PRG002", active: "true" ]
+              ]
+            ]
+
+            vars.put("facility", JsonOutput.toJson(facility))
+        body: ${facility}
+        extract-jsonpath:
+          facility_id: $.id
+  facilities-get-one:
+    requests:
+      - include-scenario: facility-create
+      - url: ${__P(base-uri)}/api/facilities/${facility_id}
+        method: GET
+        label: GetFacility
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+  facility-update:
+    requests:
+      - include-scenario: facilities-get-one
+      - url: ${__P(base-uri)}/api/facilities/${facility_id}
+        method: PUT
+        label: UpdateFacilityAsync
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonSlurper
+            import groovy.json.JsonOutput
+
+            def response = prev.getResponseDataAsString()
+            def jsonSlurper = new JsonSlurper()
+
+            def facility = jsonSlurper.parseText(response)
+            facility.name = "Updated Test facility"
+
+            vars.put("facility", JsonOutput.toJson(facility))
+        body: ${facility}
+
+reporting:
+    - module: passfail
+      criteria:
+        Update Facility too slow: p90 of UpdateFacility>500ms
