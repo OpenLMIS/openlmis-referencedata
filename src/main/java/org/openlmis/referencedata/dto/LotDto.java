@@ -15,12 +15,13 @@
 
 package org.openlmis.referencedata.dto;
 
+import org.openlmis.referencedata.domain.Lot;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.openlmis.referencedata.domain.Lot;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
@@ -31,7 +32,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(of = "lotCode", callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
 
   private String lotCode;
