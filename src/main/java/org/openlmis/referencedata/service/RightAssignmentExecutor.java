@@ -21,16 +21,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class RightAssignmentExecutor {
 
-  @Value("${right-assignments.thread.core-pool}")
+  @Value("${rightAssignments.thread.corePool}")
   private int corePoolSize;
 
-  @Value("${right-assignments.thread.max-pool}")
+  @Value("${rightAssignments.thread.maxPool}")
   private int maxPoolSize;
 
-  @Value("${right-assignments.queue.capacity}")
+  @Value("${rightAssignments.queue.capacity}")
   private int queueCapacity;
 
-  @Value("${right-assignments.thread.timeout}")
+  @Value("${rightAssignments.thread.timeout}")
   private int threadTimeout;
 
   /**
