@@ -15,13 +15,20 @@
 
 package org.openlmis.referencedata.service;
 
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
+@EnableAsync
 public class RightAssignmentExecutor {
+
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(RightAssignmentService.class);
 
   @Value("${rightAssignments.thread.corePool}")
   private int corePoolSize;
@@ -40,9 +47,12 @@ public class RightAssignmentExecutor {
    * Restricts async parameters such as thread pool size. queue capacity or thread timeout.
    */
   @Bean
+  @Qualifier("rightAssignmentTaskExecutor")
   public ThreadPoolTaskExecutor rightAssignmentTaskExecutor() {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.setCorePoolSize(corePoolSize);
+    threadPoolTaskExecutor.setRejectedExecutionHandler((runnable, executor) ->
+        XLOGGER.error("Thread pool for Right Assignment Regeneration exceeded"));
     threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);
     threadPoolTaskExecutor.setQueueCapacity(queueCapacity);
     threadPoolTaskExecutor.setKeepAliveSeconds(threadTimeout);
