@@ -17,8 +17,10 @@ package org.openlmis.referencedata.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+@Configuration
 public class RightAssignmentExecutor {
 
   @Value("${rightAssignments.thread.corePool}")
@@ -38,7 +40,7 @@ public class RightAssignmentExecutor {
    * Restricts async parameters such as thread pool size. queue capacity or thread timeout.
    */
   @Bean
-  public ThreadPoolTaskExecutor rightAssignmentExecutor() {
+  public ThreadPoolTaskExecutor rightAssignmentTaskExecutor() {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.setCorePoolSize(corePoolSize);
     threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);

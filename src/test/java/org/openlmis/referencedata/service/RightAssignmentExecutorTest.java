@@ -31,7 +31,7 @@ public class RightAssignmentExecutorTest {
     ReflectionTestUtils.setField(executor, "queueCapacity", 1);
     ReflectionTestUtils.setField(executor, "threadTimeout", 60);
 
-    ThreadPoolTaskExecutor threadPoolTaskExecutor = executor.rightAssignmentExecutor();
+    ThreadPoolTaskExecutor threadPoolTaskExecutor = executor.rightAssignmentTaskExecutor();
 
     assertEquals(1, threadPoolTaskExecutor.getCorePoolSize());
     assertEquals(1, threadPoolTaskExecutor.getMaxPoolSize());

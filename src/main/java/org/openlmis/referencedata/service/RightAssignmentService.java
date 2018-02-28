@@ -75,7 +75,7 @@ public class RightAssignmentService {
    * assignments. This is acceptable since the right assignments table is not expected to change 
    * very often, and the re-generation could take several seconds to finish.
    */
-  @Async("rightAssignmentExecutor")
+  @Async("rightAssignmentTaskExecutor")
   @Transactional(isolation = Isolation.READ_COMMITTED)
   public Future<Void> regenerateRightAssignments() {
     XLOGGER.entry();
