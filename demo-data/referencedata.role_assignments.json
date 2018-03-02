@@ -698,5 +698,21 @@
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
     "user": { "id": "211a6b4d-3c59-4fb2-8075-eedb79a18103" },
     "role": { "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c" }
+  },
+  {
+    "id": "26103eff-fed2-43f8-9811-8d801dd472ba",
+    "type": "supervision",
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": { "id": "e16d802b-8eb1-43f7-adf8-ef123227cb88" }
+  },
+  {
+    "id": "cb0a3794-95a6-46d7-b6c5-02b72e5d74af",
+    "type": "supervision",
+    "supervisoryNode": { "id": "6f5eae49-bc62-4664-a679-1ef0bfd5b21d" },
+    "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },
+    "role": { "id": "e16d802b-8eb1-43f7-adf8-ef123227cb88" }
   }
 ]
