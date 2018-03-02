@@ -90,6 +90,8 @@ schemas:
 
   - facilityType: !include schemas/facilityType.json
 
+  - facilityTypePage: !include schemas/facilityTypePage.json
+
   - geographicLevel: !include schemas/geographicLevel.json
 
   - geographicZone: !include schemas/geographicZone.json
@@ -1729,8 +1731,8 @@ resourceTypes:
   /facilityTypes:
       displayName: Facility Type
       get:
-          is: [ secured ]
-          description: Get facilityTypes.
+          is: [ secured, paginated ]
+          description: Get page of facilityTypes.
           queryParameters:
               id:
                   displayName: id
@@ -1740,10 +1742,11 @@ resourceTypes:
           responses:
               "200":
                   body:
-                    application/json:
+                      application/json:
+                          schema: facilityTypePage
               401:
                   body:
-                    application/json:
+                      application/json:
       post:
           is: [ secured ]
           description: Creates new facilityType.

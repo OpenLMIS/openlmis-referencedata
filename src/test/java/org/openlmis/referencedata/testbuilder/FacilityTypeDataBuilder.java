@@ -40,6 +40,7 @@ public class FacilityTypeDataBuilder {
     name = "Facility Type " + instanceNumber;
     displayOrder = 1;
     active = true;
+    description = "description";
   }
 
   /**

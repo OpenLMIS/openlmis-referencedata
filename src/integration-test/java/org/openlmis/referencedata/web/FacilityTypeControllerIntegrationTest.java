@@ -15,11 +15,9 @@
 
 package org.openlmis.referencedata.web;
 
-
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -29,11 +27,16 @@ import static org.mockito.Mockito.doThrow;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 import org.junit.Test;
+import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import java.util.List;
@@ -45,9 +48,12 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   private static final String RESOURCE_URL = "/api/facilityTypes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String DESCRIPTION = "OpenLMIS";
+  private static final String PAGE = "page";
+  private static final String SIZE = "size";
 
   private FacilityType facilityType;
   private UUID facilityTypeId;
+  private Pageable pageable = new PageRequest(0, 10);
 
   public FacilityTypeControllerIntegrationTest() {
     facilityType = new FacilityType("code");
@@ -177,46 +183,54 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   @Test
   public void shouldGetAllFacilityTypes() {
+    FacilityType facilityType1 = new FacilityTypeDataBuilder().build();
+    FacilityType facilityType2 = new FacilityTypeDataBuilder().build();
 
-    List<FacilityType> storedFacilityTypes = asList(facilityType, new FacilityType("code2"));
-    given(facilityTypeRepository.findAll()).willReturn(storedFacilityTypes);
+    List<FacilityType> storedFacilityTypes = asList(facilityType1, facilityType2);
+    given(facilityTypeRepository.findAll(pageable))
+        .willReturn(new PageImpl<>(storedFacilityTypes, pageable, 2));
 
-    FacilityType[] response = restAssured
+    PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(FacilityType[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    assertEquals(storedFacilityTypes.size(), response.length);
+    assertEquals(storedFacilityTypes.size(), response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldGetFacilityTypesByIds() {
+    FacilityType facilityType1 = new FacilityTypeDataBuilder().build();
+    FacilityType facilityType2 = new FacilityTypeDataBuilder().build();
 
-    UUID id1 = UUID.randomUUID();
-    UUID id2 = UUID.randomUUID();
+    List<FacilityType> storedFacilityTypes = asList(facilityType1, facilityType2);
+    given(facilityTypeRepository
+        .findByIdIn(any(List.class), any(Pageable.class)))
+        .willReturn(new PageImpl<>(storedFacilityTypes, pageable, 2));
 
-    List<FacilityType> storedFacilityTypes = asList(facilityType, new FacilityType("code2"));
-    given(facilityTypeRepository.findAll(asSet(id1, id2))).willReturn(storedFacilityTypes);
-
-    FacilityType[] response = restAssured
+    PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParam("id", id1)
-        .queryParam("id", id2)
+        .queryParam("id", facilityType1.getId())
+        .queryParam("id", facilityType2.getId())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(FacilityType[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    assertEquals(storedFacilityTypes.size(), response.length);
+    assertEquals(storedFacilityTypes.size(), response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
