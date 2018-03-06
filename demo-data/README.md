@@ -313,8 +313,10 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
   * rights:
     * PoDs Manage
   * users:
-    * smanager1, smanager2, smanager4, srmanager1, srmanager2, srmanager4 - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
-    * smanager3, srmanager3 - has this role for WH02/Balaka District Warehouse
+    * administrator - has this role for Family Planning at SN1/FP Approval point
+    * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
+    * smanager1, smanager2, smanager4, srmanager1, srmanager2, srmanager4 - has this role for Family Planning at SN1/FP Approval point and for Essential Meds at EM approval point
+    * smanager3, srmanager3 - has this role for Essential Meds at EM approval point
 7. Stock Manager
   * rights:
     * Stock Cards View

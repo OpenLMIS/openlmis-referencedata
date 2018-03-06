@@ -92,22 +92,6 @@
     "role": {"id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec"}
   },
   {
-    "id": "fa781b39-19ba-4d1f-a3ed-311c1e08dd25",
-    "type": "supervision",
-    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
-    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
-    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
-    "role": {"id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec"}
-  },
-  {
-    "id": "c27a2a53-0956-4a64-b7fd-818528accb98",
-    "type": "supervision",
-    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
-    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
-    "role": {"id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec"}
-  },
-  {
     "id": "5414a188-e0c8-4e8a-b43c-136f143b91d4",
     "type": "supervision",
     "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
