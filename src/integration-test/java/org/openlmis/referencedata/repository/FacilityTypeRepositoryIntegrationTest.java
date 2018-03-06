@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -80,5 +81,15 @@ public class FacilityTypeRepositoryIntegrationTest
 
     assertEquals(1, facilityTypePage.getContent().size());
     assertEquals(3, facilityTypePage.getTotalElements());
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldThrowExceptionOnDuplicatedCode() {
+    FacilityType type1 = facilityTypeRepository.save(generateInstance());
+
+    FacilityType type2 = generateInstance();
+    type2.setCode(type1.getCode());
+
+    facilityTypeRepository.saveAndFlush(type2);
   }
 }

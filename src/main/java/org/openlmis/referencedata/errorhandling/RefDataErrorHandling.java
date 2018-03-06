@@ -23,6 +23,7 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
@@ -54,6 +55,7 @@ public class RefDataErrorHandling extends BaseHandler {
     CONSTRAINT_MAP.put("supply_line_unique_program_supervisory_node",
         SupplyLineMessageKeys.ERROR_PROGRAM_SUPERVISORY_NODE_DUPLICATED);
     CONSTRAINT_MAP.put("uk_tradeitems_gtin", TradeItemMessageKeys.ERROR_GTIN_DUPLICATED);
+    CONSTRAINT_MAP.put("unq_facility_type_code", FacilityTypeMessageKeys.ERROR_CODE_DUPLICATED);
   }
 
   /**

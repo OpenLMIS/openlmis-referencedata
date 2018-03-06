@@ -26,6 +26,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -33,7 +34,9 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -157,6 +160,30 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
     assertEquals(facilityType, response);
     assertEquals(DESCRIPTION, response.getDescription());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldThrowExceptionIfCodeIsDuplicated() {
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    doThrow(new DataIntegrityViolationException("",
+        new ConstraintViolationException("", null, "unq_facility_type_code")))
+    .when(facilityTypeRepository).save(any(FacilityType.class));
+
+    String response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(facilityType)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertEquals(response, FacilityTypeMessageKeys.ERROR_CODE_DUPLICATED);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

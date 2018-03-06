@@ -19,19 +19,16 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.UUID;
 
 @JaversSpringDataAuditable
-public interface FacilityTypeRepository extends PagingAndSortingRepository<FacilityType, UUID> {
+public interface FacilityTypeRepository extends JpaRepository<FacilityType, UUID> {
 
   @Override
   <S extends FacilityType> S save(S entity);
-
-  @Override
-  <S extends FacilityType> Iterable<S> save(Iterable<S> entities);
 
   FacilityType findOneByCode(@Param("code") String code);
 
