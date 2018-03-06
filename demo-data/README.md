@@ -301,7 +301,6 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Orders Edit (Requisition Convert to Order)
     * Shipments View
     * Shipments Edit
-    * PoDs Manage
   * users:
     * administrator - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
     * divo1 - has this role at D001/Dep—sito Distrital Cuamba
@@ -314,8 +313,8 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
   * rights:
     * PoDs Manage
   * users:
-    * srmanager1, srmanager2, srmanager4 - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
-    * srmanager3 - has this role for WH02/Balaka District Warehouse
+    * smanager1, smanager2, smanager4, srmanager1, srmanager2, srmanager4 - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
+    * smanager3, srmanager3 - has this role for WH02/Balaka District Warehouse
 7. Stock Manager
   * rights:
     * Stock Cards View
