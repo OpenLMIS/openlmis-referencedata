@@ -17,11 +17,15 @@ package org.openlmis.referencedata;
 
 import static org.openlmis.referencedata.util.Pagination.handlePage;
 
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.Identifiable;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -33,11 +37,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
 
 /**
  * AuditLogInitializer runs after its associated Spring application has loaded.
@@ -107,7 +106,7 @@ public class AuditLogInitializer implements CommandLineRunner {
     //...check whether there exists a snapshot for it in the audit log.
     // Note that we don't care about checking for logged changes, per se,
     // and thus use findSnapshots() rather than findChanges()
-    BaseEntity baseEntity = (BaseEntity) object;
+    Identifiable baseEntity = (Identifiable) object;
 
     QueryBuilder jqlQuery = QueryBuilder.byInstanceId(baseEntity.getId(), object.getClass());
     List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
