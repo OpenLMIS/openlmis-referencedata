@@ -254,8 +254,9 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Requisition View
     * Requisition Delete
     * Requisition Create
+    * PoDs Manage
   * users:
-    * administrator - has this role for Family Planning & Essential Meds
+    * administrator - has this role for Family Planning & Essential Meds at SN1/FP Approval point and SN2/EM Approval point
     * srmanager2, srmanager4 - has this role for Family Planning & Essential Meds
     * srmanager1 - has this role for Family Planning
     * srmanager3 - has this role for Essential Meds
@@ -269,7 +270,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Requisition Delete
     * Requisition Authorize
   * users:
-    * administrator - has this role for Family Planning & Essential Meds
+    * administrator - has this role for Family Planning & Essential Meds at home facility and SN2/EM Approval point
     * smanager2, smanager4 - has this role for Family Planning & Essential Meds
     * smanager1 - has this role for Family Planning
     * smanager3 - has this role for Essential Meds
@@ -282,15 +283,16 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Requisition View
     * Requisition Approve
   * users:
-    * administrator - has this role for Family Planning & Essential Meds
+    * administrator - has this role for Family Planning & Essential Meds for SN2/EM Approval
+                      point and SN1/FP Approval point
     * dsrmanager - has this role for Family Planning & Essential Meds
 4. Program Supervisor
   * rights:
     * Requisition View
     * Requisition Approve
   * users:
-    * administrator - has this role for Family Planning & Essential Meds for SN1/FP Approval
-                      point supervisory node
+    * administrator - has this role for Family Planning & Essential Meds for SN2/EM Approval
+                      point and SN1/FP Approval point
     * psupervisor - has this role for Family Planning & Essential Meds for SN1/FP Approval
                     point supervisory node
     * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
@@ -315,7 +317,8 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
   * users:
     * administrator - has this role for Family Planning at SN1/FP Approval point
     * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
-    * smanager1, smanager2, smanager4, srmanager1, srmanager2, srmanager4 - has this role for Family Planning at SN1/FP Approval point and for Essential Meds at EM approval point
+    * smanager1, smanager2, smanager4, srmanager1, srmanager2, srmanager4 - has this role for Family Planning
+        at SN1/FP Approval point and for Essential Meds at EM approval point
     * smanager3, srmanager3 - has this role for Essential Meds at EM approval point
 7. Stock Manager
   * rights:
@@ -327,6 +330,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
     * administrator - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
+                      and for Family Planning & Essential Meds at SN1/FP Approval point and SN2/EM Approval point
 8. Requisition Viewer
   * rights:
     * Requisition View
@@ -361,7 +365,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * CCE Inventory View
     * CCE Inventory Edit
   * users:
-    * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
+    * administrator - has this role for Family Planning at SN1/FP approval point and Essential Meds at SN2/EM approval point
     * divo1 - has this role for EPI at home facility
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
