@@ -241,49 +241,56 @@
   {
     "id": "83e9caae-3482-4f71-8e0a-0302d96bfd70",
     "type": "supervision",
-    "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "c994d1ea-47f7-435d-9d4d-42fb54197698" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "455843e9-076b-4cc2-a89b-5fc32e70425a",
     "type": "supervision",
-    "warehouse": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "c994d1ea-47f7-435d-9d4d-42fb54197698" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "b319114a-b40a-4c57-a6be-c2b78cd55222",
     "type": "supervision",
-    "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "27391643-8a16-498c-9be6-40f27c75370c",
     "type": "supervision",
-    "warehouse": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "fd223503-8da4-467b-b06b-2513f3f51622",
     "type": "supervision",
-    "warehouse": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "7d6c0269-0c6a-4c9a-a098-46de276b9d26" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "cf7d2ee7-4676-4987-b49d-a62bd216d55a",
     "type": "supervision",
-    "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "c54df462-66d8-4a02-bee9-b786fe2f30ee" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "1b40502d-5d9c-4e91-955a-7284c88be1a2",
     "type": "supervision",
-    "warehouse": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "c54df462-66d8-4a02-bee9-b786fe2f30ee" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
@@ -355,42 +362,48 @@
   {
     "id": "35a2d0b7-2659-447a-908b-dce54243b2d8",
     "type": "supervision",
-    "warehouse": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "cb5cd52f-f205-475d-8763-90852839424d" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "1b43ee9e-3fc4-4523-a7d8-49ff415c80b2",
     "type": "supervision",
-    "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "9b2778af-5372-4410-a5c8-899e7f74296b" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "d87a9499-91ee-43ba-bcb1-579f4c3c05fe",
     "type": "supervision",
-    "warehouse": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "9b2778af-5372-4410-a5c8-899e7f74296b" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "d19bdb81-741b-4236-a12d-faf5c4093dc5",
     "type": "supervision",
-    "warehouse": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "2fbe9be3-f5e4-47ec-a10a-f3380c0daf75" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "91b70e92-dc03-442e-9fff-11dd064a1c33",
     "type": "supervision",
-    "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "469c6e1c-aab7-4640-8925-f3c34bbe752d" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
   {
     "id": "772b51fb-6537-4d84-8cd0-873b3b145983",
     "type": "supervision",
-    "warehouse": { "id": "9318b2ea-9ae0-42b2-a7e1-353683f54000" },
+    "supervisoryNode": { "id": "6d5831e7-c336-4129-bd10-0149910a72aa" },
+    "program": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
     "user": { "id": "469c6e1c-aab7-4640-8925-f3c34bbe752d" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
