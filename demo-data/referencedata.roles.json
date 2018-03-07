@@ -2,7 +2,7 @@
   {
     "id": "185db8f7-ee35-44d0-8b40-6de12489ae77",
     "name": "Storeroom Manager",
-    "description": "Can create, view and delete requisition."
+    "description": "Can create, view and delete requisition and manage proofs of delivery."
   },
   {
     "id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec",
@@ -52,7 +52,7 @@
   {
     "id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b",
     "name": "CCE Inventory Manager",
-    "description": "Can manage cold chain equipment."
+    "description": "Can view and manage cold chain equipment."
   },
   {
     "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c",

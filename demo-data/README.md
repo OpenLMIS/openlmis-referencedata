@@ -66,7 +66,7 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
 * Dep—sito Distrital Cuamba (D001)
   * type: District Store
   * zone: Cuamba District
-  * this is the home facility for the _divo1_ and _vsrmanager2 users
+  * this is the home facility for the _divo1_ and _vsrmanager2_ users
   * this facility is in the requisition RGEPI1
 * Dep—sito Distrital Lichinga (D002)
   * type: District Store
@@ -256,47 +256,51 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Requisition Create
     * PoDs Manage
   * users:
-    * administrator - has this role for Family Planning & Essential Meds at SN1/FP Approval point and SN2/EM Approval point
-    * srmanager2, srmanager4 - has this role for Family Planning & Essential Meds
-    * srmanager1 - has this role for Family Planning
-    * srmanager3 - has this role for Essential Meds
+    * administrator - has this role for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
+    * srmanager2, srmanager4 - has this role for Family Planning & Essential Meds at home facility
+    * srmanager1 - has this role for Family Planning at home facility
+    * srmanager3 - has this role for Essential Meds at home facility
     * divo1 - has this role for EPI at home facility
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
-    * vsrmanager1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
+    * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
 2. Store Manager
   * rights:
     * Requisition View
     * Requisition Delete
     * Requisition Authorize
   * users:
-    * administrator - has this role for Family Planning & Essential Meds at home facility and SN2/EM Approval point
-    * smanager2, smanager4 - has this role for Family Planning & Essential Meds
-    * smanager1 - has this role for Family Planning
-    * smanager3 - has this role for Essential Meds
+    * administrator - has this role for Family Planning & Essential Meds at home facility, SN1/FP approval point
+        and SN2/EM approval point
+    * smanager1 - has this role for Family Planning at home facility
+    * smanager2 - has this role for Family Planning at home facility and SN1/FP approval point
+        & for Essential Meds at home facility and SN2/EM approval point
+    * smanager3 - has this role for Essential Meds at home facility
+    * smanager4 - has this role for Family Planning & Essential Meds at home facility
     * divo1 - has this role for EPI at home facility
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
-    * vsrmanager1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
+    * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
 3. District Storeroom Manager
   * rights:
     * Requisition View
     * Requisition Approve
   * users:
-    * administrator - has this role for Family Planning & Essential Meds for SN2/EM Approval
-                      point and SN1/FP Approval point
-    * dsrmanager - has this role for Family Planning & Essential Meds
+    * administrator - has this role for Family Planning & Essential Meds at SN2/EM approval
+        point and SN1/FP approval point
+    * dsrmanager - has this role for Family Planning & Essential Meds at SN2/EM approval
+        point and SN1/FP approval point
 4. Program Supervisor
   * rights:
     * Requisition View
     * Requisition Approve
   * users:
-    * administrator - has this role for Family Planning & Essential Meds for SN2/EM Approval
-                      point and SN1/FP Approval point
-    * psupervisor - has this role for Family Planning & Essential Meds for SN1/FP Approval
-                    point supervisory node
-    * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
-    * rivo - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
+    * administrator - has this role for Family Planning & Essential Meds at SN2/EM approval
+        point and SN1/FP approval point
+    * psupervisor - has this role for Family Planning & Essential Meds at SN1/FP approval
+        point supervisory node
+    * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
+    * rivo - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
 5. Warehouse Clerk
   * rights:
     * Orders View
@@ -310,16 +314,16 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * rivo - has this role at P001/Dep—sito Provincial Niassa
     * wclerk1 - has this role for WH01/Ntcheu District Warehouse
     * wclerk2 - has this role for WH02/Balaka District Warehouse
-    * vwclerk1 - has this role at Mozambique Central Warehouse (W001)
+    * vwclerk1 - has this role at W001/Mozambique Central Warehouse
 6. Delivery Approver
   * rights:
     * PoDs Manage
   * users:
-    * administrator - has this role for Family Planning at SN1/FP Approval point
-    * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
+    * administrator - has this role for Family Planning at SN1/FP approval point
+    * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
     * smanager1, smanager2, smanager4, srmanager1, srmanager2, srmanager4 - has this role for Family Planning
-        at SN1/FP Approval point and for Essential Meds at EM approval point
-    * smanager3, srmanager3 - has this role for Essential Meds at EM approval point
+        at SN1/FP approval point and for Essential Meds at SN2/EM approval point
+    * smanager3, srmanager3 - has this role for Essential Meds at SN2/EM approval point
 7. Stock Manager
   * rights:
     * Stock Cards View
@@ -329,15 +333,22 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * divo1 - has this role for EPI at home facility
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
-    * administrator - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
-                      and for Family Planning & Essential Meds at SN1/FP Approval point and SN2/EM Approval point
-8. Requisition Viewer
+    * administrator - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
+        and for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
+    * srmanager1 - has this role for Family Planning at home facility
+    * srmanager2 - has this role for Family Planning & Essential Meds at home facility
+8. Stock Viewer
+  * rights:
+    * Stock Cards View
+  * users:
+    * wclerk1 - has this role for Family Planning at home facility
+9. Requisition Viewer
   * rights:
     * Requisition View
   * users:
-    * wclerk1 - has this role for Family Planning
-    * wclerk2 - has this role for Family Planning & Essential Meds
-9. System Administrator
+    * wclerk1 - has this role for Family Planning at home facility
+    * wclerk2 - has this role for Family Planning & Essential Meds at home facility
+10. System Administrator
   * rights:
     * Facilities Manage
     * Facilities Approved Orderables Manage
@@ -360,24 +371,23 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
   * users:
     * administrator
     * admin
-10. CCE Inventory Manager
+11. CCE Inventory Manager
   * rights:
     * CCE Inventory View
     * CCE Inventory Edit
   * users:
     * administrator - has this role for Family Planning at SN1/FP approval point and Essential Meds at SN2/EM approval point
-    * divo1 - has this role for EPI at home facility
+    * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
-11. CCE Inventory Viewer
+12. CCE Inventory Viewer
   * rights:
     * CCE Inventory View
   * users:
-    * administrator - has this role for Family Planning at FP approval point and Essential Meds at EM approval point
-    * divo1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
-    * divo2 - has this role for EPI at Lichinga district approval point (SN-LICHINGA-DIST)
-    * rivo - has this role for EPI at Niassa province approval point (SN-NIASSA-PROV)
-    * vsrmanager1 - has this role for EPI at Cuamba district approval point (SN-CUAMBA-DIST)
+    * administrator - has this role for Family Planning at SN1/FP approval point and Essential Meds at SN2/EM approval point
+    * divo2 - has this role for EPI at SN-LICHINGA-DIST/Lichinga district approval point
+    * rivo - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
+    * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
     * vsrmanager2 - has this role for EPI at home facility
 
 
@@ -392,7 +402,7 @@ the rights, as additional rights have been added to later migrations.
 
 Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json, referencedata.requisition_groups.json
 
-1. SN1/FP Approval point
+1. SN1/FP approval point
   * requisition group: RGFP1
     * program: Family Planning
   * supply lines:
@@ -402,42 +412,31 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
   * requisition group: RGFP2
     * program: Family Planning
   * facility: DH01/Balaka District Hospital
-  * parent: SN1/FP Approval point
-3. SN2/EM Approval point
+  * parent: SN1/FP approval point
+3. SN2/EM approval point
   * requisition group: RGEM1
     * program: Essential Meds
   * supply lines:
     * WH02/Balaka District Warehouse
   * facility: DH01/Balaka District Hospital
-4. SN-NIASSA-PROV/Niassa province approval point
-  * requisition group: RGEPI1
-    * program: EPI
-  * supply lines:
-    * W001/Mozambique Central Warehouse
-  * facility: Dep—sito Provincial Niassa
-5. SN-CUAMBA-DIST/Cuamba district approval point
-  * requisition group: RGEPI2
-    * program: EPI
-  * supply lines:
-    * D001/Dep—sito Distrital Cuamba
-  * facility: Dep—sito Distrital Cuamba
-  * parent: SN-NIASSA-PROV/Niassa province approval point
 
 **For EPI (Vaccines) Program**
 
-* Niassa province approval point (SN-NIASSA-PROV)
+* SN-NIASSA-PROV/Niassa province approval point
   * requisition group: RG EPI 1 (districts) (RGEPI1)
-  * facility: Dep—sito Provincial Niassa (P001)
+  * facility: P001/Dep—sito Provincial Niassa
   * supply lines:
-      * Mozambique Central Warehouse (W001)
-* Cuamba district approval point (SN-CUAMBA-DIST)
+    * W001/Mozambique Central Warehouse
+* SN-CUAMBA-DIST/Cuamba district approval point
   * requisition group: RG EPI 2 (health facilities) (RGEPI2)
-  * facility: Dep—sito Distrital Cuamba (D001)
-  * parent: Niassa province approval point (SN-NIASSA-PROV)
-* Lichinga district approval point (SN-LICHINGA-DIST)
+  * supply lines:
+    * D001/Dep—sito Distrital Cuamba
+  * facility: D001/Dep—sito Distrital Cuamba
+  * parent: SN-NIASSA-PROV/Niassa province approval point
+* SN-LICHINGA-DIST/Lichinga district approval point
   * requisition group: RG EPI 3 (health facilities) (RGEPI3)
-  * facility: Dep—sito Distrital Lichinga (D002)
-  * parent: Niassa province approval point (SN-NIASSA-PROV)
+  * facility: D002/Dep—sito Distrital Lichinga
+  * parent: SN-NIASSA-PROV/Niassa province approval point
 
 ## Ideal Stock Amounts
 

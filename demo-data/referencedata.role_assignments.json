@@ -355,7 +355,8 @@
   {
     "id": "d75b34bf-92ec-4af9-9fc9-20d6f7446390",
     "type": "supervision",
-    "warehouse": { "id": "19121381-9f3d-4e77-b9e5-d3f59fc1639e" },
+    "supervisoryNode": { "id": "fb38bd1c-beeb-4527-8345-900900329c10" },
+    "program": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
     "user": { "id": "cb5cd52f-f205-475d-8763-90852839424d" },
     "role": {"id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0"}
   },
