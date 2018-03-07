@@ -10,7 +10,7 @@ parameters to get users endpoint
 * [OLMIS-3821](https://openlmis.atlassian.net/browse/OLMIS-3821): Update search lot endpoint to follow REST
 * [OLMIS-3821](https://openlmis.atlassian.net/browse/OLMIS-4052): Facility approved products endpoint is paginated now, fullSupply" flag is optional and products can be filtered by multiple orderable ids.
 * [OLMIS-4168](https://openlmis.atlassian.net/browse/OLMIS-4168): Removed PODS_MANAGE from roles. Made PODS_MANAGE a supervision right. Added new PODS_VIEW supervision right
-* [OLMIS-4027](https://openlmis.atlassian.net/browse/OLMIS-4027): Added pagination to facility type endpoint.
+* [OLMIS-4027](https://openlmis.atlassian.net/browse/OLMIS-4027): Added pagination and sorting to facility type endpoint, can be searched using active query parameter.
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-3077](https://openlmis.atlassian.net/browse/OLMIS-3077): Added GTIN to TradeItem

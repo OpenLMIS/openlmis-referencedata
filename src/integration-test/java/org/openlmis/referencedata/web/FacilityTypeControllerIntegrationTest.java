@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
@@ -249,6 +250,62 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .queryParam("id", facilityType1.getId())
         .queryParam("id", facilityType2.getId())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(storedFacilityTypes.size(), response.getContent().size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetFacilityTypesByActive() {
+    FacilityType facilityType1 = new FacilityTypeDataBuilder().build();
+    FacilityType facilityType2 = new FacilityTypeDataBuilder().build();
+
+    List<FacilityType> storedFacilityTypes = asList(facilityType1, facilityType2);
+    given(facilityTypeRepository
+        .findByActive(any(Boolean.class), any(Pageable.class)))
+        .willReturn(new PageImpl<>(storedFacilityTypes, pageable, 2));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam("active", true)
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(storedFacilityTypes.size(), response.getContent().size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetFacilityTypesByAllParameters() {
+    FacilityType facilityType1 = new FacilityTypeDataBuilder().build();
+    FacilityType facilityType2 = new FacilityTypeDataBuilder().build();
+
+    List<FacilityType> storedFacilityTypes = asList(facilityType1, facilityType2);
+    given(facilityTypeRepository
+        .findByIdInAndActive(anyCollection(), any(Boolean.class), any(Pageable.class)))
+        .willReturn(new PageImpl<>(storedFacilityTypes, pageable, 2));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam("id", facilityType1.getId())
+        .queryParam("id", facilityType2.getId())
+        .queryParam("active", true)
         .queryParam(PAGE, pageable.getPageNumber())
         .queryParam(SIZE, pageable.getPageSize())
         .when()

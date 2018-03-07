@@ -59,4 +59,9 @@ public class FacilityTypeDataBuilder {
 
     return type;
   }
+
+  public FacilityTypeDataBuilder deactivated() {
+    this.active = false;
+    return this;
+  }
 }

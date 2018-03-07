@@ -28,12 +28,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import java.util.Collections;
 
 public class FacilityTypeRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<FacilityType> {
 
   @Autowired
   private FacilityTypeRepository facilityTypeRepository;
+
+  Pageable pageable = new PageRequest(0, 10);
 
   @Override
   FacilityTypeRepository getRepository() {
@@ -47,8 +50,6 @@ public class FacilityTypeRepositoryIntegrationTest
 
   @Test
   public void shouldFindFacilityTypesByIds() {
-    Pageable pageable = new PageRequest(0, 10);
-
     FacilityType type1 = facilityTypeRepository.save(generateInstance());
     FacilityType type2 = facilityTypeRepository.save(generateInstance());
     FacilityType type3 = facilityTypeRepository.save(generateInstance());
@@ -66,7 +67,7 @@ public class FacilityTypeRepositoryIntegrationTest
 
   @Test
   public void shouldPaginateResultWhileSearchingByIds() {
-    Pageable pageable = new PageRequest(1, 1);
+    pageable = new PageRequest(1, 1);
 
     FacilityType type1 = facilityTypeRepository.save(generateInstance());
     FacilityType type2 = facilityTypeRepository.save(generateInstance());
@@ -85,11 +86,93 @@ public class FacilityTypeRepositoryIntegrationTest
 
   @Test(expected = DataIntegrityViolationException.class)
   public void shouldThrowExceptionOnDuplicatedCode() {
-    FacilityType type1 = facilityTypeRepository.save(generateInstance());
+    FacilityType type1 = generateInstance();
+    type1.setCode("AAAA");
+    type1 = facilityTypeRepository.save(generateInstance());
 
     FacilityType type2 = generateInstance();
-    type2.setCode(type1.getCode());
-
+    type2.setCode(type1.getCode().toLowerCase());
     facilityTypeRepository.saveAndFlush(type2);
+  }
+
+  @Test
+  public void shouldGetNotActiveFacilityTypes() {
+    facilityTypeRepository.save(
+        new FacilityTypeDataBuilder()
+            .deactivated()
+            .buildAsNew());
+
+    FacilityType type1 = facilityTypeRepository.save(generateInstance());
+
+    Page<FacilityType> facilityTypePage = facilityTypeRepository
+        .findByActive(true, pageable);
+
+    assertEquals(2, facilityTypePage.getContent().size());
+    assertEquals(2, facilityTypePage.getTotalElements());
+    assertThat(facilityTypePage.getContent(), hasItems(type1));
+  }
+
+  @Test
+  public void shouldGetActiveFacilityTypes() {
+    facilityTypeRepository.save(generateInstance());
+    FacilityType type1 = facilityTypeRepository.save(
+        new FacilityTypeDataBuilder()
+            .deactivated()
+            .buildAsNew());
+
+    Page<FacilityType> facilityTypePage = facilityTypeRepository
+        .findByActive(false, pageable);
+
+    assertEquals(1, facilityTypePage.getContent().size());
+    assertEquals(1, facilityTypePage.getTotalElements());
+    assertEquals(type1, facilityTypePage.getContent().get(0));
+  }
+
+  @Test
+  public void shouldGetActiveFacilityTypesByIds() {
+    facilityTypeRepository.save(generateInstance());
+    facilityTypeRepository.save(generateInstance());
+    facilityTypeRepository.save(generateInstance());
+
+    facilityTypeRepository.save(new FacilityTypeDataBuilder()
+        .deactivated()
+        .buildAsNew());
+    FacilityType type1 = facilityTypeRepository.save(new FacilityTypeDataBuilder()
+        .deactivated()
+        .buildAsNew());
+    FacilityType type2 = facilityTypeRepository.save(new FacilityTypeDataBuilder()
+        .deactivated()
+        .buildAsNew());
+
+    Page<FacilityType> facilityTypePage = facilityTypeRepository
+        .findByIdInAndActive(asList(type1.getId(), type2.getId()), false, pageable);
+
+    assertEquals(2, facilityTypePage.getContent().size());
+    assertEquals(2, facilityTypePage.getTotalElements());
+    assertThat(facilityTypePage.getContent(), hasItems(type1, type2));
+  }
+
+  @Test
+  public void shouldGetNotActiveFacilityTypesByIds() {
+    facilityTypeRepository.save(new FacilityTypeDataBuilder()
+        .deactivated()
+        .buildAsNew());
+    facilityTypeRepository.save(new FacilityTypeDataBuilder()
+        .deactivated()
+        .buildAsNew());
+    facilityTypeRepository.save(new FacilityTypeDataBuilder()
+        .deactivated()
+        .buildAsNew());
+
+    facilityTypeRepository.save(generateInstance());
+    facilityTypeRepository.save(generateInstance());
+    FacilityType type1 = facilityTypeRepository.save(generateInstance());
+
+    Page<FacilityType> facilityTypePage = facilityTypeRepository
+        .findByIdInAndActive(Collections.singletonList(type1.getId()), true, pageable);
+
+    assertEquals(1, facilityTypePage.getContent().size());
+    assertEquals(1, facilityTypePage.getTotalElements());
+    assertEquals(type1, facilityTypePage.getContent().get(0));
   }
 }

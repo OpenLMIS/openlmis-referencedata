@@ -34,5 +34,9 @@ public interface FacilityTypeRepository extends JpaRepository<FacilityType, UUID
 
   Page<FacilityType> findByIdIn(Collection<UUID> id, Pageable pageable);
 
+  Page<FacilityType> findByIdInAndActive(Collection<UUID> id, Boolean active, Pageable pageable);
+
+  Page<FacilityType> findByActive(Boolean active, Pageable pageable);
+
   boolean existsByCode(@Param("code") String code);
 }

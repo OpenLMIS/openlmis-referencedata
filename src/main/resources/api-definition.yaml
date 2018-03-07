@@ -1731,7 +1731,7 @@ resourceTypes:
   /facilityTypes:
       displayName: Facility Type
       get:
-          is: [ secured, paginated ]
+          is: [ secured, paginated, sorted ]
           description: Get page of facilityTypes.
           queryParameters:
               id:
@@ -1739,6 +1739,11 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: true
+              active:
+                  displayName: active
+                  type: boolean
+                  required: false
+                  repeat: false
           responses:
               "200":
                   body:

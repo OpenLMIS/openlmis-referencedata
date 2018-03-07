@@ -56,6 +56,7 @@ public class FacilityTypeController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityTypeController.class);
 
   public static final String RESOURCE_PATH = API_PATH + "/facilityTypes";
+  public static final String ACTIVE = "active";
 
   @Autowired
   private FacilityTypeRepository facilityTypeRepository;
@@ -90,8 +91,17 @@ public class FacilityTypeController extends BaseController {
       @RequestParam MultiValueMap<String, Object> requestParams, Pageable pageable) {
     if (!isEmpty(requestParams)) {
       Set<UUID> ids = UuidUtil.getIds(requestParams);
-      if (!ids.isEmpty()) {
+      String activeParameter = (String) requestParams.getFirst(ACTIVE);
+      Boolean active = null != activeParameter
+          ? Boolean.valueOf((String) requestParams.getFirst(ACTIVE))
+          : null;
+
+      if (!ids.isEmpty() && active != null) {
+        return facilityTypeRepository.findByIdInAndActive(ids, active, pageable);
+      } else if (!ids.isEmpty()) {
         return facilityTypeRepository.findByIdIn(ids, pageable);
+      } else if (active != null) {
+        return facilityTypeRepository.findByActive(active, pageable);
       }
     }
 
