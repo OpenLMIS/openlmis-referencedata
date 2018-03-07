@@ -59,6 +59,7 @@ Improvements:
   * Id column has been removed.
   * Equals and hashcode methods work only on facility and program fields.
 * [OLMIS-4108](https://openlmis.atlassian.net/browse/OLMIS-4108): Facility Types can be searched by multiple "id" parameters.
+* [OLMIS-4227](https://openlmis.atlassian.net/browse/OLMIS-4227): Updated README, roles' descriptions, removed PODS_MANAGE right from Warehouse Clerk and added to Delivery Approver and Storeroom Manager.
 
 9.0.0 / 2017-11-09
 ==================
