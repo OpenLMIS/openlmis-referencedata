@@ -721,5 +721,12 @@
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
     "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },
     "role": { "id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0" }
+  },
+  {
+    "id": "8ce62dfb-6ef1-436d-8c3d-c30b207eef57",
+    "type": "supervision",
+    "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "user": { "id": "9cc9a0a4-e434-4582-9efc-2a1de44bc1f1" },
+    "role": { "id": "d8ff49b1-96e7-4710-9511-289f490f7577" }
   }
 ]

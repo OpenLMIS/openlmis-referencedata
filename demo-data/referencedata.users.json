@@ -255,5 +255,18 @@
     "loginRestricted": "false",
     "allowNotify": "true",
     "timeZone": "CET"
+  },
+  {
+    "id": "9cc9a0a4-e434-4582-9efc-2a1de44bc1f1",
+    "username": "vnurse1",
+    "email": "vnurse1@openlmis.org",
+    "firstName": "Lucky",
+    "lastName": "Moon",
+    "verified": "true",
+    "active": "true",
+    "loginRestricted": "false",
+    "allowNotify": "true",
+    "homefacilityid": { "id": "4774fc63-a0c8-4a29-a01d-5b6b48632175" },
+    "timeZone": "CET"
   }
 ]
