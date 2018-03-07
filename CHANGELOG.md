@@ -51,6 +51,7 @@ Bug fixes that are backwards-compatible:
 * [OLMIS-4038](https://openlmis.atlassian.net/browse/OLMIS-4038): In 9.0.0 the ISA upload would always create new entries, even if it was supposed to udpate. This has been fixed and works correctly now.
 * [OLMIS-4064](https://openlmis.atlassian.net/browse/OLMIS-4017): Change Location's partOf to reference a Location, not geographicZone.
 * [OLMIS-4041](https://openlmis.atlassian.net/browse/OLMIS-4041): Restricted thread pool for right assignment regeneration task to 1.
+* [OLMIS-3599](https://openlmis.atlassian.net/browse/OLMIS-3599): Removed unused PRODUCTS_MANAGE right
 
 Improvements:
 * [OLMIS-3925](https://openlmis.atlassian.net/browse/OLMIS-3925): Added unique constraint on program and supervisory node in supply line.
