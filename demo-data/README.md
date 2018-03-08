@@ -59,16 +59,16 @@ referencedata.supervisory_nodes.json and referencedata.supply_lines.json.
   * type: Warehouse
   * zone: Mozambique Country
   * this is the home facility for the _vwclerk1_ user
-* Dep—sito Provincial Niassa (P001)
+* Depósito Provincial Niassa (P001)
   * type: Provincial Store
   * zone: Niassa Province
   * this is the home facility for the _rivo_ user
-* Dep—sito Distrital Cuamba (D001)
+* Depósito Distrital Cuamba (D001)
   * type: District Store
   * zone: Cuamba District
   * this is the home facility for the _divo1_ and _vsrmanager2_ users
   * this facility is in the requisition RGEPI1
-* Dep—sito Distrital Lichinga (D002)
+* Depósito Distrital Lichinga (D002)
   * type: District Store
   * zone: Lichinga District
   * this is the home facility for the _divo2_ user
@@ -231,8 +231,8 @@ There are also 3 unused schedules, SCH003 and SCH004, SCH005.
 * RG EPI 1 (districts) (RGEPI1)
   * schedule: Quarterly
   * facilities:
-    * Dep—sito Distrital Cuamba (D001)
-    * Dep—sito Distrital Lichinga (D002)
+    * Depósito Distrital Cuamba (D001)
+    * Depósito Distrital Lichinga (D002)
 * RG EPI 2 (health facilities) (RGEPI2)
   * schedule: Monthly
   * facilities:
@@ -309,9 +309,9 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Shipments Edit
   * users:
     * administrator - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
-    * divo1 - has this role at D001/Dep—sito Distrital Cuamba
-    * divo2 - has this role at D002/Dep—sito Distrital Lichinga
-    * rivo - has this role at P001/Dep—sito Provincial Niassa
+    * divo1 - has this role at D001/Depósito Distrital Cuamba
+    * divo2 - has this role at D002/Depósito Distrital Lichinga
+    * rivo - has this role at P001/Depósito Provincial Niassa
     * wclerk1 - has this role for WH01/Ntcheu District Warehouse
     * wclerk2 - has this role for WH02/Balaka District Warehouse
     * vwclerk1 - has this role at W001/Mozambique Central Warehouse
@@ -424,18 +424,18 @@ Defined in referencedata.supervisory_nodes.json, referencedata.supply_lines.json
 
 * SN-NIASSA-PROV/Niassa province approval point
   * requisition group: RG EPI 1 (districts) (RGEPI1)
-  * facility: P001/Dep—sito Provincial Niassa
+  * facility: P001/Depósito Provincial Niassa
   * supply lines:
     * W001/Mozambique Central Warehouse
 * SN-CUAMBA-DIST/Cuamba district approval point
   * requisition group: RG EPI 2 (health facilities) (RGEPI2)
   * supply lines:
-    * D001/Dep—sito Distrital Cuamba
-  * facility: D001/Dep—sito Distrital Cuamba
+    * D001/Depósito Distrital Cuamba
+  * facility: D001/Depósito Distrital Cuamba
   * parent: SN-NIASSA-PROV/Niassa province approval point
 * SN-LICHINGA-DIST/Lichinga district approval point
   * requisition group: RG EPI 3 (health facilities) (RGEPI3)
-  * facility: D002/Dep—sito Distrital Lichinga
+  * facility: D002/Depósito Distrital Lichinga
   * parent: SN-NIASSA-PROV/Niassa province approval point
 
 ## Ideal Stock Amounts

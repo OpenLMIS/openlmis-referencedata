@@ -657,7 +657,7 @@
   {
     "id": "c62dea9b-6974-4101-ba39-b09914165967",
     "code": "D001",
-    "name": "Dep—sito Distrital Cuamba",
+    "name": "Depósito Distrital Cuamba",
     "geographicZoneId": "9b8cfb5a-217a-4261-a64f-16ca06ae79fa",
     "typeId": "5fc213c6-1bd7-46f0-9883-57c05250ca90",
     "operatedById": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -671,7 +671,7 @@
   {
     "id": "2b6a845a-1bc0-4208-a1a5-c2a09171d707",
     "code": "D002",
-    "name": "Dep—sito Distrital Lichinga",
+    "name": "Depósito Distrital Lichinga",
     "geographicZoneId": "88b7eef3-b3f3-4f1a-9782-f5a88f78c56b",
     "typeId": "5fc213c6-1bd7-46f0-9883-57c05250ca90",
     "operatedById": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -685,7 +685,7 @@
   {
     "id": "0898dcd6-53f2-41b6-ba7d-b2f5122ffb44",
     "code": "P001",
-    "name": "Dep—sito Provincial Niassa",
+    "name": "Depósito Provincial Niassa",
     "geographicZoneId": "9b8cfb5a-217a-4261-a64f-16ca06ae79fa",
     "typeId": "caecea08-6b2f-4ba9-98b2-b87702ba57ba",
     "operatedById": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
