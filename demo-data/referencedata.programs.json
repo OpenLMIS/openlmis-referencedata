@@ -25,6 +25,7 @@
     "active": "true",
     "periodsSkippable": "false",
     "skipAuthorization": "false",
+    "showNonFullSupplyTab": "false",
     "enableDatePhysicalStockCountCompleted": "false"
   },
   {
@@ -33,7 +34,8 @@
     "name": "EPI",
     "active": "true",
     "periodsSkippable": "false",
-    "skipAuthorization": "false",
+    "skipAuthorization": "true",
+    "showNonFullSupplyTab": "false",
     "enableDatePhysicalStockCountCompleted": "false"
   }
 ]
