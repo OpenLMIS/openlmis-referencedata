@@ -599,6 +599,13 @@
   {
     "id": "81606316-6277-412f-ac99-98e5ce5a2e47",
     "type": "supervision",
+    "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },
+    "role": { "id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b" }
+  },
+  {
+    "id": "81606316-6277-412f-ac99-98e5ce5a2e47",
+    "type": "supervision",
     "supervisoryNode": { "id": "6f5eae49-bc62-4664-a679-1ef0bfd5b21d" },
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
     "user": { "id": "560be32a-ea2e-4d12-ae00-1f69376ad535" },

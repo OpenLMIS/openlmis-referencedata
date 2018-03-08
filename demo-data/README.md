@@ -254,7 +254,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * Requisition View
     * Requisition Delete
     * Requisition Create
-    * PoDs Manage
+    * Proofs of Delivery Manage
   * users:
     * administrator - has this role for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
     * srmanager2, srmanager4 - has this role for Family Planning & Essential Meds at home facility
@@ -317,7 +317,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * vwclerk1 - has this role at W001/Mozambique Central Warehouse
 6. Delivery Approver
   * rights:
-    * PoDs Manage
+    * Proofs of Delivery Manage
   * users:
     * administrator - has this role for Family Planning at SN1/FP approval point
     * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
@@ -377,7 +377,7 @@ referencedata.role_rights.json and referencedata.supervisory_nodes.json.
     * CCE Inventory Edit
   * users:
     * administrator - has this role for Family Planning at SN1/FP approval point and Essential Meds at SN2/EM approval point
-    * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
+    * divo1 - has this role for EPI at home facility and SN-CUAMBA-DIST/Cuamba district approval point
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
 12. CCE Inventory Viewer
