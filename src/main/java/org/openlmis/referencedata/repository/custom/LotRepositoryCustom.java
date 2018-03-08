@@ -26,7 +26,7 @@ import java.util.UUID;
 
 public interface LotRepositoryCustom {
 
-  Page<Lot> search(Collection<TradeItem> item, LocalDate expirationDate, String code,
+  Page<Lot> search(Collection<TradeItem> tradeItems, LocalDate expirationDate, String code,
                    List<UUID> ids, Pageable pageable);
 
 }

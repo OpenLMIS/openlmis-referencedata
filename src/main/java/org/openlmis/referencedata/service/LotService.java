@@ -17,6 +17,7 @@ package org.openlmis.referencedata.service;
 
 import static org.apache.commons.collections4.IterableUtils.isEmpty;
 
+import java.util.Collections;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -64,7 +65,7 @@ public class LotService {
 
   private List<TradeItem> getTradeItems(Collection<UUID> id) {
     if (isEmpty(id)) {
-      return null;
+      return Collections.emptyList();
     }
 
     List<TradeItem> tradeItems = tradeItemRepository.findAll(id);

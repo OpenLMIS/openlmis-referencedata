@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Lot> {
 
   @Autowired
@@ -121,9 +122,6 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Test
   public void shouldFindLotsByMultipleTradeItems() {
-    lotRepository.save(generateInstance());
-    lotRepository.save(generateInstance());
-    lotRepository.save(generateInstance());
     Lot expected = lotRepository.save(generateInstance());
     Lot expected2 = lotRepository.save(generateInstance());
 
@@ -138,6 +136,19 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     assertEquals(2, lotPage.getNumberOfElements());
     assertEquals(expected, lotPage.getContent().get(0));
     assertEquals(expected2, lotPage.getContent().get(1));
+  }
+
+  @Test
+  public void shouldFindAllLotsIfSearchByEmptyTradeItemList() {
+    Page<Lot> lotPage = lotRepository.search(
+        Collections.emptyList(),
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertEquals(5, lotPage.getNumberOfElements());
   }
 
   @Test

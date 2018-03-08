@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -81,7 +83,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
 
     Predicate predicate = builder.conjunction();
 
-    if (tradeItems != null && tradeItems.size() > 0) {
+    if (!isEmpty(tradeItems)) {
       predicate = builder.and(predicate, root.get("tradeItem").in(tradeItems));
     }
 

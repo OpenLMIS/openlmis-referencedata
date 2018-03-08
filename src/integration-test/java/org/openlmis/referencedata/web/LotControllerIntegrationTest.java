@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -379,7 +380,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     );
 
     given(lotRepository.search(
-        eq(null),
+        eq(emptyList()),
         eq(null),
         eq(null),
         eq(Arrays.asList(lots.get(0).getId(), lots.get(1).getId())),
@@ -409,7 +410,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     );
 
     given(lotRepository.search(
-        eq(null),
+        eq(emptyList()),
         eq(null),
         eq(null),
         eq(null),

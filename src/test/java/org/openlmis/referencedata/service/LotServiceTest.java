@@ -112,10 +112,8 @@ public class LotServiceTest {
         null
     );
 
-    when(tradeItemRepository.findOne(eq(tradeItem.getId()))).thenReturn(tradeItem);
-
     when(lotRepository.search(
-        eq(null),
+        eq(emptyList()),
         eq(lotSearchParams.getExpirationDate()),
         eq(lotSearchParams.getLotCode()),
         eq(null),
