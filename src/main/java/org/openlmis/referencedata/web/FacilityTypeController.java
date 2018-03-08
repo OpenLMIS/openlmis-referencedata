@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.openlmis.referencedata.web.FacilityTypeController.RESOURCE_PATH;
 
 import org.openlmis.referencedata.domain.FacilityType;
@@ -23,7 +22,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.util.UuidUtil;
+import org.openlmis.referencedata.service.FacilityTypeService;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -56,10 +54,12 @@ public class FacilityTypeController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityTypeController.class);
 
   public static final String RESOURCE_PATH = API_PATH + "/facilityTypes";
-  public static final String ACTIVE = "active";
 
   @Autowired
   private FacilityTypeRepository facilityTypeRepository;
+
+  @Autowired
+  private FacilityTypeService facilityTypeService;
 
   /**
    * Allows creating new facilityType. If the id is specified, it will be ignored.
@@ -89,23 +89,7 @@ public class FacilityTypeController extends BaseController {
   @ResponseBody
   public Page<FacilityType> getFacilityTypes(
       @RequestParam MultiValueMap<String, Object> requestParams, Pageable pageable) {
-    if (!isEmpty(requestParams)) {
-      Set<UUID> ids = UuidUtil.getIds(requestParams);
-      String activeParameter = (String) requestParams.getFirst(ACTIVE);
-      Boolean active = null != activeParameter
-          ? Boolean.valueOf((String) requestParams.getFirst(ACTIVE))
-          : null;
-
-      if (!ids.isEmpty() && active != null) {
-        return facilityTypeRepository.findByIdInAndActive(ids, active, pageable);
-      } else if (!ids.isEmpty()) {
-        return facilityTypeRepository.findByIdIn(ids, pageable);
-      } else if (active != null) {
-        return facilityTypeRepository.findByActive(active, pageable);
-      }
-    }
-
-    return facilityTypeRepository.findAll(pageable);
+    return facilityTypeService.search(requestParams, pageable);
   }
 
   /**

@@ -42,7 +42,11 @@ import com.jayway.restassured.response.ExtractableResponse;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ValidatableResponse;
 import com.jayway.restassured.specification.RequestSpecification;
-
+import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlLoaders;
+import guru.nidi.ramltester.restassured.RestAssuredClient;
+import java.util.UUID;
+import javax.annotation.PostConstruct;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -80,6 +84,7 @@ import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.service.FacilityService;
+import org.openlmis.referencedata.service.FacilityTypeService;
 import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.service.IdealStockAmountService;
 import org.openlmis.referencedata.service.OrderableService;
@@ -106,14 +111,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.RamlLoaders;
-import guru.nidi.ramltester.restassured.RestAssuredClient;
-
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -302,6 +299,9 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected OrderableFulfillFactory factory;
+
+  @MockBean
+  protected FacilityTypeService facilityTypeService;
 
   /**
    * Constructor for test.
