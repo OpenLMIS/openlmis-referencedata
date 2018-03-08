@@ -272,7 +272,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", facilityTypeId)
+        .pathParam(ID, facilityTypeId)
         .when()
         .get(ID_URL)
         .then()
@@ -284,12 +284,32 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   }
 
   @Test
+  public void shouldReturn() {
+
+    given(facilityTypeRepository.findOne(facilityTypeId)).willReturn(null);
+
+    String response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam(ID, facilityTypeId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(404)
+        .extract().path("messageKey");
+
+    assertEquals(FacilityTypeMessageKeys.ERROR_NOT_FOUND, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void getShouldReturnUnauthorizedWithoutAuthorization() {
 
     restAssured
         .given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", facilityTypeId)
+        .pathParam(ID, facilityTypeId)
         .when()
         .get(ID_URL)
         .then()
