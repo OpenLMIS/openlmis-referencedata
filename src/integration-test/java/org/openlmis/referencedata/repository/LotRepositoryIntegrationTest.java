@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Lot;
@@ -27,9 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Lot> {
 
@@ -107,7 +108,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     Lot expected = lotRepository.save(generateInstance());
 
     Page<Lot> lotPage = lotRepository.search(
-        expected.getTradeItem(),
+        Collections.singletonList(expected.getTradeItem()),
         null,
         null,
         null,
@@ -119,14 +120,35 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   }
 
   @Test
+  public void shouldFindLotsByMultipleTradeItems() {
+    lotRepository.save(generateInstance());
+    lotRepository.save(generateInstance());
+    lotRepository.save(generateInstance());
+    Lot expected = lotRepository.save(generateInstance());
+    Lot expected2 = lotRepository.save(generateInstance());
+
+    Page<Lot> lotPage = lotRepository.search(
+        ImmutableList.of(expected.getTradeItem(), expected2.getTradeItem()),
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertEquals(2, lotPage.getNumberOfElements());
+    assertEquals(expected, lotPage.getContent().get(0));
+    assertEquals(expected2, lotPage.getContent().get(1));
+  }
+
+  @Test
   public void shouldFindLotsByAllParameters() {
     Lot expected = lotRepository.save(generateInstance());
 
     Page<Lot> lotPage = lotRepository.search(
-        expected.getTradeItem(),
+        Collections.singletonList(expected.getTradeItem()),
         expected.getExpirationDate(),
         expected.getLotCode(),
-        Arrays.asList(expected.getId()),
+        Collections.singletonList(expected.getId()),
         null
     );
 

@@ -15,6 +15,16 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
@@ -22,17 +32,6 @@ import org.openlmis.referencedata.repository.custom.LotRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 public class LotRepositoryImpl implements LotRepositoryCustom {
 
@@ -44,21 +43,21 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
    * Method is ignoring case for lot code.
    * To find all wanted lots by code and expiration date we use criteria query and like operator.
    *
-   * @param item TradeItem associated with Lot.
+   * @param tradeItems list of TradeItems associated with Lot.
    * @param expirationDate date of lot expiration.
    * @param lotCode Part of wanted code.
    * @return List of Facilities matching the parameters.
    */
-  public Page<Lot> search(TradeItem item, LocalDate expirationDate, String lotCode, List<UUID> ids,
-                          Pageable pageable) {
+  public Page<Lot> search(Collection<TradeItem> tradeItems, LocalDate expirationDate,
+                          String lotCode, List<UUID> ids, Pageable pageable) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Lot> lotQuery = builder.createQuery(Lot.class);
-    lotQuery = prepareQuery(lotQuery, item, expirationDate, lotCode, ids, false);
+    lotQuery = prepareQuery(lotQuery, tradeItems, expirationDate, lotCode, ids, false);
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery = prepareQuery(countQuery, item, expirationDate, lotCode, ids, true);
+    countQuery = prepareQuery(countQuery, tradeItems, expirationDate, lotCode, ids, true);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -70,9 +69,8 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
     return Pagination.getPage(orderableList, pageable, count);
   }
 
-  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, TradeItem tradeItem,
-                                            LocalDate expirationDate, String lotCode,
-                                            List<UUID> ids, boolean count) {
+  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, Collection<TradeItem>
+      tradeItems, LocalDate expirationDate, String lotCode, List<UUID> ids, boolean count) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<Lot> root = query.from(Lot.class);
 
@@ -83,8 +81,8 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
 
     Predicate predicate = builder.conjunction();
 
-    if (tradeItem != null) {
-      predicate = builder.and(predicate, builder.equal(root.get("tradeItem"), tradeItem));
+    if (tradeItems != null && tradeItems.size() > 0) {
+      predicate = builder.and(predicate, root.get("tradeItem").in(tradeItems));
     }
 
     if (lotCode != null) {

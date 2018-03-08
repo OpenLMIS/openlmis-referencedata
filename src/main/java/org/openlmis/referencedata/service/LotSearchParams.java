@@ -15,13 +15,11 @@
 
 package org.openlmis.referencedata.service;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +33,7 @@ public class LotSearchParams {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
   private LocalDate expirationDate;
 
-  private UUID tradeItemId;
+  private List<UUID> tradeItemId;
   private String lotCode;
   private List<UUID> id;
 

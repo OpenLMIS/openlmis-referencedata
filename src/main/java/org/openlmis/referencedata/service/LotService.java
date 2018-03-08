@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.service;
 
-import static java.util.Objects.isNull;
+import static org.apache.commons.collections4.IterableUtils.isEmpty;
 
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
@@ -28,10 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
-
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class LotService {
@@ -51,10 +51,10 @@ public class LotService {
    */
   public Page<Lot> search(@NotNull LotSearchParams requestParams, Pageable pageable) {
 
-    TradeItem tradeItem = getTradeItem(requestParams.getTradeItemId());
+    List<TradeItem> tradeItems = getTradeItems(requestParams.getTradeItemId());
 
     return lotRepository.search(
-        tradeItem,
+        tradeItems,
         requestParams.getExpirationDate(),
         requestParams.getLotCode(),
         requestParams.getId(),
@@ -62,17 +62,17 @@ public class LotService {
     );
   }
 
-  private TradeItem getTradeItem(UUID id) {
-    if (null == id) {
+  private List<TradeItem> getTradeItems(Collection<UUID> id) {
+    if (isEmpty(id)) {
       return null;
     }
 
-    TradeItem tradeItem = tradeItemRepository.findOne(id);
-    if (isNull(tradeItem)) {
+    List<TradeItem> tradeItems = tradeItemRepository.findAll(id);
+    if (tradeItems.size() != id.size()) {
       throw new ValidationMessageException(
           new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, id));
     }
 
-    return tradeItem;
+    return tradeItems;
   }
 }

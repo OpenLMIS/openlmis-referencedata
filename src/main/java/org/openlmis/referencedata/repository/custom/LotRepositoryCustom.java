@@ -19,14 +19,14 @@ import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 public interface LotRepositoryCustom {
 
-  Page<Lot> search(TradeItem item, LocalDate expirationDate, String code, List<UUID> ids,
-                   Pageable pageable);
+  Page<Lot> search(Collection<TradeItem> item, LocalDate expirationDate, String code,
+                   List<UUID> ids, Pageable pageable);
 
 }

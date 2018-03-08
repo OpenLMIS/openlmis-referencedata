@@ -15,10 +15,16 @@
 
 package org.openlmis.referencedata.service;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,9 +43,6 @@ import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDate;
-import java.util.Arrays;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LotServiceTest {
@@ -70,26 +73,29 @@ public class LotServiceTest {
         .withTradeItem(tradeItem)
         .build();
 
-    expected = Pagination.getPage(Arrays.asList(lot), pageable);
+    expected = Pagination.getPage(ImmutableList.of(lot), pageable);
   }
 
   @Test
   public void searchShouldReturnRepositoryResult() {
+    List<UUID> tradeItemIds = singletonList(tradeItem.getId());
     LotSearchParams lotSearchParams = new LotSearchParams(
         LocalDate.now(),
-        tradeItem.getId(),
+        tradeItemIds,
         lot.getLotCode(),
-        Arrays.asList(lot.getId())
+        ImmutableList.of(lot.getId())
     );
 
-    when(tradeItemRepository.findOne(eq(tradeItem.getId()))).thenReturn(tradeItem);
+    List<TradeItem> tradeItems = singletonList(tradeItem);
+    when(tradeItemRepository.findAll(tradeItemIds))
+        .thenReturn(tradeItems);
 
     when(lotRepository.search(
-        eq(tradeItem),
-        eq(lotSearchParams.getExpirationDate()),
-        eq(lotSearchParams.getLotCode()),
-        eq(lotSearchParams.getId()),
-        eq(pageable)
+        tradeItems,
+        lotSearchParams.getExpirationDate(),
+        lotSearchParams.getLotCode(),
+        lotSearchParams.getId(),
+        pageable
     )).thenReturn(expected);
 
     Page<Lot> result = lotService.search(lotSearchParams, pageable);
@@ -123,13 +129,13 @@ public class LotServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void searchShouldThrowExceptionIfTradeItemDoesNotExist() {
-    when(tradeItemRepository.findOne(eq(tradeItem.getId()))).thenReturn(null);
+    when(tradeItemRepository.findAll(singletonList(tradeItem.getId()))).thenReturn(emptyList());
 
     LotSearchParams lotSearchParams = new LotSearchParams(
         LocalDate.now(),
-        tradeItem.getId(),
+        singletonList(tradeItem.getId()),
         lot.getLotCode(),
-        Arrays.asList(lot.getId())
+        ImmutableList.of(lot.getId())
     );
 
     lotService.search(lotSearchParams, pageable);

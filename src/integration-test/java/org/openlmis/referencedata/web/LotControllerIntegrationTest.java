@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -32,8 +33,14 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.util.messagekeys.LotMessageKeys.ERROR_LOT_CODE_REQUIRED;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,16 +59,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -225,10 +222,12 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldFindLots() throws JsonProcessingException {
-
-    given(lotRepository.search(any(TradeItem.class), any(LocalDate.class), anyString(), anyList(),
-        any(Pageable.class))).willReturn(Pagination.getPage(singletonList(lot), pageable));
+  public void shouldFindLots() {
+    given(lotRepository.search(anyListOf(TradeItem.class), any(LocalDate.class), anyString(),
+        anyList(), any(Pageable.class)))
+        .willReturn(Pagination.getPage(singletonList(lot), pageable));
+    when(tradeItemRepository.findAll(anyListOf(UUID.class)))
+        .thenReturn(Collections.singletonList(new TradeItem()));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -248,8 +247,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldReturnBadRequestWhenTradeItemNotFound() throws JsonProcessingException {
-
+  public void shouldReturnBadRequestWhenTradeItemNotFound() {
     when(tradeItemRepository.findOne(any(UUID.class))).thenReturn(null);
 
     String messageKey = restAssured
