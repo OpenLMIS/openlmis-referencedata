@@ -575,6 +575,14 @@
     "role": { "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c" }
   },
   {
+    "id": "3f9f24f1-9a64-4eac-bc06-2572e71c617b",
+    "type": "supervision",
+    "supervisoryNode": { "id": "219cf7dd-b60a-4c25-ae4e-bf035f357bb4" },
+    "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "user": { "id": "1e3b03a5-1d48-4de1-bb4a-389beece2277" },
+    "role": { "id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0" }
+  },
+  {
     "id": "75bf2702-7f9c-49bd-a419-80e54385a331",
     "type": "fulfillment",
     "warehouse": { "id": "0898dcd6-53f2-41b6-ba7d-b2f5122ffb44" },
