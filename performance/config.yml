@@ -5,9 +5,13 @@ modules:
       basic-auth: user-client:changeme
       username: administrator
       password: password
-      # this property should always be expressed in unit of seconds.
-      scenario-duration: 300
+      # concurrency is in virtual users and duration is in seconds
+      scenario-concurrency: 30
+      scenario-duration: 30
     xml-jtl-flags:
       responseData: true
+    memory-xmx: 4G
+  local:
+    sequential: true
 reporting:
   - module: final-stats

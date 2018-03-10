@@ -1,5 +1,5 @@
 execution:
-  - concurreny: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: approved-products
 

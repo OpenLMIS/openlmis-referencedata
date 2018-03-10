@@ -1,11 +1,11 @@
 execution:
-  - concurreny: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: download-ideal-stock-amounts-csv
-  - concurreny: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: get-ideal-stock-amounts
-  - concurreny: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: upload-ideal-stock-amounts-csv
 

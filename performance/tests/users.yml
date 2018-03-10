@@ -1,44 +1,44 @@
 execution:
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-one
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-all
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-search-one-page
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-has-right
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-one-permission-strings
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-one-programs
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-one-facilities
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-one-supervised-facilities
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: create-user
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: delete-user
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-one-supported-programs
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-one-fulfillment-facilities
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-get-one-role-assignments
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: users-search-by-right
 

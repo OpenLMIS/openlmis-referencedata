@@ -1,42 +1,42 @@
 # /api/facilities/${id}/approvedProducts endpoint is tested in another config files
 execution:
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facility-create
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-minimal-all
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-minimal-one-page
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-audit-log
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facility-update
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-one
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-by-boundary-all
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-by-boundary-one-page
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-delete-one
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-supplying
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-all
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-search-all
-  - concurrency: 1
+  - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-search-one-page
 
