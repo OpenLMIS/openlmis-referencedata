@@ -6,7 +6,7 @@ modules:
       username: administrator
       password: password
       # concurrency is in virtual users and duration is in seconds
-      scenario-concurrency: 30
+      scenario-concurrency: 3
       scenario-duration: 30
     xml-jtl-flags:
       responseData: true
