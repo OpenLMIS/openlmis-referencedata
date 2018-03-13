@@ -531,6 +531,14 @@
     "role": {"id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b"}
   },
   {
+    "id": "918e5d38-c5a9-447f-bd0e-2c75c7a0b3a0",
+    "type": "supervision",
+    "supervisoryNode": { "id": "219cf7dd-b60a-4c25-ae4e-bf035f357bb4" },
+    "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "user": { "id": "a337ec45-31a0-4f2b-9b2e-a105c4b669bb" },
+    "role": { "id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b" }
+  },
+  {
     "id": "48c18a03-59a1-4348-a8f8-772080245740",
     "type": "supervision",
     "program": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
