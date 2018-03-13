@@ -77,7 +77,7 @@ public class OrderablesMigrationIntegrationTest {
   public void commodityTypesShouldMigrate() {
     SqlRowSet sqlRowSet = getSqlRowSet("commodity_types", COMMODITY_TYPE_ID);
     assertEquals("cSys", sqlRowSet.getString("classificationsystem"));
-    assertEquals("cId", sqlRowSet.getString("classificationid"));
+    assertEquals("cId2", sqlRowSet.getString("classificationid"));
     assertEquals("23856848-63c9-4807-9470-603b2ddc33fa", sqlRowSet.getString("parentid"));
   }
 
