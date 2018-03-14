@@ -1529,7 +1529,7 @@
   {
     "id": "7e451a6f-5d81-463a-ac40-98b45c8e3a2d",
     "code": "N002",
-    "name": "Chissimbir, N\'gauma",
+    "name": "Chissimbir, N'gauma",
     "geographicZoneid": "6cb9595e-bd93-41d3-89c7-776e6d813a83",
     "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f128",
     "Operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -1541,7 +1541,7 @@
   {
     "id": "dadf9834-8924-4654-8d56-00cf1992371f",
     "code": "N004",
-    "name": "Itepela, N\'gauma",
+    "name": "Itepela, N'gauma",
     "geographicZoneid": "6cb9595e-bd93-41d3-89c7-776e6d813a83",
     "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f130",
     "Operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -1565,7 +1565,7 @@
   {
     "id": "9c01c261-294e-4788-8a01-1a391516c663",
     "code": "N006",
-    "name": "Luelela, N\'gauma",
+    "name": "Luelela, N'gauma",
     "geographicZoneid": "6cb9595e-bd93-41d3-89c7-776e6d813a83",
     "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f132",
     "Operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -1601,7 +1601,7 @@
   {
     "id": "69c755ff-8d5e-44c0-a30b-175e0782b94e",
     "code": "N013",
-    "name": "Massangulo, N\'gauma",
+    "name": "Massangulo, N'gauma",
     "geographicZoneid": "6cb9595e-bd93-41d3-89c7-776e6d813a83",
     "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f138",
     "Operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -1721,7 +1721,7 @@
   {
     "id": "7389c9ad-87bc-41a9-a4f2-ebbee0c16fbd",
     "code": "N032",
-    "name": "Ngauma, N\'gauma",
+    "name": "Ngauma, N'gauma",
     "geographicZoneid": "6cb9595e-bd93-41d3-89c7-776e6d813a83",
     "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f155",
     "Operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -4133,7 +4133,7 @@
   {
     "id": "bec646eb-c521-44ee-b907-a1bc0c8e4249",
     "code": "N044",
-    "name": "Chiguaja, N\'gauma",
+    "name": "Chiguaja, N'gauma",
     "geographicZoneid": "6cb9595e-bd93-41d3-89c7-776e6d813a83",
     "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f357",
     "Operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -4553,7 +4553,7 @@
   {
     "id": "80b07d54-eefd-4895-82ca-b20f44783081",
     "code": "N081",
-    "name": "C.S M\'sawze, Mavago",
+    "name": "C.S M'sawze, Mavago",
     "geographicZoneid": "850044c1-da57-47f6-a5b1-d2f21f8182cf",
     "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f394",
     "Operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
@@ -5237,7 +5237,7 @@
   {
     "id": "f60fd924-fcb3-451d-9fae-46840aa5bd0c",
     "code": "N122",
-    "name": "Lupalane, N\'gauma",
+    "name": "Lupalane, N'gauma",
     "geographicZoneid": "6cb9595e-bd93-41d3-89c7-776e6d813a83",
     "typeid": "ac1d268b-ce10-455f-bf87-9c667da8f452",
     "Operatedbyid": "9456c3e9-c4a6-4a28-9e08-47ceb16a4121",
