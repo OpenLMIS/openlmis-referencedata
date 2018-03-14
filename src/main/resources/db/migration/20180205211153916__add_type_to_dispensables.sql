@@ -1,2 +1,1 @@
-ALTER TABLE referencedata.dispensables ADD COLUMN type text NOT NULL;
-ALTER TABLE referencedata.dispensables ALTER COLUMN type SET DEFAULT 'default';
+ALTER TABLE referencedata.dispensables ADD COLUMN type text DEFAULT 'default' NOT NULL;
