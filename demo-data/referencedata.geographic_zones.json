@@ -234,6 +234,42 @@
     "longitude": 34.92
   },
   {
+    "id": "d22d86fb-9123-437a-9eae-da2b31b77e34",
+    "code": "moz",
+    "name": "Mozambique",
+    "levelId": "6b78e6c6-292e-4733-bb9c-3d802ad61206",
+    "longitude": -18.773706,
+    "latitude": 35.834953
+  },
+  {
+    "id": "c4443209-c0ef-449d-8e27-2262f96973fc",
+	"code": "cabo-delgado",
+    "name": "Cabo Delgado",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
+  },
+  {
+    "id": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+	"code": "gaza",
+    "name": "Gaza",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
+  },
+  {
+    "id": "378e2d58-f575-4216-a580-721c6ee3b24b",
+	"code": "maputo",
+    "name": "Maputo",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
+  },
+  {
+    "id": "d46ed756-0147-4a4a-bc50-010253fc2110",
+	"code": "nampula",
+    "name": "Nampula",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
+  },
+  {
     "id": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
     "code": "niassa",
     "name": "Niassa",
@@ -241,6 +277,41 @@
     "parentId": "d22d86fb-9123-437a-9eae-da2b31b77e34",
     "longitude": -13.174973,
     "latitude": 36.204547
+  },
+  {
+    "id": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "code": "zambezia",
+    "name": "Zambezia",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
+  },
+  {
+    "id": "b85a1c07-bcc3-4238-a6d8-006445825571",
+	"code": "tete",
+    "name": "Tete",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
+  },
+  {
+    "id": "3591719c-7193-4946-9e6a-b3b8feb49090",
+	"code": "manica-pr",
+    "name": "Manica",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
+  },
+  {
+    "id": "031e326b-d16f-46a7-80a3-f53e347f8943",
+	"code": "sofala-pr",
+    "name": "Sofala",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
+  },
+  {
+    "id": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+	"code": "maputo-cidade",
+    "name": "Cidade de Maputo",
+    "levelid": "9b497d87-cdd9-400e-bb04-fae0bf6a9491",
+    "parentid": "d22d86fb-9123-437a-9eae-da2b31b77e34"
   },
   {
     "id": "9b8cfb5a-217a-4261-a64f-16ca06ae79fa",
@@ -252,14 +323,6 @@
     "latitude": 36.545
   },
   {
-    "id": "d22d86fb-9123-437a-9eae-da2b31b77e34",
-    "code": "moz",
-    "name": "Mozambique",
-    "levelId": "6b78e6c6-292e-4733-bb9c-3d802ad61206",
-    "longitude": -18.773706,
-    "latitude": 35.834953
-  },
-  {
     "id": "88b7eef3-b3f3-4f1a-9782-f5a88f78c56b",
     "code": "lichinga-distrito",
     "name": "Lichinga Distrito",
@@ -267,5 +330,1006 @@
     "parentId": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
     "longitude": -13.378,
     "latitude": 35.189
+  },
+  {
+    "id": "3e3e2b61-8ad7-41ff-a0bc-7e1fc7ed40ce",
+    "code": "ancuabe",
+    "name": "Ancuabe",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "e0867ef9-41f8-41da-a558-488b8b13c123",
+    "code": "angoche",
+    "name": "Angoche",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a101f8a8-36ae-47db-8c60-fc3123746985",
+    "code": "balama",
+    "name": "Balama",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "64d1b35b-2aee-43de-a0e9-c61145d9d76e",
+    "code": "bilene",
+    "name": "Bilene",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "06d51af1-f447-4c50-9b13-29c8e21ccbf3",
+    "code": "boane",
+    "name": "Boane",
+    "parentid": "378e2d58-f575-4216-a580-721c6ee3b24b",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "8322d123-b94e-44d8-9bd5-ba023c20c775",
+    "code": "chibuto",
+    "name": "Chibuto",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "fd14351b-2fe0-494b-b80a-98c0ee64fb97",
+    "code": "chicualacuala",
+    "name": "Chicualacuala",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "9f563e7c-aa18-46e2-9822-35952900ce9e",
+    "code": "chigubo",
+    "name": "Chigubo",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "dd698a05-a9cc-4e58-b0da-e12019e9532e",
+    "code": "chiure",
+    "name": "Chiure",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "64ae98bd-3b5b-4f65-a7a7-c10e053e9ef3",
+    "code": "chokwe",
+    "name": "Chokwe",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "9adff5ce-a6e6-4f6b-97e6-f6956722ad9e",
+    "code": "cidade-de-xai-xai",
+    "name": "Cidade De Xai Xai",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "dbb28b68-ae0b-4852-beec-18fb402949aa",
+    "code": "erati",
+    "name": "Erati",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "33dab12b-9ed1-4979-bb76-2082e58e7119",
+    "code": "guija",
+    "name": "Guija",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "3e5f0746-0adf-44bb-ba37-b9d36a17f150",
+    "code": "ibo",
+    "name": "Ibo",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "37083979-d81a-4ed9-90f7-9c1b6550c075",
+    "code": "ilha-de-mocambique",
+    "name": "Ilha De Mocambique",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "17d2bd9a-b163-4020-84dc-fabd17725128",
+    "code": "lago",
+    "name": "Lago",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "1448c817-2186-4721-9a0f-c25623f73002",
+    "code": "lalaua",
+    "name": "Lalaua",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "4bf26a0f-6b5c-41a1-9721-6ad387b4da8a",
+    "code": "lichinga-cidade",
+    "name": "Lichinga Cidade",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a39f7036-d599-461e-a170-dc1331a57ea8",
+    "code": "mabalane",
+    "name": "Mabalane",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "140fea15-5625-40b3-b0bb-8d927a7458c3",
+    "code": "macomia",
+    "name": "Macomia",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "d2409959-3ddb-4611-bfdf-55ca8290ebd0",
+    "code": "magude",
+    "name": "Magude",
+    "parentid": "378e2d58-f575-4216-a580-721c6ee3b24b",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b93c8dee-97f7-48c2-9554-f04901312af0",
+    "code": "majune",
+    "name": "Majune",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "4821a7e3-8b8e-48c9-bd04-e7878df25041",
+    "code": "malema",
+    "name": "Malema",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "13b55969-1205-40b7-a298-27befcc3c4d5",
+    "code": "mandimba",
+    "name": "Mandimba",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "7f4ed01b-73a0-4006-bff4-a512e6508eeb",
+    "code": "manhica",
+    "name": "Manhica",
+    "parentid": "378e2d58-f575-4216-a580-721c6ee3b24b",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "3801a865-d6a1-4948-94fc-8ac73167fd15",
+    "code": "manjacaze",
+    "name": "Manjacaze",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "bed2ff27-108d-445b-87c0-077c3659b8b4",
+    "code": "marracuene",
+    "name": "Marracuene",
+    "parentid": "378e2d58-f575-4216-a580-721c6ee3b24b",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "f8484a54-43a5-4e99-9077-e0d0b2b6e3ec",
+    "code": "marrupa",
+    "name": "Marrupa",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "9f1df02e-1178-42de-a5f5-aeb61264190d",
+    "code": "massangena",
+    "name": "Massangena",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "e6e6ce31-7aee-49d7-bf79-5373e7a6179c",
+    "code": "massingir",
+    "name": "Massingir",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "33ba209c-e9cd-4adf-878a-e767075a96f7",
+    "code": "matituine",
+    "name": "Matituine",
+    "parentid": "378e2d58-f575-4216-a580-721c6ee3b24b",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "52381617-856f-419b-ae72-c139d004d8c1",
+    "code": "matola",
+    "name": "Matola",
+    "parentid": "378e2d58-f575-4216-a580-721c6ee3b24b",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "98e018fe-7b46-46b9-9cba-a2b02610cb60",
+    "code": "maua",
+    "name": "Maua",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "850044c1-da57-47f6-a5b1-d2f21f8182cf",
+    "code": "mavago",
+    "name": "Mavago",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "4064382a-a9f6-4dd5-bca0-d4d80a15863c",
+    "code": "mecanhelas",
+    "name": "Mecanhelas",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "867ee023-3078-4f76-abe1-7a985248c78b",
+    "code": "meconta",
+    "name": "Meconta",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "80a77fad-e30c-4e16-80f2-552de0543190",
+    "code": "mecuburi",
+    "name": "Mecuburi",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "9d8dbf19-754c-4255-8c23-320d67e22c5b",
+    "code": "mecufi",
+    "name": "Mecufi",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b2e4e0cb-7501-4fee-a53e-d8e090cbc984",
+    "code": "mecula",
+    "name": "Mecula",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "6e02454f-412d-4def-a8fe-1b9a150b62da",
+    "code": "meluco",
+    "name": "Meluco",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b3385900-a0f5-493c-8ad1-e13c2aaa2032",
+    "code": "memba",
+    "name": "Memba",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "25eadfb0-7948-47ab-92e3-db8c834a2abc",
+    "code": "metarica",
+    "name": "Metarica",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "086b99ec-d9fc-453e-b6cf-94fd05b1ff6a",
+    "code": "moamba",
+    "name": "Moamba",
+    "parentid": "378e2d58-f575-4216-a580-721c6ee3b24b",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "e241c64f-ee10-4c72-8c87-39f08185b166",
+    "code": "mocimboa-da-praia",
+    "name": "Mocimboa Da Praia",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "592d2fd3-1fcb-4e84-b675-e648a163646c",
+    "code": "mogincual",
+    "name": "Mogincual",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "7b45d49f-de97-4a75-8b6e-287809f61627",
+    "code": "mogovolas",
+    "name": "Mogovolas",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "4e31703a-8a6b-4dc1-abaa-f574fd8ab890",
+    "code": "moma",
+    "name": "Moma",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a87de86c-fd58-40d1-a860-807a91daeb4f",
+    "code": "monapo",
+    "name": "Monapo",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a02f0a35-529a-4ac2-8405-a818f62f9abc",
+    "code": "montepuez",
+    "name": "Montepuez",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "9b4faf20-4882-49d5-9283-a2054e67bc6a",
+    "code": "mossuril",
+    "name": "Mossuril",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b85d2103-8092-4078-afa1-bbed1661eb30",
+    "code": "muecate",
+    "name": "Muecate",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "1551c71d-957b-43d2-ba74-ac80db17b91f",
+    "code": "mueda",
+    "name": "Mueda",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "368f6123-0a7b-4d67-bd6a-d5809ac4ff86",
+    "code": "muembe",
+    "name": "Muembe",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "927d2ce1-585c-4e03-8888-69ac5a60d979",
+    "code": "muidumbe",
+    "name": "Muidumbe",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "1d120c10-0eb6-4aae-b055-75da8913266f",
+    "code": "murrupula",
+    "name": "Murrupula",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b25f4d77-6382-4a09-887f-21b3bbcc4b30",
+    "code": "nacala-a-velha",
+    "name": "Nacala A Velha",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "dfc4bbf9-59a6-4804-b46c-5b000cbe23df",
+    "code": "nacala-porto",
+    "name": "Nacala Porto",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "6d8d651a-95c3-416e-bc57-c12aa9b6f19d",
+    "code": "nacaroa",
+    "name": "Nacaroa",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "70e82e7d-ff8d-4fb5-81b6-9443c397eb89",
+    "code": "namahacha",
+    "name": "Namahacha",
+    "parentid": "378e2d58-f575-4216-a580-721c6ee3b24b",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "8ca05c44-19a4-4b4b-ba40-2ad135caf8af",
+    "code": "nampula-cidade",
+    "name": "Nampula Cidade",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "675a006c-b463-4bd3-b3bb-3721a6953119",
+    "code": "nampula-distrito",
+    "name": "Nampula Distrito",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "38ae181e-0c86-4c25-ad44-b09287490378",
+    "code": "namuno",
+    "name": "Namuno",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a5a14d89-d6a5-433b-9e50-af1be78bf11d",
+    "code": "nangade",
+    "name": "Nangade",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "6cb9595e-bd93-41d3-89c7-776e6d813a83",
+    "code": "n-gauma",
+    "name": "N Gauma",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "be760e1e-1db3-4038-a780-d5faaee178da",
+    "code": "nipepe",
+    "name": "Nipepe",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "d7a1c684-9a30-46f8-befc-a3d8964f7fbd",
+    "code": "palma",
+    "name": "Palma",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "c2df7549-53ac-4ca2-b5b8-6760d9db4fc9",
+    "code": "pemba-cidade",
+    "name": "Pemba Cidade",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "f2de779c-53e1-4492-a526-4dd3fb4bbab6",
+    "code": "pemba-metuge",
+    "name": "Pemba Metuge",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "0b33d037-802d-486d-9b75-dd35be5a9108",
+    "code": "quissanga",
+    "name": "Quissanga",
+    "parentid": "c4443209-c0ef-449d-8e27-2262f96973fc",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "354e38db-bfb7-45b7-aead-82782e17bdf4",
+    "code": "ribaue",
+    "name": "Ribaue",
+    "parentid": "d46ed756-0147-4a4a-bc50-010253fc2110",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "7c723543-d612-4130-89e2-ac807372d39a",
+    "code": "sanga",
+    "name": "Sanga",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "4cd99b4b-d3d7-4da6-9fcb-9394b762b02a",
+    "code": "xai-xai",
+    "name": "Xai Xai",
+    "parentid": "4f661d1a-4b67-42b6-8d4e-f8448c22e2e7",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "4ac1ed44-213e-4f33-a961-00b7f3959ac4",
+    "code": "chimbunila",
+    "name": "Chimbunila",
+    "parentid": "0d4eb5ee-ae7f-42e7-89e1-d0f276090755",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "caa47b14-468b-4c8e-88dc-f3b1c0fc6bb0",
+    "code": "alto-molocue",
+    "name": "Alto Molocue",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "f2927ce9-d552-4693-91c7-c43bef045115",
+    "code": "chinde",
+    "name": "Chinde",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "f2ca3fbc-a524-4164-8731-ad213f4fd777",
+    "code": "derre",
+    "name": "Derre",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "ed7d21e2-fded-4090-9e2f-f9ad0c2e131b",
+    "code": "gile",
+    "name": "Gile",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "57ccb129-d5e4-44d2-91e9-04674ffe6a96",
+    "code": "gurue",
+    "name": "Gurue",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b04446d9-3a7b-4ed2-b2db-138e65a7f383",
+    "code": "ile",
+    "name": "Ile",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "871f2918-1bb0-4c20-9ad6-e27ac40c3185",
+    "code": "inhassunge",
+    "name": "Inhassunge",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "0a9cff75-0af7-486e-9810-17719a1ae9f7",
+    "code": "luabo",
+    "name": "Luabo",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "730d2fb8-3e95-4d64-9796-d314c288da7b",
+    "code": "lugela",
+    "name": "Lugela",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "46ecad7a-15cb-4e0f-b12f-be0aa01b8d1f",
+    "code": "maganja-da-costa",
+    "name": "Maganja da Costa",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "08fcd4e7-a4ca-4978-bcd2-052973deead7",
+    "code": "milange",
+    "name": "Milange",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "6c7c611a-c9a4-4d4f-92e2-5cf90f1aeb7a",
+    "code": "mocuba",
+    "name": "Mocuba",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b7386914-8067-411c-a45e-3df65a90caed",
+    "code": "mocubela",
+    "name": "Mocubela",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "3e458562-ba30-4ff0-9674-a5e4e3ce09dd",
+    "code": "molumbo",
+    "name": "Molumbo",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "46c1bda7-7c6f-40f1-8e58-1e9837c929fe",
+    "code": "mopeia",
+    "name": "Mopeia",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "f6bcbcff-b93c-44f2-97a3-9c505ac7b80f",
+    "code": "morrumbala",
+    "name": "Morrumbala",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "c25d0ff9-0b81-4ca5-b470-026565c926b7",
+    "code": "mulevala",
+    "name": "Mulevala",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "e863186f-0c70-43d8-b44e-c399e6087c5b",
+    "code": "namacurra",
+    "name": "Namacurra",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "2d7eb425-b375-436e-8a3f-2ff6ac652c50",
+    "code": "namarroi",
+    "name": "Namarroi",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "dd723024-618c-42fe-9ac3-2e6b8fb22c96",
+    "code": "nicoadala",
+    "name": "Nicoadala",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "97c0702e-80a4-4d82-b70c-7911740de017",
+    "code": "pebane",
+    "name": "Pebane",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "04a34d7f-a615-4405-ac33-6d869625c132",
+    "code": "quelimane",
+    "name": "Quelimane",
+    "parentid": "5d6a5238-bd65-4425-9562-f6c742cdc51c",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "c8cf97a3-2291-4dea-b0f8-c5e052c28a96",
+    "code": "angonia",
+    "name": "Angonia",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "cf6059c9-94b1-4aa5-8770-8e9da8e46e89",
+    "code": "cidade de tete",
+    "name": "Cidade de Tete",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "9bc7bfae-7cd3-4a7a-a795-8f2624f22a19",
+    "code": "cahora Bassa",
+    "name": "Cahora Bassa",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a03ae29e-73a7-4334-b03f-8043b6293b6b",
+    "code": "changara",
+    "name": "Changara",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b39af500-5027-44f4-aa48-5026cf9f318b",
+    "code": "chifunde",
+    "name": "Chifunde",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "7f40b5ca-90a4-4b7e-8edc-65bf2a023f76",
+    "code": "chiuta",
+    "name": "Chiuta",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "6f162627-43ac-4795-92b3-700710efaca6",
+    "code": "doa",
+    "name": "Doa",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "cbc3c363-c0fc-4838-9b8e-f49fa5dd88a4",
+    "code": "macanga",
+    "name": "Macanga",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a5e6deda-b862-461e-a568-c25881a38203",
+    "code": "magoe",
+    "name": "Magoe",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "6ba40815-d50c-48a5-8852-e3671ec44278",
+    "code": "marara",
+    "name": "Marara",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a037591b-ac0b-4774-8a15-88a275870967",
+    "code": "maravia",
+    "name": "Maravia",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a2b183bf-aca8-4324-9666-1e2719c7752f",
+    "code": "moatize",
+    "name": "Moatize",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "e0b3ee1c-a435-4e2f-8431-682674167cbe",
+    "code": "mutarara",
+    "name": "Mutarara",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "b712097d-c742-431a-811c-e4c8f30f07ba",
+    "code": "tsangano",
+    "name": "Tsangano",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "387bba51-aed3-4bda-96c0-321471d31e36",
+    "code": "zumbo",
+    "name": "Zumbo",
+    "parentid": "b85a1c07-bcc3-4238-a6d8-006445825571",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "49c1e881-51bc-4dc2-991d-2635e62af24c",
+    "code": "cidade-de-chimoio",
+    "name": "Cidade de Chimoio",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "05bd9238-0392-474e-9447-f8ee5e630281",
+    "code": "gondola",
+    "name": "Gondola",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "14201e9a-5aa9-414c-a630-7542e42ccbec",
+    "code": "manica",
+    "name": "Manica",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "34a04af8-8f97-4205-bb9d-9615551760a5",
+    "code": "sussundenga",
+    "name": "Sussundenga",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "d24ff61c-3c4a-4bd9-a070-fee5cf3932e9",
+    "code": "macate",
+    "name": "Macate",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "c329513b-e66e-441d-8bf0-ef5ef234c1f8",
+    "code": "vanduzi",
+    "name": "Vanduzi",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "eda90384-db11-4172-a24a-9a616a8b6d90",
+    "code": "barue",
+    "name": "Barue",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "faa24467-d77a-4e4b-a606-5310d97e6192",
+    "code": "guro",
+    "name": "Guro",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "60a84925-6630-4a9c-8cb5-75829231723b",
+    "code": "macossa",
+    "name": "Macossa",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "79db8a08-78fa-41c6-911e-92497fce5f87",
+    "code": "tambara",
+    "name": "Tambara",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "c0db376b-3a51-4192-8f6a-7a0a277f8056",
+    "code": "machaze",
+    "name": "Machaze",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "60987237-6158-4bc3-bc0c-e54dbbc6fc74",
+    "code": "mossurize",
+    "name": "Mossurize",
+    "parentid": "3591719c-7193-4946-9e6a-b3b8feb49090",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "4bda3a09-e4c8-4471-820c-5906a8f0947d",
+    "code": "beira",
+    "name": "Beira",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "7bb300fb-3f51-41a1-887c-146ece1634b4",
+    "code": "buzi",
+    "name": "Buzi",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "bbdc756c-b6f0-4a43-8d14-cd9c9fb45ac2",
+    "code": "caia",
+    "name": "Caia",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "45d7b038-0e1b-4d79-b25f-2e3c12096108",
+    "code": "chemba",
+    "name": "Chemba",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "3f2cb406-2636-4520-b515-3f4d56ab9cec",
+    "code": "cheringoma",
+    "name": "Cheringoma",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "74603b87-f391-4df4-937f-75b71131bac6",
+    "code": "chibabava",
+    "name": "Chibabava",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "99fe9f90-f5e3-49f7-a859-8b2b0b981e86",
+    "code": "dondo",
+    "name": "Dondo",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "643f6b85-1af4-47e5-ab5b-baca84d18da9",
+    "code": "gorongosa",
+    "name": "Gorongosa",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "411b661f-a0e4-442e-8328-6046c7f47f21",
+    "code": "machanga",
+    "name": "Machanga",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "0af7c373-dd67-4c98-a3c7-603d3fde7563",
+    "code": "maringue",
+    "name": "Maringue",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "d9f24d44-39ec-40e8-a969-a42da948d45a",
+    "code": "marromeu",
+    "name": "Marromeu",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "691523a2-3e33-4d62-97ad-d4deb768f54c",
+    "code": "muanza",
+    "name": "Muanza",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "2dabd421-f892-4513-b267-6d262340a94f",
+    "code": "nhamatanda",
+    "name": "Nhamatanda",
+    "parentid": "031e326b-d16f-46a7-80a3-f53e347f8943",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "8ad3cf19-391b-4276-9d25-1e2023f82986",
+    "code": "kampfumo",
+    "name": "KaMpfumo",
+    "parentid": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "68918ba4-69d5-48bc-a908-1ac77b060d04",
+    "code": "nhlamakulu",
+    "name": "Nhlamakulu",
+    "parentid": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "23047fd0-a1d4-48de-80ba-e9b340de2a0d",
+    "code": "kamaxakeni",
+    "name": "KaMaxakeni",
+    "parentid": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "7fbd1a18-1dc1-49fa-ae2a-79f787052315",
+    "code": "kamavota",
+    "name": "KaMavota",
+    "parentid": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "9a831ed2-a617-4171-bf64-64c9bcd262ab",
+    "code": "mamubukwana",
+    "name": "MaMubukwana",
+    "parentid": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "a228beeb-ba81-4b0f-a59e-141214798770",
+    "code": "katembe",
+    "name": "KaTembe",
+    "parentid": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "75c83ce9-efc7-48a3-82ac-c9d45833bc6c",
+    "code": "kanyaka",
+    "name": "KaNyaka",
+    "parentid": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
+  },
+  {
+    "id": "8d234672-6432-431d-a4f3-861aa61c767c",
+    "code": "dp_mc",
+    "name": "Cidade de Maputo",
+    "parentid": "6bd49e8f-e887-4a47-9f3d-dacb4ac50c08",
+    "levelid": "93c05138-4550-4461-9e8a-79d5f050c223"
   }
 ]
