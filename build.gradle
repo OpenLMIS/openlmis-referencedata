@@ -150,6 +150,8 @@ task integrationTest(type: Test) {
     exclude '**/migration/**'
 }
 
+flywayTest.mustRunAfter integrationTest
+
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
     reports.junitXml.destination = file("${testResultsDir}/${name}")

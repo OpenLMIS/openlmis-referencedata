@@ -15,81 +15,46 @@
 
 package org.openlmis.referencedata.migration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
-import org.flywaydb.test.annotation.FlywayTest;
-import org.flywaydb.test.junit.FlywayTestExecutionListener;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openlmis.referencedata.Application;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Tests for orderable's data migrations.
- *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = Application.class)
-@ActiveProfiles("test")
-@Rollback
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class, FlywayTestExecutionListener.class
-    })
-@FlywayTest
-public class OrderablesMigrationIntegrationTest {
+@FlywayTarget("20170517102033421")
+public class OrderablesMigrationIntegrationTest extends BaseMigrationIntegrationTest {
 
   private static final String ID = "'4d1115de-0f60-408a-8a1e-44401e20a5b0'";
   private static final String COMMODITY_TYPE_ID = "'4d1115de-0f60-408a-8a1e-44401e20a5b1'";
 
-  @Autowired
-  private JdbcTemplate template;
-
-  @FlywayTest(locationsForMigrate = {"/db/data"})
   @Test
-  public void orderablesShouldMigrate() {
-    SqlRowSet sqlRowSet = getSqlRowSet("orderables", ID);
-    assertEquals("unit", sqlRowSet.getString("dispensingunit"));
-    assertEquals("productname1", sqlRowSet.getString("fullproductname"));
-    assertEquals(10, sqlRowSet.getInt("packroundingthreshold"));
-    assertEquals(20, sqlRowSet.getInt("netcontent"));
-    assertEquals("Code1", sqlRowSet.getString("code"));
-    assertFalse(sqlRowSet.getBoolean("roundtozero"));
+  public void shouldMigrateOrderables() {
+    Map<String, Object> row = getRow("orderables", ID);
+    assertThat(row.get("dispensingunit"), is("unit"));
+    assertThat(row.get("fullproductname"), is("productname1"));
+    assertThat(row.get("packroundingthreshold"), is(10L));
+    assertThat(row.get("netcontent"), is(20L));
+    assertThat(row.get("code"), is("Code1"));
+    assertThat(row.get("roundtozero"), is(false));
   }
 
-  @FlywayTest(locationsForMigrate = {"/db/data"})
   @Test
-  public void tradeItemsShouldMigrate() {
-    SqlRowSet sqlRowSet = getSqlRowSet("trade_items", ID);
-    assertEquals("manufacturer1", sqlRowSet.getString("manufactureroftradeitem"));
+  public void shouldMigrateTradeItems() {
+    Map<String, Object> row = getRow("trade_items", ID);
+    assertThat(row.get("manufactureroftradeitem"), is("manufacturer1"));
   }
 
-  @FlywayTest(locationsForMigrate = {"/db/data"})
   @Test
-  public void commodityTypesShouldMigrate() {
-    SqlRowSet sqlRowSet = getSqlRowSet("commodity_types", COMMODITY_TYPE_ID);
-    assertEquals("cSys", sqlRowSet.getString("classificationsystem"));
-    assertEquals("cId2", sqlRowSet.getString("classificationid"));
-    assertEquals("23856848-63c9-4807-9470-603b2ddc33fa", sqlRowSet.getString("parentid"));
+  public void shouldMigrateCommodityTypes() {
+    Map<String, Object> row = getRow("commodity_types", COMMODITY_TYPE_ID);
+    assertThat(row.get("classificationsystem"), is("cSys"));
+    assertThat(row.get("classificationid"), is("cId2"));
+    assertThat(row.get("parentid"), is(UUID.fromString("23856848-63c9-4807-9470-603b2ddc33fa")));
   }
 
-  private SqlRowSet getSqlRowSet(String object, String id) {
-    assertEquals(1, queryForLong("SELECT COUNT(*) from " + object + " where id = " + id));
-
-    SqlRowSet sqlRowSet = template.queryForRowSet("SELECT * FROM " + object + " where id = " + id);
-    sqlRowSet.next();
-    return sqlRowSet;
-  }
-
-  private long queryForLong(String sql) {
-    return template.queryForObject(sql, Integer.class).longValue();
-  }
 }
