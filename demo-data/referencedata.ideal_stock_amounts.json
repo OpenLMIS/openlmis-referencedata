@@ -48608,6 +48608,62 @@
     "amount": 30300
   },
   {
+    "id": "93ba7d21-ee31-4bf7-b928-17fe87b565a2",
+    "facilityId": "c62dea9b-6974-4101-ba39-b09914165967",
+    "commodityTypeId": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "processingPeriodId": "f419bcd8-ac7a-4b75-8c84-c065ef437938",
+    "amount": 50000
+  },
+  {
+    "id": "a2c0e899-2c28-4b9e-a7a2-530ae5b02c11",
+    "facilityId": "c62dea9b-6974-4101-ba39-b09914165967",
+    "commodityTypeId": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "processingPeriodId": "c5012ddf-b145-4eee-9640-b2cbf4f2da85",
+    "amount": 50000
+  },
+  {
+    "id": "f47117a4-dedf-4648-84cf-f68e11983dcb",
+    "facilityId": "c62dea9b-6974-4101-ba39-b09914165967",
+    "commodityTypeId": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "processingPeriodId": "65671374-66e2-4a11-a7dc-05b645c6d815",
+    "amount": 50000
+  },
+  {
+    "id": "df9efa7f-7297-40d0-b1c6-88f02d970a00",
+    "facilityId": "c62dea9b-6974-4101-ba39-b09914165967",
+    "commodityTypeId": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "processingPeriodId": "7880be4f-6582-472a-9ea5-a6baed71e6e5",
+    "amount": 50000
+  },
+  {
+    "id": "ad0a00dc-0f2b-459b-b332-5b7f3d34420a",
+    "facilityId": "c62dea9b-6974-4101-ba39-b09914165967",
+    "commodityTypeId": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "processingPeriodId": "baf98c9a-408b-4e9e-b56a-38640c7dfed6",
+    "amount": 50000
+  },
+  {
+    "id": "0c5ec718-6643-4444-a76a-53d15bad2b2b",
+    "facilityId": "c62dea9b-6974-4101-ba39-b09914165967",
+    "commodityTypeId": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "processingPeriodId": "a4eefb4e-2bb6-4793-9f70-2cc5365de7c6",
+    "amount": 50000
+  },
+  {
+    "id": "c3bff21b-03e1-4eb2-b4ff-92de4677d4a4",
+    "facilityId": "c62dea9b-6974-4101-ba39-b09914165967",
+    "commodityTypeId": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "processingPeriodId": "f2cecbc4-c6cc-48ca-b4e7-11e69238b386",
+    "amount": 50000
+  },
+  {
+    "id": "c66d9e94-14e6-4731-a3f6-466d9acc263e",
+    "facilityId": "c62dea9b-6974-4101-ba39-b09914165967",
+    "commodityTypeId": "e0a073e0-d988-450e-875b-ab33422860cb",
+    "processingPeriodId": "8d870ab0-a8d5-11e7-abc4-cec278b6b50a",
+    "amount": 50000
+  },
+  {
     "id": "a0395e01-e2f6-4e3a-89c6-3f101710b272",
     "facilityId": "2b6a845a-1bc0-4208-a1a5-c2a09171d707",
     "commodityTypeId": "99ccf663-3304-44ae-b2e0-a67fd5511e2a",
