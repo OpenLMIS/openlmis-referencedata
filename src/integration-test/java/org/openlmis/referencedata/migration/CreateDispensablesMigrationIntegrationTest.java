@@ -17,21 +17,42 @@ package org.openlmis.referencedata.migration;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.junit.Test;
+import com.google.common.collect.ImmutableMap;
+
+import org.apache.commons.lang.RandomStringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-@FlywayTarget("20180205211153916")
-public class DispensablesMigrationIntegrationTest extends BaseMigrationIntegrationTest {
+public class CreateDispensablesMigrationIntegrationTest extends BaseMigrationIntegrationTest {
+  private static final String ORDERABLES = "orderables";
 
-  @Test
-  public void shouldMigrateDispensables() {
-    List<Map<String, Object>> orderables = getRows("orderables");
+  @Override
+  void insertDataBeforeMigration() {
+    save(ORDERABLES, generateOrderable());
+    save(ORDERABLES, generateOrderable());
+    save(ORDERABLES, generateOrderable());
+    save(ORDERABLES, generateOrderable());
+    save(ORDERABLES, generateOrderable());
+  }
+
+  @Override
+  String getBeforeTestMigration() {
+    return "20180129143106317";
+  }
+
+  @Override
+  String getTestMigration() {
+    return "20180205211153916";
+  }
+
+  @Override
+  void verifyDataAfterMigration() {
+    List<Map<String, Object>> orderables = getRows(ORDERABLES);
     List<Map<String, Object>> dispensables = getRows("dispensables");
     List<Map<String, Object>> dispensableAttributes = getRows("dispensable_attributes");
 
@@ -55,12 +76,21 @@ public class DispensablesMigrationIntegrationTest extends BaseMigrationIntegrati
 
       assertThat(attributes, is(notNullValue()));
       assertThat(attributes.get("key"), is("dispensingUnit"));
-
-      // based on data from db/data directory
-      // we can't check what value is in this column because the related column in orderables
-      // table is removed in migration :(
-      assertThat(attributes.get("value"), isOneOf("unit", "10 tab strip", "each"));
+      assertThat(attributes.get("value"), is("10 tab strip"));
     }
   }
 
+  private Map<String, Object> generateOrderable() {
+    return ImmutableMap
+        .<String, Object>builder()
+        .put("id", UUID.randomUUID().toString())
+        .put("code", "C" + getNextInstanceNumber())
+        .put("description", "Product description goes here.")
+        .put("dispensingunit", "10 tab strip")
+        .put("fullproductname", RandomStringUtils.randomAlphabetic(10))
+        .put("netcontent", 10)
+        .put("packroundingthreshold", 1)
+        .put("roundtozero", false)
+        .build();
+  }
 }

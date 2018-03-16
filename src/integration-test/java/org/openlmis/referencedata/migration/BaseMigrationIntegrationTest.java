@@ -19,10 +19,9 @@ import static java.util.Locale.ENGLISH;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.flywaydb.core.Flyway;
-import org.flywaydb.test.annotation.FlywayTest;
-import org.flywaydb.test.junit.FlywayTestExecutionListener;
+import org.flywaydb.core.api.MigrationVersion;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -33,13 +32,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -47,13 +46,9 @@ import javax.sql.DataSource;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @SpringBootTest(classes = BaseMigrationIntegrationTest.TestConfig.class)
-@Transactional
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class,
-    FlywayTargetExecutionListener.class,
-    FlywayTestExecutionListener.class})
-@FlywayTest(locationsForMigrate = {"/db/data"})
 public abstract class BaseMigrationIntegrationTest {
+  private static final String SQL_INSERT = "INSERT INTO %s(%s) VALUES (%s)";
+
   private static final String SQL_COUNT = "SELECT COUNT(*) from %s";
   private static final String SQL_SELECT = "SELECT * FROM %s";
 
@@ -63,13 +58,69 @@ public abstract class BaseMigrationIntegrationTest {
   @Autowired
   private JdbcTemplate jdbcTemplate;
 
+  @Autowired
+  private Flyway flyway;
+
+  private AtomicInteger instanceNumber = new AtomicInteger(0);
+
+  @Test
+  public void shouldMigrate() {
+    flyway.clean();
+
+    setFlywayTarget(getBeforeTestMigration(), MigrationVersion.fromVersion("20170206205310272"));
+    flyway.migrate();
+
+    insertDataBeforeMigration();
+
+    setFlywayTarget(getTestMigration(), MigrationVersion.LATEST);
+    flyway.migrate();
+
+    verifyDataAfterMigration();
+  }
+
+  /**
+   * Prepares and puts data into database before the test migrations will be executed. The
+   * database will be in version set by {@link #getBeforeTestMigration()}.
+   */
+  abstract void insertDataBeforeMigration();
+
+  /**
+   * Returns to which migration Flyway should migrate before test. If the method returns null as
+   * a value, the database will contain a initial schema and bootstrap data.
+   */
+  abstract String getBeforeTestMigration();
+
+  /**
+   * Returns a test migration. if the method returns null as a value, the database will be
+   * migrated to the latest version.
+   */
+  abstract String getTestMigration();
+
+  /**
+   * Verifies that data after migration are correct.
+   */
+  abstract void verifyDataAfterMigration();
+
+  int getNextInstanceNumber() {
+    return this.instanceNumber.incrementAndGet();
+  }
+
   List<Map<String, Object>> getRows(String table) {
     return executeSelectQuery(SQL_SELECT, table);
   }
 
   Map<String, Object> getRow(String table, String id) {
-    assertThat(executeCountQuery(SQL_COUNT_BY_ID, table, id), is(1L));
-    return executeSelectQuery(SQL_SELECT_BY_ID, table, id).get(0);
+    String sqlId = String.format("'%s'", id);
+    assertThat(executeCountQuery(SQL_COUNT_BY_ID, table, sqlId), is(1L));
+    return executeSelectQuery(SQL_SELECT_BY_ID, table, sqlId).get(0);
+  }
+
+  void save(String table, Map<String, Object> row) {
+    String argList = row.keySet().stream().collect(Collectors.joining(","));
+    String valueList = argList.replaceAll("[^,]+", "?");
+    String sql = createSql(SQL_INSERT, table, argList, valueList);
+
+    jdbcTemplate.update(sql, row.values().toArray());
   }
 
   private long executeCountQuery(String template, String... params) {
@@ -86,6 +137,13 @@ public abstract class BaseMigrationIntegrationTest {
 
   private String createSql(String template, String... params) {
     return String.format(ENGLISH, template, (Object[]) params);
+  }
+
+  private void setFlywayTarget(String target, MigrationVersion defaultValue) {
+    flyway.setTarget(defaultValue);
+    Optional
+        .ofNullable(target)
+        .ifPresent(elem -> flyway.setTarget(MigrationVersion.fromVersion(elem)));
   }
 
   @Configuration
@@ -112,7 +170,7 @@ public abstract class BaseMigrationIntegrationTest {
     @Bean
     @ConfigurationProperties("spring.datasource")
     public DataSource dataSource() {
-      return new BasicDataSource();
+      return new org.apache.tomcat.jdbc.pool.DataSource();
     }
 
     @Bean
