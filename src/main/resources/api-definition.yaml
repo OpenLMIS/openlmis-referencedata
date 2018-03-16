@@ -118,8 +118,6 @@ schemas:
 
   - orderablePage: !include schemas/orderablePage.json
 
-  - orderableQueryDto: !include schemas/orderableQueryDto.json
-
   - processingPeriod: !include schemas/processingPeriod.json
 
   - processingPeriodPage: !include schemas/processingPeriodPage.json
@@ -690,12 +688,39 @@ resourceTypes:
                       schema: localizedErrorResponse
       get:
           is: [ secured, paginated ]
-          description: Get all Orderable Products.
+          description: >
+            Get all Orderable Products if no search params provided. Otherwise returns a paginated
+            list of Orderables given either an Orderable Ids, a Program Code, a Name or a Code.
+          queryParameters:
+              ids:
+                  displayName: orderable ID
+                  type: string
+                  required: false
+                  repeat: false
+              code:
+                  displayName: orderable code
+                  type: string
+                  required: false
+                  repeat: false
+              name:
+                  displayName: orderable name
+                  type: string
+                  required: false
+                  repeat: false
+              program:
+                  displayName: program code
+                  type: string
+                  required: false
+                  repeat: false
           responses:
               "200":
                   body:
                     application/json:
                         schema: orderablePage
+              "400":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:
@@ -717,22 +742,6 @@ resourceTypes:
                           schema: localizedErrorResponse
       /{id}/auditLog:
           type: instanceAuditLog
-      /search:
-          post:
-              is: [ secured, paginated ]
-              description: Returns a paginated list of orderables given either a Program Code, a Name or a Code.
-              body:
-                application/json:
-                  schema: orderableQueryDto
-              responses:
-                200:
-                    body:
-                      application/json:
-                          schema: orderablePage
-                400:
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
 
   /tradeItems:
       displayName: Trade Item
