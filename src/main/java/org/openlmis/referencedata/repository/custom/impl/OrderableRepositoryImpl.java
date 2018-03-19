@@ -83,7 +83,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<Orderable> root = query.from(Orderable.class);
 
-    if ( count ) {
+    if (count) {
       CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
       query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
     }
@@ -101,7 +101,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
           builder.like(builder.upper(root.get(NAME)), "%" + name.toUpperCase() + "%"));
     }
 
-    if (programCode != null && !programCode.isBlank()) {
+    if (programCode != null) {
       Join<Orderable, ProgramOrderable> orderablePrograms = root.join(PROGRAMS, JoinType.LEFT);
       Join<Orderable, ProgramOrderable> programs = orderablePrograms.join(PROGRAM, JoinType.INNER);
       predicate = builder.and(predicate,

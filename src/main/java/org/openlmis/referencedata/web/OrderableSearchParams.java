@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import lombok.ToString;
 import org.apache.commons.collections4.MapUtils;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.util.UuidUtil;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+@ToString
 public class OrderableSearchParams {
 
   private static final String CODE = "code";
@@ -50,19 +52,46 @@ public class OrderableSearchParams {
     }
   }
 
+  /**
+   * Gets code.
+   *
+   * @return String value of code or null if params doesn't contain "code" param. Empty string
+   *         for null request param value.
+   */
   public String getCode() {
+    if (!params.containsKey(CODE)) {
+      return null;
+    }
     Object code = params.getFirst(CODE);
-    return String.valueOf(code);
+    return code == null ? "" : String.valueOf(code);
   }
 
+  /**
+   * Gets name.
+   *
+   * @return String value of name or null if params doesn't contain "name" param. Empty string
+   *         for null request param value.
+   */
   public String getName() {
+    if (!params.containsKey(NAME)) {
+      return null;
+    }
     Object name = params.getFirst(NAME);
-    return String.valueOf(name);
+    return name == null ? "" : String.valueOf(name);
   }
 
+  /**
+   * Gets program code.
+   *
+   * @return {@link Code} value of program code or null if params doesn't contain "programCode"
+   *                      param. Empty Code for request param that has no value.
+   */
   public Code getProgramCode() {
-    Object name = params.getFirst(PROGRAM_CODE);
-    return Code.code(String.valueOf(name));
+    if (!params.containsKey(PROGRAM_CODE)) {
+      return null;
+    }
+    Object programCode = params.getFirst(PROGRAM_CODE);
+    return programCode == null ? Code.code("") : Code.code(String.valueOf(programCode));
   }
 
   /**

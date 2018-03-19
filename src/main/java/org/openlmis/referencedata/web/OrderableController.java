@@ -88,7 +88,8 @@ public class OrderableController extends BaseController {
 
   /**
    * Finds orderables matching all of the provided parameters. If no params provided, returns all.
-   * If provided invalid param, throws {@link ValidationMessageException}
+   * If provided invalid param, throws {@link ValidationMessageException}. If provided request
+   * param doesn't have value, it will search for empty value in database.
    *
    * @param queryParams request parameters (code, name, program, ids).
    * @param pageable object used to encapsulate the pagination related values: page and size.
@@ -100,6 +101,8 @@ public class OrderableController extends BaseController {
     XLOGGER.entry(queryParams, pageable);
     Profiler profiler = new Profiler("ORDERABLES_SEARCH");
     profiler.setLogger(XLOGGER);
+
+    XLOGGER.info("search orderable query params: {}", queryParams);
 
     profiler.start("ORDERABLE_SERVICE_SEARCH");
     Page<Orderable> orderablesPage =

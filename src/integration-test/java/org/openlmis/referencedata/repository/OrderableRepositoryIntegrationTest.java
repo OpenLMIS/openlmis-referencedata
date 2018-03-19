@@ -51,6 +51,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableRepositoryIntegrationTest
@@ -127,14 +128,14 @@ public class OrderableRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindOrderablesWithSimilarCodeWhenProgramCodeIsBlank() {
+  public void shouldNotFindOrderablesWithSimilarCodeWhenProgramCodeIsBlank() {
     Orderable orderable = generateInstance();
     repository.save(orderable);
     Orderable orderable2 = generateInstance();
     repository.save(orderable2);
 
     searchOrderablesAndCheckResults(orderable.getProductCode().toString(),
-        null, new Program(""), orderable, 1);
+        null, new Program(""), orderable, 0);
   }
 
   @Test
@@ -159,11 +160,20 @@ public class OrderableRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindOrderablesWithSimilarNameWhenProgramCodeIsBlank() {
+  public void shouldFindOrderablesByEmptyName() {
+    Orderable orderable = generateInstance();
+    ReflectionTestUtils.setField(orderable, "fullProductName", "");
+    repository.save(orderable);
+
+    searchOrderablesAndCheckResults(null, "", null, orderable, 1);
+  }
+
+  @Test
+  public void shouldNotFindOrderablesWithSimilarNameWhenProgramCodeIsBlank() {
     Orderable orderable = generateInstance();
     repository.save(orderable);
 
-    searchOrderablesAndCheckResults(null, "Ab", new Program(""), orderable, 1);
+    searchOrderablesAndCheckResults(null, "Ab", new Program(""), orderable, 0);
   }
 
   @Test
@@ -188,13 +198,13 @@ public class OrderableRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindOrderablesWithSimilarCodeAndNameWhenProgramCodeIsBlank() {
+  public void shouldNotFindOrderablesWithSimilarCodeAndNameWhenProgramCodeIsBlank() {
     Orderable orderable = generateInstance();
     repository.save(orderable);
     Orderable orderable2 = generateInstance();
     repository.save(orderable2);
 
-    searchOrderablesAndCheckResults(CODE, ORDERABLE_NAME, new Program(""), orderable, 2);
+    searchOrderablesAndCheckResults(CODE, ORDERABLE_NAME, new Program(""), orderable, 0);
   }
 
   @Test
@@ -233,29 +243,14 @@ public class OrderableRepositoryIntegrationTest
   @Test
   public void shouldFindOrderablesByProgram() {
     // given a program and an orderable in that program
-    Program validProgram = new Program("some-code");
-    programRepository.save(validProgram);
-    Set<ProgramOrderable> programOrderables = new HashSet<>();
-    Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
-        Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
-        null);
-    repository.save(validOrderable);
-    programOrderables.add(createProgramOrderable(validProgram, validOrderable));
-    repository.save(validOrderable);
+    String programCode = "some-code";
+    Orderable validOrderable = createOrderableWithSupportedProgram(programCode);
 
     // given another program and another orderable in that program
-    Program invalidProgram = new Program("invalid-code");
-    programRepository.save(invalidProgram);
-    Set<ProgramOrderable> invalidProgramOrderables = new HashSet<>();
-    Orderable invalidOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
-        Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, invalidProgramOrderables,
-        null, null);
-    repository.save(invalidOrderable);
-    invalidProgramOrderables.add(createProgramOrderable(invalidProgram, invalidOrderable));
-    repository.save(invalidOrderable);
+    createOrderableWithSupportedProgram("invalid-code");
 
     // when
-    Page<Orderable> foundOrderables = repository.search(null, null, validProgram.getCode(),
+    Page<Orderable> foundOrderables = repository.search(null, null, Code.code(programCode),
         null);
 
     // then
@@ -288,6 +283,15 @@ public class OrderableRepositoryIntegrationTest
         new Program("a-code"),
         validOrderable,
         1);
+  }
+
+  @Test
+  public void shouldFindOrderablesByEmptyProgramCode() {
+    Orderable orderable = createOrderableWithSupportedProgram("");
+    createOrderableWithSupportedProgram("other");
+    createOrderableWithSupportedProgram("not-empty");
+
+    searchOrderablesAndCheckResults(null, null, new Program(""), orderable, 1);
   }
 
   @Test
@@ -432,8 +436,10 @@ public class OrderableRepositoryIntegrationTest
 
     assertEquals(expectedSize, foundOrderables.getTotalElements());
 
-    assertEquals(orderable.getFullProductName(),
-        foundOrderables.getContent().get(0).getFullProductName());
+    if (expectedSize > 0) {
+      assertEquals(orderable.getFullProductName(),
+          foundOrderables.getContent().get(0).getFullProductName());
+    }
   }
 
   private ProgramOrderable createProgramOrderable(Program program, Orderable orderable) {
@@ -446,5 +452,18 @@ public class OrderableRepositoryIntegrationTest
     programOrderableRepository.save(programOrderable);
 
     return programOrderable;
+  }
+
+  private Orderable createOrderableWithSupportedProgram(String programCode) {
+    Program validProgram = new Program(programCode);
+    programRepository.save(validProgram);
+    Set<ProgramOrderable> programOrderables = new HashSet<>();
+    Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
+        Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
+        null);
+    repository.save(validOrderable);
+    programOrderables.add(createProgramOrderable(validProgram, validOrderable));
+    validOrderable = repository.save(validOrderable);
+    return validOrderable;
   }
 }

@@ -24,6 +24,8 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.web.OrderableSearchParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OrderableService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(OrderableService.class);
 
   @Autowired
   private OrderableRepository orderableRepository;
@@ -44,16 +48,21 @@ public class OrderableService {
    */
   public Page<Orderable> searchOrderables(@NotNull OrderableSearchParams queryMap,
       Pageable pageable) {
+    LOGGER.info("search orderable query params: {}", queryMap);
+
     if (!queryMap.isValid()) {
       throw new ValidationMessageException(
           OrderableMessageKeys.ERROR_INVALID_PARAMS);
     }
     if (queryMap.isEmpty()) {
+      LOGGER.info("find all");
       return orderableRepository.findAll(pageable);
     }
 
     Set<UUID> ids = queryMap.getIds();
+    LOGGER.info("ids from query params: {}", ids);
     if (!ids.isEmpty()) {
+      LOGGER.info("find all by ids");
       return orderableRepository.findAllByIds(ids, pageable);
     }
 
@@ -61,6 +70,7 @@ public class OrderableService {
     String name = queryMap.getName();
     Code programCode = queryMap.getProgramCode();
 
+    LOGGER.info("search by code {}, name {}, and program code {}", code, name, programCode);
     return orderableRepository.search(code, name, programCode, pageable);
   }
 }
