@@ -15,3 +15,6 @@ modules:
     sequential: true
 reporting:
   - module: final-stats
+  - module: passfail
+    criteria:
+    - failures>0%, stop as failed
