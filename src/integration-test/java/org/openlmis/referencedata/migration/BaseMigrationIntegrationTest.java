@@ -47,6 +47,10 @@ import javax.sql.DataSource;
 @ActiveProfiles("test")
 @SpringBootTest(classes = BaseMigrationIntegrationTest.TestConfig.class)
 public abstract class BaseMigrationIntegrationTest {
+  private static final String INITIAL_TARGET = "20170206205310272";
+  private static final MigrationVersion INITIAL_MIGRATION = MigrationVersion
+      .fromVersion(INITIAL_TARGET);
+
   private static final String SQL_INSERT = "INSERT INTO %s(%s) VALUES (%s)";
 
   private static final String SQL_COUNT = "SELECT COUNT(*) from %s";
@@ -54,6 +58,12 @@ public abstract class BaseMigrationIntegrationTest {
 
   private static final String SQL_COUNT_BY_ID = SQL_COUNT + " where id = %s";
   private static final String SQL_SELECT_BY_ID = SQL_SELECT + " where id = %s";
+
+  static final String TABLE_COMMODITY_TYPES = "commodity_types";
+  static final String TABLE_DISPENSABLES = "dispensables";
+  static final String TABLE_DISPENSABLE_ATTRIBUTES = "dispensable_attributes";
+  static final String TABLE_ORDERABLES = "orderables";
+  static final String TABLE_TRADE_ITEMS = "trade_items";
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
@@ -67,12 +77,12 @@ public abstract class BaseMigrationIntegrationTest {
   public void shouldMigrate() {
     flyway.clean();
 
-    setFlywayTarget(getBeforeTestMigration(), MigrationVersion.fromVersion("20170206205310272"));
+    setFlywayTarget(getTargetBeforeTestMigration(), INITIAL_MIGRATION);
     flyway.migrate();
 
     insertDataBeforeMigration();
 
-    setFlywayTarget(getTestMigration(), MigrationVersion.LATEST);
+    setFlywayTarget(getTestMigrationTarget(), MigrationVersion.LATEST);
     flyway.migrate();
 
     verifyDataAfterMigration();
@@ -80,7 +90,7 @@ public abstract class BaseMigrationIntegrationTest {
 
   /**
    * Prepares and puts data into database before the test migrations will be executed. The
-   * database will be in version set by {@link #getBeforeTestMigration()}.
+   * database will be in version set by {@link #getTargetBeforeTestMigration()}.
    */
   abstract void insertDataBeforeMigration();
 
@@ -88,13 +98,13 @@ public abstract class BaseMigrationIntegrationTest {
    * Returns to which migration Flyway should migrate before test. If the method returns null as
    * a value, the database will contain a initial schema and bootstrap data.
    */
-  abstract String getBeforeTestMigration();
+  abstract String getTargetBeforeTestMigration();
 
   /**
    * Returns a test migration. if the method returns null as a value, the database will be
    * migrated to the latest version.
    */
-  abstract String getTestMigration();
+  abstract String getTestMigrationTarget();
 
   /**
    * Verifies that data after migration are correct.

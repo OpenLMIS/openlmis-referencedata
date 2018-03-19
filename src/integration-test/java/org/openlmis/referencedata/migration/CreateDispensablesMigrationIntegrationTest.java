@@ -29,32 +29,31 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CreateDispensablesMigrationIntegrationTest extends BaseMigrationIntegrationTest {
-  private static final String ORDERABLES = "orderables";
 
   @Override
   void insertDataBeforeMigration() {
-    save(ORDERABLES, generateOrderable());
-    save(ORDERABLES, generateOrderable());
-    save(ORDERABLES, generateOrderable());
-    save(ORDERABLES, generateOrderable());
-    save(ORDERABLES, generateOrderable());
+    save(TABLE_ORDERABLES, generateOrderable());
+    save(TABLE_ORDERABLES, generateOrderable());
+    save(TABLE_ORDERABLES, generateOrderable());
+    save(TABLE_ORDERABLES, generateOrderable());
+    save(TABLE_ORDERABLES, generateOrderable());
   }
 
   @Override
-  String getBeforeTestMigration() {
+  String getTargetBeforeTestMigration() {
     return "20180129143106317";
   }
 
   @Override
-  String getTestMigration() {
+  String getTestMigrationTarget() {
     return "20180205211153916";
   }
 
   @Override
   void verifyDataAfterMigration() {
-    List<Map<String, Object>> orderables = getRows(ORDERABLES);
-    List<Map<String, Object>> dispensables = getRows("dispensables");
-    List<Map<String, Object>> dispensableAttributes = getRows("dispensable_attributes");
+    List<Map<String, Object>> orderables = getRows(TABLE_ORDERABLES);
+    List<Map<String, Object>> dispensables = getRows(TABLE_DISPENSABLES);
+    List<Map<String, Object>> dispensableAttributes = getRows(TABLE_DISPENSABLE_ATTRIBUTES);
 
     assertThat(dispensables, hasSize(orderables.size()));
 

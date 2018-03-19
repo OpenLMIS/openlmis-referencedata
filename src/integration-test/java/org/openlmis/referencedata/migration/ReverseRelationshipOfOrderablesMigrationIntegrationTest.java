@@ -29,35 +29,33 @@ import java.util.UUID;
  */
 public class ReverseRelationshipOfOrderablesMigrationIntegrationTest
     extends BaseMigrationIntegrationTest {
-  private static final String ORDERABLES = "orderables";
-
   private static final String ID = "4d1115de-0f60-408a-8a1e-44401e20a5b0";
   private static final String PARENT_ID = "23856848-63c9-4807-9470-603b2ddc33fa";
   private static final String COMMODITY_TYPE_ID = "4d1115de-0f60-408a-8a1e-44401e20a5b1";
 
   @Override
   void insertDataBeforeMigration() {
-    save(ORDERABLES, generateOrderable(ID, "TRADE_ITEM", "productname1", "Code1",
+    save(TABLE_ORDERABLES, generateOrderable(ID, "TRADE_ITEM", "productname1", "Code1",
         "manufacturer1", null, null));
-    save(ORDERABLES, generateOrderable(PARENT_ID, "COMMODITY_TYPE", "parentname", "CodeParent",
-        null, "cId1", null));
-    save(ORDERABLES, generateOrderable(COMMODITY_TYPE_ID, "COMMODITY_TYPE", "productname2",
+    save(TABLE_ORDERABLES, generateOrderable(PARENT_ID, "COMMODITY_TYPE", "parentname",
+        "CodeParent", null, "cId1", null));
+    save(TABLE_ORDERABLES, generateOrderable(COMMODITY_TYPE_ID, "COMMODITY_TYPE", "productname2",
         "Code2", null, "cId2", PARENT_ID));
   }
 
   @Override
-  String getBeforeTestMigration() {
+  String getTargetBeforeTestMigration() {
     return "20170516132139856";
   }
 
   @Override
-  String getTestMigration() {
+  String getTestMigrationTarget() {
     return "20170517102033421";
   }
 
   @Override
   void verifyDataAfterMigration() {
-    Map<String, Object> orderable = getRow("orderables", ID);
+    Map<String, Object> orderable = getRow(TABLE_ORDERABLES, ID);
     assertThat(orderable.get("dispensingunit"), is("unit"));
     assertThat(orderable.get("fullproductname"), is("productname1"));
     assertThat(orderable.get("packroundingthreshold"), is(10L));
@@ -65,10 +63,10 @@ public class ReverseRelationshipOfOrderablesMigrationIntegrationTest
     assertThat(orderable.get("code"), is("Code1"));
     assertThat(orderable.get("roundtozero"), is(false));
 
-    Map<String, Object> tradeItem = getRow("trade_items", ID);
+    Map<String, Object> tradeItem = getRow(TABLE_TRADE_ITEMS, ID);
     assertThat(tradeItem.get("manufactureroftradeitem"), is("manufacturer1"));
 
-    Map<String, Object> commodityType = getRow("commodity_types", COMMODITY_TYPE_ID);
+    Map<String, Object> commodityType = getRow(TABLE_COMMODITY_TYPES, COMMODITY_TYPE_ID);
     assertThat(commodityType.get("classificationsystem"), is("cSys"));
     assertThat(commodityType.get("classificationid"), is("cId2"));
     assertThat(
