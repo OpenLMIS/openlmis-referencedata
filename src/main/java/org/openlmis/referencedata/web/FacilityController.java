@@ -440,6 +440,7 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public Page<BasicFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
                                                  Pageable pageable) {
+    LOGGER.trace("facility search query parameters ", queryParams);
     Profiler profiler = new Profiler("SEARCH_FACILITIES");
     profiler.setLogger(LOGGER);
 
@@ -449,6 +450,7 @@ public class FacilityController extends BaseController {
     List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities, profiler);
     Page<BasicFacilityDto> page = toPage(facilityDtos, pageable, profiler);
 
+    LOGGER.trace("facility search result ", page);
     profiler.stop().log();
     return page;
   }
