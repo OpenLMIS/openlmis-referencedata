@@ -16,6 +16,11 @@
 package org.openlmis.referencedata.web;
 
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -42,8 +47,8 @@ import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.validate.FacilityValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -63,18 +68,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Controller
 @Transactional
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityController extends BaseController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FacilityController.class);
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(FacilityController.class);
 
   public static final String RESOURCE_PATH = "/facilities";
 
@@ -114,7 +114,7 @@ public class FacilityController extends BaseController {
   public FacilityDto createFacility(@RequestBody FacilityDto facilityDto,
                                     BindingResult bindingResult) {
     Profiler profiler = new Profiler("CREATE_FACILITY");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
@@ -122,7 +122,7 @@ public class FacilityController extends BaseController {
     facilityValidator.validate(facilityDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    LOGGER.debug("Creating new facility");
+    XLOGGER.debug("Creating new facility");
     profiler.start("IMPORT_FACILITY_FROM_DTO");
     facilityDto.setId(null);
     Facility newFacility = Facility.newFacility(facilityDto);
@@ -132,7 +132,7 @@ public class FacilityController extends BaseController {
 
     profiler.start("SAVE");
     newFacility = facilityRepository.save(newFacility);
-    LOGGER.debug("Created new facility with id: ", facilityDto.getId());
+    XLOGGER.debug("Created new facility with id: ", facilityDto.getId());
 
     FacilityDto dto = toDto(newFacility, profiler);
 
@@ -155,7 +155,7 @@ public class FacilityController extends BaseController {
       @RequestParam(required = false) Boolean active,
       Pageable pageable) {
     Profiler profiler = new Profiler("GET_MINIMAL_FACILITIES");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     Page<Facility> facilities;
 
@@ -196,7 +196,7 @@ public class FacilityController extends BaseController {
                         boolean returnJson,
           Pageable page) {
     Profiler profiler = new Profiler("GET_AUDIT_LOG");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
@@ -229,7 +229,7 @@ public class FacilityController extends BaseController {
       BindingResult bindingResult) {
 
     Profiler profiler = new Profiler("UPDATE_FACILITY");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
@@ -250,7 +250,7 @@ public class FacilityController extends BaseController {
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
     rightAssignmentService.regenerateRightAssignments();
 
-    LOGGER.info("Saved facility with id: {}", facilityToSave.getId());
+    XLOGGER.info("Saved facility with id: {}", facilityToSave.getId());
     FacilityDto dto = toDto(facilityToSave, profiler);
 
     profiler.stop().log();
@@ -268,7 +268,7 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public FacilityDto getFacility(@PathVariable("id") UUID facilityId) {
     Profiler profiler = new Profiler("GET_FACILITY");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     Facility facility = findFacility(facilityId, profiler);
     FacilityDto dto = toDto(facility, profiler);
@@ -297,7 +297,7 @@ public class FacilityController extends BaseController {
       @PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
 
     Profiler profiler = new Profiler("GET_FACILITY_APPROVED_PRODUCTS");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     profiler.start("FIND_FACILITY");
     Facility facility = facilityRepository.findOne(facilityId);
@@ -330,7 +330,7 @@ public class FacilityController extends BaseController {
   public Page<FacilityDto> findFacilitiesByBoundary(@RequestBody Polygon boundary, 
       Pageable pageable) {
     Profiler profiler = new Profiler("GET_FACILITIES_BY_BOUNDARY");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
@@ -353,7 +353,7 @@ public class FacilityController extends BaseController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacility(@PathVariable("id") UUID facilityId) {
     Profiler profiler = new Profiler("DELETE_FACILITY");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
@@ -377,7 +377,7 @@ public class FacilityController extends BaseController {
       @RequestParam(value = "programId") UUID programId,
       @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
     Profiler profiler = new Profiler("GET_SUPPLYING_DEPOTS");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     profiler.start("EXISTS_PROGRAM");
     if (!programRepository.exists(programId)) {
@@ -416,7 +416,7 @@ public class FacilityController extends BaseController {
   public List<FacilityDto> getFacilities(
       @RequestParam MultiValueMap<String, Object> requestParams) {
     Profiler profiler = new Profiler("GET_FACILITIES");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     profiler.start("FIND_FACILITIES");
     List<Facility> facilities = facilityService.getFacilities(requestParams);
@@ -440,9 +440,9 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public Page<BasicFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
                                                  Pageable pageable) {
-    LOGGER.trace("facility search query parameters ", queryParams);
+    XLOGGER.entry(queryParams);
     Profiler profiler = new Profiler("SEARCH_FACILITIES");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     profiler.start("SERVICE_SEARCH");
     List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
@@ -450,7 +450,7 @@ public class FacilityController extends BaseController {
     List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities, profiler);
     Page<BasicFacilityDto> page = toPage(facilityDtos, pageable, profiler);
 
-    LOGGER.trace("facility search result ", page);
+    XLOGGER.exit(page);
     profiler.stop().log();
     return page;
   }

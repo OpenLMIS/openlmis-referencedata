@@ -30,8 +30,8 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.validate.ProgramValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -55,7 +55,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Transactional
 public class ProgramController extends BaseController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProgramController.class);
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(ProgramController.class);
 
   public static final String RESOURCE_PATH = API_PATH + "/programs";
 
@@ -84,7 +84,7 @@ public class ProgramController extends BaseController {
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
 
-    LOGGER.debug("Creating new program");
+    XLOGGER.debug("Creating new program");
     // Ignore provided id
     Program newProgram = Program.newProgram(program);
     programRepository.save(newProgram);
@@ -158,13 +158,13 @@ public class ProgramController extends BaseController {
     rightService.checkAdminRight(RightName.PROGRAMS_MANAGE);
 
     if (program == null || id == null) {
-      LOGGER.debug("Update failed - program id not specified");
+      XLOGGER.debug("Update failed - program id not specified");
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_ID_NULL);
     }
 
     Program storedProgram = programRepository.findOne(id);
     if (storedProgram == null) {
-      LOGGER.warn("Update failed - program with id: {} not found", id);
+      XLOGGER.warn("Update failed - program with id: {} not found", id);
       throw new ValidationMessageException(
           new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, id));
     }
@@ -198,15 +198,15 @@ public class ProgramController extends BaseController {
   public List<Program> findProgramsByName(
       @RequestParam("name") String programName) {
 
-    LOGGER.trace("program search name: ", programName);
+    XLOGGER.entry(programName);
     Profiler profiler = new Profiler("SEARCH_FOR_PROGRAMS");
-    profiler.setLogger(LOGGER);
+    profiler.setLogger(XLOGGER);
 
     profiler.start("REPOSITORY_SEARCH");
     List<Program> result = programRepository.findProgramsByName(programName);
 
     profiler.stop().log();
-    LOGGER.trace("program search result: ", result);
+    XLOGGER.exit(result);
 
     return result;
   }
