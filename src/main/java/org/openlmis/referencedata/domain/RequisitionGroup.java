@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import lombok.AllArgsConstructor;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 
@@ -49,6 +50,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "requisition_groups", schema = "referencedata")
 @NoArgsConstructor
+@AllArgsConstructor
 @TypeName("RequisitionGroup")
 public class RequisitionGroup extends BaseEntity {
 

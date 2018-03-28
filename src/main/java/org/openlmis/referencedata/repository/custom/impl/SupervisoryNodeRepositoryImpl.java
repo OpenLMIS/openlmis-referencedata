@@ -116,7 +116,7 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
       if (facilityId != null) {
         Join<RequisitionGroup, Facility> memberFacilitiesJoin =
             requisitionGroupJoin.join(MEMBER_FACILITIES, JoinType.LEFT);
-        predicate = builder.and(predicate, builder.equal(memberFacilitiesJoin.get(ID), zoneId));
+        predicate = builder.and(predicate, builder.equal(memberFacilitiesJoin.get(ID), facilityId));
       }
 
       if (programId != null) {

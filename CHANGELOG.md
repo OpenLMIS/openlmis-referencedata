@@ -12,6 +12,7 @@ parameters to get users endpoint
 * [OLMIS-4168](https://openlmis.atlassian.net/browse/OLMIS-4168): Removed PODS_MANAGE from roles. Made PODS_MANAGE a supervision right. Added new PODS_VIEW supervision right
 * [OLMIS-4027](https://openlmis.atlassian.net/browse/OLMIS-4027): Added pagination and sorting to facility type endpoint, can be searched using active query parameter.
 * [OLMIS-4281](https://openlmis.atlassian.net/browse/OLMIS-4281): Added search abilities to /api/orderables endpoint, removed /api/orderables/search
+* [OLMIS-4384](https://openlmis.atlassian.net/browse/OLMIS-4384): Removed POST /api/supervisoryNodes/search endpoint and merged it with GET /api/supervisoryNodes which now is paginated and supports batch fetch.
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-3077](https://openlmis.atlassian.net/browse/OLMIS-3077): Added GTIN to TradeItem

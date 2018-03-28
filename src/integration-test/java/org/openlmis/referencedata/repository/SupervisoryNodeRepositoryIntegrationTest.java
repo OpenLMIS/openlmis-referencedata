@@ -27,9 +27,15 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -54,9 +60,22 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   @Autowired
   private GeographicLevelRepository geographicLevelRepository;
 
+  @Autowired
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private ProcessingScheduleRepository scheduleRepository;
+
+  @Autowired
+  private RequisitionGroupRepository requisitionGroupRepository;
+
+  @Autowired
+  private RequisitionGroupProgramScheduleRepository requisitionGroupProgramScheduleRepository;
+
   private Facility facility;
   private FacilityType facilityType;
   private GeographicLevel geographicLevel;
+  private GeographicZone geographicZone;
 
   @Override
   CrudRepository<SupervisoryNode, UUID> getRepository() {
@@ -72,7 +91,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     geographicLevel.setLevelNumber(1);
     geographicLevelRepository.save(geographicLevel);
 
-    GeographicZone geographicZone = new GeographicZone();
+    geographicZone = new GeographicZone();
     geographicZone.setCode(code);
     geographicZone.setLevel(geographicLevel);
     geographicZoneRepository.save(geographicZone);
@@ -241,24 +260,63 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   @Test
   public void shouldSearchByProgramId() {
     supervisoryNodeRepository.save(generateInstance());
+    supervisoryNodeRepository.save(generateInstance());
+    supervisoryNodeRepository.save(generateInstance());
 
-    GeographicZone geographicZone = geographicZoneRepository.save(
-        new GeographicZoneDataBuilder()
-            .withLevel(geographicLevel)
+    Program program = programRepository.save(new Program("program-code"));
+
+    Page<SupervisoryNode> result = supervisoryNodeRepository
+        .search(null, null, null, null, program.getId(), null, null);
+
+    assertEquals(0, result.getTotalElements());
+
+    ProcessingSchedule schedule = scheduleRepository
+        .save(new ProcessingScheduleDataBuilder().buildWithoutId());
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.save(generateInstance());
+
+    RequisitionGroup requisitionGroup = requisitionGroupRepository
+        .save(new RequisitionGroupDataBuilder()
+            .withSupervisoryNode(supervisoryNode)
             .buildAsNew());
-    Facility facility = facilityRepository.save(
+
+    requisitionGroupProgramScheduleRepository.save(RequisitionGroupProgramSchedule
+        .newRequisitionGroupProgramSchedule(requisitionGroup, program, schedule, false));
+
+    result = supervisoryNodeRepository
+        .search(null, null, null, null, program.getId(), null, null);
+
+    assertEquals(1, result.getTotalElements());
+    assertEquals(supervisoryNode, result.getContent().get(0));
+  }
+
+  @Test
+  public void shouldSearchByFacilityId() {
+    supervisoryNodeRepository.save(generateInstance());
+    supervisoryNodeRepository.save(generateInstance());
+    supervisoryNodeRepository.save(generateInstance());
+
+    Facility newFacility = facilityRepository.save(
         new FacilityDataBuilder()
             .withType(facilityType)
             .withGeographicZone(geographicZone)
             .withoutOperator()
             .buildAsNew());
-    SupervisoryNode node = supervisoryNodeRepository.save(
-        new SupervisoryNodeDataBuilder().withFacility(facility).withoutId().build());
 
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(null, null, geographicZone.getId(), null, null, null, null);
+        .search(null, null, null, newFacility.getId(), null, null, null);
+    assertEquals(0, result.getTotalElements());
+
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.save(generateInstance());
+
+    requisitionGroupRepository.save(new RequisitionGroupDataBuilder()
+            .withSupervisoryNode(supervisoryNode)
+            .withMemberFacilities(asSet(newFacility))
+            .buildAsNew());
+
+    result = supervisoryNodeRepository
+        .search(null, null, null, newFacility.getId(), null, null, null);
 
     assertEquals(1, result.getTotalElements());
-    assertEquals(node, result.getContent().get(0));
+    assertEquals(supervisoryNode, result.getContent().get(0));
   }
 }
