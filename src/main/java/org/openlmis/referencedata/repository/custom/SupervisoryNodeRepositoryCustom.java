@@ -15,11 +15,13 @@
 
 package org.openlmis.referencedata.repository.custom;
 
-import org.openlmis.referencedata.domain.GeographicZone;
+import java.util.Collection;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.SupervisoryNode;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface SupervisoryNodeRepositoryCustom {
-  List<SupervisoryNode> search(String code, String name, GeographicZone zone);
+  Page<SupervisoryNode> search(String code, String name, UUID geographicZoneId, UUID facilityId,
+      UUID programId, Collection<UUID> ids, Pageable pageable);
 }

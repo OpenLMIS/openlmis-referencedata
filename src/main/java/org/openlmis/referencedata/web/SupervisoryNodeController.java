@@ -18,6 +18,10 @@ package org.openlmis.referencedata.web;
 import static java.util.stream.Collectors.toSet;
 import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
@@ -33,7 +37,6 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.RightService;
-import org.openlmis.referencedata.service.SupervisoryNodeService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
@@ -49,7 +52,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,13 +62,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Controller
 @Transactional
@@ -86,9 +84,6 @@ public class SupervisoryNodeController extends BaseController {
   @Autowired
   private RightService rightService;
 
-  @Autowired
-  private SupervisoryNodeService supervisoryNodeService;
-  
   @Autowired
   private RightAssignmentService rightAssignmentService;
 
@@ -118,26 +113,6 @@ public class SupervisoryNodeController extends BaseController {
     supervisoryNodeRepository.save(supervisoryNode);
     LOGGER.info("Created new supervisoryNode with id: {}", supervisoryNode.getId());
     return exportToDto(supervisoryNode);
-  }
-
-  /**
-   * Get all supervisoryNodes.
-   *
-   * @return the SupervisoryNodeDtos.
-   */
-  @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<SupervisoryNodeDto> getAllSupervisoryNodes() {
-
-    Iterable<SupervisoryNode> supervisoryNodes = supervisoryNodeRepository.findAll();
-    List<SupervisoryNodeDto> supervisoryNodeDtos = new ArrayList<>();
-
-    for (SupervisoryNode supervisoryNode : supervisoryNodes) {
-      supervisoryNodeDtos.add(exportToDto(supervisoryNode));
-    }
-
-    return supervisoryNodeDtos;
   }
 
   /**
@@ -270,22 +245,33 @@ public class SupervisoryNodeController extends BaseController {
 
   /**
    * Retrieves all Supervisory Nodes that are matching given query parameters
+   * (code, name, zoneId, programId, facilityId, id - multiple).
    *
-   * @param queryParams request parameters (code, name, zoneId, programId, facilityId).
-   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @param queryParams request parameters
+   * @param pageable    object used to encapsulate the pagination related values: page and size.
    * @return List of wanted Supervisory Nodes matching query parameters.
    */
-  @RequestMapping(value = "/supervisoryNodes/search", method = RequestMethod.POST)
+  @GetMapping("/supervisoryNodes")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<SupervisoryNodeDto> search(@RequestBody Map<String, Object> queryParams,
-                                         Pageable pageable) {
+  public Page<SupervisoryNodeDto> search(@RequestParam MultiValueMap<String, Object> queryParams,
+      Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_SUPERVISORY_NODES");
+    profiler.setLogger(LOGGER);
 
-    return Pagination.getPage(supervisoryNodeService.searchSupervisoryNodes(queryParams)
-        .stream()
-        .map(a -> exportToDto(a))
-        .collect(Collectors.toList()),
-        pageable);
+    profiler.start("CONVERT_QUERY_PARAMS");
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(queryParams);
+
+    profiler.start("GET_SUPERVISORY_NODES_FROM_DB");
+    Page<SupervisoryNode> supervisoryNodePage = supervisoryNodeRepository.search(params.getCode(),
+        params.getName(), params.getZoneId(), params.getFacilityId(), params.getProgramId(),
+        params.getIds(), pageable);
+
+    profiler.start("TO_DTO");
+    Page<SupervisoryNodeDto> dtoPage = exportToDto(supervisoryNodePage, pageable);
+
+    profiler.stop().log();
+    return dtoPage;
   }
 
   /**
@@ -321,7 +307,6 @@ public class SupervisoryNodeController extends BaseController {
         returnJson);
   }
 
-
   private SupervisoryNodeDto exportToDto(SupervisoryNode supervisoryNode) {
     SupervisoryNodeDto supervisoryNodeDto = null;
 
@@ -331,6 +316,14 @@ public class SupervisoryNodeController extends BaseController {
     }
 
     return supervisoryNodeDto;
+  }
+
+  private Page<SupervisoryNodeDto> exportToDto(Page<SupervisoryNode> supervisoryNodePage,
+      Pageable pageable) {
+    List<SupervisoryNodeDto> dtoPage = supervisoryNodePage.getContent().stream()
+        .map(this::exportToDto)
+        .collect(Collectors.toList());
+    return Pagination.getPage(dtoPage, pageable, supervisoryNodePage.getTotalElements());
   }
 
   private UserDto exportToDto(User user) {

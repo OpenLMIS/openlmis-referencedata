@@ -196,8 +196,6 @@ schemas:
 
   - supervisoryNodePage: !include schemas/supervisoryNodePage.json
 
-  - supervisoryNodeQueryDto: !include schemas/supervisoryNodeQueryDto.json
-
   - supplyLine: !include schemas/supplyLineDto.json
 
   - supplyLineQuery: !include schemas/supplyLineQuery.json
@@ -2425,32 +2423,63 @@ resourceTypes:
   /supervisoryNodes:
       displayName: Supervisory Node
       post:
-            is: [ secured ]
-            description: Create new supervisoryNode.
-            body:
-                application/json:
-            responses:
-                "201":
-                    body:
-                        application/json:
-                "400":
-                    body:
+          is: [ secured ]
+          description: Create new supervisoryNode.
+          body:
+              application/json:
+          responses:
+              "201":
+                  body:
                       application/json:
-                        schema: localizedErrorResponse
-                "403":
-                    body:
-                      application/json:
-                        schema: localizedErrorResponse
+              "400":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+              "403":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
       get:
-            is: [ secured ]
-            description: Get all supervisoryNodes.
-            responses:
-                "200":
-                    body:
-                        application/json:
-                401:
-                    body:
-                        application/json:
+          is: [ secured, paginated ]
+          description: Get page of Supervisory Nodes that are matching given query parameters.
+          queryParameters:
+              code:
+                  displayName: Supervisory Node Code
+                  type: string
+                  required: false
+                  repeat: false
+              name:
+                  displayName: Supervisory Node Name
+                  type: string
+                  required: false
+                  repeat: false
+              zoneId:
+                  displayName: Geographic Zone Id of Supervisory Node associated Facility
+                  type: string
+                  required: false
+                  repeat: false
+              facilityId:
+                  displayName: Facility Id of Requisition Group Facility Members
+                  type: string
+                  required: false
+                  repeat: false
+              programId:
+                  displayName: Program Id of Requisition Group Program Schedule
+                  type: string
+                  required: false
+                  repeat: false
+              id:
+                  displayName: Supervisory Node Id
+                  type: string
+                  required: false
+                  repeat: true
+          responses:
+              "200":
+                  body:
+                      application/json:
+              401:
+                  body:
+                      application/json:
 
       /{id}:
             uriParameters:
@@ -2544,25 +2573,6 @@ resourceTypes:
                                   schema: localizedErrorResponse
       /{id}/auditLog:
           type: instanceAuditLog
-      /search:
-            post:
-                is: [ secured, paginated ]
-                description: Retrieve Supervisory Node Page based on the provided parameters.
-                body:
-                    application/json:
-                        schema: supervisoryNodeQueryDto
-                responses:
-                    "200":
-                        body:
-                          application/json:
-                              schema: supervisoryNodePage
-                    "400":
-                        body:
-                          application/json:
-                            schema: errorResponse
-                    401:
-                        body:
-                            application/json:
   /roles:
       displayName: Role
       post:

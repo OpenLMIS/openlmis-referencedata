@@ -91,7 +91,6 @@ import org.openlmis.referencedata.service.OrderableService;
 import org.openlmis.referencedata.service.RequisitionGroupProgramScheduleService;
 import org.openlmis.referencedata.service.RequisitionGroupService;
 import org.openlmis.referencedata.service.RightService;
-import org.openlmis.referencedata.service.SupervisoryNodeService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
@@ -269,9 +268,6 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected UserRepository userRepository;
-
-  @MockBean
-  protected SupervisoryNodeService supervisoryNodeService;
 
   @MockBean
   protected SupplyLineRepository supplyLineRepository;

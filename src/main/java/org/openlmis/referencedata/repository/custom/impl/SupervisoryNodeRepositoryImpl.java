@@ -15,11 +15,11 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -28,14 +28,30 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryCustom {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
   private static final String FACILITY = "facility";
-  private static final String ZONE = "geographicZone";
+  private static final String PROGRAM = "program";
+  private static final String REQUISITION_GROUP = "requisitionGroup";
+  private static final String MEMBER_FACILITIES = "memberFacilities";
+  private static final String GEOGRAPHIC_ZONE = "geographicZone";
+  private static final String ID = "id";
+  private static final String REQUISITION_GROUP_PROGRAM_SCHEDULE =
+      "requisitionGroupProgramSchedules";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -48,10 +64,39 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
    * @param name Part of wanted name.
    * @return List of Supervisory Nodes matching the parameters.
    */
-  public List<SupervisoryNode> search(String code, String name, GeographicZone zone) {
+  public Page<SupervisoryNode> search(String code, String name, UUID zoneId, UUID facilityId,
+      UUID programId, Collection<UUID> ids, Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<SupervisoryNode> query = builder.createQuery(SupervisoryNode.class);
+
+    CriteriaQuery<SupervisoryNode> nodeQuery = builder.createQuery(SupervisoryNode.class);
+    nodeQuery = prepareQuery(nodeQuery, code, name, zoneId,
+        facilityId, programId, ids, false, builder);
+
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    countQuery = prepareQuery(countQuery, code, name, zoneId,
+        facilityId, programId, ids, true, builder);
+
+    Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+
+    List<SupervisoryNode> supervisoryNodes = entityManager.createQuery(nodeQuery)
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
+        .getResultList();
+    return Pagination.getPage(supervisoryNodes, pageable, count);
+  }
+
+  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, String code, String name,
+      UUID zoneId, UUID facilityId, UUID programId, Collection<UUID> ids,
+      boolean count, CriteriaBuilder builder) {
     Root<SupervisoryNode> root = query.from(SupervisoryNode.class);
+
+    if (count) {
+      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
+      query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
+    }
+
     Predicate predicate = builder.conjunction();
 
     if (code != null) {
@@ -64,12 +109,37 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
           builder.like(builder.upper(root.get(NAME)), "%" + name.toUpperCase() + "%"));
     }
 
-    if (zone != null) {
+    if (facilityId != null || programId != null) {
+      Join<SupervisoryNode, RequisitionGroup> requisitionGroupJoin =
+          root.join(REQUISITION_GROUP, JoinType.LEFT);
+
+      if (facilityId != null) {
+        Join<RequisitionGroup, Facility> memberFacilitiesJoin =
+            requisitionGroupJoin.join(MEMBER_FACILITIES, JoinType.LEFT);
+        predicate = builder.and(predicate, builder.equal(memberFacilitiesJoin.get(ID), zoneId));
+      }
+
+      if (programId != null) {
+        Join<RequisitionGroup, RequisitionGroupProgramSchedule> rgpsJoin =
+            requisitionGroupJoin.join(REQUISITION_GROUP_PROGRAM_SCHEDULE, JoinType.LEFT);
+        Join<RequisitionGroupProgramSchedule, Program> programJoin =
+            rgpsJoin.join(PROGRAM, JoinType.LEFT);
+        predicate = builder.and(predicate, builder.equal(programJoin.get(ID), programId));
+      }
+    }
+
+    if (zoneId != null) {
       Join<SupervisoryNode, Facility> facilityJoin = root.join(FACILITY, JoinType.LEFT);
-      predicate = builder.and(predicate, builder.equal(facilityJoin.get(ZONE), zone));
+      Join<Facility, GeographicZone> geographicZoneJoin =
+          facilityJoin.join(GEOGRAPHIC_ZONE, JoinType.LEFT);
+      predicate = builder.and(predicate, builder.equal(geographicZoneJoin.get(ID), zoneId));
+    }
+
+    if (!isEmpty(ids)) {
+      predicate = builder.and(predicate, root.get("id").in(ids));
     }
 
     query.where(predicate);
-    return entityManager.createQuery(query).getResultList();
+    return query;
   }
 }

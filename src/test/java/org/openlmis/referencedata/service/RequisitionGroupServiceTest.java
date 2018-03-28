@@ -15,7 +15,18 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -33,19 +44,8 @@ import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class RequisitionGroupServiceTest {
 
@@ -140,9 +140,10 @@ public class RequisitionGroupServiceTest {
   public void shouldSearchForRequisitionGroupsWithAllParametersProvided() {
     when(geographicZoneRepository.findByCode(any(String.class))).thenReturn(zone);
     when(programRepository.findByCode(any(Code.class))).thenReturn(program);
-    List<SupervisoryNode> nodes = Arrays.asList(supervisoryNode);
-    when(supervisoryNodeRepository.search(any(String.class), any(String.class), eq(zone)))
-        .thenReturn(nodes);
+    List<SupervisoryNode> nodes = Collections.singletonList(supervisoryNode);
+    doReturn(new PageImpl(nodes, pageable, nodes.size()))
+        .when(supervisoryNodeRepository).search(any(), any(), any(),
+        any(), any(), any(), any());
     when(requisitionGroupRepository.search(any(String.class), any(String.class),
         any(Program.class), any(List.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(requisitionGroups, null, 2));

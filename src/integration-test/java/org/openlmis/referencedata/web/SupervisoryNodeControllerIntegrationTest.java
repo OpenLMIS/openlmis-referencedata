@@ -17,17 +17,30 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
+import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
+import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
+import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.NAME_PARAM;
+import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.PAGE;
+import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.PROGRAM_ID;
+import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.SIZE;
+import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.ZONE_ID;
 
 import com.jayway.restassured.response.ValidatableResponse;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.hamcrest.Matchers;
-import org.javers.common.collections.Sets;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
@@ -52,19 +65,11 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -72,9 +77,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SUPERVISING_USERS_URL = ID_URL + "/supervisingUsers";
-  private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String RIGHT_ID_PARAM = "rightId";
-  private static final String PROGRAM_ID_PARAM = "programId";
 
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;
@@ -87,6 +90,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private UUID facilityId;
   private UUID programId;
   private UUID rightId;
+  private UUID zoneId;
+
 
   /**
    * Constructor for tests.
@@ -124,6 +129,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     facilityId = UUID.randomUUID();
     programId = UUID.randomUUID();
     rightId = UUID.randomUUID();
+    zoneId = UUID.randomUUID();
   }
 
   @Test
@@ -329,27 +335,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldGetAllSupervisoryNodes() {
-
-    List<SupervisoryNode> storedSupervisoryNodes = Arrays.asList(supervisoryNode,
-        new SupervisoryNodeDataBuilder().withCode("SN2").build());
-    given(supervisoryNodeRepository.findAll()).willReturn(storedSupervisoryNodes);
-
-    SupervisoryNodeDto[] response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(SupervisoryNodeDto[].class);
-
-    assertEquals(storedSupervisoryNodes.size(), response.length);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
 
     restAssured
@@ -410,7 +395,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     supervisingUser.assignRoles(
         new SupervisionRoleAssignment(role, supervisingUser, program, supervisoryNode));
 
-    Set<User> supervisingUsers = Sets.asSet(supervisingUser);
+    Set<User> supervisingUsers = asSet(supervisingUser);
 
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(right);
@@ -424,7 +409,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
-        .queryParam(PROGRAM_ID_PARAM, programId)
+        .queryParam(PROGRAM_ID, programId)
         .when()
         .get(SUPERVISING_USERS_URL)
         .then()
@@ -450,7 +435,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
-        .queryParam(PROGRAM_ID_PARAM, programId)
+        .queryParam(PROGRAM_ID, programId)
         .when()
         .get(SUPERVISING_USERS_URL)
         .then()
@@ -474,7 +459,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
-        .queryParam(PROGRAM_ID_PARAM, programId)
+        .queryParam(PROGRAM_ID, programId)
         .when()
         .get(SUPERVISING_USERS_URL)
         .then()
@@ -497,7 +482,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
-        .queryParam(PROGRAM_ID_PARAM, programId)
+        .queryParam(PROGRAM_ID, programId)
         .when()
         .get(SUPERVISING_USERS_URL)
         .then()
@@ -522,7 +507,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
         .queryParam(RIGHT_ID_PARAM, rightId)
-        .queryParam(PROGRAM_ID_PARAM, programId)
+        .queryParam(PROGRAM_ID, programId)
         .when()
         .get(SUPERVISING_USERS_URL)
         .then()
@@ -532,16 +517,25 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldGetSupervisoryNodeByFacilityAndProgram() {
+  public void shouldSearchSupervisoryNodes() {
+    final UUID id = UUID.randomUUID();
+
+    final Pageable pageable = new PageRequest(0, 10);
 
     HashMap<String, Object> queryParams = new HashMap<>();
-    queryParams.put("facilityId", facilityId.toString());
-    queryParams.put(PROGRAM_ID_PARAM, programId.toString());
 
-    given(facilityRepository.findOne(facilityId)).willReturn(facility);
-    given(programRepository.findOne(programId)).willReturn(program);
-    given(supervisoryNodeService.searchSupervisoryNodes(queryParams))
-        .willReturn(Collections.singletonList(supervisoryNode));
+    queryParams.put(FACILITY_ID, facilityId.toString());
+    queryParams.put(PROGRAM_ID, programId.toString());
+    queryParams.put(ZONE_ID, zoneId);
+    queryParams.put(NAME_PARAM, "some-name");
+    queryParams.put(CODE_PARAM, "some-code");
+    queryParams.put(ID, id);
+    queryParams.put(PAGE, 0);
+    queryParams.put(SIZE, 10);
+
+    given(supervisoryNodeRepository.search("some-code", "some-name", zoneId, facilityId, programId,
+        asSet(id), pageable))
+        .willReturn(new PageImpl(Collections.singletonList(supervisoryNode), pageable, 1));
 
     PageImplRepresentation response = searchForSupervisoryNode(queryParams, 200)
         .extract().as(PageImplRepresentation.class);
@@ -559,32 +553,13 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     restAssured
         .given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(queryParams)
+        .queryParams(queryParams)
         .when()
-        .post(SEARCH_URL)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(401);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnEmptyListWhenSearchingForNonExistingSupervisoryNode() {
-
-    HashMap<String, Object> queryParams = new HashMap<>();
-    queryParams.put("facilityId", facilityId.toString());
-    queryParams.put(PROGRAM_ID_PARAM, programId.toString());
-
-    given(facilityRepository.findOne(facilityId)).willReturn(facility);
-    given(programRepository.findOne(programId)).willReturn(program);
-    given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
-        program, facility)).willReturn(null);
-
-    searchForSupervisoryNode(queryParams, 200);
-    PageImplRepresentation response = searchForSupervisoryNode(queryParams, 200)
-        .extract().as(PageImplRepresentation.class);
-
-    assertEquals(0, response.getContent().size());
   }
 
   @Test
@@ -629,9 +604,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
       .given()
       .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
       .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(queryParams)
+      .queryParams(queryParams)
       .when()
-      .post(SEARCH_URL)
+      .get(RESOURCE_URL)
       .then()
       .statusCode(expectedCode);
   }
