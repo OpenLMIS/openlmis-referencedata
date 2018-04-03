@@ -107,9 +107,8 @@ public final class SupervisoryNodeSearchParams {
   }
 
   private UUID getSingleUuidValue(MultiValueMap<String, Object> params, String paramName) {
-    String uuid = getSingleStringValue(params, paramName);
-    return uuid == null ? null : UuidUtil
-        .fromString(uuid)
+    return UuidUtil
+        .fromString(getSingleStringValue(params, paramName))
         .orElse(null);
   }
 

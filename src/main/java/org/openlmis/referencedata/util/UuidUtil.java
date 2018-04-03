@@ -40,6 +40,9 @@ public class UuidUtil {
    *     Optional should it be un-parseable.
    */
   public static Optional<UUID> fromString(String uuid) {
+    if (uuid == null) {
+      return Optional.empty();
+    }
     try {
       return Optional.of(UUID.fromString(uuid));
     } catch (IllegalArgumentException iae) {
