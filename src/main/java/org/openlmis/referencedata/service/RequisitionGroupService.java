@@ -32,6 +32,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
+import org.openlmis.referencedata.web.SupervisoryNodeSearchParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -104,8 +105,10 @@ public class RequisitionGroupService {
       if (zone == null) {
         throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
       }
-      supervisoryNodes = supervisoryNodeRepository.search(null, null, zone.getId(), null, null,
-          null, new PageRequest(0, Integer.MAX_VALUE)).getContent();
+      SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(
+          null, null, null, null, zone.getId(), null);
+      supervisoryNodes = supervisoryNodeRepository.search(params,
+          new PageRequest(0, Integer.MAX_VALUE)).getContent();
     }
     return supervisoryNodes;
   }

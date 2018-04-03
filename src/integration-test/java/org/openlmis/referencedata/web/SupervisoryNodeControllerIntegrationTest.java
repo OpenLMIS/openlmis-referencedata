@@ -533,8 +533,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     queryParams.put(PAGE, 0);
     queryParams.put(SIZE, 10);
 
-    given(supervisoryNodeRepository.search("some-code", "some-name", zoneId, facilityId, programId,
-        asSet(id), pageable))
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(
+        "some-name", "some-code", facilityId, programId, zoneId, asSet(id));
+    given(supervisoryNodeRepository.search(params, pageable))
         .willReturn(new PageImpl(Collections.singletonList(supervisoryNode), pageable, 1));
 
     PageImplRepresentation response = searchForSupervisoryNode(queryParams, 200)

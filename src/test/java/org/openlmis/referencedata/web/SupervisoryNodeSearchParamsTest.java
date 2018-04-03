@@ -28,6 +28,8 @@ import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.PROGRAM
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.ZONE_ID;
 
 import java.util.UUID;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -35,7 +37,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.springframework.util.LinkedMultiValueMap;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class SupervisoryNodeParamsTest {
+public class SupervisoryNodeSearchParamsTest {
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -157,4 +159,14 @@ public class SupervisoryNodeParamsTest {
     queryMap.add("someParameter", "some-value");
     new SupervisoryNodeSearchParams(queryMap);
   }
+
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(SupervisoryNodeSearchParams.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in search params object
+        .verify();
+  }
+
+
 }

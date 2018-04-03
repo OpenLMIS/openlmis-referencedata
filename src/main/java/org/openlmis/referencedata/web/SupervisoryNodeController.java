@@ -263,9 +263,7 @@ public class SupervisoryNodeController extends BaseController {
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(queryParams);
 
     profiler.start("GET_SUPERVISORY_NODES_FROM_DB");
-    Page<SupervisoryNode> supervisoryNodePage = supervisoryNodeRepository.search(params.getCode(),
-        params.getName(), params.getZoneId(), params.getFacilityId(), params.getProgramId(),
-        params.getIds(), pageable);
+    Page<SupervisoryNode> supervisoryNodePage = supervisoryNodeRepository.search(params, pageable);
 
     profiler.start("TO_DTO");
     Page<SupervisoryNodeDto> dtoPage = exportToDto(supervisoryNodePage, pageable);

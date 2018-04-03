@@ -17,8 +17,8 @@ package org.openlmis.referencedata.repository.custom.impl;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -37,6 +37,7 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.web.SupervisoryNodeSearchParams;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -60,21 +61,18 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
    * This method is supposed to retrieve all supervisory nodes with matched parameters.
    * Method is ignoring case and using like operator for code and name.
    *
-   * @param code Part of wanted code.
-   * @param name Part of wanted name.
+   * @param searchParams Search parameters.
    * @return List of Supervisory Nodes matching the parameters.
    */
-  public Page<SupervisoryNode> search(String code, String name, UUID zoneId, UUID facilityId,
-      UUID programId, Collection<UUID> ids, Pageable pageable) {
+  public Page<SupervisoryNode> search(SupervisoryNodeSearchParams searchParams,
+      Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<SupervisoryNode> nodeQuery = builder.createQuery(SupervisoryNode.class);
-    nodeQuery = prepareQuery(nodeQuery, code, name, zoneId,
-        facilityId, programId, ids, false, builder);
+    nodeQuery = prepareQuery(nodeQuery, searchParams, false, builder);
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery = prepareQuery(countQuery, code, name, zoneId,
-        facilityId, programId, ids, true, builder);
+    countQuery = prepareQuery(countQuery, searchParams, true, builder);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -87,9 +85,8 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
     return Pagination.getPage(supervisoryNodes, pageable, count);
   }
 
-  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, String code, String name,
-      UUID zoneId, UUID facilityId, UUID programId, Collection<UUID> ids,
-      boolean count, CriteriaBuilder builder) {
+  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query,
+      SupervisoryNodeSearchParams searchParams, boolean count, CriteriaBuilder builder) {
     Root<SupervisoryNode> root = query.from(SupervisoryNode.class);
 
     if (count) {
@@ -99,16 +96,20 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
 
     Predicate predicate = builder.conjunction();
 
+    String code = searchParams.getCode();
     if (code != null) {
       predicate = builder.and(predicate,
           builder.like(builder.upper(root.get(CODE)), "%" + code.toUpperCase() + "%"));
     }
 
+    String name = searchParams.getName();
     if (name != null) {
       predicate = builder.and(predicate,
           builder.like(builder.upper(root.get(NAME)), "%" + name.toUpperCase() + "%"));
     }
 
+    UUID facilityId = searchParams.getFacilityId();
+    UUID programId = searchParams.getProgramId();
     if (facilityId != null || programId != null) {
       Join<SupervisoryNode, RequisitionGroup> requisitionGroupJoin =
           root.join(REQUISITION_GROUP, JoinType.LEFT);
@@ -128,6 +129,7 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
       }
     }
 
+    UUID zoneId = searchParams.getZoneId();
     if (zoneId != null) {
       Join<SupervisoryNode, Facility> facilityJoin = root.join(FACILITY, JoinType.LEFT);
       Join<Facility, GeographicZone> geographicZoneJoin =
@@ -135,6 +137,7 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
       predicate = builder.and(predicate, builder.equal(geographicZoneJoin.get(ID), zoneId));
     }
 
+    Set<UUID> ids = searchParams.getIds();
     if (!isEmpty(ids)) {
       predicate = builder.and(predicate, root.get("id").in(ids));
     }

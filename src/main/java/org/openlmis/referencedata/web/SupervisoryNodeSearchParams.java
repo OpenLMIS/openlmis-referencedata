@@ -19,7 +19,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -29,7 +32,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @ToString
-class SupervisoryNodeSearchParams {
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+public final class SupervisoryNodeSearchParams {
 
   static final String FACILITY_ID = "facilityId";
   static final String PROGRAM_ID = "programId";

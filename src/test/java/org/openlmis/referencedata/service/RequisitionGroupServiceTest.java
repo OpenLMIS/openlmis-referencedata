@@ -142,8 +142,7 @@ public class RequisitionGroupServiceTest {
     when(programRepository.findByCode(any(Code.class))).thenReturn(program);
     List<SupervisoryNode> nodes = Collections.singletonList(supervisoryNode);
     doReturn(new PageImpl(nodes, pageable, nodes.size()))
-        .when(supervisoryNodeRepository).search(any(), any(), any(),
-        any(), any(), any(), any());
+        .when(supervisoryNodeRepository).search(any(), any());
     when(requisitionGroupRepository.search(any(String.class), any(String.class),
         any(Program.class), any(List.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(requisitionGroups, null, 2));

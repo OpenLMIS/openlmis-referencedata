@@ -37,6 +37,7 @@ import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.web.SupervisoryNodeSearchParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -180,21 +181,33 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     supervisoryNodeRepository.save(generateInstance());
     supervisoryNodeRepository.save(generateInstance());
 
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(
+        "name", "code", null, null, null, null);
     assertEquals(3, supervisoryNodeRepository
-        .search("code", "name", null, null, null, null, null).getTotalElements());
+        .search(params, null).getTotalElements());
+    params.setCode("CODE");
+    params.setName("NAME");
     assertEquals(3, supervisoryNodeRepository
-        .search("CODE", "NAME", null, null, null, null, null).getTotalElements());
+        .search(params, null).getTotalElements());
+    params.setCode("CoDe");
+    params.setName("nAMe");
     assertEquals(3, supervisoryNodeRepository
-        .search("CoDe", "nAMe", null, null, null, null, null).getTotalElements());
+        .search(params, null).getTotalElements());
 
+    params.setName("some-name");
+    params.setCode(null);
     assertEquals(1, supervisoryNodeRepository
-        .search(null, "some-name", null, null, null, null, null).getTotalElements());
+        .search(params, null).getTotalElements());
+    params.setCode("random-string");
     assertEquals(0, supervisoryNodeRepository
-        .search("random-string", "some-name", null, null, null, null, null).getTotalElements());
+        .search(params, null).getTotalElements());
+    params.setCode("some-code");
+    params.setName(null);
     assertEquals(1, supervisoryNodeRepository
-        .search("some-code", null, null, null, null, null, null).getTotalElements());
+        .search(params, null).getTotalElements());
+    params.setName("random-string");
     assertEquals(0, supervisoryNodeRepository
-        .search("some-code", "random-string", null, null, null, null, null).getTotalElements());
+        .search(params, null).getTotalElements());
   }
 
   @Test
@@ -214,8 +227,10 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     SupervisoryNode node = supervisoryNodeRepository.save(
         new SupervisoryNodeDataBuilder().withFacility(facility).withoutId().build());
 
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null, null, null, null,
+        geographicZone.getId(), null);
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(null, null, geographicZone.getId(), null, null, null, null);
+        .search(params, null);
 
     assertEquals(1, result.getTotalElements());
     assertEquals(node, result.getContent().get(0));
@@ -229,8 +244,10 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     supervisoryNodeRepository.save(generateInstance());
     supervisoryNodeRepository.save(generateInstance());
 
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null, null, null, null,
+        null, asSet(node1.getId(), node2.getId()));
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(null, null, null, null, null, asSet(node1.getId(), node2.getId()), null);
+        .search(params, null);
 
     assertEquals(2, result.getTotalElements());
     assertThat(result.getContent(), hasItems(node1, node2));
@@ -244,17 +261,18 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     supervisoryNodeRepository.save(generateInstance());
     supervisoryNodeRepository.save(generateInstance());
 
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams();
     assertEquals(2, supervisoryNodeRepository
-        .search(null, null, null, null, null, null, new PageRequest(0, 2)).getContent().size());
+        .search(params, new PageRequest(0, 2)).getContent().size());
     assertEquals(2, supervisoryNodeRepository
-        .search(null, null, null, null, null, null, new PageRequest(1, 2)).getContent().size());
+        .search(params, new PageRequest(1, 2)).getContent().size());
     assertEquals(1, supervisoryNodeRepository
-        .search(null, null, null, null, null, null, new PageRequest(2, 2)).getContent().size());
+        .search(params, new PageRequest(2, 2)).getContent().size());
 
     assertEquals(4, supervisoryNodeRepository
-        .search(null, null, null, null, null, null, new PageRequest(0, 4)).getContent().size());
+        .search(params, new PageRequest(0, 4)).getContent().size());
     assertEquals(1, supervisoryNodeRepository
-        .search(null, null, null, null, null, null, new PageRequest(1, 4)).getContent().size());
+        .search(params, new PageRequest(1, 4)).getContent().size());
   }
 
   @Test
@@ -265,8 +283,10 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
 
     Program program = programRepository.save(new Program("program-code"));
 
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null,
+        null, null, program.getId(), null, null);
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(null, null, null, null, program.getId(), null, null);
+        .search(params, null);
 
     assertEquals(0, result.getTotalElements());
 
@@ -283,7 +303,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
         .newRequisitionGroupProgramSchedule(requisitionGroup, program, schedule, false));
 
     result = supervisoryNodeRepository
-        .search(null, null, null, null, program.getId(), null, null);
+        .search(params, null);
 
     assertEquals(1, result.getTotalElements());
     assertEquals(supervisoryNode, result.getContent().get(0));
@@ -302,8 +322,10 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
             .withoutOperator()
             .buildAsNew());
 
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null,
+        null, newFacility.getId(), null, null, null);
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(null, null, null, newFacility.getId(), null, null, null);
+        .search(params, null);
     assertEquals(0, result.getTotalElements());
 
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.save(generateInstance());
@@ -314,7 +336,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
             .buildAsNew());
 
     result = supervisoryNodeRepository
-        .search(null, null, null, newFacility.getId(), null, null, null);
+        .search(params, null);
 
     assertEquals(1, result.getTotalElements());
     assertEquals(supervisoryNode, result.getContent().get(0));
