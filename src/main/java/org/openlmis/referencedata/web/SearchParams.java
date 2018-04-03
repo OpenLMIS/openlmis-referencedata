@@ -16,11 +16,17 @@
 package org.openlmis.referencedata.web;
 
 import java.util.Collection;
+import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+@NoArgsConstructor
 public class SearchParams {
+
+  public static final String PAGE = "page";
+  public static final String SIZE = "size";
+  public static final String SORT = "sort";
 
   private MultiValueMap<String, Object> params;
 
@@ -30,9 +36,9 @@ public class SearchParams {
   public SearchParams(MultiValueMap<String, Object> queryMap) {
     if (queryMap != null) {
       params = new LinkedMultiValueMap<>(queryMap);
-      params.remove("page");
-      params.remove("size");
-      params.remove("sort");
+      params.remove(PAGE);
+      params.remove(SIZE);
+      params.remove(SORT);
     } else {
       params = new LinkedMultiValueMap<>();
     }

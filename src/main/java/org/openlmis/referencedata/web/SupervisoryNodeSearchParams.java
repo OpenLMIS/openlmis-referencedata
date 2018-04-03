@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,13 +27,11 @@ import lombok.ToString;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @ToString
-@AllArgsConstructor
+@EqualsAndHashCode(exclude = "queryParams")
 @NoArgsConstructor
-@EqualsAndHashCode
 public final class SupervisoryNodeSearchParams {
 
   static final String FACILITY_ID = "facilityId";
@@ -43,9 +40,6 @@ public final class SupervisoryNodeSearchParams {
   static final String NAME_PARAM = "name";
   static final String CODE_PARAM = "code";
   static final String ID = "id";
-  static final String PAGE = "page";
-  static final String SIZE = "size";
-  static final String SORT = "sort";
 
   @Getter
   @Setter
@@ -71,19 +65,45 @@ public final class SupervisoryNodeSearchParams {
   @Setter
   private Set<UUID> ids;
 
+  private SearchParams queryParams;
+
   /**
    * Retrieves query parameters from multi value map and assigns them to properties.
    * If in the map there are parameters unrecognizable by this class exception will be thrown.
    */
-  SupervisoryNodeSearchParams(MultiValueMap<String, Object> params) {
-    validateUnknownParameters(params);
+  SupervisoryNodeSearchParams(MultiValueMap<String, Object> queryMap) {
+    queryParams = new SearchParams(queryMap);
+    if (!isValid()) {
+      throw new ValidationMessageException(
+          OrderableMessageKeys.ERROR_INVALID_PARAMS);
+    }
 
-    this.name = getSingleStringValue(params, NAME_PARAM);
-    this.code = getSingleStringValue(params, CODE_PARAM);
-    this.facilityId = getSingleUuidValue(params, FACILITY_ID);
-    this.programId = getSingleUuidValue(params, PROGRAM_ID);
-    this.zoneId = getSingleUuidValue(params, ZONE_ID);
-    this.ids = UuidUtil.getIds(params);
+    this.name = getSingleStringValue(queryMap, NAME_PARAM);
+    this.code = getSingleStringValue(queryMap, CODE_PARAM);
+    this.facilityId = getSingleUuidValue(queryMap, FACILITY_ID);
+    this.programId = getSingleUuidValue(queryMap, PROGRAM_ID);
+    this.zoneId = getSingleUuidValue(queryMap, ZONE_ID);
+    this.ids = UuidUtil.getIds(queryMap);
+  }
+
+  /**
+   * Constructs new instance of {@code SupervisoryNodeSearchParams}.
+   */
+  public SupervisoryNodeSearchParams(String name, String code, UUID facilityId, UUID programId,
+      UUID zoneId, Set<UUID> ids) {
+    queryParams = new SearchParams();
+    this.name = name;
+    this.code = code;
+    this.facilityId = facilityId;
+    this.programId = programId;
+    this.zoneId = zoneId;
+    this.ids = ids;
+  }
+
+  private boolean isValid() {
+    return Collections.unmodifiableList(
+        Arrays.asList(ID, CODE_PARAM, NAME_PARAM, FACILITY_ID, PROGRAM_ID, ZONE_ID))
+        .containsAll(queryParams.keySet());
   }
 
   private UUID getSingleUuidValue(MultiValueMap<String, Object> params, String paramName) {
@@ -102,22 +122,5 @@ public final class SupervisoryNodeSearchParams {
       return null;
     }
     return params.getFirst(paramName);
-  }
-
-  private void validateUnknownParameters(MultiValueMap<String, Object> queryMap) {
-    if (queryMap != null) {
-      MultiValueMap<String, Object> params = new LinkedMultiValueMap<>(queryMap);
-
-      params.remove(PAGE);
-      params.remove(SIZE);
-      params.remove(SORT);
-
-      if (!Collections.unmodifiableList(
-          Arrays.asList(ID, CODE_PARAM, NAME_PARAM, FACILITY_ID, PROGRAM_ID, ZONE_ID))
-          .containsAll(params.keySet())) {
-        throw new ValidationMessageException(
-            OrderableMessageKeys.ERROR_INVALID_PARAMS);
-      }
-    }
   }
 }

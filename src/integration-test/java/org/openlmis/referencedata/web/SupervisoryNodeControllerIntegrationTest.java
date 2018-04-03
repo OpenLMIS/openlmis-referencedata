@@ -24,12 +24,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.openlmis.referencedata.web.SearchParams.PAGE;
+import static org.openlmis.referencedata.web.SearchParams.SIZE;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.NAME_PARAM;
-import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.PAGE;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.PROGRAM_ID;
-import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.SIZE;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.ZONE_ID;
 
 import com.jayway.restassured.response.ValidatableResponse;

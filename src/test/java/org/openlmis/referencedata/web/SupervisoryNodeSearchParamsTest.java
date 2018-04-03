@@ -165,6 +165,7 @@ public class SupervisoryNodeSearchParamsTest {
     EqualsVerifier
         .forClass(SupervisoryNodeSearchParams.class)
         .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in search params object
+        .withIgnoredFields("queryParams")
         .verify();
   }
 

@@ -33,14 +33,14 @@ public class OrderableSearchParams {
   private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
 
-  private SearchParams params;
+  private SearchParams queryParams;
 
   /**
    * Wraps map of query params into an object. Remove parameters that should be managed by
    * {@link Pageable}
    */
   public OrderableSearchParams(MultiValueMap<String, Object> queryMap) {
-    params = new SearchParams(queryMap);
+    queryParams = new SearchParams(queryMap);
   }
 
   /**
@@ -50,10 +50,10 @@ public class OrderableSearchParams {
    *         for null request param value.
    */
   public String getCode() {
-    if (!params.containsKey(CODE)) {
+    if (!queryParams.containsKey(CODE)) {
       return null;
     }
-    Object code = params.getFirst(CODE);
+    Object code = queryParams.getFirst(CODE);
     return code == null ? "" : String.valueOf(code);
   }
 
@@ -64,10 +64,10 @@ public class OrderableSearchParams {
    *         for null request param value.
    */
   public String getName() {
-    if (!params.containsKey(NAME)) {
+    if (!queryParams.containsKey(NAME)) {
       return null;
     }
-    Object name = params.getFirst(NAME);
+    Object name = queryParams.getFirst(NAME);
     return name == null ? "" : String.valueOf(name);
   }
 
@@ -78,10 +78,10 @@ public class OrderableSearchParams {
    *                      param. Empty Code for request param that has no value.
    */
   public Code getProgramCode() {
-    if (!params.containsKey(PROGRAM_CODE)) {
+    if (!queryParams.containsKey(PROGRAM_CODE)) {
       return null;
     }
-    Object programCode = params.getFirst(PROGRAM_CODE);
+    Object programCode = queryParams.getFirst(PROGRAM_CODE);
     return programCode == null ? Code.code("") : Code.code(String.valueOf(programCode));
   }
 
@@ -89,7 +89,7 @@ public class OrderableSearchParams {
    * Gets and collection of {@link UUID} for "ids" key from params.
    */
   public Set<UUID> getIds() {
-    return UuidUtil.getIds(params.asMultiValueMap());
+    return UuidUtil.getIds(queryParams.asMultiValueMap());
   }
 
   /**
@@ -98,11 +98,11 @@ public class OrderableSearchParams {
    */
   public boolean isValid() {
     return Collections.unmodifiableList(Arrays.asList(ID, CODE, NAME, PROGRAM_CODE))
-        .containsAll(params.keySet());
+        .containsAll(queryParams.keySet());
   }
 
   public boolean isEmpty() {
-    return params.isEmpty();
+    return queryParams.isEmpty();
   }
 
 }
