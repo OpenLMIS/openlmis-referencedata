@@ -28,6 +28,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
@@ -64,7 +65,7 @@ public class SupervisoryNodeRepositoryImpl implements SupervisoryNodeRepositoryC
    * @param searchParams Search parameters.
    * @return List of Supervisory Nodes matching the parameters.
    */
-  public Page<SupervisoryNode> search(SupervisoryNodeSearchParams searchParams,
+  public Page<SupervisoryNode> search(@NotNull SupervisoryNodeSearchParams searchParams,
       Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 

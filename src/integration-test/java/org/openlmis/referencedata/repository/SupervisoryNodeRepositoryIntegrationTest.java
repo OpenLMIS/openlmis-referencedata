@@ -5,12 +5,12 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.repository;
@@ -19,6 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.UUID;
 import org.junit.Before;
@@ -44,8 +45,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class SupervisoryNodeRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<SupervisoryNode> {
+
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
@@ -276,6 +279,29 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   }
 
   @Test
+  public void shouldReturnAllElementsIfNoSearchParamsProvided() {
+    supervisoryNodeRepository.save(generateInstance());
+    supervisoryNodeRepository.save(generateInstance());
+    supervisoryNodeRepository.save(generateInstance());
+    supervisoryNodeRepository.save(generateInstance());
+    supervisoryNodeRepository.save(generateInstance());
+
+    SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams();
+    assertEquals(5, supervisoryNodeRepository
+        .search(params, null).getTotalElements());
+    assertEquals(5, supervisoryNodeRepository
+        .search(params, null).getContent().size());
+    assertEquals(5, supervisoryNodeRepository
+        .search(params, null).getNumberOfElements());
+    assertEquals(0, supervisoryNodeRepository
+        .search(params, null).getNumber());
+    assertEquals(0, supervisoryNodeRepository
+        .search(params, null).getSize());
+    assertNull(supervisoryNodeRepository
+        .search(params, null).getSort());
+  }
+
+  @Test
   public void shouldSearchByProgramId() {
     supervisoryNodeRepository.save(generateInstance());
     supervisoryNodeRepository.save(generateInstance());
@@ -331,9 +357,9 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.save(generateInstance());
 
     requisitionGroupRepository.save(new RequisitionGroupDataBuilder()
-            .withSupervisoryNode(supervisoryNode)
-            .withMemberFacilities(asSet(newFacility))
-            .buildAsNew());
+        .withSupervisoryNode(supervisoryNode)
+        .withMemberFacilities(asSet(newFacility))
+        .buildAsNew());
 
     result = supervisoryNodeRepository
         .search(params, null);
