@@ -20,11 +20,9 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import lombok.ToString;
-import org.apache.commons.collections4.MapUtils;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @ToString
@@ -35,21 +33,14 @@ public class OrderableSearchParams {
   private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
 
-  private MultiValueMap<String, Object> params;
+  private SearchParams params;
 
   /**
    * Wraps map of query params into an object. Remove parameters that should be managed by
    * {@link Pageable}
    */
   public OrderableSearchParams(MultiValueMap<String, Object> queryMap) {
-    if (queryMap != null) {
-      params = new LinkedMultiValueMap<>(queryMap);
-      params.remove("page");
-      params.remove("size");
-      params.remove("sort");
-    } else {
-      params = new LinkedMultiValueMap<>();
-    }
+    params = new SearchParams(queryMap);
   }
 
   /**
@@ -98,7 +89,7 @@ public class OrderableSearchParams {
    * Gets and collection of {@link UUID} for "ids" key from params.
    */
   public Set<UUID> getIds() {
-    return UuidUtil.getIds(params);
+    return UuidUtil.getIds(params.asMultiValueMap());
   }
 
   /**
@@ -111,7 +102,7 @@ public class OrderableSearchParams {
   }
 
   public boolean isEmpty() {
-    return MapUtils.isEmpty(params);
+    return params.isEmpty();
   }
 
 }
