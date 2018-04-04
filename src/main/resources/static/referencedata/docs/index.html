@@ -6,14 +6,29 @@
   <title>API Console</title>
   <link rel="stylesheet" href="../webjars/api-console/3.0.17/dist/styles/api-console-light-theme.css" type="text/css" />
 </head>
-</head>
 <body ng-cloak class="raml-console-body">
   <script type="text/javascript" src="../webjars/api-console/3.0.17/dist/scripts/api-console-vendor.js"></script>
   <script type="text/javascript" src="../webjars/api-console/3.0.17/dist/scripts/api-console.js"></script>
   <script type="text/javascript">
     $.noConflict();
 
-    var baseUrl = window.location.protocol + '//' + window.location.host;
+    var currentProtocol = window.location.protocol,
+        baseUrl = currentProtocol + '//' + window.location.host,
+        setProtocols = function (resource) {
+          var i;
+
+          if (resource.resources) {
+            for (i = 0; i < resource.resources.length; i += 1) {
+              setProtocols(resource.resources[i]);
+            }
+          }
+
+          if (resource.methods) {
+            for (i = 0; i < resource.methods.length; i += 1) {
+              resource.methods[i].protocols = [currentProtocol];
+            }
+          }
+        };
 
     angular.module('raml').config(function($provide) {
       $provide.decorator('ramlParser', function($delegate) {
@@ -21,7 +36,16 @@
 
         $delegate.loadPath = function() {
           return originalMethod.apply($delegate, arguments).then(function (raml) {
+            var i;
+
             raml.specification.baseUri = baseUrl;
+
+            if (raml.specification.resources) {
+              for (i = 0; i < raml.specification.resources.length; i += 1) {
+                setProtocols(raml.specification.resources[i]);
+              }
+            }
+
             return raml;
           });
         };
