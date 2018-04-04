@@ -44,7 +44,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.security.oauth:spring-security-oauth2"
     compile "org.slf4j:slf4j-ext:1.7.25"
-    compile 'org.webjars:swagger-ui:2.2.6'
+    compile 'org.webjars.npm:api-console:3.0.17'
     compile 'org.apache.commons:commons-lang3:3.6'
     compile 'org.apache.commons:commons-csv:1.4'
     compile 'org.apache.commons:commons-collections4:4.1'
