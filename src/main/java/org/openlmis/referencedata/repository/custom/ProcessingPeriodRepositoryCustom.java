@@ -13,23 +13,15 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.repository.custom;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
+import java.time.LocalDate;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
-import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCustom;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-@JaversSpringDataAuditable
-public interface ProcessingPeriodRepository extends JpaRepository<ProcessingPeriod, UUID>,
-    ProcessingPeriodRepositoryCustom {
-
-  List<ProcessingPeriod> findByProcessingSchedule(ProcessingSchedule schedule);
-
-  Optional<ProcessingPeriod> findOneByNameAndProcessingSchedule(String name,
-                                                                ProcessingSchedule schedule);
+public interface ProcessingPeriodRepositoryCustom {
+  Page<ProcessingPeriod> search(ProcessingSchedule schedule, LocalDate startDate, LocalDate endDate,
+      Pageable pageable);
 }

@@ -67,6 +67,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   private static final String FACILITY = "facilityId";
   private static final String PROCESSING_SCHEDULE = "processingScheduleId";
   private static final String START_DATE = "startDate";
+  private static final String END_DATE = "endDate";
   private static final String PAGE = "page";
   private static final String SIZE = "size";
   private static final String SORT = "sort";
@@ -205,7 +206,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldFindPeriodsByProgramAndFacility() {
+  public void shouldSearchForProcessingPeriods() {
     given(programRepository.findOne(programId))
         .willReturn(requisitionGroupProgramSchedule.getProgram());
     given(facilityRepository.findOne(facilityId))
@@ -215,12 +216,15 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
             requisitionGroupProgramSchedule.getDropOffFacility()))
         .willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
     PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
-    given(periodRepository.findByProcessingSchedule(schedule, pageable))
+    given(periodRepository
+        .search(schedule, firstPeriod.getStartDate(), firstPeriod.getEndDate(), pageable))
         .willReturn(Pagination.getPage(Arrays.asList(firstPeriod, secondPeriod), pageable, 2));
 
     restAssured.given()
         .queryParam(PROGRAM, programId)
         .queryParam(FACILITY, facilityId)
+        .queryParam(START_DATE, firstPeriod.getStartDate().toString())
+        .queryParam(END_DATE, firstPeriod.getEndDate().toString())
         .queryParam(PAGE, 0)
         .queryParam(SIZE, 10)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -229,32 +233,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .then()
         .statusCode(200)
         .body(CONTENT_SIZE, is(2));
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldFindPeriodsByScheduleAndDate() {
-    given(scheduleRepository.findOne(scheduleId)).willReturn(schedule);
-    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
-    given(periodRepository.findByProcessingScheduleAndStartDateLessThanEqual(schedule,
-        secondPeriod.getStartDate(), pageable))
-        .willReturn(Pagination.getPage(Arrays.asList(secondPeriod, firstPeriod), pageable, 2));
-
-    String expectedId = firstPeriod.getProcessingSchedule().getId().toString();
-    restAssured.given()
-        .queryParam(PAGE, 0)
-        .queryParam(SIZE, 10)
-        .queryParam(PROCESSING_SCHEDULE, scheduleId)
-        .queryParam(START_DATE, secondPeriod.getStartDate().toString())
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .body(CONTENT_SIZE, is(2))
-        .body("content[0].processingSchedule.id", is(expectedId))
-        .body("content[1].processingSchedule.id", is(expectedId));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -319,42 +297,19 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldGetAllPeriods() {
+  public void shouldGetAllPeriodsSortedByEndDate() {
     List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
         firstPeriod, secondPeriod, thirdPeriod
     );
-    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
-    given(periodRepository.findAll(pageable))
-        .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParam(PAGE, 0)
-        .queryParam(SIZE, 10)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .body(CONTENT_SIZE, is(3));
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetAllPeriodsSortedByStartDate() {
-    List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
-        firstPeriod, secondPeriod, thirdPeriod
-    );
-    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
-    given(periodRepository.findAll(pageable))
+    PageRequest pageable = new PageRequest(0, 10, new Sort(END_DATE));
+    given(periodRepository.search(null, null, null, pageable))
         .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
     restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(PAGE, 0)
         .queryParam(SIZE, 10)
-        .queryParam(SORT, START_DATE)
+        .queryParam(SORT, END_DATE)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -374,7 +329,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         firstPeriod, secondPeriod, thirdPeriod
     );
     PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
-    given(periodRepository.findAll(pageable))
+    given(periodRepository.search(null, null, null, pageable))
         .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
     restAssured.given()

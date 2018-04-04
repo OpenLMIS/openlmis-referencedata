@@ -76,6 +76,7 @@ public class ProcessingPeriodService {
 
     ProcessingSchedule schedule;
     LocalDate startDate = params.getStartDate();
+    LocalDate endDate = params.getEndDate();
 
     if (null != program && null != facility) {
       List<RequisitionGroupProgramSchedule> schedules = requisitionGroupProgramScheduleRepository
@@ -92,12 +93,7 @@ public class ProcessingPeriodService {
           ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_ID);
     }
 
-    return null == schedule && null == startDate ? periodRepository.findAll(pageable) :
-        null == schedule ? periodRepository.findByStartDateLessThanEqual(startDate, pageable) :
-            null == startDate ? periodRepository.findByProcessingSchedule(schedule, pageable) :
-                periodRepository
-                    .findByProcessingScheduleAndStartDateLessThanEqual(
-                        schedule, startDate, pageable);
+    return periodRepository.search(schedule, startDate, endDate, pageable);
   }
 
   private <T> T getById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {

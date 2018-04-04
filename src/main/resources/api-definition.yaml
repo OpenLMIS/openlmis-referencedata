@@ -448,6 +448,11 @@ resourceTypes:
                       type: string
                       required: false
                       repeat: false
+              endDate:
+                      displayName: startDate
+                      type: string
+                      required: false
+                      repeat: false
           responses:
               "200":
                   body:

@@ -36,7 +36,7 @@ public class ProcessingPeriodSearchParamsTest {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage("");
 
-    new ProcessingPeriodSearchParams(randomUUID(), null, null, null).validate();
+    new ProcessingPeriodSearchParams(randomUUID(), null, null, null, null).validate();
   }
 
   @Test
@@ -44,7 +44,7 @@ public class ProcessingPeriodSearchParamsTest {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage("");
 
-    new ProcessingPeriodSearchParams(null, randomUUID(), null, null).validate();
+    new ProcessingPeriodSearchParams(null, randomUUID(), null, null, null).validate();
   }
 
   @Test
@@ -52,13 +52,14 @@ public class ProcessingPeriodSearchParamsTest {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage("");
 
-    new ProcessingPeriodSearchParams(randomUUID(), randomUUID(), randomUUID(), null).validate();
+    new ProcessingPeriodSearchParams(randomUUID(), randomUUID(), randomUUID(), null, null)
+        .validate();
   }
 
   @Test
   public void shouldValidateParams() {
-    new ProcessingPeriodSearchParams(randomUUID(), randomUUID(), null, null).validate();
-    new ProcessingPeriodSearchParams(null, null, randomUUID(), null).validate();
+    new ProcessingPeriodSearchParams(randomUUID(), randomUUID(), null, null, null).validate();
+    new ProcessingPeriodSearchParams(null, null, randomUUID(), null, null).validate();
   }
 
   @Test
@@ -72,7 +73,7 @@ public class ProcessingPeriodSearchParamsTest {
   @Test
   public void shouldImplementToString() {
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        randomUUID(), randomUUID(), randomUUID(), LocalDate.now());
+        randomUUID(), randomUUID(), randomUUID(), LocalDate.now(), LocalDate.now());
     ToStringTestUtils.verify(ProcessingPeriodSearchParams.class, params);
   }
 

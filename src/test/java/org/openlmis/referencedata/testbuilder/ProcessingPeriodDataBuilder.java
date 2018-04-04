@@ -30,7 +30,7 @@ public class ProcessingPeriodDataBuilder {
   private String name = RandomStringUtils.randomAlphanumeric(5);
   private String description = RandomStringUtils.randomAlphanumeric(25);
   private LocalDate startDate = LocalDate.now();
-  private LocalDate endDate = LocalDate.now().plusMonths(1);
+  private LocalDate endDate = LocalDate.now().plusMonths(1).minusDays(1);
 
   public ProcessingPeriodDataBuilder withSchedule(ProcessingSchedule schedule) {
     this.processingSchedule = schedule;
@@ -39,6 +39,11 @@ public class ProcessingPeriodDataBuilder {
 
   public ProcessingPeriodDataBuilder withStartDate(LocalDate startDate) {
     this.startDate = startDate;
+    return this;
+  }
+
+  public ProcessingPeriodDataBuilder withEndDate(LocalDate endDate) {
+    this.endDate = endDate;
     return this;
   }
 

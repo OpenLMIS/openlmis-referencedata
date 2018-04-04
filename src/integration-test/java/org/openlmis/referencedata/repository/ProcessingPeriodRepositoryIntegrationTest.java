@@ -15,7 +15,9 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -31,6 +33,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class ProcessingPeriodRepositoryIntegrationTest
       extends BaseCrudRepositoryIntegrationTest<ProcessingPeriod> {
 
@@ -43,6 +46,10 @@ public class ProcessingPeriodRepositoryIntegrationTest
   private ProcessingSchedule schedule;
   private PageRequest pageable = new PageRequest(0, 10);
 
+  private ProcessingPeriod period1;
+  private ProcessingPeriod period2;
+  private ProcessingPeriod period3;
+
   ProcessingPeriodRepository getRepository() {
     return this.periodRepository;
   }
@@ -51,59 +58,69 @@ public class ProcessingPeriodRepositoryIntegrationTest
   public void setUp() {
     schedule = new ProcessingScheduleDataBuilder().buildWithoutId();
     scheduleRepository.save(schedule);
+
+    period1 = periodRepository.save(generateInstance());
+    period2 = periodRepository.save(
+        generateInstance(period1.getStartDate().plusMonths(1), period1.getEndDate().plusMonths(1)));
+    period3 = periodRepository.save(
+        generateInstance(period2.getStartDate().plusMonths(1), period2.getEndDate().plusMonths(1)));
   }
 
   @Test
-  public void shouldFindPeriodsByScheduleAndStartDate() {
-    ProcessingPeriod period = periodRepository.save(generateInstance());
-
-    ProcessingSchedule schedule2 = new ProcessingScheduleDataBuilder().buildWithoutId();
-    scheduleRepository.save(schedule2);
-    ProcessingPeriod period2 = generateInstance(schedule2, period.getStartDate().plusDays(1));
-    period2 = periodRepository.save(period2);
-
-    ProcessingPeriod period3 = generateInstance(period.getStartDate().plusDays(2));
-    periodRepository.save(period3);
-
+  public void shouldFindPeriodsStartDate() {
     Page<ProcessingPeriod> periods = periodRepository
-        .findByProcessingScheduleAndStartDateLessThanEqual(
-            schedule, period2.getStartDate(), pageable);
-    assertEquals(1, periods.getTotalElements());
-    assertEquals(period, periods.getContent().get(0));
+        .search(schedule, period2.getEndDate(), null, pageable);
+
+    assertEquals(2, periods.getTotalElements());
+    assertThat(periods.getContent(), hasItems(period2, period3));
+  }
+
+  @Test
+  public void shouldFindPeriodsByEndDate() {
+    Page<ProcessingPeriod> periods = periodRepository
+        .search(schedule, null, period2.getStartDate(), pageable);
+
+    assertEquals(2, periods.getTotalElements());
+    assertThat(periods.getContent(), hasItems(period1, period2));
+  }
+
+  @Test
+  public void shouldFindPeriodsByStartDateAndEndDate() {
+    Page<ProcessingPeriod> periods = periodRepository
+        .search(schedule, period1.getEndDate(), period2.getStartDate(), pageable);
+
+    assertEquals(2, periods.getTotalElements());
+    assertThat(periods.getContent(), hasItems(period1, period2));
   }
 
   @Test
   public void shouldFindPeriodsBySchedulePage() {
-    periodRepository.save(generateInstance());
-    periodRepository.save(generateInstance());
-
     ProcessingSchedule schedule2 = new ProcessingScheduleDataBuilder().buildWithoutId();
     scheduleRepository.save(schedule2);
     periodRepository.save(generateInstance(schedule2));
 
-    Page<ProcessingPeriod> periods = periodRepository.findByProcessingSchedule(schedule, pageable);
-    assertEquals(2, periods.getTotalElements());
+    Page<ProcessingPeriod> periods = periodRepository.search(schedule, null, null, pageable);
+    assertEquals(3, periods.getTotalElements());
     assertEquals(schedule, periods.getContent().get(0).getProcessingSchedule());
     assertEquals(schedule, periods.getContent().get(1).getProcessingSchedule());
+    assertEquals(schedule, periods.getContent().get(2).getProcessingSchedule());
 
-    periods = periodRepository.findByProcessingSchedule(schedule2, pageable);
+    periods = periodRepository.search(schedule2, null, null, pageable);
     assertEquals(1, periods.getTotalElements());
     assertEquals(schedule2, periods.getContent().get(0).getProcessingSchedule());
   }
 
   @Test
   public void shouldFindPeriodsByScheduleList() {
-    periodRepository.save(generateInstance());
-    periodRepository.save(generateInstance());
-
     ProcessingSchedule schedule2 = new ProcessingScheduleDataBuilder().buildWithoutId();
     scheduleRepository.save(schedule2);
     periodRepository.save(generateInstance(schedule2));
 
     List<ProcessingPeriod> periods = periodRepository.findByProcessingSchedule(schedule);
-    assertEquals(2, periods.size());
+    assertEquals(3, periods.size());
     assertEquals(schedule, periods.get(0).getProcessingSchedule());
     assertEquals(schedule, periods.get(1).getProcessingSchedule());
+    assertEquals(schedule, periods.get(2).getProcessingSchedule());
 
     periods = periodRepository.findByProcessingSchedule(schedule2);
     assertEquals(1, periods.size());
@@ -111,27 +128,29 @@ public class ProcessingPeriodRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindPeriodsByStartDate() {
-    ProcessingPeriod period = periodRepository.save(generateInstance());
+  public void shouldFindPeriodsByScheduleAndStartDateAndEndDate() {
+    ProcessingSchedule newSchedule = scheduleRepository
+        .save(new ProcessingScheduleDataBuilder().buildWithoutId());
 
-    ProcessingPeriod period2 = generateInstance(period.getStartDate().plusDays(1));
-    period2 = periodRepository.save(period2);
-
-    ProcessingPeriod period3 = generateInstance(period.getStartDate().plusDays(2));
-    periodRepository.save(period3);
+    ProcessingPeriod period4 = periodRepository.save(generateInstance(newSchedule));
+    ProcessingPeriod period5 = periodRepository.save(generateInstance(newSchedule,
+        period1.getStartDate().plusMonths(1), period1.getEndDate().plusMonths(1)));
+    periodRepository.save(generateInstance(newSchedule,
+        period2.getStartDate().plusMonths(1), period2.getEndDate().plusMonths(1)));
 
     Page<ProcessingPeriod> periods = periodRepository
-        .findByStartDateLessThanEqual(period2.getStartDate(), pageable);
+        .search(newSchedule, period4.getEndDate(), period5.getStartDate(), pageable);
+
     assertEquals(2, periods.getTotalElements());
-    assertTrue(periods.getContent().get(0).getStartDate().isBefore(period3.getStartDate()));
-    assertTrue(periods.getContent().get(1).getStartDate().isBefore(period3.getStartDate()));
+    assertThat(periods.getContent(), hasItems(period4, period5));
   }
 
   @Test
   public void shouldFindPeriodsByNameAndSchedule() {
     ProcessingPeriod period = periodRepository.save(generateInstance());
 
-    ProcessingPeriod period2 = generateInstance(period.getStartDate().plusDays(1));
+    ProcessingPeriod period2 = generateInstance(period.getStartDate().plusMonths(1),
+        period.getEndDate().plusMonths(1));
     periodRepository.save(period2);
 
     ProcessingPeriod period3 = new ProcessingPeriodDataBuilder()
@@ -158,18 +177,20 @@ public class ProcessingPeriodRepositoryIntegrationTest
         .buildAsNew();
   }
 
-  private ProcessingPeriod generateInstance(LocalDate startDate) {
+  private ProcessingPeriod generateInstance(LocalDate startDate, LocalDate endDate) {
     return new ProcessingPeriodDataBuilder()
         .withSchedule(schedule)
-        .withStartDate(startDate)
+        .withStartDate(null != startDate ? startDate : LocalDate.now())
+        .withEndDate(null != endDate ? endDate : LocalDate.now().plusMonths(1))
         .buildAsNew();
   }
 
   private ProcessingPeriod generateInstance(ProcessingSchedule processingSchedule,
-                                            LocalDate startDate) {
+      LocalDate startDate, LocalDate endDate) {
     return new ProcessingPeriodDataBuilder()
         .withSchedule(processingSchedule)
-        .withStartDate(startDate)
+        .withStartDate(null != startDate ? startDate : LocalDate.now())
+        .withEndDate(null != endDate ? endDate : LocalDate.now().plusMonths(1))
         .buildAsNew();
   }
 }

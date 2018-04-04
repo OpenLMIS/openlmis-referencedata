@@ -95,7 +95,7 @@ public class ProcessingPeriodServiceTest {
   @Test(expected = NotFoundException.class)
   public void shouldThrowExceptionWhenProgramWasNotFoundById() {
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null);
+        program.getId(), facility.getId(), null, null, null);
     when(programRepository.findOne(program.getId())).thenReturn(null);
     periodService.searchPeriods(params, pageable);
   }
@@ -103,7 +103,7 @@ public class ProcessingPeriodServiceTest {
   @Test(expected = NotFoundException.class)
   public void shouldThrowExceptionWhenFacilityWasNotFoundById() {
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null);
+        program.getId(), facility.getId(), null, null, null);
     when(facilityRepository.findOne(facility.getId())).thenReturn(null);
     periodService.searchPeriods(params, pageable);
   }
@@ -111,7 +111,7 @@ public class ProcessingPeriodServiceTest {
   @Test
   public void shouldReturnEmptyPageWhenScheduleWasNotFoundForFacilityAndProgram() {
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null);
+        program.getId(), facility.getId(), null, null, null);
     doReturn(Collections.emptyList()).when(repository)
         .searchRequisitionGroupProgramSchedules(program, facility);
     Page<ProcessingPeriod> result = periodService.searchPeriods(params, pageable);
@@ -123,15 +123,15 @@ public class ProcessingPeriodServiceTest {
     doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
           .searchRequisitionGroupProgramSchedules(program, facility);
     doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
-        .when(periodRepository).findByProcessingSchedule(schedule, pageable);
+        .when(periodRepository).search(schedule, null, null, pageable);
 
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null);
+        program.getId(), facility.getId(), null, null, null);
 
     periodService.searchPeriods(params, pageable);
 
     verify(repository).searchRequisitionGroupProgramSchedules(program, facility);
-    verify(periodRepository).findByProcessingSchedule(schedule, pageable);
+    verify(periodRepository).search(schedule, null, null, pageable);
   }
 
   @Test(expected = NotFoundException.class)
@@ -139,7 +139,7 @@ public class ProcessingPeriodServiceTest {
     doReturn(null).when(processingScheduleRepository).findOne(schedule.getId());
 
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        null, null, schedule.getId(), null);
+        null, null, schedule.getId(), null, null);
 
     periodService.searchPeriods(params, pageable);
   }
@@ -147,30 +147,27 @@ public class ProcessingPeriodServiceTest {
   @Test
   public void shouldFindPeriodsBySchedule() {
     doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
-        .when(periodRepository).findByProcessingSchedule(schedule, pageable);
+        .when(periodRepository).search(schedule, null, null, pageable);
 
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        null, null, schedule.getId(), null);
+        null, null, schedule.getId(), null, null);
 
     periodService.searchPeriods(params, pageable);
 
-    verify(periodRepository).findByProcessingSchedule(schedule, pageable);
+    verify(periodRepository).search(schedule, null, null, pageable);
   }
 
   @Test
-  public void shouldFindPeriodsWithinProvidedDateIfTheyExist() {
+  public void shouldFindPeriodsWithStartDateAndEndDate() {
     List<ProcessingPeriod> matchedPeriods = new ArrayList<>();
     matchedPeriods.addAll(periods);
     matchedPeriods.remove(periods.get(0));
 
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        null, null, schedule.getId(), periods.get(0).getStartDate());
+        null, null, schedule.getId(), periods.get(0).getStartDate(), periods.get(0).getEndDate());
 
     when(periodRepository
-        .findByProcessingScheduleAndStartDateLessThanEqual(
-            schedule,
-            periods.get(0).getStartDate(),
-            pageable))
+        .search(schedule, periods.get(0).getStartDate(), periods.get(0).getEndDate(), pageable))
         .thenReturn(Pagination.getPage(matchedPeriods, pageable, 5));
 
     Page<ProcessingPeriod> receivedPeriods = periodService

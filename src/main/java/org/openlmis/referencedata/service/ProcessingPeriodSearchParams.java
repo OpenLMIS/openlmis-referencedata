@@ -42,6 +42,8 @@ public final class ProcessingPeriodSearchParams {
   private UUID processingScheduleId;
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
   private LocalDate startDate;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  private LocalDate endDate;
 
   /**
    * Validates if this search params contains a valid parameters.
