@@ -107,6 +107,9 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseBody
   public Page<ProcessingPeriodDto> getAllProcessingPeriods(ProcessingPeriodSearchParams params,
                                              @SortDefault(sort = "startDate") Pageable pageable) {
+    LOGGER.debug("period search start date {}", params.getStartDate());
+    LOGGER.debug("period search end date {}", params.getEndDate());
+
     Profiler profiler = new Profiler("SEARCH_PROCESSING_PERIODS");
     profiler.setLogger(LOGGER);
 
