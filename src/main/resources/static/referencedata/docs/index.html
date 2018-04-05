@@ -5,12 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>API Console</title>
   <link rel="stylesheet" href="../webjars/api-console/3.0.17/dist/styles/api-console-light-theme.css" type="text/css" />
+  <style type="text/css">
+    .raml-console-resource-panel-primary p {
+      font-family: inherit;
+    }
+  </style>
 </head>
 <body ng-cloak class="raml-console-body">
   <script type="text/javascript" src="../webjars/api-console/3.0.17/dist/scripts/api-console-vendor.js"></script>
   <script type="text/javascript" src="../webjars/api-console/3.0.17/dist/scripts/api-console.js"></script>
   <script type="text/javascript">
-    var currentProtocol, baseUrl, setProtocols;
+    var currentProtocol, baseUrl, setProtocols, sortResources;
 
     $.noConflict();
 
@@ -37,21 +42,33 @@
       }
     };
 
+    sortResources = function (resource) {
+      var i;
+
+      if (resource.resources) {
+        for (i = 0; i < resource.resources.length; i += 1) {
+          sortResources(resource.resources[i]);
+        }
+
+        resource.resources.sort(function (left, right) {
+          var leftLower = left.absoluteUri.toLowerCase(),
+              rightLower = right.absoluteUri.toLowerCase();
+
+          return leftLower > rightLower ? 1 : (leftLower < rightLower ? -1 : 0);
+        });
+      }
+    }
+
     angular.module('raml').config(function($provide) {
       $provide.decorator('ramlParser', function($delegate) {
         var originalMethod = $delegate.loadPath;
 
         $delegate.loadPath = function() {
           return originalMethod.apply($delegate, arguments).then(function (raml) {
-            var i;
-
             raml.specification.baseUri = baseUrl;
 
-            if (raml.specification.resources) {
-              for (i = 0; i < raml.specification.resources.length; i += 1) {
-                setProtocols(raml.specification.resources[i]);
-              }
-            }
+            setProtocols(raml.specification);
+            sortResources(raml.specification);
 
             return raml;
           });
