@@ -449,7 +449,7 @@ resourceTypes:
                       required: false
                       repeat: false
               endDate:
-                      displayName: startDate
+                      displayName: endDate
                       type: string
                       required: false
                       repeat: false
