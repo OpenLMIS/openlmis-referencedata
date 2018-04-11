@@ -3,6 +3,9 @@ pipeline {
     environment {
       PATH = "/usr/local/bin/:$PATH"
     }
+    parameters {
+        text(defaultValue: "", description: 'Custom environment variables to be used in contract tests', name: 'customEnv')
+    }
     stages {
         stage('Preparation') {
             steps {
@@ -92,6 +95,8 @@ pipeline {
                     }
                     sh 'set +x'
                     sh 'cp ./openlmis-config/contract_tests.env ./settings.env'
+
+                    sh "echo \"${params.customEnv}\" >> .env"
                     sh "sed -i '' -e 's#^OL_REFERENCEDATA_VERSION=.*#OL_REFERENCEDATA_VERSION=${VERSION_WITH_BUILD_NUMBER}#' .env  2>/dev/null || true"
 
                     sh './run_contract_tests.sh docker-compose.referencedata.yml -v'
