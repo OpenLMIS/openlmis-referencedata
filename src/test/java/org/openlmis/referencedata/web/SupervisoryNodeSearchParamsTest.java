@@ -19,7 +19,6 @@ import static java.util.Collections.emptySet;
 import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_INVALID_PARAMS;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.ID;
@@ -34,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.springframework.util.LinkedMultiValueMap;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -153,7 +153,7 @@ public class SupervisoryNodeSearchParamsTest {
   @Test
   public void shouldThrowExceptionIfThereIsUnknownParameterInParameters() {
     exception.expect(ValidationMessageException.class);
-    exception.expectMessage(ERROR_INVALID_PARAMS);
+    exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_INVALID_PARAMS);
 
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     queryMap.add("someParameter", "some-value");

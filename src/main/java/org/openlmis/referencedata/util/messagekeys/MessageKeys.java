@@ -59,6 +59,7 @@ public abstract class MessageKeys {
   protected static final String MUST_BE_PROVIDED = "mustBeProvided";
   protected static final String MISMATCH = "mismatch";
   protected static final String INVALID_LENGTH = "invalidLength";
+  protected static final String INVALID_PARAMS = "invalidParams";
 
   // Entities
   protected static final String LOT = "lot";

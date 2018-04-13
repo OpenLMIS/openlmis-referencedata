@@ -27,6 +27,7 @@ public class SearchParams {
   public static final String PAGE = "page";
   public static final String SIZE = "size";
   public static final String SORT = "sort";
+  public static final String ACCESS_TOKEN = "access_token";
 
   private MultiValueMap<String, Object> params;
 
@@ -39,6 +40,7 @@ public class SearchParams {
       params.remove(PAGE);
       params.remove(SIZE);
       params.remove(SORT);
+      params.remove(ACCESS_TOKEN);
     } else {
       params = new LinkedMultiValueMap<>();
     }

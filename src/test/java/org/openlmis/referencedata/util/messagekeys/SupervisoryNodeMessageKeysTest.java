@@ -29,13 +29,13 @@ public class SupervisoryNodeMessageKeysTest {
         SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     assertEquals("referenceData.error.supervisoryNode.notFound.with.id",
         SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_ID);
-    assertEquals("referenceData.error.supervisoryNode.search.lacksParameters",
-        SupervisoryNodeMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
     assertEquals("referenceData.error.supervisoryNode.code.required",
         SupervisoryNodeMessageKeys.ERROR_CODE_REQUIRED);
     assertEquals("referenceData.error.supervisoryNode.code.mustBeUnique",
         SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
     assertEquals("referenceData.error.supervisoryNode.name.required",
         SupervisoryNodeMessageKeys.ERROR_NAME_REQUIRED);
+    assertEquals("referenceData.error.supervisoryNode.search.invalidParams",
+        SupervisoryNodeMessageKeys.ERROR_INVALID_PARAMS);
   }
 }

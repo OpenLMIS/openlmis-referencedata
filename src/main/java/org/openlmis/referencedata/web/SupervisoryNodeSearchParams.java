@@ -26,7 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.UuidUtil;
-import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.springframework.util.MultiValueMap;
 
 @ToString
@@ -75,7 +75,7 @@ public final class SupervisoryNodeSearchParams {
     queryParams = new SearchParams(queryMap);
     if (!isValid()) {
       throw new ValidationMessageException(
-          OrderableMessageKeys.ERROR_INVALID_PARAMS);
+          SupervisoryNodeMessageKeys.ERROR_INVALID_PARAMS);
     }
 
     this.name = getSingleStringValue(queryMap, NAME_PARAM);
