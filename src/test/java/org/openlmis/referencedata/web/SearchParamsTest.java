@@ -39,7 +39,7 @@ public class SearchParamsTest {
   }
 
   @Test
-  public void containsKeyShouldReturnTrueIfKeyWasNotAdded() {
+  public void containsKeyShouldReturnFalseIfKeyWasNotAdded() {
     SearchParams searchParams = new SearchParams(map);
 
     assertFalse(searchParams.containsKey("notExist"));
