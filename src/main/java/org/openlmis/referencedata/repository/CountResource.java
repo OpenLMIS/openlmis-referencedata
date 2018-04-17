@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public final class CountResource {
@@ -34,9 +36,4 @@ public final class CountResource {
   @Getter
   @Setter
   private Long count;
-
-  public CountResource(UUID id, Long count) {
-    this.id = id;
-    this.count = count;
-  }
 }
