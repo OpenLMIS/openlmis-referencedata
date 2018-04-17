@@ -15,10 +15,12 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.NoArgsConstructor;
@@ -90,7 +92,8 @@ public class RoleController extends BaseController {
     List<CountResource> usersCount = roleAssignmentRepository.countUsersAssignedToRoles();
 
     profiler.start("TO_DTO");
-    Set<RoleDto> dtos = exportToDto(roles, usersCount);
+    Set<RoleDto> dtos = exportToDto(roles, usersCount.stream()
+        .collect(toMap(CountResource::getId, CountResource::getCount)));
 
     profiler.stop().log();
     return dtos;
@@ -244,14 +247,9 @@ public class RoleController extends BaseController {
     return roleDto;
   }
 
-  private Set<RoleDto> exportToDto(Set<Role> roles, List<CountResource> usersCount) {
+  private Set<RoleDto> exportToDto(Set<Role> roles, Map<UUID, Long> usersCount) {
     Set<RoleDto> dtos = roles.stream().map(this::exportToDto).collect(toSet());
-    dtos.forEach(role -> role.setCount(
-            usersCount.stream()
-                .filter(count -> count.getId().equals(role.getId()))
-                .findFirst()
-                .orElse(new CountResource(role.getId(), 0L))
-                .getCount()));
+    dtos.forEach(role -> role.setCount(usersCount.getOrDefault(role.getId(), 0L)));
     return dtos;
   }
 
