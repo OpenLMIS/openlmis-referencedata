@@ -26,6 +26,9 @@ import java.util.Set;
 import java.util.UUID;
 
 public class UserDataBuilder {
+
+  private static int instanceNumber = 0;
+
   private UUID id = UUID.randomUUID();
   private String username = "admin";
   private String firstName = "Admin";
@@ -40,6 +43,29 @@ public class UserDataBuilder {
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
   private Map<String, String> extraData = new HashMap<>();
   private Set<RightAssignment> rightAssignments = new HashSet<>();
+
+
+  /**
+   * Builds instance of {@link UserDataBuilder} with sample data.
+   */
+  public UserDataBuilder() {
+    instanceNumber++;
+
+    id = UUID.randomUUID();
+    username = "admin" + instanceNumber;
+    firstName = "Admin";
+    lastName = "User";
+    email = instanceNumber + "example@mail.com";
+    timezone = "UTC";
+    homeFacilityId = null;
+    verified = true;
+    active = true;
+    loginRestricted = false;
+    allowNotify = true;
+    roleAssignments = new HashSet<>();
+    extraData = new HashMap<>();
+    rightAssignments = new HashSet<>();
+  }
 
   /**
    * Builds instance of {@link User} without id.

@@ -24,7 +24,7 @@ import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -33,10 +33,14 @@ import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.repository.CountResource;
 import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.testbuilder.RightDataBuilder;
+import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
@@ -44,6 +48,9 @@ public class RoleControllerTest {
 
   @Mock
   private RoleRepository repository;
+
+  @Mock
+  private RoleAssignmentRepository roleAssignmentRepository;
 
   @Mock
   private RightRepository rightRepository;
@@ -67,7 +74,6 @@ public class RoleControllerTest {
   private Role role1;
   private List<Role> roles;
   private RoleDto role1Dto;
-  private UUID roleId;
 
   /**
    * Constructor for test.
@@ -76,17 +82,16 @@ public class RoleControllerTest {
     initMocks(this);
 
     right1Name = "right1";
-    right1 = Right.newRight(right1Name, RightType.GENERAL_ADMIN);
+    right1 = new RightDataBuilder().withName(right1Name).build();
     right2Name = "right2";
-    right2 = Right.newRight(right2Name, RightType.GENERAL_ADMIN);
+    right2 = new RightDataBuilder().withName(right2Name).build();
 
     role1Name = "role1";
-    role1 = Role.newRole(role1Name, right1, right2);
+    role1 = new RoleDataBuilder().withName(role1Name).withRights(right1, right2).build();
     roles = Collections.singletonList(role1);
 
     role1Dto = new RoleDto();
     role1.export(role1Dto);
-    roleId = UUID.randomUUID();
   }
   
   private void preparePostOrPut() {
@@ -101,6 +106,12 @@ public class RoleControllerTest {
     Set<RoleDto> expectedRoleDtos = Sets.newHashSet(role1Dto);
     when(repository.findAll()).thenReturn(roles);
 
+    List<CountResource> usersCount = roles.stream()
+        .map(role -> new CountResource(role.getId(), 1L))
+        .collect(Collectors.toList());
+    expectedRoleDtos.stream().forEach(role -> role.setCount(1L));
+    when(roleAssignmentRepository.countUsersAssignedToRoles()).thenReturn(usersCount);
+
     //when
     Set<RoleDto> roleDtos = controller.getAllRoles();
 
@@ -111,10 +122,10 @@ public class RoleControllerTest {
   @Test
   public void shouldGetRole() {
     //given
-    when(repository.findOne(roleId)).thenReturn(role1);
+    when(repository.findOne(role1.getId())).thenReturn(role1);
 
     //when
-    RoleDto roleDto = controller.getRole(roleId);
+    RoleDto roleDto = controller.getRole(role1.getId());
 
     //then
     assertEquals(role1Dto, roleDto);
@@ -123,10 +134,10 @@ public class RoleControllerTest {
   @Test(expected = NotFoundException.class)
   public void shouldNotGetNonExistingRole() {
     //given
-    when(repository.findOne(roleId)).thenReturn(null);
+    when(repository.findOne(role1.getId())).thenReturn(null);
 
     //when
-    controller.getRole(roleId);
+    controller.getRole(role1.getId());
   }
 
   @Test
@@ -161,7 +172,7 @@ public class RoleControllerTest {
     Role updatedRole1 = Role.newRole(role1Dto);
 
     //when
-    controller.updateRole(roleId, role1Dto);
+    controller.updateRole(role1.getId(), role1Dto);
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
@@ -178,7 +189,7 @@ public class RoleControllerTest {
     Role updatedRole1 = Role.newRole(role1Dto);
 
     //when
-    controller.updateRole(roleId, role1Dto);
+    controller.updateRole(role1.getId(), role1Dto);
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
@@ -198,7 +209,7 @@ public class RoleControllerTest {
     updatedRole1.export(updatedRole1Dto);
 
     //when
-    controller.updateRole(roleId, updatedRole1Dto);
+    controller.updateRole(role1.getId(), updatedRole1Dto);
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
@@ -218,7 +229,7 @@ public class RoleControllerTest {
     updatedRole1.export(updatedRole1Dto);
 
     //when
-    controller.updateRole(roleId, updatedRole1Dto);
+    controller.updateRole(role1.getId(), updatedRole1Dto);
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
@@ -235,7 +246,7 @@ public class RoleControllerTest {
     updatedRole1.export(updatedRole1Dto);
 
     //when
-    controller.updateRole(roleId, updatedRole1Dto);
+    controller.updateRole(role1.getId(), updatedRole1Dto);
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
@@ -245,21 +256,21 @@ public class RoleControllerTest {
   @Test
   public void shouldDeleteExistingRole() {
     //given
-    when(repository.findOne(roleId)).thenReturn(role1);
+    when(repository.findOne(role1.getId())).thenReturn(role1);
 
     //when
-    controller.deleteRole(roleId);
+    controller.deleteRole(role1.getId());
 
     //then
-    verify(repository).delete(roleId);
+    verify(repository).delete(role1.getId());
   }
 
   @Test(expected = NotFoundException.class)
   public void shouldNotDeleteNonExistingRole() {
     //given
-    when(repository.findOne(roleId)).thenReturn(null);
+    when(repository.findOne(role1.getId())).thenReturn(null);
 
     //when
-    controller.deleteRole(roleId);
+    controller.deleteRole(role1.getId());
   }
 }

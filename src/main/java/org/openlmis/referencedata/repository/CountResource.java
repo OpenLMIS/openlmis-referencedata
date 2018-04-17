@@ -15,20 +15,28 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import org.openlmis.referencedata.domain.RoleAssignment;
-import org.openlmis.referencedata.dto.RoleAssignmentDto;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-public interface RoleAssignmentRepository extends JpaRepository<RoleAssignment, UUID> {
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
+public final class CountResource {
 
-  @Query(name = "RoleAssignment.findByUser", nativeQuery = true)
-  Set<RoleAssignmentDto> findByUser(@Param("userId") UUID userId);
+  @Getter
+  @Setter
+  private UUID id;
 
-  @Query(name = "RoleAssignment.countUsersAssignedToRoles", nativeQuery = true)
-  List<CountResource> countUsersAssignedToRoles();
+  @Getter
+  @Setter
+  private Long count;
+
+  public CountResource(UUID id, Long count) {
+    this.id = id;
+    this.count = count;
+  }
 }

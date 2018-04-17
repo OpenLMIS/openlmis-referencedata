@@ -39,6 +39,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.CountResource;
 import org.openlmis.referencedata.util.Message;
 
 @Entity
@@ -55,7 +56,12 @@ import org.openlmis.referencedata.util.Message;
             + "   , ra.warehouseid"
             + " FROM referencedata.role_assignments ra"
             + " WHERE ra.userid = :userId",
-        resultSetMapping = "RoleAssignment.idResource")
+        resultSetMapping = "RoleAssignment.idResource"),
+    @NamedNativeQuery(name = "RoleAssignment.countUsersAssignedToRoles",
+        query = "SELECT ra.roleid as id, COUNT(DISTINCT ra.userid) as count"
+            + " FROM referencedata.role_assignments ra"
+            + " GROUP BY roleid",
+        resultSetMapping = "RoleAssignment.countResource")
     })
 @SqlResultSetMappings({
     @SqlResultSetMapping(
@@ -68,6 +74,18 @@ import org.openlmis.referencedata.util.Message;
                     @ColumnResult(name = "programid", type = UUID.class),
                     @ColumnResult(name = "supervisorynodeid", type = UUID.class),
                     @ColumnResult(name = "warehouseid", type = UUID.class)
+                }
+            )
+        }
+    ),
+    @SqlResultSetMapping(
+        name = "RoleAssignment.countResource",
+        classes = {
+            @ConstructorResult(
+                targetClass = CountResource.class,
+                columns = {
+                    @ColumnResult(name = "id", type = UUID.class),
+                    @ColumnResult(name = "count", type = Long.class)
                 }
             )
         }
