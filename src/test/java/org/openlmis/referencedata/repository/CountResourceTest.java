@@ -15,20 +15,24 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import org.openlmis.referencedata.domain.RoleAssignment;
-import org.openlmis.referencedata.dto.RoleAssignmentDto;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-public interface RoleAssignmentRepository extends JpaRepository<RoleAssignment, UUID> {
+public class CountResourceTest {
 
-  @Query(name = "RoleAssignment.findByUser", nativeQuery = true)
-  Set<RoleAssignmentDto> findByUser(@Param("userId") UUID userId);
+  @Test
+  public void equalsContract() {
+    EqualsVerifier.forClass(CountResource.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
 
-  @Query(name = "RoleAssignment.countUsersAssignedToRoles", nativeQuery = true)
-  List<CountResource> countUsersAssignedToRoles();
+  @Test
+  public void shouldImplementToString() {
+    CountResource countResource = new CountResource();
+    ToStringTestUtils.verify(CountResource.class, countResource);
+  }
 }

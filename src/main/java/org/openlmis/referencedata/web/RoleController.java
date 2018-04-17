@@ -18,14 +18,19 @@ package org.openlmis.referencedata.web;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.Sets;
-
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.dto.RightDto;
 import org.openlmis.referencedata.dto.RoleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.repository.CountResource;
 import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
@@ -47,11 +52,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import lombok.NoArgsConstructor;
-
-import java.util.Set;
-import java.util.UUID;
-
 @NoArgsConstructor
 @Controller
 @Transactional
@@ -61,6 +61,9 @@ public class RoleController extends BaseController {
 
   @Autowired
   private RoleRepository roleRepository;
+
+  @Autowired
+  private RoleAssignmentRepository roleAssignmentRepository;
 
   @Autowired
   private RightRepository rightRepository;
@@ -77,10 +80,20 @@ public class RoleController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Set<RoleDto> getAllRoles() {
-    
-    LOGGER.debug("Getting all roles");
+    Profiler profiler = new Profiler("GET_ALL_ROLES");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("GET_ALL_ROLES_REPOSITORY");
     Set<Role> roles = Sets.newHashSet(roleRepository.findAll());
-    return roles.stream().map(this::exportToDto).collect(toSet());
+
+    profiler.start("COUNT_ASSIGNED_USERS_TO_ROLES");
+    List<CountResource> usersCount = roleAssignmentRepository.countUsersAssignedToRoles();
+
+    profiler.start("TO_DTO");
+    Set<RoleDto> dtos = exportToDto(roles, usersCount);
+
+    profiler.stop().log();
+    return dtos;
   }
 
   /**
@@ -229,6 +242,17 @@ public class RoleController extends BaseController {
     RoleDto roleDto = new RoleDto();
     role.export(roleDto);
     return roleDto;
+  }
+
+  private Set<RoleDto> exportToDto(Set<Role> roles, List<CountResource> usersCount) {
+    Set<RoleDto> dtos = roles.stream().map(this::exportToDto).collect(toSet());
+    dtos.forEach(role -> role.setCount(
+            usersCount.stream()
+                .filter(count -> count.getId().equals(role.getId()))
+                .findFirst()
+                .orElse(new CountResource(role.getId(), 0L))
+                .getCount()));
+    return dtos;
   }
 
   private void populateRights(RoleDto roleDto) {

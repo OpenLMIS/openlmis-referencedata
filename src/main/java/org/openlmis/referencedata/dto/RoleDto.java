@@ -37,6 +37,10 @@ public class RoleDto extends BaseDto implements Role.Exporter, Role.Importer {
 
   private Set<RightDto> rights = new HashSet<>();
 
+  @Getter
+  @Setter
+  private Long count;
+
   @Override
   public void setRights(Set<Right> rights) {
     for (Right right : rights) {
