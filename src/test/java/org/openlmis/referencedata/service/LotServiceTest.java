@@ -17,7 +17,9 @@ package org.openlmis.referencedata.service;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +36,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
@@ -125,8 +126,8 @@ public class LotServiceTest {
     assertEquals(expected, result);
   }
 
-  @Test(expected = ValidationMessageException.class)
-  public void searchShouldThrowExceptionIfTradeItemDoesNotExist() {
+  @Test
+  public void searchShouldReturnEmptyListIfTradeItemDoesNotExist() {
     when(tradeItemRepository.findAll(singletonList(tradeItem.getId()))).thenReturn(emptyList());
 
     LotSearchParams lotSearchParams = new LotSearchParams(
@@ -136,7 +137,8 @@ public class LotServiceTest {
         ImmutableList.of(lot.getId())
     );
 
-    lotService.search(lotSearchParams, pageable);
+    Page<Lot> result = lotService.search(lotSearchParams, pageable);
+    assertThat(result.getContent(), hasSize(0));
   }
 
   @Test(expected = NullPointerException.class)

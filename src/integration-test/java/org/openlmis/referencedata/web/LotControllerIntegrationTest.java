@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -54,7 +55,6 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -248,21 +248,19 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldReturnBadRequestWhenTradeItemNotFound() {
-    when(tradeItemRepository.findOne(any(UUID.class))).thenReturn(null);
+  public void shouldReturnEmptyListWhenTradeItemNotFound() {
+    when(tradeItemRepository.findAll(anyListOf(UUID.class))).thenReturn(emptyList());
 
-    String messageKey = restAssured
+    restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("tradeItemId", lot.getTradeItem().getId())
         .when()
         .get(RESOURCE_URL)
         .then()
-        .statusCode(400)
-        .extract()
-        .path(MESSAGE_KEY);
+        .statusCode(200)
+        .body("content", hasSize(0));
 
-    assertThat(messageKey, Matchers.is(equalTo(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

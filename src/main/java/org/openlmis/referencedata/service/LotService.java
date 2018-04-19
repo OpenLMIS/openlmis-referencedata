@@ -15,24 +15,20 @@
 
 package org.openlmis.referencedata.service;
 
-import static org.apache.commons.collections4.IterableUtils.isEmpty;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 import java.util.Collections;
+import java.util.List;
+import javax.validation.constraints.NotNull;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
+import org.openlmis.referencedata.util.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 public class LotService {
@@ -51,8 +47,15 @@ public class LotService {
    * @return the Page of lots found, or an empty page.
    */
   public Page<Lot> search(@NotNull LotSearchParams requestParams, Pageable pageable) {
+    List<TradeItem> tradeItems = Collections.emptyList();
 
-    List<TradeItem> tradeItems = getTradeItems(requestParams.getTradeItemId());
+    if (!isEmpty(requestParams.getTradeItemId())) {
+      tradeItems = tradeItemRepository.findAll(requestParams.getTradeItemId());
+
+      if (tradeItems.isEmpty()) {
+        return Pagination.getPage(Collections.emptyList(), pageable, 0);
+      }
+    }
 
     return lotRepository.search(
         tradeItems,
@@ -63,17 +66,4 @@ public class LotService {
     );
   }
 
-  private List<TradeItem> getTradeItems(Collection<UUID> id) {
-    if (isEmpty(id)) {
-      return Collections.emptyList();
-    }
-
-    List<TradeItem> tradeItems = tradeItemRepository.findAll(id);
-    if (tradeItems.size() != id.size()) {
-      throw new ValidationMessageException(
-          new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, id));
-    }
-
-    return tradeItems;
-  }
 }
