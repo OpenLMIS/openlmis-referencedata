@@ -15,7 +15,9 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +34,7 @@ import org.springframework.data.domain.PageRequest;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Sort.Direction;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class ProcessingPeriodRepositoryIntegrationTest
@@ -111,23 +114,6 @@ public class ProcessingPeriodRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindPeriodsByScheduleList() {
-    ProcessingSchedule schedule2 = new ProcessingScheduleDataBuilder().buildWithoutId();
-    scheduleRepository.save(schedule2);
-    periodRepository.save(generateInstance(schedule2));
-
-    List<ProcessingPeriod> periods = periodRepository.findByProcessingSchedule(schedule);
-    assertEquals(3, periods.size());
-    assertEquals(schedule, periods.get(0).getProcessingSchedule());
-    assertEquals(schedule, periods.get(1).getProcessingSchedule());
-    assertEquals(schedule, periods.get(2).getProcessingSchedule());
-
-    periods = periodRepository.findByProcessingSchedule(schedule2);
-    assertEquals(1, periods.size());
-    assertEquals(schedule2, periods.get(0).getProcessingSchedule());
-  }
-
-  @Test
   public void shouldFindPeriodsByScheduleAndStartDateAndEndDate() {
     ProcessingSchedule newSchedule = scheduleRepository
         .save(new ProcessingScheduleDataBuilder().buildWithoutId());
@@ -146,23 +132,45 @@ public class ProcessingPeriodRepositoryIntegrationTest
   }
 
   @Test
+  public void shouldSortByStartDateDesc() {
+    pageable = new PageRequest(0, 10, Direction.DESC, "startDate");
+
+    Page<ProcessingPeriod> page = periodRepository.search(schedule, null, null, pageable);
+    List<ProcessingPeriod> content = page.getContent();
+
+    assertThat(content, hasSize(3));
+    assertThat(content, contains(period3, period2, period1));
+  }
+
+  @Test
+  public void shouldFindPeriodsByScheduleList() {
+    ProcessingSchedule schedule2 = new ProcessingScheduleDataBuilder().buildWithoutId();
+    scheduleRepository.save(schedule2);
+    periodRepository.save(generateInstance(schedule2));
+
+    List<ProcessingPeriod> periods = periodRepository.findByProcessingSchedule(schedule);
+    assertEquals(3, periods.size());
+    assertEquals(schedule, periods.get(0).getProcessingSchedule());
+    assertEquals(schedule, periods.get(1).getProcessingSchedule());
+    assertEquals(schedule, periods.get(2).getProcessingSchedule());
+
+    periods = periodRepository.findByProcessingSchedule(schedule2);
+    assertEquals(1, periods.size());
+    assertEquals(schedule2, periods.get(0).getProcessingSchedule());
+  }
+
+  @Test
   public void shouldFindPeriodsByNameAndSchedule() {
-    ProcessingPeriod period = periodRepository.save(generateInstance());
-
-    ProcessingPeriod period2 = generateInstance(period.getStartDate().plusMonths(1),
-        period.getEndDate().plusMonths(1));
-    periodRepository.save(period2);
-
-    ProcessingPeriod period3 = new ProcessingPeriodDataBuilder()
+    period3 = new ProcessingPeriodDataBuilder()
         .withName("some-other-name")
         .withSchedule(schedule)
         .buildAsNew();
     periodRepository.save(period3);
 
     Optional<ProcessingPeriod> result = periodRepository
-        .findOneByNameAndProcessingSchedule(period.getName(), schedule);
+        .findOneByNameAndProcessingSchedule(period1.getName(), schedule);
     assertTrue(result.isPresent());
-    assertEquals(period, result.get());
+    assertEquals(period1, result.get());
   }
 
   ProcessingPeriod generateInstance() {

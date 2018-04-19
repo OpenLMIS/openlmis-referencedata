@@ -16,11 +16,15 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.tuple.Pair;
@@ -30,6 +34,7 @@ import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCu
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositoryCustom {
 
@@ -55,10 +60,10 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<ProcessingPeriod> periodQuery = builder.createQuery(ProcessingPeriod.class);
-    periodQuery = prepareQuery(periodQuery, schedule, startDate, endDate, false, builder);
+    periodQuery = prepareQuery(periodQuery, schedule, startDate, endDate, false, builder, pageable);
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery = prepareQuery(countQuery, schedule, startDate, endDate, true, builder);
+    countQuery = prepareQuery(countQuery, schedule, startDate, endDate, true, builder, pageable);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -72,7 +77,8 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
   }
 
   private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, ProcessingSchedule schedule,
-      LocalDate startDate, LocalDate endDate, boolean count, CriteriaBuilder builder) {
+      LocalDate startDate, LocalDate endDate, boolean count, CriteriaBuilder builder,
+      Pageable pageable) {
     Root<ProcessingPeriod> root = query.from(ProcessingPeriod.class);
 
     if (count) {
@@ -96,6 +102,32 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
     }
 
     query.where(predicate);
+
+    if (!count && pageable != null && pageable.getSort() != null) {
+      query = addSortProperties(query, root, builder, pageable);
+    }
+
     return query;
+  }
+
+  private <T> CriteriaQuery<T> addSortProperties(CriteriaQuery<T> query,
+      Root<ProcessingPeriod> root, CriteriaBuilder builder, Pageable pageable) {
+    List<Order> orders = new ArrayList<>();
+    Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+    Sort.Order order;
+
+    while (iterator.hasNext()) {
+      order = iterator.next();
+      String property = order.getProperty();
+      Path path = root.get(property);
+
+      if (order.isAscending()) {
+        orders.add(builder.asc(path));
+      } else {
+        orders.add(builder.desc(path));
+      }
+    }
+
+    return query.orderBy(orders);
   }
 }
