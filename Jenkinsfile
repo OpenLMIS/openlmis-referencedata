@@ -116,6 +116,11 @@ pipeline {
             }
         }
         stage('Push image') {
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'master' || env.GIT_BRANCH =~ /rel-.+/
+                }
+            }
             steps {
                 sh "docker tag openlmis/referencedata:${VERSION_WITH_BUILD_NUMBER} openlmis/referencedata:${VERSION}"
                 sh "docker push openlmis/referencedata:${VERSION}"
