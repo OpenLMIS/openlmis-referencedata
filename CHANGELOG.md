@@ -1,5 +1,5 @@
-10.0.0 / WIP
-============
+10.0.0 / 2018-04-28
+===================
 
 Breaking changes:
 * [OLMIS-3600](https://openlmis.atlassian.net/browse/OLMIS-3600): Paginate and add get by ids
