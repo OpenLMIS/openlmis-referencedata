@@ -86,33 +86,8 @@ pipeline {
         }
         stage('Contract tests') {
             steps {
-                dir('contract-tests') {
-                    git url: 'https://github.com/OpenLMIS/openlmis-contract-tests.git'
-                    dir('openlmis-config') {
-                        git branch: 'master',
-                            credentialsId: 'OpenLMISConfigKey',
-                            url: 'git@github.com:villagereach/openlmis-config.git'
-                    }
-                    sh 'set +x'
-                    sh 'cp ./openlmis-config/contract_tests.env ./settings.env'
-
-                    sh "echo \"${params.customEnv}\" >> .env"
-                    sh "sed -i '' -e 's#^OL_REFERENCEDATA_VERSION=.*#OL_REFERENCEDATA_VERSION=${VERSION_WITH_BUILD_NUMBER}#' .env  2>/dev/null || true"
-
-                    sh './run_contract_tests.sh docker-compose.referencedata.yml -v'
-                    junit healthScaleFactor: 1.0, testResults: 'build/cucumber/junit/**.xml'
-
-                    sh './run_contract_tests.sh docker-compose.fulfillment.yml -v'
-                }
-            }
-            post {
-                always {
-                    sh '''
-                        rm -Rf ./contract-tests/openlmis-config
-                        rm -f ./contract-tests/settings.env
-                    '''
-                    junit healthScaleFactor: 1.0, testResults: 'contract-tests/build/cucumber/junit/**.xml'
-                }
+                build job: 'OpenLMIS-referencedata-contract-test', propagate: true, wait: true
+                build job: 'OpenLMIS-fulfillment-contract-test', propagate: true, wait: true
             }
         }
         stage('Push image') {
