@@ -1,3 +1,9 @@
+10.1.0 / WIP
+============
+
+New functionality added in a backwards-compatible manner:
+* [OLMIS-2245](https://openlmis.atlassian.net/browse/OLMIS-2245): Added GTIN to TradeItem
+
 10.0.0 / 2018-04-28
 ===================
 
