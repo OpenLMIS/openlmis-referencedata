@@ -2,7 +2,7 @@
 ============
 
 New functionality added in a backwards-compatible manner:
-* [OLMIS-2245](https://openlmis.atlassian.net/browse/OLMIS-2245): Added GTIN to TradeItem
+* [OLMIS-2245](https://openlmis.atlassian.net/browse/OLMIS-2245): Added user count to Role resource.
 
 10.0.0 / 2018-04-28
 ===================
