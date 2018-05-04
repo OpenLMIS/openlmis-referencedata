@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -180,5 +183,30 @@ public class SupervisionRoleAssignmentTest {
 
     //then
     assertThat(supervisedFacilities.size(), is(0));
+  }
+
+  @Test
+  public void shouldAddRightAssignmentsIfUserHasHomeFacility() {
+    user.getRightAssignments().clear();
+
+    new SupervisionRoleAssignment(role, user, program);
+
+    assertThat(
+        user.getRightAssignments(),
+        hasItem(hasProperty("facilityId", is(user.getHomeFacilityId())))
+    );
+  }
+
+  @Test
+  public void shouldNotAddRightAssignmentsIfUserHomeFacilityIsNull() {
+    user.setHomeFacilityId(null);
+    user.getRightAssignments().clear();
+
+    new SupervisionRoleAssignment(role, user, program);
+
+    assertThat(
+        user.getRightAssignments(),
+        not(hasItem(hasProperty("facilityId", is(user.getHomeFacilityId()))))
+    );
   }
 }

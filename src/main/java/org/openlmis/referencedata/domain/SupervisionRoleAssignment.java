@@ -135,7 +135,7 @@ public class SupervisionRoleAssignment extends RoleAssignment {
           user.addRightAssignment(right.getName(), facility.getId(), program.getId());
         }
       }
-    } else {
+    } else if (user.getHomeFacilityId() != null) {
       for (Right right : role.getRights()) {
         user.addRightAssignment(right.getName(), user.getHomeFacilityId(), program.getId());
       }

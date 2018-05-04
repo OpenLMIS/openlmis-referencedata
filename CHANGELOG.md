@@ -4,6 +4,9 @@
 New functionality added in a backwards-compatible manner:
 * [OLMIS-2245](https://openlmis.atlassian.net/browse/OLMIS-2245): Added user count to Role resource.
 
+Bug fixes, security and performance improvements, also backwards-compatible:
+* [OLMIS-4422](https://openlmis.atlassian.net/browse/OLMIS-4422): Stop creating right assignments for supervision role assignments when user has no home facility.
+
 10.0.0 / 2018-04-28
 ===================
 

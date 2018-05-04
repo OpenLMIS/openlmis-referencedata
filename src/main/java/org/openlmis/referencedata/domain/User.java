@@ -17,6 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.AccessLevel;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.util.View;
@@ -116,6 +117,7 @@ public class User extends BaseEntity {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @DiffIgnore
+  @Getter(AccessLevel.PACKAGE)
   private Set<RightAssignment> rightAssignments = new HashSet<>();
 
   private User(Importer importer) {
