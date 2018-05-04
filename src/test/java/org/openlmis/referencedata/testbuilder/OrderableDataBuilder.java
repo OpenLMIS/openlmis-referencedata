@@ -15,15 +15,15 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.ProgramOrderable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public class OrderableDataBuilder {
 
@@ -37,7 +37,7 @@ public class OrderableDataBuilder {
   private long netContent;
   private long packRoundingTreshold;
   private boolean roundToZero;
-  private Set<ProgramOrderable> programOrderables;
+  private List<ProgramOrderable> programOrderables;
   private Map<String, String> identifiers;
   private Map<String, String> extraData;
 
@@ -51,15 +51,31 @@ public class OrderableDataBuilder {
     productCode = Code.code("P" + instanceNumber);
     dispensable = Dispensable.createNew("pack");
     fullProductName = "product " + instanceNumber;
+    description = "description";
     netContent = 10;
     packRoundingTreshold = 5;
     roundToZero = false;
-    programOrderables = new HashSet<>();
+    programOrderables = new ArrayList<>();
     identifiers = new HashMap<>();
   }
 
   public OrderableDataBuilder withIdentifier(String key, Object valueToString) {
     this.identifiers.put(key, valueToString.toString());
+    return this;
+  }
+
+  public OrderableDataBuilder withProductCode(Code productCode) {
+    this.productCode = productCode;
+    return this;
+  }
+
+  public OrderableDataBuilder withDispensable(Dispensable dispensable) {
+    this.dispensable = dispensable;
+    return this;
+  }
+
+  public OrderableDataBuilder withFullProductName(String fullProductName) {
+    this.fullProductName = fullProductName;
     return this;
   }
 

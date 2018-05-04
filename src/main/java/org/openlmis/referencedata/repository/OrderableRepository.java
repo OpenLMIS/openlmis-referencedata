@@ -15,31 +15,27 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.List;
+import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Persistence repository for saving/finding {@link Orderable}.
  */
 @JaversSpringDataAuditable
 public interface OrderableRepository extends
-    PagingAndSortingRepository<Orderable, UUID>, OrderableRepositoryCustom {
+    JpaRepository<Orderable, UUID>, OrderableRepositoryCustom {
 
   @Override
   <S extends Orderable> S save(S entity);
-
-  @Override
-  <S extends Orderable> Iterable<S> save(Iterable<S> entities);
 
   <S extends Orderable> S findByProductCode(Code code);
 

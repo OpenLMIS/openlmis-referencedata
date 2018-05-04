@@ -17,7 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.Sets;
+import java.util.Arrays;
 import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class OrderableTest {
     ProgramOrderable ibuprofenInFp =
         ProgramOrderable.createNew(fp, testCat, null, CurrencyUnit.USD);
     ibuprofen = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-        DESCRIPTION, 10, 5, false, Sets.newHashSet(ibuprofenInEm, ibuprofenInFp), null, null);
+        DESCRIPTION, 10, 5, false, Arrays.asList(ibuprofenInEm, ibuprofenInFp), null, null);
     ibuprofenInEm.setProduct(ibuprofen);
     ibuprofenInFp.setProduct(ibuprofen);
 

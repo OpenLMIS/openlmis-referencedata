@@ -17,17 +17,16 @@ package org.openlmis.referencedata.util;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 public class OrderableBuilder {
@@ -51,7 +50,7 @@ public class OrderableBuilder {
           .map(item -> programRepository.findOne(item.getProgramId()))
           .collect(Collectors.toMap(Program::getId, program -> program));
 
-      Set<ProgramOrderable> programOrderables = importer
+      List<ProgramOrderable> programOrderables = importer
           .getPrograms()
           .stream()
           .map(item -> {
@@ -63,7 +62,7 @@ public class OrderableBuilder {
 
             return programOrderable;
           })
-          .collect(Collectors.toSet());
+          .collect(Collectors.toList());
 
       orderable.setProgramOrderables(programOrderables);
     }

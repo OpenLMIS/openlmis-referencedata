@@ -18,6 +18,16 @@ package org.openlmis.referencedata.repository.custom.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
+import java.util.List;
+import java.util.UUID;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Code;
@@ -32,17 +42,6 @@ import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 public class FacilityTypeApprovedProductRepositoryImpl
     implements FacilityTypeApprovedProductRepositoryCustom {
@@ -173,8 +172,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
     conjunctionPredicate = builder.and(conjunctionPredicate,
         builder.equal(ft.get(CODE), facilityTypeCode));
     Join<FacilityTypeApprovedProduct, Orderable> orderable = ftap.join("orderable");
-    Join<Orderable, Set<ProgramOrderable>> programOrderables =
-        orderable.joinSet("programOrderables");
+    Join<Orderable, List<ProgramOrderable>> programOrderables =
+        orderable.joinList("programOrderables");
 
     conjunctionPredicate = builder.and(conjunctionPredicate,
         builder.isTrue(programOrderables.get("active")));

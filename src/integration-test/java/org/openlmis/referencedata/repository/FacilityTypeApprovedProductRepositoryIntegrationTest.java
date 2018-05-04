@@ -135,7 +135,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
         .createNew(program, orderableDisplayCategory, null, currencyUnit);
     orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
         "Ibuprofen", DESCRIPTION, 10, 5, false,
-        Collections.singleton(programOrderableFullSupply), identifiers, extraData);
+        Collections.singletonList(programOrderableFullSupply), identifiers, extraData);
     programOrderableFullSupply.setProduct(orderableFullSupply);
     orderableRepository.save(orderableFullSupply);
 
@@ -143,7 +143,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
         .createNew(program2, orderableDisplayCategory, null, currencyUnit);
     orderable1 = new Orderable(Code.code("levora"), Dispensable.createNew("each"),
         "Levora", DESCRIPTION, 10, 5, false,
-        Collections.singleton(programOrderable1), identifiers, extraData);
+        Collections.singletonList(programOrderable1), identifiers, extraData);
     programOrderable1.setProduct(orderable1);
     orderableRepository.save(orderable1);
 
@@ -151,7 +151,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
         .createNew(program2, orderableDisplayCategory, null, currencyUnit);
     orderable2 = new Orderable(Code.code("glibenclamide"), Dispensable.createNew("each"),
         "Glibenclamide", DESCRIPTION, 10, 5, false,
-        Collections.singleton(programOrderable2), identifiers, extraData);
+        Collections.singletonList(programOrderable2), identifiers, extraData);
     programOrderable2.setProduct(orderable2);
     orderableRepository.save(orderable2);
 
@@ -160,7 +160,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
             Money.of(currencyUnit, 0), currencyUnit);
     orderableNonFullSupply = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
         "Gloves", DESCRIPTION, 6, 3, false,
-        Collections.singleton(programOrderableNonFullSupply), identifiers, extraData);
+        Collections.singletonList(programOrderableNonFullSupply), identifiers, extraData);
     programOrderableNonFullSupply.setProduct(orderableNonFullSupply);
     orderableRepository.save(orderableNonFullSupply);
 

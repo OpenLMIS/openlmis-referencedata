@@ -15,22 +15,12 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.referencedata.dto.ProgramOrderableDto;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -45,6 +35,14 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
 /**
  * Products that are Orderable by Program.  An Orderable represent any medical commodities
@@ -88,7 +86,7 @@ public class Orderable extends BaseEntity {
       fetch = FetchType.EAGER)
   @DiffIgnore
   @Setter
-  private Set<ProgramOrderable> programOrderables;
+  private List<ProgramOrderable> programOrderables;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @MapKeyColumn(name = "key")
@@ -188,7 +186,7 @@ public class Orderable extends BaseEntity {
     orderable.netContent = importer.getNetContent();
     orderable.packRoundingThreshold = importer.getPackRoundingThreshold();
     orderable.roundToZero = importer.getRoundToZero();
-    orderable.programOrderables = new HashSet<>();
+    orderable.programOrderables = new ArrayList<>();
 
     orderable.identifiers = importer.getIdentifiers();
     orderable.extraData = importer.getExtraData();

@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.TypeName;
@@ -37,7 +38,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "program_orderables", schema = "referencedata")
+@Table(name = "program_orderables", schema = "referencedata",
+    uniqueConstraints = @UniqueConstraint(
+        name = "unq_orderableid_programid", columnNames = {"orderableid", "programid"})
+    )
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("ProgramOrderable")

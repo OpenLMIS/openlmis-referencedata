@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.repository;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -26,8 +28,14 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
 import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
 
-import com.google.common.collect.Sets;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+import org.assertj.core.api.Assertions;
 import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -42,20 +50,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<Orderable> {
+
+  private static final String CODE = "abcd";
+  private static final String NAME = "Abcd";
+  private static final String EACH = "each";
+  private static final String DESCRIPTION = "description";
+  private static final String ORDERABLE_NAME = "abc";
+  private static final String SOME_CODE = "some-code";
 
   @Autowired
   private OrderableRepository repository;
@@ -64,19 +70,10 @@ public class OrderableRepositoryIntegrationTest
   private ProgramRepository programRepository;
 
   @Autowired
-  private ProgramOrderableRepository programOrderableRepository;
-
-  @Autowired
   private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
   @Autowired
   private EntityManager entityManager;
-
-  private static final String CODE = "abcd";
-  private static final String NAME = "Abcd";
-  private static final String EACH = "each";
-  private static final String DESCRIPTION = "description";
-  private static final String ORDERABLE_NAME = "abc";
 
   @Override
   CrudRepository<Orderable, UUID> getRepository() {
@@ -90,11 +87,34 @@ public class OrderableRepositoryIntegrationTest
   }
 
   Orderable generateInstance(Code productCode) {
-    HashMap<String, String> identificators = new HashMap<>();
-    identificators.put("cSys", "cSysId");
-    HashMap<String, String> extraData = new HashMap<>();
-    return new Orderable(productCode, Dispensable.createNew(EACH),
-        NAME, DESCRIPTION, 10, 5, false, new HashSet<>(), identificators, extraData);
+    return new OrderableDataBuilder()
+        .withProductCode(productCode)
+        .withIdentifier("cSys", "cSysId")
+        .withDispensable(Dispensable.createNew(EACH))
+        .withFullProductName(NAME)
+        .buildAsNew();
+  }
+
+  @Test
+  public void shouldNotAllowForDuplicatedProgramOrderables() {
+    // given
+    OrderableDisplayCategory orderableDisplayCategory = createOrderableDisplayCategory(SOME_CODE);
+    OrderableDisplayCategory orderableDisplayCategory2 =
+        createOrderableDisplayCategory("some-other-code");
+    Program program = createProgram(SOME_CODE);
+    Orderable orderable = generateInstance();
+
+    ProgramOrderable programOrderable =
+        ProgramOrderable.createNew(program, orderableDisplayCategory, orderable, CurrencyUnit.USD);
+    ProgramOrderable programOrderableDuplicated =
+        ProgramOrderable.createNew(program, orderableDisplayCategory2, orderable, CurrencyUnit.USD);
+    orderable.setProgramOrderables(Arrays.asList(programOrderable, programOrderableDuplicated));
+
+    // when
+    Throwable thrown = catchThrowable(() -> repository.saveAndFlush(orderable));
+
+    // then
+    Assertions.assertThat(thrown).hasMessageContaining("unq_orderableid_programid");
   }
 
   @Test
@@ -109,7 +129,7 @@ public class OrderableRepositoryIntegrationTest
     repository.save(generateInstance());
 
     // when
-    Set<UUID> ids = Sets.newHashSet(orderable.getId(), orderable2.getId());
+    Set<UUID> ids = newHashSet(orderable.getId(), orderable2.getId());
     Page<Orderable> found = repository.findAllByIds(ids, null);
 
     // then
@@ -223,9 +243,8 @@ public class OrderableRepositoryIntegrationTest
   @Test
   public void shouldNotFindAnyOrderableForIncorrectCodeAndName() {
     // given a program and an orderable in that program
-    Program validProgram = new Program("valid-code");
-    programRepository.save(validProgram);
-    Set<ProgramOrderable> programOrderables = new HashSet<>();
+    Program validProgram = createProgram("valid-code");
+    List<ProgramOrderable> programOrderables = new ArrayList<>();
     Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
         Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
         null);
@@ -243,7 +262,7 @@ public class OrderableRepositoryIntegrationTest
   @Test
   public void shouldFindOrderablesByProgram() {
     // given a program and an orderable in that program
-    String programCode = "some-code";
+    String programCode = SOME_CODE;
     Orderable validOrderable = createOrderableWithSupportedProgram(programCode);
 
     // given another program and another orderable in that program
@@ -261,11 +280,10 @@ public class OrderableRepositoryIntegrationTest
   @Test
   public void shouldFindOrderablesByProgramCodeIgnoreCase() {
     // given a program
-    Program validProgram = new Program("a-code");
-    programRepository.save(validProgram);
+    Program validProgram = createProgram("a-code");
 
     // given an orderable in that program
-    Set<ProgramOrderable> programOrderables = new HashSet<>();
+    List<ProgramOrderable> programOrderables = new ArrayList<>();
     Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
         Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
         null);
@@ -297,11 +315,10 @@ public class OrderableRepositoryIntegrationTest
   @Test
   public void shouldFindOrderablesByAllParams() {
     // given a program
-    Program validProgram = new Program("some-test-code");
-    programRepository.save(validProgram);
+    Program validProgram = createProgram("some-test-code");
 
     // given an orderable in that program
-    Set<ProgramOrderable> programOrderables = new HashSet<>();
+    List<ProgramOrderable> programOrderables = new ArrayList<>();
     Orderable validOrderable = new Orderable(Code.code(CODE), Dispensable.createNew(EACH),
         NAME, DESCRIPTION, 10, 5, false, programOrderables, null, null);
     repository.save(validOrderable);
@@ -443,21 +460,25 @@ public class OrderableRepositoryIntegrationTest
   }
 
   private ProgramOrderable createProgramOrderable(Program program, Orderable orderable) {
-    OrderableDisplayCategory orderableDisplayCategory = OrderableDisplayCategory.createNew(
-        Code.code("some-code"));
-    orderableDisplayCategoryRepository.save(orderableDisplayCategory);
+    OrderableDisplayCategory orderableDisplayCategory = createOrderableDisplayCategory(
+        "some-code");
 
     ProgramOrderable programOrderable = ProgramOrderable.createNew(program,
         orderableDisplayCategory, orderable, CurrencyUnit.USD);
-    programOrderableRepository.save(programOrderable);
 
     return programOrderable;
   }
 
+  private OrderableDisplayCategory createOrderableDisplayCategory(String someCode) {
+    OrderableDisplayCategory orderableDisplayCategory =
+        OrderableDisplayCategory.createNew(Code.code(someCode));
+    orderableDisplayCategoryRepository.save(orderableDisplayCategory);
+    return orderableDisplayCategory;
+  }
+
   private Orderable createOrderableWithSupportedProgram(String programCode) {
-    Program validProgram = new Program(programCode);
-    programRepository.save(validProgram);
-    Set<ProgramOrderable> programOrderables = new HashSet<>();
+    Program validProgram = createProgram(programCode);
+    List<ProgramOrderable> programOrderables = new ArrayList<>();
     Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
         Dispensable.createNew(EACH), NAME, DESCRIPTION, 10, 5, false, programOrderables, null,
         null);
@@ -465,5 +486,11 @@ public class OrderableRepositoryIntegrationTest
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     validOrderable = repository.save(validOrderable);
     return validOrderable;
+  }
+
+  private Program createProgram(String code) {
+    Program program = new Program(code);
+    programRepository.save(program);
+    return program;
   }
 }
