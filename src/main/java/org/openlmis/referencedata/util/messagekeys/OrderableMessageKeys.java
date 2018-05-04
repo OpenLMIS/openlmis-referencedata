@@ -30,4 +30,6 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   public static final String ERROR_DISPENSABLE_REQUIRED = join(ERROR, "dispensable", REQUIRED);
   public static final String ERROR_INVALID_PARAMS = join(ERROR, SEARCH, INVALID_PARAMS);
   public static final String ERROR_DUPLICATED = join(ERROR, DUPLICATED);
+  public static final String ERROR_PROGRAMS_DUPLICATED =
+      join(ERROR, "programOrderable", DUPLICATED);
 }
