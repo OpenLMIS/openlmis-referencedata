@@ -1,2 +1,3 @@
-ALTER TABLE ONLY program_orderables
-    ADD CONSTRAINT unq_orderableid_programid UNIQUE (orderableid, programid);
+CREATE UNIQUE INDEX unq_orderableid_programid
+ON program_orderables(orderableid, programid)
+WHERE (active = TRUE)
