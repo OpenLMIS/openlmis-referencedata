@@ -104,11 +104,11 @@ public class Orderable extends BaseEntity {
    * Get the association to a {@link Program}.
    * @param program the Program this product is (maybe) in.
    * @return the association to the given {@link Program}, or null if this product is not in the
-   *        given program.
+   *        given program or is marked inactive.
    */
   public ProgramOrderable getProgramOrderable(Program program) {
     for (ProgramOrderable programOrderable : programOrderables) {
-      if (programOrderable.isForProgram(program)) {
+      if (programOrderable.isForProgram(program) && programOrderable.isActive()) {
         return programOrderable;
       }
     }

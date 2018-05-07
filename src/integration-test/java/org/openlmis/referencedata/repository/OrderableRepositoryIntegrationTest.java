@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
 import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +38,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import org.assertj.core.api.Assertions;
 import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
@@ -96,7 +98,7 @@ public class OrderableRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldNotAllowForDuplicatedProgramOrderables() {
+  public void shouldNotAllowForDuplicatedActiveProgramOrderables() {
     // given
     OrderableDisplayCategory orderableDisplayCategory = createOrderableDisplayCategory(SOME_CODE);
     OrderableDisplayCategory orderableDisplayCategory2 =
@@ -115,6 +117,29 @@ public class OrderableRepositoryIntegrationTest
 
     // then
     Assertions.assertThat(thrown).hasMessageContaining("unq_orderableid_programid");
+  }
+
+  @Test
+  public void shouldAllowForDuplicatedProgramOrderablesIfTheyAreInactive() {
+    // given
+    OrderableDisplayCategory orderableDisplayCategory = createOrderableDisplayCategory(SOME_CODE);
+    OrderableDisplayCategory orderableDisplayCategory2 =
+        createOrderableDisplayCategory("some-other-code");
+    Program program = createProgram(SOME_CODE);
+    Orderable orderable = generateInstance();
+
+    ProgramOrderable programOrderable =
+        ProgramOrderable.createNew(program, orderableDisplayCategory, orderable, CurrencyUnit.USD);
+    ProgramOrderable programOrderableDuplicated =
+        ProgramOrderable.createNew(program, orderableDisplayCategory2, orderable, 0,
+            false, true, 0, Money.of(CurrencyUnit.USD, BigDecimal.ZERO), CurrencyUnit.USD);
+    orderable.setProgramOrderables(Arrays.asList(programOrderable, programOrderableDuplicated));
+
+    // when
+    Orderable savedOrderable = repository.saveAndFlush(orderable);
+
+    // then
+    assertEquals(programOrderable, savedOrderable.getProgramOrderable(program));
   }
 
   @Test

@@ -91,6 +91,7 @@ public class OrderableBuilderTest {
     for (UUID programId : programIds) {
       ProgramOrderableDto programOrderableDto = new ProgramOrderableDto();
       programOrderableDto.setProgramId(programId);
+      programOrderableDto.setActive(true);
 
       programs.add(programOrderableDto);
     }
