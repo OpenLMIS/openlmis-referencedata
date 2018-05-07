@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '15'))
+    }
     environment {
       PATH = "/usr/local/bin/:$PATH"
     }
@@ -10,7 +13,7 @@ pipeline {
         stage('Preparation') {
             steps {
                 checkout scm
-                
+
                 withCredentials([usernamePassword(
                   credentialsId: "cad2f741-7b1e-4ddd-b5ca-2959d40f62c2",
                   usernameVariable: "USER",
@@ -152,6 +155,11 @@ pipeline {
                 sh "docker tag openlmis/referencedata:${VERSION_WITH_BUILD_NUMBER} openlmis/referencedata:${VERSION}"
                 sh "docker push openlmis/referencedata:${VERSION}"
             }
+        }
+    }
+    post {
+        failure {
+            slackSend color: 'danger', message: '${env.JOB_NAME} - ${env.BUILD_NUMBER} FAILED (<${env.BUILD_URL}|Open>)'
         }
     }
 }
