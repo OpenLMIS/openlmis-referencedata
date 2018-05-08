@@ -48,7 +48,7 @@ public class OrderableBuilder {
           .getPrograms()
           .stream()
           .map(item -> programRepository.findOne(item.getProgramId()))
-          .collect(Collectors.toMap(Program::getId, program -> program));
+          .collect(Collectors.toMap(Program::getId, program -> program, (id1, id2) -> id1));
 
       List<ProgramOrderable> programOrderables = importer
           .getPrograms()
