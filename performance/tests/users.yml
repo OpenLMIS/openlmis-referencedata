@@ -43,20 +43,6 @@ execution:
     scenario: users-search-by-right
 
 scenarios:
-  get-user-token:
-    requests:
-      - url: ${__P(base-uri)}/api/oauth/token
-        method: POST
-        label: GetUserToken
-        headers:
-          Authorization: Basic ${__base64Encode(${__P(basic-auth)})}
-        body:
-          grant_type: password
-          username: ${__P(username)}
-          password: ${__P(password)}
-        extract-jsonpath:
-          access_token:
-            jsonpath: $.access_token
   users-get-one:
     variables:
       user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
