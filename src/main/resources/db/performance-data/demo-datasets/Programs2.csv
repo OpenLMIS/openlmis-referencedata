@@ -1,3 +1,5 @@
-id,code,name,active,periodsskippable,shownonfullsupplytab
-dce17f2e-af3e-40ad-8e00-3496adef44c3,PRG001,Family Planning,true,true,true
-10845cb9-d365-4aaa-badd-b4fa39c6a26a,PRG002,Essential Meds,true,false,
+id,code,name,active,periodsskippable,skipAuthorization,showNonFullSupplyTab,enableDatePhysicalStockCountCompleted
+dce17f2e-af3e-40ad-8e00-3496adef44c3,PRG001,Family Planning,true,true,false,true,false
+0845cb9-d365-4aaa-badd-b4fa39c6a26a,PRG002,Essential Meds,true,false,false,false
+66032ea8-b69b-4102-a1eb-844e57143187,PRG003,New Program,true,false,false,false,false
+418bdc1d-c303-4bd0-b2d3-d8901150a983,PRG004,EPI,true,false,true,false,false
