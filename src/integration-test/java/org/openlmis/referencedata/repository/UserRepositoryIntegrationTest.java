@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -441,6 +442,15 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     newUser.setUsername(user.getUsername().toUpperCase());
     repository.save(newUser);
 
+    entityManager.flush();
+  }
+
+  @Test(expected = ConstraintViolationException.class)
+  public void shouldThrowExceptionIfEmailIsIncorrect() {
+    User user = generateInstance();
+    user.setEmail("abc-def");
+
+    repository.save(user);
     entityManager.flush();
   }
 

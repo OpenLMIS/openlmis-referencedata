@@ -18,6 +18,7 @@ package org.openlmis.referencedata.domain;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.AccessLevel;
+import org.hibernate.validator.constraints.Email;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.util.View;
@@ -73,6 +74,7 @@ public class User extends BaseEntity {
   @Column(unique = true)
   @Getter
   @Setter
+  @Email
   private String email;
 
   @Getter

@@ -82,10 +82,6 @@ public class UserValidator implements BaseValidator {
     rejectIfEmptyOrWhitespace(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_REQUIRED);
     rejectIfEmptyOrWhitespace(errors, FIRST_NAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
     rejectIfEmptyOrWhitespace(errors, LAST_NAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
-
-    if (errors.getFieldValue(EMAIL) != null) {
-      rejectIfEmptyOrWhitespace(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
-    }
   }
 
   private void verifyUsername(UUID id, String username, Errors errors) {
