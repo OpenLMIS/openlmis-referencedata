@@ -42,6 +42,7 @@ import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 
+@SuppressWarnings("PMD.TooManyMethods")
 @RunWith(MockitoJUnitRunner.class)
 public class RefDataErrorHandlingTest {
   private static final Locale ENGLISH_LOCALE = Locale.ENGLISH;
@@ -96,6 +97,36 @@ public class RefDataErrorHandlingTest {
   }
 
   @Test
+  public void shouldHandleDataIntegrityViolationEvenIfMessageKeyNotExist() {
+    // given
+    String constraintName = "unq_program_code_abc_def";
+    ConstraintViolationException constraintViolation = new ConstraintViolationException(
+        null, null, constraintName);
+    DataIntegrityViolationException exp = new DataIntegrityViolationException(
+        null, constraintViolation);
+
+    // when
+    mockMessage(exp.getMessage());
+    LocalizedMessage message = errorHandler.handleDataIntegrityViolation(exp);
+
+    // then
+    assertMessage(message, exp.getMessage());
+  }
+
+  @Test
+  public void shouldHandleDataIntegrityViolationEvenIfCauseNotExist() {
+    // given
+    DataIntegrityViolationException exp = new DataIntegrityViolationException(ERROR_MESSAGE, null);
+
+    // when
+    mockMessage(exp.getMessage());
+    LocalizedMessage message = errorHandler.handleDataIntegrityViolation(exp);
+
+    // then
+    assertMessage(message, exp.getMessage());
+  }
+
+  @Test
   public void shouldHandleConstraintViolationException() {
     // given
     String messageTemplate = "{org.hibernate.validator.constraints.Email.message}";
@@ -111,6 +142,39 @@ public class RefDataErrorHandlingTest {
 
     // then
     assertMessage(message, UserMessageKeys.ERROR_EMAIL_INVALID);
+  }
+
+  @Test
+  public void shouldHandleConstraintViolationExceptionEvenIfMessageKeyNotExist() {
+    // given
+    String messageTemplate = "my_message_template";
+    ConstraintViolation<?> violation = mock(ConstraintViolation.class);
+    when(violation.getMessageTemplate()).thenReturn(messageTemplate);
+
+    javax.validation.ConstraintViolationException exp =
+        new javax.validation.ConstraintViolationException(
+            ERROR_MESSAGE, Sets.newHashSet(violation));
+
+    // when
+    mockMessage(exp.getMessage());
+    LocalizedMessage message = errorHandler.handleConstraintViolationException(exp);
+
+    // then
+    assertMessage(message, exp.getMessage());
+  }
+
+  @Test
+  public void shouldHandleConstraintViolationExceptionEvenIfConstraintViolationSetIsEmpty() {
+    // given
+    javax.validation.ConstraintViolationException exp =
+        new javax.validation.ConstraintViolationException(ERROR_MESSAGE, Sets.newHashSet());
+
+    // when
+    mockMessage(exp.getMessage());
+    LocalizedMessage message = errorHandler.handleConstraintViolationException(exp);
+
+    // then
+    assertMessage(message, exp.getMessage());
   }
 
   @Test
