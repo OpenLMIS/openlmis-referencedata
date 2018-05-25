@@ -28,11 +28,17 @@ import static org.openlmis.referencedata.domain.RightType.REPORTS;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import com.google.common.collect.Sets;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -50,22 +56,12 @@ import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.UnusedPrivateFiled"})
 public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<User> {
@@ -73,9 +69,6 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   private static final String EXTRA_DATA_KEY = "color";
   private static final String EXTRA_DATA_VALUE = "orange";
   private static final int TOTAL_USERS = 5;
-
-  private static final String USER_1 = "user1";
-  private static final String USER_2 = "user2";
 
   @Autowired
   private UserRepository repository;
@@ -120,13 +113,9 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   User generateInstance() {
     int instanceNumber = this.getNextInstanceNumber();
-    return new UserBuilder("user" + instanceNumber, "Test", "User", instanceNumber + "@mail.com")
-        .setTimezone("UTC")
-        .setHomeFacilityId(generateFacility(instanceNumber).getId())
-        .setActive(true)
-        .setVerified(true)
-        .setLoginRestricted(false)
-        .createUser();
+    return new UserDataBuilder()
+        .withHomeFacilityId(generateFacility(instanceNumber).getId())
+        .buildAsNew();
   }
 
   @Before
@@ -292,7 +281,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     //given
     Map<String, String> extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
     String extraDataJson = mapper.writeValueAsString(extraData);
-    User expectedUser = repository.findOneByUsernameIgnoreCase(USER_1);
+    User expectedUser = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
     expectedUser.setExtraData(extraData);
     repository.save(expectedUser);
 
@@ -335,7 +324,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Program program = saveNewProgram("P1");
     SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
 
-    User supervisingUser = repository.findOneByUsernameIgnoreCase(USER_1);
+    User supervisingUser = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
     supervisingUser = assignRoleToUser(supervisingUser,
         new SupervisionRoleAssignment(role, supervisingUser, program, supervisoryNode));
 
@@ -356,11 +345,11 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Program program = saveNewProgram("P1");
     SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
 
-    User supervisingUser = repository.findOneByUsernameIgnoreCase(USER_1);
+    User supervisingUser = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
     assignRoleToUser(supervisingUser, new SupervisionRoleAssignment(
         supervisionRole, supervisingUser, program, supervisoryNode));
 
-    User supervisingUser2 = repository.findOneByUsernameIgnoreCase(USER_2);
+    User supervisingUser2 = repository.findOneByUsernameIgnoreCase(users.get(1).getUsername());
     assignRoleToUser(supervisingUser2, new SupervisionRoleAssignment(
         supervisionRole, supervisingUser2, program, supervisoryNode));
 
@@ -368,11 +357,11 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Role fulfillmentRole = saveNewRole("fulfillmentRole", fulfillmentRight);
     Facility warehouse = generateFacility(11, "warehouse");
 
-    User warehouseClerk = repository.findOneByUsernameIgnoreCase("user3");
+    User warehouseClerk = repository.findOneByUsernameIgnoreCase(users.get(2).getUsername());
     warehouseClerk = assignRoleToUser(warehouseClerk,
         new FulfillmentRoleAssignment(fulfillmentRole, warehouseClerk, warehouse));
 
-    User warehouseClerk2 = repository.findOneByUsernameIgnoreCase("user4");
+    User warehouseClerk2 = repository.findOneByUsernameIgnoreCase(users.get(3).getUsername());
     warehouseClerk2 = assignRoleToUser(warehouseClerk2,
         new FulfillmentRoleAssignment(fulfillmentRole, warehouseClerk2, warehouse));
 
@@ -392,8 +381,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Right adminRight = saveNewRight("adminRight", GENERAL_ADMIN);
     Role adminRole = saveNewRole("adminRole", adminRight);
 
-    User user1 = repository.findOneByUsernameIgnoreCase(USER_1);
-    User user2 = repository.findOneByUsernameIgnoreCase(USER_2);
+    User user1 = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
+    User user2 = repository.findOneByUsernameIgnoreCase(users.get(1).getUsername());
 
     user1.assignRoles(new DirectRoleAssignment(reportRole, user1),
         new DirectRoleAssignment(adminRole, user1));
@@ -457,13 +446,16 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   private User cloneUser(User user) {
     int instanceNumber = this.getNextInstanceNumber();
-    User clonedUser = new UserBuilder(user.getUsername() + instanceNumber,
-        user.getFirstName(), user.getLastName(), instanceNumber + "@mail.com")
-        .setTimezone("UTC")
-        .setHomeFacilityId(user.getHomeFacilityId())
-        .setActive(user.isActive())
-        .setVerified(user.isVerified())
-        .createUser();
+    User clonedUser = new UserDataBuilder()
+        .withUsername(user.getUsername() + instanceNumber)
+        .withFirstName(user.getFirstName())
+        .withLastName(user.getLastName())
+        .withEmail(instanceNumber + "@mail.com")
+        .withHomeFacilityId(user.getHomeFacilityId())
+        .withActive(user.isActive())
+        .withVerified(user.isVerified())
+        .buildAsNew();
+
     repository.save(clonedUser);
     return clonedUser;
   }

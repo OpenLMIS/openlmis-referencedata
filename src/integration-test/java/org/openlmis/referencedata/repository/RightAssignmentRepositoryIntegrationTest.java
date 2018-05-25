@@ -30,8 +30,8 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.NamedResource;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
@@ -81,17 +81,8 @@ public class RightAssignmentRepositoryIntegrationTest
     return new RightAssignment(user1, RIGHT_NAME);
   }
   
-  private User persistUser(int instanceNumber, UUID userId) {
-    User user = new UserBuilder(
-        "user" + instanceNumber,
-        "Test",
-        "User",
-        instanceNumber + "@mail.com")
-        .setTimezone("UTC")
-        .setActive(true)
-        .setVerified(true)
-        .setLoginRestricted(false)
-        .createUser();
+  private User persistUser(UUID userId) {
+    User user = new UserDataBuilder().buildAsNew();
     user.setId(userId);
     userRepository.save(user);
     return user;
@@ -102,7 +93,7 @@ public class RightAssignmentRepositoryIntegrationTest
     rightRepository.save(Right.newRight(RIGHT_NAME, RightType.GENERAL_ADMIN));
     
     userId = UUID.randomUUID();
-    user1 = persistUser(getNextInstanceNumber(), userId);
+    user1 = persistUser(userId);
     
     RightAssignment rightAssignment = this.generateInstance();
     repository.save(rightAssignment);
@@ -112,7 +103,7 @@ public class RightAssignmentRepositoryIntegrationTest
   public void findByUserShouldFindPermissionStrings() {
     // given
     rightRepository.save(Right.newRight(ANOTHER_RIGHT_NAME, RightType.GENERAL_ADMIN));
-    User user2 = persistUser(getNextInstanceNumber(), UUID.randomUUID());
+    User user2 = persistUser(UUID.randomUUID());
     repository.save(new RightAssignment(user2, ANOTHER_RIGHT_NAME));
 
     // when

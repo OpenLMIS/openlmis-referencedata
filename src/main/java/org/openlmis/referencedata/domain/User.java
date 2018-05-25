@@ -75,6 +75,14 @@ public class User extends BaseEntity {
   @Setter
   private String email;
 
+  @Getter
+  @Setter
+  private String jobTitle;
+
+  @Getter
+  @Setter
+  private String phoneNumber;
+
   @Column
   @Getter
   @Setter
@@ -126,6 +134,8 @@ public class User extends BaseEntity {
     firstName = importer.getFirstName();
     lastName = importer.getLastName();
     email = importer.getEmail();
+    jobTitle = importer.getJobTitle();
+    phoneNumber = importer.getPhoneNumber();
     timezone = importer.getTimezone();
     homeFacilityId = importer.getHomeFacilityId();
     verified = importer.isVerified();
@@ -137,23 +147,6 @@ public class User extends BaseEntity {
       allowNotify = importer.getAllowNotify();
     }
     extraData = importer.getExtraData();
-  }
-
-  User(UUID id, String username, String firstName, String lastName, String email, String timezone,
-       UUID homeFacilityId, boolean active, boolean verified, boolean loginRestricted,
-       Boolean allowNotify, Map<String, String> extraData) {
-    this.id = id;
-    this.username = username;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-    this.timezone = timezone;
-    this.homeFacilityId = homeFacilityId;
-    this.active = active;
-    this.verified = verified;
-    this.loginRestricted = loginRestricted;
-    this.allowNotify = allowNotify;
-    this.extraData = extraData;
   }
 
   /**
@@ -275,6 +268,8 @@ public class User extends BaseEntity {
     exporter.setLoginRestricted(loginRestricted);
     exporter.setAllowNotify(allowNotify);
     exporter.setExtraData(extraData);
+    exporter.setJobTitle(jobTitle);
+    exporter.setPhoneNumber(phoneNumber);
   }
 
   @Override
@@ -305,6 +300,10 @@ public class User extends BaseEntity {
 
     void setEmail(String email);
 
+    void setJobTitle(String jobTitle);
+
+    void setPhoneNumber(String phoneNumber);
+
     void setTimezone(String timezone);
 
     void setHomeFacilityId(UUID homeFacilityId);
@@ -330,6 +329,10 @@ public class User extends BaseEntity {
     String getLastName();
 
     String getEmail();
+
+    String getJobTitle();
+
+    String getPhoneNumber();
 
     String getTimezone();
 

@@ -69,7 +69,6 @@ import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.NamedResource;
@@ -82,6 +81,7 @@ import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
@@ -1389,16 +1389,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private User generateUser() {
-    Integer instanceNumber = generateInstanceNumber();
-    return new UserBuilder("kota" + instanceNumber,
-        "Ala" + instanceNumber,
-        "ma" + instanceNumber,
-        instanceNumber + "@mail.com")
-        .setTimezone(TIMEZONE)
-        .setHomeFacilityId(homeFacilityId)
-        .setVerified(true)
-        .setActive(true)
-        .createUser();
+    return new UserDataBuilder()
+        .withTimeZone(TIMEZONE)
+        .withHomeFacilityId(homeFacilityId)
+        .build();
   }
 
   private static Integer generateInstanceNumber() {

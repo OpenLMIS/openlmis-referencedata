@@ -15,16 +15,17 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
-
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -41,7 +42,6 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -58,6 +58,7 @@ import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.openlmis.referencedata.validate.UserValidator;
@@ -65,15 +66,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.BindingResult;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class UserControllerTest {
-
-  private static final String ACCESS_TOKEN = "49c1e712-da50-4428-ae39-2d0409bd8059";
+  private static final String[] IGNORED_FIELDS_ON_EQUAL_CHECK = { "roleAssignments" };
 
   @Mock
   private UserService service;
@@ -149,14 +144,14 @@ public class UserControllerTest {
     homeFacilityId = UUID.randomUUID();
     homeFacility = new Facility("C1");
     homeFacility.setId(homeFacilityId);
-    user1UserName = "user1";
-    user2UserName = "user2";
-    user1 = new UserBuilder(user1UserName, "User", "1", "user1@openlmis.org")
-        .setHomeFacilityId(homeFacilityId)
-        .createUser();
-    user2 = new UserBuilder(user2UserName, "User", "2", "user2@openlmis.org")
-        .setHomeFacilityId(homeFacilityId)
-        .createUser();
+    user1 = new UserDataBuilder()
+        .withHomeFacilityId(homeFacilityId)
+        .build();
+    user2 = new UserDataBuilder()
+        .withHomeFacilityId(homeFacilityId)
+        .build();
+    user1UserName = user1.getUsername();
+    user2UserName = user2.getUsername();
     users = Sets.newHashSet(user1, user2);
 
     user1Dto = new UserDto();
@@ -209,7 +204,7 @@ public class UserControllerTest {
     Page<UserDto> userDtos = controller.getUsers(searchParams, pageable);
 
     //then
-    assertEquals(expectedUserDtos, userDtos.getContent());
+    assertThat(userDtos.getContent()).isEqualTo(expectedUserDtos);
   }
 
   @Test
@@ -222,7 +217,7 @@ public class UserControllerTest {
     UserDto userDto = controller.getUser(userId);
 
     //then
-    assertEquals(user1Dto, userDto);
+    assertThat(userDto).isEqualTo(user1Dto);
   }
 
   @Test
@@ -244,7 +239,7 @@ public class UserControllerTest {
     UserDto userDto = controller.getUser(userId);
 
     //then
-    assertEquals(expectedUserDto, userDto);
+    assertThat(userDto).isEqualTo(expectedUserDto);
   }
 
   @Test(expected = NotFoundException.class)
@@ -318,7 +313,7 @@ public class UserControllerTest {
     UserDto savedUserDto = controller.saveUser(user1Dto, result);
 
     //then
-    assertEquals(user1Dto, savedUserDto);
+    assertThat(savedUserDto).isEqualToIgnoringGivenFields(user1Dto, IGNORED_FIELDS_ON_EQUAL_CHECK);
     verify(repository).save(user1);
   }
 
@@ -342,7 +337,7 @@ public class UserControllerTest {
     UserDto savedUserDto = controller.saveUser(user1Dto, result);
 
     //then
-    assertEquals(user1Dto, savedUserDto);
+    assertThat(savedUserDto).isEqualToIgnoringGivenFields(user1Dto, IGNORED_FIELDS_ON_EQUAL_CHECK);
     verify(repository).save(user1);
   }
 
@@ -367,7 +362,7 @@ public class UserControllerTest {
     UserDto savedUserDto = controller.saveUser(user1Dto, result);
 
     //then
-    assertEquals(user1Dto, savedUserDto);
+    assertThat(savedUserDto).isEqualToIgnoringGivenFields(user1Dto, IGNORED_FIELDS_ON_EQUAL_CHECK);
     verify(repository).save(user1);
   }
 
@@ -390,7 +385,7 @@ public class UserControllerTest {
     UserDto savedUserDto = controller.saveUser(user1Dto, result);
 
     //then
-    assertEquals(user1Dto, savedUserDto);
+    assertThat(savedUserDto).isEqualToIgnoringGivenFields(user1Dto, IGNORED_FIELDS_ON_EQUAL_CHECK);
     verify(repository).save(user1);
   }
 
@@ -413,7 +408,7 @@ public class UserControllerTest {
     UserDto savedUserDto = controller.saveUser(user1Dto, result);
 
     //then
-    assertEquals(user1Dto, savedUserDto);
+    assertThat(savedUserDto).isEqualToIgnoringGivenFields(user1Dto, IGNORED_FIELDS_ON_EQUAL_CHECK);
     verify(repository).save(user1);
   }
 
@@ -431,7 +426,7 @@ public class UserControllerTest {
     UserDto savedUserDto = controller.saveUser(user1Dto, result);
 
     //then
-    assertEquals(user1Dto, savedUserDto);
+    assertThat(savedUserDto).isEqualTo(user1Dto);
     verify(repository).save(user1);
   }
 
@@ -496,7 +491,7 @@ public class UserControllerTest {
     Set<FacilityDto> facilities = controller.getUserFulfillmentFacilities(userId, rightId);
 
     //then
-    assertThat(facilities.size(), is(1));
+    assertThat(facilities.size()).isEqualTo(1);
   }
 
   private void setProgramSupportedAndActive() {

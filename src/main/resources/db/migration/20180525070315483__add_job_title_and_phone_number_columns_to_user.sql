@@ -1,0 +1,3 @@
+ALTER TABLE referencedata.users
+  ADD COLUMN jobTitle CHARACTER VARYING(255),
+  ADD COLUMN phoneNumber CHARACTER VARYING(255);

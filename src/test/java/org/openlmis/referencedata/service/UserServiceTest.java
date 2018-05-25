@@ -40,13 +40,13 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -442,15 +442,11 @@ public class UserServiceTest {
   }
 
   private User generateUser() {
-    return new UserBuilder("kota", "Ala", "ma", "test@mail.com")
-        .setId(UUID.randomUUID())
-        .setTimezone("UTC")
-        .setHomeFacilityId(mock(UUID.class))
-        .setVerified(false)
-        .setActive(true)
-        .setLoginRestricted(true)
-        .setAllowNotify(true)
-        .setExtraData(Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE))
-        .createUser();
+    return new UserDataBuilder()
+        .withHomeFacilityId(UUID.randomUUID())
+        .withUnverifiedFlag()
+        .withLoginRestrictedFlag()
+        .withExtraData(EXTRA_DATA_KEY, EXTRA_DATA_VALUE)
+        .build();
   }
 }

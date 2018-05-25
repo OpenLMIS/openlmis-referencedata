@@ -24,6 +24,20 @@
       "type": "string",
       "title": "email"
     },
+    "jobTitle": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "jobTitle"
+    },
+    "phoneNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "phoneNumber"
+    },
     "timezone": {
       "type": "string",
       "title": "timezone"

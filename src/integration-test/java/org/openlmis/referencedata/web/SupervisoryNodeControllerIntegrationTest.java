@@ -58,11 +58,11 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.PageImpl;
@@ -390,8 +390,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     Role role = Role.newRole("role", right);
     role.setId(UUID.randomUUID());
 
-    User supervisingUser = new UserBuilder("supervisingUser", "Supervising", "User",
-        "a@b.com").createUser();
+    User supervisingUser = new UserDataBuilder().build();
     supervisingUser.assignRoles(
         new SupervisionRoleAssignment(role, supervisingUser, program, supervisoryNode));
 

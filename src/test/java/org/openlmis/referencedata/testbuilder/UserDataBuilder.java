@@ -15,25 +15,28 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import com.google.common.collect.Maps;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.User;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+@SuppressWarnings("PMD.TooManyMethods")
 public class UserDataBuilder {
-
   private static int instanceNumber = 0;
 
   private UUID id = UUID.randomUUID();
-  private String username = "admin";
+  private String username;
   private String firstName = "Admin";
   private String lastName = "User";
-  private String email = "example@mail.com";
+  private String email;
+  private String jobTitle = "Junior Tester";
+  private String phoneNumber = "000-000-000";
   private String timezone = "UTC";
   private UUID homeFacilityId = null;
   private boolean verified = true;
@@ -51,20 +54,67 @@ public class UserDataBuilder {
   public UserDataBuilder() {
     instanceNumber++;
 
-    id = UUID.randomUUID();
     username = "admin" + instanceNumber;
-    firstName = "Admin";
-    lastName = "User";
     email = instanceNumber + "example@mail.com";
-    timezone = "UTC";
-    homeFacilityId = null;
-    verified = true;
-    active = true;
-    loginRestricted = false;
-    allowNotify = true;
-    roleAssignments = new HashSet<>();
-    extraData = new HashMap<>();
-    rightAssignments = new HashSet<>();
+  }
+
+  public UserDataBuilder withHomeFacilityId(UUID homeFacilityId) {
+    this.homeFacilityId = homeFacilityId;
+    return this;
+  }
+
+  public UserDataBuilder withUnverifiedFlag() {
+    this.verified = false;
+    return this;
+  }
+
+  public UserDataBuilder withLoginRestrictedFlag() {
+    this.loginRestricted = true;
+    return this;
+  }
+
+  /**
+   * Add single extra data to the collection.
+   */
+  public UserDataBuilder withExtraData(String key, String value) {
+    this.extraData = Optional.ofNullable(extraData).orElse(Maps.newHashMap());
+    this.extraData.put(key, value);
+    return this;
+  }
+
+  public UserDataBuilder withUsername(String username) {
+    this.username = username;
+    return this;
+  }
+
+  public UserDataBuilder withFirstName(String firstName) {
+    this.firstName = firstName;
+    return this;
+  }
+
+  public UserDataBuilder withLastName(String lastName) {
+    this.lastName = lastName;
+    return this;
+  }
+
+  public UserDataBuilder withEmail(String email) {
+    this.email = email;
+    return this;
+  }
+
+  public UserDataBuilder withActive(boolean active) {
+    this.active = active;
+    return this;
+  }
+
+  public UserDataBuilder withVerified(boolean verified) {
+    this.verified = verified;
+    return this;
+  }
+
+  public UserDataBuilder withTimeZone(String timezone) {
+    this.timezone = timezone;
+    return this;
   }
 
   /**
@@ -72,8 +122,8 @@ public class UserDataBuilder {
    */
   public User buildAsNew() {
     return new User(
-        username, firstName, lastName, email, timezone, homeFacilityId, verified, active,
-        loginRestricted, allowNotify, roleAssignments, extraData, rightAssignments
+        username, firstName, lastName, email, jobTitle, phoneNumber, timezone, homeFacilityId,
+        verified, active, loginRestricted, allowNotify, roleAssignments, extraData, rightAssignments
     );
   }
 

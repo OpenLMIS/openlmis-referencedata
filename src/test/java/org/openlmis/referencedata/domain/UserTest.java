@@ -16,21 +16,19 @@
 package org.openlmis.referencedata.domain;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
-
-import java.util.Collections;
-import java.util.Set;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 
 public class UserTest {
 
@@ -50,7 +48,7 @@ public class UserTest {
 
   @Before
   public void setUp() {
-    user = new UserBuilder("user", "Test", "User", "test@test.com").createUser();
+    user = new UserDataBuilder().build();
     program = new Program("P1");
   }
 
@@ -61,7 +59,7 @@ public class UserTest {
         RightType.REPORTS)), user));
 
     //then
-    assertThat(user.getRoleAssignments().size(), is(1));
+    assertThat(user.getRoleAssignments().size()).isEqualTo(1);
   }
 
   @Test
@@ -77,7 +75,7 @@ public class UserTest {
     boolean hasRight = user.hasRight(rightQuery);
 
     //then
-    assertTrue(hasRight);
+    assertThat(hasRight).isTrue();
   }
 
   @Test
@@ -93,7 +91,7 @@ public class UserTest {
     boolean hasRight = user.hasRight(rightQuery);
 
     //then
-    assertFalse(hasRight);
+    assertThat(hasRight).isFalse();
   }
 
   @Test
@@ -112,7 +110,7 @@ public class UserTest {
     Set<Facility> facilities = user.getSupervisedFacilities(right, program);
 
     //then
-    assertThat(facilities.size(), is(3));
+    assertThat(facilities.size()).isEqualTo(3);
   }
 
   @Test
@@ -134,7 +132,7 @@ public class UserTest {
     Set<Facility> facilities = user.getSupervisedFacilities(right, anotherProgram);
 
     //then
-    assertThat(facilities.size(), is(0));
+    assertThat(facilities.size()).isEqualTo(0);
   }
 
   @Test
@@ -154,7 +152,7 @@ public class UserTest {
         Right.newRight("anotherRight", RightType.SUPERVISION), program);
 
     //then
-    assertThat(facilities.size(), is(0));
+    assertThat(facilities.size()).isEqualTo(0);
   }
 
   @Test
@@ -183,8 +181,27 @@ public class UserTest {
     Set<Facility> facilities = user.getFulfillmentFacilities(fulfillmentRight1);
 
     //then - only facilities where we have the right are returned
-    assertThat(facilities.size(), is(1));
-    assertThat(facilities.iterator().next(), is(facility1));
+    assertThat(facilities.size()).isEqualTo(1);
+    assertThat(facilities.iterator().next()).isEqualTo(facility1);
+  }
+
+  @Test
+  public void shouldExportData() {
+    UserDto exporter = new UserDto();
+
+    user.export(exporter);
+
+    assertThat(exporter).isEqualToComparingFieldByField(user);
+  }
+
+  @Test
+  public void shouldImportData() {
+    UserDto importer = new UserDto();
+    user.export(importer);
+
+    User newUser = User.newUser(importer);
+
+    assertThat(newUser).isEqualToComparingFieldByField(user);
   }
 
   private SupervisoryNode getSupervisoryHierarchy() {

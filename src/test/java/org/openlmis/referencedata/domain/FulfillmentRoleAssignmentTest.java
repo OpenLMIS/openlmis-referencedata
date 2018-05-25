@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.ORDER_FULFILLMENT;
 
 import org.junit.Test;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 
 public class FulfillmentRoleAssignmentTest {
 
@@ -39,7 +40,7 @@ public class FulfillmentRoleAssignmentTest {
     warehouse.setType(new FacilityType("warehouse"));
     hospital = new Facility("C2");
     hospital.setType(new FacilityType("hospital"));
-    user = new UserBuilder("username", "User", "Name", "test@test.com").createUser();
+    user = new UserDataBuilder().build();
     fulfillmentRoleAssignment = new FulfillmentRoleAssignment(
         Role.newRole(roleName, right), user, warehouse);
   }

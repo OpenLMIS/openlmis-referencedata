@@ -30,9 +30,9 @@ import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.domain.UserBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -267,17 +267,9 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
   }
 
   private User persistUserWithHomeFacilityId(UUID homeFacilityId) {
-    User user = new UserBuilder(
-        "user",
-        "Test",
-        "User",
-        "user@mail.com")
-        .setTimezone("UTC")
-        .setActive(true)
-        .setVerified(true)
-        .setLoginRestricted(false)
-        .setHomeFacilityId(homeFacilityId)
-        .createUser();
+    User user = new UserDataBuilder()
+        .withHomeFacilityId(homeFacilityId)
+        .buildAsNew();
     userRepository.save(user);
     return user;
   }

@@ -26,14 +26,13 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
 
 import com.google.common.collect.Sets;
-
-import org.junit.Test;
-import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
-import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import org.junit.Test;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisionRoleAssignmentTest {
@@ -59,9 +58,9 @@ public class SupervisionRoleAssignmentTest {
     UUID homeFacilityId = UUID.randomUUID();
     homeFacility.setId(homeFacilityId);
 
-    user = new UserBuilder("testuser", "Test", "User", "test@test.com")
-        .setHomeFacilityId(homeFacilityId)
-        .createUser();
+    user = new UserDataBuilder()
+        .withHomeFacilityId(homeFacilityId)
+        .build();
 
     homeFacilityRoleAssignment = new SupervisionRoleAssignment(role, user, program);
 

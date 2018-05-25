@@ -15,37 +15,31 @@
 
 package org.openlmis.referencedata.dto;
 
-import com.google.common.collect.Sets;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public final class UserDto extends BaseDto implements User.Exporter, User.Importer {
-  private String username;
-  private String firstName;
-  private String lastName;
-  private String email;
-  private String jobTitle;
-  private String phoneNumber;
-  private String timezone;
-  private UUID homeFacilityId;
-  private boolean verified;
-  private boolean active;
-  private boolean loginRestricted;
-  private Boolean allowNotify;
-  private Map<String, String> extraData;
-  private Set<RoleAssignmentDto> roleAssignments = Sets.newHashSet();
+public class UserDtoTest {
+
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(UserDto.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    UserDto dto = new UserDto();
+    User user = new UserDataBuilder().build();
+    user.export(dto);
+
+    ToStringTestUtils.verify(UserDto.class, dto);
+  }
+
 }
