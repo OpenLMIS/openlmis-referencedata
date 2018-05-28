@@ -5,45 +5,40 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import lombok.AccessLevel;
-import org.hibernate.validator.constraints.Email;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.util.View;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.profiler.Profiler;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.util.View;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @Entity
@@ -74,7 +69,6 @@ public class User extends BaseEntity {
   @Column(unique = true)
   @Getter
   @Setter
-  @Email
   private String email;
 
   @Getter
@@ -183,7 +177,7 @@ public class User extends BaseEntity {
   /**
    * Get all facilities being supervised by this user, by right and program.
    *
-   * @param right   right to check
+   * @param right right to check
    * @param program program to check
    * @return set of supervised facilities
    */
@@ -292,6 +286,7 @@ public class User extends BaseEntity {
   }
 
   public interface Exporter {
+
     void setId(UUID id);
 
     void setUsername(String username);
@@ -322,6 +317,7 @@ public class User extends BaseEntity {
   }
 
   public interface Importer {
+
     UUID getId();
 
     String getUsername();

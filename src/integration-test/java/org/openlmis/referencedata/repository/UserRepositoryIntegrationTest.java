@@ -5,12 +5,12 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.repository;
@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
-import javax.validation.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -85,16 +84,16 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   @Autowired
   private FacilityRepository facilityRepository;
-  
+
   @Autowired
   private RightRepository rightRepository;
-  
+
   @Autowired
   private RoleRepository roleRepository;
-  
+
   @Autowired
   private ProgramRepository programRepository;
-  
+
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
@@ -105,7 +104,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   private Pageable pageable;
 
   private List<User> users;
-  
+
   private ObjectMapper mapper = new ObjectMapper();
 
   UserRepository getRepository() {
@@ -175,7 +174,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test
   public void searchUsersWithAllParametersNullShouldReturnAllUsers() {
     Page<User> receivedUsers = repository.searchUsers(
-            null, null, null, null, null, null, null, null, null, pageable);
+        null, null, null, null, null, null, null, null, null, pageable);
 
     assertEquals(TOTAL_USERS, receivedUsers.getContent().size());
   }
@@ -330,7 +329,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         new SupervisionRoleAssignment(role, supervisingUser, program, supervisoryNode));
 
     //when
-    Set<User> supervisingUsers = repository.findSupervisingUsersBy(right, supervisoryNode, 
+    Set<User> supervisingUsers = repository.findSupervisingUsersBy(right, supervisoryNode,
         program);
 
     //then
@@ -445,15 +444,6 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     entityManager.flush();
   }
 
-  @Test(expected = ConstraintViolationException.class)
-  public void shouldThrowExceptionIfEmailIsIncorrect() {
-    User user = generateInstance();
-    user.setEmail("abc-def");
-
-    repository.save(user);
-    entityManager.flush();
-  }
-
   private User cloneUser(User user) {
     int instanceNumber = this.getNextInstanceNumber();
     User clonedUser = new UserDataBuilder()
@@ -499,7 +489,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   private GeographicZone generateGeographicZone(GeographicLevel geographicLevel,
-                                                int instanceNumber) {
+      int instanceNumber) {
     GeographicZone geographicZone = new GeographicZone();
     geographicZone.setCode("GeographicZone" + instanceNumber);
     geographicZone.setLevel(geographicLevel);

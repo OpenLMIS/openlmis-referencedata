@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.validate;
 
+import java.util.UUID;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.repository.UserRepository;
@@ -24,9 +26,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import org.apache.commons.validator.routines.EmailValidator;
-
-import java.util.UUID;
 
 /**
  * A validator for {@link UserDto} object.
@@ -82,6 +81,10 @@ public class UserValidator implements BaseValidator {
     rejectIfEmptyOrWhitespace(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_REQUIRED);
     rejectIfEmptyOrWhitespace(errors, FIRST_NAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
     rejectIfEmptyOrWhitespace(errors, LAST_NAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
+
+    if (errors.getFieldValue(EMAIL) != null) {
+      rejectIfEmptyOrWhitespace(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
+    }
   }
 
   private void verifyUsername(UUID id, String username, Errors errors) {

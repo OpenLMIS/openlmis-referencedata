@@ -15,10 +15,8 @@
 
 package org.openlmis.referencedata.errorhandling;
 
-import com.google.common.collect.Maps;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.ConstraintViolation;
 import org.hibernate.exception.ConstraintViolationException;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -32,7 +30,6 @@ import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -48,7 +45,6 @@ public class RefDataErrorHandling extends BaseHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(RefDataErrorHandling.class);
 
   private static final Map<String, String> CONSTRAINT_MAP = new HashMap<>();
-  private static final Map<String, String> JAVAX_VALIDATIONS = Maps.newHashMap();
 
   static {
     CONSTRAINT_MAP.put("unq_program_code", ProgramMessageKeys.ERROR_CODE_DUPLICATED);
@@ -62,9 +58,6 @@ public class RefDataErrorHandling extends BaseHandler {
     CONSTRAINT_MAP.put("unq_facility_type_code", FacilityTypeMessageKeys.ERROR_CODE_DUPLICATED);
     CONSTRAINT_MAP.put("unq_orderableid_programid",
         OrderableMessageKeys.ERROR_PROGRAMS_DUPLICATED);
-
-    JAVAX_VALIDATIONS.put("{org.hibernate.validator.constraints.Email.message}",
-        UserMessageKeys.ERROR_EMAIL_INVALID);
   }
 
   /**
@@ -101,28 +94,6 @@ public class RefDataErrorHandling extends BaseHandler {
     }
 
     return getLocalizedMessage(dive.getMessage());
-  }
-
-  /**
-   * Handles javax constraint violation exception.
-   */
-  @ExceptionHandler(javax.validation.ConstraintViolationException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @ResponseBody
-  public LocalizedMessage handleConstraintViolationException(
-      javax.validation.ConstraintViolationException exp) {
-    LOGGER.info(exp.getMessage());
-
-    if (!exp.getConstraintViolations().isEmpty()) {
-      ConstraintViolation<?> firstViolation = exp.getConstraintViolations().iterator().next();
-      String messageKey = JAVAX_VALIDATIONS.get(firstViolation.getMessageTemplate());
-
-      if (null != messageKey) {
-        return getLocalizedMessage(messageKey);
-      }
-    }
-
-    return getLocalizedMessage(exp.getMessage());
   }
 
   /**

@@ -17,12 +17,9 @@ package org.openlmis.referencedata.errorhandling;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Sets;
 import java.util.Locale;
-import javax.validation.ConstraintViolation;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +35,6 @@ import org.openlmis.referencedata.i18n.MessageService;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -121,57 +117,6 @@ public class RefDataErrorHandlingTest {
     // when
     mockMessage(exp.getMessage());
     LocalizedMessage message = errorHandler.handleDataIntegrityViolation(exp);
-
-    // then
-    assertMessage(message, exp.getMessage());
-  }
-
-  @Test
-  public void shouldHandleConstraintViolationException() {
-    // given
-    String messageTemplate = "{org.hibernate.validator.constraints.Email.message}";
-    ConstraintViolation<?> violation = mock(ConstraintViolation.class);
-    when(violation.getMessageTemplate()).thenReturn(messageTemplate);
-
-    javax.validation.ConstraintViolationException exp =
-        new javax.validation.ConstraintViolationException(Sets.newHashSet(violation));
-
-    // when
-    mockMessage(UserMessageKeys.ERROR_EMAIL_INVALID);
-    LocalizedMessage message = errorHandler.handleConstraintViolationException(exp);
-
-    // then
-    assertMessage(message, UserMessageKeys.ERROR_EMAIL_INVALID);
-  }
-
-  @Test
-  public void shouldHandleConstraintViolationExceptionEvenIfMessageKeyNotExist() {
-    // given
-    String messageTemplate = "my_message_template";
-    ConstraintViolation<?> violation = mock(ConstraintViolation.class);
-    when(violation.getMessageTemplate()).thenReturn(messageTemplate);
-
-    javax.validation.ConstraintViolationException exp =
-        new javax.validation.ConstraintViolationException(
-            ERROR_MESSAGE, Sets.newHashSet(violation));
-
-    // when
-    mockMessage(exp.getMessage());
-    LocalizedMessage message = errorHandler.handleConstraintViolationException(exp);
-
-    // then
-    assertMessage(message, exp.getMessage());
-  }
-
-  @Test
-  public void shouldHandleConstraintViolationExceptionEvenIfConstraintViolationSetIsEmpty() {
-    // given
-    javax.validation.ConstraintViolationException exp =
-        new javax.validation.ConstraintViolationException(ERROR_MESSAGE, Sets.newHashSet());
-
-    // when
-    mockMessage(exp.getMessage());
-    LocalizedMessage message = errorHandler.handleConstraintViolationException(exp);
 
     // then
     assertMessage(message, exp.getMessage());
