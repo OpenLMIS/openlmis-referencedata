@@ -17,6 +17,7 @@ package org.openlmis.referencedata.validate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Objects;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ValidationMessageKeys;
 import org.springframework.validation.Errors;
@@ -24,6 +25,13 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 interface BaseValidator extends Validator {
+
+  default void rejectIfNotEquals(Errors errors, Object oldData, Object newData, String field,
+      String message) {
+    if (!Objects.equals(oldData, newData)) {
+      rejectValue(errors, field, message);
+    }
+  }
 
   default void rejectIfEmpty(Errors errors, String field, String message) {
     ValidationUtils.rejectIfEmpty(errors, field, message, message);

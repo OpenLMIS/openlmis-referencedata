@@ -3,7 +3,8 @@
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-2245](https://openlmis.atlassian.net/browse/OLMIS-2245): Added user count to Role resource.
-* [OLMIS-4730](https://openlmis.atlassian.net/browse/OLMIS-4730): Added job title and phone number fields to user
+* [OLMIS-4730](https://openlmis.atlassian.net/browse/OLMIS-4730): Allow to update basic information by user
+  * added job title and phone number fields
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-4422](https://openlmis.atlassian.net/browse/OLMIS-4422): Stop creating right assignments for supervision role assignments when user has no home facility.

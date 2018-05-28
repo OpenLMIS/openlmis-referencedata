@@ -15,33 +15,47 @@
 
 package org.openlmis.referencedata.validate;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.validate.UserValidator.ACTIVE;
+import static org.openlmis.referencedata.validate.UserValidator.ALLOW_NOTIFY;
 import static org.openlmis.referencedata.validate.UserValidator.EMAIL;
+import static org.openlmis.referencedata.validate.UserValidator.EXTRA_DATA;
 import static org.openlmis.referencedata.validate.UserValidator.FIRST_NAME;
+import static org.openlmis.referencedata.validate.UserValidator.HOME_FACILITY_ID;
+import static org.openlmis.referencedata.validate.UserValidator.JOB_TITLE;
 import static org.openlmis.referencedata.validate.UserValidator.LAST_NAME;
+import static org.openlmis.referencedata.validate.UserValidator.LOGIN_RESTRICTED;
+import static org.openlmis.referencedata.validate.UserValidator.ROLE_ASSIGNMENTS;
+import static org.openlmis.referencedata.validate.UserValidator.TIMEZONE;
 import static org.openlmis.referencedata.validate.UserValidator.USERNAME;
+import static org.openlmis.referencedata.validate.UserValidator.VERIFIED;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+import java.util.UUID;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
-import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("PMD.TooManyMethods")
@@ -50,29 +64,36 @@ public class UserValidatorTest {
   @Mock
   private UserRepository userRepository;
 
+  @Mock
+  private RightService rightService;
+
+  @Mock
+  private RoleAssignmentRepository roleAssignmentRepository;
+
   @InjectMocks
   private Validator validator = new UserValidator();
 
+  private User user;
   private UserDto userDto;
   private Errors errors;
 
   @Before
   public void setUp() throws Exception {
     userDto = new UserDto();
-    userDto.setUsername("User_name1");
-    userDto.setEmail("user@mail.com");
-    userDto.setFirstName("FirstName");
-    userDto.setLastName("LastName");
-    userDto.setId(UUID.randomUUID());
+
+    user = new UserDataBuilder().build();
+    user.export(userDto);
 
     errors = new BeanPropertyBindingResult(userDto, "userDto");
+
+    when(rightService.hasRight(RightName.USERS_MANAGE_RIGHT)).thenReturn(true);
   }
 
   @Test
   public void shouldNotFindErrorsWhenUserIsValid() throws Exception {
     validator.validate(userDto, errors);
 
-    assertEquals(0, errors.getErrorCount());
+    assertThat(errors.getErrorCount()).isEqualTo(0);
   }
 
   @Test
@@ -97,7 +118,7 @@ public class UserValidatorTest {
         .findOneByUsernameIgnoreCase(userDto.getUsername());
 
     validator.validate(userDto, errors);
-    assertThat(errors.hasFieldErrors(USERNAME), is(false));
+    assertThat(errors.hasFieldErrors(USERNAME)).isFalse();
   }
 
   @Test
@@ -162,7 +183,7 @@ public class UserValidatorTest {
         .findOneByEmail(userDto.getEmail());
 
     validator.validate(userDto, errors);
-    assertThat(errors.hasFieldErrors(EMAIL), is(false));
+    assertThat(errors.hasFieldErrors(EMAIL)).isFalse();
   }
 
   @Test
@@ -184,7 +205,7 @@ public class UserValidatorTest {
 
     validator.validate(userDto, errors);
 
-    assertFalse(errors.hasFieldErrors(EMAIL));
+    assertThat(errors.hasFieldErrors(EMAIL)).isFalse();
   }
 
   @Test
@@ -266,5 +287,63 @@ public class UserValidatorTest {
     validator.validate(userDto, errors);
 
     assertErrorMessage(errors, LAST_NAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
+  }
+
+  @Test
+  public void shouldNotRejectIfUserHasNoRightForEditAndFieldsWereNotChanged() {
+    prepareForValidateInvariants();
+
+    validator.validate(userDto, errors);
+
+    assertThat(errors.getErrorCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldNotRejectIfUserHasNoRightForEditAndBasicDetailsWereChanged() {
+    prepareForValidateInvariants();
+
+    userDto.setFirstName(RandomStringUtils.randomAlphanumeric(5));
+    userDto.setLastName(RandomStringUtils.randomAlphanumeric(5));
+    userDto.setEmail(RandomStringUtils.randomAlphanumeric(1) + user.getEmail());
+    userDto.setPhoneNumber(RandomStringUtils.randomNumeric(9));
+    validator.validate(userDto, errors);
+
+    assertThat(errors.getErrorCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldRejectIfUserHasNoRightForEditAndInvariantsWereChanged() {
+    prepareForValidateInvariants();
+
+    userDto.setUsername(RandomStringUtils.randomAlphanumeric(10));
+    userDto.setJobTitle("test-job-title");
+    userDto.setTimezone("test-time-zone");
+    userDto.setHomeFacilityId(UUID.randomUUID());
+    userDto.setVerified(!userDto.isVerified());
+    userDto.setActive(!userDto.isActive());
+    userDto.setLoginRestricted(!userDto.isLoginRestricted());
+    userDto.setAllowNotify(!userDto.getAllowNotify());
+    userDto.setExtraData(ImmutableMap.of("a", "b"));
+    userDto.setRoleAssignments(Sets.newHashSet(new RoleAssignmentDto()));
+    validator.validate(userDto, errors);
+
+    assertThat(errors.getErrorCount()).isGreaterThanOrEqualTo(9);
+    assertErrorMessage(errors, USERNAME, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, JOB_TITLE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, TIMEZONE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, HOME_FACILITY_ID, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, VERIFIED, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, ACTIVE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, LOGIN_RESTRICTED, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, ALLOW_NOTIFY, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, EXTRA_DATA, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    assertErrorMessage(errors, ROLE_ASSIGNMENTS, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+  }
+
+  private void prepareForValidateInvariants() {
+    when(rightService.hasRight(RightName.USERS_MANAGE_RIGHT)).thenReturn(false);
+    when(userRepository.findOne(userDto.getId())).thenReturn(user);
+    when(roleAssignmentRepository.findByUser(userDto.getId()))
+        .thenReturn(userDto.getRoleAssignments());
   }
 }

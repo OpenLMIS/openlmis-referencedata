@@ -95,6 +95,23 @@ public class RightService {
                                UUID expectedUserId) {
     XLOGGER.entry(rightName, allowUserTokens, allowServiceTokens, allowApiKey, expectedUserId);
 
+    if (!hasRight(rightName, allowUserTokens, allowServiceTokens, allowApiKey, expectedUserId)) {
+      // at this point, token is unauthorized
+      XLOGGER.exit("Token not valid");
+      Message message = isBlank(rightName)
+          ? new Message(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC)
+          : new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName);
+
+      throw new UnauthorizedException(message);
+    }
+  }
+
+  public boolean hasRight(String rightName) {
+    return hasRight(rightName, true, true, false, null);
+  }
+
+  private boolean hasRight(String rightName, boolean allowUserTokens, boolean allowServiceTokens,
+      boolean allowApiKey, UUID expectedUserId) {
     OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder
         .getContext()
         .getAuthentication();
@@ -102,22 +119,16 @@ public class RightService {
     if (authentication.isClientOnly()) {
       if (checkServiceToken(allowServiceTokens, allowApiKey, authentication)) {
         XLOGGER.exit("service token or API Key");
-        return;
+        return true;
       }
     } else {
       if (checkUserToken(rightName, allowUserTokens, expectedUserId)) {
         XLOGGER.exit("User has right");
-        return;
+        return true;
       }
     }
 
-    // at this point, token is unauthorized
-    XLOGGER.exit("Token not valid");
-    Message message = isBlank(rightName)
-        ? new Message(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC)
-        : new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, rightName);
-
-    throw new UnauthorizedException(message);
+    return false;
   }
 
   /**

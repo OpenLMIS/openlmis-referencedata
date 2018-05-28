@@ -15,12 +15,14 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.API_KEY_PREFIX;
 import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.SERVICE_CLIENT_ID;
 
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +40,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.UUID;
-
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("PMD.TooManyMethods")
 public class RightServiceTest {
 
   private static final String RIGHT_NAME = "RIGHT_NAME";
@@ -151,5 +152,23 @@ public class RightServiceTest {
     when(securityContext.getAuthentication()).thenReturn(apiKeyClient);
 
     rightService.checkRootAccess();
+  }
+
+  @Test
+  public void shouldReturnTrueIfUserHasRight() {
+    when(securityContext.getAuthentication()).thenReturn(userClient);
+    when(rightAssignmentRepository.existsByUserIdAndRightName(user.getId(), RIGHT_NAME))
+        .thenReturn(true);
+
+    assertThat(rightService.hasRight(RIGHT_NAME)).isTrue();
+  }
+
+  @Test
+  public void shouldReturnFalseIfUserHasNoRight() {
+    when(securityContext.getAuthentication()).thenReturn(userClient);
+    when(rightAssignmentRepository.existsByUserIdAndRightName(user.getId(), RIGHT_NAME))
+        .thenReturn(false);
+
+    assertThat(rightService.hasRight(RIGHT_NAME)).isFalse();
   }
 }

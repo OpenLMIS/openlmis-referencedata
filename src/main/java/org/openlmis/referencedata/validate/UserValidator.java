@@ -5,21 +5,26 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.validate;
 
+import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,20 +40,34 @@ public class UserValidator implements BaseValidator {
 
   // User fields
   static final String USERNAME = "username";
-  static final String EMAIL = "email";
   static final String FIRST_NAME = "firstName";
   static final String LAST_NAME = "lastName";
+  static final String EMAIL = "email";
+  static final String JOB_TITLE = "jobTitle";
+  static final String TIMEZONE = "timezone";
+  static final String HOME_FACILITY_ID = "homeFacilityId";
+  static final String VERIFIED = "verified";
+  static final String ACTIVE = "active";
+  static final String LOGIN_RESTRICTED = "loginRestricted";
+  static final String ALLOW_NOTIFY = "allowNotify";
+  static final String EXTRA_DATA = "extraData";
+  static final String ROLE_ASSIGNMENTS = "roleAssignments";
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private RightService rightService;
+
+  @Autowired
+  private RoleAssignmentRepository roleAssignmentRepository;
 
   /**
    * Checks if the given class definition is supported.
    *
    * @param clazz the {@link Class} that this {@link Validator} is being asked if it can {@link
-   *              #validate(Object, Errors) validate}
-   * @return true if {@code clazz} is equal to {@link UserDto} class definition.
-   *     Otherwise false.
+   * #validate(Object, Errors) validate}
+   * @return true if {@code clazz} is equal to {@link UserDto} class definition. Otherwise false.
    */
   @Override
   public boolean supports(Class<?> clazz) {
@@ -68,11 +87,16 @@ public class UserValidator implements BaseValidator {
 
     rejectEmptyValues(errors);
     if (!errors.hasErrors()) {
-      UserDto user = (UserDto) target;
-      verifyUsername(user.getId(), user.getUsername(), errors);
+      UserDto dto = (UserDto) target;
 
-      if (user.getEmail() != null) {
-        verifyEmail(user.getId(), user.getEmail(), errors);
+      if (null != dto.getId() && !rightService.hasRight(RightName.USERS_MANAGE_RIGHT)) {
+        validateInvariants(dto, errors);
+      }
+
+      verifyUsername(dto.getId(), dto.getUsername(), errors);
+
+      if (dto.getEmail() != null) {
+        verifyEmail(dto.getId(), dto.getEmail(), errors);
       }
     }
   }
@@ -113,5 +137,34 @@ public class UserValidator implements BaseValidator {
       rejectValue(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
     }
 
+  }
+
+  private void validateInvariants(UserDto dto, Errors errors) {
+    User db = userRepository.findOne(dto.getId());
+
+    rejectIfNotEquals(errors, db.getUsername(), dto.getUsername(), USERNAME,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfNotEquals(errors, db.getJobTitle(), dto.getJobTitle(), JOB_TITLE,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfNotEquals(errors, db.getTimezone(), dto.getTimezone(), TIMEZONE,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfNotEquals(errors, db.getHomeFacilityId(), dto.getHomeFacilityId(), HOME_FACILITY_ID,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfNotEquals(errors, db.isVerified(), dto.isVerified(), VERIFIED,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfNotEquals(errors, db.isActive(), dto.isActive(), ACTIVE,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfNotEquals(errors, db.isLoginRestricted(), dto.isLoginRestricted(), LOGIN_RESTRICTED,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfNotEquals(errors, db.getAllowNotify(), dto.getAllowNotify(), ALLOW_NOTIFY,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfNotEquals(errors, db.getExtraData(), dto.getExtraData(), EXTRA_DATA,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+
+    Set<RoleAssignmentDto> oldRoleAssignments = roleAssignmentRepository.findByUser(dto.getId());
+    Set<RoleAssignmentDto> newRoleAssignments = dto.getRoleAssignments();
+
+    rejectIfNotEquals(errors, oldRoleAssignments, newRoleAssignments, ROLE_ASSIGNMENTS,
+        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
   }
 }

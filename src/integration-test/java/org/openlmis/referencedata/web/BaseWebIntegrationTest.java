@@ -29,6 +29,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
 
@@ -385,6 +386,8 @@ public abstract class BaseWebIntegrationTest {
   protected void mockUserHasRight(String rightName) {
     doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), any(UUID.class));
     doNothing().when(rightService).checkAdminRight(rightName);
+
+    doReturn(true).when(rightService).hasRight(rightName);
   }
 
   protected void mockUserHasNoRight(String rightName) {

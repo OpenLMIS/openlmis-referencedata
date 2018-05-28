@@ -172,7 +172,7 @@ public class UserController extends BaseController {
     profiler.setLogger(LOGGER);
 
     profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userDto.getId());
 
     profiler.start("VALIDATE_USER");
     userValidator.validate(userDto, bindingResult);
