@@ -26,7 +26,7 @@ import org.springframework.validation.Validator;
 
 interface BaseValidator extends Validator {
 
-  default void rejectIfNotEquals(Errors errors, Object oldData, Object newData, String field,
+  default void rejectIfNotEqual(Errors errors, Object oldData, Object newData, String field,
       String message) {
     if (!Objects.equals(oldData, newData)) {
       rejectValue(errors, field, message);
