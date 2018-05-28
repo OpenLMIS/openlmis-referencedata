@@ -142,29 +142,26 @@ public class UserValidator implements BaseValidator {
   private void validateInvariants(UserDto dto, Errors errors) {
     User db = userRepository.findOne(dto.getId());
 
-    rejectIfNotEqual(errors, db.getUsername(), dto.getUsername(), USERNAME,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    rejectIfNotEqual(errors, db.getJobTitle(), dto.getJobTitle(), JOB_TITLE,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    rejectIfNotEqual(errors, db.getTimezone(), dto.getTimezone(), TIMEZONE,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    rejectIfNotEqual(errors, db.getHomeFacilityId(), dto.getHomeFacilityId(), HOME_FACILITY_ID,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    rejectIfNotEqual(errors, db.isVerified(), dto.isVerified(), VERIFIED,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    rejectIfNotEqual(errors, db.isActive(), dto.isActive(), ACTIVE,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    rejectIfNotEqual(errors, db.isLoginRestricted(), dto.isLoginRestricted(), LOGIN_RESTRICTED,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    rejectIfNotEqual(errors, db.getAllowNotify(), dto.getAllowNotify(), ALLOW_NOTIFY,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    rejectIfNotEqual(errors, db.getExtraData(), dto.getExtraData(), EXTRA_DATA,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfInvariantWasChanged(errors, USERNAME, db.getUsername(), dto.getUsername());
+    rejectIfInvariantWasChanged(errors, JOB_TITLE, db.getJobTitle(), dto.getJobTitle());
+    rejectIfInvariantWasChanged(errors, TIMEZONE, db.getTimezone(), dto.getTimezone());
+    rejectIfInvariantWasChanged(errors, HOME_FACILITY_ID,
+        db.getHomeFacilityId(), dto.getHomeFacilityId());
+    rejectIfInvariantWasChanged(errors, VERIFIED, db.isVerified(), dto.isVerified());
+    rejectIfInvariantWasChanged(errors, ACTIVE, db.isActive(), dto.isActive());
+    rejectIfInvariantWasChanged(errors, LOGIN_RESTRICTED,
+        db.isLoginRestricted(), dto.isLoginRestricted());
+    rejectIfInvariantWasChanged(errors, ALLOW_NOTIFY, db.getAllowNotify(), dto.getAllowNotify());
+    rejectIfInvariantWasChanged(errors, EXTRA_DATA, db.getExtraData(), dto.getExtraData());
 
     Set<RoleAssignmentDto> oldRoleAssignments = roleAssignmentRepository.findByUser(dto.getId());
     Set<RoleAssignmentDto> newRoleAssignments = dto.getRoleAssignments();
 
-    rejectIfNotEqual(errors, oldRoleAssignments, newRoleAssignments, ROLE_ASSIGNMENTS,
-        UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+    rejectIfInvariantWasChanged(errors, ROLE_ASSIGNMENTS, oldRoleAssignments, newRoleAssignments);
+  }
+
+  private void rejectIfInvariantWasChanged(Errors errors, String field, Object oldValue,
+      Object newValue) {
+    rejectIfNotEqual(errors, oldValue, newValue, field, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
   }
 }
