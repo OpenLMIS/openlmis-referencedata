@@ -54,15 +54,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: '8da5ba56-8ebb-4a6a-bdb5-43c9d0efb120', variable: 'ENV_FILE')]) {
                     sh( script: "./ci-envTest.sh" )
-                    sh 'set +x'
-                    sh 'sudo rm -f .env'
-                    sh 'cp $ENV_FILE .env'
-
-                    sh 'docker-compose -f docker-compose.builder.yml run -e BUILD_NUMBER=$BUILD_NUMBER -e GIT_BRANCH=$GIT_BRANCH builder'
-                    sh 'docker-compose -f docker-compose.builder.yml build image'
-                    sh 'docker-compose -f docker-compose.builder.yml down --volumes'
-                    sh "docker tag openlmis/referencedata:latest openlmis/referencedata:${STAGING_VERSION}"
-                    sh "docker push openlmis/referencedata:${STAGING_VERSION}"
+                    sh( script: "./ci-buildImage.sh )
                 }
             }
             post {
