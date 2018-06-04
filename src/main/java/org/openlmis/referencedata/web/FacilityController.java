@@ -20,7 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -69,6 +72,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+@NoArgsConstructor
 @Controller
 @Transactional
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -230,6 +234,10 @@ public class FacilityController extends BaseController {
 
     Profiler profiler = new Profiler("UPDATE_FACILITY");
     profiler.setLogger(XLOGGER);
+
+    if (null != facilityDto.getId() && !Objects.equals(facilityDto.getId(), facilityId)) {
+      throw new ValidationMessageException("referenceData.error.facility.idMismatch");
+    }
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
