@@ -55,6 +55,7 @@ import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -736,7 +737,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     FacilityDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
+        .pathParam("id", facilityDto.getId())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
         .when()
@@ -762,13 +763,33 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
+        .pathParam("id", facilityDto.getId())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void putShouldReturnBadRequestIfIdMismatch() {
+    FacilityDto facilityDto = new FacilityDto();
+    facility.export(facilityDto);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam("id", UUID.randomUUID())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(facilityDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(400)
+        .body(MESSAGE_KEY, is(FacilityMessageKeys.ERROR_ID_MISMATCH));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -782,7 +803,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
+        .pathParam("id", facilityDto.getId())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
         .when()
@@ -817,7 +838,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", UUID.randomUUID())
+        .pathParam("id", facilityDto.getId())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(facilityDto)
         .when()

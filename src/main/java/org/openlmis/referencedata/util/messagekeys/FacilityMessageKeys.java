@@ -29,4 +29,5 @@ public abstract class FacilityMessageKeys extends MessageKeys {
       join(ERROR, SEARCH, LACKS_PARAMETERS);
   public static final String ERROR_MUST_BE_WAREHOUSE =
       join(ERROR, TYPE, MUST_BE_WAREHOUSE);
+  public static final String ERROR_ID_MISMATCH = join(ERROR, "idMismatch");
 }

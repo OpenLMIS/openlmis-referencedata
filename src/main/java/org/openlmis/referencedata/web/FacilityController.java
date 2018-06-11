@@ -236,7 +236,7 @@ public class FacilityController extends BaseController {
     profiler.setLogger(XLOGGER);
 
     if (null != facilityDto.getId() && !Objects.equals(facilityDto.getId(), facilityId)) {
-      throw new ValidationMessageException("referenceData.error.facility.idMismatch");
+      throw new ValidationMessageException(FacilityMessageKeys.ERROR_ID_MISMATCH);
     }
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
