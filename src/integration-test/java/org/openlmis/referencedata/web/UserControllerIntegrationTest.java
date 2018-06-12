@@ -373,7 +373,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     UserDto userDto = new UserDto();
 
-    UserDto response = putUser(userDto)
+    UserDto response = putUser(userDto, getClientTokenHeader())
         .then()
         .statusCode(200)
         .extract().as(UserDto.class);
@@ -383,16 +383,14 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldRejectPutUserIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
-
-    String messageKey = putUser(null)
+  public void shouldRejectPutUserIfRequestWasFromUser() {
+    String messageKey = putUser(null, getTokenHeader())
         .then()
         .statusCode(403)
         .extract()
         .path(MESSAGE_KEY);
 
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -404,7 +402,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     user.setId(UUID.randomUUID());
     given(userRepository.findOneByEmail(user1.getEmail())).willReturn(user);
 
-    String messageKey = putUser(null)
+    String messageKey = putUser(null, getClientTokenHeader())
         .then()
         .statusCode(400)
         .extract()
@@ -422,7 +420,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     user.setId(UUID.randomUUID());
     given(userRepository.findOneByUsernameIgnoreCase(user1.getUsername())).willReturn(user);
 
-    String messageKey = putUser(null)
+    String messageKey = putUser(null, getClientTokenHeader())
         .then()
         .statusCode(400)
         .extract()
@@ -437,7 +435,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setUsername(null);
-    String messageKey = putUser(null)
+    String messageKey = putUser(null, getClientTokenHeader())
         .then()
         .statusCode(400)
         .extract()
@@ -452,7 +450,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setUsername("bad:name");
-    String messageKey = putUser(null)
+    String messageKey = putUser(null, getClientTokenHeader())
         .then()
         .statusCode(400)
         .extract()
@@ -467,7 +465,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setEmail(null);
-    putUser(null)
+    putUser(null, getClientTokenHeader())
         .then()
         .statusCode(200);
 
@@ -479,7 +477,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setFirstName(null);
-    String messageKey = putUser(null)
+    String messageKey = putUser(null, getClientTokenHeader())
         .then()
         .statusCode(400)
         .extract()
@@ -494,7 +492,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setLastName(null);
-    String messageKey = putUser(null)
+    String messageKey = putUser(null, getClientTokenHeader())
         .then()
         .statusCode(400)
         .extract()
@@ -866,11 +864,11 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldPaginateFindUsers() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    UserSearchParams searchParams = new UserSearchParamsDataBuilder().build();
-
-    User user2 = generateUser();
+    user2 = generateUser();
     user2.setId(UUID.randomUUID());
     assignUserRoles(user2);
+
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder().build();
 
     given(userService.searchUsers(eq(searchParams), any(Pageable.class)))
         .willReturn(Pagination.getPage(asList(user1), null, 2));
@@ -936,7 +934,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     User response = restAssured
         .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(userDto)
         .when()
@@ -968,7 +966,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     UserDto user = restAssured
         .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.AUTHORIZATION, getClientTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(newUserDto)
         .when()
@@ -1070,7 +1068,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getUserAuditLogShouldReturnNotFoundIfUserDoesNotExist() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, null);
     given(userRepository.findOne(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -1094,7 +1092,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserAuditLog() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+        .checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, null);
     given(userRepository.exists(any(UUID.class))).willReturn(true);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -1282,7 +1280,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(ROLE_ASSIGNMENTS_URL);
   }
 
-  private Response putUser(UserDto userDto) {
+  private Response putUser(UserDto userDto, String tokenHeader) {
     if (userDto == null) {
       userDto = new UserDto();
     }
@@ -1297,7 +1295,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.AUTHORIZATION, tokenHeader)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(userDto)
         .when()

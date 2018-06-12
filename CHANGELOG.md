@@ -1,5 +1,9 @@
-10.1.0 / WIP
+11.0.0 / WIP
 ============
+
+Breaking changes:
+* [OLMIS-4896](https://openlmis.atlassian.net/browse/OLMIS-4896): Blocked the user save endpoint for user requests
+  * the user should use the related endpoint from the auth service 
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-2245](https://openlmis.atlassian.net/browse/OLMIS-2245): Added user count to Role resource.

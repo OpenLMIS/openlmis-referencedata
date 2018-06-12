@@ -3,6 +3,7 @@ modules:
     properties:
       base-uri: http://localhost
       basic-auth: user-client:changeme
+      service-auth: trusted-client:secret
       username: administrator
       password: password
       # concurrency is in virtual users and duration is in seconds
@@ -37,4 +38,18 @@ scenarios:
               password: ${__P(password)}
             extract-jsonpath:
               access_token:
+                jsonpath: $.access_token
+  get-service-token:
+    requests:
+      - if: '${__javaScript(vars.get("service_token") == null)}'
+        then:
+          - url: ${__P(base-uri)}/api/oauth/token
+            method: POST
+            label: GetServiceToken
+            headers:
+              Authorization: Basic ${__base64Encode(${__P(service-auth)})}
+            body:
+              grant_type: client_credentials
+            extract-jsonpath:
+              service_token:
                 jsonpath: $.access_token

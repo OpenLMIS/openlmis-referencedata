@@ -19,23 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.validate.UserValidator.ACTIVE;
-import static org.openlmis.referencedata.validate.UserValidator.ALLOW_NOTIFY;
 import static org.openlmis.referencedata.validate.UserValidator.EMAIL;
-import static org.openlmis.referencedata.validate.UserValidator.EXTRA_DATA;
 import static org.openlmis.referencedata.validate.UserValidator.FIRST_NAME;
-import static org.openlmis.referencedata.validate.UserValidator.HOME_FACILITY_ID;
-import static org.openlmis.referencedata.validate.UserValidator.JOB_TITLE;
 import static org.openlmis.referencedata.validate.UserValidator.LAST_NAME;
-import static org.openlmis.referencedata.validate.UserValidator.LOGIN_RESTRICTED;
-import static org.openlmis.referencedata.validate.UserValidator.ROLE_ASSIGNMENTS;
-import static org.openlmis.referencedata.validate.UserValidator.TIMEZONE;
 import static org.openlmis.referencedata.validate.UserValidator.USERNAME;
-import static org.openlmis.referencedata.validate.UserValidator.VERIFIED;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import java.util.UUID;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
@@ -46,7 +35,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
@@ -309,35 +297,6 @@ public class UserValidatorTest {
     validator.validate(userDto, errors);
 
     assertThat(errors.getErrorCount()).isEqualTo(0);
-  }
-
-  @Test
-  public void shouldRejectIfUserHasNoRightForEditAndInvariantsWereChanged() {
-    prepareForValidateInvariants();
-
-    userDto.setUsername(RandomStringUtils.randomAlphanumeric(10));
-    userDto.setJobTitle("test-job-title");
-    userDto.setTimezone("test-time-zone");
-    userDto.setHomeFacilityId(UUID.randomUUID());
-    userDto.setVerified(!userDto.isVerified());
-    userDto.setActive(!userDto.isActive());
-    userDto.setLoginRestricted(!userDto.isLoginRestricted());
-    userDto.setAllowNotify(!userDto.getAllowNotify());
-    userDto.setExtraData(ImmutableMap.of("a", "b"));
-    userDto.setRoleAssignments(Sets.newHashSet(new RoleAssignmentDto()));
-    validator.validate(userDto, errors);
-
-    assertThat(errors.getErrorCount()).isGreaterThanOrEqualTo(9);
-    assertErrorMessage(errors, USERNAME, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, JOB_TITLE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, TIMEZONE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, HOME_FACILITY_ID, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, VERIFIED, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, ACTIVE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, LOGIN_RESTRICTED, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, ALLOW_NOTIFY, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, EXTRA_DATA, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, ROLE_ASSIGNMENTS, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
   }
 
   private void prepareForValidateInvariants() {

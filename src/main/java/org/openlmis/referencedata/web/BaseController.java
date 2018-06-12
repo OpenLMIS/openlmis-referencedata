@@ -58,12 +58,17 @@ public abstract class BaseController {
   private Javers javers;
 
   protected void checkAdminRight(String rightName, Profiler profiler) {
-    checkAdminRight(rightName, true, profiler);
+    checkAdminRight(rightName, true, null, profiler);
   }
 
   protected void checkAdminRight(String rightName, boolean allowServiceTokens, Profiler profiler) {
+    checkAdminRight(rightName, allowServiceTokens, null, profiler);
+  }
+
+  protected void checkAdminRight(String rightName, boolean allowServiceTokens, UUID expectedUserId,
+      Profiler profiler) {
     profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(rightName, allowServiceTokens);
+    rightService.checkAdminRight(rightName, allowServiceTokens, expectedUserId);
   }
 
   protected <T> Page<T> toPage(List<T> originalList, Pageable pageable, Profiler profiler) {
@@ -212,7 +217,6 @@ public abstract class BaseController {
     /* Depending on the business' preference, we can either use findSnapshots() or findChanges().
        Whereas the former returns the entire state of the object as it was at each commit, the later
        returns only the property and values which changed. */
-    //List<Change> changes = javers.findSnapshots(queryBuilder.build());
     List<Change> changes = javers.findChanges(queryBuilder.build());
 
     changes.sort((o1, o2) -> -1 * o1.getCommitMetadata().get().getCommitDate()

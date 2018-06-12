@@ -17,6 +17,16 @@ package org.openlmis.referencedata.web;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
+import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
@@ -80,19 +90,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import lombok.NoArgsConstructor;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-
 @NoArgsConstructor
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 @Controller
@@ -102,6 +99,8 @@ public class UserController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(UserController.class);
   private static final String USER_ID = "userId";
+
+  private static final String PROFILER_TO_DTO = "TO_DTO";
 
   @Autowired
   private UserService userService;
@@ -136,11 +135,6 @@ public class UserController extends BaseController {
   @Autowired
   private RoleAssignmentRepository roleAssignmentRepository;
 
-  @InitBinder
-  protected void initBinder(WebDataBinder binder) {
-    binder.setValidator(this.validator);
-  }
-
   /**
    * Constructor for controller unit testing.
    */
@@ -160,6 +154,11 @@ public class UserController extends BaseController {
     this.facilityRepository = facilityRepository;
   }
 
+  @InitBinder
+  protected void initBinder(WebDataBinder binder) {
+    binder.setValidator(this.validator);
+  }
+
   /**
    * Custom endpoint for creating and updating users and their roles.
    */
@@ -171,8 +170,8 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("CREATE_USER");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userDto.getId());
+    profiler.start("CHECK_ROOT_ACCESS");
+    rightService.checkRootAccess();
 
     profiler.start("VALIDATE_USER");
     userValidator.validate(userDto, bindingResult);
@@ -199,7 +198,7 @@ public class UserController extends BaseController {
     profiler.start("SAVE_USER");
     userRepository.save(userToSave);
 
-    profiler.start("TO_DTO");
+    profiler.start(PROFILER_TO_DTO);
     UserDto responseDto = exportUserToDto(userToSave);
     addRoleAssignmentIdsToUserDto(responseDto);
 
@@ -236,8 +235,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USERS");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, profiler);
 
     LOGGER.debug("Getting all users");
     profiler.start("SEARCH_USERS");
@@ -264,8 +262,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_SINGLE_USER");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("FIND_USER");
     User user = userRepository.findOne(userId);
@@ -298,8 +295,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_ROLE_ASSIGNMENTS");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("FIND_USER_ROLE_ASSIGNMENTS");
     User user = userRepository.findOne(userId);
@@ -330,8 +326,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("DELETE_USER");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("FIND_USER");
     User user = userRepository.findOne(userId);
@@ -368,8 +363,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("POST_USER_SEARCH");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN_RIGHT");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, profiler);
 
     profiler.start("SEARCH_USERS");
     Page<User> result = userService.searchUsers(queryParams, pageable);
@@ -405,13 +399,9 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_HAS_RIGHT");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN_RIGHT");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
-    profiler.start("CHECK_USER_EXISTS");
-    if (!userRepository.exists(userId)) {
-      throw new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId));
-    }
+    checkUserExists(userId, profiler);
 
     boolean hasRight;
 
@@ -475,13 +465,8 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_PROGRAMS");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
-
-    profiler.start("CHECK_USER_EXISTS");
-    if (!userRepository.exists(userId)) {
-      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
-    }
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
+    checkUserExists(userId, profiler);
 
     profiler.start("GET_SUPERVISION_PROGRAMS_BY_USER");
     Set<Program> userPrograms = programRepository.findSupervisionProgramsByUser(userId);
@@ -510,13 +495,8 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_SUPPORTED_PROGRAMS");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
-
-    profiler.start("CHECK_USER_EXISTS");
-    if (!userRepository.exists(userId)) {
-      throw new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId));
-    }
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
+    checkUserExists(userId, profiler);
 
     profiler.start("GET_HOME_FACILITY_SUPERVISION_PROGRAMS_BY_USER");
     Set<Program> userHomeFacilityPrograms = programRepository
@@ -550,8 +530,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_SUPERVISED_FACILITIES");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("GET_USER");
     User user = (User) validateId(userId, userRepository).orElseThrow( () ->
@@ -570,7 +549,7 @@ public class UserController extends BaseController {
     profiler.start("GET_SUPERVISED_FACILITIES");
     Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
 
-    profiler.start("TO_DTO");
+    profiler.start(PROFILER_TO_DTO);
     Set<FacilityDto> result = facilitiesToDto(supervisedFacilities);
 
     profiler.stop().log();
@@ -592,8 +571,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_FULFILLMENT_FACILITIES");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("VALIDATE_USER");
     User user = validateUser(userId);
@@ -606,7 +584,7 @@ public class UserController extends BaseController {
     profiler.start("GET_FULFILLMENT_FACILITIES");
     Set<Facility> facilities = user.getFulfillmentFacilities(right);
 
-    profiler.start("TO_DTO");
+    profiler.start(PROFILER_TO_DTO);
     Set<FacilityDto> facilityDtos = facilitiesToDto(facilities);
 
     profiler.stop().log();
@@ -634,8 +612,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USERS_BY_RIGHT");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, profiler);
 
     profiler.start("USERS_BY_RIGHT_SEARCH");
     Set<User> users = userService.rightSearch(rightId, programId,
@@ -673,17 +650,11 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_AUDIT_LOG");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-
-    //Return a 404 if the specified user can't be found
-    profiler.start("CHECK_USER_EXISTS");
-    if (false == userRepository.exists(userId)) {
-      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
-    }
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, profiler);
+    checkUserExists(userId, profiler);
 
     profiler.start("GET_AUDIT_LOG");
-    ResponseEntity responseEntity = getAuditLogResponse(User.class,
+    ResponseEntity<String> responseEntity = getAuditLogResponse(User.class,
         userId,
         author,
         changedPropertyName,
@@ -706,23 +677,18 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_PERM_STRINGS");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
+    checkUserExists(userId, profiler);
 
-    profiler.start("CHECK_USER_EXISTS");
-    if (!userRepository.exists(userId)) {
-      throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      profiler.start("GET_PERM_STRINGS_FROM_RIGHT_ASSIGNMENTS");
-      Set<String> permissionStrings = rightAssignmentRepository.findByUser(userId);
-      
-      profiler.stop().log();
-      XLOGGER.exit(permissionStrings);
-      return ResponseEntity
-          .ok()
-          .eTag(Integer.toString(permissionStrings.hashCode()))
-          .body(permissionStrings);
-    }
+    profiler.start("GET_PERM_STRINGS_FROM_RIGHT_ASSIGNMENTS");
+    Set<String> permissionStrings = rightAssignmentRepository.findByUser(userId);
+
+    profiler.stop().log();
+    XLOGGER.exit(permissionStrings);
+    return ResponseEntity
+        .ok()
+        .eTag(Integer.toString(permissionStrings.hashCode()))
+        .body(permissionStrings);
   }
 
   /**
@@ -739,8 +705,7 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("GET_USER_FACILITIES");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId);
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     if (!userRepository.exists(userId)) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
@@ -894,5 +859,12 @@ public class UserController extends BaseController {
     }
 
     return dtos;
+  }
+
+  private void checkUserExists(UUID userId, Profiler profiler) {
+    profiler.start("CHECK_USER_EXISTS");
+    if (!userRepository.exists(userId)) {
+      throw new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId));
+    }
   }
 }
