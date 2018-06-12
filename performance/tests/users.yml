@@ -78,7 +78,7 @@ scenarios:
         method: PUT
         label: CreateUser
         headers:
-          Authorization: Bearer ${access_token}
+          Authorization: Bearer ${service_token}
           Content-Type: application/json
         jsr223:
           execute: before
