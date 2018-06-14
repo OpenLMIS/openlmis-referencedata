@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.validate;
 
 import java.util.UUID;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.repository.UserRepository;
@@ -37,16 +36,6 @@ public class UserValidator implements BaseValidator {
   static final String USERNAME = "username";
   static final String FIRST_NAME = "firstName";
   static final String LAST_NAME = "lastName";
-  static final String EMAIL = "email";
-  static final String JOB_TITLE = "jobTitle";
-  static final String TIMEZONE = "timezone";
-  static final String HOME_FACILITY_ID = "homeFacilityId";
-  static final String VERIFIED = "verified";
-  static final String ACTIVE = "active";
-  static final String LOGIN_RESTRICTED = "loginRestricted";
-  static final String ALLOW_NOTIFY = "allowNotify";
-  static final String EXTRA_DATA = "extraData";
-  static final String ROLE_ASSIGNMENTS = "roleAssignments";
 
   @Autowired
   private UserRepository userRepository;
@@ -79,10 +68,6 @@ public class UserValidator implements BaseValidator {
       UserDto dto = (UserDto) target;
 
       verifyUsername(dto.getId(), dto.getUsername(), errors);
-
-      if (dto.getEmail() != null) {
-        verifyEmail(dto.getId(), dto.getEmail(), errors);
-      }
     }
   }
 
@@ -90,10 +75,6 @@ public class UserValidator implements BaseValidator {
     rejectIfEmptyOrWhitespace(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_REQUIRED);
     rejectIfEmptyOrWhitespace(errors, FIRST_NAME, UserMessageKeys.ERROR_FIRSTNAME_REQUIRED);
     rejectIfEmptyOrWhitespace(errors, LAST_NAME, UserMessageKeys.ERROR_LASTNAME_REQUIRED);
-
-    if (errors.getFieldValue(EMAIL) != null) {
-      rejectIfEmptyOrWhitespace(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
-    }
   }
 
   private void verifyUsername(UUID id, String username, Errors errors) {
@@ -107,19 +88,6 @@ public class UserValidator implements BaseValidator {
 
     if (null != db && (null == id || !id.equals(db.getId()))) {
       rejectValue(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_DUPLICATED);
-    }
-  }
-
-  private void verifyEmail(UUID id, String email, Errors errors) {
-    // user email cannot be duplicated
-    User db = userRepository.findOneByEmail(email);
-
-    if (null != db && (null == id || !id.equals(db.getId()))) {
-      rejectValue(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_DUPLICATED);
-    }
-
-    if (!EmailValidator.getInstance().isValid(email)) {
-      rejectValue(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
     }
   }
 

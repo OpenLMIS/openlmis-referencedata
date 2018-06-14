@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.validate.UserValidator.EMAIL;
 import static org.openlmis.referencedata.validate.UserValidator.FIRST_NAME;
 import static org.openlmis.referencedata.validate.UserValidator.LAST_NAME;
 import static org.openlmis.referencedata.validate.UserValidator.USERNAME;
@@ -147,80 +146,6 @@ public class UserValidatorTest {
     validator.validate(userDto, errors);
 
     assertErrorMessage(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_INVALID);
-  }
-
-  @Test
-  public void shouldRejectIfEmailIsDuplicated() {
-    userDto.setId(null);
-    doReturn(mock(User.class))
-        .when(userRepository)
-        .findOneByEmail(userDto.getEmail());
-
-    validator.validate(userDto, errors);
-
-    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_DUPLICATED);
-  }
-
-  @Test
-  public void shouldNotRejectIfEmailIsDuplicatedAndIdsAreSame() {
-    User old = new User();
-    old.setId(userDto.getId());
-
-    doReturn(old)
-        .when(userRepository)
-        .findOneByEmail(userDto.getEmail());
-
-    validator.validate(userDto, errors);
-    assertThat(errors.hasFieldErrors(EMAIL)).isFalse();
-  }
-
-  @Test
-  public void shouldRejectIfEmailIsDuplicatedAndIdsAreDifferent() {
-    User old = new User();
-    old.setId(UUID.randomUUID());
-
-    doReturn(old)
-        .when(userRepository)
-        .findOneByEmail(userDto.getEmail());
-
-    validator.validate(userDto, errors);
-    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_DUPLICATED);
-  }
-
-  @Test
-  public void shouldNotRejectWhenEmailIsNull() {
-    userDto.setEmail(null);
-
-    validator.validate(userDto, errors);
-
-    assertThat(errors.hasFieldErrors(EMAIL)).isFalse();
-  }
-
-  @Test
-  public void shouldRejectWhenEmailIsEmpty() {
-    userDto.setEmail("");
-
-    validator.validate(userDto, errors);
-
-    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
-  }
-
-  @Test
-  public void shouldRejectWhenEmailIsWhitespace() {
-    userDto.setEmail(" ");
-
-    validator.validate(userDto, errors);
-
-    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
-  }
-
-  @Test
-  public void shouldRejectWhenEmailIsInvalid() {
-    userDto.setEmail("invalid@email");
-
-    validator.validate(userDto, errors);
-
-    assertErrorMessage(errors, EMAIL, UserMessageKeys.ERROR_EMAIL_INVALID);
   }
 
   @Test
