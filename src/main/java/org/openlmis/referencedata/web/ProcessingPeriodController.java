@@ -124,34 +124,6 @@ public class ProcessingPeriodController extends BaseController {
   }
 
   /**
-   * Get all ProcessingPeriods based on provided program
-   *
-   * @return the ProcessingPeriods.
-   */
-  @RequestMapping(value = RESOURCE_PATH + "/byProgram", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Page<ProcessingPeriodDto> getAllProcessingPeriodsByProgramId(
-          @RequestParam(value = "program") UUID program,
-          @SortDefault(sort = "startDate") Pageable pageable) {
-    LOGGER.debug("Fetching periods by program", program);
-
-    Profiler profiler = new Profiler("FETCHING_PROCESSING_PERIODS_BY_PROGRAM");
-    profiler.setLogger(LOGGER);
-
-    profiler.start("FETCH_PERIODS");
-    Page<ProcessingPeriod> periods = periodService
-            .getProcessingPeriodsByProgramId(program, pageable);
-
-    profiler.start("EXPORT_PERIODS_TO_DTO");
-    Page<ProcessingPeriodDto> dtos = exportToDto(periods, profiler, pageable);
-
-    profiler.stop().log();
-    return dtos;
-  }
-
-
-  /**
    * Update an existing ProcessingPeriod using the provided ProcessingPeriodDto. Note, if the role
    * does not exist, will create one.
    *

@@ -96,31 +96,6 @@ public class ProcessingPeriodService {
     return periodRepository.search(schedule, startDate, endDate, pageable);
   }
 
-  /**
-   * Gets all the ProcessingPeriods based on program.
-   */
-  public Page<ProcessingPeriod> getProcessingPeriodsByProgramId(UUID programId,
-                                              Pageable pageable) {
-
-    Program program = getById(programRepository, programId,
-            ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID);
-
-    ProcessingSchedule schedule;
-
-    List<RequisitionGroupProgramSchedule> schedules = requisitionGroupProgramScheduleRepository
-            .searchRequisitionGroupProgramSchedules(program, null);
-    if (schedules.isEmpty()) {
-      LOGGER.warn("Cannot find Requisition Group Program Schedule for program {}",
-              program.getId());
-      return Pagination.getPage(Collections.emptyList(), pageable, 0);
-    } else {
-      schedule = schedules.get(0).getProcessingSchedule();
-    }
-
-    return periodRepository.search(schedule, null, null, pageable);
-  }
-
-
   private <T> T getById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {
     T object = null == id ? null : repository.findOne(id);
     if (null != id && null == object) {
