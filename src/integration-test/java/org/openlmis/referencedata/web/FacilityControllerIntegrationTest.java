@@ -221,13 +221,16 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
     String similarCode = "Facility";
-    MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
-    requestBody.add("code", similarCode);
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("code", similarCode);
+    MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+    requestBody.entrySet().stream()
+        .forEach(entry -> map.add(entry.getKey(), entry.getValue()));
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
     given(facilityService.searchFacilities(
-        new FacilitySearchParams(requestBody)))
+        new FacilitySearchParams(map)))
         .willReturn(listToReturn);
 
     PageImplRepresentation response = restAssured.given()
@@ -263,12 +266,15 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldFindFacilitiesWithSimilarName() {
 
     String similarName = "Facility";
-    MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
-    requestBody.add(NAME_KEY, similarName);
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put(NAME_KEY, similarName);
+    MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+    requestBody.entrySet().stream()
+        .forEach(entry -> map.add(entry.getKey(), entry.getValue()));
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityService.searchFacilities(new FacilitySearchParams(requestBody)))
+    given(facilityService.searchFacilities(new FacilitySearchParams(map)))
         .willReturn(listToReturn);
 
     PageImplRepresentation response = restAssured.given()

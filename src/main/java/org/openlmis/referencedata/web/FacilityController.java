@@ -453,7 +453,10 @@ public class FacilityController extends BaseController {
     profiler.setLogger(XLOGGER);
 
     profiler.start("CONVERT_PARAMS");
-    FacilitySearchParams params = new FacilitySearchParams(new LinkedMultiValueMap(queryParams));
+    MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+    queryParams.entrySet().stream()
+        .forEach(entry -> map.add(entry.getKey(), entry.getValue()));
+    FacilitySearchParams params = new FacilitySearchParams(map);
 
     profiler.start("SERVICE_SEARCH");
     List<Facility> foundFacilities = facilityService.searchFacilities(params);
