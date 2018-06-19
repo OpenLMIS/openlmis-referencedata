@@ -24,6 +24,5 @@ import java.util.UUID;
 public interface FacilityRepositoryCustom {
 
   List<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
-                        String facilityTypeCode, String extraData);
-
+                        String facilityTypeCode, String extraData, Boolean conjunction);
 }

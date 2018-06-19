@@ -153,7 +153,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Test
   public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
-    List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null, null, null);
+    List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null, null, null, false);
     assertEquals(0, foundFacilties.size());
   }
 
@@ -168,7 +168,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     List<Facility> foundFacilties = repository
-        .search(null, null, null, facilityType.getCode(), null);
+        .search(null, null, null, facilityType.getCode(), null, false);
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -193,7 +193,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     List<Facility> foundFacilities = repository
-        .search(null, facility.getName(), null, null, null);
+        .search(null, facility.getName(), null, null, null, false);
 
     // then
     assertEquals(1, foundFacilities.size());
@@ -213,7 +213,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     List<Facility> foundFacilties = repository
-        .search(null, null, ImmutableSet.of(geographicZone.getId()), null, null);
+        .search(null, null, ImmutableSet.of(geographicZone.getId()), null, null, false);
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -233,7 +233,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataRural);
-    List<Facility> foundFacilties = repository.search(null, null, null, null, extraDataJson);
+    List<Facility> foundFacilties = repository.search(null, null, null, null, extraDataJson, false);
 
     assertThat(foundFacilties, hasSize(1));
     assertThat(foundFacilties, hasItem(facility));
@@ -250,7 +250,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     String extraDataJson = mapper.writeValueAsString(extraDataUrban);
     List<Facility> foundFacilties = repository.search(
         facility.getCode(), "Facility", ImmutableSet.of(geographicZone.getId()),
-        facilityType.getCode(), extraDataJson
+        facilityType.getCode(), extraDataJson, false
     );
 
     // then
@@ -352,6 +352,17 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
         .forEach(sp -> assertThat(sp.getLocallyFulfilled(), is(false)));
   }
 
+  @Test
+  public void shouldFindFacilitiesByAllParamsWithConjunction() throws JsonProcessingException {
+    List<Facility> foundFacilities = repository.search(
+        facility.getCode(), "Facility", ImmutableSet.of(geographicZone.getId()),
+        facilityType.getCode(), null, true);
+
+    // then
+    assertEquals(1, foundFacilities.size());
+    assertThat(foundFacilities, hasItem(facility));
+  }
+
   @Override
   Facility generateInstance() {
     return getFacilityDataBuilder()
@@ -367,7 +378,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   private void searchFacilityAndCheckResults(String code, String name, Facility facility,
                                              int expectedSize) {
-    List<Facility> foundFacilities = repository.search(code, name, null, null, null);
+    List<Facility> foundFacilities = repository.search(code, name, null, null, null, false);
     assertThat(foundFacilities, hasSize(expectedSize));
     assertThat(foundFacilities, hasItem(hasProperty("name", equalTo(facility.getName()))));
   }

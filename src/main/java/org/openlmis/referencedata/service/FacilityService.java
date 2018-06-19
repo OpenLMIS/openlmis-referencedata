@@ -19,12 +19,16 @@ import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isAllEmpty;
 
-import com.google.common.collect.Sets;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.commons.collections4.MapUtils;
+import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import org.apache.commons.lang3.BooleanUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -33,30 +37,21 @@ import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
+import org.openlmis.referencedata.web.FacilitySearchParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 public class FacilityService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityService.class);
 
-  private static final String CODE = "code";
-  private static final String NAME = "name";
-  private static final String FACILITY_TYPE_CODE = "type";
-  private static final String ZONE_ID = "zoneId";
-  private static final String RECURSE = "recurse";
-  private static final String EXTRA_DATA = "extraData";
+  @Value("${featureFlags.facilitySearchConjunction}")
+  private String facilitySearchConjunction;
 
   @Autowired
   private FacilityRepository facilityRepository;
@@ -92,29 +87,29 @@ public class FacilityService {
       return facilityRepository.findAll(ids);
     }
 
-    return searchFacilities(queryMap.toSingleValueMap());
+    return searchFacilities(new FacilitySearchParams(queryMap));
   }
 
   /**
    * Method returns all facilities with matched parameters. When no valid params are given,
    * returns all facilities
    *
-   * @param queryMap request parameters (code, name, zone, type, recurse) and JSON extraData.
-   *                 May be null or empty
+   * @param params request parameters (code, name, zone, type, recurse) and JSON extraData.
+   *               May be null or empty
    * @return List of facilities. All facilities will be returned when map is null or empty
    */
-  public List<Facility> searchFacilities(Map<String, Object> queryMap) {
-
-    String code = MapUtils.getString(queryMap, CODE, null);
-    String name = MapUtils.getString(queryMap, NAME, null);
-    String facilityTypeCode = MapUtils.getString(queryMap, FACILITY_TYPE_CODE, null);
-    UUID zoneId = UuidUtil
-        .fromString(MapUtils.getObject(queryMap, ZONE_ID, "").toString())
-        .orElse(null);
-    final boolean recurse = MapUtils.getBooleanValue(queryMap, RECURSE);
+  public List<Facility> searchFacilities(FacilitySearchParams params) {
+    final String code = params.getCode();
+    final String name = params.getName();
+    final String facilityTypeCode = params.getFacilityTypeCode();
+    final UUID zoneId = params.getZoneId();
+    final Boolean recurse = params.isRecurse();
+    final Map extraData = params.getExtraData();
 
     // validate query parameters
-    if (isEmpty(queryMap) || (isAllEmpty(code, name, facilityTypeCode) && null == zoneId)) {
+    if (isEmpty(extraData)
+        && isAllEmpty(code, name, facilityTypeCode)
+        && null == zoneId) {
       return facilityRepository.findAll();
     }
 
@@ -127,8 +122,6 @@ public class FacilityService {
     if (facilityTypeCode != null && !facilityTypeRepository.existsByCode(facilityTypeCode)) {
       throw new ValidationMessageException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     }
-
-    Map extraData = (Map) queryMap.get(EXTRA_DATA);
 
     List<Facility> facilities = findFacilities(
         zoneId, code, name, facilityTypeCode, extraData, recurse
@@ -161,7 +154,8 @@ public class FacilityService {
       }
     }
 
-    return facilityRepository.search(code, name, zones, facilityTypeCode, extraDataString);
+    return facilityRepository.search(code, name, zones, facilityTypeCode, extraDataString,
+        BooleanUtils.toBoolean(facilitySearchConjunction));
   }
 
 }

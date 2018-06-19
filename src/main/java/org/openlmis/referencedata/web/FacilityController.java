@@ -18,11 +18,10 @@ package org.openlmis.referencedata.web;
 import com.vividsolutions.jts.geom.Polygon;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.Objects;
 import java.util.stream.Collectors;
-
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
@@ -61,6 +60,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -452,8 +452,11 @@ public class FacilityController extends BaseController {
     Profiler profiler = new Profiler("SEARCH_FACILITIES");
     profiler.setLogger(XLOGGER);
 
+    profiler.start("CONVERT_PARAMS");
+    FacilitySearchParams params = new FacilitySearchParams(new LinkedMultiValueMap(queryParams));
+
     profiler.start("SERVICE_SEARCH");
-    List<Facility> foundFacilities = facilityService.searchFacilities(queryParams);
+    List<Facility> foundFacilities = facilityService.searchFacilities(params);
 
     List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities, profiler);
     Page<BasicFacilityDto> page = toPage(facilityDtos, pageable, profiler);

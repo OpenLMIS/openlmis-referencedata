@@ -23,7 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -35,6 +34,16 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -65,16 +74,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -222,12 +221,13 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindFacilitiesWithSimilarCode() {
     String similarCode = "Facility";
-    Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("code", similarCode);
+    MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+    requestBody.add("code", similarCode);
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityService.searchFacilities(requestBody))
+    given(facilityService.searchFacilities(
+        new FacilitySearchParams(requestBody)))
         .willReturn(listToReturn);
 
     PageImplRepresentation response = restAssured.given()
@@ -263,12 +263,12 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldFindFacilitiesWithSimilarName() {
 
     String similarName = "Facility";
-    Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put(NAME_KEY, similarName);
+    MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+    requestBody.add(NAME_KEY, similarName);
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityService.searchFacilities(requestBody))
+    given(facilityService.searchFacilities(new FacilitySearchParams(requestBody)))
         .willReturn(listToReturn);
 
     PageImplRepresentation response = restAssured.given()
@@ -289,7 +289,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnBadRequestWhenSearchThrowsException() {
     // given
-    given(facilityService.searchFacilities(anyMap())).willThrow(
+    given(facilityService.searchFacilities(any())).willThrow(
         new ValidationMessageException("somethingWrong"));
 
     // when
@@ -329,11 +329,11 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldPaginateSearchFacilities() {
 
-    Map<String, Object> requestBody = new HashMap<>();
+    MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityService.searchFacilities(requestBody))
+    given(facilityService.searchFacilities(new FacilitySearchParams(requestBody)))
         .willReturn(listToReturn);
 
     PageImplRepresentation response = restAssured.given()

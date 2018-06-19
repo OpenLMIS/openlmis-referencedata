@@ -21,13 +21,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -38,13 +42,10 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.web.FacilitySearchParams;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityServiceTest {
@@ -98,43 +99,42 @@ public class FacilityServiceTest {
   public void shouldReturnAllIfZoneCodeAndNameNotProvidedForSearch() {
     when(facilityRepository.findAll()).thenReturn(facilityList);
 
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(RECURSE, false);
-    List<Facility> actual = facilityService.searchFacilities(searchParams);
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(RECURSE, false);
+    List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params));
 
     verify(facilityRepository).findAll();
     assertEquals(facilityList, actual);
-
   }
 
-  @Test
+  @Test(expected = ValidationMessageException.class)
   public void shouldOnlyThrowValidationExceptionIfQueryMapCantBeParsed() {
     when(facilityRepository.findAll()).thenReturn(facilityList);
 
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(CODE, "-1");
-    searchParams.put(NAME, "-1");
-    searchParams.put(ZONE_ID, "a");
-    searchParams.put(RECURSE, "a");
-    facilityService.searchFacilities(searchParams);
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(CODE, "-1");
+    params.add(NAME, "-1");
+    params.add(ZONE_ID, "a");
+    params.add(RECURSE, "a");
+    facilityService.searchFacilities(new FacilitySearchParams(params));
   }
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfGeographicZoneDoesNotExist() {
     when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(null);
 
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(ZONE_ID, UUID.randomUUID());
-    facilityService.searchFacilities(searchParams);
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(ZONE_ID, UUID.randomUUID().toString());
+    facilityService.searchFacilities(new FacilitySearchParams(params));
   }
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfFacilityTypeDoesNotExist() {
     when(facilityTypeRepository.findOneByCode(any(String.class))).thenReturn(null);
 
-    Map<String, Object> searchParams = new HashMap<>();
-    searchParams.put(ZONE_ID, UUID.randomUUID());
-    facilityService.searchFacilities(searchParams);
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(ZONE_ID, UUID.randomUUID().toString());
+    facilityService.searchFacilities(new FacilitySearchParams(params));
   }
 
   @Test
@@ -181,7 +181,7 @@ public class FacilityServiceTest {
     params.add(CODE, FACILITY_CODE);
     params.add(NAME, FACILITY_NAME);
     params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.add(ZONE_ID, parentId);
+    params.add(ZONE_ID, parentId.toString());
 
     final List<Facility> actual = facilityService.getFacilities(params);
 
@@ -197,7 +197,7 @@ public class FacilityServiceTest {
     params.add(CODE, FACILITY_CODE);
     params.add(NAME, FACILITY_NAME);
     params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.add(ZONE_ID, parentId);
+    params.add(ZONE_ID, parentId.toString());
 
     List<Facility> actual = facilityService.getFacilities(params);
 
@@ -208,7 +208,8 @@ public class FacilityServiceTest {
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
     when(facilityRepository.findAll()).thenReturn(facilityList);
 
-    List<Facility> actual = facilityService.searchFacilities(new HashMap<>());
+    List<Facility> actual = facilityService
+        .searchFacilities(new FacilitySearchParams(new LinkedMultiValueMap<>()));
     verify(facilityRepository).findAll();
     assertEquals(facilityList, actual);
   }
@@ -217,14 +218,15 @@ public class FacilityServiceTest {
   public void shouldSearchForFacilitiesInChildZonesIfRecurseOptionProvided() {
     prepareForSearchWithRecurse();
 
-    Map<String, Object> params = new HashMap<>();
-    params.put(RECURSE, true);
-    params.put(CODE, FACILITY_CODE);
-    params.put(NAME, FACILITY_NAME);
-    params.put(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.put(ZONE_ID, parentId);
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(RECURSE, true);
+    params.add(CODE, FACILITY_CODE);
+    params.add(NAME, FACILITY_NAME);
+    params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
+    params.add(ZONE_ID, parentId.toString());
 
-    final List<Facility> actual = facilityService.searchFacilities(params);
+    final List<Facility> actual = facilityService
+        .searchFacilities(new FacilitySearchParams(params));
 
     verifyAfterSearchWithRecurse(actual);
   }
@@ -233,14 +235,14 @@ public class FacilityServiceTest {
   public void shouldSearchForFacilitiesInParentZoneOnlyIfRecurseOptionIsOff() {
     prepareForSearchWithoutRecurse();
 
-    Map<String, Object> params = new HashMap<>();
-    params.put(RECURSE, false);
-    params.put(CODE, FACILITY_CODE);
-    params.put(NAME, FACILITY_NAME);
-    params.put(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.put(ZONE_ID, parentId);
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(RECURSE, false);
+    params.add(CODE, FACILITY_CODE);
+    params.add(NAME, FACILITY_NAME);
+    params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
+    params.add(ZONE_ID, parentId.toString());
 
-    List<Facility> actual = facilityService.searchFacilities(params);
+    List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params));
 
     verifyAfterSearchWithoutRecurse(actual);
   }
@@ -258,24 +260,39 @@ public class FacilityServiceTest {
 
     when(facilityRepository
         .search(code, name, of(parentId, childId, childOfChildId),
-            FACILITY_TYPE, "{\"type\":\"rural\"}"))
+            FACILITY_TYPE, "{\"type\":\"rural\"}", false))
         .thenReturn(Lists.newArrayList(facility2));
 
     Map<String, String> extraData = new HashMap<>();
     extraData.put("type", "rural");
 
-    Map<String, Object> params = new HashMap<>();
-    params.put(RECURSE, true);
-    params.put(CODE, code);
-    params.put(NAME, name);
-    params.put(FACILITY_TYPE_CODE, FACILITY_TYPE);
-    params.put(ZONE_ID, parentId);
-    params.put("extraData", extraData);
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(RECURSE, true);
+    params.add(CODE, code);
+    params.add(NAME, name);
+    params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
+    params.add(ZONE_ID, parentId.toString());
+    params.add("extraData", extraData);
 
-    List<Facility> actual = facilityService.searchFacilities(params);
+    List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params));
 
     assertEquals(1, actual.size());
     assertThat(actual, hasItem(facility2));
+  }
+
+  @Test
+  public void shouldSearchForFacilitiesUsingConjunction() {
+    prepareForSearchWithRecurse();
+
+    ReflectionTestUtils.setField(facilityService, "facilitySearchConjunction", "true");
+
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(RECURSE, true);
+    params.add(CODE, FACILITY_CODE);
+
+    facilityService.searchFacilities(new FacilitySearchParams(params));
+
+    verify(facilityRepository).search(any(), any(), any(), any(), any(), eq(true));
   }
 
   private void prepareForSearchWithRecurse() {
@@ -289,14 +306,14 @@ public class FacilityServiceTest {
     when(facilityRepository
         .search(
             FACILITY_CODE, FACILITY_NAME,
-            of(parentId, childId, childOfChildId), FACILITY_TYPE, null))
+            of(parentId, childId, childOfChildId), FACILITY_TYPE, null, false))
         .thenReturn(Lists.newArrayList(facility, facility2));
   }
 
   private void verifyAfterSearchWithRecurse(List<Facility> actual) {
     verify(facilityRepository)
         .search(FACILITY_CODE, FACILITY_NAME,
-            of(parentId, childId, childOfChildId), FACILITY_TYPE, null);
+            of(parentId, childId, childOfChildId), FACILITY_TYPE, null, false);
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(facility));
@@ -309,13 +326,13 @@ public class FacilityServiceTest {
     when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
 
     when(facilityRepository
-        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null))
+        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null, false))
         .thenReturn(Lists.newArrayList(facility));
   }
 
   private void verifyAfterSearchWithoutRecurse(List<Facility> actual) {
     verify(facilityRepository)
-        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null);
+        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null, false);
     verifyNoMoreInteractions(facilityRepository);
 
     assertEquals(1, actual.size());

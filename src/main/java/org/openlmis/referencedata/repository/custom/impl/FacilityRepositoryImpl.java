@@ -22,21 +22,18 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import org.hibernate.SQLQuery;
-import org.hibernate.type.PostgresUUIDType;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.PostgresUUIDType;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 
 public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
@@ -55,6 +52,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
   private static final String WHERE = "WHERE";
   private static final String OR = " OR ";
+  private static final String AND = " AND ";
 
   private static final String WITH_CODE = "UPPER(f.code) LIKE :code";
   private static final String WITH_NAME = "UPPER(f.name) LIKE :name";
@@ -77,7 +75,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * @return List of Facilities matching the parameters.
    */
   public List<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
-                               String facilityTypeCode, String extraData) {
+                               String facilityTypeCode, String extraData, Boolean conjunction) {
     List<String> sql = Lists.newArrayList(NATIVE_SELECT_BY_PARAMS);
     List<String> where = Lists.newArrayList();
     Map<String, Object> params = Maps.newHashMap();
@@ -110,7 +108,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
     if (!where.isEmpty()) {
       sql.add(WHERE);
-      sql.add(Joiner.on(OR).join(where));
+      sql.add(Joiner.on(conjunction ? AND : OR).join(where));
     }
 
     String query = Joiner.on(' ').join(sql);
