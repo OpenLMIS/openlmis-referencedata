@@ -15,19 +15,35 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toSet;
+import static org.openlmis.referencedata.util.messagekeys.SystemMessageKeys.ERROR_INVALID_FORMAT_DATE;
+import static org.openlmis.referencedata.util.messagekeys.SystemMessageKeys.ERROR_INVALID_FORMAT_UUID;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.collections4.MapUtils;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.UuidUtil;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @NoArgsConstructor
-public class SearchParams {
+@EqualsAndHashCode
+@ToString
+public final class SearchParams {
 
-  public static final String PAGE = "page";
-  public static final String SIZE = "size";
-  public static final String SORT = "sort";
-  public static final String ACCESS_TOKEN = "access_token";
+  private static final String PAGE = "page";
+  private static final String SIZE = "size";
+  private static final String SORT = "sort";
+  private static final String ACCESS_TOKEN = "access_token";
 
   private MultiValueMap<String, Object> params;
 
@@ -50,8 +66,16 @@ public class SearchParams {
     return params.containsKey(key);
   }
 
-  public Object getFirst(String key) {
-    return params.getFirst(key);
+  public String getFirst(String key) {
+    return (String) params.getFirst(key);
+  }
+
+  public Collection<Object> get(String key) {
+    return params.get(key);
+  }
+
+  public Map getMap(String key) {
+    return (Map) params.getFirst(key);
   }
 
   public LinkedMultiValueMap<String, Object> asMultiValueMap() {
@@ -64,5 +88,67 @@ public class SearchParams {
 
   public boolean isEmpty() {
     return MapUtils.isEmpty(params);
+  }
+
+  /**
+   * Parses String value into {@link LocalDate}.
+   * If format is wrong {@link ValidationMessageException} will be thrown.
+   *
+   * @param key key for value be parsed into LocalDate
+   * @return parsed local date
+   */
+  public LocalDate getLocalDate(String key) {
+    String value = getFirst(key);
+
+    try {
+      return LocalDate.parse(value);
+    } catch (DateTimeParseException cause) {
+      throw new ValidationMessageException(cause,
+          new Message(ERROR_INVALID_FORMAT_DATE, value, key));
+    }
+  }
+
+  /**
+   * Parses String value into {@link Boolean}.
+   * If format is wrong null value will be returned.
+   *
+   * @param key key for value be parsed into LocalDate
+   * @return parsed local date
+   */
+  public Boolean getBoolean(String key) {
+    return (Boolean) params.getFirst(key);
+  }
+
+  /**
+   * Parses String value into {@link UUID} based on given key.
+   * If format is wrong {@link ValidationMessageException} will be thrown.
+   *
+   * @param key key for value be parsed into UUID
+   * @return parsed UUID
+   */
+  public UUID getUuid(String key) {
+    String value = getFirst(key);
+    return parse(value, key);
+  }
+
+  /**
+   * Parses String value into {@link UUID} based on given key.
+   * If format is wrong {@link ValidationMessageException} will be thrown.
+   *
+   * @param key key for value be parsed into UUID
+   * @return parsed list of UUIDs
+   */
+  public Set<UUID> getUuids(String key) {
+    Collection<Object> values = get(key);
+
+    return values.stream()
+        .map(value -> parse((String) value, key))
+        .collect(toSet());
+  }
+
+  private UUID parse(String value, String key) {
+    return UuidUtil.fromString(value)
+        .orElseThrow(() ->
+            new ValidationMessageException(new Message(ERROR_INVALID_FORMAT_UUID, value, key)));
   }
 }

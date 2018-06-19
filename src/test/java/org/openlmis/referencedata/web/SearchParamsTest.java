@@ -15,16 +15,32 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.openlmis.referencedata.ToStringTestUtils;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class SearchParamsTest {
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   private MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
 
@@ -43,6 +59,20 @@ public class SearchParamsTest {
     SearchParams searchParams = new SearchParams(map);
 
     assertFalse(searchParams.containsKey("notExist"));
+  }
+
+  @Test
+  public void isEmptyShouldReturnTrueIfNoValueMapIsProvided() {
+    SearchParams searchParams = new SearchParams();
+
+    assertTrue(searchParams.isEmpty());
+  }
+
+  @Test
+  public void isEmptyShouldReturnTrueIfValueMapIsNull() {
+    SearchParams searchParams = new SearchParams(null);
+
+    assertTrue(searchParams.isEmpty());
   }
 
   @Test
@@ -85,4 +115,102 @@ public class SearchParamsTest {
     assertFalse(searchParams.containsKey(sort));
   }
 
+  @Test
+  public void shouldGetUuidFromString() {
+    String key = "id";
+    UUID id = UUID.randomUUID();
+    map.add(key, id.toString());
+
+    SearchParams searchParams = new SearchParams(map);
+
+    assertEquals(id, searchParams.getUuid(key));
+  }
+
+  @Test
+  public void shouldGetUuidsFromStrings() {
+    String key = "id";
+    UUID id1 = UUID.randomUUID();
+    UUID id2 = UUID.randomUUID();
+    UUID id3 = UUID.randomUUID();
+    map.add(key, id1.toString());
+    map.add(key, id2.toString());
+    map.add(key, id3.toString());
+
+
+    SearchParams searchParams = new SearchParams(map);
+
+    assertThat(searchParams.getUuids(key), hasItems(id1, id2, id3));
+  }
+
+  @Test
+  public void shouldThrowExceptionIfIdHasWrongFormat() {
+    exception.expect(ValidationMessageException.class);
+
+    String key = "id";
+    map.add(key, "wrong-format");
+
+    SearchParams searchParams = new SearchParams(map);
+    searchParams.getUuid(key);
+  }
+
+  @Test
+  public void shouldGetLocalDateFromString() {
+    String key = "date";
+    LocalDate date = LocalDate.now();
+    map.add(key, date.toString());
+
+    SearchParams searchParams = new SearchParams(map);
+
+    assertEquals(date, searchParams.getLocalDate(key));
+  }
+
+  @Test
+  public void shouldThrowExceptionIfDateHasWrongFormat() {
+    exception.expect(ValidationMessageException.class);
+
+    String key = "date";
+    map.add(key, "wrong-format");
+
+    SearchParams searchParams = new SearchParams(map);
+    searchParams.getLocalDate(key);
+  }
+
+  @Test
+  public void shouldGetBooleanFromObject() {
+    String key = "boolean";
+    map.add(key, true);
+
+    SearchParams searchParams = new SearchParams(map);
+
+    assertTrue(searchParams.getBoolean(key));
+  }
+
+  @Test
+  public void shouldGetMap() {
+    String key = "map";
+    Map<String, String> newMap = new HashMap<>();
+    map.add(key, newMap);
+
+    SearchParams searchParams = new SearchParams(map);
+
+    assertEquals(newMap, searchParams.getMap(key));
+  }
+
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(SearchParams.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+    map.add("key", "value");
+    SearchParams params = new SearchParams(map);
+
+    ToStringTestUtils.verify(SearchParams.class, params,
+        "PAGE", "SIZE", "SORT", "ZONE_ID", "ACCESS_TOKEN");
+  }
 }

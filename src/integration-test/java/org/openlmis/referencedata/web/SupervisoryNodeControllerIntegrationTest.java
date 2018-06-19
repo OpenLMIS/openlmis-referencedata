@@ -24,8 +24,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.openlmis.referencedata.web.SearchParams.PAGE;
-import static org.openlmis.referencedata.web.SearchParams.SIZE;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.NAME_PARAM;
@@ -78,6 +76,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SUPERVISING_USERS_URL = ID_URL + "/supervisingUsers";
   private static final String RIGHT_ID_PARAM = "rightId";
+  private static final String PAGE = "page";
+  private static final String SIZE = "size";
 
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;

@@ -60,6 +60,10 @@ public abstract class MessageKeys {
   protected static final String MISMATCH = "mismatch";
   protected static final String INVALID_LENGTH = "invalidLength";
   protected static final String INVALID_PARAMS = "invalidParams";
+  protected static final String FORMAT = "format";
+  protected static final String UUID = "uuid";
+  protected static final String DATE = "date";
+  protected static final String BOOLEAN = "boolean";
 
   // Entities
   protected static final String LOT = "lot";
