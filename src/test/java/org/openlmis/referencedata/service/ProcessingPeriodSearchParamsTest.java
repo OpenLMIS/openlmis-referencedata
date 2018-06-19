@@ -32,14 +32,6 @@ public class ProcessingPeriodSearchParamsTest {
   public ExpectedException exception = ExpectedException.none();
 
   @Test
-  public void shouldThrowExceptionIfProgramIdIsSetAndFacilityIdIsNotSet() {
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage("");
-
-    new ProcessingPeriodSearchParams(randomUUID(), null, null, null, null).validate();
-  }
-
-  @Test
   public void shouldThrowExceptionIfProgramIdIsNotSetAndFacilityIdIsSet() {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage("");

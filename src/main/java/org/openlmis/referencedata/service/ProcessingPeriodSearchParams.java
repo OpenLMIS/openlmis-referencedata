@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.service;
 
-import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER;
 
@@ -49,9 +48,6 @@ public final class ProcessingPeriodSearchParams {
    * Validates if this search params contains a valid parameters.
    */
   public void validate() {
-    if (null != programId && null == facilityId) {
-      throw new ValidationMessageException(ERROR_FACILITY_ID_NULL);
-    }
 
     if (null == programId && null != facilityId) {
       throw new ValidationMessageException(ERROR_PROGRAM_ID_NULL);

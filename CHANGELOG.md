@@ -15,6 +15,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-4422](https://openlmis.atlassian.net/browse/OLMIS-4422): Stop creating right assignments for supervision role assignments when user has no home facility.
 * [OLMIS-4172](https://openlmis.atlassian.net/browse/OLMIS-4172): It is no longer possible to create an orderable with more than one active association to the same program.
 * [OLMIS-4695](https://openlmis.atlassian.net/browse/OLMIS-4695): Added Missing ID check on updating facility
+* [OLMIS-3288](https://openlmis.atlassian.net/browse/OLMIS-3288): Add option of fetching processing periods only by programId. Useful for report filters
 
 Improvements:
 * [OLMIS-3498](https://openlmis.atlassian.net/browse/OLMIS-3498): Added Jenkinsfile
