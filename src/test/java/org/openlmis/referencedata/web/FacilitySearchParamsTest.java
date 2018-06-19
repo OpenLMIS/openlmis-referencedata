@@ -132,7 +132,7 @@ public class FacilitySearchParamsTest {
   public void shouldGetNullIfMapHasNoRecurseProperty() {
     FacilitySearchParams params = new FacilitySearchParams(queryMap);
 
-    assertNull(params.isRecurse());
+    assertFalse(params.isRecurse());
   }
 
   @Test

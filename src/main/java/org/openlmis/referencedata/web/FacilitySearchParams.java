@@ -108,7 +108,7 @@ public final class FacilitySearchParams {
    */
   public Boolean isRecurse() {
     if (!queryParams.containsKey(RECURSE)) {
-      return null;
+      return false;
     }
     return queryParams.getBoolean(RECURSE);
   }
