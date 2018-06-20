@@ -38,7 +38,10 @@ pipeline {
                         error("serviceVersion property not found")
                     }
                     VERSION = properties.serviceVersion
-                    STAGING_VERSION = properties.serviceVersion + "-STAGING"
+                    STAGING_VERSION = properties.serviceVersion
+                    if (env.GIT_BRANCH != 'master') {
+                        STAGING_VERSION += "-STAGING"
+                    }
                     currentBuild.displayName += " - " + VERSION
                 }
             }
@@ -69,6 +72,21 @@ pipeline {
                     checkstyle pattern: '**/build/reports/checkstyle/*.xml'
                     pmd pattern: '**/build/reports/pmd/*.xml'
                     junit '**/build/test-results/*/*.xml'
+                }
+            }
+        }
+        stage('Deploy to test') {
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'master'
+                }
+            }
+            steps {
+                build job: 'OpenLMIS-referencedata-deploy-to-test', wait: false
+            }
+            post {
+                failure {
+                    slackSend color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} ${env.STAGE_NAME} FAILED (<${env.BUILD_URL}|Open>)"
                 }
             }
         }
@@ -191,7 +209,7 @@ pipeline {
         stage('Push image') {
             when {
                 expression {
-                    return env.GIT_BRANCH == 'master' || env.GIT_BRANCH =~ /rel-.+/
+                    env.GIT_BRANCH =~ /rel-.+/
                 }
             }
             steps {
@@ -215,9 +233,6 @@ pipeline {
     post {
         fixed {
             slackSend color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Back to normal"
-        }
-        success {
-            build job: 'OpenLMIS-referencedata-deploy-to-test', wait: false
         }
     }
 }
