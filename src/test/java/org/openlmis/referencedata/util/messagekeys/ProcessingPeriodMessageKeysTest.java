@@ -35,8 +35,6 @@ public class ProcessingPeriodMessageKeysTest {
         ProcessingPeriodMessageKeys.ERROR_END_DATE_BEFORE_START_DATE);
     assertEquals("referenceData.error.processingPeriod.program.id.null",
         ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL);
-    assertEquals("referenceData.error.processingPeriod.facility.id.null",
-        ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL);
     assertEquals("referenceData.error.processingPeriod.invalidSortingColumn",
         ProcessingPeriodMessageKeys.ERROR_INVALID_SORTING_COLUMN);
     assertEquals("referenceData.error.processingPeriod.notFound",
