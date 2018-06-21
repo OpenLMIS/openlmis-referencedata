@@ -15,7 +15,7 @@ pipeline {
         disableConcurrentBuilds()
     }
     environment {
-        PATH+LOCAL_BIN = "/usr/local/bin/:$PATH"
+        PATH = "/usr/local/bin/:$PATH"
         COMPOSE_PROJECT_NAME = "referencedata-${BRANCH_NAME}"
     }
     parameters {
