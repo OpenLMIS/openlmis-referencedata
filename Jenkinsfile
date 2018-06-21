@@ -9,7 +9,7 @@ properties([
   ]
 ])
 pipeline {
-    agent none
+    agent any
     options {
         buildDiscarder(logRotator(numToKeepStr: '15'))
         disableConcurrentBuilds()
@@ -23,7 +23,6 @@ pipeline {
     }
     stages {
         stage('Preparation') {
-            agent any
             steps {
                 checkout scm
 
@@ -47,7 +46,6 @@ pipeline {
                     }
                     currentBuild.displayName += " - " + VERSION
                 }
-                stash includes: '**' name: 'source'
             }
             post {
                 failure {
@@ -56,11 +54,9 @@ pipeline {
             }
         }
         stage('Build') {
-            agent any
             environment {
                 STAGING_VERSION = "${STAGING_VERSION}"
             }
-            unstash 'source'
             steps {
                 withCredentials([file(credentialsId: '8da5ba56-8ebb-4a6a-bdb5-43c9d0efb120', variable: 'ENV_FILE')]) {
                     sh( script: "./ci-buildImage.sh" )
@@ -98,8 +94,6 @@ pipeline {
         stage('Parallel: Sonar analysis and contract tests') {
             parallel {
                 stage('Sonar analysis') {
-                agent any
-                unstash 'app'
                     steps {
                         withSonarQubeEnv('Sonar OpenLMIS') {
                             withCredentials([string(credentialsId: 'SONAR_LOGIN', variable: 'SONAR_LOGIN'), string(credentialsId: 'SONAR_PASSWORD', variable: 'SONAR_PASSWORD')]) {
@@ -143,6 +137,7 @@ pipeline {
                     }
                 }
                 stage('Contract tests') {
+                    agent any
                     steps {
                         build job: "OpenLMIS-contract-tests-pipeline/${params.contractTestsBranch}", propagate: true, wait: true,
                         parameters: [
@@ -164,8 +159,6 @@ pipeline {
             }
         }
         stage('ERD generation') {
-            agent any
-            unstash 'app'
             steps {
                 dir('erd') {
                     sh '''#!/bin/bash -xe
@@ -216,7 +209,6 @@ pipeline {
             }
         }
         stage('Push image') {
-            agent any
             when {
                 expression {
                     env.GIT_BRANCH =~ /rel-.+/
