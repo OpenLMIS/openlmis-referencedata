@@ -47,7 +47,7 @@ pipeline {
                     }
                     currentBuild.displayName += " - " + VERSION
                 }
-                stash includes: '**', name: 'source'
+                stash includes: '**' name: 'source'
             }
             post {
                 failure {
