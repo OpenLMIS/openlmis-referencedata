@@ -137,7 +137,6 @@ pipeline {
                     }
                 }
                 stage('Contract tests') {
-                    agent any
                     steps {
                         build job: "OpenLMIS-contract-tests-pipeline/${params.contractTestsBranch}", propagate: true, wait: true,
                         parameters: [
