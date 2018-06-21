@@ -60,8 +60,8 @@ pipeline {
             environment {
                 STAGING_VERSION = "${STAGING_VERSION}"
             }
-            unstash 'source'
             steps {
+                unstash 'source'
                 withCredentials([file(credentialsId: '8da5ba56-8ebb-4a6a-bdb5-43c9d0efb120', variable: 'ENV_FILE')]) {
                     sh( script: "./ci-buildImage.sh" )
                 }
@@ -98,9 +98,9 @@ pipeline {
         stage('Parallel: Sonar analysis and contract tests') {
             parallel {
                 stage('Sonar analysis') {
-                agent any
-                unstash 'app'
+                    agent any
                     steps {
+                        unstash 'source'
                         withSonarQubeEnv('Sonar OpenLMIS') {
                             withCredentials([string(credentialsId: 'SONAR_LOGIN', variable: 'SONAR_LOGIN'), string(credentialsId: 'SONAR_PASSWORD', variable: 'SONAR_PASSWORD')]) {
                                 sh '''
@@ -165,8 +165,8 @@ pipeline {
         }
         stage('ERD generation') {
             agent any
-            unstash 'app'
             steps {
+                unstash 'source'
                 dir('erd') {
                     sh '''#!/bin/bash -xe
                         # prepare ERD folder on CI server
