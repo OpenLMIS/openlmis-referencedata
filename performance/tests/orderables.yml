@@ -43,6 +43,6 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-        GetAnOrderablePageOfTen too slow: p90 of GetAnOrderablePageOfTen>100ms
-        GetAnOrderableByIdPageOfTen too slow: p90 of GetAnOrderableByIdPageOfTen>100ms
-        GetAnOrderableByProgramAndCodeAndName too slow: p90 of GetAnOrderableByProgramAndCodeAndName>100ms
+        Get An Orderable Page Of Ten too slow: p90 of GetAnOrderablePageOfTen>100ms
+        Get An Orderable By Id Page Of Ten too slow: p90 of GetAnOrderableByIdPageOfTen>100ms
+        Get An Orderable By Program And Code And Name too slow: p90 of GetAnOrderableByProgramAndCodeAndName>200ms
