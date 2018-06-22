@@ -17,4 +17,4 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-        90% of get facility type approved products page of ten fail to get in 100ms milliseconds: p90 of GetAFacilityTypeApprovedProductsPageOfTen>100ms, continue as failed
+        90% of get facility type approved products page of ten fail to get in 100ms milliseconds: p90 of GetAFacilityTypeApprovedProductsPageOfTen>500ms, continue as failed

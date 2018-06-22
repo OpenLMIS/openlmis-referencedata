@@ -27,5 +27,5 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-        Get Approved Full Supply Products For District Hospital too slow: p90 of GetApprovedFullSupplyProductsForDistrictHospital>500ms
-        Get Approved Non Full Supply Products For District Hospital too slow: p90 of GetApprovedNonFullSupplyProductsForDistrictHospital>500ms
+        Get Approved Full Supply Products For District Hospital too slow: p90 of GetApprovedFullSupplyProductsForDistrictHospital>1500ms
+        Get Approved Non Full Supply Products For District Hospital too slow: p90 of GetApprovedNonFullSupplyProductsForDistrictHospital>8000ms

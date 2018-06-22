@@ -32,4 +32,4 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-        Get Approved Full Supply Products For Health Clinic too slow: p90 of GetApprovedFullSupplyProductsForHealthClinic>500ms
+        Get Approved Full Supply Products For Health Clinic too slow: p90 of GetApprovedFullSupplyProductsForHealthClinic>1500ms
