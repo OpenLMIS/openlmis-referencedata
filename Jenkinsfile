@@ -9,13 +9,12 @@ properties([
   ]
 ])
 pipeline {
-    agent any
+    agent none
     options {
         buildDiscarder(logRotator(numToKeepStr: '15'))
         disableConcurrentBuilds()
     }
     environment {
-        PATH = "/usr/local/bin/:$PATH"
         COMPOSE_PROJECT_NAME = "referencedata-${BRANCH_NAME}"
     }
     parameters {
@@ -23,6 +22,7 @@ pipeline {
     }
     stages {
         stage('Preparation') {
+            agent any
             steps {
                 checkout scm
 
@@ -46,6 +46,8 @@ pipeline {
                     }
                     currentBuild.displayName += " - " + VERSION
                 }
+
+                stash includes: '**', name: 'source'
             }
             post {
                 failure {
@@ -54,10 +56,13 @@ pipeline {
             }
         }
         stage('Build') {
+            agent any
             environment {
+                PATH = "/usr/local/bin/:$PATH"
                 STAGING_VERSION = "${STAGING_VERSION}"
             }
             steps {
+                unstash 'source'
                 withCredentials([file(credentialsId: '8da5ba56-8ebb-4a6a-bdb5-43c9d0efb120', variable: 'ENV_FILE')]) {
                     sh( script: "./ci-buildImage.sh" )
                 }
@@ -94,7 +99,12 @@ pipeline {
         stage('Parallel: Sonar analysis and contract tests') {
             parallel {
                 stage('Sonar analysis') {
+                    agent any
+                    environment {
+                        PATH = "/usr/local/bin/:$PATH"
+                    }
                     steps {
+                        unstash 'source'
                         withSonarQubeEnv('Sonar OpenLMIS') {
                             withCredentials([string(credentialsId: 'SONAR_LOGIN', variable: 'SONAR_LOGIN'), string(credentialsId: 'SONAR_PASSWORD', variable: 'SONAR_PASSWORD')]) {
                                 sh '''
@@ -158,6 +168,10 @@ pipeline {
             }
         }
         stage('ERD generation') {
+            agent any
+            environment {
+                PATH = "/usr/local/bin/:$PATH"
+            }
             steps {
                 dir('erd') {
                     sh '''#!/bin/bash -xe
@@ -208,6 +222,7 @@ pipeline {
             }
         }
         stage('Push image') {
+            agent any
             when {
                 expression {
                     env.GIT_BRANCH =~ /rel-.+/
