@@ -24,8 +24,6 @@ pipeline {
         stage('Preparation') {
             agent any
             steps {
-                checkout scm
-
                 withCredentials([usernamePassword(
                   credentialsId: "cad2f741-7b1e-4ddd-b5ca-2959d40f62c2",
                   usernameVariable: "USER",
@@ -46,8 +44,6 @@ pipeline {
                     }
                     currentBuild.displayName += " - " + VERSION
                 }
-
-                stash includes: '**', name: 'source'
             }
             post {
                 failure {
@@ -62,7 +58,6 @@ pipeline {
                 STAGING_VERSION = "${STAGING_VERSION}"
             }
             steps {
-                unstash 'source'
                 withCredentials([file(credentialsId: '8da5ba56-8ebb-4a6a-bdb5-43c9d0efb120', variable: 'ENV_FILE')]) {
                     sh( script: "./ci-buildImage.sh" )
                 }
@@ -104,7 +99,6 @@ pipeline {
                         PATH = "/usr/local/bin/:$PATH"
                     }
                     steps {
-                        unstash 'source'
                         withSonarQubeEnv('Sonar OpenLMIS') {
                             withCredentials([string(credentialsId: 'SONAR_LOGIN', variable: 'SONAR_LOGIN'), string(credentialsId: 'SONAR_PASSWORD', variable: 'SONAR_PASSWORD')]) {
                                 sh '''
