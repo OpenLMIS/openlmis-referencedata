@@ -79,7 +79,7 @@ pipeline {
         stage('Deploy to test') {
             when {
                 expression {
-                    return env.GIT_BRANCH == 'master'
+                    return env.GIT_BRANCH =~ /master/
                 }
             }
             steps {
