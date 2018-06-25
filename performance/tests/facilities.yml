@@ -33,12 +33,12 @@ execution:
   - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-all
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
-    scenario: facilities-search-all
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
-    scenario: facilities-search-one-page
+#  - concurrency: ${__P(scenario-concurrency,1)}
+#    hold-for: ${__P(scenario-duration,60)}
+#    scenario: facilities-search-all
+#  - concurrency: ${__P(scenario-concurrency,1)}
+#    hold-for: ${__P(scenario-duration,60)}
+#    scenario: facilities-search-one-page
 
 scenarios:
   facility-type-get-single:
