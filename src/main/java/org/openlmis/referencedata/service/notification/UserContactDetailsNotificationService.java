@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UserContactDetailsNotificationService {
-  private static final String RESOURCE_URL = "/api/userContactDetails";
+  private static final String RESOURCE_URL = "/api/userContactDetails/";
 
   @Value("${service.url}")
   private String serviceUrl;
@@ -43,7 +43,7 @@ public class UserContactDetailsNotificationService {
    */
   public void putContactDetails(UserContactDetailsDto contactDetails) {
     restTemplate.postForEntity(
-        URI.create(serviceUrl + RESOURCE_URL),
+        URI.create(serviceUrl + RESOURCE_URL + contactDetails.getReferenceDataUserId()),
         new HttpEntity<>(contactDetails, createHeadersWithAuth()),
         UserContactDetailsDto.class
     );

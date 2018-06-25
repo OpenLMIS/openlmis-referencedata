@@ -36,6 +36,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -63,16 +65,22 @@ public class UserContactDetailsNotificationServiceTest {
   @Captor
   private ArgumentCaptor<HttpEntity<UserContactDetailsDto>> entityCaptor;
 
+  private UserContactDetailsDto userContactDetails;
+
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     ReflectionTestUtils.setField(service, "serviceUrl", "http://localhost/notification");
     when(authService.obtainAccessToken()).thenReturn(TOKEN);
+
+    UserDto userDto = new UserDto();
+    new UserDataBuilder().withEmail(null).build().export(userDto);
+
+    userContactDetails = new UserContactDetailsDto(userDto);
   }
 
   @Test
   public void shouldSendNotification() {
-    UserContactDetailsDto request = new UserContactDetailsDto();
-    service.putContactDetails(request);
+    service.putContactDetails(userContactDetails);
 
     verify(restTemplate).postForEntity(
         uriCaptor.capture(),
@@ -81,7 +89,8 @@ public class UserContactDetailsNotificationServiceTest {
     );
 
     URI uri = uriCaptor.getValue();
-    String url = "http://localhost/notification/api/userContactDetails";
+    String url = "http://localhost/notification/api/userContactDetails/"
+        + userContactDetails.getReferenceDataUserId();
     assertThat(uri.toString(), is(url));
 
     HttpEntity entity = entityCaptor.getValue();
@@ -91,7 +100,7 @@ public class UserContactDetailsNotificationServiceTest {
 
     UserContactDetailsDto sent = (UserContactDetailsDto) body;
 
-    assertThat(sent, is(request));
+    assertThat(sent, is(userContactDetails));
 
     assertAuthHeader(entity);
   }
@@ -102,7 +111,7 @@ public class UserContactDetailsNotificationServiceTest {
         .postForEntity(any(URI.class), any(HttpEntity.class), eq(UserContactDetailsDto.class)))
         .thenThrow(new HttpServerErrorException(HttpStatus.BAD_GATEWAY));
 
-    service.putContactDetails(new UserContactDetailsDto());
+    service.putContactDetails(userContactDetails);
   }
 
   private void assertAuthHeader(HttpEntity value) {
