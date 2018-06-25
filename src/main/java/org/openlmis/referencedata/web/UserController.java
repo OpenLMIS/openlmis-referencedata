@@ -202,10 +202,14 @@ public class UserController extends BaseController {
 
     profiler.start("SAVE_USER");
     userRepository.save(userToSave);
-    userContactDetailsNotificationService.putContactDetails(new UserContactDetailsDto(userDto));
 
     profiler.start(PROFILER_TO_DTO);
     UserDto responseDto = exportUserToDto(userToSave);
+
+    profiler.start("PUT_CONTACT_DETAILS");
+    userContactDetailsNotificationService.putContactDetails(new UserContactDetailsDto(responseDto));
+
+    profiler.start("ADD_ROLE_ASSIGNMENTS_IDS_TO_RESPONSE");
     addRoleAssignmentIdsToUserDto(responseDto);
 
     profiler.stop().log();
