@@ -211,6 +211,10 @@ checkstyle {
 //Usage: gradle sonarqube
 sonarqube {
     properties {
+        def branch = System.getenv("SONAR_BRANCH")
+        if (branch && branch != 'master') {
+            property "sonar.branch", branch
+        }
         property "sonar.projectName", "OpenLMIS Reference Data Service"
         property "sonar.projectKey", "org.sonarqube:openlmis-referencedata"
         property "sonar.projectVersion", version
