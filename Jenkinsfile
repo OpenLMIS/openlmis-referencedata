@@ -33,13 +33,14 @@ pipeline {
                     sh 'docker login -u $USER -p $PASS'
                 }
                 script {
+                    CURRENT_BRANCH = env.GIT_BRANCH // needed for agent-less stages
                     def properties = readProperties file: 'gradle.properties'
                     if (!properties.serviceVersion) {
                         error("serviceVersion property not found")
                     }
                     VERSION = properties.serviceVersion
                     STAGING_VERSION = properties.serviceVersion
-                    if (env.GIT_BRANCH != 'master') {
+                    if (CURRENT_BRANCH != 'master') {
                         STAGING_VERSION += "-STAGING"
                     }
                     currentBuild.displayName += " - " + VERSION
@@ -79,7 +80,7 @@ pipeline {
         stage('Deploy to test') {
             when {
                 expression {
-                    return env.GIT_BRANCH == 'master'
+                    return CURRENT_BRANCH == 'master'
                 }
             }
             steps {
