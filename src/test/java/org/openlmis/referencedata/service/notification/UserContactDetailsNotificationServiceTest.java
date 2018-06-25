@@ -40,6 +40,7 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpServerErrorException;
@@ -47,6 +48,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserContactDetailsNotificationServiceTest {
+
   private static final String TOKEN = UUID.randomUUID().toString();
   protected static final String TOKEN_HEADER = "Bearer " + TOKEN;
 
@@ -82,8 +84,9 @@ public class UserContactDetailsNotificationServiceTest {
   public void shouldSendNotification() {
     service.putContactDetails(userContactDetails);
 
-    verify(restTemplate).postForEntity(
+    verify(restTemplate).exchange(
         uriCaptor.capture(),
+        eq(HttpMethod.PUT),
         entityCaptor.capture(),
         eq(UserContactDetailsDto.class)
     );
@@ -107,8 +110,8 @@ public class UserContactDetailsNotificationServiceTest {
 
   @Test(expected = HttpServerErrorException.class)
   public void shouldReturnFalseIfCannotSendNotification() {
-    when(restTemplate
-        .postForEntity(any(URI.class), any(HttpEntity.class), eq(UserContactDetailsDto.class)))
+    when(restTemplate.exchange(any(URI.class), eq(HttpMethod.PUT),
+        any(HttpEntity.class), eq(UserContactDetailsDto.class)))
         .thenThrow(new HttpServerErrorException(HttpStatus.BAD_GATEWAY));
 
     service.putContactDetails(userContactDetails);

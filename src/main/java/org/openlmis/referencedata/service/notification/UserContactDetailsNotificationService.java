@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
@@ -42,8 +43,9 @@ public class UserContactDetailsNotificationService {
    * @param contactDetails details about user's contact details.
    */
   public void putContactDetails(UserContactDetailsDto contactDetails) {
-    restTemplate.postForEntity(
+    restTemplate.exchange(
         URI.create(serviceUrl + RESOURCE_URL + contactDetails.getReferenceDataUserId()),
+        HttpMethod.PUT,
         new HttpEntity<>(contactDetails, createHeadersWithAuth()),
         UserContactDetailsDto.class
     );
