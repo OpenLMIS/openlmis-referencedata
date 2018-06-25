@@ -84,6 +84,7 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.service.UserSearchParams;
+import org.openlmis.referencedata.service.notification.UserContactDetailsDto;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
@@ -374,6 +375,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(UserDto.class);
 
     assertEquals(userDto, response);
+    verify(userContactDetailsNotificationService)
+        .putContactDetails(new UserContactDetailsDto(userDto));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

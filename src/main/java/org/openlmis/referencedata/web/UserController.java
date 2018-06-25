@@ -58,6 +58,8 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.service.notification.UserContactDetailsDto;
+import org.openlmis.referencedata.service.notification.UserContactDetailsNotificationService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
@@ -135,6 +137,9 @@ public class UserController extends BaseController {
   @Autowired
   private RoleAssignmentRepository roleAssignmentRepository;
 
+  @Autowired
+  private UserContactDetailsNotificationService userContactDetailsNotificationService;
+
   /**
    * Constructor for controller unit testing.
    */
@@ -197,6 +202,7 @@ public class UserController extends BaseController {
 
     profiler.start("SAVE_USER");
     userRepository.save(userToSave);
+    userContactDetailsNotificationService.putContactDetails(new UserContactDetailsDto(userDto));
 
     profiler.start(PROFILER_TO_DTO);
     UserDto responseDto = exportUserToDto(userToSave);

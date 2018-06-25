@@ -57,6 +57,8 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
+import org.openlmis.referencedata.service.notification.UserContactDetailsDto;
+import org.openlmis.referencedata.service.notification.UserContactDetailsNotificationService;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
@@ -102,6 +104,9 @@ public class UserControllerTest {
 
   @Mock
   private UserService userService;
+
+  @Mock
+  private UserContactDetailsNotificationService userContactDetailsNotificationService;
 
   @InjectMocks
   private UserController controller = new UserController();
@@ -266,6 +271,8 @@ public class UserControllerTest {
 
     //then
     verify(repository).save(user1);
+    verify(userContactDetailsNotificationService)
+        .putContactDetails(new UserContactDetailsDto(user1Dto));
   }
 
   @Test
@@ -281,6 +288,8 @@ public class UserControllerTest {
 
     //then
     verify(repository).save(user1);
+    verify(userContactDetailsNotificationService)
+        .putContactDetails(new UserContactDetailsDto(user1Dto));
   }
 
   @Test(expected = ValidationMessageException.class)
