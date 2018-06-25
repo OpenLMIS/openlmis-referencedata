@@ -43,7 +43,6 @@ pipeline {
                         STAGING_VERSION += "-STAGING"
                     }
                     currentBuild.displayName += " - " + VERSION
-                    sh 'echo "GIT_BRANCH: ${GIT_BRANCH}"'
                 }
             }
             post {
@@ -80,7 +79,7 @@ pipeline {
         stage('Deploy to test') {
             when {
                 expression {
-                    return env.GIT_BRANCH =~ /master/
+                    return env.GIT_BRANCH == 'master'
                 }
             }
             steps {
