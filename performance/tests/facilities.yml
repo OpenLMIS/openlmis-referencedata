@@ -285,28 +285,28 @@ scenarios:
         label: GetAllFacilities
         headers:
           Authorization: Bearer ${access_token}
-  facilities-search-all:
-    requests:
-      - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/facilities/search
-        method: POST
-        label: FindAllHealthCenterFacilities
-        headers:
-          Authorization: Bearer ${access_token}
-          Content-Type: application/json
-        body:
-          type: "health_center"
-  facilities-search-one-page:
-    requests:
-      - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/facilities/search?page=0&size=10
-        method: POST
-        label: FindFirstTenHealthCenterFacilities
-        headers:
-          Authorization: Bearer ${access_token}
-          Content-Type: application/json
-        body:
-          type: "health_center"
+#  facilities-search-all:
+#    requests:
+#      - include-scenario: get-user-token
+#      - url: ${__P(base-uri)}/api/facilities/search
+#        method: POST
+#        label: FindAllHealthCenterFacilities
+#        headers:
+#          Authorization: Bearer ${access_token}
+#          Content-Type: application/json
+#        body:
+#          type: "health_center"
+#  facilities-search-one-page:
+#    requests:
+#      - include-scenario: get-user-token
+#      - url: ${__P(base-uri)}/api/facilities/search?page=0&size=10
+#        method: POST
+#        label: FindFirstTenHealthCenterFacilities
+#        headers:
+#          Authorization: Bearer ${access_token}
+#          Content-Type: application/json
+#        body:
+#          type: "health_center"
 
 reporting:
     - module: passfail
@@ -322,5 +322,5 @@ reporting:
         Delete Facility too slow: p90 of DeleteFacility>500ms
         Get Supplying Facilities too slow: p90 of GetSupplyingFacilities>500ms
         Get All Facilities too slow: p90 of GetAllFacilities>4000ms
-        Find All Health Center Facilities too slow: p90 of FindAllHealthCenterFacilities>30000ms
-        Find First Ten Health Center Facilities too slow: p90 of FindFirstTenHealthCenterFacilities>30000ms
+#        Find All Health Center Facilities too slow: p90 of FindAllHealthCenterFacilities>30000ms
+#        Find First Ten Health Center Facilities too slow: p90 of FindFirstTenHealthCenterFacilities>30000ms
