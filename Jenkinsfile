@@ -43,6 +43,7 @@ pipeline {
                         STAGING_VERSION += "-STAGING"
                     }
                     currentBuild.displayName += " - " + VERSION
+                    sh 'echo "GIT_BRANCH: ${GIT_BRANCH}"'
                 }
             }
             post {
