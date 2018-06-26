@@ -16,11 +16,15 @@
 package org.openlmis.referencedata.validate;
 
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.SupportedProgramDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+
+import java.util.Set;
 
 @Component
 public class FacilityValidator implements BaseValidator {
@@ -42,10 +46,26 @@ public class FacilityValidator implements BaseValidator {
 
     FacilityDto facilityDto = (FacilityDto) target;
     if (facilityRepository.existsByCode(facilityDto.getCode())
-        && (facilityDto.getId() == null
+            && (facilityDto.getId() == null
             || !facilityRepository.findFirstByCode(facilityDto.getCode()).getId()
-                .equals(facilityDto.getId()))) {
+            .equals(facilityDto.getId()))) {
       rejectValue(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+    }
+
+    validateDuplicateProgramSupported(facilityDto.getSupportedPrograms());
+  }
+
+  private void validateDuplicateProgramSupported(Set<SupportedProgramDto> supportedProgramDtos) {
+    if (supportedProgramDtos != null
+          &&  (supportedProgramDtos.stream()
+              .map(SupportedProgramDto::getCode)
+              .distinct()
+              .count() != supportedProgramDtos.size()
+          || supportedProgramDtos.stream()
+                  .map(SupportedProgramDto::getId)
+                  .distinct()
+                  .count() != supportedProgramDtos.size())) {
+      throw new ValidationMessageException(FacilityMessageKeys.ERROR_DUPLICATE_PROGRAM_SUPPORTED);
     }
   }
 }

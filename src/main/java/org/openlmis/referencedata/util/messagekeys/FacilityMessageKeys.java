@@ -26,4 +26,6 @@ public abstract class FacilityMessageKeys extends MessageKeys {
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
   public static final String ERROR_INVALID_PARAMS = join(ERROR, INVALID_PARAMS);
   public static final String ERROR_ID_MISMATCH = join(ERROR, "idMismatch");
+  public static final String ERROR_DUPLICATE_PROGRAM_SUPPORTED =
+          join(ERROR, SUPPORTED_PROGRAMS, DUPLICATED);
 }

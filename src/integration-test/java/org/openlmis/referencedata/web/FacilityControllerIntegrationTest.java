@@ -96,6 +96,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID supervisoryNodeId;
   private Program program;
   private Facility facility;
+  private Facility facility1;
+  private Program program1;
   private GeometryFactory gf = new GeometryFactory();
   private Coordinate[] coords = new Coordinate[] {
       new Coordinate(0, 0),
@@ -114,8 +116,12 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     orderableId1 = UUID.randomUUID();
     orderableId2 = UUID.randomUUID();
     program = new ProgramDataBuilder().withId(programId).build();
+    program1 = new ProgramDataBuilder().withId(programId).build();
     facility = new FacilityDataBuilder()
         .withSupportedProgram(program).build();
+    facility1 = new FacilityDataBuilder()
+            .withSupportedProgram(program)
+            .withSupportedProgram(program1).build();
 
     mockUserHasRight(FACILITIES_MANAGE_RIGHT);
   }
@@ -776,6 +782,29 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(ID_URL)
         .then()
         .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void putShouldReturnBadRequestForDuplicateProgramSupported() {
+    doNothing()
+            .when(rightService)
+            .checkAdminRight(FACILITIES_MANAGE_RIGHT);
+    FacilityDto facilityDto = new FacilityDto();
+    facility1.export(facilityDto);
+
+    restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .pathParam("id", facilityDto.getId())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(facilityDto)
+            .when()
+            .put(ID_URL)
+            .then()
+            .statusCode(400)
+            .body(MESSAGE_KEY, is(FacilityMessageKeys.ERROR_DUPLICATE_PROGRAM_SUPPORTED));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
