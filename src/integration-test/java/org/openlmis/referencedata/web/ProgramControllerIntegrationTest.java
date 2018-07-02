@@ -15,11 +15,17 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Arrays.asList;
+import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
@@ -30,19 +36,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/programs";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/search";
+  private static final String NAME = "name";
 
   private Program program;
   private ProgramDto programDto = new ProgramDto();
@@ -224,13 +224,87 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetAllPrograms() {
 
-    List<Program> storedPrograms = Arrays.asList(program, new Program("P2"));
+    List<Program> storedPrograms = asList(program, new Program("P2"));
     given(programRepository.findAll()).willReturn(storedPrograms);
 
     Program[] response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program[].class);
+
+    assertEquals(storedPrograms.size(), response.length);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFilterProgramsByIdsAndName() {
+    String name = "some-name";
+    UUID id1 = UUID.randomUUID();
+    UUID id2 = UUID.randomUUID();
+
+    List<Program> storedPrograms = asList(program, new Program("P2"));
+    given(programRepository.findByIdInAndNameIgnoreCaseContaining(asSet(id1, id2), name))
+        .willReturn(storedPrograms);
+
+    Program[] response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(ID, id1)
+        .queryParam(ID, id2)
+        .queryParam(NAME, name)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program[].class);
+
+    assertEquals(storedPrograms.size(), response.length);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFilterProgramsByIds() {
+    UUID id1 = UUID.randomUUID();
+    UUID id2 = UUID.randomUUID();
+
+    List<Program> storedPrograms = asList(program, new Program("P2"));
+    given(programRepository.findAll(asSet(id1, id2))).willReturn(storedPrograms);
+
+    Program[] response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(ID, id1)
+        .queryParam(ID, id2)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program[].class);
+
+    assertEquals(storedPrograms.size(), response.length);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFilterProgramsByName() {
+    String name = "some-name";
+
+    List<Program> storedPrograms = asList(program, new Program("P2"));
+    given(programRepository.findByNameIgnoreCaseContaining(name))
+        .willReturn(storedPrograms);
+
+    Program[] response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(NAME, name)
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -278,7 +352,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(Program[].class);
 
-    List<Program> foundProgram = Arrays.asList(response);
+    List<Program> foundProgram = asList(response);
     assertEquals(1, foundProgram.size());
     assertEquals("Program name", foundProgram.get(0).getName());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -299,7 +373,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(Program[].class);
 
-    List<Program> foundProgram = Arrays.asList(response);
+    List<Program> foundProgram = asList(response);
     assertEquals(0, foundProgram.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

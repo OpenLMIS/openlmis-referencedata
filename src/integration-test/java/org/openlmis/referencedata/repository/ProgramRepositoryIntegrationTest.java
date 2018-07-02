@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -165,6 +169,41 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     List<Program> foundPrograms = repository.findProgramsByName("Incorrect Name");
 
     assertEquals(0, foundPrograms.size());
+  }
+
+  @Test
+  public void shouldFindProgramsByName() {
+    Program program1 = this.generateInstance();
+    program1.setName("name1");
+    repository.save(program1);
+    Program program2 = this.generateInstance();
+    program2.setName("name2");
+    repository.save(program2);
+    Program program3 = this.generateInstance();
+    program3.setName("something");
+    repository.save(program3);
+
+    List<Program> foundPrograms = repository.findByNameIgnoreCaseContaining("name");
+
+    assertThat(foundPrograms, hasItems(program1, program2));
+  }
+
+  @Test
+  public void shouldFindProgramsByNameAndIds() {
+    Program program1 = this.generateInstance();
+    program1.setName("name1");
+    repository.save(program1);
+    Program program2 = this.generateInstance();
+    program2.setName("name2");
+    repository.save(program2);
+    Program program3 = this.generateInstance();
+    program3.setName("something");
+    repository.save(program3);
+
+    List<Program> foundPrograms = repository.findByIdInAndNameIgnoreCaseContaining(
+        asList(program2.getId(), program3.getId()), "name");
+
+    assertThat(foundPrograms, hasItem(program2));
   }
   
   @Test

@@ -15,10 +15,12 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.openlmis.referencedata.web.ProgramController.RESOURCE_PATH;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
@@ -39,6 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -99,13 +102,30 @@ public class ProgramController extends BaseController {
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<Program> getAllPrograms() {
-    Iterable<Program> programs = programRepository.findAll();
-    if (programs == null) {
-      throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
+  public Iterable<Program> search(@RequestParam MultiValueMap<String, Object> queryParams) {
+    Profiler profiler = new Profiler("SEARCH_FOR_PROGRAMS");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("CONVERT_TO_PARAMS");
+    ProgramSearchParams params = new ProgramSearchParams(queryParams);
+
+    final Set<UUID> ids = params.getIds();
+    final String name = params.getName();
+
+    profiler.start("REPOSITORY_SEARCH");
+    Iterable<Program> programs;
+    if (!isEmpty(ids) && null != name) {
+      programs = programRepository.findByIdInAndNameIgnoreCaseContaining(ids, name);
+    } else if (!isEmpty(ids)) {
+      programs = programRepository.findAll(ids);
+    } else if (null != name) {
+      programs = programRepository.findByNameIgnoreCaseContaining(name);
     } else {
-      return programs;
+      programs = programRepository.findAll();
     }
+
+    profiler.stop().log();
+    return programs;
   }
 
   /**

@@ -18,8 +18,10 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-4695](https://openlmis.atlassian.net/browse/OLMIS-4695): Added Missing ID check on updating facility
 * [OLMIS-3288](https://openlmis.atlassian.net/browse/OLMIS-3288): Add option of fetching processing periods only by programId. Useful for report filters
 * [OLMIS-3982](https://openlmis.atlassian.net/browse/OLMIS-3982): Add validation for one program not to be assigned more that one time for a facility
+
 Improvements:
 * [OLMIS-3498](https://openlmis.atlassian.net/browse/OLMIS-3498): Added Jenkinsfile
+* [OLMIS-4818](https://openlmis.atlassian.net/browse/OLMIS-4818): GET /api/programs endpoint now accepts "name" and multiple "id" parameters.
 
 10.0.0 / 2018-04-28
 ===================

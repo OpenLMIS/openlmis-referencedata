@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
@@ -22,8 +26,6 @@ import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.util.Set;
-import java.util.UUID;
 
 @JaversSpringDataAuditable
 public interface ProgramRepository
@@ -55,4 +57,8 @@ public interface ProgramRepository
   Set<Program> findHomeFacilitySupervisionProgramsByUser(@Param("userId") UUID userId);
 
   boolean existsByCode(Code programCode);
+
+  List<Program> findByNameIgnoreCaseContaining(String name);
+
+  List<Program> findByIdInAndNameIgnoreCaseContaining(Collection<UUID> ids, String name);
 }

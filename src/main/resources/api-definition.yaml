@@ -1837,6 +1837,19 @@ resourceTypes:
       get:
           is: [ secured ]
           description: Get all programs.
+          queryParameters:
+              name:
+                  displayName: Name
+                  description: Filter name value
+                  type: string
+                  required: false
+                  repeat: false
+              id:
+                  displayName: ID
+                  description: Program IDs
+                  type: string
+                  required: false
+                  repeat: true
           responses:
               "200":
                   body:
