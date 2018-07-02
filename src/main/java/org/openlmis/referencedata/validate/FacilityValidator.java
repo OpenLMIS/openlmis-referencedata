@@ -58,12 +58,12 @@ public class FacilityValidator implements BaseValidator {
   }
 
   private void validateDuplicateProgramSupported(Set<SupportedProgramDto> supportedProgramDtos) {
-    boolean duplicateProgramId = supportedProgramDtos.stream()
+    boolean duplicateProgramCode  = supportedProgramDtos.stream()
             .map(SupportedProgramDto::getCode)
             .distinct()
             .count() != supportedProgramDtos.size();
 
-    boolean duplicateProgramCode = supportedProgramDtos.stream()
+    boolean duplicateProgramId = supportedProgramDtos.stream()
             .map(SupportedProgramDto::getId)
             .distinct()
             .count() != supportedProgramDtos.size();
