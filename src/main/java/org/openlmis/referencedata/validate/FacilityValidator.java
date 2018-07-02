@@ -52,19 +52,23 @@ public class FacilityValidator implements BaseValidator {
       rejectValue(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
     }
 
-    validateDuplicateProgramSupported(facilityDto.getSupportedPrograms());
+    if (facilityDto.getSupportedPrograms() != null) {
+      validateDuplicateProgramSupported(facilityDto.getSupportedPrograms());
+    }
   }
 
   private void validateDuplicateProgramSupported(Set<SupportedProgramDto> supportedProgramDtos) {
-    if (supportedProgramDtos != null
-          &&  (supportedProgramDtos.stream()
-              .map(SupportedProgramDto::getCode)
-              .distinct()
-              .count() != supportedProgramDtos.size()
-          || supportedProgramDtos.stream()
-                  .map(SupportedProgramDto::getId)
-                  .distinct()
-                  .count() != supportedProgramDtos.size())) {
+    boolean duplicateProgramId = supportedProgramDtos.stream()
+            .map(SupportedProgramDto::getCode)
+            .distinct()
+            .count() != supportedProgramDtos.size();
+
+    boolean duplicateProgramCode = supportedProgramDtos.stream()
+            .map(SupportedProgramDto::getId)
+            .distinct()
+            .count() != supportedProgramDtos.size();
+
+    if (duplicateProgramId  || duplicateProgramCode) {
       throw new ValidationMessageException(FacilityMessageKeys.ERROR_DUPLICATE_PROGRAM_SUPPORTED);
     }
   }
