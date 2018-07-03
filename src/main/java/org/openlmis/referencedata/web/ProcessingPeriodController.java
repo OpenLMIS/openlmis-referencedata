@@ -41,6 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -105,13 +106,17 @@ public class ProcessingPeriodController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<ProcessingPeriodDto> getAllProcessingPeriods(ProcessingPeriodSearchParams params,
-                                             @SortDefault(sort = "startDate") Pageable pageable) {
-    LOGGER.debug("period search start date {}", params.getStartDate());
-    LOGGER.debug("period search end date {}", params.getEndDate());
+  public Page<ProcessingPeriodDto> getAllProcessingPeriods(
+      @RequestParam MultiValueMap<String, Object> requestParams,
+      @SortDefault(sort = "startDate") Pageable pageable) {
 
     Profiler profiler = new Profiler("SEARCH_PROCESSING_PERIODS");
     profiler.setLogger(LOGGER);
+
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(requestParams);
+
+    LOGGER.debug("period search start date {}", params.getStartDate());
+    LOGGER.debug("period search end date {}", params.getEndDate());
 
     profiler.start("SEARCH_FOR_PERIODS");
     Page<ProcessingPeriod> periods = periodService.searchPeriods(params, pageable);

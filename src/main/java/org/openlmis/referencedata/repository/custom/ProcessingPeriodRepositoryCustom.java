@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.repository.custom;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.springframework.data.domain.Page;
@@ -23,5 +25,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProcessingPeriodRepositoryCustom {
   Page<ProcessingPeriod> search(ProcessingSchedule schedule, LocalDate startDate, LocalDate endDate,
-      Pageable pageable);
+      Collection<UUID> ids, Pageable pageable);
 }

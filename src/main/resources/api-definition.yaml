@@ -453,6 +453,11 @@ resourceTypes:
                       type: string
                       required: false
                       repeat: false
+              id:
+                      displayName: id
+                      type: string
+                      required: false
+                      repeat: true
           responses:
               "200":
                   body:

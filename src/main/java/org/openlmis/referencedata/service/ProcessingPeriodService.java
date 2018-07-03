@@ -15,6 +15,11 @@
 
 package org.openlmis.referencedata.service;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
@@ -38,10 +43,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ProcessingPeriodService {
@@ -77,6 +78,7 @@ public class ProcessingPeriodService {
     ProcessingSchedule schedule;
     LocalDate startDate = params.getStartDate();
     LocalDate endDate = params.getEndDate();
+    Collection<UUID> ids = params.getIds();
 
     if (null != program && null != facility) {
       List<RequisitionGroupProgramSchedule> schedules = requisitionGroupProgramScheduleRepository
@@ -93,7 +95,7 @@ public class ProcessingPeriodService {
           ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_ID);
     }
 
-    return periodRepository.search(schedule, startDate, endDate, pageable);
+    return periodRepository.search(schedule, startDate, endDate, ids, pageable);
   }
 
   private <T> T getById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {

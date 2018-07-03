@@ -15,10 +15,14 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -41,6 +45,7 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
   private static final String PROCESSING_SCHEDULE = "processingSchedule";
   private static final String START_DATE = "startDate";
   private static final String END_DATE = "endDate";
+  private static final String ID = "id";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -56,14 +61,16 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
    * @return Page of Processing Periods matching the parameters.
    */
   public Page<ProcessingPeriod> search(ProcessingSchedule schedule, LocalDate startDate,
-      LocalDate endDate, Pageable pageable) {
+      LocalDate endDate, Collection<UUID> ids, Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<ProcessingPeriod> periodQuery = builder.createQuery(ProcessingPeriod.class);
-    periodQuery = prepareQuery(periodQuery, schedule, startDate, endDate, false, builder, pageable);
+    periodQuery =
+        prepareQuery(periodQuery, schedule, startDate, endDate, ids, false, builder, pageable);
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery = prepareQuery(countQuery, schedule, startDate, endDate, true, builder, pageable);
+    countQuery =
+        prepareQuery(countQuery, schedule, startDate, endDate, ids, true, builder, pageable);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -77,8 +84,8 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
   }
 
   private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, ProcessingSchedule schedule,
-      LocalDate startDate, LocalDate endDate, boolean count, CriteriaBuilder builder,
-      Pageable pageable) {
+      LocalDate startDate, LocalDate endDate, Collection<UUID> ids, boolean count,
+      CriteriaBuilder builder, Pageable pageable) {
     Root<ProcessingPeriod> root = query.from(ProcessingPeriod.class);
 
     if (count) {
@@ -99,6 +106,10 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
 
     if (null != endDate) {
       predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get(START_DATE), endDate));
+    }
+
+    if (!isEmpty(ids)) {
+      predicate = builder.and(predicate, root.get(ID).in(ids));
     }
 
     query.where(predicate);

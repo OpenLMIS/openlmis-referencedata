@@ -15,8 +15,10 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -207,6 +209,9 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldSearchForProcessingPeriods() {
+    final UUID id1 = UUID.randomUUID();
+    final UUID id2 = UUID.randomUUID();
+
     given(programRepository.findOne(programId))
         .willReturn(requisitionGroupProgramSchedule.getProgram());
     given(facilityRepository.findOne(facilityId))
@@ -217,7 +222,8 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
     PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
     given(periodRepository
-        .search(schedule, firstPeriod.getStartDate(), firstPeriod.getEndDate(), pageable))
+        .search(schedule, firstPeriod.getStartDate(), firstPeriod.getEndDate(),
+            asSet(id1, id2), pageable))
         .willReturn(Pagination.getPage(Arrays.asList(firstPeriod, secondPeriod), pageable, 2));
 
     restAssured.given()
@@ -225,6 +231,8 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .queryParam(FACILITY, facilityId)
         .queryParam(START_DATE, firstPeriod.getStartDate().toString())
         .queryParam(END_DATE, firstPeriod.getEndDate().toString())
+        .queryParam(ID, id1.toString())
+        .queryParam(ID, id2.toString())
         .queryParam(PAGE, 0)
         .queryParam(SIZE, 10)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -302,7 +310,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         firstPeriod, secondPeriod, thirdPeriod
     );
     PageRequest pageable = new PageRequest(0, 10, new Sort(END_DATE));
-    given(periodRepository.search(null, null, null, pageable))
+    given(periodRepository.search(null, null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
     restAssured.given()
@@ -329,7 +337,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         firstPeriod, secondPeriod, thirdPeriod
     );
     PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
-    given(periodRepository.search(null, null, null, pageable))
+    given(periodRepository.search(null, null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
     restAssured.given()

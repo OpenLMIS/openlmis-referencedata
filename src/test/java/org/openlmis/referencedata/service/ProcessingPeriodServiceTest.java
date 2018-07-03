@@ -15,12 +15,20 @@
 
 package org.openlmis.referencedata.service;
 
+import static java.util.Collections.emptySet;
+import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,16 +53,17 @@ import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import org.springframework.util.LinkedMultiValueMap;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessingPeriodServiceTest {
+
+  private static final String PROGRAM_ID = "programId";
+  private static final String FACILITY_ID = "facilityId";
+  private static final String PROCESSING_SCHEDULE_ID = "processingScheduleId";
+  private static final String START_DATE = "startDate";
+  private static final String END_DATE = "endDate";
+  private static final String ID = "id";
 
   @InjectMocks
   private ProcessingPeriodService periodService;
@@ -77,6 +86,8 @@ public class ProcessingPeriodServiceTest {
   @Mock
   private RequisitionGroupProgramSchedule requisitionGroupProgramSchedule;
 
+  private LinkedMultiValueMap<String, Object> queryMap;
+
   private ProcessingPeriod period = new ProcessingPeriodDataBuilder().build();
   private ProcessingSchedule schedule = new ProcessingScheduleDataBuilder().build();
   private Program program = new ProgramDataBuilder().build();
@@ -86,6 +97,8 @@ public class ProcessingPeriodServiceTest {
 
   @Before
   public void setUp() {
+    queryMap = new LinkedMultiValueMap<>();
+
     when(requisitionGroupProgramSchedule.getProcessingSchedule()).thenReturn(schedule);
     when(facilityRepository.findOne(facility.getId())).thenReturn(facility);
     when(programRepository.findOne(program.getId())).thenReturn(program);
@@ -94,24 +107,27 @@ public class ProcessingPeriodServiceTest {
 
   @Test(expected = NotFoundException.class)
   public void shouldThrowExceptionWhenProgramWasNotFoundById() {
-    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null, null);
+    queryMap.add(PROGRAM_ID, program.getId().toString());
+    queryMap.add(FACILITY_ID, facility.getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
     when(programRepository.findOne(program.getId())).thenReturn(null);
     periodService.searchPeriods(params, pageable);
   }
 
   @Test(expected = NotFoundException.class)
   public void shouldThrowExceptionWhenFacilityWasNotFoundById() {
-    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null, null);
+    queryMap.add(PROGRAM_ID, program.getId().toString());
+    queryMap.add(FACILITY_ID, facility.getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
     when(facilityRepository.findOne(facility.getId())).thenReturn(null);
     periodService.searchPeriods(params, pageable);
   }
 
   @Test
   public void shouldReturnEmptyPageWhenScheduleWasNotFoundForFacilityAndProgram() {
-    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null, null);
+    queryMap.add(PROGRAM_ID, program.getId().toString());
+    queryMap.add(FACILITY_ID, facility.getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
     doReturn(Collections.emptyList()).when(repository)
         .searchRequisitionGroupProgramSchedules(program, facility);
     Page<ProcessingPeriod> result = periodService.searchPeriods(params, pageable);
@@ -123,23 +139,24 @@ public class ProcessingPeriodServiceTest {
     doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
           .searchRequisitionGroupProgramSchedules(program, facility);
     doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
-        .when(periodRepository).search(schedule, null, null, pageable);
+        .when(periodRepository).search(schedule, null, null, emptySet(), pageable);
 
-    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        program.getId(), facility.getId(), null, null, null);
+    queryMap.add(PROGRAM_ID, program.getId().toString());
+    queryMap.add(FACILITY_ID, facility.getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
 
     periodService.searchPeriods(params, pageable);
 
     verify(repository).searchRequisitionGroupProgramSchedules(program, facility);
-    verify(periodRepository).search(schedule, null, null, pageable);
+    verify(periodRepository).search(schedule, null, null, emptySet(), pageable);
   }
 
   @Test(expected = NotFoundException.class)
   public void shouldThrowExceptionWhenScheduleWasNotFoundById() {
     doReturn(null).when(processingScheduleRepository).findOne(schedule.getId());
 
-    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        null, null, schedule.getId(), null, null);
+    queryMap.add(PROCESSING_SCHEDULE_ID, schedule.getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
 
     periodService.searchPeriods(params, pageable);
   }
@@ -147,14 +164,14 @@ public class ProcessingPeriodServiceTest {
   @Test
   public void shouldFindPeriodsBySchedule() {
     doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
-        .when(periodRepository).search(schedule, null, null, pageable);
+        .when(periodRepository).search(schedule, null, null, emptySet(), pageable);
 
-    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        null, null, schedule.getId(), null, null);
+    queryMap.add(PROCESSING_SCHEDULE_ID, schedule.getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
 
     periodService.searchPeriods(params, pageable);
 
-    verify(periodRepository).search(schedule, null, null, pageable);
+    verify(periodRepository).search(schedule, null, null, emptySet(), pageable);
   }
 
   @Test
@@ -163,11 +180,14 @@ public class ProcessingPeriodServiceTest {
     matchedPeriods.addAll(periods);
     matchedPeriods.remove(periods.get(0));
 
-    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(
-        null, null, schedule.getId(), periods.get(0).getStartDate(), periods.get(0).getEndDate());
+    queryMap.add(PROCESSING_SCHEDULE_ID, schedule.getId().toString());
+    queryMap.add(START_DATE, periods.get(0).getStartDate().toString());
+    queryMap.add(END_DATE, periods.get(0).getEndDate().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
 
     when(periodRepository
-        .search(schedule, periods.get(0).getStartDate(), periods.get(0).getEndDate(), pageable))
+        .search(schedule, periods.get(0).getStartDate(), periods.get(0).getEndDate(),
+            emptySet(), pageable))
         .thenReturn(Pagination.getPage(matchedPeriods, pageable, 5));
 
     Page<ProcessingPeriod> receivedPeriods = periodService
@@ -178,6 +198,22 @@ public class ProcessingPeriodServiceTest {
       assertEquals(schedule, period.getProcessingSchedule());
       assertTrue(periods.get(0).getStartDate().isAfter(period.getStartDate()));
     }
+  }
+
+  @Test
+  public void shouldFindPeriodsByIds() {
+    queryMap.add(ID, periods.get(0).getId().toString());
+    queryMap.add(ID, periods.get(1).getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
+
+    when(periodRepository
+        .search(null, null, null, asSet(periods.get(0).getId(), periods.get(1).getId()), pageable))
+        .thenReturn(Pagination.getPage(periods, pageable, 5));
+
+    Page<ProcessingPeriod> receivedPeriods = periodService
+        .searchPeriods(params, pageable);
+
+    assertEquals(receivedPeriods.getContent(), periods);
   }
 
   private List<ProcessingPeriod> generateInstances() {

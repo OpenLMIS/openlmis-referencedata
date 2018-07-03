@@ -22,6 +22,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 Improvements:
 * [OLMIS-3498](https://openlmis.atlassian.net/browse/OLMIS-3498): Added Jenkinsfile
 * [OLMIS-4818](https://openlmis.atlassian.net/browse/OLMIS-4818): GET /api/programs endpoint now accepts "name" and multiple "id" parameters.
+* [OLMIS-4819](https://openlmis.atlassian.net/browse/OLMIS-4819): GET /api/processingPeriods endpoint now accepts multiple "id" parameters.
 
 10.0.0 / 2018-04-28
 ===================

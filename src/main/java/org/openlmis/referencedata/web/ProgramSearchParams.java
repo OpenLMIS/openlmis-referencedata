@@ -71,7 +71,6 @@ public final class ProgramSearchParams {
     return queryParams.getUuids(ID);
   }
 
-
   /**
    * Checks if query params are valid. Returns false if any provided param is not on supported list.
    */

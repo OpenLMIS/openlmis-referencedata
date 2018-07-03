@@ -18,10 +18,14 @@ package org.openlmis.referencedata.repository;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
@@ -31,9 +35,6 @@ import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Sort.Direction;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
@@ -72,7 +73,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
   @Test
   public void shouldFindPeriodsStartDate() {
     Page<ProcessingPeriod> periods = periodRepository
-        .search(schedule, period2.getEndDate(), null, pageable);
+        .search(schedule, period2.getEndDate(), null, null, pageable);
 
     assertEquals(2, periods.getTotalElements());
     assertThat(periods.getContent(), hasItems(period2, period3));
@@ -81,7 +82,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
   @Test
   public void shouldFindPeriodsByEndDate() {
     Page<ProcessingPeriod> periods = periodRepository
-        .search(schedule, null, period2.getStartDate(), pageable);
+        .search(schedule, null, period2.getStartDate(), null, pageable);
 
     assertEquals(2, periods.getTotalElements());
     assertThat(periods.getContent(), hasItems(period1, period2));
@@ -90,10 +91,20 @@ public class ProcessingPeriodRepositoryIntegrationTest
   @Test
   public void shouldFindPeriodsByStartDateAndEndDate() {
     Page<ProcessingPeriod> periods = periodRepository
-        .search(schedule, period1.getEndDate(), period2.getStartDate(), pageable);
+        .search(schedule, period1.getEndDate(), period2.getStartDate(), null, pageable);
 
     assertEquals(2, periods.getTotalElements());
     assertThat(periods.getContent(), hasItems(period1, period2));
+  }
+
+  @Test
+  public void shouldFindPeriodsByIds() {
+    Page<ProcessingPeriod> periods = periodRepository
+        .search(schedule, null, null,
+            asSet(period1.getId(), period2.getId(), period3.getId()), pageable);
+
+    assertEquals(3, periods.getTotalElements());
+    assertThat(periods.getContent(), hasItems(period1, period2, period3));
   }
 
   @Test
@@ -102,19 +113,19 @@ public class ProcessingPeriodRepositoryIntegrationTest
     scheduleRepository.save(schedule2);
     periodRepository.save(generateInstance(schedule2));
 
-    Page<ProcessingPeriod> periods = periodRepository.search(schedule, null, null, pageable);
+    Page<ProcessingPeriod> periods = periodRepository.search(schedule, null, null, null, pageable);
     assertEquals(3, periods.getTotalElements());
     assertEquals(schedule, periods.getContent().get(0).getProcessingSchedule());
     assertEquals(schedule, periods.getContent().get(1).getProcessingSchedule());
     assertEquals(schedule, periods.getContent().get(2).getProcessingSchedule());
 
-    periods = periodRepository.search(schedule2, null, null, pageable);
+    periods = periodRepository.search(schedule2, null, null, null, pageable);
     assertEquals(1, periods.getTotalElements());
     assertEquals(schedule2, periods.getContent().get(0).getProcessingSchedule());
   }
 
   @Test
-  public void shouldFindPeriodsByScheduleAndStartDateAndEndDate() {
+  public void shouldFindPeriodsByScheduleAndStartDateAndEndDateAndIds() {
     ProcessingSchedule newSchedule = scheduleRepository
         .save(new ProcessingScheduleDataBuilder().buildWithoutId());
 
@@ -125,7 +136,9 @@ public class ProcessingPeriodRepositoryIntegrationTest
         period2.getStartDate().plusMonths(1), period2.getEndDate().plusMonths(1)));
 
     Page<ProcessingPeriod> periods = periodRepository
-        .search(newSchedule, period4.getEndDate(), period5.getStartDate(), pageable);
+        .search(newSchedule, period4.getEndDate(), period5.getStartDate(),
+            asSet(period1.getId(), period2.getId(), period4.getId(), period5.getId()),
+            pageable);
 
     assertEquals(2, periods.getTotalElements());
     assertThat(periods.getContent(), hasItems(period4, period5));
@@ -135,7 +148,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
   public void shouldSortByStartDateDesc() {
     pageable = new PageRequest(0, 10, Direction.DESC, "startDate");
 
-    Page<ProcessingPeriod> page = periodRepository.search(schedule, null, null, pageable);
+    Page<ProcessingPeriod> page = periodRepository.search(schedule, null, null, null, pageable);
     List<ProcessingPeriod> content = page.getContent();
 
     assertThat(content, hasSize(3));
