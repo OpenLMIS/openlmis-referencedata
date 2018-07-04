@@ -22,6 +22,7 @@ public abstract class ProcessingPeriodMessageKeys extends MessageKeys {
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_PROGRAM_ID_NULL = join(ERROR, PROGRAM, ID, NULL);
+  public static final String ERROR_FACILITY_ID_NULL = join(ERROR, FACILITY, ID, NULL);
   public static final String ERROR_START_DATE_NULL = join(ERROR, START_DATE, NULL);
   public static final String ERROR_END_DATE_NULL = join(ERROR, END_DATE, NULL);
   public static final String ERROR_START_DATE_AFTER_END_DATE =

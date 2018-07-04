@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys.ERROR_INVALID_PARAMS;
+import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER;
 
@@ -66,14 +67,6 @@ public class ProcessingPeriodSearchParamsTest {
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
 
     assertEquals(id, params.getProgramId());
-  }
-
-  @Test
-  public void shouldGetNullIfMapHasNoProgramIdProperty() {
-    queryMap.add(FACILITY_ID, "");
-    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
-
-    assertNull(params.getProgramId());
   }
 
   @Test
@@ -149,11 +142,21 @@ public class ProcessingPeriodSearchParamsTest {
   }
 
   @Test
-  public void shouldThrowExceptionIfProgramIdIsNotSetAndFacilityIdIsSet() {
+  public void shouldThrowExceptionIfProgramIdIsSetAndFacilityIdIsNot() {
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(ERROR_FACILITY_ID_NULL);
+
+    queryMap.add(PROGRAM_ID, "program");
+
+    new ProcessingPeriodSearchParams(queryMap);
+  }
+
+  @Test
+  public void shouldThrowExceptionIfProgramIdIsNotSetAndFacilityIdIs() {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(ERROR_PROGRAM_ID_NULL);
 
-    queryMap.add(PROGRAM_ID, "program");
+    queryMap.add(FACILITY_ID, "facility");
 
     new ProcessingPeriodSearchParams(queryMap);
   }
