@@ -97,6 +97,7 @@ public class ProcessingPeriod extends BaseEntity {
           importer.getEndDate());
     newPeriod.id = importer.getId();
     newPeriod.description = importer.getDescription();
+    newPeriod.extraData = importer.getExtraData();
     return newPeriod;
   }
 
@@ -194,6 +195,8 @@ public class ProcessingPeriod extends BaseEntity {
     LocalDate getStartDate();
 
     LocalDate getEndDate();
+    
+    Map<String, String> getExtraData();
   }
 
 }
