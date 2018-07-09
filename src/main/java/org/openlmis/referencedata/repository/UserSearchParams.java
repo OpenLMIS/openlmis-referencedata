@@ -13,10 +13,18 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.repository;
 
-import static java.util.Objects.isNull;
+import static org.openlmis.referencedata.util.messagekeys.UserMessageKeys.ERROR_HOME_FACILITY_ID_INVALID;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,13 +34,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.UuidUtil;
-import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,15 +41,14 @@ import java.util.UUID;
 @Getter
 @Setter
 public class UserSearchParams {
-
-  Set<String> id;
-  String username;
-  String firstName;
-  String lastName;
-  String homeFacilityId;
-  Boolean active;
-  Boolean loginRestricted;
-  Map<String, String> extraData;
+  private Set<String> id;
+  private String username;
+  private String firstName;
+  private String lastName;
+  private String homeFacilityId;
+  private Boolean active;
+  private Boolean loginRestricted;
+  private Map<String, String> extraData;
 
   /**
    * Constructor with id.
@@ -68,22 +68,29 @@ public class UserSearchParams {
    * Check if all params are empty.
    */
   public boolean isEmpty() {
-    return CollectionUtils.isEmpty(id) && isNull(username) && isNull(firstName)
-        && isNull(lastName) && isNull(homeFacilityId) && isNull(active) && isNull(loginRestricted)
-        && MapUtils.isEmpty(extraData);
+    if (!CollectionUtils.isEmpty(id)) {
+      return false;
+    }
+
+    if (!MapUtils.isEmpty(extraData)) {
+      return false;
+    }
+
+    return Stream
+        .of(username, firstName, lastName, homeFacilityId, active, loginRestricted, extraData)
+        .allMatch(Objects::isNull);
   }
 
   /**
    * Gets a set of string id list parsed to UUIDs.
    */
   public Set<UUID> getIds() {
-    if (id == null) {
-      return Collections.emptySet();
-    }
-    Set<UUID> ids = new HashSet<>();
-    id.forEach(id -> ids.add(UUID.fromString((String)id)));
-
-    return ids;
+    return Optional
+        .ofNullable(id)
+        .orElse(Collections.emptySet())
+        .stream()
+        .map(UUID::fromString)
+        .collect(Collectors.toSet());
   }
 
   /**
@@ -96,11 +103,10 @@ public class UserSearchParams {
     if (this.homeFacilityId == null) {
       return null;
     }
-    Optional<UUID> uuid = UuidUtil.fromString(this.homeFacilityId);
-    if (!uuid.isPresent()) {
-      throw new ValidationMessageException(UserMessageKeys.ERROR_HOME_FACILITY_ID_INVALID);
-    }
-    return uuid.get();
+
+    return UuidUtil
+        .fromString(homeFacilityId)
+        .orElseThrow(() -> new ValidationMessageException(ERROR_HOME_FACILITY_ID_INVALID));
   }
 
 }

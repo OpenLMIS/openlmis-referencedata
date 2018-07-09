@@ -16,13 +16,13 @@
 package org.openlmis.referencedata.repository.custom;
 
 import java.util.List;
-import java.util.UUID;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.repository.UserSearchParams;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserRepositoryCustom {
 
-  Page<User> searchUsers(String username, String firstName, String lastName, UUID homeFacilityId,
-      Boolean active, Boolean loginRestricted, List<User> foundUsers, Pageable pageable);
+  Page<User> searchUsers(UserSearchParams searchParams, List<User> foundUsers, Pageable pageable);
+
 }

@@ -55,7 +55,7 @@ import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
-import org.openlmis.referencedata.service.UserSearchParams;
+import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;

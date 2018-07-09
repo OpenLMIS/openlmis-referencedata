@@ -83,7 +83,7 @@ import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.service.UserSearchParams;
+import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;

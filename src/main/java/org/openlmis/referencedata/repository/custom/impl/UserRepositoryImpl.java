@@ -29,6 +29,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.collections4.CollectionUtils;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
@@ -40,10 +41,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   protected static final String USERNAME = "username";
   protected static final String FIRST_NAME = "firstName";
   protected static final String LAST_NAME = "lastName";
-  protected static final String EMAIL = "email";
   protected static final String HOME_FACILITY_ID = "homeFacilityId";
   protected static final String ACTIVE = "active";
-  protected static final String VERIFIED = "verified";
   protected static final String LOGIN_RESTRICTED = "loginRestricted";
   protected static final String ID = "id";
 
@@ -57,27 +56,19 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
    * the searched value. Case insensitive.
    * Other fields: entered string value must equal to searched value.
    *
-   * @param username        username of user.
-   * @param firstName       firstName of user.
-   * @param lastName        lastName of user.
-   * @param homeFacilityId  homeFacility of user.
-   * @param active          is the account activated.
-   * @param loginRestricted is the account login restricted.
+   * @param searchParams    user search params
    * @param foundUsers      list of already found users
    * @param pageable        pagination parameters
    * @return Page of users
    */
-  public Page<User> searchUsers(String username, String firstName, String lastName,
-      UUID homeFacilityId, Boolean active, Boolean loginRestricted, List<User> foundUsers,
+  public Page<User> searchUsers(UserSearchParams searchParams, List<User> foundUsers,
       Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<User> query = builder.createQuery(User.class);
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
 
-    query = prepareQuery(username, firstName, lastName, homeFacilityId, active,
-        loginRestricted, foundUsers, query, false, pageable);
-    countQuery = prepareQuery(username, firstName, lastName, homeFacilityId, active,
-        loginRestricted, foundUsers, countQuery, true, pageable);
+    query = prepareQuery(searchParams, foundUsers, query, false, pageable);
+    countQuery = prepareQuery(searchParams, foundUsers, countQuery, true, pageable);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -89,8 +80,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     return Pagination.getPage(result, pageable, count);   
   }
 
-  private <T> CriteriaQuery<T> prepareQuery(String username, String firstName, String lastName,
-      UUID homeFacilityId, Boolean active, Boolean loginRestricted, List<User> foundUsers,
+  private <T> CriteriaQuery<T> prepareQuery(UserSearchParams searchParams, List<User> foundUsers,
       CriteriaQuery<T> query, boolean count, Pageable pageable) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -102,12 +92,14 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
       query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
     }
 
-    predicate = addLikeFilter(predicate, builder, root, USERNAME, username);
-    predicate = addLikeFilter(predicate, builder, root, FIRST_NAME, firstName);
-    predicate = addLikeFilter(predicate, builder, root, LAST_NAME, lastName);
-    predicate = addEqualsFilter(predicate, builder, root, HOME_FACILITY_ID, homeFacilityId);
-    predicate = addEqualsFilter(predicate, builder, root, ACTIVE, active);
-    predicate = addEqualsFilter(predicate, builder, root, LOGIN_RESTRICTED, loginRestricted);
+    predicate = addLikeFilter(predicate, builder, root, USERNAME, searchParams.getUsername());
+    predicate = addLikeFilter(predicate, builder, root, FIRST_NAME, searchParams.getFirstName());
+    predicate = addLikeFilter(predicate, builder, root, LAST_NAME, searchParams.getLastName());
+    predicate = addEqualsFilter(predicate, builder, root, HOME_FACILITY_ID,
+        searchParams.getHomeFacilityUuid());
+    predicate = addEqualsFilter(predicate, builder, root, ACTIVE, searchParams.getActive());
+    predicate = addEqualsFilter(predicate, builder, root, LOGIN_RESTRICTED,
+        searchParams.getLoginRestricted());
 
     if (!CollectionUtils.isEmpty(foundUsers)) {
       List<UUID> ids = foundUsers.stream().map(User::getId).collect(Collectors.toList());

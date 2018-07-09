@@ -18,10 +18,10 @@ package org.openlmis.referencedata.util;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 
-import org.openlmis.referencedata.service.UserSearchParams;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.openlmis.referencedata.repository.UserSearchParams;
 
 public class UserSearchParamsDataBuilder {
 
@@ -43,24 +43,56 @@ public class UserSearchParamsDataBuilder {
   }
 
   /**
-   * Sets username for new {@link UserSearchParams}.
+   * Sets the {@code null} value for all fields.
    */
+  public UserSearchParamsDataBuilder asEmpty() {
+    id = null;
+    username = null;
+    firstName = null;
+    lastName = null;
+    homeFacilityId = null;
+    active = null;
+    loginRestricted = null;
+    extraData = null;
+
+    return this;
+  }
+
+  public UserSearchParamsDataBuilder withId(Set<String> id) {
+    this.id = id;
+    return this;
+  }
+
   public UserSearchParamsDataBuilder withUsername(String username) {
     this.username = username;
     return this;
   }
 
-  /**
-   * Sets firstName for new {@link UserSearchParams}.
-   */
   public UserSearchParamsDataBuilder withFirstName(String firstName) {
     this.firstName = firstName;
     return this;
   }
 
-  /**
-   * Sets username for new {@link UserSearchParams}.
-   */
+  public UserSearchParamsDataBuilder withLastName(String lastName) {
+    this.lastName = lastName;
+    return this;
+  }
+
+  public UserSearchParamsDataBuilder withHomeFacilityId(UUID homeFacilityId) {
+    this.homeFacilityId = homeFacilityId.toString();
+    return this;
+  }
+
+  public UserSearchParamsDataBuilder withActive(Boolean active) {
+    this.active = active;
+    return this;
+  }
+
+  public UserSearchParamsDataBuilder withLoginRestricted(Boolean loginRestricted) {
+    this.loginRestricted = loginRestricted;
+    return this;
+  }
+
   public UserSearchParamsDataBuilder withExtraData(Map<String, String> extraData) {
     this.extraData = extraData;
     return this;

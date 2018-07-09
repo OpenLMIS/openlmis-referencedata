@@ -33,6 +33,7 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
@@ -116,7 +117,7 @@ public class UserService {
     profiler.setLogger(LOGGER);
 
     profiler.start("GET_EXTRA_DATA_FROM_PARAMS");
-    Map<String, String> extraData = searchParams.extraData;
+    Map<String, String> extraData = searchParams.getExtraData();
 
     profiler.start("SEARCHING_BY_EXTRA_DATA");
     List<User> foundUsers = null;
@@ -134,10 +135,7 @@ public class UserService {
     }
 
     profiler.start("SEARCH_IN_DB");
-    Page<User> result = userRepository
-        .searchUsers(searchParams.username, searchParams.firstName, searchParams.lastName,
-            searchParams.getHomeFacilityUuid(), searchParams.active, searchParams.loginRestricted,
-            foundUsers, pageable);
+    Page<User> result = userRepository.searchUsers(searchParams, foundUsers, pageable);
 
     profiler.stop().log();
 

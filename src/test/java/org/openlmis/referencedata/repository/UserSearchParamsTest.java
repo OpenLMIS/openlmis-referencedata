@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.repository;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
@@ -22,10 +22,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
-import org.junit.Test;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import java.util.Collections;
 import java.util.UUID;
+import org.junit.Test;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 
 public class UserSearchParamsTest {
 
@@ -34,42 +34,41 @@ public class UserSearchParamsTest {
   @Test
   public void shouldReturnTrueIfAllFieldsAreEmpty() {
     UserSearchParams userSearchParams = new UserSearchParams();
-
     assertTrue(userSearchParams.isEmpty());
   }
 
   @Test
   public void shouldReturnFalseIfAnyFieldIsEmpty() {
     UserSearchParams userSearchParams = new UserSearchParams();
-    userSearchParams.id = Collections.singleton(TEST);
+    userSearchParams.setId(Collections.singleton(TEST));
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.username = TEST;
+    userSearchParams.setUsername(TEST);
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.firstName = TEST;
+    userSearchParams.setFirstName(TEST);
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.lastName = TEST;
+    userSearchParams.setLastName(TEST);
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.homeFacilityId = TEST;
+    userSearchParams.setHomeFacilityId(TEST);
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.active = true;
+    userSearchParams.setActive(true);
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.loginRestricted = true;
+    userSearchParams.setLoginRestricted(true);
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.extraData = Collections.singletonMap(TEST, TEST);
+    userSearchParams.setExtraData(Collections.singletonMap(TEST, TEST));
     assertFalse(userSearchParams.isEmpty());
   }
 
