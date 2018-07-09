@@ -15,23 +15,22 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
 @Table(name = "processing_periods", schema = "referencedata")
@@ -64,6 +63,12 @@ public class ProcessingPeriod extends BaseEntity {
   @Getter
   @Setter
   private LocalDate endDate;
+
+  @Column(name = "extradata", columnDefinition = "jsonb")
+  @Convert(converter = ExtraDataConverter.class)
+  @Getter
+  @Setter
+  private Map<String, String> extraData;
 
   private ProcessingPeriod(String name, ProcessingSchedule schedule,
                            LocalDate startDate, LocalDate endDate) {
@@ -122,6 +127,7 @@ public class ProcessingPeriod extends BaseEntity {
     exporter.setDescription(description);
     exporter.setStartDate(startDate);
     exporter.setEndDate(endDate);
+    exporter.setExtraData(extraData);
 
     Optional<ProcessingSchedule.Exporter> exporterOptional =
         exporter.provideProcessingScheduleExporter();
@@ -172,6 +178,8 @@ public class ProcessingPeriod extends BaseEntity {
     void setDurationInMonths(Integer duration);
 
     boolean supportsDurationInMonths();
+    
+    void setExtraData(Map<String, String> extraData);
   }
 
   public interface Importer {

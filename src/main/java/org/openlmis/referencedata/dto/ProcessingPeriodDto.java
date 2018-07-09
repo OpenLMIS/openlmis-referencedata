@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.dto;
 
+import java.util.Map;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 
@@ -40,6 +41,7 @@ public class ProcessingPeriodDto extends BaseDto
   private LocalDate startDate;
   private LocalDate endDate;
   private Integer durationInMonths;
+  private Map<String, String> extraData;
 
   @Override
   public int hashCode() {
