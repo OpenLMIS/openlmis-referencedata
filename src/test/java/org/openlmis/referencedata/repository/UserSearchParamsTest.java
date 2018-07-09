@@ -24,8 +24,12 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.UUID;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 
 public class UserSearchParamsTest {
 
@@ -98,6 +102,19 @@ public class UserSearchParamsTest {
     userSearchParams.setHomeFacilityId("123");
 
     userSearchParams.getHomeFacilityUuid();
+  }
+
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(UserSearchParams.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    ToStringTestUtils.verify(UserSearchParams.class, new UserSearchParamsDataBuilder().build());
   }
 
 }

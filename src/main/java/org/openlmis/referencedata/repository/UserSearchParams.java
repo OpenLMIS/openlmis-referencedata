@@ -30,17 +30,19 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.UuidUtil;
 
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Getter
-@Setter
-public class UserSearchParams {
+public final class UserSearchParams {
   private Set<String> id;
   private String username;
   private String firstName;
