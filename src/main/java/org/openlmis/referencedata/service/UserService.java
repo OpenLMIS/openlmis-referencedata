@@ -17,6 +17,10 @@ package org.openlmis.referencedata.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
@@ -43,10 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -134,17 +134,10 @@ public class UserService {
     }
 
     profiler.start("SEARCH_IN_DB");
-    Page<User> result = userRepository.searchUsers(
-        searchParams.username,
-        searchParams.firstName,
-        searchParams.lastName,
-        searchParams.email,
-        searchParams.getHomeFacilityUuid(),
-        searchParams.active,
-        searchParams.verified,
-        searchParams.loginRestricted,
-        foundUsers,
-        pageable);
+    Page<User> result = userRepository
+        .searchUsers(searchParams.username, searchParams.firstName, searchParams.lastName,
+            searchParams.getHomeFacilityUuid(), searchParams.active, searchParams.loginRestricted,
+            foundUsers, pageable);
 
     profiler.stop().log();
 

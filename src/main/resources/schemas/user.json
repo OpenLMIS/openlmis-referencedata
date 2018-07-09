@@ -20,23 +20,12 @@
       "type": "string",
       "title": "lastName"
     },
-    "email": {
-      "type": "string",
-      "title": "email"
-    },
     "jobTitle": {
       "type": [
         "string",
         "null"
       ],
       "title": "jobTitle"
-    },
-    "phoneNumber": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "title": "phoneNumber"
     },
     "timezone": {
       "type": "string",
@@ -47,10 +36,6 @@
       "$ref": "facility.json",
       "title": "homeFacility"
     },
-    "verified": {
-      "type": "boolean",
-      "title": "verified"
-    },
     "active": {
       "type": "boolean",
       "title": "active"
@@ -58,10 +43,6 @@
     "loginRestricted": {
       "type": "boolean",
       "title": "loginRestricted"
-    },
-    "allowNotify": {
-      "type": "boolean",
-      "title": "allowNotify"
     },
     "roleAssignments": {
       "type": "array",
@@ -81,7 +62,6 @@
     "username",
     "firstName",
     "lastName",
-    "verified",
     "active",
     "loginRestricted"
   ]

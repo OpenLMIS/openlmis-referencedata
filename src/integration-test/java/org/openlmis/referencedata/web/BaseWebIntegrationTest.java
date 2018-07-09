@@ -94,7 +94,6 @@ import org.openlmis.referencedata.service.RequisitionGroupService;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.service.UserService;
-import org.openlmis.referencedata.service.notification.UserContactDetailsNotificationService;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
@@ -300,9 +299,6 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected FacilityTypeService facilityTypeService;
-
-  @MockBean
-  protected UserContactDetailsNotificationService userContactDetailsNotificationService;
 
   /**
    * Constructor for test.

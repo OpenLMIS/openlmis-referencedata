@@ -84,7 +84,6 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.service.UserSearchParams;
-import org.openlmis.referencedata.service.notification.UserContactDetailsDto;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
@@ -369,26 +368,26 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     UserDto userDto = new UserDto();
 
-    UserDto response = putUser(userDto, getClientTokenHeader())
+    UserDto response = putUser(userDto)
         .then()
         .statusCode(200)
         .extract().as(UserDto.class);
 
     assertEquals(userDto, response);
-    verify(userContactDetailsNotificationService)
-        .putContactDetails(new UserContactDetailsDto(userDto));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldRejectPutUserIfRequestWasFromUser() {
-    String messageKey = putUser(null, getTokenHeader())
+  public void shouldRejectPutUserIfUserHasNoRight() {
+    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
+
+    String messageKey = putUser(null)
         .then()
         .statusCode(403)
         .extract()
         .path(MESSAGE_KEY);
 
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC)));
+    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -400,7 +399,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     user.setId(UUID.randomUUID());
     given(userRepository.findOneByUsernameIgnoreCase(user1.getUsername())).willReturn(user);
 
-    String messageKey = putUser(null, getClientTokenHeader())
+    String messageKey = putUser(null)
         .then()
         .statusCode(400)
         .extract()
@@ -415,7 +414,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setUsername(null);
-    String messageKey = putUser(null, getClientTokenHeader())
+    String messageKey = putUser(null)
         .then()
         .statusCode(400)
         .extract()
@@ -430,7 +429,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setUsername("bad:name");
-    String messageKey = putUser(null, getClientTokenHeader())
+    String messageKey = putUser(null)
         .then()
         .statusCode(400)
         .extract()
@@ -441,23 +440,11 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldNotRejectPutUserIfEmailIsNull() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-
-    user1.setEmail(null);
-    putUser(null, getClientTokenHeader())
-        .then()
-        .statusCode(200);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldRejectPutUserIfFirstNameIsNull() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setFirstName(null);
-    String messageKey = putUser(null, getClientTokenHeader())
+    String messageKey = putUser(null)
         .then()
         .statusCode(400)
         .extract()
@@ -472,7 +459,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     user1.setLastName(null);
-    String messageKey = putUser(null, getClientTokenHeader())
+    String messageKey = putUser(null)
         .then()
         .statusCode(400)
         .extract()
@@ -929,10 +916,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.getUsername(), response.getUsername());
     assertEquals(user.getFirstName(), response.getFirstName());
     assertEquals(user.getLastName(), response.getLastName());
-    assertEquals(user.getEmail(), response.getEmail());
     assertEquals(user.getHomeFacilityId(), response.getHomeFacilityId());
     assertEquals(user.isActive(), response.isActive());
-    assertEquals(user.isVerified(), response.isVerified());
   }
 
   @Test
@@ -958,9 +943,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertNotNull(user);
 
-    String newEmail = generateInstanceNumber() + "@mail.com";
-    assertNotEquals(newEmail, user.getEmail());
-    user.setEmail(newEmail);
+    String newFirstName = generateInstanceNumber() + "-first-name";
+    assertNotEquals(newFirstName, user.getFirstName());
+    user.setFirstName(newFirstName);
 
     User response = restAssured
         .given()
@@ -978,10 +963,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(user.getUsername(), response.getUsername());
     assertEquals(user.getFirstName(), response.getFirstName());
     assertEquals(user.getLastName(), response.getLastName());
-    assertEquals(user.getEmail(), response.getEmail());
     assertEquals(user.getHomeFacilityId(), response.getHomeFacilityId());
     assertEquals(user.isActive(), response.isActive());
-    assertEquals(user.isVerified(), response.isVerified());
   }
 
   @Test
@@ -1260,7 +1243,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(ROLE_ASSIGNMENTS_URL);
   }
 
-  private Response putUser(UserDto userDto, String tokenHeader) {
+  private Response putUser(UserDto userDto) {
     if (userDto == null) {
       userDto = new UserDto();
     }
@@ -1275,7 +1258,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     return restAssured
         .given()
-        .header(HttpHeaders.AUTHORIZATION, tokenHeader)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(userDto)
         .when()

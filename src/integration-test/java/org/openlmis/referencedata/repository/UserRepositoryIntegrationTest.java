@@ -134,17 +134,9 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test
   public void testSearchUsersByAllParameters() {
     User user = cloneUser(users.get(0));
-    Page<User> receivedUsers = repository.searchUsers(
-        user.getUsername(),
-        user.getFirstName(),
-        user.getLastName(),
-        user.getEmail(),
-        user.getHomeFacilityId(),
-        user.isActive(),
-        user.isVerified(),
-        user.isLoginRestricted(),
-        null,
-        pageable);
+    Page<User> receivedUsers = repository
+        .searchUsers(user.getUsername(), user.getFirstName(), user.getLastName(),
+            user.getHomeFacilityId(), user.isActive(), user.isLoginRestricted(), null, pageable);
 
     assertEquals(1, receivedUsers.getContent().size());
     assertEquals(1, receivedUsers.getTotalElements());
@@ -164,17 +156,14 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         user.isActive(),
         receivedUsers.getContent().get(0).isActive());
     assertEquals(
-        user.isVerified(),
-        receivedUsers.getContent().get(0).isVerified());
-    assertEquals(
         user.isLoginRestricted(),
         receivedUsers.getContent().get(0).isLoginRestricted());
   }
 
   @Test
   public void searchUsersWithAllParametersNullShouldReturnAllUsers() {
-    Page<User> receivedUsers = repository.searchUsers(
-        null, null, null, null, null, null, null, null, null, pageable);
+    Page<User> receivedUsers = repository
+        .searchUsers(null, null, null, null, null, null, null, pageable);
 
     assertEquals(TOTAL_USERS, receivedUsers.getContent().size());
   }
@@ -182,17 +171,9 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test
   public void testSearchUsersByFirstNameAndLastNameAndHomeFacility() {
     User user = cloneUser(users.get(0));
-    Page<User> receivedUsers = repository.searchUsers(
-        null,
-        user.getFirstName(),
-        user.getLastName(),
-        null,
-        user.getHomeFacilityId(),
-        null,
-        null,
-        null,
-        null,
-        pageable);
+    Page<User> receivedUsers = repository
+        .searchUsers(null, user.getFirstName(), user.getLastName(), user.getHomeFacilityId(), null,
+            null, null, pageable);
 
     assertEquals(2, receivedUsers.getContent().size());
     for (User receivedUser : receivedUsers) {
@@ -210,17 +191,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   @Test
   public void testSearchUsersShouldReturnAllUsersListIfEmptyListIsPassed() {
-    Page<User> receivedUsers = repository.searchUsers(
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        Collections.emptyList(),
-        pageable);
+    Page<User> receivedUsers = repository
+        .searchUsers(null, null, null, null, null, null, Collections.emptyList(), pageable);
 
     assertEquals(TOTAL_USERS, receivedUsers.getContent().size());
   }
@@ -230,50 +202,13 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "username"));
     when(pageable.getSort()).thenReturn(sort);
 
-    Page<User> receivedUsers = repository.searchUsers(
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        pageable
-    );
+    Page<User> receivedUsers = repository
+        .searchUsers(null, null, null, null, null, null, null, pageable);
 
     for (int i = 1; i < receivedUsers.getContent().size(); i++) {
       assertTrue(receivedUsers.getContent().get(i).getUsername()
           .compareTo(receivedUsers.getContent().get(i - 1).getUsername()) > 0);
     }
-  }
-
-  @Test
-  public void testSearchUsersOnlyByEmail() {
-    User user1 = cloneUser(users.get(0));
-    user1.setEmail("user1@mail.com");
-    repository.save(user1);
-    User user2 = cloneUser(users.get(0));
-    user2.setEmail("user2@mail.com");
-    repository.save(user2);
-
-    Page<User> receivedUsers = repository.searchUsers(
-        null,
-        null,
-        null,
-        "user",
-        null,
-        null,
-        null,
-        null,
-        null,
-        pageable);
-
-    assertEquals(2, receivedUsers.getContent().size());
-
-    assertTrue(receivedUsers.getContent().contains(user1));
-    assertTrue(receivedUsers.getContent().contains(user2));
   }
 
   @Test
@@ -295,11 +230,9 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     assertEquals(expectedUser.getUsername(), user.getUsername());
     assertEquals(expectedUser.getFirstName(), user.getFirstName());
     assertEquals(expectedUser.getLastName(), user.getLastName());
-    assertEquals(expectedUser.getEmail(), user.getEmail());
     assertEquals(expectedUser.getTimezone(), user.getTimezone());
     assertEquals(expectedUser.getHomeFacilityId(), user.getHomeFacilityId());
     assertEquals(expectedUser.isActive(), user.isActive());
-    assertEquals(expectedUser.isVerified(), user.isVerified());
     assertEquals(expectedUser.isLoginRestricted(), user.isLoginRestricted());
     assertEquals(expectedUser.getExtraData(), user.getExtraData());
   }
@@ -450,10 +383,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         .withUsername(user.getUsername() + instanceNumber)
         .withFirstName(user.getFirstName())
         .withLastName(user.getLastName())
-        .withEmail(instanceNumber + "@mail.com")
         .withHomeFacilityId(user.getHomeFacilityId())
         .withActive(user.isActive())
-        .withVerified(user.isVerified())
         .buildAsNew();
 
     repository.save(clonedUser);

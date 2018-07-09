@@ -29,9 +29,7 @@ public class UserSearchParamsDataBuilder {
   private String username = "someName";
   private String firstName = "firstName";
   private String lastName = "lastName";
-  private String email = "someName@mail.com";
   private String homeFacilityId = UUID.randomUUID().toString();
-  private Boolean verified = true;
   private Boolean active = true;
   private Boolean loginRestricted = true;
   private Map<String, String> extraData = emptyMap();
@@ -40,7 +38,7 @@ public class UserSearchParamsDataBuilder {
    * Builds new instance of {@link UserSearchParams} with test data.
    */
   public UserSearchParams build() {
-    return new UserSearchParams(id, username, firstName, lastName, email, homeFacilityId, verified,
+    return new UserSearchParams(id, username, firstName, lastName, homeFacilityId,
         active, loginRestricted, extraData);
   }
 

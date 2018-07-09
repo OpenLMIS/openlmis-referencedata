@@ -66,18 +66,9 @@ public class User extends BaseEntity {
   @Setter
   private String lastName;
 
-  @Column(unique = true)
-  @Getter
-  @Setter
-  private String email;
-
   @Getter
   @Setter
   private String jobTitle;
-
-  @Getter
-  @Setter
-  private String phoneNumber;
 
   @Column
   @Getter
@@ -91,22 +82,12 @@ public class User extends BaseEntity {
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   @Getter
   @Setter
-  private boolean verified;
-
-  @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
-  @Getter
-  @Setter
   private boolean active;
 
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   @Getter
   @Setter
   private boolean loginRestricted;
-
-  @Column(columnDefinition = "boolean DEFAULT true")
-  @Getter
-  @Setter
-  private Boolean allowNotify;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @DiffIgnore
@@ -129,19 +110,11 @@ public class User extends BaseEntity {
     username = importer.getUsername();
     firstName = importer.getFirstName();
     lastName = importer.getLastName();
-    email = importer.getEmail();
     jobTitle = importer.getJobTitle();
-    phoneNumber = importer.getPhoneNumber();
     timezone = importer.getTimezone();
     homeFacilityId = importer.getHomeFacilityId();
-    verified = importer.isVerified();
     active = importer.isActive();
     loginRestricted = importer.isLoginRestricted();
-    if (importer.getAllowNotify() == null) {
-      allowNotify = Boolean.TRUE;
-    } else {
-      allowNotify = importer.getAllowNotify();
-    }
     extraData = importer.getExtraData();
   }
 
@@ -256,16 +229,12 @@ public class User extends BaseEntity {
     exporter.setUsername(username);
     exporter.setFirstName(firstName);
     exporter.setLastName(lastName);
-    exporter.setEmail(email);
     exporter.setTimezone(timezone);
     exporter.setHomeFacilityId(homeFacilityId);
     exporter.setActive(active);
-    exporter.setVerified(verified);
     exporter.setLoginRestricted(loginRestricted);
-    exporter.setAllowNotify(allowNotify);
     exporter.setExtraData(extraData);
     exporter.setJobTitle(jobTitle);
-    exporter.setPhoneNumber(phoneNumber);
   }
 
   @Override
@@ -295,23 +264,15 @@ public class User extends BaseEntity {
 
     void setLastName(String lastName);
 
-    void setEmail(String email);
-
     void setJobTitle(String jobTitle);
-
-    void setPhoneNumber(String phoneNumber);
 
     void setTimezone(String timezone);
 
     void setHomeFacilityId(UUID homeFacilityId);
 
-    void setVerified(boolean verified);
-
     void setActive(boolean active);
 
     void setLoginRestricted(boolean loginRestricted);
-
-    void setAllowNotify(Boolean allowNotify);
 
     void setExtraData(Map<String, String> extraData);
   }
@@ -326,23 +287,15 @@ public class User extends BaseEntity {
 
     String getLastName();
 
-    String getEmail();
-
     String getJobTitle();
-
-    String getPhoneNumber();
 
     String getTimezone();
 
     UUID getHomeFacilityId();
 
-    boolean isVerified();
-
     boolean isActive();
 
     boolean isLoginRestricted();
-
-    Boolean getAllowNotify();
 
     Map<String, String> getExtraData();
   }

@@ -60,27 +60,24 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
    * @param username        username of user.
    * @param firstName       firstName of user.
    * @param lastName        lastName of user.
-   * @param email           email of user.
    * @param homeFacilityId  homeFacility of user.
    * @param active          is the account activated.
-   * @param verified        is the account verified.
    * @param loginRestricted is the account login restricted.
    * @param foundUsers      list of already found users
    * @param pageable        pagination parameters
    * @return Page of users
    */
   public Page<User> searchUsers(String username, String firstName, String lastName,
-                                String email, UUID homeFacilityId, Boolean active,
-                                Boolean verified, Boolean loginRestricted,
-                                List<User> foundUsers, Pageable pageable) {
+      UUID homeFacilityId, Boolean active, Boolean loginRestricted, List<User> foundUsers,
+      Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<User> query = builder.createQuery(User.class);
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
 
-    query = prepareQuery(username, firstName, lastName, email, homeFacilityId, active, verified,
+    query = prepareQuery(username, firstName, lastName, homeFacilityId, active,
         loginRestricted, foundUsers, query, false, pageable);
-    countQuery = prepareQuery(username, firstName, lastName, email, homeFacilityId, active, 
-        verified, loginRestricted, foundUsers, countQuery, true, pageable);
+    countQuery = prepareQuery(username, firstName, lastName, homeFacilityId, active,
+        loginRestricted, foundUsers, countQuery, true, pageable);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -93,10 +90,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   }
 
   private <T> CriteriaQuery<T> prepareQuery(String username, String firstName, String lastName,
-                                            String email, UUID homeFacilityId, Boolean active,
-                                            Boolean verified, Boolean loginRestricted,
-                                            List<User> foundUsers, CriteriaQuery<T> query,
-                                            boolean count, Pageable pageable) {
+      UUID homeFacilityId, Boolean active, Boolean loginRestricted, List<User> foundUsers,
+      CriteriaQuery<T> query, boolean count, Pageable pageable) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<User> root = query.from(User.class);
@@ -110,10 +105,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     predicate = addLikeFilter(predicate, builder, root, USERNAME, username);
     predicate = addLikeFilter(predicate, builder, root, FIRST_NAME, firstName);
     predicate = addLikeFilter(predicate, builder, root, LAST_NAME, lastName);
-    predicate = addLikeFilter(predicate, builder, root, EMAIL, email);
     predicate = addEqualsFilter(predicate, builder, root, HOME_FACILITY_ID, homeFacilityId);
     predicate = addEqualsFilter(predicate, builder, root, ACTIVE, active);
-    predicate = addEqualsFilter(predicate, builder, root, VERIFIED, verified);
     predicate = addEqualsFilter(predicate, builder, root, LOGIN_RESTRICTED, loginRestricted);
 
     if (!CollectionUtils.isEmpty(foundUsers)) {

@@ -23,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface UserRepositoryCustom {
 
-  Page<User> searchUsers(String username, String firstName, String lastName, String email,
-      UUID homeFacilityId, Boolean active, Boolean verified,
-      Boolean loginRestricted, List<User> foundUsers, Pageable pageable);
+  Page<User> searchUsers(String username, String firstName, String lastName, UUID homeFacilityId,
+      Boolean active, Boolean loginRestricted, List<User> foundUsers, Pageable pageable);
 }

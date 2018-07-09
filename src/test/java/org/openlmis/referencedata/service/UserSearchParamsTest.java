@@ -57,15 +57,7 @@ public class UserSearchParamsTest {
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.email = TEST;
-    assertFalse(userSearchParams.isEmpty());
-
-    userSearchParams = new UserSearchParams();
     userSearchParams.homeFacilityId = TEST;
-    assertFalse(userSearchParams.isEmpty());
-
-    userSearchParams = new UserSearchParams();
-    userSearchParams.verified = true;
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();

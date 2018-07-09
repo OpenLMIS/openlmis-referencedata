@@ -43,6 +43,8 @@ public abstract class UserMessageKeys extends MessageKeys {
   public static final String ERROR_USERNAME_DUPLICATED = join(ERROR, USERNAME, DUPLICATED);
   public static final String ERROR_USERNAME_INVALID = join(ERROR, USERNAME, INVALID);
 
+  public static final String ERROR_FIELD_IS_INVARIANT = join(ERROR, "fieldIsInvariant");
+
   public static final String WAREHOUSE_ID_REQUIRED =
       join(ERROR, RIGHT_SEARCH, WAREHOUSE_ID, REQUIRED);
   public static final String PROGRAM_ID_REQUIRED =

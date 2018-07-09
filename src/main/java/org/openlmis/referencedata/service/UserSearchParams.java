@@ -45,9 +45,7 @@ public class UserSearchParams {
   String username;
   String firstName;
   String lastName;
-  String email;
   String homeFacilityId;
-  Boolean verified;
   Boolean active;
   Boolean loginRestricted;
   Map<String, String> extraData;
@@ -70,9 +68,9 @@ public class UserSearchParams {
    * Check if all params are empty.
    */
   public boolean isEmpty() {
-    return CollectionUtils.isEmpty(id) && isNull(username) && isNull(firstName) && isNull(email)
-        && isNull(lastName) && isNull(homeFacilityId) && isNull(verified)
-        && isNull(active) && isNull(loginRestricted) && MapUtils.isEmpty(extraData);
+    return CollectionUtils.isEmpty(id) && isNull(username) && isNull(firstName)
+        && isNull(lastName) && isNull(homeFacilityId) && isNull(active) && isNull(loginRestricted)
+        && MapUtils.isEmpty(extraData);
   }
 
   /**

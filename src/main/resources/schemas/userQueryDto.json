@@ -16,17 +16,9 @@
       "type": "string",
       "title": "lastName"
     },
-    "email": {
-      "type": "string",
-      "title": "email"
-    },
     "homeFacilityId": {
       "type": "string",
       "title": "homeFacilityId"
-    },
-    "verified": {
-      "type": "boolean",
-      "title": "verified"
     },
     "active": {
       "type": "boolean",

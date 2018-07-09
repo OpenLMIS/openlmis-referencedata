@@ -28,6 +28,12 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,12 +60,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 
 @SuppressWarnings("PMD.TooManyMethods")
@@ -132,17 +132,8 @@ public class UserServiceTest {
   @Test
   public void searchUsersShouldUseExtraDataString() {
     when(userRepository
-        .searchUsers(
-            any(String.class),
-            eq(FIRST_NAME_SEARCH),
-            any(String.class),
-            any(String.class),
-            any(UUID.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(List.class),
-            any(Pageable.class)))
+        .searchUsers(any(String.class), eq(FIRST_NAME_SEARCH), any(String.class), any(UUID.class),
+            any(Boolean.class), any(Boolean.class), any(List.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
     userSearch.extraData = extraData;
@@ -152,33 +143,16 @@ public class UserServiceTest {
 
     assertEquals(2, receivedUsers.getContent().size());
     verify(userRepository).findByExtraData(extraDataString);
-    verify(userRepository).searchUsers(
-        null,
-        FIRST_NAME_SEARCH,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        Arrays.asList(user, user2),
-        pageable);
+    verify(userRepository)
+        .searchUsers(null, FIRST_NAME_SEARCH, null, null, null, null, Arrays.asList(user, user2),
+            pageable);
   }
 
   @Test
   public void searchUsersShouldReturnEmptyPageIfExtraDataSearchReturnedNoResults() {
     when(userRepository
-        .searchUsers(
-            any(String.class),
-        eq(FIRST_NAME_SEARCH),
-            any(String.class),
-            any(String.class),
-            any(UUID.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(List.class),
-            any(Pageable.class)))
+        .searchUsers(any(String.class), eq(FIRST_NAME_SEARCH), any(String.class), any(UUID.class),
+            any(Boolean.class), any(Boolean.class), any(List.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
     userSearch.extraData = extraData;
@@ -189,33 +163,16 @@ public class UserServiceTest {
 
     assertEquals(0, receivedUsers.getContent().size());
     verify(userRepository).findByExtraData(extraDataString);
-    verify(userRepository, never()).searchUsers(
-        any(String.class),
-        any(String.class),
-        any(String.class),
-        any(String.class),
-        any(UUID.class),
-        any(Boolean.class),
-        any(Boolean.class),
-        any(Boolean.class),
-        any(List.class),
-        any(Pageable.class));
+    verify(userRepository, never())
+        .searchUsers(any(String.class), any(String.class), any(String.class), any(UUID.class),
+            any(Boolean.class), any(Boolean.class), any(List.class), any(Pageable.class));
   }
 
   @Test
   public void searchUsersShouldNotSearchExtraDataIfParameterIsNullOrEmpty() {
     when(userRepository
-        .searchUsers(
-            any(String.class),
-            eq(FIRST_NAME_SEARCH),
-            any(String.class),
-            any(String.class),
-            any(UUID.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(List.class),
-            any(Pageable.class)))
+        .searchUsers(any(String.class), eq(FIRST_NAME_SEARCH), any(String.class), any(UUID.class),
+            any(Boolean.class), any(Boolean.class), any(List.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
     Page<User> receivedUsers = userService.searchUsers(userSearch, pageable);
@@ -224,33 +181,15 @@ public class UserServiceTest {
     assertTrue(receivedUsers.getContent().contains(user));
     assertTrue(receivedUsers.getContent().contains(user2));
     verify(userRepository, never()).findByExtraData(any(String.class));
-    verify(userRepository).searchUsers(
-        null,
-        FIRST_NAME_SEARCH,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        pageable);
+    verify(userRepository)
+        .searchUsers(null, FIRST_NAME_SEARCH, null, null, null, null, null, pageable);
   }
 
   @Test
   public void searchUsersShouldSearchByAllParameters() {
     when(userRepository
-        .searchUsers(
-            any(String.class),
-            any(String.class),
-            any(String.class),
-            any(String.class),
-            any(UUID.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(Boolean.class),
-            any(List.class),
-            any(Pageable.class)))
+        .searchUsers(any(String.class), any(String.class), any(String.class), any(UUID.class),
+            any(Boolean.class), any(Boolean.class), any(List.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
 
     UserSearchParams searchParams = new UserSearchParamsDataBuilder()
@@ -270,17 +209,10 @@ public class UserServiceTest {
     assertEquals(2, receivedUsers.getContent().size());
     assertTrue(receivedUsers.getContent().contains(user));
     assertTrue(receivedUsers.getContent().contains(user2));
-    verify(userRepository).searchUsers(
-        searchParams.username,
-        FIRST_NAME_SEARCH,
-        searchParams.lastName,
-        searchParams.email,
-        UUID.fromString(searchParams.homeFacilityId),
-        searchParams.active,
-        searchParams.verified,
-        searchParams.loginRestricted,
-        foundUsers,
-        pageable);
+    verify(userRepository)
+        .searchUsers(searchParams.username, FIRST_NAME_SEARCH, searchParams.lastName,
+            UUID.fromString(searchParams.homeFacilityId), searchParams.active,
+            searchParams.loginRestricted, foundUsers, pageable);
   }
 
   @Test
@@ -444,7 +376,6 @@ public class UserServiceTest {
   private User generateUser() {
     return new UserDataBuilder()
         .withHomeFacilityId(UUID.randomUUID())
-        .withUnverifiedFlag()
         .withLoginRestrictedFlag()
         .withExtraData(EXTRA_DATA_KEY, EXTRA_DATA_VALUE)
         .build();

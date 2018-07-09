@@ -34,15 +34,11 @@ public class UserDataBuilder {
   private String username;
   private String firstName = "Admin";
   private String lastName = "User";
-  private String email;
   private String jobTitle = "Junior Tester";
-  private String phoneNumber = "000-000-000";
   private String timezone = "UTC";
   private UUID homeFacilityId = null;
-  private boolean verified = true;
   private boolean active = true;
   private boolean loginRestricted = false;
-  private Boolean allowNotify = true;
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
   private Map<String, String> extraData = new HashMap<>();
   private Set<RightAssignment> rightAssignments = new HashSet<>();
@@ -55,16 +51,10 @@ public class UserDataBuilder {
     instanceNumber++;
 
     username = "admin" + instanceNumber;
-    email = instanceNumber + "example@mail.com";
   }
 
   public UserDataBuilder withHomeFacilityId(UUID homeFacilityId) {
     this.homeFacilityId = homeFacilityId;
-    return this;
-  }
-
-  public UserDataBuilder withUnverifiedFlag() {
-    this.verified = false;
     return this;
   }
 
@@ -97,18 +87,8 @@ public class UserDataBuilder {
     return this;
   }
 
-  public UserDataBuilder withEmail(String email) {
-    this.email = email;
-    return this;
-  }
-
   public UserDataBuilder withActive(boolean active) {
     this.active = active;
-    return this;
-  }
-
-  public UserDataBuilder withVerified(boolean verified) {
-    this.verified = verified;
     return this;
   }
 
@@ -122,8 +102,8 @@ public class UserDataBuilder {
    */
   public User buildAsNew() {
     return new User(
-        username, firstName, lastName, email, jobTitle, phoneNumber, timezone, homeFacilityId,
-        verified, active, loginRestricted, allowNotify, roleAssignments, extraData, rightAssignments
+        username, firstName, lastName, jobTitle, timezone, homeFacilityId,
+        active, loginRestricted, roleAssignments, extraData, rightAssignments
     );
   }
 

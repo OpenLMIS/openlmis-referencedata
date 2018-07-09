@@ -37,15 +37,11 @@ public final class UserDto extends BaseDto implements User.Exporter, User.Import
   private String username;
   private String firstName;
   private String lastName;
-  private String email;
   private String jobTitle;
-  private String phoneNumber;
   private String timezone;
   private UUID homeFacilityId;
-  private boolean verified;
   private boolean active;
   private boolean loginRestricted;
-  private Boolean allowNotify;
   private Map<String, String> extraData;
   private Set<RoleAssignmentDto> roleAssignments = Sets.newHashSet();
 }

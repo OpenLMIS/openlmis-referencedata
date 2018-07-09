@@ -58,8 +58,6 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
-import org.openlmis.referencedata.service.notification.UserContactDetailsDto;
-import org.openlmis.referencedata.service.notification.UserContactDetailsNotificationService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
@@ -137,9 +135,6 @@ public class UserController extends BaseController {
   @Autowired
   private RoleAssignmentRepository roleAssignmentRepository;
 
-  @Autowired
-  private UserContactDetailsNotificationService userContactDetailsNotificationService;
-
   /**
    * Constructor for controller unit testing.
    */
@@ -170,13 +165,11 @@ public class UserController extends BaseController {
   @RequestMapping(value = "/users", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public UserDto saveUser(@RequestBody @Valid UserDto userDto,
-                          BindingResult bindingResult) {
+  public UserDto saveUser(@RequestBody @Valid UserDto userDto, BindingResult bindingResult) {
     Profiler profiler = new Profiler("CREATE_USER");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ROOT_ACCESS");
-    rightService.checkRootAccess();
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userDto.getId(), profiler);
 
     profiler.start("VALIDATE_USER");
     userValidator.validate(userDto, bindingResult);
@@ -205,9 +198,6 @@ public class UserController extends BaseController {
 
     profiler.start(PROFILER_TO_DTO);
     UserDto responseDto = exportUserToDto(userToSave);
-
-    profiler.start("PUT_CONTACT_DETAILS");
-    userContactDetailsNotificationService.putContactDetails(new UserContactDetailsDto(responseDto));
 
     profiler.start("ADD_ROLE_ASSIGNMENTS_IDS_TO_RESPONSE");
     addRoleAssignmentIdsToUserDto(responseDto);

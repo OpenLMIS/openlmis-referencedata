@@ -46,8 +46,6 @@ public interface UserRepository extends
 
   User findOneByUsernameIgnoreCase(@Param("username") String username);
 
-  User findOneByEmail(@Param("email") String email);
-
   @Query(value = "SELECT u.*"
       + " FROM referencedata.users u"
       + " WHERE u.extradata @> (:extraData)\\:\\:jsonb",

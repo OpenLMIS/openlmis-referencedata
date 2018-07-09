@@ -73,12 +73,12 @@ scenarios:
           Content-Type: application/json
   create-user:
     requests:
-      - include-scenario: get-service-token
+      - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/users
         method: PUT
         label: CreateUser
         headers:
-          Authorization: Bearer ${service_token}
+          Authorization: Bearer ${access_token}
           Content-Type: application/json
         jsr223:
           execute: before
@@ -104,7 +104,7 @@ scenarios:
           method: DELETE
           label: DeleteUser
           headers:
-            Authorization: Bearer ${service_token}
+            Authorization: Bearer ${access_token}
   users-has-right:
     variables:
       # administrator
