@@ -9,6 +9,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-4730](https://openlmis.atlassian.net/browse/OLMIS-4730): Allow to update basic information by user
   * added job title and phone number fields
 * [OLMIS-4908](https://openlmis.atlassian.net/browse/OLMIS-4908): Send user's contact details to the notification service  
+* [OLMIS-4980](https://openlmis.atlassian.net/browse/OLMIS-4980): Add extra data to processing period model (for report only flag)
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-4422](https://openlmis.atlassian.net/browse/OLMIS-4422): Stop creating right assignments for supervision role assignments when user has no home facility.
