@@ -95,12 +95,8 @@ public class UserService {
     if (searchParams.isEmpty()) {
       return userRepository.findAll(pageable);
     }
-    Set<UUID> ids = searchParams.getIds();
-    if (!ids.isEmpty()) {
-      return userRepository.findAllByIds(ids, pageable);
-    } else {
-      return searchUsers(searchParams, pageable);
-    }
+
+    return searchUsers(searchParams, pageable);
   }
 
   /**

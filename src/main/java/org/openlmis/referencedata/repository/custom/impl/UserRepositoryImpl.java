@@ -15,9 +15,12 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
@@ -101,16 +104,14 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     predicate = addEqualsFilter(predicate, builder, root, LOGIN_RESTRICTED,
         searchParams.getLoginRestricted());
 
-    if (!CollectionUtils.isEmpty(foundUsers)) {
-      List<UUID> ids = foundUsers.stream().map(User::getId).collect(Collectors.toList());
+    Set<UUID> ids = Sets.newHashSet();
+    ids.addAll(searchParams.getIds());
 
-      Predicate extraDatePredicate = builder.disjunction();
-      for (UUID id : ids) {
-        extraDatePredicate = builder.or(extraDatePredicate,
-            builder.equal(root.get(ID), id));
-      }
-      predicate = builder.and(predicate, extraDatePredicate);
+    if (!CollectionUtils.isEmpty(foundUsers)) {
+      ids.addAll(foundUsers.stream().map(User::getId).collect(Collectors.toSet()));
     }
+
+    predicate = addInFilter(predicate, builder, root, ID, ids);
 
     query.where(predicate);
 
@@ -139,7 +140,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     return query.orderBy(orders);
   }
 
-  private Predicate addEqualsFilter(Predicate predicate, CriteriaBuilder builder, Root root,
+  private Predicate addEqualsFilter(Predicate predicate, CriteriaBuilder builder, Root<User> root,
                               String filterKey, Object filterValue) {
     if (filterValue != null) {
       return builder.and(
@@ -151,7 +152,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     }
   }
 
-  private Predicate addLikeFilter(Predicate predicate, CriteriaBuilder builder, Root root,
+  private Predicate addLikeFilter(Predicate predicate, CriteriaBuilder builder, Root<User> root,
                                   String filterKey, String filterValue) {
     if (filterValue != null) {
       return builder.and(
@@ -161,6 +162,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     } else {
       return predicate;
     }
+  }
+
+  private Predicate addInFilter(Predicate predicate, CriteriaBuilder builder, Root<User> root,
+      String filterKey, Collection values) {
+    if (null == values || values.isEmpty()) {
+      return predicate;
+    }
+
+    return builder.and(predicate, root.get(filterKey).in(values));
   }
 
 }

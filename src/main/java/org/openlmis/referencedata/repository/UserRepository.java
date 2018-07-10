@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
@@ -22,15 +25,9 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @JaversSpringDataAuditable
@@ -85,8 +82,5 @@ public interface UserRepository extends
       + " WHERE rr.rightid = :right",
       nativeQuery = true)
   Set<User> findUsersByDirectRight(@Param("right") Right right);
-
-  @Query("SELECT u FROM User u WHERE u.id in :ids")
-  Page<User> findAllByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
 
 }

@@ -30,13 +30,13 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import org.junit.Before;
@@ -143,6 +143,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         .withHomeFacilityId(user.getHomeFacilityId())
         .withActive(user.isActive())
         .withLoginRestricted(user.isLoginRestricted())
+        .withId(Sets.newHashSet(user.getId().toString()))
         .build();
     Page<User> receivedUsers = repository.searchUsers(searchParams, null, pageable);
 
@@ -211,6 +212,50 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
       assertTrue(receivedUsers.getContent().get(i).getUsername()
           .compareTo(receivedUsers.getContent().get(i - 1).getUsername()) > 0);
     }
+  }
+
+  @Test
+  public void shouldFindAllByIds() {
+    // given users I want
+    User user1 = repository.save(generateInstance());
+    User user2 = repository.save(generateInstance());
+
+    // given a user I don't want
+    repository.save(generateInstance());
+
+    // when
+    Set<String> ids = Sets.newHashSet(user1.getId().toString(), user2.getId().toString());
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder()
+        .asEmpty()
+        .withId(ids)
+        .build();
+    Page<User> found = repository.searchUsers(searchParams, null, pageable);
+
+    // then
+    assertEquals(2, found.getContent().size());
+    assertThat(found.getContent(), hasItems(user1, user2));
+  }
+
+  @Test
+  public void shouldFindByIdsAndHomeFacilityId() {
+    // given users I want
+    User user1 = repository.save(generateInstance());
+
+    // given a user I don't want
+    User user2 = repository.save(generateInstance());
+    User user3 = repository.save(generateInstance());
+
+    // when
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder()
+        .asEmpty()
+        .withId(Sets.newHashSet(user1.getId().toString(), user2.getId().toString()))
+        .withHomeFacilityId(user1.getHomeFacilityId())
+        .build();
+    Page<User> found = repository.searchUsers(searchParams, ImmutableList.of(user3), pageable);
+
+    // then
+    assertEquals(1, found.getContent().size());
+    assertThat(found.getContent(), hasItem(user1));
   }
 
   @Test
@@ -332,26 +377,6 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     assertThat(reportUsers, hasItems(user1, user2));
     assertThat(adminUsers, hasSize(1));
     assertThat(adminUsers, hasItem(user1));
-  }
-
-  @Test
-  public void shouldFindAllByIds() {
-    // given users I want
-    User user1 = generateInstance();
-    user1 = repository.save(user1);
-    User user2 = generateInstance();
-    user2 = repository.save(user2);
-
-    // given a user I don't want
-    repository.save(generateInstance());
-
-    // when
-    Set<UUID> ids = Sets.newHashSet(user1.getId(), user2.getId());
-    Page<User> found = repository.findAllByIds(ids, pageable);
-
-    // then
-    assertEquals(2, found.getContent().size());
-    assertThat(found.getContent(), hasItems(user1, user2));
   }
 
   @Test
