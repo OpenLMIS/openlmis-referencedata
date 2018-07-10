@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Component
@@ -62,12 +63,12 @@ public class FacilityValidator implements BaseValidator {
 
     boolean noDuplicateProgramCode = supportedProgramDtos.stream()
             .map(SupportedProgramDto::getCode)
-            .filter(code -> code != null)
+            .filter(Objects::nonNull)
             .allMatch(new HashSet<>()::add);
 
     boolean noDuplicateProgramId = supportedProgramDtos.stream()
             .map(SupportedProgramDto::getId)
-            .filter(id -> id != null)
+            .filter(Objects::nonNull)
             .allMatch(new HashSet<>()::add);
 
 
