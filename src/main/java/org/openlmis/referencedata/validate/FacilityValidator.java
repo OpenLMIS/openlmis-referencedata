@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -58,17 +59,19 @@ public class FacilityValidator implements BaseValidator {
   }
 
   private void validateDuplicateProgramSupported(Set<SupportedProgramDto> supportedProgramDtos) {
-    boolean duplicateProgramCode  = supportedProgramDtos.stream()
+
+    boolean noDuplicateProgramCode = supportedProgramDtos.stream()
             .map(SupportedProgramDto::getCode)
-            .distinct()
-            .count() != supportedProgramDtos.size();
+            .filter(code -> code != null)
+            .allMatch(new HashSet<>()::add);
 
-    boolean duplicateProgramId = supportedProgramDtos.stream()
+    boolean noDuplicateProgramId = supportedProgramDtos.stream()
             .map(SupportedProgramDto::getId)
-            .distinct()
-            .count() != supportedProgramDtos.size();
+            .filter(id -> id != null)
+            .allMatch(new HashSet<>()::add);
 
-    if (duplicateProgramId  || duplicateProgramCode) {
+
+    if (!(noDuplicateProgramCode && noDuplicateProgramId)) {
       throw new ValidationMessageException(FacilityMessageKeys.ERROR_DUPLICATE_PROGRAM_SUPPORTED);
     }
   }
