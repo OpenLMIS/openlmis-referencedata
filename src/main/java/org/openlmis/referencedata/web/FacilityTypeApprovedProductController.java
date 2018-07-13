@@ -17,14 +17,19 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.service.FacilityTypeApprovedProductBuilder;
 import org.openlmis.referencedata.service.FacilityTypeApprovedProductService;
-import org.openlmis.referencedata.util.OrderableBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.slf4j.Logger;
@@ -44,13 +49,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-
 @Controller
 @Transactional
 public class FacilityTypeApprovedProductController extends BaseController {
@@ -65,7 +63,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
   private FacilityTypeApprovedProductService approvedProductService;
 
   @Autowired
-  private OrderableBuilder orderableBuilder;
+  private FacilityTypeApprovedProductBuilder facilityTypeApprovedProductBuilder;
 
   /**
    * Allows creating new facilityTypeApprovedProduct.
@@ -83,11 +81,8 @@ public class FacilityTypeApprovedProductController extends BaseController {
     validateFtapNotDuplicated(approvedProductDto);
 
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
-    Orderable orderable = orderableBuilder.newOrderable(approvedProductDto.getOrderable());
-
-    FacilityTypeApprovedProduct facilityTypeApprovedProduct =
-        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
-    facilityTypeApprovedProduct.setOrderable(orderable);
+    FacilityTypeApprovedProduct facilityTypeApprovedProduct = facilityTypeApprovedProductBuilder
+        .build(approvedProductDto);
 
     // Ignore provided id
     facilityTypeApprovedProduct.setId(null);
@@ -111,14 +106,17 @@ public class FacilityTypeApprovedProductController extends BaseController {
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
+    if (null != approvedProductDto.getId()
+        && !Objects.equals(approvedProductDto.getId(), facilityTypeApprovedProductId)) {
+      throw new ValidationMessageException(
+          FacilityTypeApprovedProductMessageKeys.ERROR_ID_MISMATCH);
+    }
+
     validateFtapNotDuplicated(approvedProductDto);
 
     LOGGER.debug("Updating facilityTypeApprovedProduct");
-    Orderable orderable = orderableBuilder.newOrderable(approvedProductDto.getOrderable());
-
-    FacilityTypeApprovedProduct facilityTypeApprovedProduct =
-        FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct(approvedProductDto);
-    facilityTypeApprovedProduct.setOrderable(orderable);
+    FacilityTypeApprovedProduct facilityTypeApprovedProduct = facilityTypeApprovedProductBuilder
+        .build(approvedProductDto);
 
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
     return toDto(save);

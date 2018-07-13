@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -178,7 +177,7 @@ public class Orderable extends BaseEntity {
    */
   public static Orderable newInstance(Importer importer) {
     Orderable orderable = new Orderable();
-    orderable.id = importer.getId();
+    orderable.setId(importer.getId());
     orderable.productCode = Code.code(importer.getProductCode());
     orderable.dispensable = Dispensable.createNew(importer.getDispensable());
     orderable.fullProductName = importer.getFullProductName();
@@ -200,7 +199,7 @@ public class Orderable extends BaseEntity {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setId(id);
+    exporter.setId(getId());
     exporter.setProductCode(productCode.toString());
     exporter.setDispensable(dispensable);
     exporter.setFullProductName(fullProductName);
@@ -213,8 +212,7 @@ public class Orderable extends BaseEntity {
     exporter.setExtraData(extraData);
   }
 
-  public interface Exporter {
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter {
 
     void setProductCode(String productCode);
 
@@ -237,8 +235,7 @@ public class Orderable extends BaseEntity {
     void setExtraData(Map<String, String> extraData);
   }
 
-  public interface Importer {
-    UUID getId();
+  public interface Importer extends BaseImporter {
 
     String getProductCode();
 

@@ -73,7 +73,7 @@ public class Program extends BaseEntity {
    * @param id the program id
    */
   public Program(UUID id) {
-    this.id = id;
+    setId(id);
   }
 
   /**
@@ -147,7 +147,7 @@ public class Program extends BaseEntity {
    * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
-    exporter.setId(id);
+    exporter.setId(getId());
     String codeString = this.code.toString();
     if (isFalse(codeString.isEmpty())) {
       exporter.setCode(codeString);
@@ -161,9 +161,7 @@ public class Program extends BaseEntity {
     exporter.setEnableDatePhysicalStockCountCompleted(enableDatePhysicalStockCountCompleted);
   }
 
-  public interface Exporter {
-
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter {
 
     void setCode(String code);
 
@@ -182,9 +180,7 @@ public class Program extends BaseEntity {
     void setEnableDatePhysicalStockCountCompleted(Boolean enableDatePhysicalStockCountCompleted);
   }
 
-  public interface Importer {
-
-    UUID getId();
+  public interface Importer extends BaseImporter {
 
     String getCode();
 

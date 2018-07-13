@@ -13,19 +13,31 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-package org.openlmis.referencedata.util.messagekeys;
+package org.openlmis.referencedata.dto;
 
-public abstract class FacilityMessageKeys extends MessageKeys {
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 
-  private static final String ERROR = join(SERVICE_ERROR, FACILITY);
+public class ApprovedProductDtoTest {
 
-  public static final String ERROR_NULL = join(ERROR, NULL);
-  public static final String ERROR_CODE_REQUIRED = join(ERROR, "code", REQUIRED);
-  public static final String ERROR_CODE_MUST_BE_UNIQUE = join(ERROR, "code", MUST_BE_UNIQUE);
-  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
-  public static final String ERROR_INVALID_PARAMS = join(ERROR, INVALID_PARAMS);
-  public static final String ERROR_ID_MISMATCH = join(ERROR, ID_MISMATCH);
-  public static final String ERROR_DUPLICATE_PROGRAM_SUPPORTED =
-          join(ERROR, SUPPORTED_PROGRAMS, DUPLICATED);
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(ApprovedProductDto.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    ApprovedProductDto dto = new ApprovedProductDto();
+    new FacilityTypeApprovedProductsDataBuilder().build().export(dto);
+
+    ToStringTestUtils.verify(ApprovedProductDto.class, dto);
+  }
+
 }

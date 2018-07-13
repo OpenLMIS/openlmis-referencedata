@@ -64,6 +64,7 @@ public abstract class MessageKeys {
   protected static final String UUID = "uuid";
   protected static final String DATE = "date";
   protected static final String BOOLEAN = "boolean";
+  protected static final String ID_MISMATCH = "idMismatch";
 
   // Entities
   protected static final String LOT = "lot";

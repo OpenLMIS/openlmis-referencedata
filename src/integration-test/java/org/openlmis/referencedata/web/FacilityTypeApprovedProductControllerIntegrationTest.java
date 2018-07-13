@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -30,7 +31,10 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
 import com.google.common.collect.Lists;
-
+import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -55,12 +59,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import guru.nidi.ramltester.junit.RamlMatchers;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.UUID;
-
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWebIntegrationTest {
 
@@ -77,7 +75,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Before
   public void setUp() {
-
     program = new Program("programCode");
     program.setPeriodsSkippable(true);
     program.setId(UUID.randomUUID());
@@ -113,6 +110,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     // used in deserialization
     given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
+    given(programRepository.findOne(program.getId())).willReturn(program);
+    given(facilityTypeRepository.findOne(facilityType1.getId())).willReturn(facilityType1);
 
     mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
   }
@@ -235,6 +234,22 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .put(ID_URL)
         .then()
         .statusCode(403);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void putShouldReturnBadRequestIfIdMismatch() {
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", UUID.randomUUID())
+        .body(ftapDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(400)
+        .body(MESSAGE_KEY, is(FacilityTypeApprovedProductMessageKeys.ERROR_ID_MISMATCH));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

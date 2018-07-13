@@ -15,16 +15,15 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.TypeName;
-import java.util.Objects;
-import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "facility_types", schema = "referencedata")
@@ -113,7 +112,7 @@ public class FacilityType extends BaseEntity {
    * @param exporter instance of {@link Exporter}
    */
   public void export(Exporter exporter) {
-    exporter.setId(id);
+    exporter.setId(getId());
     exporter.setCode(code);
     exporter.setName(name);
     exporter.setDescription(description);
@@ -121,9 +120,7 @@ public class FacilityType extends BaseEntity {
     exporter.setActive(active);
   }
 
-  public interface Exporter {
-
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter {
 
     void setCode(String code);
 
@@ -137,9 +134,7 @@ public class FacilityType extends BaseEntity {
 
   }
 
-  public interface Importer {
-
-    UUID getId();
+  public interface Importer extends BaseImporter {
 
     String getCode();
 

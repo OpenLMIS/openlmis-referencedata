@@ -15,24 +15,66 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.Program;
 
 @Getter
 @Setter
-public class ApprovedProductDto extends BaseDto implements FacilityTypeApprovedProduct.Exporter,
-    FacilityTypeApprovedProduct.Importer {
+@ToString(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public final class ApprovedProductDto
+    extends BaseDto
+    implements FacilityTypeApprovedProduct.Exporter, FacilityTypeApprovedProduct.Importer {
 
   private OrderableDto orderable;
-
   private ProgramDto program;
-
   private FacilityTypeDto facilityType;
-
   private Double maxPeriodsOfStock;
-
   private Double minPeriodsOfStock;
-
   private Double emergencyOrderPoint;
+
+  @JsonSetter("orderable")
+  public void setOrderable(OrderableDto orderable) {
+    this.orderable = orderable;
+  }
+
+  @Override
+  @JsonIgnore
+  public void setOrderable(Orderable orderable) {
+    this.orderable = OrderableDto.newInstance(orderable);
+  }
+
+  @JsonSetter("program")
+  public void setProgram(ProgramDto program) {
+    this.program = program;
+  }
+
+  @Override
+  @JsonIgnore
+  public void setProgram(Program program) {
+    this.program = ProgramDto.newInstance(program);
+  }
+
+  @JsonSetter("facilityType")
+  public void setFacilityType(FacilityTypeDto facilityType) {
+    this.facilityType = facilityType;
+  }
+
+  @Override
+  @JsonIgnore
+  public void setFacilityType(FacilityType facilityType) {
+    this.facilityType = FacilityTypeDto.newInstance(facilityType);
+  }
 }

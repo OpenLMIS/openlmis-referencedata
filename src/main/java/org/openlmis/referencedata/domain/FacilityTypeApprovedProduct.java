@@ -15,25 +15,18 @@
 
 package org.openlmis.referencedata.domain;
 
-import lombok.AllArgsConstructor;
-import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.referencedata.dto.FacilityTypeDto;
-import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.dto.ProgramDto;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
 @Table(name = "facility_type_approved_products", schema = "referencedata",
@@ -89,12 +82,6 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     ftap.setMaxPeriodsOfStock(importer.getMaxPeriodsOfStock());
     ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
     ftap.setEmergencyOrderPoint(importer.getEmergencyOrderPoint());
-    if (null != importer.getProgram()) {
-      ftap.setProgram(Program.newProgram(importer.getProgram()));
-    }
-    if (null != importer.getFacilityType()) {
-      ftap.setFacilityType(FacilityType.newFacilityType(importer.getFacilityType()));
-    }
     return ftap;
   }
 
@@ -104,17 +91,16 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setId(id);
+    exporter.setId(getId());
     exporter.setMaxPeriodsOfStock(maxPeriodsOfStock);
     exporter.setMinPeriodsOfStock(minPeriodsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
-    exporter.setOrderable(OrderableDto.newInstance(orderable));
-    exporter.setProgram(ProgramDto.newInstance(program));
-    exporter.setFacilityType(FacilityTypeDto.newInstance(facilityType));
+    exporter.setOrderable(orderable);
+    exporter.setProgram(program);
+    exporter.setFacilityType(facilityType);
   }
 
-  public interface Exporter {
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter {
 
     void setMaxPeriodsOfStock(Double maxPeriodsOfStock);
 
@@ -122,15 +108,14 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
 
     void setEmergencyOrderPoint(Double emergencyOrderPoint);
 
-    void setOrderable(OrderableDto orderable);
+    void setOrderable(Orderable orderable);
 
-    void setProgram(ProgramDto program);
+    void setProgram(Program program);
 
-    void setFacilityType(FacilityTypeDto facilityType);
+    void setFacilityType(FacilityType facilityType);
   }
 
-  public interface Importer {
-    UUID getId();
+  public interface Importer extends BaseImporter {
 
     Double getMaxPeriodsOfStock();
 
@@ -138,7 +123,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
 
     Double getEmergencyOrderPoint();
 
-    OrderableDto getOrderable();
+    Orderable.Importer getOrderable();
 
     Program.Importer getProgram();
 

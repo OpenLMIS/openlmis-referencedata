@@ -15,22 +15,20 @@
 
 package org.openlmis.referencedata.domain;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.UUID;
-
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 @MappedSuperclass
 @EqualsAndHashCode
 public abstract class BaseEntity implements Identifiable {
+
   static final String UUID_TYPE = "pg-uuid";
 
   @Id
@@ -41,5 +39,17 @@ public abstract class BaseEntity implements Identifiable {
   @Getter
   @Setter
   protected UUID id;
+
+  public interface BaseExporter {
+
+    void setId(UUID id);
+
+  }
+
+  public interface BaseImporter {
+
+    UUID getId();
+
+  }
 
 }

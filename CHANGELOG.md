@@ -17,7 +17,8 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-4695](https://openlmis.atlassian.net/browse/OLMIS-4695): Added Missing ID check on updating facility
 * [OLMIS-3288](https://openlmis.atlassian.net/browse/OLMIS-3288): Add option of fetching processing periods only by programId. Useful for report filters
 * [OLMIS-3982](https://openlmis.atlassian.net/browse/OLMIS-3982): Add validation for one program not to be assigned more that one time for a facility
-* [OLMIS-3705](https://openlmis.atlassian.net/browse/OLMIS-3705): the GET /api/users endpoint will not omit other parameters if "id" parameter is passed 
+* [OLMIS-3705](https://openlmis.atlassian.net/browse/OLMIS-3705): the GET /api/users endpoint will not omit other parameters if "id" parameter is passed
+* [OLMIS-5019](https://openlmis.atlassian.net/browse/OLMIS-5019): Fixed problem with creating Facility Type Approved Products
 
 Improvements:
 * [OLMIS-3498](https://openlmis.atlassian.net/browse/OLMIS-3498): Added Jenkinsfile

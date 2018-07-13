@@ -15,11 +15,11 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
-import java.util.UUID;
 
 public class FacilityTypeApprovedProductsDataBuilder {
 
@@ -39,7 +39,24 @@ public class FacilityTypeApprovedProductsDataBuilder {
     orderable = new OrderableDataBuilder().build();
     program = new ProgramDataBuilder().build();
     facilityType = new FacilityTypeDataBuilder().build();
-    maxPeriodsOfStock = 1.0;
+    maxPeriodsOfStock = 3.0;
+    minPeriodsOfStock = 1.0;
+    emergencyOrderPoint = 0.0;
+  }
+
+  public FacilityTypeApprovedProductsDataBuilder withOrderable(Orderable orderable) {
+    this.orderable = orderable;
+    return this;
+  }
+
+  public FacilityTypeApprovedProductsDataBuilder withProgram(Program program) {
+    this.program = program;
+    return this;
+  }
+
+  public FacilityTypeApprovedProductsDataBuilder withFacilityType(FacilityType facilityType) {
+    this.facilityType = facilityType;
+    return this;
   }
 
   /**
