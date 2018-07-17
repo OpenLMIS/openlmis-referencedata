@@ -151,7 +151,7 @@ pipeline {
             }
             steps {
                 dir('erd') {
-                    sh(script: "./ci-erdGeneration.sh")
+                    sh(script: "../ci-erdGeneration.sh")
                     archiveArtifacts artifacts: 'erd-referencedata.zip'
                 }
             }
