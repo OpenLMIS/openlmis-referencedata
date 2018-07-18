@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys.ERROR_INVALID_PARAMS;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL;
-import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_PROGRAM_ID_NULL;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER;
 
 import java.time.LocalDate;
@@ -147,16 +146,6 @@ public class ProcessingPeriodSearchParamsTest {
     exception.expectMessage(ERROR_FACILITY_ID_NULL);
 
     queryMap.add(PROGRAM_ID, "program");
-
-    new ProcessingPeriodSearchParams(queryMap);
-  }
-
-  @Test
-  public void shouldThrowExceptionIfProgramIdIsNotSetAndFacilityIdIs() {
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage(ERROR_PROGRAM_ID_NULL);
-
-    queryMap.add(FACILITY_ID, "facility");
 
     new ProcessingPeriodSearchParams(queryMap);
   }
