@@ -33,34 +33,34 @@ import org.springframework.stereotype.Component;
 @Order(5)
 public class TestDataInitializer implements CommandLineRunner {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
-  private static final String PERF_DATA_PATH = "classpath:db/performance-data/";
+  private static final String DEMO_DATA_PATH = "classpath:db/demo-data/";
 
-  @Value(value = PERF_DATA_PATH + "referencedata.users.sql")
+  @Value(value = DEMO_DATA_PATH + "referencedata.users.sql")
   private Resource usersResource;
 
-  @Value(value = PERF_DATA_PATH + "facilities.csv")
+  @Value(value = DEMO_DATA_PATH + "facilities.csv")
   private Resource facilitiesResource;
 
-  @Value(value = PERF_DATA_PATH + "orderables.csv")
+  @Value(value = DEMO_DATA_PATH + "orderables.csv")
   private Resource orderablesResource;
 
-  @Value(value = PERF_DATA_PATH + "requisition_group_members.csv")
+  @Value(value = DEMO_DATA_PATH + "requisition_group_members.csv")
   private Resource requisitionGroupMembersResource;
 
-  @Value(value = PERF_DATA_PATH + "supported_programs.csv")
+  @Value(value = DEMO_DATA_PATH + "supported_programs.csv")
   private Resource supportedProgramsResource;
 
-  @Value(value = PERF_DATA_PATH + "full_supply_products.csv")
+  @Value(value = DEMO_DATA_PATH + "full_supply_products.csv")
   private Resource fullSupplyProductsResource;
 
-  @Value(value = PERF_DATA_PATH + "non-full_supply_products.csv")
+  @Value(value = DEMO_DATA_PATH + "non-full_supply_products.csv")
   private Resource nonfullSupplyProductsResource;
 
-  @Value(value = PERF_DATA_PATH
+  @Value(value = DEMO_DATA_PATH
       + "facility_type_approved_products_for_Essential_Medicines___District_Hospital.csv")
   private Resource ftapResource;
 
-  @Value(value = PERF_DATA_PATH + "processing_periods.csv")
+  @Value(value = DEMO_DATA_PATH + "processing_periods.csv")
   private Resource processingPeriodsResource;
 
   @Autowired
