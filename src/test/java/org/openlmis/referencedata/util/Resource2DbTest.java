@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -23,7 +24,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -31,10 +37,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public class Resource2DbTest {
@@ -77,8 +79,53 @@ public class Resource2DbTest {
     assertFalse(resource.isOpen());
   }
 
+  @Test
+  public void resourceCsvToBatchedPairShouldReturnListPair() throws IOException {
+    // given
+    Resource resource = mock(Resource.class);
+    InputStream inputStream = spy(IOUtils.toInputStream("Col1,Col2\na,b"));
+    when(resource.getInputStream()).thenReturn(inputStream);
+
+    // when
+    Pair<List<String>, List<Object[]>> batchedPair = resource2Db.resourceCsvToBatchedPair(resource);
+
+    // then
+    List headers = batchedPair.getLeft();
+    assertEquals(2, headers.size());
+    assertEquals("Col1", headers.get(0));
+    assertEquals("Col2", headers.get(1));
+
+    List rows = batchedPair.getRight();
+    assertEquals(1, rows.size());
+    Object[] rowData = batchedPair.getRight().get(0);
+    assertEquals(2, rowData.length);
+    assertEquals("a", rowData[0]);
+    assertEquals("b", rowData[1]);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void resourceCsvToBatchedPairShouldThrowExceptionIfRecordIsInconsistent()
+      throws IOException {
+    // given
+    Resource resource = mock(Resource.class);
+    InputStream inputStream = spy(IOUtils.toInputStream("Col1,Col2\na,b,c"));
+    when(resource.getInputStream()).thenReturn(inputStream);
+
+    // when
+    resource2Db.resourceCsvToBatchedPair(resource);
+  }
+  
+  @Test
+  public void updateDbFromSqlStringsShouldReturnWithoutUpdateIfNoSqlLines() {
+    // when
+    resource2Db.updateDbFromSqlStrings(Collections.emptyList());
+    
+    // then
+    verify(template, times(0)).batchUpdate(any(String.class));
+  }
+
   @Test(expected = NullPointerException.class)
-  public void resource2DbWithNullResourceShouldThrowExecption() {
+  public void resource2DbWithNullResourceShouldThrowException() {
     new Resource2Db(null);
   }
 

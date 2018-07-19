@@ -24,12 +24,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -110,13 +111,14 @@ public class Resource2Db {
    and Pair.right is the rows of data which go into those columns (each row is an array, the array
    matches the order of the columns
    */
-  private Pair<List<String>, List<Object[]>> resourceCsvToBatchedPair(final Resource resource)
+  Pair<List<String>, List<Object[]>> resourceCsvToBatchedPair(final Resource resource)
       throws IOException {
     XLOGGER.entry(resource.getDescription());
 
     // parse CSV
-    try (InputStreamReader isReader = new InputStreamReader(resource.getInputStream())) {
-      CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(isReader);
+    try (InputStreamReader isReader = new InputStreamReader(
+        new BOMInputStream(resource.getInputStream(), ByteOrderMark.UTF_8))) {
+      CSVParser parser = CSVFormat.DEFAULT.withHeader().withNullString("").parse(isReader);
 
       // read header row
       MutablePair<List<String>, List<Object[]>> readData = new MutablePair<>();
@@ -143,7 +145,7 @@ public class Resource2Db {
   /*
    runs the list of SQL strings directly on the database - could be insert / update
    */
-  private void updateDbFromSqlStrings(final List<String> sqlLines) {
+  void updateDbFromSqlStrings(final List<String> sqlLines) {
     XLOGGER.entry();
 
     if (CollectionUtils.isEmpty(sqlLines)) {
