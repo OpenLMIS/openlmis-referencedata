@@ -2,7 +2,7 @@
   {
     "id": "e7aab4ca-4586-4ef2-8923-dc3940bb3104",
     "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
-    "processingScheduleId": { "id": "9c15bd6e-3f6b-4b91-b53a-36c199d35eac" },
+    "processingScheduleId": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" },
     "directDelivery": "true",
     "requisitionGroupId": { "id": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05" }
   },

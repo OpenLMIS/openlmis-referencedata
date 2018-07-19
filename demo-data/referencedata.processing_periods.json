@@ -222,5 +222,101 @@
     "startDate": "2018-10-01",
     "endDate": "2018-12-31",
     "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" }
+  },
+  {
+    "id": "6140c1d0-5722-4380-8530-952be6602514",
+    "name": "Jan2018",
+    "startDate": "2018-01-01",
+    "endDate": "2018-01-31",
+    "extraData": { "reportOnly": "true" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "2c267af9-a1cf-4d72-a653-d4a3e1571c76",
+    "name": "Feb2018",
+    "startDate": "2018-02-01",
+    "endDate": "2018-02-28",
+    "extraData": { "reportOnly": "false" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "d1486f6e-62a2-4d37-9f84-f7ca476d38fc",
+    "name": "Mar2018",
+    "startDate": "2018-03-01",
+    "endDate": "2018-03-31",
+    "extraData": { "reportOnly": "true" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "ed4d2f1e-c3bf-4a83-919a-87ac53ff3b94",
+    "name": "Apr2018",
+    "startDate": "2018-04-01",
+    "endDate": "2018-04-30",
+    "extraData": { "reportOnly": "true" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "14f87029-ede4-447a-a381-6e6c726ff2a7",
+    "name": "May2018",
+    "startDate": "2018-05-01",
+    "endDate": "2018-05-31",
+    "extraData": { "reportOnly": "false" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "9f958ba5-e53d-4ec4-9c8a-89bc3f4e722d",
+    "name": "Jun2018",
+    "startDate": "2018-06-01",
+    "endDate": "2018-06-30",
+    "extraData": { "reportOnly": "true" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "d0e52f8f-382f-4d44-a4f1-bab8b3fe92c3",
+    "name": "Jul2018",
+    "startDate": "2018-07-01",
+    "endDate": "2018-07-31",
+    "extraData": { "reportOnly": "true" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "bd03629c-0f3c-477f-8758-289ac60e5889",
+    "name": "Aug2018",
+    "startDate": "2018-08-01",
+    "endDate": "2018-08-31",
+    "extraData": { "reportOnly": "false" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "837b246e-df9e-4796-ba85-f7525a91cd9c",
+    "name": "Sep2018",
+    "startDate": "2018-09-01",
+    "endDate": "2018-09-30",
+    "extraData": { "reportOnly": "true" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "bba38eb4-a72f-4365-9cb2-cff931d188a2",
+    "name": "Oct2018",
+    "startDate": "2018-10-01",
+    "endDate": "2018-10-31",
+    "extraData": { "reportOnly": "true" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "6c95dd13-bf0c-4c4c-b908-0cefdb2942c4",
+    "name": "Nov2018",
+    "startDate": "2018-11-01",
+    "endDate": "2018-11-30",
+    "extraData": { "reportOnly": "false" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
+  },
+  {
+    "id": "fb50ea77-f775-49ff-a6fd-517e17ef4510",
+    "name": "Dec2018",
+    "startDate": "2018-12-01",
+    "endDate": "2018-12-31",
+    "extraData": { "reportOnly": "true" },
+    "processingSchedule": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" }
   }
 ]
