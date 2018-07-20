@@ -34,6 +34,9 @@ import org.springframework.stereotype.Component;
 public class TestDataInitializer implements CommandLineRunner {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
   private static final String DEMO_DATA_PATH = "classpath:db/demo-data/";
+  
+  private static final String SCHEMA_PREFIX = "referencedata.";
+  private static final String PROGRAM_ORDERABLES = "program_orderables";
 
   @Value(value = DEMO_DATA_PATH + "referencedata.geographic_levels.csv")
   private Resource geographicLevelsResource;
@@ -181,7 +184,7 @@ public class TestDataInitializer implements CommandLineRunner {
     r2db.insertToDbFromCsv("referencedata.orderables", orderablesResource);
     r2db.insertToDbFromCsv("referencedata.orderable_identifiers", orderableIdentifiersResource);
     r2db.insertToDbFromCsv("referencedata.programs", programsResource);
-    r2db.insertToDbFromCsv("referencedata.program_orderables", programOrderablesResource);
+    r2db.insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES, programOrderablesResource);
     r2db.insertToDbFromCsv("referencedata.supply_lines", supplyLinesResource);
     r2db.insertToDbFromCsv("referencedata.users", usersResource);
     r2db.insertToDbFromCsv("referencedata.roles", rolesResource);
@@ -209,8 +212,8 @@ public class TestDataInitializer implements CommandLineRunner {
     r2db.insertToDbFromCsv("referencedata.requisition_group_members",
         moreRequisitionGroupMembersResource);
     r2db.insertToDbFromCsv("referencedata.supported_programs", moreSupportedProgramsResource);
-    r2db.insertToDbFromCsv("referencedata.program_orderables", fullSupplyProductsResource);
-    r2db.insertToDbFromCsv("referencedata.program_orderables", nonfullSupplyProductsResource);
+    r2db.insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES, fullSupplyProductsResource);
+    r2db.insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES, nonfullSupplyProductsResource);
     r2db.insertToDbFromCsv("referencedata.facility_type_approved_products", ftapResource);
 
     XLOGGER.exit();
