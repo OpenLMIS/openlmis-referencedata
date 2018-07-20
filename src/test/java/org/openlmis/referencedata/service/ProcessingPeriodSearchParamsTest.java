@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys.ERROR_INVALID_PARAMS;
-import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER;
 
 import java.time.LocalDate;
@@ -138,16 +137,6 @@ public class ProcessingPeriodSearchParamsTest {
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
 
     assertEquals(0, params.getIds().size());
-  }
-
-  @Test
-  public void shouldThrowExceptionIfProgramIdIsSetAndFacilityIdIsNot() {
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage(ERROR_FACILITY_ID_NULL);
-
-    queryMap.add(PROGRAM_ID, "program");
-
-    new ProcessingPeriodSearchParams(queryMap);
   }
 
   @Test

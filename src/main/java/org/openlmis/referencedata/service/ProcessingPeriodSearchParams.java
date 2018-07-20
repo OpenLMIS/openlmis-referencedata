@@ -17,7 +17,6 @@ package org.openlmis.referencedata.service;
 
 import static java.util.Arrays.asList;
 import static org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys.ERROR_INVALID_PARAMS;
-import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_FACILITY_ID_NULL;
 import static org.openlmis.referencedata.util.messagekeys.ProcessingPeriodMessageKeys.ERROR_SCHEDULE_ID_SINGLE_PARAMETER;
 
 import java.time.LocalDate;
@@ -139,9 +138,6 @@ public final class ProcessingPeriodSearchParams {
   public void validate() {
     if (!ALL_PARAMETERS.containsAll(queryParams.keySet())) {
       throw new ValidationMessageException(new Message(ERROR_INVALID_PARAMS));
-    }
-    if (queryParams.containsKey(PROGRAM_ID) && !queryParams.containsKey(FACILITY_ID)) {
-      throw new ValidationMessageException(ERROR_FACILITY_ID_NULL);
     }
     if (queryParams.containsKey(PROGRAM_ID)
         && queryParams.containsKey(FACILITY_ID)
