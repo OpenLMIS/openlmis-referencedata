@@ -1,0 +1,62 @@
+[
+  {
+    "id": "185db8f7-ee35-44d0-8b40-6de12489ae77",
+    "name": "Storeroom Manager",
+    "description": "Can create, view and delete requisition and manage proofs of delivery."
+  },
+  {
+    "id": "b6134c01-cb37-4303-85f0-8c8eab9d3cec",
+    "name": "Store Manager",
+    "description": "Can view, authorize and delete requisitions."
+  },
+  {
+    "id": "2c3e59f2-6630-4e6d-b98a-4ed427ed778d",
+    "name": "District Storeroom Manager",
+    "description": "Can view and approve requisitions."
+  },
+  {
+    "id": "d30a2fbb-51d9-49ad-90fe-fb405470a439",
+    "name": "Program Supervisor",
+    "description": "Can view and approve requisitions."
+  },
+  {
+    "id": "e16d802b-8eb1-43f7-adf8-ef123227cb88",
+    "name": "Warehouse Clerk",
+    "description": "Can view and edit orders and shipments."
+  },
+  {
+    "id": "2fef03c4-8854-4dc8-b126-007f5e2afcc1",
+    "name": "Reporting Personnel",
+    "description": "Can view reports and edit report templates."
+  },
+  {
+    "id": "d8ff49b1-96e7-4710-9511-289f490f7577",
+    "name": "Stock Manager",
+    "description": "Can view stock cards, edit stock inventories and adjust stock."
+  },
+  {
+    "id": "3322e1e5-7f6d-4bac-bdb2-0919e54c58d0",
+    "name": "Delivery Approver",
+    "description": "Can manage proof of deliveries."
+  },
+  {
+    "id": "201a4f3a-a299-4f5e-8c11-b21a3dbc2ceb",
+    "name": "Requisition Viewer",
+    "description": "Can view requisitions."
+  },
+  {
+    "id": "5c316c50-96ad-4f04-8a3a-4f5aa8afa67e",
+    "name": "Stock Viewer",
+    "description": "Can view stock cards."
+  },
+  {
+    "id": "d835bb5b-2309-4c3e-b6d1-6315442b9f7b",
+    "name": "CCE Inventory Manager",
+    "description": "Can view and manage cold chain equipment."
+  },
+  {
+    "id": "3aa8dfc1-ef16-4345-9924-d39cc264cd1c",
+    "name": "CCE Inventory Viewer",
+    "description": "Can view cold chain equipment."
+  }
+]

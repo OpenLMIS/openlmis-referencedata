@@ -1,0 +1,138 @@
+[
+  {
+    "id": "F34C6FB6-0760-445E-991F-59A6988A3C49",
+    "lotCode": "LC2017A",
+    "expirationDate": "2020-01-30",
+    "manufactureDate": "2017-01-30",
+    "tradeItemId": "929D5DED-AC04-4ECA-A64A-E82BDB179098",
+    "active": "true"
+  },
+  {
+    "id": "47B62CE6-8844-41B5-8A20-3308379D3AEB",
+    "lotCode": "LC2017B",
+    "expirationDate": "2020-08-20",
+    "manufactureDate": "2017-08-20",
+    "tradeItemId": "929D5DED-AC04-4ECA-A64A-E82BDB179098",
+    "active": "true"
+  },
+  {
+    "id": "98DFAF97-BD04-46E4-923D-2663EB77D3B2",
+    "lotCode": "LC2016A",
+    "expirationDate": "2018-01-01",
+    "manufactureDate": "2016-01-10",
+    "tradeItemId": "AE40351C-64FA-4AE4-8D11-06A4B4D7DF78",
+    "active": "true"
+  },
+  {
+    "id": "83390A13-6857-42CD-9B2C-BCDE3A3B0868",
+    "lotCode": "LC2016B",
+    "expirationDate": "2018-12-01",
+    "manufactureDate": "2016-12-01",
+    "tradeItemId": "AE40351C-64FA-4AE4-8D11-06A4B4D7DF78",
+    "active": "true"
+  },
+  {
+    "id": "7A459948-1B4D-44DF-B7C4-104287314C2B",
+    "lotCode": "MF2017A",
+    "expirationDate": "2020-01-30",
+    "manufactureDate": "2017-01-30",
+    "tradeItemId": "529E0819-07EB-4A8B-827A-C566ED611C59",
+    "active": "true"
+  },
+  {
+    "id": "55A260C2-A366-4DEB-B006-455CF8A0E5D0",
+    "lotCode": "MF2017B",
+    "expirationDate": "2020-08-20",
+    "manufactureDate": "2017-08-20",
+    "tradeItemId": "529E0819-07EB-4A8B-827A-C566ED611C59",
+    "active": "true"
+  },
+  {
+    "id": "AF804501-EF41-4367-9733-83B73E7C0A4B",
+    "lotCode": "MF2016A",
+    "expirationDate": "2018-01-01",
+    "manufactureDate": "2016-01-10",
+    "tradeItemId": "2F32DC9E-5675-46B7-86CF-CCE7DCFE9658",
+    "active": "true"
+  },
+  {
+    "id": "4840173B-DD8D-4A0D-A7D0-A068DBBF6089",
+    "lotCode": "MF2016B",
+    "expirationDate": "2018-12-01",
+    "manufactureDate": "2016-12-01",
+    "tradeItemId": "2F32DC9E-5675-46B7-86CF-CCE7DCFE9658",
+    "active": "true"
+  },
+  {
+    "id": "4727ECBF-DF85-41CE-BBE0-BDCC3B1FE448",
+    "lotCode": "MA2017A",
+    "expirationDate": "2020-01-30",
+    "manufactureDate": "2017-01-30",
+    "tradeItemId": "DF3A6FDE-C153-4C21-950B-4148F8D82F97",
+    "active": "true"
+  },
+  {
+    "id": "B0F164CA-2151-46B5-B341-3883BD1CE354",
+    "lotCode": "MA2017B",
+    "expirationDate": "2020-08-20",
+    "manufactureDate": "2017-08-20",
+    "tradeItemId": "DF3A6FDE-C153-4C21-950B-4148F8D82F97",
+    "active": "true"
+  },
+  {
+    "id": "7355b200-f7c3-4558-a4b5-d0e0787c94de",
+    "lotCode": "MF2016A",
+    "expirationDate": "2018-01-01",
+    "manufactureDate": "2016-01-10",
+    "tradeItemId": "d25b86ed-0d35-4861-bd3e-1fcc42443aa5",
+    "active": "true"
+  },
+  {
+    "id": "bf2ad108-1ad8-4070-b7d7-d51f5d33a6fa",
+    "lotCode": "MF2016B",
+    "expirationDate": "2018-01-01",
+    "manufactureDate": "2016-01-10",
+    "tradeItemId": "d25b86ed-0d35-4861-bd3e-1fcc42443aa5",
+    "active": "true"
+  },
+  {
+    "id": "f08d3db1-9132-487c-ba58-15ea12302aee",
+    "lotCode": "BCGI2017A",
+    "expirationDate": "2019-06-01",
+    "manufactureDate": "2017-06-01",
+    "tradeItemId": "4e59b2cb-c9fb-4103-9ac7-f087cec868c5",
+    "active": "true"
+  },
+  {
+    "id": "9d0cd7cb-5739-491b-8d6b-890fd17ec810",
+    "lotCode": "BCGI2017B",
+    "expirationDate": "2019-07-01",
+    "manufactureDate": "2017-07-01",
+    "tradeItemId": "4e59b2cb-c9fb-4103-9ac7-f087cec868c5",
+    "active": "true"
+  },
+  {
+    "id": "f9f9bb7c-7636-40c1-a548-b45e918a512a",
+    "lotCode": "ROTAM2017A",
+    "expirationDate": "2019-06-01",
+    "manufactureDate": "2017-06-01",
+    "tradeItemId": "2f8ab876-dc49-43df-b79b-36c12a210db8",
+    "active": "true"
+  },
+  {
+    "id": "06f86552-1aa9-47d6-8857-6b7ad824f805",
+    "lotCode": "ROTAM2017B",
+    "expirationDate": "2019-07-01",
+    "manufactureDate": "2017-07-01",
+    "tradeItemId": "2f8ab876-dc49-43df-b79b-36c12a210db8",
+    "active": "true"
+  },
+  {
+    "id": "edd308be-dcdc-4841-be05-d577a668fd09",
+    "lotCode": "ROTAM2017C",
+    "expirationDate": "2019-06-01",
+    "manufactureDate": "2017-08-01",
+    "tradeItemId": "2f8ab876-dc49-43df-b79b-36c12a210db8",
+    "active": "true"
+  }
+]

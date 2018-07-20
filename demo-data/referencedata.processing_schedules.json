@@ -1,0 +1,31 @@
+[
+  {
+    "id": "9c15bd6e-3f6b-4b91-b53a-36c199d35eac",
+    "code": "SCH001",
+    "name": "Monthly",
+    "modifiedDate": "2015-12-31 23:59:59"
+  },
+  {
+    "id": "057921bd-1841-4748-8523-dbe5ebb58368",
+    "code": "SCH002",
+    "name": "Quarterly"
+  },
+  {
+    "id": "d036a3bc-865a-402b-972e-96e0695bf8ce",
+    "code": "SCH003",
+    "name": "Monthly A",
+    "modifiedDate": "2016-02-20 13:20:11"
+  },
+  {
+    "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f",
+    "code": "SCH004",
+    "name": "Monthly B",
+    "modifiedDate": "2016-04-05 16:57:06"
+  } ,
+  {
+    "id": "083775ab-b9af-41a3-b845-0fbf4fe1583d",
+    "code": "SCH005",
+    "name": "Monthly C",
+    "modifiedDate": "2016-04-05 16:57:06"
+  }
+]

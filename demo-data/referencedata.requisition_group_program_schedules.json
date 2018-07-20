@@ -1,0 +1,44 @@
+[
+  {
+    "id": "e7aab4ca-4586-4ef2-8923-dc3940bb3104",
+    "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "processingScheduleId": { "id": "9fca3d5d-b2c8-46c8-adb0-96e38d2c1f6f" },
+    "directDelivery": "true",
+    "requisitionGroupId": { "id": "1642bfd8-94e1-4fcf-80e7-254b29ca8e05" }
+  },
+  {
+    "id": "1ad386bb-e4b0-463b-b660-3f6973f14305",
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" },
+    "directDelivery": "true",
+    "requisitionGroupId": { "id": "748f2602-9ffa-4ddc-9647-8bfde04f13c1" }
+  },
+  {
+    "id": "56b50f88-13e2-4dd1-8210-fead7025b106",
+    "programId": { "id": "10845cb9-d365-4aaa-badd-b4fa39c6a26a" },
+    "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" },
+    "directDelivery": "true",
+    "requisitionGroupId": { "id": "84b33e28-f537-4a76-8895-9d4d564a623a" }
+  },
+  {
+    "id": "9204494e-22e8-4f1c-8517-9d90ad3d06d4",
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "processingScheduleId": { "id": "9c15bd6e-3f6b-4b91-b53a-36c199d35eac" },
+    "directDelivery": "true",
+    "requisitionGroupId": { "id": "f3ff98db-6254-4d3e-a501-01874ed4d184" }
+  },
+  {
+    "id": "298da8ae-bff9-4f1c-99f5-49e02b2b3b91",
+    "programId": { "id": "dce17f2e-af3e-40ad-8e00-3496adef44c3" },
+    "processingScheduleId": { "id": "057921bd-1841-4748-8523-dbe5ebb58368" },
+    "directDelivery": "true",
+    "requisitionGroupId": { "id": "e90da490-a371-4c2f-83c3-7c1dc9748d48" }
+  },
+  {
+    "id": "60f72164-92f7-4cab-a6f0-49cc802a8eeb",
+    "programId": { "id": "418bdc1d-c303-4bd0-b2d3-d8901150a983" },
+    "processingScheduleId": { "id": "9c15bd6e-3f6b-4b91-b53a-36c199d35eac" },
+    "directDelivery": "true",
+    "requisitionGroupId": { "id": "8c3cc51e-9471-4d05-857f-67958f5cd171" }
+  }
+]
