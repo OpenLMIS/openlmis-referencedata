@@ -1,5 +1,0 @@
-id,code,name,active,displayorder
-ac1d268b-ce10-455f-bf87-9c667da8f060,health_center,Health Center,true,2
-663b1d34-cc17-4d60-9619-e553e45aa441,dist_hosp,District Hospital,true,3
-5fc213c6-1bd7-46f0-9883-57c05250ca90,dist_store,District Store,true,4
-caecea08-6b2f-4ba9-98b2-b87702ba57ba,prov_store,Provincial Store,true,5

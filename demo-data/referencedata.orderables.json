@@ -1,0 +1,944 @@
+[
+  {
+    "id": "2400e410-b8dd-4954-b1c0-80d8a8e785fc",
+    "code": "C1",
+    "dispensableId": "62d6457e-02ab-49b0-8952-a1ed5bd8d056",
+    "fullProductName": "Acetylsalicylic Acid",
+    "netContent": 16,
+    "packRoundingThreshold": 8,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "9e25fd93-d8a0-4d1d-8188-55dd3c408d24"
+      }
+    ]
+  },
+  {
+    "id": "103396e1-f5e4-4754-bb7b-1c799097dfea",
+    "code": "C2",
+    "dispensableId": "ffd57abe-a891-4f59-a66b-2ad3de0f809c",
+    "fullProductName": "Glibenclamide",
+    "netContent": 40,
+    "packRoundingThreshold": 20,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "d4e4c6ca-efc9-4ab4-8966-d78ba594ac0c"
+      }
+    ]
+  },
+  {
+    "id": "bac90734-6e58-426e-849b-331286ec77d2",
+    "code": "C3",
+    "dispensableId": "1bfced14-16ad-44df-b73f-5106353972d0",
+    "fullProductName": "Streptococcus Pneumoniae Vaccine",
+    "netContent": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "267321d1-447c-4fac-9430-907ae38d1854"
+      }
+    ]
+  },
+  {
+    "id": "c9e65f02-f84f-4ba2-85f7-e2cb6f0989af",
+    "code": "C4",
+    "dispensableId": "ab83c808-7c70-463c-9a69-9c875dd2c93e",
+    "fullProductName": "Streptococcus Pneumoniae Vaccine II",
+    "netContent": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "1af3b535-fe6a-41ce-b4c6-7d0aa4381cdb"
+      }
+    ]
+  },
+  {
+    "id": "6be94307-c7f4-4782-ba83-45f496c8ac42",
+    "code": "C5",
+    "dispensableId": "1a5c9c42-451e-41d4-b04c-5f069955ca71",
+    "fullProductName": "Streptococcus Pneumoniae Vaccine with VVM",
+    "netContent": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "52128e33-732a-4627-bd4b-69632f0568de"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "d602d0c6-4052-456c-8ccd-61b4ad77bece",
+    "code": "C100",
+    "dispensableId": "b8764f2b-c649-4991-b160-fd9c9b8c258b",
+    "fullProductName": "Levora",
+    "netContent": 84,
+    "packRoundingThreshold": 42,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "10d447ea-0a86-4267-8048-0b331d509601"
+      }
+    ]
+  },
+  {
+    "id": "23819693-0670-4c4b-b400-28e009b86b51",
+    "code": "C200",
+    "dispensableId": "8282ae4f-0410-4e77-a2f8-735d3ac442db",
+    "fullProductName": "Ortho-Novum",
+    "netContent": 63,
+    "packRoundingThreshold": 31,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "2e9cf7eb-ae09-431b-a3da-aa51a7f4aca0"
+      }
+    ]
+  },
+  {
+    "id": "7f7b83db-580d-4269-88d2-7f9c80a591a9",
+    "code": "C300",
+    "dispensableId": "b659c6aa-37ad-4cb9-bf76-7e6669c04fed",
+    "fullProductName": "Depo-Estradiol",
+    "netContent": 5,
+    "packRoundingThreshold": 2,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "366fdbed-c1ba-4bd0-b387-b1c75df9da48"
+      }
+    ]
+  },
+  {
+    "id": "bfde33c3-83f1-4feb-a27c-842852f66b71",
+    "code": "C400",
+    "dispensableId": "b6eb78c8-3c62-427e-87a8-e16615f9683d",
+    "fullProductName": "Male Condom",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "e119197f-2326-47b1-9a7f-00f020d9e2b9"
+      }
+    ]
+  },
+  {
+    "id": "880cf2eb-7b68-4450-a037-a0dec1a17987",
+    "code": "C500",
+    "dispensableId": "ddcce957-a360-47e1-af82-f9c3c1525298",
+    "fullProductName": "Implanon",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "ceaa00b6-e2bb-4908-ab82-4e2265c39404"
+      }
+    ]
+  },
+  {
+    "id": "7b9b66e0-f008-4c38-93ec-7a5f4868cca9",
+    "code": "C600",
+    "dispensableId": "daf071e6-2394-4ac9-b5a1-97a433d49160",
+    "fullProductName": "Levonorgestrel",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "79159377-dc1c-4eaa-b4e9-8dad221a1a97"
+      }
+    ]
+  },
+  {
+    "id": "ef8cdc67-688a-4b9b-a253-a20889d74447",
+    "code": "C101",
+    "dispensableId": "ac523cc0-cb98-4061-a6b1-508cf636e816",
+    "fullProductName": "Abortiva",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "d6a1cd34-26d7-4239-ad87-d8e6870e76f5"
+      }
+    ]
+  },
+  {
+    "id": "142bc03c-f4fc-40a8-a1ef-efebc900b171",
+    "code": "C102",
+    "dispensableId": "690b6b04-688f-4249-904c-f310f2785217",
+    "fullProductName": "Adiuvantia",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "3bbad45f-3faa-4de1-b714-103625edd6bf"
+      }
+    ]
+  },
+  {
+    "id": "62e16def-53ef-46b5-8bf1-8dab9b0bcec1",
+    "code": "C103",
+    "dispensableId": "3a7a8e99-6ce3-4e14-9ad1-3085f22905d9",
+    "fullProductName": "Adsorbentia",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "8b1adea1-9c11-4fff-b21f-e62bfb3c6500"
+      }
+    ]
+  },
+  {
+    "id": "430e898a-59a8-465a-8431-98cd55bbe418",
+    "code": "C104",
+    "dispensableId": "afa35730-18eb-4cff-9031-bcd88bcf67ac",
+    "fullProductName": "Adstrigentia",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "fed83adf-5777-4273-a4d7-a7bb79af93c7"
+      }
+    ]
+  },
+  {
+    "id": "b42db3d0-b2a1-46db-abd0-99421878a4da",
+    "code": "C105",
+    "dispensableId": "0c83003d-c6c4-458d-9f29-7afa8eed045a",
+    "fullProductName": "Antiemetica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "bdc9eeaa-549f-4899-8b9c-c7fe89c0b0f9"
+      }
+    ]
+  },
+  {
+    "id": "f573f7d1-b90b-4c3c-8d8b-b8865315d32d",
+    "code": "C106",
+    "dispensableId": "db10e9b3-6ce6-4fda-b2c3-0b6a8e419b91",
+    "fullProductName": "Antimycotica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "568ae7b9-6232-45db-b2b7-c711c60dca7e"
+      }
+    ]
+  },
+  {
+    "id": "4b0d49aa-aa15-4ccf-b91b-197f7cb35c16",
+    "code": "C107",
+    "dispensableId": "94504ff0-d0a0-4b64-9d34-2210dce715db",
+    "fullProductName": "Antiparasitica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "7cb3ebcb-fcf7-4376-b8b8-48147b421e5d"
+      }
+    ]
+  },
+  {
+    "id": "25665e10-cca7-44c0-b508-e95600d8fb99",
+    "code": "C108",
+    "dispensableId": "2a3a4ff5-35ed-438f-87a9-fee1e597fca3",
+    "fullProductName": "Antipruritica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "02005e40-24a8-486b-83cb-e865c19dbb89"
+      }
+    ]
+  },
+  {
+    "id": "d4dbd20e-8ce2-480e-a019-4a90d115719c",
+    "code": "C109",
+    "dispensableId": "83aea028-dcd5-42da-b17e-677fcc398d71",
+    "fullProductName": "Antitussica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "051c3da5-4490-4ff8-b426-bd7c79252685"
+      }
+    ]
+  },
+  {
+    "id": "8c74cdb8-2138-487d-a7ec-c7b55607c83a",
+    "code": "C110",
+    "dispensableId": "cd47655d-2330-4910-bf6a-9b3d55d0b2ce",
+    "fullProductName": "Aphrodisiaca",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "f3e29f41-dd7a-4a4c-9f20-b1c9923bb0be"
+      }
+    ]
+  },
+  {
+    "id": "8dc476f4-222e-46fa-9b4f-f1f67c0f5681",
+    "code": "C111",
+    "dispensableId": "c19e7465-a528-409d-a6e3-0d2da8ffa43a",
+    "fullProductName": "Cardiaca",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "76fc2ccb-8aff-4358-8be7-25e70571f493"
+      }
+    ]
+  },
+  {
+    "id": "32a04b36-4b4b-4591-b7fe-927d3569bd06",
+    "code": "C112",
+    "dispensableId": "c43b7586-7aa1-4cf7-9318-aacb5a3a4f0e",
+    "fullProductName": "Cholagoga",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "178c789e-fde2-4c47-a389-fdf449438020"
+      }
+    ]
+  },
+  {
+    "id": "b5cb6082-1def-492d-a0a0-abd2ab3bfafa",
+    "code": "C113",
+    "dispensableId": "12466469-a5c0-4075-8792-1f9ae9784622",
+    "fullProductName": "Diuretica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "0cee0d57-02cb-4ad6-b381-1fea5d17e5d8"
+      }
+    ]
+  },
+  {
+    "id": "66b29383-b508-48a5-bd26-f7fdf0f8dc9a",
+    "code": "C114",
+    "dispensableId": "b952ad73-dc30-45f5-93a5-3fb752e092ed",
+    "fullProductName": "Emetica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "fbffcdff-10ff-4316-b8fd-f9b29cd3436b"
+      }
+    ]
+  },
+  {
+    "id": "f7dcea66-dc3d-42cd-8cc2-64b2bf929470",
+    "code": "C115",
+    "dispensableId": "9914a1fc-61a3-43eb-89f6-5525e08f88ee",
+    "fullProductName": "Hypnotica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "e817f021-51f5-4044-b74d-58b4d6d6e547"
+      }
+    ]
+  },
+  {
+    "id": "1a0588a7-5a8d-4184-8955-07ce8f4d578d",
+    "code": "C116",
+    "dispensableId": "d7ea198c-bf53-4cad-b068-dc5877c64229",
+    "fullProductName": "Praemedicantia",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "300bdc4e-3ea0-4b3d-96fa-b79faaa14adc"
+      }
+    ]
+  },
+  {
+    "id": "70285d72-0790-4846-aa74-23c013c5c408",
+    "code": "C117",
+    "dispensableId": "cd312ae9-6fca-4d1f-ac35-695c3c48c3bf",
+    "fullProductName": "Sedativa",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "174ad3ce-9cff-432f-a902-9b9dcd76b25b"
+      }
+    ]
+  },
+  {
+    "id": "0dc9c1ad-2266-4fb3-ad74-993c38b8c28a",
+    "code": "C118",
+    "dispensableId": "572db554-b816-4bf4-93ed-624bcdda2c39",
+    "fullProductName": "Stomachica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "ea082992-91d1-42ae-b860-4e16a1192209"
+      }
+    ]
+  },
+  {
+    "id": "4cb2f620-27e2-4506-b44b-328a10bf54ca",
+    "code": "C119",
+    "dispensableId": "5b71a8ec-9ef2-4f09-a61c-d1f5017ac697",
+    "fullProductName": "Tonica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "2a840788-c3d5-400e-8c90-b35b69455089"
+      }
+    ]
+  },
+  {
+    "id": "66c57fb6-5bb4-466e-8159-c0a41eb08137",
+    "code": "C120",
+    "dispensableId": "d10f85d2-ae75-483e-9d84-2eeafbc07a88",
+    "fullProductName": "Thymoleptica",
+    "netContent": 1,
+    "packRoundingThreshold": 0,
+    "roundToZero": false,
+    "description": "Product description goes here.",
+    "programOrderables": [
+      {
+        "id": "df7214f6-32c5-4e18-8118-3e935b242997"
+      }
+    ]
+  },
+  {
+    "id": "9c3bea84-487b-4e22-8759-3fe93f8201d9",
+    "code": "IVX-BCG-20-1234",
+    "dispensableId": "0251c7ba-da9e-4e7e-981d-d3b57d336981",
+    "fullProductName": "Intervax BCG (20 dose)",
+    "netContent": 20,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "a3edc24b-070c-4051-871e-757ec98a09bd"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "0a83fb92-289b-45c9-adba-f2ac7647312e",
+    "code": "SNF-IPV-5-1234",
+    "dispensableId": "33259963-6feb-48d6-b29d-d313936cdbb3",
+    "fullProductName": "IPOL (5 dose)",
+    "netContent": 5,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "a5a69736-fca9-48a3-b0ff-658e3739db86"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "8f5e5923-e192-40b1-bf9e-3b4444579e05",
+    "code": "GSK-POLIO-20-1234",
+    "dispensableId": "cb27d04b-b5a3-4b1c-b3f5-e4912f217eba",
+    "fullProductName": "GlaxoSmithKline Polio (20 dose)",
+    "netContent": 20,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "cd7b3be2-c56e-43c8-b013-123abcd5af60"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "b0c0426e-6840-4531-a116-043ba854c58b",
+    "code": "SII-PENTA-1-1234",
+    "dispensableId": "30f45eb1-7d68-4962-8927-60f989f78af3",
+    "fullProductName": "Pentavac PFS (1 dose)",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "34f7d0d0-daac-4502-a3b4-82ae6c5fc792"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "a852f785-d82e-4afe-bc6a-04f3236caf90",
+    "code": "SII-PENTA-10-1234",
+    "dispensableId": "bb81110c-7a94-4ac3-9bd5-67184160259d",
+    "fullProductName": "Pentavac PFS (10 dose)",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "aa40f09f-fa28-468f-987a-515605f51341"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "b75a88c7-70fa-4bab-9785-3dd980a5ffc3",
+    "code": "GSK-PCV10-2-1234",
+    "dispensableId": "54d6f74f-2d10-4d69-92ff-31da53c16b46",
+    "fullProductName": "Synflorix PCV10 (2 dose)",
+    "netContent": 2,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "04c46cef-d420-4623-8ab5-8f5cf023c529"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "047638fa-92ce-4adf-9bbd-3bcb3216897a",
+    "code": "MRK-ROTA-1-1234",
+    "dispensableId": "b7c4800e-5955-45df-8a4f-4f260f00d493",
+    "fullProductName": "RotaTeq (1 dose)",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "66c0c14b-1bf1-4970-b239-1c2f0dab37a0"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "71204042-558e-4c47-a602-7886451e5689",
+    "code": "MRK-MEASLES-10-1234",
+    "dispensableId": "0198a03d-d138-489d-a1f4-3c4a1719b987",
+    "fullProductName": "MMR II (10 dose)",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "3c752d12-471b-47c0-82d7-4954df384c6b"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "18223845-4d19-4408-b7c2-971c26014058",
+    "code": "SNF-TETANUS-10-1234",
+    "dispensableId": "afbd8835-9264-4602-87a4-41f5a752da82",
+    "fullProductName": "Tenivac (10 dose)",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "e7813092-ec6d-4d96-8876-35c6310b19ba"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "170738eb-6364-4d2a-98cf-1ea54cc5a61a",
+    "code": "ACM-SYRINGE5ML-1234",
+    "dispensableId": "b9c8ba9b-91ec-4908-9c68-ecbd579036eb",
+    "fullProductName": "Acme Syringe 5ml",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "b3c3bc1c-fb2f-431e-9284-799b01c05ad9"
+      }
+    ]
+  },
+  {
+    "id": "bfc1bfee-d6bb-4254-8bc9-5a0d962fce97",
+    "code": "ACM-SYRINGE05ML-1234",
+    "dispensableId": "df396885-aba2-40dc-bfc2-212be35eb9d2",
+    "fullProductName": "Acme Syringe 0.5ml",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "e5fabbc8-8edc-47fb-a8d9-069dc8c52fca"
+      }
+    ]
+  },
+  {
+    "id": "4457d688-9617-4594-bb54-03f98cabf84d",
+    "code": "ACM-SYRINGE005ML-1234",
+    "dispensableId": "eea1399c-b99d-4e8a-af86-6a8062978bd9",
+    "fullProductName": "Acme Syringe 0.05ml",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "defadd1a-90a7-43f8-ad87-f382df45c40f"
+      }
+    ]
+  },
+  {
+    "id": "7d5a1795-b219-465c-ba78-f5187b65d7f9",
+    "code": "ACM-SAFETYBOX-1234",
+    "dispensableId": "82801936-acf5-47c7-8712-3d518479c941",
+    "fullProductName": "Acme Safety Box",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "fb28e397-ea2c-474a-8312-536ae55bca17"
+      }
+    ]
+  },
+  {
+    "id": "4a05482a-68b8-4064-979f-6bfadf464481",
+    "code": "ACM-GAS-1234",
+    "dispensableId": "375127ec-0ac9-4b91-9111-7f1d2bbbd0ac",
+    "fullProductName": "Acme Gas (Cylinder)",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "b601feb7-108f-436d-b90d-6bc6106f3da1"
+      }
+    ]
+  },
+  {
+    "id": "8ef9d4da-b6e5-401c-b433-765a5fd8a0cc",
+    "code": "bcg20",
+    "dispensableId": "50b7b60f-8ac6-42fe-a74f-bbf8b4e2b570",
+    "fullProductName": "BCG",
+    "netContent": 20,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "93664367-c870-46ba-92fb-b4e5252b5db1"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "b8ff7c36-2003-46d6-a687-551bdd521a9e",
+    "code": "ipv5",
+    "dispensableId": "c55bcbff-166e-4486-85e8-0f06acf978fe",
+    "fullProductName": "IPV",
+    "netContent": 5,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "7e8fe526-5b81-440d-a04f-1dea877b5ef6"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "f8e6ea34-0ad8-43d5-96d7-a6f8b14ff210",
+    "code": "polio20",
+    "dispensableId": "9f4336d5-e1da-47f6-bdc1-2470672ca1ef",
+    "fullProductName": "Polio (20 dose)",
+    "netContent": 20,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "5612fe9d-451e-4e46-a813-125044f9dc7f"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "5f0dd194-aae1-490c-8b51-3cf0c87af983",
+    "code": "penta1",
+    "dispensableId": "d18c1b6e-9961-4106-801d-28ce4a71bd47",
+    "fullProductName": "Pentavalent (1 dose)",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "b1eadac7-7380-4a2e-b648-43db0b069d79"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "c0d41166-01fd-4a28-ae2f-46f867ffb368",
+    "code": "penta10",
+    "dispensableId": "915ecc5c-87ff-425e-ac64-45c831b6672b",
+    "fullProductName": "Pentavalent (10 dose)",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "bd9340e8-efbb-4118-9ccd-8b50308eeb89"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "72971f1d-dd20-4373-aa94-f9615777581b",
+    "code": "pcv10",
+    "dispensableId": "843457e4-0de6-46c4-aa8a-5df5d00aaa8f",
+    "fullProductName": "PCV10",
+    "netContent": 2,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "a94c9ecf-4f00-44af-84ea-02938d72d397"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "b61c652d-2259-41d7-8bb6-fc5fcdd95626",
+    "code": "rota1",
+    "dispensableId": "22011f6f-1b25-42cd-aedf-e5e92efa186b",
+    "fullProductName": "Rotavirus",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "01014c20-c7ae-41ec-a206-24bb3ebfacab"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "b918c3a4-7d12-4be3-854d-d1792cf3b33b",
+    "code": "measles10",
+    "dispensableId": "a3d9fd8a-27a6-4288-93d3-92f941885e5d",
+    "fullProductName": "Measles",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "5cfe2dc7-4fd6-4697-b2bb-9e14034f6ae0"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "e217910c-3364-46b3-92cd-8dd8acf0c557",
+    "code": "tetanus10",
+    "dispensableId": "c05d4177-8844-48f8-94fb-3ecf6b3fb1cc",
+    "fullProductName": "VAT",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "aacd2540-7c07-44e2-ad51-8751dd8e22ee"
+      }
+    ],
+    "extraData": {
+      "useVVM": "true"
+    }
+  },
+  {
+    "id": "bb66a9c4-8443-42ee-b701-caf00061f4df",
+    "code": "syringe5ml",
+    "dispensableId": "d4d15162-5718-4f8d-942a-b8b85f3f78e4",
+    "fullProductName": "Syringe 5ml",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "0c263b63-8836-49d9-86fb-37e5b78a7b75"
+      }
+    ]
+  },
+  {
+    "id": "1a354c78-33e5-423d-a8d8-a8ebfa08e117",
+    "code": "syringe05ml",
+    "dispensableId": "d88a3cd4-271a-49d3-961a-fbef88a74e4c",
+    "fullProductName": "Syringe 0.5ml",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "10b8aaca-61ea-4a71-b5a7-bdbfd965eb40"
+      }
+    ]
+  },
+  {
+    "id": "22dbc5cf-2b86-4763-afc7-e730a2750146",
+    "code": "syringe005ml",
+    "dispensableId": "7dea5bc1-daf4-4c82-a447-d9393822c4fc",
+    "fullProductName": "Syringe 0.05ml",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "85b1a585-7f10-4792-a3b2-7504a9b88b91"
+      }
+    ]
+  },
+  {
+    "id": "6fc0455a-d572-4503-bedf-f3872536c2ad",
+    "code": "safetybox",
+    "dispensableId": "b9c10903-dad3-47b6-b6e5-21dd9d232ad8",
+    "fullProductName": "Safety Box",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "bf352543-38ba-4d09-9fc7-75f969a3ec48"
+      }
+    ]
+  },
+  {
+    "id": "ce5ef390-4e4c-477e-a894-ac831be4d012",
+    "code": "gas",
+    "dispensableId": "d97e2d8d-7d0f-47f7-87d5-28ff55f9364c",
+    "fullProductName": "Gas (Cylinder)",
+    "netContent": 1,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "6e705316-39d6-4308-80c1-0b9e06ff34b3"
+      }
+    ]
+  },
+  {
+    "id": "c75152ee-ebed-47ed-bb87-0930aee18320",
+    "code": "IVX-BCGDIL-20-1234",
+    "dispensableId": "73d9e5ae-dae2-4578-8952-746cc62067a0",
+    "fullProductName": "Intervax BCG Diluent (20 dose)",
+    "netContent": 20,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "3494a7fc-f37f-46b4-88d5-99e3c77321b5"
+      }
+    ]
+  },
+  {
+    "id": "7c58f053-0ca5-46ad-8209-98cff0c79b42",
+    "code": "MRK-MEASLESDIL-10-1234",
+    "dispensableId": "3722add3-32f4-4b3a-bdd5-ca036ac73624",
+    "fullProductName": "MMR II Diluent (10 dose)",
+    "netContent": 10,
+    "packRoundingThreshold": 1,
+    "roundToZero": true,
+    "programOrderables": [
+      {
+        "id": "d4d88938-7669-407e-9180-ce16be769314"
+      }
+    ]
+  }
+]
