@@ -80,7 +80,7 @@ pipeline {
         stage('Build demo-data') {
             when {
                 expression {
-                    return env.GIT_BRANCH == 'master'
+                    return CURRENT_BRANCH == 'master'
                 }
             }
             steps {
