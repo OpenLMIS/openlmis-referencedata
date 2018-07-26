@@ -33,10 +33,10 @@ referencedata.supervisory_nodes.csv and referencedata.supply_lines.csv.
   * this facility is in the requisition group RGFP1
 4. HC03/Kalembo Health Center
   * type: Health Center
-  * programs: Essential Meds
+  * programs: Essential Meds and Family Planning
   * zone: Thyolo District
   * this is the home facility for _srmanager3_ and _smanager3_ users
-  * this facility is in the requisition group RGEM1
+  * this facility is in the requisition group RGEM1 and RGFP3
 5. DH01/Balaka District Hospital
   * type: District Hospital
   * programs: Family Planning and Essential Meds
@@ -228,8 +228,12 @@ referencedata.requisition_group_members.csv.
   * facilities:
     * DH01/Balaka District Hospital
     * HF01/Kankao Health Facility
+4. RGFP3/RG Family Planning 3
+  * schedule: Monthly A (Jan2018, Feb2018 and Mar2018 report-only, Apr2018 ...)
+  * facilities:
+    * HC03/Kalembo Health Center
 
-There are also 3 unused schedules, SCH003 and SCH004, SCH005.
+There are also 2 unused schedules, SCH004 and SCH005.
 
 **For EPI (Vaccines) Program**
 
@@ -264,7 +268,7 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * administrator - has this role for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
     * srmanager2, srmanager4 - has this role for Family Planning & Essential Meds at home facility
     * srmanager1 - has this role for Family Planning at home facility
-    * srmanager3 - has this role for Essential Meds at home facility
+    * srmanager3 - has this role for Essential Meds & Family Planning at home facility
     * divo1 - has this role for EPI at home facility
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
@@ -280,7 +284,7 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * smanager1 - has this role for Family Planning at home facility
     * smanager2 - has this role for Family Planning at home facility and SN1/FP approval point
         & for Essential Meds at home facility and SN2/EM approval point
-    * smanager3 - has this role for Essential Meds at home facility
+    * smanager3 - has this role for Essential Meds & Family Planning at home facility
     * smanager4 - has this role for Family Planning & Essential Meds at home facility
     * divo1 - has this role for EPI at home facility
     * divo2 - has this role for EPI at home facility
@@ -294,7 +298,7 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * administrator - has this role for Family Planning & Essential Meds at SN2/EM approval
         point and SN1/FP approval point
     * dsrmanager - has this role for Family Planning & Essential Meds at SN2/EM approval
-        point and SN1/FP approval point
+        point, SN1.1/FP approval sub point and SN1.2/FP approval sub point 2
 4. Program Supervisor
   * rights:
     * Requisition View
@@ -418,7 +422,12 @@ Defined in referencedata.supervisory_nodes.csv, referencedata.supply_lines.csv, 
     * program: Family Planning
   * facility: DH01/Balaka District Hospital
   * parent: SN1/FP approval point
-3. SN2/EM approval point
+3. SN1.2/FP Approval sub point 2
+  * requisition group: RGFP3
+    * program: Family Planning
+  * facility: DH01/Balaka District Hospital
+  * parent: SN1/FP approval point
+4. SN2/EM approval point
   * requisition group: RGEM1
     * program: Essential Meds
   * supply lines:

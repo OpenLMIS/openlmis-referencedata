@@ -1,6 +1,7 @@
 id,code,name,facilityid,parentid
 fb38bd1c-beeb-4527-8345-900900329c10,SN1,FP approval point,e6799d64-d10d-4011-b8c2-0e4d4a3f65ce,
 9f470265-0770-4dd1-bd5a-cf8fe3734d79,SN1.1,FP approval sub point,13037147-1769-4735-90a7-b9b310d128b8,fb38bd1c-beeb-4527-8345-900900329c10
+05b8e2b8-2f8f-4585-99da-0e41fcc4da69,SN1.2,FP approval sub point 2,13037147-1769-4735-90a7-b9b310d128b8,fb38bd1c-beeb-4527-8345-900900329c10
 6d5831e7-c336-4129-bd10-0149910a72aa,SN2,EM approval point,13037147-1769-4735-90a7-b9b310d128b8,
 219cf7dd-b60a-4c25-ae4e-bf035f357bb4,SN-NIASSA-PROV,Niassa province approval point (EPI),0898dcd6-53f2-41b6-ba7d-b2f5122ffb44,
 6f5eae49-bc62-4664-a679-1ef0bfd5b21d,SN-CUAMBA-DIST,Cuamba district approval point (EPI),c62dea9b-6974-4101-ba39-b09914165967,219cf7dd-b60a-4c25-ae4e-bf035f357bb4
