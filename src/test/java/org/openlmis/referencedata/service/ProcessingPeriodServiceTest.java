@@ -56,6 +56,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.util.LinkedMultiValueMap;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class ProcessingPeriodServiceTest {
 
   private static final String PROGRAM_ID = "programId";
@@ -135,6 +136,16 @@ public class ProcessingPeriodServiceTest {
   }
 
   @Test
+  public void shouldReturnEmptyPageWhenScheduleWasNotFoundForProgram() {
+    queryMap.add(PROGRAM_ID, program.getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
+    doReturn(Collections.emptyList()).when(repository)
+            .searchRequisitionGroupProgramSchedules(program, null);
+    Page<ProcessingPeriod> result = periodService.searchPeriods(params, pageable);
+    assertEquals(0, result.getContent().size());
+  }
+
+  @Test
   public void shouldFindPeriodsByProgramAndFacility() {
     doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
           .searchRequisitionGroupProgramSchedules(program, facility);
@@ -148,6 +159,22 @@ public class ProcessingPeriodServiceTest {
     periodService.searchPeriods(params, pageable);
 
     verify(repository).searchRequisitionGroupProgramSchedules(program, facility);
+    verify(periodRepository).search(schedule, null, null, emptySet(), pageable);
+  }
+
+  @Test
+  public void shouldFindPeriodsByProgram() {
+    doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
+            .searchRequisitionGroupProgramSchedules(program, null);
+    doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
+            .when(periodRepository).search(schedule, null, null, emptySet(), pageable);
+
+    queryMap.add(PROGRAM_ID, program.getId().toString());
+    ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
+
+    periodService.searchPeriods(params, pageable);
+
+    verify(repository).searchRequisitionGroupProgramSchedules(program, null);
     verify(periodRepository).search(schedule, null, null, emptySet(), pageable);
   }
 

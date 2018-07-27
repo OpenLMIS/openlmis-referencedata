@@ -80,12 +80,17 @@ public class ProcessingPeriodService {
     LocalDate endDate = params.getEndDate();
     Collection<UUID> ids = params.getIds();
 
-    if (null != program && null != facility) {
+    if (null != program) {
       List<RequisitionGroupProgramSchedule> schedules = requisitionGroupProgramScheduleRepository
           .searchRequisitionGroupProgramSchedules(program, facility);
       if (schedules.isEmpty()) {
-        LOGGER.warn("Cannot find Requisition Group Program Schedule for program {} and facility {}",
-            program.getId(), facility.getId());
+        if (facility == null) {
+          LOGGER.warn("Cannot find Requisition Group Program Schedule for program {}",
+                  program.getId());
+        } else {
+          LOGGER.warn("Cannot find Requisition Group Program Schedule for"
+                  + "program {} and facility {}", program.getId(), facility.getId());
+        }
         return Pagination.getPage(Collections.emptyList(), pageable, 0);
       } else {
         schedule = schedules.get(0).getProcessingSchedule();
