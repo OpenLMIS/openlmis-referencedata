@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * <a href="https://github.com/javers/javers/issues/214">this issue</a>.
  */
 @Component
-@Profile("refresh-db")
+@Profile("init-audit-log")
 @Order(20)
 public class AuditLogInitializer implements CommandLineRunner {
   private static final XLogger LOGGER = XLoggerFactory.getXLogger(AuditLogInitializer.class);
