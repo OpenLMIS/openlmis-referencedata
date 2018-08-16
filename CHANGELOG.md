@@ -1,5 +1,5 @@
-11.0.0 / WIP
-============
+11.0.0 / 2018-08-16
+===================
 
 Breaking changes:
 * [OLMIS-4985](https://openlmis.atlassian.net/browse/OLMIS-4985): Changed the user resource structure
