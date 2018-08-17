@@ -17,6 +17,8 @@ package org.openlmis.referencedata;
 
 import com.google.gson.internal.bind.TypeAdapters;
 
+import java.time.Clock;
+import java.time.ZoneId;
 import org.flywaydb.core.Flyway;
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
@@ -68,6 +70,9 @@ public class Application {
 
   @Value("${defaultLocale}")
   private Locale locale;
+
+  @Value("${time.zoneId}")
+  private String timeZoneId;
 
   @Autowired
   DialectName dialectName;
@@ -191,6 +196,16 @@ public class Application {
   @Bean
   public ProcessingPeriodValidator beforeSavePeriodValidator() {
     return new ProcessingPeriodValidator();
+  }
+
+  /**
+   * Creates new Clock.
+   *
+   * @return Created clock.
+   */
+  @Bean
+  public Clock clock() {
+    return Clock.system(ZoneId.of(timeZoneId));
   }
 
   /**
