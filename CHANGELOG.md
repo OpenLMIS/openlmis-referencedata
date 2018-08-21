@@ -1,13 +1,7 @@
-11.0.1 / WIP
+11.1.0 / WIP
 ===================
 
-Breaking changes:
-
 New functionality added in a backwards-compatible manner:
-
-Bug fixes, security and performance improvements, also backwards-compatible:
-
-Improvements:
 * [OLMIS-4940](https://openlmis.atlassian.net/browse/OLMIS-4940): Ensured that all microservices get system time zone from configuration on startup
 
 11.0.0 / 2018-08-16
