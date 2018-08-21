@@ -15,26 +15,25 @@
 
 package org.openlmis.referencedata.web.locale;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-@Component
-public class LocaleDtoBuilder {
+public class LocaleDtoTest {
 
-  @Value("${time.zoneId}")
-  private String timeZoneId;
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(LocaleDto.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
+  }
 
-  /**
-   * Create a new instance of {@link LocaleDto}.
-   *
-   * @return new instance of {@link LocaleDto}. {@code null}
-   *         if timeZoneId is {@code null}.
-   */
-  public LocaleDto build() {
-
-    if (null == timeZoneId) {
-      return null;
-    }
-    return new LocaleDto(timeZoneId);
+  @Test
+  public void shouldImplementToString() {
+    LocaleDto dto = new LocaleDto();
+    ToStringTestUtils.verify(LocaleDto.class, dto);
   }
 }

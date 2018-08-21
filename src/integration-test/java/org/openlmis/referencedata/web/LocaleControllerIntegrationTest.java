@@ -13,28 +13,28 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.locale;
+package org.openlmis.referencedata.web;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import static org.junit.Assert.assertEquals;
 
-@Component
-public class LocaleDtoBuilder {
+import org.apache.http.HttpHeaders;
+import org.junit.Test;
+import org.openlmis.referencedata.web.locale.LocaleDto;
 
-  @Value("${time.zoneId}")
-  private String timeZoneId;
+public class LocaleControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  /**
-   * Create a new instance of {@link LocaleDto}.
-   *
-   * @return new instance of {@link LocaleDto}. {@code null}
-   *         if timeZoneId is {@code null}.
-   */
-  public LocaleDto build() {
+  @Test
+  public void shouldReturnLocaleSettings() {
 
-    if (null == timeZoneId) {
-      return null;
-    }
-    return new LocaleDto(timeZoneId);
+    LocaleDto response = new LocaleDto();
+    response = restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get("api/localeSettings")
+        .then()
+        .statusCode(200)
+        .extract().as(response.getClass());
+
+    assertEquals("UTC" ,response.getTimeZoneId());
   }
 }

@@ -15,26 +15,23 @@
 
 package org.openlmis.referencedata.web.locale;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+public class LocaleDtoBuilderTest {
 
-@Component
-public class LocaleDtoBuilder {
-
-  @Value("${time.zoneId}")
-  private String timeZoneId;
+  private String timeZoneId = "UTC";
 
   /**
-   * Create a new instance of {@link LocaleDto}.
-   *
-   * @return new instance of {@link LocaleDto}. {@code null}
-   *         if timeZoneId is {@code null}.
+   * Creates a new instance of {@link LocaleDto} without timeZoneId field.
+   */
+  public LocaleDto buildAsNew() {
+    return new LocaleDto();
+  }
+
+  /**
+   * Creates a new instance of {@link LocaleDto}.
    */
   public LocaleDto build() {
-
-    if (null == timeZoneId) {
-      return null;
-    }
-    return new LocaleDto(timeZoneId);
+    LocaleDto dto = buildAsNew();
+    dto.setTimeZoneId(timeZoneId);
+    return dto;
   }
 }
