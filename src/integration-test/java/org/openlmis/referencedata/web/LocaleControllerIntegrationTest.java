@@ -16,7 +16,9 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
+import guru.nidi.ramltester.junit.RamlMatchers;
 import org.apache.http.HttpHeaders;
 import org.junit.Test;
 import org.openlmis.referencedata.web.locale.LocaleDto;
@@ -36,5 +38,7 @@ public class LocaleControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(response.getClass());
 
     assertEquals("UTC" ,response.getTimeZoneId());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 }
