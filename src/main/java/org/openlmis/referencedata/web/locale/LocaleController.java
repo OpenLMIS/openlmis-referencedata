@@ -15,19 +15,19 @@
 
 package org.openlmis.referencedata.web.locale;
 
-import lombok.AllArgsConstructor;
 import org.openlmis.referencedata.web.BaseController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@AllArgsConstructor
 @RestController
 public class LocaleController extends BaseController {
 
-  private final LocaleDtoBuilder localeDtoBuilder;
+  @Autowired
+  private LocaleDtoBuilder localeDtoBuilder;
 
   /**
    * Get Locale Settings.
