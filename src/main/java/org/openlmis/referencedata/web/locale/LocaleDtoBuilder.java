@@ -31,10 +31,6 @@ public class LocaleDtoBuilder {
    *         if timeZoneId is {@code null}.
    */
   public LocaleDto build() {
-
-    if (null == timeZoneId) {
-      return null;
-    }
     return new LocaleDto(timeZoneId);
   }
 }
