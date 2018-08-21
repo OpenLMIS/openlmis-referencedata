@@ -16,12 +16,16 @@
 package org.openlmis.referencedata.web.locale;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@EqualsAndHashCode
+@ToString
 public class LocaleDto {
 
   private String timeZoneId;
