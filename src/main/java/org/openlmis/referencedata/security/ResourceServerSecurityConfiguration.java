@@ -93,7 +93,8 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
             "/webjars/**",
             "/referencedata/webjars/**",
             "/health",
-            "/referencedata/docs/**"
+            "/referencedata/docs/**",
+            "/localeSettings"
         ).permitAll()
         .antMatchers("/**").fullyAuthenticated();
   }
