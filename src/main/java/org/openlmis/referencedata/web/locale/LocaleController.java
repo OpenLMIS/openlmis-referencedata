@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web.locale;
 
-import org.openlmis.referencedata.web.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class LocaleController extends BaseController {
+public class LocaleController {
 
   @Autowired
   private LocaleDtoBuilder localeDtoBuilder;
