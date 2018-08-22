@@ -236,6 +236,12 @@ schemas:
 
   - localeDto: !include schemas/localeDto.json
 
+  - localeArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/localeDto.json" }
+      }
+
   - lot: !include schemas/lot.json
 
   - lotDto: !include schemas/lotDto.json
