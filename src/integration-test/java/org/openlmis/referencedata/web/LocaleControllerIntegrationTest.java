@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
-import org.apache.http.HttpHeaders;
 import org.junit.Test;
 import org.openlmis.referencedata.web.locale.LocaleDto;
 
@@ -30,9 +29,8 @@ public class LocaleControllerIntegrationTest extends BaseWebIntegrationTest {
 
     LocaleDto response = new LocaleDto();
     response = restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
-        .get("api/localeSettings")
+        .get("/localeSettings")
         .then()
         .statusCode(200)
         .extract().as(response.getClass());

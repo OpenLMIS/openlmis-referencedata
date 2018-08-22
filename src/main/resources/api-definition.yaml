@@ -3229,13 +3229,12 @@ resourceTypes:
                       application/json:
                           schema: Location
 
-  /localeSettings:
-    displayName: Locale settings
-    get:
-      is: [ secured ]
-      description: Get locale settings.
-      responses:
-        "200":
-          body:
-            application/json:
-              schema: localeDto
+/localeSettings:
+  displayName: Locale settings
+  get:
+    description: Get locale settings.
+    responses:
+      "200":
+        body:
+          application/json:
+            schema: localeDto
