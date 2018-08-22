@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.web.locale;
 
-public class LocaleDtoBuilderTest {
+public class LocaleDtoDataBuilder {
 
   private String timeZoneId = "UTC";
 

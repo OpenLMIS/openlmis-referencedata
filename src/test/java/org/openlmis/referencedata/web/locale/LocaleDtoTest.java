@@ -33,7 +33,7 @@ public class LocaleDtoTest {
 
   @Test
   public void shouldImplementToString() {
-    LocaleDto dto = new LocaleDto();
+    LocaleDto dto = new LocaleDtoDataBuilder().build();
     ToStringTestUtils.verify(LocaleDto.class, dto);
   }
 }
