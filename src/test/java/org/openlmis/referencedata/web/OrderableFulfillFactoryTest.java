@@ -79,7 +79,8 @@ public class OrderableFulfillFactoryTest {
   public void shouldCreateResourceForTradeItem() {
     when(tradeItemRepository.findOne(tradeItem.getId())).thenReturn(tradeItem);
     when(commodityTypeRepository.findAll(pageable)).thenReturn(getPage(commodityType));
-    when(orderableRepository.findAllByIdentifier(COMMODITY_TYPE, commodityType.getId().toString()))
+    when(orderableRepository.findAllLatestByIdentifier(
+        COMMODITY_TYPE, commodityType.getId().toString()))
         .thenReturn(Lists.newArrayList(commodityTypeOrderable));
 
     OrderableFulfill response = factory.createFor(tradeItemOrderable);
@@ -92,7 +93,7 @@ public class OrderableFulfillFactoryTest {
   public void shouldCreateResourceForCommodityType() {
     when(commodityTypeRepository.findOne(commodityType.getId())).thenReturn(commodityType);
     when(tradeItemRepository.findAll(pageable)).thenReturn(getPage(tradeItem));
-    when(orderableRepository.findAllByIdentifier(TRADE_ITEM, tradeItem.getId().toString()))
+    when(orderableRepository.findAllLatestByIdentifier(TRADE_ITEM, tradeItem.getId().toString()))
         .thenReturn(Lists.newArrayList(tradeItemOrderable));
 
     OrderableFulfill response = factory.createFor(commodityTypeOrderable);

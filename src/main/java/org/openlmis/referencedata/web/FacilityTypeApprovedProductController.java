@@ -24,10 +24,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.FacilityTypeApprovedProductBuilder;
 import org.openlmis.referencedata.service.FacilityTypeApprovedProductService;
 import org.openlmis.referencedata.util.Pagination;
@@ -58,6 +60,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
 
   @Autowired
   private FacilityTypeApprovedProductRepository repository;
+
+  @Autowired
+  private OrderableRepository orderableRepository;
 
   @Autowired
   private FacilityTypeApprovedProductService approvedProductService;
@@ -233,10 +238,14 @@ public class FacilityTypeApprovedProductController extends BaseController {
   }
 
   private void validateFtapNotDuplicated(ApprovedProductDto approvedProductDto) {
+    UUID orderableId = approvedProductDto.getOrderable().getId();
+
+    Orderable latestOrderable = orderableRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderableId);
     FacilityTypeApprovedProduct existing = repository
-        .findByFacilityTypeIdAndOrderableIdAndProgramId(
+        .findByFacilityTypeIdAndOrderableAndProgramId(
             approvedProductDto.getFacilityType().getId(),
-            approvedProductDto.getOrderable().getId(),
+            latestOrderable,
             approvedProductDto.getProgram().getId());
 
     if (existing != null

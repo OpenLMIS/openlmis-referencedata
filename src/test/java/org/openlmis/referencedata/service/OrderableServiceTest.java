@@ -98,7 +98,8 @@ public class OrderableServiceTest {
 
   @Test
   public void shouldNotThrowValidationExceptionIfQueryMapCanBeParsed() {
-    when(orderableRepository.findAll()).thenReturn(orderableList);
+    Page<Orderable> thePage = Pagination.getPage(orderableList, null);
+    when(orderableRepository.findAllLatest(null)).thenReturn(thePage);
 
     searchParams.add(CODE, "-1");
     searchParams.add(NAME, "-1");
@@ -110,7 +111,7 @@ public class OrderableServiceTest {
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
     // given
     Page<Orderable> thePage = Pagination.getPage(orderableList, null);
-    when(orderableRepository.findAll(any(Pageable.class)))
+    when(orderableRepository.findAllLatest(any(Pageable.class)))
         .thenReturn(thePage);
 
     // when
@@ -118,7 +119,7 @@ public class OrderableServiceTest {
         searchParams), null);
 
     // then
-    verify(orderableRepository).findAll(isNull(Pageable.class));
+    verify(orderableRepository).findAllLatest(isNull(Pageable.class));
     assertEquals(thePage, actual);
   }
 
@@ -126,7 +127,7 @@ public class OrderableServiceTest {
   public void shouldReturnAllElementsIfQueryMapIsNull() {
     // given
     Page<Orderable> thePage = Pagination.getPage(orderableList, null);
-    when(orderableRepository.findAll(any(Pageable.class)))
+    when(orderableRepository.findAllLatest(any(Pageable.class)))
         .thenReturn(thePage);
 
     // when
@@ -134,7 +135,7 @@ public class OrderableServiceTest {
         orderableService.searchOrderables(new OrderableSearchParams(null), null);
 
     // then
-    verify(orderableRepository).findAll(isNull(Pageable.class));
+    verify(orderableRepository).findAllLatest(isNull(Pageable.class));
     assertEquals(thePage, actual);
   }
 
@@ -174,7 +175,7 @@ public class OrderableServiceTest {
   @Test
   public void shouldFindOrderablesByIds() {
     // given
-    given(orderableRepository.findAllByIds(anySetOf(UUID.class), any(Pageable.class)))
+    given(orderableRepository.findAllLatestByIds(anySetOf(UUID.class), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(orderable2)));
 
     searchParams.add(ID, orderableId.toString());
@@ -186,7 +187,7 @@ public class OrderableServiceTest {
         orderableService.searchOrderables(new OrderableSearchParams(searchParams), pageable);
 
     // then
-    verify(orderableRepository).findAllByIds(
+    verify(orderableRepository).findAllLatestByIds(
         new HashSet<>(Arrays.asList(orderableId, orderableId2)), pageable);
 
     assertEquals(1, actual.getTotalElements());

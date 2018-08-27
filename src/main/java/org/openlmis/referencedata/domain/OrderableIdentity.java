@@ -13,21 +13,37 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.domain;
 
+import java.io.Serializable;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import javax.persistence.Embeddable;
+import javax.persistence.GeneratedValue;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
-@JaversSpringDataAuditable
-public interface FacilityTypeApprovedProductRepository
-    extends PagingAndSortingRepository<FacilityTypeApprovedProduct, UUID>,
-    FacilityTypeApprovedProductRepositoryCustom {
+@Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+public class OrderableIdentity implements Serializable {
 
-  FacilityTypeApprovedProduct findByFacilityTypeIdAndOrderableAndProgramId(
-      UUID facilityTypeId, Orderable orderable, UUID programId
-  );
+  private static final String UUID_TYPE = "pg-uuid";
+
+  @GeneratedValue(generator = "uuid-gen")
+  @GenericGenerator(name = "uuid-gen",
+      strategy = "org.openlmis.referencedata.util.ConditionalUuidGenerator")
+  @Type(type = UUID_TYPE)
+  @Getter
+  @Setter
+  private UUID id;
+
+  @Getter
+  @Setter
+  private Long versionId;
 }

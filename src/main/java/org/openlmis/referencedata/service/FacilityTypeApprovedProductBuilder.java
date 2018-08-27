@@ -48,8 +48,9 @@ public class FacilityTypeApprovedProductBuilder {
    * Creates new {@link FacilityTypeApprovedProduct} based on data from importer.
    */
   public FacilityTypeApprovedProduct build(FacilityTypeApprovedProduct.Importer importer) {
-    Orderable orderable = findResource(orderableRepository::findOne, importer.getOrderable(),
-        OrderableMessageKeys.ERROR_NOT_FOUND);
+    Orderable orderable = findResource(
+        orderableRepository::findFirstByIdentityIdOrderByIdentityVersionIdDesc,
+        importer.getOrderable(), OrderableMessageKeys.ERROR_NOT_FOUND);
     Program program = findResource(programRepository::findOne, importer.getProgram(),
         ProgramMessageKeys.ERROR_NOT_FOUND);
     FacilityType facilityType = findResource(facilityTypeRepository::findOne,

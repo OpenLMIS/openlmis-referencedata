@@ -56,7 +56,7 @@ public class RefDataErrorHandling extends BaseHandler {
         SupplyLineMessageKeys.ERROR_PROGRAM_SUPERVISORY_NODE_DUPLICATED);
     CONSTRAINT_MAP.put("uk_tradeitems_gtin", TradeItemMessageKeys.ERROR_GTIN_DUPLICATED);
     CONSTRAINT_MAP.put("unq_facility_type_code", FacilityTypeMessageKeys.ERROR_CODE_DUPLICATED);
-    CONSTRAINT_MAP.put("unq_orderableid_programid",
+    CONSTRAINT_MAP.put("unq_programid_orderableid_orderableversionid",
         OrderableMessageKeys.ERROR_PROGRAMS_DUPLICATED);
   }
 

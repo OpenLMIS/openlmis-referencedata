@@ -33,7 +33,6 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 import com.google.common.collect.Lists;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,11 +83,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         new OrderedDisplayValue("orderableDisplayCategoryName", 1));
     orderableDisplayCategory.setId(UUID.randomUUID());
 
-    HashMap<String, String> identificators = new HashMap<>();
-    HashMap<String, String> extraData = new HashMap<>();
     orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
-        "Abcd", "description", 10, 5, false, Collections.emptyList(), identificators,
-        extraData);
+        "Abcd", 10, 5, false, Collections.emptyList(), UUID.randomUUID(), 1L);
     orderable.setId(UUID.randomUUID());
 
     facilityType1 = new FacilityType("facilityType1");
@@ -109,7 +105,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .willAnswer(new SaveAnswer<FacilityTypeApprovedProduct>());
 
     // used in deserialization
-    given(orderableRepository.findOne(orderable.getId())).willReturn(orderable);
+    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
+        .willReturn(orderable);
     given(programRepository.findOne(program.getId())).willReturn(program);
     given(facilityTypeRepository.findOne(facilityType1.getId())).willReturn(facilityType1);
 
@@ -274,7 +271,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .statusCode(200)
         .extract().as(ApprovedProductDto.class);
 
-    assertEquals(ftapDto, response);
+    ftapEquals(ftapDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -297,8 +294,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(UUID.randomUUID());
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
-      facilityType1.getId(), orderable.getId(), program.getId()
+    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableAndProgramId(
+      facilityType1.getId(), orderable, program.getId()
     )).thenReturn(existingFtap);
 
     restAssured.given()
@@ -323,8 +320,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(UUID.randomUUID());
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
-        facilityType1.getId(), orderable.getId(), program.getId()
+    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableAndProgramId(
+        facilityType1.getId(), orderable, program.getId()
     )).thenReturn(existingFtap);
 
     restAssured.given()
@@ -348,8 +345,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(facilityTypeAppProdId);
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
-        facilityType1.getId(), orderable.getId(), program.getId()
+    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableAndProgramId(
+        facilityType1.getId(), orderable, program.getId()
     )).thenReturn(existingFtap);
 
     restAssured.given()
@@ -495,9 +492,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertEquals(expected.getEmergencyOrderPoint(), response.getEmergencyOrderPoint());
     assertEquals(expected.getMaxPeriodsOfStock(), response.getMaxPeriodsOfStock());
     assertEquals(expected.getMinPeriodsOfStock(), response.getMinPeriodsOfStock());
-    assertEquals(expected.getFacilityType(), response.getFacilityType());
-    assertEquals(expected.getOrderable(), response.getOrderable());
-    assertEquals(expected.getProgram(), response.getProgram());
+    assertEquals(expected.getFacilityType().getId(), response.getFacilityType().getId());
+    assertEquals(expected.getProgram().getId(), response.getProgram().getId());
+    assertEquals(expected.getOrderable().getId(), response.getOrderable().getId());
+    assertEquals(expected.getOrderable().getVersionId(), response.getOrderable().getVersionId());
   }
 
 }

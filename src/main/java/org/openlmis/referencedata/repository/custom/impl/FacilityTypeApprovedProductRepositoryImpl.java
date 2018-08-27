@@ -62,7 +62,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   private static final String WITH_PROGRAM = " AND p.id = :programId";
   private static final String WITH_FULL_SUPPLY = " AND po.fullSupply = :fullSupply";
-  private static final String WITH_ORDERABLE_IDS = " AND o.id in :orderableIds";
+  private static final String WITH_ORDERABLE_IDS = " AND o.identity.id in :orderableIds";
 
   private static final String PROGRAM = "program";
   private static final String FACILITY_TYPE = "facilityType";

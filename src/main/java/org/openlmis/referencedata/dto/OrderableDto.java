@@ -15,24 +15,34 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.repository.OrderableRepository;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@ToString
 public class OrderableDto extends BaseDto implements Orderable.Importer, Orderable.Exporter {
+
+  public static final String META_KEY_VERSION_ID = "versionId";
+  public static final String META_KEY_LAST_UPDATED = "lastUpdated";
 
   private String productCode;
 
@@ -53,6 +63,11 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
   private Map<String, String> identifiers;
 
   private Map<String, String> extraData;
+
+  private Map<String, String> meta = new HashMap<>();
+  
+  @JsonIgnore
+  private OrderableRepository orderableRepository;
 
   /**
    * Create new set of OrderableDto based on given iterable of {@link Orderable}.
@@ -82,9 +97,89 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
     return orderableDto;
   }
 
+  @JsonSetter("dispensable")
+  public void setDispensable(DispensableDto dispensable) {
+    this.dispensable = dispensable;
+  }
+
   @Override
   public void setDispensable(Dispensable dispensable) {
     this.dispensable = new DispensableDto();
     dispensable.export(this.dispensable);
+  }
+  
+  @Override
+  @JsonIgnore
+  public Long getVersionId() {
+    if (null == orderableRepository) {
+      return 1L;
+    } else {
+      Orderable latestOrderable = orderableRepository
+          .findFirstByIdentityIdOrderByIdentityVersionIdDesc(getId());
+      return latestOrderable.getVersionId();
+    }
+  }
+  
+  @Override
+  public void setVersionId(Long versionId) {
+    meta.put(META_KEY_VERSION_ID, versionId.toString());
+  }
+
+  @Override
+  public void setLastUpdated(ZonedDateTime lastUpdated) {
+    meta.put(META_KEY_LAST_UPDATED, lastUpdated.toString());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof OrderableDto)) {
+      return false;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    OrderableDto that = (OrderableDto) obj;
+    return Objects.equals(productCode, that.productCode)
+        && Objects.equals(dispensable, that.dispensable)
+        && Objects.equals(fullProductName, that.fullProductName)
+        && Objects.equals(description, that.description)
+        && Objects.equals(netContent, that.netContent)
+        && Objects.equals(packRoundingThreshold, that.packRoundingThreshold)
+        && Objects.equals(roundToZero, that.roundToZero)
+        && Objects.equals(programs, that.programs)
+        && Objects.equals(identifiers, that.identifiers)
+        && Objects.equals(extraData, that.extraData)
+        && isMetaEquals(that);
+  }
+
+  @Override
+  public int hashCode() {
+
+    return Objects
+        .hash(super.hashCode(), productCode, dispensable, fullProductName, description, netContent,
+            packRoundingThreshold, roundToZero, programs, identifiers, extraData, meta);
+  }
+  
+  private boolean isMetaEquals(OrderableDto that) {
+    for (Map.Entry<String, String> metaEntry : meta.entrySet()) {
+      String metaKey = metaEntry.getKey();
+      Object metaValue = metaEntry.getValue();
+      if (null != metaKey && metaKey.equalsIgnoreCase(META_KEY_LAST_UPDATED)) {
+        Instant instantThis = ZonedDateTime.parse(metaValue.toString()).toInstant();
+        Instant instantThat = ZonedDateTime.parse(that.meta.get(META_KEY_LAST_UPDATED)).toInstant();
+        if (!instantThis.equals(instantThat)) {
+          return false;
+        }
+      } else {
+        if (!metaValue.equals(that.meta.get(metaKey))) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
   }
 }

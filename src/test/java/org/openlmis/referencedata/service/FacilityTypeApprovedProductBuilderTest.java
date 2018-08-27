@@ -78,7 +78,8 @@ public class FacilityTypeApprovedProductBuilderTest {
         .build()
         .export(importer);
 
-    when(orderableRepository.findOne(orderable.getId())).thenReturn(orderable);
+    when(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
+        .thenReturn(orderable);
     when(programRepository.findOne(program.getId())).thenReturn(program);
     when(facilityTypeRepository.findOne(facilityType.getId())).thenReturn(facilityType);
   }
@@ -99,7 +100,8 @@ public class FacilityTypeApprovedProductBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfOrderableCouldNotBeFound() {
-    when(orderableRepository.findOne(orderable.getId())).thenReturn(null);
+    when(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
+        .thenReturn(null);
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(OrderableMessageKeys.ERROR_NOT_FOUND);

@@ -25,7 +25,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
@@ -57,12 +56,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
 
   private static final double MAX_PERIODS_OF_STOCK_DELTA = 1e-15;
-  private static final String CLASSIFICATION_SYS = "cSys";
-  private static final String CLASSIFICATION_SYS_ID = "cSysId";
   private static final String FACILITY_TYPE_CODE = "facilityType";
   private static final String FACILITY_TYPE2_CODE = "facilityType2";
   private static final String PROGRAM_CODE = "programCode";
-  private static final String DESCRIPTION = "description";
 
   @Autowired
   private FacilityTypeApprovedProductRepository ftapRepository;
@@ -126,32 +122,29 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
             new OrderedDisplayValue("orderableDisplayCategoryName", 1));
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
 
-    HashMap<String, String> identifiers = new HashMap<>();
-    identifiers.put(CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID);
-    HashMap<String, String> extraData = new HashMap<>();
     CurrencyUnit currencyUnit = CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE);
 
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
         .createNew(program, orderableDisplayCategory, null, currencyUnit);
     orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
-        "Ibuprofen", DESCRIPTION, 10, 5, false,
-        Collections.singletonList(programOrderableFullSupply), identifiers, extraData);
+        "Ibuprofen", 10, 5, false, Collections.singletonList(programOrderableFullSupply),
+        UUID.randomUUID(), 1L);
     programOrderableFullSupply.setProduct(orderableFullSupply);
-    orderableRepository.save(orderableFullSupply);
+    orderableRepository.saveAndFlush(orderableFullSupply);
 
     ProgramOrderable programOrderable1 = ProgramOrderable
         .createNew(program2, orderableDisplayCategory, null, currencyUnit);
     orderable1 = new Orderable(Code.code("levora"), Dispensable.createNew("each"),
-        "Levora", DESCRIPTION, 10, 5, false,
-        Collections.singletonList(programOrderable1), identifiers, extraData);
+        "Levora", 10, 5, false, Collections.singletonList(programOrderable1),
+        UUID.randomUUID(), 1L);
     programOrderable1.setProduct(orderable1);
     orderableRepository.save(orderable1);
 
     ProgramOrderable programOrderable2 = ProgramOrderable
         .createNew(program2, orderableDisplayCategory, null, currencyUnit);
     orderable2 = new Orderable(Code.code("glibenclamide"), Dispensable.createNew("each"),
-        "Glibenclamide", DESCRIPTION, 10, 5, false,
-        Collections.singletonList(programOrderable2), identifiers, extraData);
+        "Glibenclamide", 10, 5, false, Collections.singletonList(programOrderable2),
+        UUID.randomUUID(), 1L);
     programOrderable2.setProduct(orderable2);
     orderableRepository.save(orderable2);
 
@@ -159,10 +152,10 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
         ProgramOrderable.createNew(program, orderableDisplayCategory, null, 0, true, false, 0,
             Money.of(currencyUnit, 0), currencyUnit);
     orderableNonFullSupply = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
-        "Gloves", DESCRIPTION, 6, 3, false,
-        Collections.singletonList(programOrderableNonFullSupply), identifiers, extraData);
+        "Gloves", 6, 3, false, Collections.singletonList(programOrderableNonFullSupply),
+        UUID.randomUUID(), 1L);
     programOrderableNonFullSupply.setProduct(orderableNonFullSupply);
-    orderableRepository.save(orderableNonFullSupply);
+    orderableRepository.saveAndFlush(orderableNonFullSupply);
 
     GeographicLevel level = new GeographicLevel();
     level.setCode("FacilityRepositoryIntegrationTest");
@@ -333,8 +326,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftap = ftapRepository.save(ftap);
     UUID id = ftap.getId();
 
-    ftap = ftapRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
-        ftap.getFacilityType().getId(), ftap.getOrderable().getId(), ftap.getProgram().getId()
+    ftap = ftapRepository.findByFacilityTypeIdAndOrderableAndProgramId(
+        ftap.getFacilityType().getId(), ftap.getOrderable(), ftap.getProgram().getId()
     );
 
     assertNotNull(ftap);

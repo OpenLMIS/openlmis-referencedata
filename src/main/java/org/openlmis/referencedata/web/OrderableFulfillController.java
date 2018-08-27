@@ -66,8 +66,8 @@ public class OrderableFulfillController extends BaseController {
 
   private Page<Orderable> getOrderables(Set<UUID> ids, Pageable pageable) {
     return ids.isEmpty()
-        ? orderableRepository.findAll(pageable)
-        : orderableRepository.findAllByIds(ids, pageable);
+        ? orderableRepository.findAllLatest(pageable)
+        : orderableRepository.findAllLatestByIds(ids, pageable);
   }
 
   private void addEntry(Map<UUID, OrderableFulfill> map, Orderable orderable) {

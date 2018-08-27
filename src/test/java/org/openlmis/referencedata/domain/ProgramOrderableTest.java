@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.UUID;
 import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class ProgramOrderableTest {
     em = new Program("EM");
     testCat = OrderableDisplayCategory.createNew(Code.code("test"));
     ibuprofen = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-        "description", 20, 10, false, null, null, null);
+        20, 10, false, null, UUID.randomUUID(), 1L);
   }
 
   @Test

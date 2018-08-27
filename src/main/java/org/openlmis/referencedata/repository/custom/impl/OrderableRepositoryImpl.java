@@ -24,6 +24,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
@@ -40,6 +41,9 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final String PROGRAMS = "programOrderables";
   private static final String PROGRAM = "program";
   private static final String CODE = "code";
+  private static final String IDENTITY = "identity";
+  private static final String ID = "id";
+  private static final String VERSION_ID = "versionId";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -107,6 +111,22 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
           builder.like(builder.upper(programs.get(CODE).get("code")),
               programCode.toString().toUpperCase()));
     }
+
+    Subquery<String> latestOrderablesQuery = query.subquery(String.class);
+    Root<Orderable> latestOrderablesRoot = latestOrderablesQuery.from(Orderable.class);
+    latestOrderablesQuery.select(
+        builder.concat(
+            latestOrderablesRoot.get(IDENTITY).get(ID).as(String.class),
+            builder.max(latestOrderablesRoot.get(IDENTITY).get(VERSION_ID)).as(String.class)));
+    latestOrderablesQuery.groupBy(latestOrderablesRoot.get(IDENTITY).get(ID));
+    
+    predicate = builder.and(
+        predicate, builder.in(
+            builder.concat(
+                root.get(IDENTITY).get(ID).as(String.class), 
+                root.get(IDENTITY).get(VERSION_ID)).as(String.class))
+            .value(latestOrderablesQuery)
+    );
 
     query.where(predicate);
     return query;

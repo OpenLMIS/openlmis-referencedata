@@ -48,7 +48,17 @@
     "extraData": {
       "type": "object",
       "title": "extraData"
+    },
+    "meta": {
+      "type": "object",
+      "$ref": "metadata.json",
+      "description": "The orderable metadata"
     }
   },
-  "required": ["productCode", "packRoundingThreshold", "roundToZero", "netContent"]
+  "required": [
+    "productCode",
+    "packRoundingThreshold",
+    "roundToZero",
+    "netContent"
+  ]
 }

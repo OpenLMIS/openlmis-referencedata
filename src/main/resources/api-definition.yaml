@@ -740,13 +740,24 @@ resourceTypes:
                   repeat: false
           get:
               is: [ secured ]
-              description: Get chosen orderable orderable.
+              description: Get chosen orderable. If versionId is omitted, returns newest version.
+              queryParameters:
+                  versionId:
+                      displayName: Version ID
+                      type: integer
+                      description: Version of orderable
+                      example: 1
+                      required: false
               responses:
                   "200":
                       body:
                         application/json:
                             schema: orderable
+                  "401":
+                      body:
+                        application/json:
                   "404":
+                      description: Returned when requested orderable or specified version was not found.
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2410,8 +2421,8 @@ resourceTypes:
                               schema: localizedErrorResponse
                     "404":
                         body:
-                          application/json:
-                            schema: localizedErrorResponse
+                            application/json:
+                                schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen facilityTypeApprovedProduct.

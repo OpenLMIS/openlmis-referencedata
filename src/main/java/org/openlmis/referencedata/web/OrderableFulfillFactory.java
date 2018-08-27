@@ -102,7 +102,7 @@ public class OrderableFulfillFactory {
   private void addToListIfDispensableMatches(List<UUID> list, String key, BaseEntity entity,
                                              Dispensable dispensableToMatch) {
     List<Orderable> orderables = orderableRepository
-        .findAllByIdentifier(key, entity.getId().toString());
+        .findAllLatestByIdentifier(key, entity.getId().toString());
 
     orderables.forEach(
         item -> {

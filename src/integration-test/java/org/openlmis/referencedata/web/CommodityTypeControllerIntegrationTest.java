@@ -54,6 +54,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.CommodityTypeMessageKeys;
@@ -81,7 +82,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     when(commodityTypeRepository.save(any(CommodityType.class))).thenAnswer(new 
         SaveAnswer<CommodityType>());
-    when(orderableRepository.save(any(Orderable.class))).thenAnswer(new SaveAnswer<Orderable>());
+    when(orderableRepository.save(any(Orderable.class))).thenReturn(
+        new OrderableDataBuilder().build());
   }
 
   @Test

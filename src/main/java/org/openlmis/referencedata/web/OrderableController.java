@@ -127,9 +127,16 @@ public class OrderableController extends BaseController {
    */
   @GetMapping("/orderables/{id}")
   public OrderableDto getChosenOrderable(
-      @PathVariable("id") UUID productId) {
+      @PathVariable("id") UUID productId,
+      @RequestParam(required = false, value = "versionId") Long versionId) {
 
-    Orderable orderable = repository.findOne(productId);
+    Orderable orderable;
+    if (null == versionId) {
+      orderable = repository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(productId);
+    } else {
+      orderable = repository.findByIdentityIdAndIdentityVersionId(productId, versionId);
+    }
+
     if (orderable == null) {
       throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -162,8 +169,7 @@ public class OrderableController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    Orderable instance = repository.findOne(id);
-    if (instance == null) {
+    if (!repository.existsById(id)) {
       throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
     }
 

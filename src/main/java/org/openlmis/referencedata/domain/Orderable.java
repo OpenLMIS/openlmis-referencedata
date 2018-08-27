@@ -15,17 +15,21 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -35,12 +39,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.domain.BaseEntity.BaseExporter;
+import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
 /**
@@ -50,10 +55,10 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
 @Entity
 @TypeName("Orderable")
 @Table(name = "orderables", schema = "referencedata",
-    uniqueConstraints = @UniqueConstraint(name = "unq_productCode", columnNames = "code"))
+    uniqueConstraints = @UniqueConstraint(name = "unq_productcode_versionid",
+        columnNames = {"code", "versionid"}))
 @NoArgsConstructor
-@AllArgsConstructor
-public class Orderable extends BaseEntity {
+public class Orderable implements Identifiable, Serializable {
   public static final String TRADE_ITEM = "tradeItem";
   public static final String COMMODITY_TYPE = "commodityType";
 
@@ -63,6 +68,7 @@ public class Orderable extends BaseEntity {
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "dispensableid", nullable = false)
+  @DiffIgnore // same reason as one in Facility.supportedPrograms
   @Getter
   private Dispensable dispensable;
 
@@ -70,6 +76,7 @@ public class Orderable extends BaseEntity {
   private String fullProductName;
 
   @Getter
+  @Setter
   private String description;
 
   @Getter(AccessLevel.PACKAGE)
@@ -92,14 +99,66 @@ public class Orderable extends BaseEntity {
   @Column(name = "value")
   @CollectionTable(
       name = "orderable_identifiers",
-      joinColumns = @JoinColumn(name = "orderableId"))
+      joinColumns = {
+          @JoinColumn(name = "orderableId", referencedColumnName = "id"),
+          @JoinColumn(name = "orderableVersionId", referencedColumnName = "versionId")})
+  @Setter
   private Map<String, String> identifiers;
 
   @Column(name = "extradata", columnDefinition = "jsonb")
   @Convert(converter = ExtraDataConverter.class)
+  @Setter
   private Map<String, String> extraData;
 
+  @EmbeddedId
+  private OrderableIdentity identity;
+
+  @Getter
+  @Setter
+  private ZonedDateTime lastUpdated;
+
   /**
+   * Default constructor.
+   * 
+   * @param productCode product code
+   * @param dispensable dispensable
+   * @param fullProductName full product name
+   * @param netContent net content
+   * @param packRoundingThreshold pack rounding threshold
+   * @param roundToZero round to zero
+   * @param programOrderables programs
+   * @param id id
+   * @param versionId version id
+   */
+  public Orderable(Code productCode, Dispensable dispensable, String fullProductName,
+      long netContent, long packRoundingThreshold, boolean roundToZero,
+      List<ProgramOrderable> programOrderables, UUID id, Long versionId) {
+    this.productCode = productCode;
+    this.dispensable = dispensable;
+    this.fullProductName = fullProductName;
+    this.netContent = netContent;
+    this.packRoundingThreshold = packRoundingThreshold;
+    this.roundToZero = roundToZero;
+    this.programOrderables = programOrderables;
+    this.identity = new OrderableIdentity(id, versionId);
+    this.lastUpdated = ZonedDateTime.now();
+  }
+  
+  @Override
+  public UUID getId() {
+    return identity.getId();
+  }
+  
+  public void setId(UUID id) {
+    identity.setId(id);
+  }
+  
+  public Long getVersionId() {
+    return identity.getVersionId();
+  }
+  
+  /**
+  
    * Get the association to a {@link Program}.
    * @param program the Program this product is (maybe) in.
    * @return the association to the given {@link Program}, or null if this product is not in the
@@ -177,7 +236,6 @@ public class Orderable extends BaseEntity {
    */
   public static Orderable newInstance(Importer importer) {
     Orderable orderable = new Orderable();
-    orderable.setId(importer.getId());
     orderable.productCode = Code.code(importer.getProductCode());
     orderable.dispensable = Dispensable.createNew(importer.getDispensable());
     orderable.fullProductName = importer.getFullProductName();
@@ -190,6 +248,8 @@ public class Orderable extends BaseEntity {
     orderable.identifiers = importer.getIdentifiers();
     orderable.extraData = importer.getExtraData();
 
+    orderable.identity = new OrderableIdentity(importer.getId(), importer.getVersionId());
+
     return orderable;
   }
 
@@ -199,7 +259,7 @@ public class Orderable extends BaseEntity {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setId(getId());
+    exporter.setId(identity.getId());
     exporter.setProductCode(productCode.toString());
     exporter.setDispensable(dispensable);
     exporter.setFullProductName(fullProductName);
@@ -210,6 +270,8 @@ public class Orderable extends BaseEntity {
     exporter.setPrograms(ProgramOrderableDto.newInstance(programOrderables));
     exporter.setIdentifiers(identifiers);
     exporter.setExtraData(extraData);
+    exporter.setVersionId(identity.getVersionId());
+    exporter.setLastUpdated(lastUpdated);
   }
 
   public interface Exporter extends BaseExporter {
@@ -233,6 +295,10 @@ public class Orderable extends BaseEntity {
     void setIdentifiers(Map<String, String> identifiers);
 
     void setExtraData(Map<String, String> extraData);
+    
+    void setVersionId(Long versionId);
+
+    void setLastUpdated(ZonedDateTime lastUpdated);
   }
 
   public interface Importer extends BaseImporter {
@@ -256,5 +322,7 @@ public class Orderable extends BaseEntity {
     Map<String, String> getIdentifiers();
 
     Map<String, String> getExtraData();
+    
+    Long getVersionId();
   }
 }

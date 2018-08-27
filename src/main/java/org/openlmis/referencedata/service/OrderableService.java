@@ -56,14 +56,14 @@ public class OrderableService {
     }
     if (queryMap.isEmpty()) {
       LOGGER.info("find all");
-      return orderableRepository.findAll(pageable);
+      return orderableRepository.findAllLatest(pageable);
     }
 
     Set<UUID> ids = queryMap.getIds();
     LOGGER.info("ids from query params: {}", ids);
     if (!ids.isEmpty()) {
       LOGGER.info("find all by ids");
-      return orderableRepository.findAllByIds(ids, pageable);
+      return orderableRepository.findAllLatestByIds(ids, pageable);
     }
 
     String code = queryMap.getCode();

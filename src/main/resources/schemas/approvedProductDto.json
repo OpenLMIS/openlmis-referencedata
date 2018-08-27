@@ -34,7 +34,18 @@
     "emergencyOrderPoint": {
       "type": "number",
       "title": "emergencyOrderPoint"
+    },
+    "meta": {
+      "type": "object",
+      "$ref": "metadata.json",
+      "description": "The approved product metadata"
     }
   },
-  "required": ["id", "program", "orderable", "facilityType", "maxPeriodsOfStock"]
+  "required": [
+    "id",
+    "program",
+    "orderable",
+    "facilityType",
+    "maxPeriodsOfStock"
+  ]
 }

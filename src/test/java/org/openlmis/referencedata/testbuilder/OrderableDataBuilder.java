@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,8 @@ public class OrderableDataBuilder {
   private List<ProgramOrderable> programOrderables;
   private Map<String, String> identifiers;
   private Map<String, String> extraData;
+  private Long versionId;
+  private ZonedDateTime lastUpdated;
 
   /**
    * Returns instance of {@link OrderableDataBuilder} with sample data.
@@ -57,6 +60,9 @@ public class OrderableDataBuilder {
     roundToZero = false;
     programOrderables = new ArrayList<>();
     identifiers = new HashMap<>();
+    extraData = new HashMap<>();
+    versionId = 1L;
+    lastUpdated = ZonedDateTime.now();
   }
 
   public OrderableDataBuilder withIdentifier(String key, Object valueToString) {
@@ -79,6 +85,11 @@ public class OrderableDataBuilder {
     return this;
   }
 
+  public OrderableDataBuilder withVersionId(Long versionId) {
+    this.versionId = versionId;
+    return this;
+  }
+
   /**
    * Builds instance of {@link Orderable}.
    */
@@ -93,7 +104,12 @@ public class OrderableDataBuilder {
    * Builds instance of {@link Orderable} without id field.
    */
   public Orderable buildAsNew() {
-    return new Orderable(productCode, dispensable, fullProductName, description,
-        netContent, packRoundingTreshold, roundToZero, programOrderables, identifiers, extraData);
+    Orderable orderable = new Orderable(productCode, dispensable, fullProductName,
+        netContent, packRoundingTreshold, roundToZero, programOrderables, id, versionId);
+    orderable.setDescription(description);
+    orderable.setIdentifiers(identifiers);
+    orderable.setExtraData(extraData);
+    orderable.setLastUpdated(lastUpdated);
+    return orderable;
   }
 }

@@ -44,7 +44,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   @Before
   public void setUp() {
     super.setUp();
-    given(orderableRepository.findAll(pageable)).willReturn(getPage(orderable));
+    given(orderableRepository.findAllLatest(pageable)).willReturn(getPage(orderable));
   }
 
   @Test
@@ -79,7 +79,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldReturnEmptyListIfThereAreNoOrderables() {
-    given(orderableRepository.findAll(pageable)).willReturn(new PageImpl<>(emptyList()));
+    given(orderableRepository.findAllLatest(pageable)).willReturn(new PageImpl<>(emptyList()));
 
     doRequest().body("isEmpty()", is(true));
     verifyZeroInteractions(factory);

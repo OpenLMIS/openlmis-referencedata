@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -37,7 +38,8 @@ import org.openlmis.referencedata.CurrencyConfig;
 @Entity
 @Table(name = "program_orderables", schema = "referencedata",
     uniqueConstraints = @UniqueConstraint(
-        name = "unq_orderableid_programid", columnNames = {"orderableid", "programid"})
+        name = "unq_programid_orderableid_orderableversionid",
+        columnNames = {"programid", "orderableid", "orderableversionid"})
     )
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,7 +53,10 @@ public class ProgramOrderable extends BaseEntity {
   private Program program;
 
   @ManyToOne
-  @JoinColumn(name = "orderableId", nullable = false)
+  @JoinColumns({
+      @JoinColumn(name = "orderableId", referencedColumnName = "id", nullable = false),
+      @JoinColumn(name = "orderableVersionId", referencedColumnName = "versionId", nullable = false)
+      })
   @Getter
   @Setter
   private Orderable product;
@@ -75,7 +80,7 @@ public class ProgramOrderable extends BaseEntity {
   @Type(type = "org.jadira.usertype.moneyandcurrency.joda.PersistentMoneyAmount",
       parameters = {@Parameter(name = "currencyCode", value = CurrencyConfig.CURRENCY_CODE)})
   private Money pricePerPack;
-
+  
   private ProgramOrderable(Program program,
                            Orderable product,
                            OrderableDisplayCategory orderableDisplayCategory) {
