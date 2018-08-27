@@ -20,12 +20,15 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
-import java.util.UUID;
+import ca.uhn.fhir.rest.gclient.TokenClientParam;
+import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class LocationSynchronizer<T extends IBaseResource> implements Synchronizer<Location, T> {
+abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBundle>
+    implements Synchronizer<Location, T> {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -58,8 +61,23 @@ abstract class LocationSynchronizer<T extends IBaseResource> implements Synchron
     IGenericClient client = context.newRestfulGenericClient(fhirServerUrl);
     client.registerInterceptor(loggingInterceptor);
 
-    ICriterion criterion = createIdentifierCriterion(serviceUrl, olmisLocation.getId());
-    T existing = findResource(client, criterion);
+    logger.trace(
+        "Create identifier criterion for system {} and value {}",
+        serviceUrl, olmisLocation.getId()
+    );
+
+    ICriterion criterion = new TokenClientParam("identifier")
+        .exactly()
+        .systemAndValues(serviceUrl, olmisLocation.getId().toString());
+
+    logger.debug("Try to find resources by criterion");
+    B bundle = client
+        .search()
+        .forResource(getFhirClass())
+        .where(criterion)
+        .returnBundle(getBundleClass())
+        .execute();
+    T existing = getEntry(bundle);
 
     if (null == existing) {
       createLocation(client, fhirLocation);
@@ -68,34 +86,33 @@ abstract class LocationSynchronizer<T extends IBaseResource> implements Synchron
     }
   }
 
-  LocationSynchronizer<T> withContext(FhirContext context) {
+  LocationSynchronizer<T, B> withContext(FhirContext context) {
     this.context = context;
     return this;
   }
 
-  LocationSynchronizer<T> withFhirServerUrl(String fhirServerUrl) {
+  LocationSynchronizer<T, B> withFhirServerUrl(String fhirServerUrl) {
     this.fhirServerUrl = fhirServerUrl;
     return this;
   }
 
-  LocationSynchronizer<T> withServiceUrl(String serviceUrl) {
+  LocationSynchronizer<T, B> withServiceUrl(String serviceUrl) {
     this.serviceUrl = serviceUrl;
     return this;
   }
 
-  Logger log() {
-    return logger;
-  }
+  abstract Class<T> getFhirClass();
 
-  abstract ICriterion createIdentifierCriterion(String system, UUID value);
+  abstract Class<B> getBundleClass();
 
-  abstract T findResource(IGenericClient client, ICriterion criterion);
+  abstract T getEntry(B bundle);
 
   void copyIdElement(T existing, T fhirLocation) {
     fhirLocation.setId(existing.getIdElement().withVersion(null));
   }
 
   private void createLocation(IGenericClient client, T fhirLocation) {
+    fhirLocation.setId((IIdType) null);
     client
         .create()
         .resource(fhirLocation)

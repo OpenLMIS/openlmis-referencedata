@@ -19,82 +19,99 @@ import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
-import ca.uhn.fhir.model.dstu2.resource.Location.Position;
 import ca.uhn.fhir.model.dstu2.valueset.LocationStatusEnum;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 class Dstu2LocationConverter extends LocationConverter<ca.uhn.fhir.model.dstu2.resource.Location> {
 
   @Override
-  public ca.uhn.fhir.model.dstu2.resource.Location apply(Location input) {
-    ca.uhn.fhir.model.dstu2.resource.Location location =
-        new ca.uhn.fhir.model.dstu2.resource.Location();
-
-    location.setId(input.getId().toString());
-    location.setName(input.getName());
-    location.setPhysicalType(getPhysicalType(input));
-    location.setPartOf(new ResourceReferenceDt(input.getPartOf().getReference()));
-    location.setIdentifier(getIdentifiers(input));
-
-    Optional
-        .ofNullable(input.getPosition())
-        .ifPresent(position -> location.setPosition(getPosition(position)));
-
-    Optional
-        .ofNullable(input.getDescription())
-        .ifPresent(location::setDescription);
-
-    Optional
-        .ofNullable(input.getStatus())
-        .ifPresent(status -> location.setStatus(getStatus(status)));
-
-    return location;
+  ca.uhn.fhir.model.dstu2.resource.Location createResource(Location input) {
+    return new ca.uhn.fhir.model.dstu2.resource.Location();
   }
 
   @Override
-  void addSystemIdentifier(ca.uhn.fhir.model.dstu2.resource.Location resource,
-      String system, UUID value) {
-    resource.addIdentifier(new IdentifierDt(system, value.toString()));
+  void setName(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
+    resource.setName(input.getName());
   }
 
-  private Position getPosition(org.openlmis.referencedata.fhir.Position inputPosition) {
-    Position position = new Position();
-    position.setLatitude(inputPosition.getLatitude());
-    position.setLongitude(inputPosition.getLongitude());
-
-    return position;
-  }
-
-  private CodeableConceptDt getPhysicalType(Location input) {
+  @Override
+  void setPhysicalType(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
     CodeableConceptDt physicalType = new CodeableConceptDt();
     input
         .getPhysicalType()
         .getCoding()
         .stream()
         .map(elem -> {
-          CodingDt coding = new CodingDt(elem.getSystem(), elem.getCode());
+          CodingDt coding = new CodingDt();
+          coding.setSystem(elem.getSystem());
+          coding.setCode(elem.getCode());
           coding.setDisplay(elem.getDisplay());
 
           return coding;
         })
         .forEach(physicalType::addCoding);
 
-    return physicalType;
+    resource.setPhysicalType(physicalType);
   }
 
-  private LocationStatusEnum getStatus(String inputStatus) {
-    return LocationStatusEnum.forCode(inputStatus);
+  @Override
+  void setPartOf(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
+    resource.setPartOf(new ResourceReferenceDt(input.getPartOf().getReference()));
   }
 
-  private List<IdentifierDt> getIdentifiers(Location input) {
-    return input
+  @Override
+  void setIdentifier(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
+    input
         .getIdentifier()
         .stream()
-        .map(elem -> new IdentifierDt(elem.getSystem(), elem.getValue()))
-        .collect(Collectors.toList());
+        .map(elem -> {
+          IdentifierDt identifier = new IdentifierDt();
+          identifier.setSystem(elem.getSystem());
+          identifier.setValue(elem.getValue());
+
+          return identifier;
+        })
+        .forEach(resource::addIdentifier);
+  }
+
+  @Override
+  void addSystemIdentifier(ca.uhn.fhir.model.dstu2.resource.Location resource,
+      String system, UUID value) {
+    IdentifierDt identifier = new IdentifierDt();
+    identifier.setSystem(system);
+    identifier.setValue(value.toString());
+
+    resource.addIdentifier(identifier);
+  }
+
+  @Override
+  void setAlias(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
+    // nothing to do here
+  }
+
+  @Override
+  void setPosition(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
+    if (null != input.getPosition()) {
+      ca.uhn.fhir.model.dstu2.resource.Location.Position position =
+          new ca.uhn.fhir.model.dstu2.resource.Location.Position();
+      position.setLatitude(new BigDecimal(input.getPosition().getLatitude()));
+      position.setLongitude(new BigDecimal(input.getPosition().getLongitude()));
+
+      resource.setPosition(position);
+    }
+  }
+
+  @Override
+  void setDescription(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
+    resource.setDescription(input.getDescription());
+  }
+
+  @Override
+  void setStatus(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
+    if (null != input.getStatus()) {
+      resource.setStatus(LocationStatusEnum.forCode(input.getStatus()));
+    }
   }
 
 }

@@ -42,8 +42,16 @@ abstract class LocationConverter<T extends IBaseResource> implements Converter<L
 
   @Override
   public T convert(Location input) {
-    T resource = apply(input);
+    T resource = createResource(input);
+    setName(resource, input);
+    setPhysicalType(resource, input);
+    setPartOf(resource, input);
+    setIdentifier(resource, input);
     addSystemIdentifier(resource, serviceUrl, input.getId());
+    setAlias(resource, input);
+    setPosition(resource, input);
+    setDescription(resource, input);
+    setStatus(resource, input);
 
     return resource;
   }
@@ -53,8 +61,24 @@ abstract class LocationConverter<T extends IBaseResource> implements Converter<L
     return this;
   }
 
-  abstract T apply(Location input);
+  abstract T createResource(Location input);
+
+  abstract void setName(T resource, Location input);
+
+  abstract void setPhysicalType(T resource, Location input);
+
+  abstract void setPartOf(T resource, Location input);
+
+  abstract void setIdentifier(T resource, Location input);
 
   abstract void addSystemIdentifier(T resource, String system, UUID value);
+
+  abstract void setAlias(T resource, Location input);
+
+  abstract void setPosition(T resource, Location input);
+
+  abstract void setDescription(T resource, Location input);
+
+  abstract void setStatus(T resource, Location input);
 
 }

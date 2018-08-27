@@ -26,7 +26,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class Dstu21LocationSynchronizerTest extends LocationSynchronizerTest<Location, Bundle> {
 
   @Override
-  LocationSynchronizer<Location> getSynchronizer() {
+  LocationSynchronizer<Location, Bundle> getSynchronizer() {
     return new Dstu21LocationSynchronizer();
   }
 

@@ -74,7 +74,7 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
   @Mock
   private IUpdateTyped updateTyped;
 
-  private LocationSynchronizer<R> synchronizer;
+  private LocationSynchronizer<R, B> synchronizer;
 
   private Location olmisLocation;
   private R fhirLocation;
@@ -149,7 +149,7 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
     verify(updateTyped).execute();
   }
 
-  abstract LocationSynchronizer<R> getSynchronizer();
+  abstract LocationSynchronizer<R, B> getSynchronizer();
 
   abstract FhirVersionEnum getFhirVersion();
 

@@ -23,7 +23,7 @@ import org.hl7.fhir.dstu3.model.Location;
 public class Dstu3LocationSynchronizerTest extends LocationSynchronizerTest<Location, Bundle> {
 
   @Override
-  LocationSynchronizer<Location> getSynchronizer() {
+  LocationSynchronizer<Location, Bundle> getSynchronizer() {
     return new Dstu3LocationSynchronizer();
   }
 

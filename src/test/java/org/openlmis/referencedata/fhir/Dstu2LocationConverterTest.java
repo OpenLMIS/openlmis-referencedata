@@ -40,7 +40,6 @@ public class Dstu2LocationConverterTest {
     Location olmisLocation = new Location(SERVICE_URL, new FacilityDataBuilder().build());
     ca.uhn.fhir.model.dstu2.resource.Location fhirLocation = converter.convert(olmisLocation);
 
-    assertThat(fhirLocation.getId().toString()).isEqualTo(olmisLocation.getId().toString());
     assertThat(fhirLocation.getName()).isEqualTo(olmisLocation.getName());
 
     assertThat(fhirLocation.getPhysicalType()).isNotNull();

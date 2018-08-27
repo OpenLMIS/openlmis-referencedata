@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.Location;
 public class R4LocationSynchronizerTest extends LocationSynchronizerTest<Location, Bundle> {
 
   @Override
-  LocationSynchronizer<Location> getSynchronizer() {
+  LocationSynchronizer<Location, Bundle> getSynchronizer() {
     return new R4LocationSynchronizer();
   }
 

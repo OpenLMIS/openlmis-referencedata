@@ -15,42 +15,28 @@
 
 package org.openlmis.referencedata.fhir;
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.ICriterion;
 import java.util.List;
-import java.util.UUID;
-import org.apache.commons.collections.CollectionUtils;
 import org.hl7.fhir.dstu2016may.model.Bundle;
 import org.hl7.fhir.dstu2016may.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.dstu2016may.model.Location;
+import org.springframework.util.CollectionUtils;
 
-class Dstu21LocationSynchronizer extends LocationSynchronizer<Location> {
+class Dstu21LocationSynchronizer extends LocationSynchronizer<Location, Bundle> {
 
   @Override
-  ICriterion createIdentifierCriterion(String system, UUID value) {
-    log().trace("Create identifier criterion for system {} and value {}", system, value);
-    return Location.IDENTIFIER.exactly().systemAndValues(system, value.toString());
+  Class<Location> getFhirClass() {
+    return Location.class;
   }
 
   @Override
-  Location findResource(IGenericClient client, ICriterion criterion) {
-    log().debug("Try to find resources by criterion");
-    Bundle bundle = client
-        .search()
-        .forResource(Location.class)
-        .where(criterion)
-        .returnBundle(Bundle.class)
-        .execute();
+  Class<Bundle> getBundleClass() {
+    return Bundle.class;
+  }
 
+  @Override
+  Location getEntry(Bundle bundle) {
     List<BundleEntryComponent> entries = bundle.getEntry();
-
-    if (CollectionUtils.isEmpty(entries)) {
-      log().debug("Found zero resources. The null value will be returned.");
-      return null;
-    } else {
-      log().debug("Found {} resources. The first resource will be returned.", entries.size());
-      return (Location) entries.get(0).getResource();
-    }
+    return CollectionUtils.isEmpty(entries) ? null : (Location) entries.get(0).getResource();
   }
 
   @Override

@@ -15,10 +15,8 @@
 
 package org.openlmis.referencedata.fhir;
 
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -26,34 +24,57 @@ import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Location.LocationPositionComponent;
 import org.hl7.fhir.r4.model.Location.LocationStatus;
 import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.StringType;
 
 class R4LocationConverter extends LocationConverter<org.hl7.fhir.r4.model.Location> {
 
   @Override
-  public org.hl7.fhir.r4.model.Location apply(Location input) {
-    org.hl7.fhir.r4.model.Location location = new org.hl7.fhir.r4.model.Location();
+  org.hl7.fhir.r4.model.Location createResource(Location input) {
+    return new org.hl7.fhir.r4.model.Location();
+  }
 
-    location.setId(input.getId().toString());
-    location.setName(input.getName());
-    location.setPhysicalType(getPhysicalType(input));
-    location.setPartOf(new Reference(input.getPartOf().getReference()));
-    location.setIdentifier(getIdentifiers(input));
-    location.setAlias(getAlias(input));
+  @Override
+  void setName(org.hl7.fhir.r4.model.Location resource, Location input) {
+    resource.setName(input.getName());
+  }
 
-    Optional
-        .ofNullable(input.getPosition())
-        .ifPresent(position -> location.setPosition(getPosition(position)));
+  @Override
+  void setPhysicalType(org.hl7.fhir.r4.model.Location resource, Location input) {
+    CodeableConcept physicalType = new CodeableConcept();
+    input
+        .getPhysicalType()
+        .getCoding()
+        .stream()
+        .map(elem -> {
+          Coding coding = new Coding();
+          coding.setSystem(elem.getSystem());
+          coding.setCode(elem.getCode());
+          coding.setDisplay(elem.getDisplay());
 
-    Optional
-        .ofNullable(input.getDescription())
-        .ifPresent(location::setDescription);
+          return coding;
+        })
+        .forEach(physicalType::addCoding);
 
-    Optional
-        .ofNullable(input.getStatus())
-        .ifPresent(status -> location.setStatus(getStatus(status)));
+    resource.setPhysicalType(physicalType);
+  }
 
-    return location;
+  @Override
+  void setPartOf(org.hl7.fhir.r4.model.Location resource, Location input) {
+    resource.setPartOf(new Reference(input.getPartOf().getReference()));
+  }
+
+  @Override
+  void setIdentifier(org.hl7.fhir.r4.model.Location resource, Location input) {
+    input
+        .getIdentifier()
+        .stream()
+        .map(elem -> {
+          Identifier identifier = new Identifier();
+          identifier.setSystem(elem.getSystem());
+          identifier.setValue(elem.getValue());
+
+          return identifier;
+        })
+        .forEach(resource::addIdentifier);
   }
 
   @Override
@@ -66,54 +87,38 @@ class R4LocationConverter extends LocationConverter<org.hl7.fhir.r4.model.Locati
     resource.addIdentifier(identifier);
   }
 
-  private LocationPositionComponent getPosition(Position inputPosition) {
-    LocationPositionComponent position = new LocationPositionComponent();
-    position.setLatitude(inputPosition.getLatitude());
-    position.setLongitude(inputPosition.getLongitude());
-
-    return position;
-  }
-
-  private CodeableConcept getPhysicalType(Location input) {
-    CodeableConcept physicalType = new CodeableConcept();
+  @Override
+  void setAlias(org.hl7.fhir.r4.model.Location resource, Location input) {
     input
-        .getPhysicalType()
-        .getCoding()
-        .stream()
-        .map(coding -> new Coding(coding.getSystem(), coding.getCode(), coding.getDisplay()))
-        .forEach(physicalType::addCoding);
-
-    return physicalType;
+        .getAlias()
+        .forEach(resource::addAlias);
   }
 
-  private LocationStatus getStatus(String inputStatus) {
-    try {
-      return LocationStatus.fromCode(inputStatus);
-    } catch (FHIRException exp) {
-      throw new IllegalStateException(exp);
+  @Override
+  void setPosition(org.hl7.fhir.r4.model.Location resource, Location input) {
+    if (null != input.getPosition()) {
+      LocationPositionComponent position = new LocationPositionComponent();
+      position.setLatitude(new BigDecimal(input.getPosition().getLatitude()));
+      position.setLongitude(new BigDecimal(input.getPosition().getLongitude()));
+
+      resource.setPosition(position);
     }
   }
 
-  private List<Identifier> getIdentifiers(Location input) {
-    return input
-        .getIdentifier()
-        .stream()
-        .map(elem -> {
-          Identifier identifier = new Identifier();
-          identifier.setSystem(elem.getSystem());
-          identifier.setValue(elem.getValue());
-
-          return identifier;
-        })
-        .collect(Collectors.toList());
+  @Override
+  void setDescription(org.hl7.fhir.r4.model.Location resource, Location input) {
+    resource.setDescription(input.getDescription());
   }
 
-  private List<StringType> getAlias(Location input) {
-    return input
-        .getAlias()
-        .stream()
-        .map(StringType::new)
-        .collect(Collectors.toList());
+  @Override
+  void setStatus(org.hl7.fhir.r4.model.Location resource, Location input) {
+    if (null != input.getStatus()) {
+      try {
+        resource.setStatus(LocationStatus.fromCode(input.getStatus()));
+      } catch (FHIRException exp) {
+        throw new IllegalStateException(exp);
+      }
+    }
   }
 
 }

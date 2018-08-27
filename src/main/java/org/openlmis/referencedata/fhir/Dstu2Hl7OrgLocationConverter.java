@@ -16,10 +16,7 @@
 package org.openlmis.referencedata.fhir;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.CodeableConcept;
 import org.hl7.fhir.instance.model.Coding;
@@ -31,49 +28,17 @@ import org.hl7.fhir.instance.model.Reference;
 class Dstu2Hl7OrgLocationConverter extends LocationConverter<org.hl7.fhir.instance.model.Location> {
 
   @Override
-  public org.hl7.fhir.instance.model.Location apply(Location input) {
-    org.hl7.fhir.instance.model.Location location = new org.hl7.fhir.instance.model.Location();
-
-    location.setId(input.getId().toString());
-    location.setName(input.getName());
-    location.setPhysicalType(getPhysicalType(input));
-    location.setPartOf(new Reference(input.getPartOf().getReference()));
-    getIdentifiers(input).forEach(location::addIdentifier);
-
-    Optional
-        .ofNullable(input.getPosition())
-        .ifPresent(position -> location.setPosition(getPosition(position)));
-
-    Optional
-        .ofNullable(input.getDescription())
-        .ifPresent(location::setDescription);
-
-    Optional
-        .ofNullable(input.getStatus())
-        .ifPresent(status -> location.setStatus(getStatus(status)));
-
-    return location;
+  org.hl7.fhir.instance.model.Location createResource(Location input) {
+    return new org.hl7.fhir.instance.model.Location();
   }
 
   @Override
-  void addSystemIdentifier(org.hl7.fhir.instance.model.Location resource,
-      String system, UUID value) {
-    Identifier identifier = new Identifier();
-    identifier.setSystem(system);
-    identifier.setValue(value.toString());
-
-    resource.addIdentifier(identifier);
+  void setName(org.hl7.fhir.instance.model.Location resource, Location input) {
+    resource.setName(input.getName());
   }
 
-  private LocationPositionComponent getPosition(Position inputPosition) {
-    LocationPositionComponent position = new LocationPositionComponent();
-    position.setLatitude(new BigDecimal(inputPosition.getLatitude()));
-    position.setLongitude(new BigDecimal(inputPosition.getLongitude()));
-
-    return position;
-  }
-
-  private CodeableConcept getPhysicalType(Location input) {
+  @Override
+  void setPhysicalType(org.hl7.fhir.instance.model.Location resource, Location input) {
     CodeableConcept physicalType = new CodeableConcept();
     input
         .getPhysicalType()
@@ -89,19 +54,17 @@ class Dstu2Hl7OrgLocationConverter extends LocationConverter<org.hl7.fhir.instan
         })
         .forEach(physicalType::addCoding);
 
-    return physicalType;
+    resource.setPhysicalType(physicalType);
   }
 
-  private LocationStatus getStatus(String inputStatus) {
-    try {
-      return LocationStatus.fromCode(inputStatus);
-    } catch (FHIRException exp) {
-      throw new IllegalStateException(exp);
-    }
+  @Override
+  void setPartOf(org.hl7.fhir.instance.model.Location resource, Location input) {
+    resource.setPartOf(new Reference(input.getPartOf().getReference()));
   }
 
-  private List<Identifier> getIdentifiers(Location input) {
-    return input
+  @Override
+  void setIdentifier(org.hl7.fhir.instance.model.Location resource, Location input) {
+    input
         .getIdentifier()
         .stream()
         .map(elem -> {
@@ -111,7 +74,49 @@ class Dstu2Hl7OrgLocationConverter extends LocationConverter<org.hl7.fhir.instan
 
           return identifier;
         })
-        .collect(Collectors.toList());
+        .forEach(resource::addIdentifier);
+  }
+
+  @Override
+  void addSystemIdentifier(org.hl7.fhir.instance.model.Location resource,
+      String system, UUID value) {
+    Identifier identifier = new Identifier();
+    identifier.setSystem(system);
+    identifier.setValue(value.toString());
+
+    resource.addIdentifier(identifier);
+  }
+
+  @Override
+  void setAlias(org.hl7.fhir.instance.model.Location resource, Location input) {
+    // nothing to do here
+  }
+
+  @Override
+  void setPosition(org.hl7.fhir.instance.model.Location resource, Location input) {
+    if (null != input.getPosition()) {
+      LocationPositionComponent position = new LocationPositionComponent();
+      position.setLatitude(new BigDecimal(input.getPosition().getLatitude()));
+      position.setLongitude(new BigDecimal(input.getPosition().getLongitude()));
+
+      resource.setPosition(position);
+    }
+  }
+
+  @Override
+  void setDescription(org.hl7.fhir.instance.model.Location resource, Location input) {
+    resource.setDescription(input.getDescription());
+  }
+
+  @Override
+  void setStatus(org.hl7.fhir.instance.model.Location resource, Location input) {
+    if (null != input.getStatus()) {
+      try {
+        resource.setStatus(LocationStatus.fromCode(input.getStatus()));
+      } catch (FHIRException exp) {
+        throw new IllegalStateException(exp);
+      }
+    }
   }
 
 }

@@ -24,7 +24,7 @@ public class Dstu2Hl7OrgLocationSynchronizerTest
     extends LocationSynchronizerTest<Location, Bundle> {
 
   @Override
-  LocationSynchronizer<Location> getSynchronizer() {
+  LocationSynchronizer<Location, Bundle> getSynchronizer() {
     return new Dstu2Hl7OrgLocationSynchronizer();
   }
 
