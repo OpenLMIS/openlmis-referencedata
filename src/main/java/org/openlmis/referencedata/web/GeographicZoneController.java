@@ -28,6 +28,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
 import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.fhir.FhirClient;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.util.Pagination;
@@ -63,6 +64,9 @@ public class GeographicZoneController extends BaseController {
   @Autowired
   private GeographicZoneService geographicZoneService;
 
+  @Autowired
+  private FhirClient fhirClient;
+
   /**
    * Allows creating new geographicZones.
    *
@@ -80,7 +84,11 @@ public class GeographicZoneController extends BaseController {
     GeographicZone geographicZone = GeographicZone.newGeographicZone(geographicZoneDto);
     // Ignore provided id
     geographicZone.setId(null);
-    return toDto(geographicZoneRepository.save(geographicZone));
+    GeographicZone zone = geographicZoneRepository.save(geographicZone);
+
+    fhirClient.synchronizeGeographicZone(zone);
+
+    return toDto(zone);
   }
 
 
@@ -116,7 +124,11 @@ public class GeographicZoneController extends BaseController {
     geoZoneToSave.setId(geographicZoneId);
 
     LOGGER.debug("Updating geographicZone");
-    return toDto(geographicZoneRepository.save(geoZoneToSave));
+    GeographicZone zone = geographicZoneRepository.save(geoZoneToSave);
+
+    fhirClient.synchronizeGeographicZone(zone);
+
+    return toDto(zone);
   }
 
   /**

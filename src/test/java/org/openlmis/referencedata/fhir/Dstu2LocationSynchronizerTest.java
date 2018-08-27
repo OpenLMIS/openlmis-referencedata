@@ -13,19 +13,44 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
+package org.openlmis.referencedata.fhir;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Bundle.Entry;
+import ca.uhn.fhir.model.dstu2.resource.Location;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum Status {
-  ACTIVE("active"), SUSPENDED("suspended"), INACTIVE("inactive");
-
-  private String name;
+public class Dstu2LocationSynchronizerTest extends LocationSynchronizerTest<Location, Bundle> {
 
   @Override
-  public String toString() {
-    return name;
+  LocationSynchronizer<Location> getSynchronizer() {
+    return new Dstu2LocationSynchronizer();
   }
+
+  @Override
+  FhirVersionEnum getFhirVersion() {
+    return FhirVersionEnum.DSTU2;
+  }
+
+  @Override
+  Location getFhirLocation() {
+    return new Location();
+  }
+
+  @Override
+  Bundle getEmptyBundle() {
+    return new Bundle();
+  }
+
+  @Override
+  Bundle getBundle(Location resource) {
+    Entry entry = new Entry();
+    entry.setResource(resource);
+
+    Bundle bundle = new Bundle();
+    bundle.addEntry(entry);
+
+    return bundle;
+  }
+
 }

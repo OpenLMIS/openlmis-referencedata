@@ -13,15 +13,20 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
+package org.openlmis.referencedata.fhir;
 
 import static org.openlmis.referencedata.web.BaseController.API_PATH;
 
 import java.util.UUID;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
-public class Reference {
+@EqualsAndHashCode
+@ToString
+public final class Reference {
+
   // Literal reference, Relative, internal or absolute URL
   private final String reference;
 

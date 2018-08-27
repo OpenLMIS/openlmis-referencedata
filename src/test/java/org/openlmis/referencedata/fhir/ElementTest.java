@@ -13,24 +13,31 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
-
-import static org.apache.commons.lang3.StringUtils.joinWith;
+package org.openlmis.referencedata.fhir;
 
 import java.util.UUID;
-import lombok.Getter;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-@Getter
-public final class Identifier {
-  public static final String SYSTEM_RFC_3986 = "urn:ietf:rfc:3986";
-  private static final String SEPARATOR = "/";
+public class ElementTest {
 
-  private final String system;
-  private final String value;
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(Element.class)
+        .withRedefinedSubclass(Resource.class)
+        .withRedefinedSubclass(Location.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
+  }
 
-  Identifier(String serviceUrl, String path, UUID uuid) {
-    this.system = SYSTEM_RFC_3986;
-    this.value = joinWith(SEPARATOR, serviceUrl + path, uuid);
+  @Test
+  public void shouldImplementToString() {
+    Element dto = new Element(UUID.randomUUID()) {
+    };
+    ToStringTestUtils.verify(Element.class, dto);
   }
 
 }

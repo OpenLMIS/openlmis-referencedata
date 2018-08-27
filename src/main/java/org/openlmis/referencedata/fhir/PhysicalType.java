@@ -13,14 +13,19 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
+package org.openlmis.referencedata.fhir;
 
 import java.util.Arrays;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@EqualsAndHashCode
+@ToString
 public final class PhysicalType {
+
   private final List<Coding> coding;
 
   PhysicalType(Coding... coding) {

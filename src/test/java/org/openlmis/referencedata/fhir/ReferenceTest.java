@@ -13,21 +13,28 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
+package org.openlmis.referencedata.fhir;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.UUID;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum Coding {
-  AREA("http://hl7.org/fhir/location-physical-type", "area", "Area"),
-  SITE("http://hl7.org/fhir/location-physical-type", "si", "Site");
+public class ReferenceTest {
 
-  private final String system;
-  private final String code;
-  private final String display;
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(Reference.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    Reference dto = new Reference("service", "path", UUID.randomUUID());
+    ToStringTestUtils.verify(Reference.class, dto);
+  }
+
 }

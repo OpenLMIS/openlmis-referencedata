@@ -13,15 +13,19 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
+package org.openlmis.referencedata.fhir;
 
-import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.GeographicZone;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-public abstract class Element {
-  private final UUID id;
+public interface FhirClient {
+
+  default void synchronizeFacility(Facility facility) {
+    // nothing to do here
+  }
+
+  default void synchronizeGeographicZone(GeographicZone geographicZone) {
+    // nothing to do here
+  }
+
 }

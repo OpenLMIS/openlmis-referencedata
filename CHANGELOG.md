@@ -3,7 +3,8 @@
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-4940](https://openlmis.atlassian.net/browse/OLMIS-4940): Ensured that the microservice gets system time zone from configuration on startup:
-  *Added GET api/localeSettings endpoint for retrieving time zone information from properties.
+  * Added GET api/localeSettings endpoint for retrieving time zone information from properties.
+* [OLMIS-5262](https://openlmis.atlassian.net/browse/OLMIS-5262): Added ability to syncing FHIR-related reference data changes to Hearth FHIR server
   
 Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.

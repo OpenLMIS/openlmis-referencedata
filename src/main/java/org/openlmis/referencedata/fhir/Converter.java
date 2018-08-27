@@ -13,17 +13,12 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
+package org.openlmis.referencedata.fhir;
 
-import java.util.UUID;
-import lombok.Getter;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
-@Getter
-public abstract class Resource extends Element {
-  private final String resourceType;
+interface Converter<I extends Element, O extends IBaseResource> {
 
-  Resource(UUID id, String resourceType) {
-    super(id);
-    this.resourceType = resourceType;
-  }
+  O convert(I input);
+
 }

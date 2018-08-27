@@ -19,10 +19,10 @@ import static org.openlmis.referencedata.util.Pagination.handlePage;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.openlmis.referencedata.fhir.Location;
+import org.openlmis.referencedata.fhir.LocationFactory;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
-import org.openlmis.referencedata.web.fhir.Location;
-import org.openlmis.referencedata.web.fhir.LocationFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -13,25 +13,19 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
+package org.openlmis.referencedata.fhir;
 
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.GeographicZone;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 
-@Component
-public class LocationFactory {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public enum Status {
+  ACTIVE("active"), SUSPENDED("suspended"), INACTIVE("inactive");
 
-  @Value("${service.url}")
-  private String serviceUrl;
+  private String name;
 
-  public Location createFor(GeographicZone zone) {
-    return new Location(serviceUrl, zone);
+  @Override
+  public String toString() {
+    return name;
   }
-
-  public Location createFor(Facility facility) {
-    return new Location(serviceUrl, facility);
-  }
-
 }

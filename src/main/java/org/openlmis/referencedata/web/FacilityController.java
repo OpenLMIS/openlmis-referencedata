@@ -37,6 +37,7 @@ import org.openlmis.referencedata.dto.MinimalFacilityDto;
 import org.openlmis.referencedata.dto.SupportedProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.fhir.FhirClient;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -106,6 +107,9 @@ public class FacilityController extends BaseController {
   @Autowired
   private RightAssignmentService rightAssignmentService;
 
+  @Autowired
+  private FhirClient fhirClient;
+
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
    *
@@ -137,6 +141,9 @@ public class FacilityController extends BaseController {
     profiler.start("SAVE");
     newFacility = facilityRepository.save(newFacility);
     XLOGGER.debug("Created new facility with id: ", facilityDto.getId());
+
+    profiler.start("SYNC_FHIR_RESOURCE");
+    fhirClient.synchronizeFacility(newFacility);
 
     FacilityDto dto = toDto(newFacility, profiler);
 
@@ -257,6 +264,9 @@ public class FacilityController extends BaseController {
 
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
     rightAssignmentService.regenerateRightAssignments();
+
+    profiler.start("SYNC_FHIR_RESOURCE");
+    fhirClient.synchronizeFacility(facilityToSave);
 
     XLOGGER.info("Saved facility with id: {}", facilityToSave.getId());
     FacilityDto dto = toDto(facilityToSave, profiler);

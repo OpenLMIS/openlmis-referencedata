@@ -13,21 +13,25 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.fhir;
+package org.openlmis.referencedata.fhir;
 
-import static org.openlmis.referencedata.web.fhir.Coding.AREA;
-import static org.openlmis.referencedata.web.fhir.Coding.SITE;
+import static org.apache.commons.lang.BooleanUtils.isTrue;
+import static org.openlmis.referencedata.fhir.Coding.AREA;
+import static org.openlmis.referencedata.fhir.Coding.SITE;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
+import org.apache.commons.collections.CollectionUtils;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.web.FacilityOperatorController;
@@ -38,8 +42,11 @@ import org.openlmis.referencedata.web.ProgramController;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public final class Location extends Resource {
-  private static final String LOCATION = "Location";
+
+  static final String RESOURCE_TYPE_NAME = "Location";
 
   private final List<String> alias;
   private final List<Identifier> identifier;
@@ -72,9 +79,9 @@ public final class Location extends Resource {
   }
 
   private Location(UUID id, List<String> alias, List<Identifier> identifier, String name,
-                   Position position, PhysicalType physicalType, Reference partOf,
-                   String description, String status) {
-    super(id, LOCATION);
+      Position position, PhysicalType physicalType, Reference partOf,
+      String description, String status) {
+    super(id, RESOURCE_TYPE_NAME);
 
     this.alias = alias;
     this.identifier = identifier;
@@ -96,20 +103,23 @@ public final class Location extends Resource {
   private static List<Identifier> getIdentifier(String serviceUrl, Facility facility) {
     Set<SupportedProgram> supportedPrograms = facility.getSupportedPrograms();
     List<Identifier> identifier;
-    if (supportedPrograms != null) {
+
+    if (!CollectionUtils.isEmpty(supportedPrograms)) {
       identifier = new ArrayList<>(supportedPrograms.size() + 2);
       supportedPrograms.forEach(sp -> identifier.add(new Identifier(
           serviceUrl, ProgramController.RESOURCE_PATH, sp.programId())));
     } else {
       identifier = new ArrayList<>(2);
     }
+
     identifier.add(new Identifier(
         serviceUrl, FacilityTypeController.RESOURCE_PATH, facility.getType().getId()));
-    FacilityOperator operator = facility.getOperator();
-    if (operator != null) {
-      identifier.add(new Identifier(
-          serviceUrl, FacilityOperatorController.RESOURCE_PATH, operator.getId()));
-    }
+
+    Optional
+        .ofNullable(facility.getOperator())
+        .ifPresent(operator -> identifier.add(new Identifier(
+            serviceUrl, FacilityOperatorController.RESOURCE_PATH, operator.getId())));
+
     return identifier;
   }
 
@@ -126,7 +136,7 @@ public final class Location extends Resource {
   }
 
   private static String getStatus(Facility facility) {
-    return facility.getActive() ? Status.ACTIVE.toString() : Status.INACTIVE.toString();
+    return isTrue(facility.getActive()) ? Status.ACTIVE.toString() : Status.INACTIVE.toString();
   }
 
 }
