@@ -5,16 +5,28 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.openlmis.referencedata.dto.RightAssignmentDto;
@@ -31,18 +43,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 /**
  * RightAssignmentInitializer runs after its associated Spring application has loaded. It 
@@ -95,7 +95,7 @@ public class RightAssignmentService {
 
     Resource2Db r2db = new Resource2Db(template);
     try {
-      for ( List partialRightAssignments : ListUtils.partition(dbRightAssignments, 100) ) {
+      for (List partialRightAssignments : ListUtils.partition(dbRightAssignments, 100)) {
         insertFromDbRightAssignmentList(r2db, partialRightAssignments);
       }
     } catch (IOException ioe) {
@@ -118,9 +118,9 @@ public class RightAssignmentService {
     // Convert set of right assignments to insert to a set of SQL inserts
     XLOGGER.debug("Convert right assignments to SQL inserts");
     MutablePair dataWithHeader = new MutablePair<List<String>, List<Object[]>>();
-    dataWithHeader.setRight( rightAssignmentsToInsert.stream()
+    dataWithHeader.setRight(rightAssignmentsToInsert.stream()
         .map(rad -> rad.toColumnArray())
-        .collect(Collectors.toList()) );
+        .collect(Collectors.toList()));
 
     // set column headers
     dataWithHeader.setLeft(Arrays.asList("id",

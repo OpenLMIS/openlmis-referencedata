@@ -5,12 +5,12 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.web;
@@ -144,7 +144,7 @@ public class UserController extends BaseController {
                         RightRepository rightRepository,
                         ProgramRepository programRepository,
                         SupervisoryNodeRepository supervisoryNodeRepository,
-                        FacilityRepository facilityRepository ) {
+                        FacilityRepository facilityRepository) {
     this.userService = userService;
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
@@ -533,16 +533,16 @@ public class UserController extends BaseController {
     checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("GET_USER");
-    User user = (User) validateId(userId, userRepository).orElseThrow( () ->
+    User user = (User) validateId(userId, userRepository).orElseThrow(() ->
         new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId)));
 
     profiler.start("GET_RIGHT");
-    Right right = (Right) validateId(rightId, rightRepository).orElseThrow( () ->
+    Right right = (Right) validateId(rightId, rightRepository).orElseThrow(() ->
         new ValidationMessageException(
             new Message(RightMessageKeys.ERROR_NOT_FOUND_WITH_ID, rightId)));
 
     profiler.start("GET_PROGRAM");
-    Program program = (Program) validateId(programId, programRepository).orElseThrow( () ->
+    Program program = (Program) validateId(programId, programRepository).orElseThrow(() ->
         new ValidationMessageException(
             new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId)));
 
@@ -577,7 +577,7 @@ public class UserController extends BaseController {
     User user = validateUser(userId);
 
     profiler.start("VALIDATE_RIGHT");
-    Right right = (Right) validateId(rightId, rightRepository).orElseThrow( () ->
+    Right right = (Right) validateId(rightId, rightRepository).orElseThrow(() ->
         new ValidationMessageException(
             new Message(RightMessageKeys.ERROR_NOT_FOUND_WITH_ID, rightId)));
 

@@ -5,18 +5,20 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.STOCK_ADJUSTMENT_REASONS_MANAGE;
 
+import java.util.List;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -39,9 +41,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.List;
-import java.util.UUID;
 
 @Controller
 @Transactional
@@ -199,7 +198,7 @@ public class StockAdjustmentReasonController extends BaseController {
 
 
   /**
-   * Retrieves StockAdjustmentReasons for a specified program
+   * Retrieves StockAdjustmentReasons for a specified program.
    *
    * @param programId the program id.
    * @return a list of StockAdjustmentReasons.

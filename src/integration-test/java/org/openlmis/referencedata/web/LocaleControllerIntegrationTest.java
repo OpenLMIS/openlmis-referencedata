@@ -35,7 +35,7 @@ public class LocaleControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(response.getClass());
 
-    assertEquals("UTC" ,response.getTimeZoneId());
+    assertEquals("UTC", response.getTimeZoneId());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

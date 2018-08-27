@@ -5,12 +5,12 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.web.csv.model;
@@ -28,22 +28,22 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ImportField {
   /**
-   * indicate if field is mandatory
+   * indicate if field is mandatory.
    */
   boolean mandatory() default false;
 
   /**
-   * indicate field type
+   * indicate field type.
    */
   String type() default "String";
 
   /**
-   * indicate field name
+   * indicate field name.
    */
   String name() default "";
 
   /**
-   * indicate nested field value
+   * indicate nested field value.
    */
   String nested() default "";
 }
