@@ -142,17 +142,18 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
       return false;
     }
     OrderableDto that = (OrderableDto) obj;
-    return Objects.equals(productCode, that.productCode)
+    boolean mainPropertiesEquals = Objects.equals(productCode, that.productCode)
         && Objects.equals(dispensable, that.dispensable)
         && Objects.equals(fullProductName, that.fullProductName)
-        && Objects.equals(description, that.description)
-        && Objects.equals(netContent, that.netContent)
+        && Objects.equals(description, that.description);
+    boolean packPropertiesEquals = Objects.equals(netContent, that.netContent)
         && Objects.equals(packRoundingThreshold, that.packRoundingThreshold)
-        && Objects.equals(roundToZero, that.roundToZero)
-        && Objects.equals(programs, that.programs)
+        && Objects.equals(roundToZero, that.roundToZero);
+    boolean mapPropertiesEquals = Objects.equals(programs, that.programs)
         && Objects.equals(identifiers, that.identifiers)
         && Objects.equals(extraData, that.extraData)
         && isMetaEquals(that);
+    return mainPropertiesEquals && packPropertiesEquals && mapPropertiesEquals;
   }
 
   @Override
