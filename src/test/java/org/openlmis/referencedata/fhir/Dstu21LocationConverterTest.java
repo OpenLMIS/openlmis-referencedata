@@ -37,7 +37,7 @@ public class Dstu21LocationConverterTest {
 
   @Test
   public void shouldCovertOpenLmisLocationToFhirLocation() {
-    Location olmisLocation = new Location(SERVICE_URL, new FacilityDataBuilder().build());
+    Location olmisLocation = Location.newInstance(SERVICE_URL, new FacilityDataBuilder().build());
     org.hl7.fhir.dstu2016may.model.Location fhirLocation = converter.convert(olmisLocation);
 
     assertThat(fhirLocation.getName()).isEqualTo(olmisLocation.getName());

@@ -20,20 +20,16 @@ import static org.openlmis.referencedata.fhir.Coding.AREA;
 import static org.openlmis.referencedata.fhir.Coding.SITE;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.common.collect.ImmutableList;
-import com.vividsolutions.jts.geom.Point;
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.collections.CollectionUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.web.FacilityOperatorController;
 import org.openlmis.referencedata.web.FacilityTypeController;
 import org.openlmis.referencedata.web.GeographicLevelController;
@@ -45,98 +41,96 @@ import org.openlmis.referencedata.web.ProgramController;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class Location extends Resource {
-
   static final String RESOURCE_TYPE_NAME = "Location";
 
   private final List<String> alias;
   private final List<Identifier> identifier;
-  private final String name;
-  private final Position position;
-  private final PhysicalType physicalType;
-  private final Reference partOf;
-  private final String description;
-  private final String status;
+
+  private String name;
+  private Position position;
+  private PhysicalType physicalType;
+  private Reference partOf;
+  private String description;
+  private String status;
+
+  private Location(UUID id) {
+    super(id, RESOURCE_TYPE_NAME);
+
+    this.alias = Lists.newArrayList();
+    this.identifier = Lists.newArrayList();
+  }
 
   /**
    * Creates new instance of Location based on data from {@link GeographicZone}.
    */
-  Location(String serviceUrl, GeographicZone zone) {
-    this(zone.getId(), ImmutableList.of(zone.getCode()), getIdentifier(serviceUrl, zone),
-        zone.getName(), new Position(zone.getLongitude(), zone.getLatitude()),
-        new PhysicalType(AREA), getGeographicZoneAsReference(serviceUrl, zone.getParent()),
-        null, null);
+  static Location newInstance(String serviceUrl, GeographicZone zone) {
+    Location location = new Location(zone.getId());
+    location.addAlias(zone.getCode());
+    location.addIdentifier(
+        serviceUrl, GeographicLevelController.RESOURCE_PATH, zone.getLevel().getId());
+    location.name = zone.getName();
+    location.position = new Position(zone.getLongitude(), zone.getLatitude());
+    location.physicalType = new PhysicalType(AREA);
+
+    Optional
+        .ofNullable(zone.getParent())
+        .ifPresent(parent ->
+            location.partOf =
+                new Reference(serviceUrl, LocationController.RESOURCE_PATH, parent.getId()));
+
+    return location;
   }
 
   /**
    * Creates new instance of Location based on data from {@link Facility}.
    */
-  Location(String serviceUrl, Facility facility) {
-    this(facility.getId(), ImmutableList.of(facility.getCode()),
-        getIdentifier(serviceUrl, facility), facility.getName(),
-        getPosition(facility.getLocation()), new PhysicalType(SITE),
-        getGeographicZoneAsReference(serviceUrl, facility.getGeographicZone()),
-        facility.getDescription(), getStatus(facility));
-  }
+  static Location newInstance(String serviceUrl, Facility facility) {
+    Location location = new Location(facility.getId());
+    location.addAlias(facility.getCode());
 
-  private Location(UUID id, List<String> alias, List<Identifier> identifier, String name,
-      Position position, PhysicalType physicalType, Reference partOf,
-      String description, String status) {
-    super(id, RESOURCE_TYPE_NAME);
+    Optional
+        .ofNullable(facility.getSupportedPrograms())
+        .orElse(Collections.emptySet())
+        .forEach(sp -> location.addIdentifier(
+            serviceUrl, ProgramController.RESOURCE_PATH, sp.programId()));
 
-    this.alias = alias;
-    this.identifier = identifier;
-    this.name = name;
-    this.position = position;
-    this.physicalType = physicalType;
-    this.partOf = partOf;
-    this.description = description;
-    this.status = status;
-  }
-
-  private static List<Identifier> getIdentifier(String serviceUrl, GeographicZone zone) {
-    return ImmutableList.of(
-        new Identifier(
-            serviceUrl,
-            GeographicLevelController.RESOURCE_PATH, zone.getLevel().getId()));
-  }
-
-  private static List<Identifier> getIdentifier(String serviceUrl, Facility facility) {
-    Set<SupportedProgram> supportedPrograms = facility.getSupportedPrograms();
-    List<Identifier> identifier;
-
-    if (!CollectionUtils.isEmpty(supportedPrograms)) {
-      identifier = new ArrayList<>(supportedPrograms.size() + 2);
-      supportedPrograms.forEach(sp -> identifier.add(new Identifier(
-          serviceUrl, ProgramController.RESOURCE_PATH, sp.programId())));
-    } else {
-      identifier = new ArrayList<>(2);
-    }
-
-    identifier.add(new Identifier(
-        serviceUrl, FacilityTypeController.RESOURCE_PATH, facility.getType().getId()));
+    location.addIdentifier(
+        serviceUrl, FacilityTypeController.RESOURCE_PATH, facility.getType().getId());
 
     Optional
         .ofNullable(facility.getOperator())
-        .ifPresent(operator -> identifier.add(new Identifier(
-            serviceUrl, FacilityOperatorController.RESOURCE_PATH, operator.getId())));
+        .ifPresent(operator -> location.addIdentifier(
+            serviceUrl, FacilityOperatorController.RESOURCE_PATH, operator.getId()));
 
-    return identifier;
+    location.name = facility.getName();
+
+    Optional
+        .ofNullable(facility.getLocation())
+        .ifPresent(point -> location.position = new Position(point.getX(), point.getY()));
+
+    location.physicalType = new PhysicalType(SITE);
+
+    Optional
+        .ofNullable(facility.getGeographicZone())
+        .ifPresent(zone ->
+            location.partOf =
+                new Reference(serviceUrl, LocationController.RESOURCE_PATH, zone.getId()));
+
+    location.description = facility.getDescription();
+
+    location.status = isTrue(facility.getActive())
+        ? Status.ACTIVE.toString()
+        : Status.INACTIVE.toString();
+
+    return location;
   }
 
-  private static Reference getGeographicZoneAsReference(String serviceUrl, GeographicZone zone) {
-    return zone != null
-        ? new Reference(serviceUrl, LocationController.RESOURCE_PATH, zone.getId())
-        : null;
+  private void addAlias(String alias) {
+    this.alias.add(alias);
   }
 
-  private static Position getPosition(Point location) {
-    return location != null
-        ? new Position(location.getX(), location.getY())
-        : null;
-  }
-
-  private static String getStatus(Facility facility) {
-    return isTrue(facility.getActive()) ? Status.ACTIVE.toString() : Status.INACTIVE.toString();
+  private void addIdentifier(String serviceUrl, String path, UUID uuid) {
+    identifier.add(new Identifier(serviceUrl, path, uuid));
   }
 
 }

@@ -27,11 +27,11 @@ public class LocationFactory {
   private String serviceUrl;
 
   public Location createFor(GeographicZone zone) {
-    return new Location(serviceUrl, zone);
+    return Location.newInstance(serviceUrl, zone);
   }
 
   public Location createFor(Facility facility) {
-    return new Location(serviceUrl, facility);
+    return Location.newInstance(serviceUrl, facility);
   }
 
 }

@@ -51,7 +51,7 @@ public class LocationTest {
 
   @Test
   public void shouldImplementToString() {
-    Location dto = new Location("service-url", new FacilityDataBuilder().build());
+    Location dto = Location.newInstance("service-url", new FacilityDataBuilder().build());
     ToStringTestUtils.verify(Location.class, dto, "LOCATION");
   }
 
@@ -60,7 +60,7 @@ public class LocationTest {
     GeographicZone zone = new GeographicZoneDataBuilder()
         .withParent(new GeographicZoneDataBuilder().build())
         .build();
-    Location location = new Location(SERVICE_URL, zone);
+    Location location = Location.newInstance(SERVICE_URL, zone);
 
     assertThat(location.getId())
         .isEqualTo(zone.getId());
@@ -103,7 +103,7 @@ public class LocationTest {
     Optional.ofNullable(program).ifPresent(builder::withSupportedProgram);
     Facility facility = builder.build();
 
-    Location location = new Location(SERVICE_URL, facility);
+    Location location = Location.newInstance(SERVICE_URL, facility);
 
     assertThat(location.getId())
         .isEqualTo(facility.getId());
