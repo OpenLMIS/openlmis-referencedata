@@ -16,10 +16,9 @@
 package org.openlmis.referencedata.fhir;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 import org.hl7.fhir.exceptions.FHIRException;
-import org.hl7.fhir.instance.model.CodeableConcept;
-import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Identifier;
 import org.hl7.fhir.instance.model.Location.LocationPositionComponent;
 import org.hl7.fhir.instance.model.Location.LocationStatus;
@@ -39,13 +38,14 @@ class Dstu2Hl7OrgLocationConverter extends LocationConverter<org.hl7.fhir.instan
 
   @Override
   void setPhysicalType(org.hl7.fhir.instance.model.Location resource, Location input) {
-    CodeableConcept physicalType = new CodeableConcept();
+    org.hl7.fhir.instance.model.CodeableConcept physicalType =
+        new org.hl7.fhir.instance.model.CodeableConcept();
     input
         .getPhysicalType()
         .getCoding()
         .stream()
         .map(elem -> {
-          Coding coding = new Coding();
+          org.hl7.fhir.instance.model.Coding coding = new org.hl7.fhir.instance.model.Coding();
           coding.setSystem(elem.getSystem());
           coding.setCode(elem.getCode());
           coding.setDisplay(elem.getDisplay());
@@ -94,13 +94,15 @@ class Dstu2Hl7OrgLocationConverter extends LocationConverter<org.hl7.fhir.instan
 
   @Override
   void setPosition(org.hl7.fhir.instance.model.Location resource, Location input) {
-    if (null != input.getPosition()) {
-      LocationPositionComponent position = new LocationPositionComponent();
-      position.setLatitude(new BigDecimal(input.getPosition().getLatitude()));
-      position.setLongitude(new BigDecimal(input.getPosition().getLongitude()));
+    Optional
+        .ofNullable(input.getPosition())
+        .ifPresent(position -> {
+          LocationPositionComponent positionComponent = new LocationPositionComponent();
+          positionComponent.setLatitude(new BigDecimal(position.getLatitude()));
+          positionComponent.setLongitude(new BigDecimal(position.getLongitude()));
 
-      resource.setPosition(position);
-    }
+          resource.setPosition(positionComponent);
+        });
   }
 
   @Override
@@ -110,13 +112,15 @@ class Dstu2Hl7OrgLocationConverter extends LocationConverter<org.hl7.fhir.instan
 
   @Override
   void setStatus(org.hl7.fhir.instance.model.Location resource, Location input) {
-    if (null != input.getStatus()) {
-      try {
-        resource.setStatus(LocationStatus.fromCode(input.getStatus()));
-      } catch (FHIRException exp) {
-        throw new IllegalStateException(exp);
-      }
-    }
+    Optional
+        .ofNullable(input.getStatus())
+        .ifPresent(status -> {
+          try {
+            resource.setStatus(LocationStatus.fromCode(status));
+          } catch (FHIRException exp) {
+            throw new IllegalStateException(exp);
+          }
+        });
   }
 
 }

@@ -23,25 +23,14 @@ import org.springframework.util.CollectionUtils;
 
 class Dstu2Hl7OrgLocationSynchronizer extends LocationSynchronizer<Location, Bundle> {
 
-  @Override
-  Class<Location> getFhirClass() {
-    return Location.class;
-  }
-
-  @Override
-  Class<Bundle> getBundleClass() {
-    return Bundle.class;
+  Dstu2Hl7OrgLocationSynchronizer() {
+    super(Location.class, Bundle.class, false);
   }
 
   @Override
   Location getEntry(Bundle bundle) {
     List<BundleEntryComponent> entries = bundle.getEntry();
     return CollectionUtils.isEmpty(entries) ? null : (Location) entries.get(0).getResource();
-  }
-
-  @Override
-  void copyIdElement(Location existing, Location fhirLocation) {
-    fhirLocation.setId(existing.getIdElement());
   }
 
 }

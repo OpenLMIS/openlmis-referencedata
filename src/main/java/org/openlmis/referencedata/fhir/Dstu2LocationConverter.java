@@ -15,12 +15,11 @@
 
 package org.openlmis.referencedata.fhir;
 
-import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
-import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.valueset.LocationStatusEnum;
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 class Dstu2LocationConverter extends LocationConverter<ca.uhn.fhir.model.dstu2.resource.Location> {
@@ -37,13 +36,15 @@ class Dstu2LocationConverter extends LocationConverter<ca.uhn.fhir.model.dstu2.r
 
   @Override
   void setPhysicalType(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
-    CodeableConceptDt physicalType = new CodeableConceptDt();
+    ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt physicalType =
+        new ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt();
     input
         .getPhysicalType()
         .getCoding()
         .stream()
         .map(elem -> {
-          CodingDt coding = new CodingDt();
+          ca.uhn.fhir.model.dstu2.composite.CodingDt coding =
+              new ca.uhn.fhir.model.dstu2.composite.CodingDt();
           coding.setSystem(elem.getSystem());
           coding.setCode(elem.getCode());
           coding.setDisplay(elem.getDisplay());
@@ -92,14 +93,16 @@ class Dstu2LocationConverter extends LocationConverter<ca.uhn.fhir.model.dstu2.r
 
   @Override
   void setPosition(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
-    if (null != input.getPosition()) {
-      ca.uhn.fhir.model.dstu2.resource.Location.Position position =
-          new ca.uhn.fhir.model.dstu2.resource.Location.Position();
-      position.setLatitude(new BigDecimal(input.getPosition().getLatitude()));
-      position.setLongitude(new BigDecimal(input.getPosition().getLongitude()));
+    Optional
+        .ofNullable(input.getPosition())
+        .ifPresent(position -> {
+          ca.uhn.fhir.model.dstu2.resource.Location.Position positionComponent =
+              new ca.uhn.fhir.model.dstu2.resource.Location.Position();
+          positionComponent.setLatitude(new BigDecimal(position.getLatitude()));
+          positionComponent.setLongitude(new BigDecimal(position.getLongitude()));
 
-      resource.setPosition(position);
-    }
+          resource.setPosition(positionComponent);
+        });
   }
 
   @Override
@@ -109,9 +112,9 @@ class Dstu2LocationConverter extends LocationConverter<ca.uhn.fhir.model.dstu2.r
 
   @Override
   void setStatus(ca.uhn.fhir.model.dstu2.resource.Location resource, Location input) {
-    if (null != input.getStatus()) {
-      resource.setStatus(LocationStatusEnum.forCode(input.getStatus()));
-    }
+    Optional
+        .ofNullable(input.getStatus())
+        .ifPresent(status -> resource.setStatus(LocationStatusEnum.forCode(status)));
   }
 
 }

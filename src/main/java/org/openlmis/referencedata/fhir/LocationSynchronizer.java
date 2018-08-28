@@ -36,6 +36,16 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
   private String fhirServerUrl;
   private String serviceUrl;
 
+  private Class<T> resourceClass;
+  private Class<B> bundleClass;
+  private boolean removeVersion;
+
+  LocationSynchronizer(Class<T> resourceClass, Class<B> bundleClass, boolean removeVersion) {
+    this.resourceClass = resourceClass;
+    this.bundleClass = bundleClass;
+    this.removeVersion = removeVersion;
+  }
+
   static LocationSynchronizer getInstance(FhirVersionEnum version) {
     switch (version) {
       case DSTU2:
@@ -73,9 +83,9 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
     logger.debug("Try to find resources by criterion");
     B bundle = client
         .search()
-        .forResource(getFhirClass())
+        .forResource(resourceClass)
         .where(criterion)
-        .returnBundle(getBundleClass())
+        .returnBundle(bundleClass)
         .execute();
     T existing = getEntry(bundle);
 
@@ -101,15 +111,7 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
     return this;
   }
 
-  abstract Class<T> getFhirClass();
-
-  abstract Class<B> getBundleClass();
-
   abstract T getEntry(B bundle);
-
-  void copyIdElement(T existing, T fhirLocation) {
-    fhirLocation.setId(existing.getIdElement().withVersion(null));
-  }
 
   private void createLocation(IGenericClient client, T fhirLocation) {
     fhirLocation.setId((IIdType) null);
@@ -122,7 +124,13 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
   }
 
   private void updateLocation(IGenericClient client, T existing, T fhirLocation) {
-    copyIdElement(existing, fhirLocation);
+    IIdType idType = existing.getIdElement();
+
+    if (removeVersion) {
+      idType = idType.withVersion(null);
+    }
+
+    fhirLocation.setId(idType);
     client
         .update()
         .resource(fhirLocation)

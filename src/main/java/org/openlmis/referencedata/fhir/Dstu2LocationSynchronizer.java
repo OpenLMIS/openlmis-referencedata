@@ -23,14 +23,8 @@ import org.springframework.util.CollectionUtils;
 
 class Dstu2LocationSynchronizer extends LocationSynchronizer<Location, Bundle> {
 
-  @Override
-  Class<Location> getFhirClass() {
-    return Location.class;
-  }
-
-  @Override
-  Class<Bundle> getBundleClass() {
-    return Bundle.class;
+  Dstu2LocationSynchronizer() {
+    super(Location.class, Bundle.class, true);
   }
 
   @Override

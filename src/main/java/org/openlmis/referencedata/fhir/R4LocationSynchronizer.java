@@ -23,14 +23,8 @@ import org.springframework.util.CollectionUtils;
 
 class R4LocationSynchronizer extends LocationSynchronizer<Location, Bundle> {
 
-  @Override
-  Class<Location> getFhirClass() {
-    return Location.class;
-  }
-
-  @Override
-  Class<Bundle> getBundleClass() {
-    return Bundle.class;
+  R4LocationSynchronizer() {
+    super(Location.class, Bundle.class, true);
   }
 
   @Override
