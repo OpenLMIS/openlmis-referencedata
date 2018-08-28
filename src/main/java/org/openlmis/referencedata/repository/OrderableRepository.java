@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_ORDERABLES_CLAUSE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WITH_LATEST_ORDERABLE;
+
 import java.util.List;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
@@ -34,11 +37,6 @@ import org.springframework.data.repository.query.Param;
 @JaversSpringDataAuditable
 public interface OrderableRepository extends
     JpaRepository<Orderable, OrderableIdentity>, OrderableRepositoryCustom {
-
-  String FROM_ORDERABLES_CLAUSE = " FROM referencedata.orderables o";
-  String JOIN_WITH_LATEST_ORDERABLE = "   JOIN (SELECT id, MAX(versionid) AS versionid"
-      + "       FROM referencedata.orderables GROUP BY id) AS latest"
-      + "     ON o.id = latest.id AND o.versionid = latest.versionid";
 
   @Override
   <S extends Orderable> S save(S entity);

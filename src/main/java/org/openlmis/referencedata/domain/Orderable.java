@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,7 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
     uniqueConstraints = @UniqueConstraint(name = "unq_productcode_versionid",
         columnNames = {"code", "versionid"}))
 @NoArgsConstructor
-public class Orderable implements Identifiable, Serializable {
+public class Orderable implements Identifiable {
   public static final String TRADE_ITEM = "tradeItem";
   public static final String COMMODITY_TYPE = "commodityType";
 
@@ -73,6 +72,7 @@ public class Orderable implements Identifiable, Serializable {
   private Dispensable dispensable;
 
   @Getter
+  @Setter
   private String fullProductName;
 
   @Getter
@@ -122,24 +122,19 @@ public class Orderable implements Identifiable, Serializable {
    * 
    * @param productCode product code
    * @param dispensable dispensable
-   * @param fullProductName full product name
    * @param netContent net content
    * @param packRoundingThreshold pack rounding threshold
    * @param roundToZero round to zero
-   * @param programOrderables programs
    * @param id id
    * @param versionId version id
    */
-  public Orderable(Code productCode, Dispensable dispensable, String fullProductName,
-      long netContent, long packRoundingThreshold, boolean roundToZero,
-      List<ProgramOrderable> programOrderables, UUID id, Long versionId) {
+  public Orderable(Code productCode, Dispensable dispensable, long netContent,
+      long packRoundingThreshold, boolean roundToZero, UUID id, Long versionId) {
     this.productCode = productCode;
     this.dispensable = dispensable;
-    this.fullProductName = fullProductName;
     this.netContent = netContent;
     this.packRoundingThreshold = packRoundingThreshold;
     this.roundToZero = roundToZero;
-    this.programOrderables = programOrderables;
     this.identity = new OrderableIdentity(id, versionId);
     this.lastUpdated = ZonedDateTime.now();
   }

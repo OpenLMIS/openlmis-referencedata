@@ -163,7 +163,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
             packRoundingThreshold, roundToZero, programs, identifiers, extraData, meta);
   }
   
-  private boolean isMetaEquals(OrderableDto that) {
+  boolean isMetaEquals(OrderableDto that) {
     for (Map.Entry<String, String> metaEntry : meta.entrySet()) {
       String metaKey = metaEntry.getKey();
       Object metaValue = metaEntry.getValue();

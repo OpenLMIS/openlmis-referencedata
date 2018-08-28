@@ -97,7 +97,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         NAME, null, 10L, 5L, false, Collections.emptySet(), null, null, metaAttributes, null);
 
     orderable = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
-        NAME, 10, 5, false, Collections.emptyList(), orderableId, 1L);
+        10, 5, false, orderableId, 1L);
+    orderable.setProgramOrderables(Collections.emptyList());
     orderable.export(orderableDto);
 
     when(orderableRepository.save(any(Orderable.class))).thenReturn(orderable);

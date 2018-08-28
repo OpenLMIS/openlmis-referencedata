@@ -84,7 +84,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     orderableDisplayCategory.setId(UUID.randomUUID());
 
     orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
-        "Abcd", 10, 5, false, Collections.emptyList(), UUID.randomUUID(), 1L);
+        10, 5, false, UUID.randomUUID(), 1L);
+    orderable.setProgramOrderables(Collections.emptyList());
     orderable.setId(UUID.randomUUID());
 
     facilityType1 = new FacilityType("facilityType1");

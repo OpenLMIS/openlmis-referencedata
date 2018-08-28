@@ -127,24 +127,24 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
         .createNew(program, orderableDisplayCategory, null, currencyUnit);
     orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
-        "Ibuprofen", 10, 5, false, Collections.singletonList(programOrderableFullSupply),
-        UUID.randomUUID(), 1L);
+        10, 5, false, UUID.randomUUID(), 1L);
+    orderableFullSupply.setProgramOrderables(Collections.singletonList(programOrderableFullSupply));
     programOrderableFullSupply.setProduct(orderableFullSupply);
     orderableRepository.saveAndFlush(orderableFullSupply);
 
     ProgramOrderable programOrderable1 = ProgramOrderable
         .createNew(program2, orderableDisplayCategory, null, currencyUnit);
     orderable1 = new Orderable(Code.code("levora"), Dispensable.createNew("each"),
-        "Levora", 10, 5, false, Collections.singletonList(programOrderable1),
-        UUID.randomUUID(), 1L);
+        10, 5, false, UUID.randomUUID(), 1L);
+    orderable1.setProgramOrderables(Collections.singletonList(programOrderable1));
     programOrderable1.setProduct(orderable1);
     orderableRepository.save(orderable1);
 
     ProgramOrderable programOrderable2 = ProgramOrderable
         .createNew(program2, orderableDisplayCategory, null, currencyUnit);
     orderable2 = new Orderable(Code.code("glibenclamide"), Dispensable.createNew("each"),
-        "Glibenclamide", 10, 5, false, Collections.singletonList(programOrderable2),
-        UUID.randomUUID(), 1L);
+        10, 5, false, UUID.randomUUID(), 1L);
+    orderable2.setProgramOrderables(Collections.singletonList(programOrderable2));
     programOrderable2.setProduct(orderable2);
     orderableRepository.save(orderable2);
 
@@ -152,8 +152,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
         ProgramOrderable.createNew(program, orderableDisplayCategory, null, 0, true, false, 0,
             Money.of(currencyUnit, 0), currencyUnit);
     orderableNonFullSupply = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
-        "Gloves", 6, 3, false, Collections.singletonList(programOrderableNonFullSupply),
-        UUID.randomUUID(), 1L);
+        6, 3, false, UUID.randomUUID(), 1L);
+    orderableNonFullSupply.setProgramOrderables(
+        Collections.singletonList(programOrderableNonFullSupply));
     programOrderableNonFullSupply.setProduct(orderableNonFullSupply);
     orderableRepository.saveAndFlush(orderableNonFullSupply);
 

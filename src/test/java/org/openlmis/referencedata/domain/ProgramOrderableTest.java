@@ -35,8 +35,8 @@ public class ProgramOrderableTest {
   {
     em = new Program("EM");
     testCat = OrderableDisplayCategory.createNew(Code.code("test"));
-    ibuprofen = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), IBUPROFEN,
-        20, 10, false, null, UUID.randomUUID(), 1L);
+    ibuprofen = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), 20, 10, false,
+        UUID.randomUUID(), 1L);
   }
 
   @Test

@@ -104,9 +104,11 @@ public class OrderableDataBuilder {
    * Builds instance of {@link Orderable} without id field.
    */
   public Orderable buildAsNew() {
-    Orderable orderable = new Orderable(productCode, dispensable, fullProductName,
-        netContent, packRoundingTreshold, roundToZero, programOrderables, id, versionId);
+    Orderable orderable = new Orderable(productCode, dispensable, netContent, packRoundingTreshold,
+        roundToZero, id, versionId);
+    orderable.setFullProductName(fullProductName);
     orderable.setDescription(description);
+    orderable.setProgramOrderables(programOrderables);
     orderable.setIdentifiers(identifiers);
     orderable.setExtraData(extraData);
     orderable.setLastUpdated(lastUpdated);

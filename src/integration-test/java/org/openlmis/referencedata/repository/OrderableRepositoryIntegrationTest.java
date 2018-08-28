@@ -299,7 +299,8 @@ public class OrderableRepositoryIntegrationTest {
     Program validProgram = createProgram("valid-code");
     List<ProgramOrderable> programOrderables = new ArrayList<>();
     Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
-        Dispensable.createNew(EACH), NAME, 10, 5, false, programOrderables, UUID.randomUUID(), 1L);
+        Dispensable.createNew(EACH), 10, 5, false, UUID.randomUUID(), 1L);
+    validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
@@ -337,7 +338,8 @@ public class OrderableRepositoryIntegrationTest {
     // given an orderable in that program
     List<ProgramOrderable> programOrderables = new ArrayList<>();
     Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
-        Dispensable.createNew(EACH), NAME, 10, 5, false, programOrderables, UUID.randomUUID(), 1L);
+        Dispensable.createNew(EACH), 10, 5, false, UUID.randomUUID(), 1L);
+    validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
@@ -365,14 +367,14 @@ public class OrderableRepositoryIntegrationTest {
 
   @Test
   public void shouldFindOrderablesByAllParams() {
-    // given a program
-    Program validProgram = createProgram("some-test-code");
-
-    // given an orderable in that program
+    // given an orderable in a program
     List<ProgramOrderable> programOrderables = new ArrayList<>();
     Orderable validOrderable = new Orderable(Code.code(CODE), Dispensable.createNew(EACH),
-        NAME, 10, 5, false, programOrderables, UUID.randomUUID(), 1L);
+        10, 5, false, UUID.randomUUID(), 1L);
+    validOrderable.setFullProductName(NAME);
+    validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
+    Program validProgram = createProgram("some-test-code");
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
 
@@ -382,7 +384,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository.search(validOrderable.getProductCode().toString(),
-        CODE,
+        NAME,
         validProgram.getCode(),
         null);
 
@@ -573,7 +575,8 @@ public class OrderableRepositoryIntegrationTest {
     Program validProgram = createProgram(programCode);
     List<ProgramOrderable> programOrderables = new ArrayList<>();
     Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
-        Dispensable.createNew(EACH), NAME, 10, 5, false, programOrderables, UUID.randomUUID(), 1L);
+        Dispensable.createNew(EACH), 10, 5, false, UUID.randomUUID(), 1L);
+    validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     validOrderable = repository.save(validOrderable);
