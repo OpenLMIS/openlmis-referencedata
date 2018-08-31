@@ -57,6 +57,7 @@ import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -361,6 +362,20 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // then
     assertEquals(1, foundFacilities.size());
     assertThat(foundFacilities, hasItem(facility));
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldRejectIfFacilityCodeIsNotUniqueCaseInsensitive() {
+    Facility facilityWithUpperCaseCode = getFacilityDataBuilder()
+        .withCode("CODE")
+        .buildAsNew();
+
+    Facility facilityWithLowerCaseCode = getFacilityDataBuilder()
+        .withCode("code")
+        .buildAsNew();
+
+    repository.saveAndFlush(facilityWithUpperCaseCode);
+    repository.saveAndFlush(facilityWithLowerCaseCode);
   }
 
   @Override
