@@ -1,5 +1,8 @@
-11.1.0 / WIP
+12.0.0 / WIP
 ===================
+
+Breaking changes:
+* [OLMIS-3341](https://openlmis.atlassian.net/browse/OLMIS-3341): Removed DELETE /api/processingPeriods/{id} endpoint
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-4940](https://openlmis.atlassian.net/browse/OLMIS-4940): Ensured that the microservice gets system time zone from configuration on startup:

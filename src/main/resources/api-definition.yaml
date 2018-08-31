@@ -496,20 +496,6 @@ resourceTypes:
                   type: string
                   required: true
                   repeat: false
-          delete:
-              is: [ secured ]
-              description: "[AVOID USING] Completely removes processing period. This action is not recoverable."
-              responses:
-                  "204":
-                  "403":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-                  "404":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
-                  "409":
           get:
               is: [ secured ]
               description: Get chosen processingPeriod.

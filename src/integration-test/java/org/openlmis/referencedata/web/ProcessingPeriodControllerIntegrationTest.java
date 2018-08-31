@@ -264,23 +264,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldDeletePeriod() {
-    mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", firstPeriodId)
-        .when()
-        .delete(ID_URL)
-        .then()
-        .statusCode(204);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldPutPeriod() {
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     firstPeriod.setDescription("OpenLMIS");
@@ -387,22 +370,6 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .get(DIFFERENCE_URL)
         .then()
         .statusCode(401);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnUnauthorizedOnDeletePeriodIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", firstPeriodId)
-        .when()
-        .delete(ID_URL)
-        .then()
-        .statusCode(403);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

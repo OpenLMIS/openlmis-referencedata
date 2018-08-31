@@ -176,23 +176,6 @@ public class ProcessingPeriodController extends BaseController {
   }
 
   /**
-   * Allows deleting ProcessingPeriodDto.
-   *
-   * @param periodId UUID of the ProcessingPeriodDto which we want to delete
-   */
-  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteProcessingPeriod(@PathVariable("id") UUID periodId) {
-    rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    ProcessingPeriod period = periodRepository.findOne(periodId);
-    if (period == null) {
-      throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      periodRepository.delete(period);
-    }
-  }
-
-  /**
    * Returns total difference between start date and end date from given ProcessingPeriod rounded to
    * whole months.
    *
