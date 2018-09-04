@@ -157,9 +157,13 @@ public class FacilityDataBuilder {
     return this;
   }
 
-  public FacilityDataBuilder withoutOperator() {
-    this.operator = null;
+  public FacilityDataBuilder withOperator(FacilityOperator operator) {
+    this.operator = operator;
     return this;
+  }
+
+  public FacilityDataBuilder withoutOperator() {
+    return withOperator(null);
   }
 
   public FacilityDataBuilder withLocation(Point location) {

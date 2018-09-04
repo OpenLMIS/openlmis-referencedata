@@ -19,22 +19,16 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.domain.SupportedProgram;
-import org.openlmis.referencedata.domain.SupportedProgramPrimaryKey;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.MinimalFacilityDto;
-import org.openlmis.referencedata.dto.SupportedProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.fhir.FhirClient;
@@ -43,6 +37,7 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
+import org.openlmis.referencedata.service.FacilityBuilder;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.util.Message;
@@ -110,6 +105,9 @@ public class FacilityController extends BaseController {
   @Autowired
   private FhirClient fhirClient;
 
+  @Autowired
+  private FacilityBuilder facilityBuilder;
+
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
    *
@@ -131,12 +129,9 @@ public class FacilityController extends BaseController {
     throwValidationMessageExceptionIfErrors(bindingResult);
 
     XLOGGER.debug("Creating new facility");
-    profiler.start("IMPORT_FACILITY_FROM_DTO");
+    profiler.start("BUILD_FACILITY_FROM_DTO");
     facilityDto.setId(null);
-    Facility newFacility = Facility.newFacility(facilityDto);
-
-    profiler.start("ADD_SUPPORTED_PROGRAMS");
-    addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(), newFacility);
+    Facility newFacility = facilityBuilder.build(facilityDto);
 
     profiler.start("SAVE");
     newFacility = facilityRepository.save(newFacility);
@@ -252,12 +247,8 @@ public class FacilityController extends BaseController {
     facilityValidator.validate(facilityDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    profiler.start("IMPORT_FACILITY_FROM_DTO");
-    Facility facilityToSave = Facility.newFacility(facilityDto);
-    facilityToSave.setId(facilityId);
-
-    profiler.start("ADD_SUPPORTED_PROGRAMS");
-    addSupportedProgramsToFacility(facilityDto.getSupportedPrograms(), facilityToSave);
+    profiler.start("BUILD_FACILITY_FROM_DTO");
+    Facility facilityToSave = facilityBuilder.build(facilityDto);
 
     profiler.start("SAVE_FACILITY");
     facilityToSave = facilityRepository.saveAndFlush(facilityToSave);
@@ -542,26 +533,4 @@ public class FacilityController extends BaseController {
         .collect(Collectors.toList());
   }
 
-  private void addSupportedProgramsToFacility(Set<SupportedProgramDto> supportedProgramDtos,
-                                                 Facility facility) {
-    if (supportedProgramDtos != null) {
-      for (SupportedProgramDto dto : supportedProgramDtos) {
-        Program program;
-        if (dto.getCode() != null) {
-          program = programRepository.findByCode(Code.code(dto.getCode()));
-        } else if (dto.getId() != null) {
-          program = programRepository.findOne(dto.getId());
-        } else {
-          throw new ValidationMessageException(ProgramMessageKeys.ERROR_CODE_OR_ID_REQUIRED);
-        }
-        if (program == null) {
-          throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
-        }
-        SupportedProgram supportedProgram = new SupportedProgram(
-            new SupportedProgramPrimaryKey(facility, program), dto.isSupportActive(),
-            dto.isSupportLocallyFulfilled(), dto.getSupportStartDate());
-        facility.addSupportedProgram(supportedProgram);
-      }
-    }
-  }
 }

@@ -15,7 +15,9 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.Map;
@@ -64,12 +66,18 @@ public final class FacilityDto extends BasicFacilityDto {
     setId(id);
   }
 
+  @JsonSetter("operator")
+  public void setOperator(FacilityOperatorDto operator) {
+    this.operator = operator;
+  }
+
   @Override
+  @JsonIgnore
   public void setOperator(FacilityOperator operator) {
     this.operator = new FacilityOperatorDto();
     operator.export(this.operator);
   }
-  
+
   @Override
   public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
     if (supportedPrograms == null) {

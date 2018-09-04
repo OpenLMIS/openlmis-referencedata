@@ -40,6 +40,7 @@ import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -47,6 +48,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.NamedResource;
 
 @Entity
+@NoArgsConstructor
 @TypeName("Facility")
 @Table(name = "facilities", schema = "referencedata")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -158,10 +160,6 @@ public class Facility extends BaseEntity {
   @Setter
   private Map<String, String> extraData;
 
-  private Facility() {
-
-  }
-
   public Facility(String code) {
     this.code = code;
   }
@@ -227,6 +225,29 @@ public class Facility extends BaseEntity {
     facility.setLocation(importer.getLocation());
 
     return facility;
+  }
+
+  /**
+   * Update this from another.
+   *
+   * @param importer object to update from.
+   */
+  public void updateFrom(Importer importer) {
+    code = importer.getCode();
+    name = importer.getName();
+    description = importer.getDescription();
+    extraData = importer.getExtraData();
+    active = importer.getActive();
+    goLiveDate = importer.getGoLiveDate();
+    goDownDate = importer.getGoDownDate();
+    comment = importer.getComment();
+    enabled = importer.getEnabled();
+    openLmisAccessible = importer.getOpenLmisAccessible();
+    location = importer.getLocation();
+  }
+
+  public void removeAllSupportedPrograms() {
+    supportedPrograms.clear();
   }
 
   public void addSupportedProgram(SupportedProgram supportedProgram) {

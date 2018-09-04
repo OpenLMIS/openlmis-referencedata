@@ -17,7 +17,6 @@ package org.openlmis.referencedata.domain;
 
 import com.vividsolutions.jts.geom.Polygon;
 import java.util.Objects;
-import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -159,9 +158,7 @@ public class GeographicZone extends BaseEntity {
     exporter.setBoundary(boundary);
   }
 
-  public interface Exporter {
-
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter {
 
     void setCode(String code);
 
@@ -181,9 +178,7 @@ public class GeographicZone extends BaseEntity {
 
   }
 
-  public interface Importer {
-
-    UUID getId();
+  public interface Importer extends BaseImporter {
 
     String getCode();
 

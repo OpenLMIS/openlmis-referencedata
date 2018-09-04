@@ -51,6 +51,8 @@ import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
@@ -60,6 +62,8 @@ import org.openlmis.referencedata.dto.MinimalFacilityDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
@@ -95,6 +99,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID orderableId2;
   private UUID supervisoryNodeId;
   private Program program;
+  private GeographicZone geographicZone = new GeographicZoneDataBuilder().build();
+  private FacilityType facilityType = new FacilityTypeDataBuilder().build();
   private Facility facility;
   private Facility facility1;
   private Program program1;
@@ -118,12 +124,25 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     program = new ProgramDataBuilder().withId(programId).build();
     program1 = new ProgramDataBuilder().withId(programId).build();
     facility = new FacilityDataBuilder()
-        .withSupportedProgram(program).build();
+        .withSupportedProgram(program)
+        .withGeographicZone(geographicZone)
+        .withType(facilityType)
+        .withoutOperator()
+        .build();
     facility1 = new FacilityDataBuilder()
-            .withSupportedProgram(program)
-            .withSupportedProgram(program1).build();
+        .withSupportedProgram(program)
+        .withSupportedProgram(program1)
+        .withGeographicZone(geographicZone)
+        .withType(facilityType)
+        .withoutOperator()
+        .build();
 
     mockUserHasRight(FACILITIES_MANAGE_RIGHT);
+
+    given(geographicZoneRepository.findOne(geographicZone.getId())).willReturn(geographicZone);
+    given(facilityTypeRepository.findOne(facilityType.getId())).willReturn(facilityType);
+    given(facilityRepository.findOne(facility.getId())).willReturn(facility);
+    given(facilityRepository.findOne(facility1.getId())).willReturn(facility1);
   }
 
   @Test

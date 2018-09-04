@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.domain;
 
 import java.util.Objects;
-import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -99,9 +98,7 @@ public class FacilityOperator extends BaseEntity {
     exporter.setDisplayOrder(displayOrder);
   }
 
-  public interface Exporter {
-
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter {
 
     void setCode(String code);
 
@@ -113,9 +110,7 @@ public class FacilityOperator extends BaseEntity {
 
   }
 
-  public interface Importer {
-
-    UUID getId();
+  public interface Importer extends BaseImporter {
 
     String getCode();
 

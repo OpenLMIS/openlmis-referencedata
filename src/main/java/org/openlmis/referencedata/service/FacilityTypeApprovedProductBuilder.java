@@ -15,14 +15,13 @@
 
 package org.openlmis.referencedata.service;
 
-import java.util.UUID;
-import java.util.function.Function;
-import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
+import static org.openlmis.referencedata.domain.FacilityTypeApprovedProduct.Importer;
+import static org.openlmis.referencedata.domain.FacilityTypeApprovedProduct.newFacilityTypeApprovedProduct;
+
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -33,7 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FacilityTypeApprovedProductBuilder {
+public class FacilityTypeApprovedProductBuilder
+    extends DomainResourceBuilder<Importer, FacilityTypeApprovedProduct> {
 
   @Autowired
   private OrderableRepository orderableRepository;
@@ -47,7 +47,7 @@ public class FacilityTypeApprovedProductBuilder {
   /**
    * Creates new {@link FacilityTypeApprovedProduct} based on data from importer.
    */
-  public FacilityTypeApprovedProduct build(FacilityTypeApprovedProduct.Importer importer) {
+  public FacilityTypeApprovedProduct build(Importer importer) {
     Orderable orderable = findResource(
         orderableRepository::findFirstByIdentityIdOrderByIdentityVersionIdDesc,
         importer.getOrderable(), OrderableMessageKeys.ERROR_NOT_FOUND);
@@ -56,28 +56,12 @@ public class FacilityTypeApprovedProductBuilder {
     FacilityType facilityType = findResource(facilityTypeRepository::findOne,
         importer.getFacilityType(), FacilityTypeMessageKeys.ERROR_NOT_FOUND);
 
-    FacilityTypeApprovedProduct approvedProduct = FacilityTypeApprovedProduct
-        .newFacilityTypeApprovedProduct(importer);
+    FacilityTypeApprovedProduct approvedProduct = newFacilityTypeApprovedProduct(importer);
     approvedProduct.setOrderable(orderable);
     approvedProduct.setProgram(program);
     approvedProduct.setFacilityType(facilityType);
 
     return approvedProduct;
   }
-
-  private <R> R findResource(Function<UUID, R> finder, BaseImporter importer, String errorMessage) {
-    if (null == importer || null == importer.getId()) {
-      throw new ValidationMessageException(errorMessage);
-    }
-
-    R resource = finder.apply(importer.getId());
-
-    if (null == resource) {
-      throw new ValidationMessageException(errorMessage);
-    }
-
-    return resource;
-  }
-
 
 }

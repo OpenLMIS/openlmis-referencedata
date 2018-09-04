@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.Map;
@@ -50,13 +52,25 @@ public class BasicFacilityDto extends MinimalFacilityDto implements Facility.Imp
     return dto;
   }
 
+  @JsonSetter("geographicZone")
+  public void setGeographicZone(GeographicZoneSimpleDto geographicZone) {
+    this.geographicZone = geographicZone;
+  }
+
   @Override
+  @JsonIgnore
   public void setGeographicZone(GeographicZone geographicZone) {
     this.geographicZone = new GeographicZoneSimpleDto();
     geographicZone.export(this.geographicZone);
   }
 
+  @JsonSetter("type")
+  public void setType(FacilityTypeDto type) {
+    this.type = type;
+  }
+
   @Override
+  @JsonIgnore
   public void setType(FacilityType type) {
     this.type = new FacilityTypeDto();
     type.export(this.type);
