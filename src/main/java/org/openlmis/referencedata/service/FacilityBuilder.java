@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FacilityBuilder extends DomainResourceBuilder<FacilityDto, Facility> {
+public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facility> {
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;

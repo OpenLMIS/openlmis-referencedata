@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FacilityTypeApprovedProductBuilder
-    extends DomainResourceBuilder<Importer, FacilityTypeApprovedProduct> {
+    implements DomainResourceBuilder<Importer, FacilityTypeApprovedProduct> {
 
   @Autowired
   private OrderableRepository orderableRepository;

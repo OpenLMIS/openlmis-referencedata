@@ -20,11 +20,11 @@ import java.util.function.Function;
 import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 
-public abstract class DomainResourceBuilder<I, O> {
+interface DomainResourceBuilder<I, O> {
 
-  public abstract O build(I input);
+  O build(I input);
 
-  <R> R findResource(Function<UUID, R> finder, BaseImporter importer, String errorMessage) {
+  default <R> R findResource(Function<UUID, R> finder, BaseImporter importer, String errorMessage) {
     if (null == importer || null == importer.getId()) {
       throw new ValidationMessageException(errorMessage);
     }
