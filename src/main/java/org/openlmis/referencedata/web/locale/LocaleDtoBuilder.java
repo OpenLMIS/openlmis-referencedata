@@ -24,6 +24,36 @@ public class LocaleDtoBuilder {
   @Value("${time.zoneId}")
   private String timeZoneId;
 
+  @Value("${currencyCode}")
+  private String currencyCode;
+
+  @Value("${currencySymbol}")
+  private String currencySymbol;
+
+  @Value("${currencySymbolSide}")
+  private String currencySymbolSide;
+
+  @Value("${currencyDecimalPlaces}")
+  private Integer currencyDecimalPlaces;
+
+  @Value("${groupingSeparator}")
+  private String groupingSeparator;
+
+  @Value("${groupingSize}")
+  private Integer groupingSize;
+
+  @Value("${decimalSeparator}")
+  private String decimalSeparator;
+
+  @Value("${dateFormat}")
+  private String dateFormat;
+
+  @Value("${dateTimeFormat}")
+  private String dateTimeFormat;
+
+  @Value("${datepickerFormat}")
+  private String datepickerFormat;
+
   /**
    * Create a new instance of {@link LocaleDto}.
    *
@@ -31,6 +61,8 @@ public class LocaleDtoBuilder {
    *         if timeZoneId is {@code null}.
    */
   public LocaleDto build() {
-    return new LocaleDto(timeZoneId);
+    return new LocaleDto(timeZoneId, currencyCode, currencySymbol, currencySymbolSide,
+        currencyDecimalPlaces, groupingSeparator, groupingSize, decimalSeparator, dateFormat,
+        dateTimeFormat, datepickerFormat);
   }
 }

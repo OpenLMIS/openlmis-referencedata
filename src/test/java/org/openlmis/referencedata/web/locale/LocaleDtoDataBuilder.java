@@ -18,6 +18,16 @@ package org.openlmis.referencedata.web.locale;
 public class LocaleDtoDataBuilder {
 
   private String timeZoneId = "UTC";
+  private String currencyCode = "USD";
+  private String currencySymbol = "$";
+  private String currencySymbolSide = "left";
+  private Integer currencyDecimalPlaces = 2;
+  private String groupingSeparator = ",";
+  private Integer groupingSize = 3;
+  private String decimalSeparator = ".";
+  private String dateFormat = "dd/MM/yyyy";
+  private String dateTimeFormat = "dd/MM/yyyy HH:mm:ss";
+  private String datepickerFormat = "dd/mm/yyyy";
 
   /**
    * Creates a new instance of {@link LocaleDto} without timeZoneId field.
@@ -32,6 +42,16 @@ public class LocaleDtoDataBuilder {
   public LocaleDto build() {
     LocaleDto dto = buildAsNew();
     dto.setTimeZoneId(timeZoneId);
+    dto.setCurrencyCode(currencyCode);
+    dto.setCurrencySymbol(currencySymbol);
+    dto.setCurrencySymbolSide(currencySymbolSide);
+    dto.setCurrencyDecimalPlaces(currencyDecimalPlaces);
+    dto.setGroupingSeparator(groupingSeparator);
+    dto.setGroupingSize(groupingSize);
+    dto.setDecimalSeparator(decimalSeparator);
+    dto.setDateFormat(dateFormat);
+    dto.setDateTimeFormat(dateTimeFormat);
+    dto.setDatepickerFormat(datepickerFormat);
     return dto;
   }
 }
