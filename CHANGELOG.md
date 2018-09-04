@@ -14,7 +14,8 @@ Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.
 
 Bug fixes, security and performance improvements, also backwards-compatible:
-* [OLMIS-4949](https://openlmis.atlassian.net/browse/OLMIS-4949): Made that the facility code is unique case insensitive
+* [OLMIS-4949](https://openlmis.atlassian.net/browse/OLMIS-4949): Fixed problem with updating a facility
+  * Made that the facility code is unique case insensitive
 
 11.0.0 / 2018-08-16
 ===================
