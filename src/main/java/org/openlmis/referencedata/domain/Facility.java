@@ -246,10 +246,16 @@ public class Facility extends BaseEntity {
     location = importer.getLocation();
   }
 
+  /**
+   * Removes all supported programs from this facility.
+   */
   public void removeAllSupportedPrograms() {
     supportedPrograms.clear();
   }
 
+  /**
+   * Adds supported program to this facility.
+   */
   public void addSupportedProgram(SupportedProgram supportedProgram) {
     supportedPrograms.add(supportedProgram);
   }
