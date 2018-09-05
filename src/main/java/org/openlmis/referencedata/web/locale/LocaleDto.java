@@ -49,6 +49,4 @@ public final class LocaleDto {
   private String dateFormat;
 
   private String dateTimeFormat;
-
-  private String datepickerFormat;
 }

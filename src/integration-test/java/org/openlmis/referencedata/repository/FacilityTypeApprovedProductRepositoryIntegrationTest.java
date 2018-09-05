@@ -58,6 +58,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   private static final String FACILITY_TYPE_CODE = "facilityType";
   private static final String FACILITY_TYPE2_CODE = "facilityType2";
   private static final String PROGRAM_CODE = "programCode";
+  private static final String CURRENCY_CODE = "USD";
 
   @Autowired
   private FacilityTypeApprovedProductRepository ftapRepository;
@@ -121,7 +122,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
             new OrderedDisplayValue("orderableDisplayCategoryName", 1));
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
 
-    CurrencyUnit currencyUnit = CurrencyUnit.of(System.getenv("CURRENCY_CODE"));
+    CurrencyUnit currencyUnit = CurrencyUnit.of(CURRENCY_CODE);
 
     ProgramOrderable programOrderableFullSupply = ProgramOrderable
         .createNew(program, orderableDisplayCategory, null, currencyUnit);

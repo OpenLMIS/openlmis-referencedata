@@ -51,9 +51,6 @@ public class LocaleDtoBuilder {
   @Value("${dateTimeFormat}")
   private String dateTimeFormat;
 
-  @Value("${datepickerFormat}")
-  private String datepickerFormat;
-
   /**
    * Create a new instance of {@link LocaleDto}.
    *
@@ -63,6 +60,6 @@ public class LocaleDtoBuilder {
   public LocaleDto build() {
     return new LocaleDto(timeZoneId, currencyCode, currencySymbol, currencySymbolSide,
         currencyDecimalPlaces, groupingSeparator, groupingSize, decimalSeparator, dateFormat,
-        dateTimeFormat, datepickerFormat);
+        dateTimeFormat);
   }
 }

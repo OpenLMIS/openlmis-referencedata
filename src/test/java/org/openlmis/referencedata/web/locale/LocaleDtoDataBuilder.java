@@ -27,7 +27,6 @@ public class LocaleDtoDataBuilder {
   private String decimalSeparator = ".";
   private String dateFormat = "dd/MM/yyyy";
   private String dateTimeFormat = "dd/MM/yyyy HH:mm:ss";
-  private String datepickerFormat = "dd/mm/yyyy";
 
   /**
    * Creates a new instance of {@link LocaleDto} without timeZoneId field.
@@ -51,7 +50,6 @@ public class LocaleDtoDataBuilder {
     dto.setDecimalSeparator(decimalSeparator);
     dto.setDateFormat(dateFormat);
     dto.setDateTimeFormat(dateTimeFormat);
-    dto.setDatepickerFormat(datepickerFormat);
     return dto;
   }
 }
