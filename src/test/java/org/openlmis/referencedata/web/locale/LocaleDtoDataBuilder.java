@@ -29,7 +29,7 @@ public class LocaleDtoDataBuilder {
   private String dateTimeFormat = "dd/MM/yyyy HH:mm:ss";
 
   /**
-   * Creates a new instance of {@link LocaleDto} without timeZoneId field.
+   * Creates a new instance of {@link LocaleDto} without any field.
    */
   public LocaleDto buildAsNew() {
     return new LocaleDto();

@@ -19,6 +19,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import java.math.BigDecimal;
 import java.util.Properties;
+import lombok.EqualsAndHashCode;
 import org.hibernate.SessionFactory;
 import org.hibernate.usertype.ParameterizedType;
 import org.jadira.usertype.moneyandcurrency.joda.columnmapper.BigDecimalColumnMoneyMapper;
@@ -28,6 +29,7 @@ import org.jadira.usertype.spi.shared.IntegratorConfiguredType;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
+@EqualsAndHashCode
 public class CustomSingleColumnMoneyUserType
     extends AbstractSingleColumnUserType<Money, BigDecimal, BigDecimalColumnMoneyMapper>
     implements ParameterizedType, IntegratorConfiguredType {
@@ -35,7 +37,6 @@ public class CustomSingleColumnMoneyUserType
   private static final String CURRENCY_CODE = System.getenv("CURRENCY_CODE");
 
   private Properties parameterValues;
-  private CurrencyUnit currencyUnit;
 
   @Override
   public void setParameterValues(Properties parameters) {
@@ -48,18 +49,9 @@ public class CustomSingleColumnMoneyUserType
 
   @Override
   public void applyConfiguration(SessionFactory sessionFactory) {
-
     CurrencyUnitConfigured columnMapper = getColumnMapper();
-    if (currencyUnit == null) {
-      String currencyString = null;
-      if (parameterValues != null) {
-        currencyString = parameterValues.getProperty("currencyCode");
-      }
-      if (currencyString == null) {
-        currencyString = isEmpty(CURRENCY_CODE) ? "USD" : CURRENCY_CODE;
-        currencyUnit = CurrencyUnit.of(currencyString);
-      }
-    }
+    String currencyString = isEmpty(CURRENCY_CODE) ? "USD" : CURRENCY_CODE;
+    CurrencyUnit currencyUnit = CurrencyUnit.of(currencyString);
     columnMapper.setCurrencyUnit(currencyUnit);
   }
 }
