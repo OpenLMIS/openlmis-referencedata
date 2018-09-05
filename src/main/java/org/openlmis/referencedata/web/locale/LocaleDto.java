@@ -31,22 +31,4 @@ import lombok.ToString;
 public final class LocaleDto {
 
   private String timeZoneId;
-
-  private String currencyCode;
-
-  private String currencySymbol;
-
-  private String currencySymbolSide;
-
-  private Integer currencyDecimalPlaces;
-
-  private String groupingSeparator;
-
-  private Integer groupingSize;
-
-  private String decimalSeparator;
-
-  private String dateFormat;
-
-  private String dateTimeFormat;
 }

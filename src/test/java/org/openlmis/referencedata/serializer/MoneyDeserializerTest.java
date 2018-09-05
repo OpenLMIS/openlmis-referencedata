@@ -16,8 +16,6 @@
 package org.openlmis.referencedata.serializer;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -27,25 +25,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ System.class, StringUtils.class })
 public class MoneyDeserializerTest {
-
-  private static final String CURRENCY_CODE = "CURRENCY_CODE";
 
   private ObjectMapper mapper;
   private MoneyDeserializer moneyDeserializer;
-
-  private String json = String.format("{\"value\":%s}", "\"10\"");
 
   @Before
   public void setup() {
@@ -55,29 +43,13 @@ public class MoneyDeserializerTest {
 
   @Test(expected = NumberFormatException.class)
   public void shouldNotDeserializeMoneyWhenValueEmpty() throws IOException {
-    json = String.format("{\"value\":%s}", "\"\"");
+    String json = String.format("{\"value\":%s}", "\"\"");
     deserializeMoney(json);
   }
 
   @Test
-  public void shouldDeserializeMoneyIfCurrencyCodeIsSetInEnv() throws IOException {
-    mockStatic(System.class);
-    when(System.getenv(CURRENCY_CODE)).thenReturn("USD");
-
-    Money money = deserializeMoney(json);
-
-    assertEquals(new BigDecimal("10.00"), money.getAmount());
-    assertEquals(CurrencyUnit.USD, money.getCurrencyUnit());
-  }
-
-  @Test
-  public void shouldDeserializeMoneyIfCurrencyCodeIsEmptyInEnv() throws IOException {
-    mockStatic(System.class);
-    when(System.getenv(CURRENCY_CODE)).thenReturn(null);
-
-    mockStatic(StringUtils.class);
-    when(StringUtils.isEmpty(System.getenv(CURRENCY_CODE))).thenReturn(true);
-
+  public void shouldDeserializeMoney() throws IOException {
+    String json = String.format("{\"value\":%s}", "\"10\"");
     Money money = deserializeMoney(json);
 
     assertEquals(new BigDecimal("10.00"), money.getAmount());
