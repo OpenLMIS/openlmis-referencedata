@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import org.openlmis.referencedata.CurrencyConfig;
 
 /**
  * MoneyDeserializer class represents the deserializer for Money.
@@ -32,6 +31,6 @@ public class MoneyDeserializer extends JsonDeserializer<Money> {
   public Money deserialize(JsonParser jsonParser, DeserializationContext ctxt)
       throws IOException {
     return Money.parse(
-        CurrencyUnit.of(CurrencyConfig.CURRENCY_CODE).getCode() + " " + jsonParser.getText());
+        CurrencyUnit.of(System.getenv("CURRENCY_CODE")).getCode() + " " + jsonParser.getText());
   }
 }
