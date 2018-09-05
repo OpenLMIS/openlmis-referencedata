@@ -42,6 +42,8 @@ public class MoneyDeserializerTest {
   private ObjectMapper mapper;
   private MoneyDeserializer moneyDeserializer;
 
+  private String json = String.format("{\"value\":%s}", "\"10\"");
+
   @Before
   public void setup() {
     mapper = new ObjectMapper();
@@ -50,7 +52,7 @@ public class MoneyDeserializerTest {
 
   @Test(expected = NumberFormatException.class)
   public void shouldNotDeserializeMoneyWhenValueEmpty() throws IOException {
-    String json = String.format("{\"value\":%s}", "\"\"");
+    json = String.format("{\"value\":%s}", "\"\"");
     deserializeMoney(json);
   }
 
@@ -59,7 +61,6 @@ public class MoneyDeserializerTest {
     mockStatic(System.class);
     when(System.getenv("CURRENCY_CODE")).thenReturn("USD");
 
-    String json = String.format("{\"value\":%s}", "\"10\"");
     Money money = deserializeMoney(json);
 
     assertEquals(new BigDecimal("10.00"), money.getAmount());
@@ -69,9 +70,19 @@ public class MoneyDeserializerTest {
   @Test
   public void shouldDeserializeMoneyIfCurrencyCodeIsEmptyInEnv() throws IOException {
     mockStatic(System.class);
+    when(System.getenv("CURRENCY_CODE")).thenReturn("");
+
+    Money money = deserializeMoney(json);
+
+    assertEquals(new BigDecimal("10.00"), money.getAmount());
+    assertEquals(CurrencyUnit.USD, money.getCurrencyUnit());
+  }
+
+  @Test
+  public void shouldDeserializeMoneyIfCurrencyCodeIsNullInEnv() throws IOException {
+    mockStatic(System.class);
     when(System.getenv("CURRENCY_CODE")).thenReturn(null);
 
-    String json = String.format("{\"value\":%s}", "\"10\"");
     Money money = deserializeMoney(json);
 
     assertEquals(new BigDecimal("10.00"), money.getAmount());
