@@ -64,9 +64,6 @@ public class MoneyDeserializerTest {
     mockStatic(System.class);
     when(System.getenv(CURRENCY_CODE)).thenReturn("USD");
 
-    mockStatic(StringUtils.class);
-    when(StringUtils.isEmpty(System.getenv(CURRENCY_CODE))).thenReturn(false);
-
     Money money = deserializeMoney(json);
 
     assertEquals(new BigDecimal("10.00"), money.getAmount());
