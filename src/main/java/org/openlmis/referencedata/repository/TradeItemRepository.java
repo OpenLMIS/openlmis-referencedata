@@ -19,9 +19,31 @@ import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.custom.TradeItemRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 @JaversSpringDataAuditable
 public interface TradeItemRepository
-    extends JpaRepository<TradeItem, UUID>, TradeItemRepositoryCustom {
+    extends JpaRepository<TradeItem, UUID>, TradeItemRepositoryCustom,
+    BaseAuditableRepository<TradeItem, UUID> {
+
+  @Query(value = "SELECT\n"
+      + "    t.*\n"
+      + "FROM\n"
+      + "    referencedata.trade_items t\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.trade_items t\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(t.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<TradeItem> findAllWithoutSnapshots(Pageable pageable);
 }

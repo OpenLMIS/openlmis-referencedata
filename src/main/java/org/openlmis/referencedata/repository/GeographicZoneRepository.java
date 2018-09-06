@@ -23,13 +23,16 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.repository.custom.GeographicZoneRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 @JaversSpringDataAuditable
 public interface GeographicZoneRepository extends PagingAndSortingRepository<GeographicZone, UUID>,
-                                                  GeographicZoneRepositoryCustom {
+                                                  GeographicZoneRepositoryCustom,
+                                                  BaseAuditableRepository<GeographicZone, UUID> {
 
   @Override
   <S extends GeographicZone> S save(S entity);
@@ -52,4 +55,22 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
       nativeQuery = true
   )
   List<GeographicZone> findByLocation(@Param("location") Point location);
+
+  @Query(value = "SELECT\n"
+      + "    gz.*\n"
+      + "FROM\n"
+      + "    referencedata.geographic_zones gz\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.geographic_zones gz\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(gz.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<GeographicZone> findAllWithoutSnapshots(Pageable pageable);
 }

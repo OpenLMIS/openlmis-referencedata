@@ -25,6 +25,8 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -33,7 +35,8 @@ import org.springframework.data.repository.query.Param;
 @JaversSpringDataAuditable
 public interface UserRepository extends
     PagingAndSortingRepository<User, UUID>,
-    UserRepositoryCustom {
+    UserRepositoryCustom,
+    BaseAuditableRepository<User, UUID> {
 
   @Override
   <S extends User> S save(S entity);
@@ -83,4 +86,21 @@ public interface UserRepository extends
       nativeQuery = true)
   Set<User> findUsersByDirectRight(@Param("right") Right right);
 
+  @Query(value = "SELECT\n"
+      + "    u.*\n"
+      + "FROM\n"
+      + "    referencedata.users u\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.users u\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(u.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<User> findAllWithoutSnapshots(Pageable pageable);
 }

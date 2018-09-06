@@ -19,11 +19,34 @@ import java.util.Optional;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.CommodityType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 @JaversSpringDataAuditable
-public interface CommodityTypeRepository extends PagingAndSortingRepository<CommodityType, UUID> {
+public interface CommodityTypeRepository
+    extends PagingAndSortingRepository<CommodityType, UUID>,
+    BaseAuditableRepository<CommodityType, UUID> {
 
   Optional<CommodityType> findByClassificationIdAndClassificationSystem(
       String classificationId, String classificationSystem);
+
+  @Query(value = "SELECT\n"
+      + "    ct.*\n"
+      + "FROM\n"
+      + "    referencedata.commodity_types ct\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.commodity_types ct\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(ct.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<CommodityType> findAllWithoutSnapshots(Pageable pageable);
 }

@@ -12,6 +12,7 @@ New functionality added in a backwards-compatible manner:
   
 Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.
+* [OLMIS-3078](https://openlmis.atlassian.net/browse/OLMIS-3078): Made Javers log initializer not iterate over all items, only those without logs.
 
 Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-4949](https://openlmis.atlassian.net/browse/OLMIS-4949): Fixed problem with updating a facility

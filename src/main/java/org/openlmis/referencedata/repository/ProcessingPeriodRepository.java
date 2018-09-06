@@ -22,14 +22,36 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 @JaversSpringDataAuditable
 public interface ProcessingPeriodRepository extends JpaRepository<ProcessingPeriod, UUID>,
-    ProcessingPeriodRepositoryCustom {
+    ProcessingPeriodRepositoryCustom,
+    BaseAuditableRepository<ProcessingPeriod, UUID> {
 
   List<ProcessingPeriod> findByProcessingSchedule(ProcessingSchedule schedule);
 
   Optional<ProcessingPeriod> findOneByNameAndProcessingSchedule(String name,
                                                                 ProcessingSchedule schedule);
+
+  @Query(value = "SELECT\n"
+      + "    p.*\n"
+      + "FROM\n"
+      + "    referencedata.processing_periods p\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.processing_periods p\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(p.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<ProcessingPeriod> findAllWithoutSnapshots(Pageable pageable);
 }

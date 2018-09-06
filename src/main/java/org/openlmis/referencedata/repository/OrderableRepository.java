@@ -36,7 +36,8 @@ import org.springframework.data.repository.query.Param;
  */
 @JaversSpringDataAuditable
 public interface OrderableRepository extends
-    JpaRepository<Orderable, OrderableIdentity>, OrderableRepositoryCustom {
+    JpaRepository<Orderable, OrderableIdentity>, OrderableRepositoryCustom,
+    BaseAuditableRepository<Orderable, OrderableIdentity> {
 
   @Override
   <S extends Orderable> S save(S entity);
@@ -85,4 +86,22 @@ public interface OrderableRepository extends
       nativeQuery = true
   )
   Page<Orderable> findAllLatest(Pageable pageable);
+
+  @Query(value = "SELECT\n"
+      + "    o.*\n"
+      + "FROM\n"
+      + "    referencedata.orderables o\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.orderables o\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(o.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<Orderable> findAllWithoutSnapshots(Pageable pageable);
 }

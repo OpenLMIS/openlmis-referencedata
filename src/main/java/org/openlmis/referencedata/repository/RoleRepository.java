@@ -18,10 +18,32 @@ package org.openlmis.referencedata.repository;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 @JaversSpringDataAuditable
-public interface RoleRepository extends JpaRepository<Role, UUID> {
+public interface RoleRepository extends JpaRepository<Role, UUID>,
+      BaseAuditableRepository<Role, UUID> {
 
   Role findFirstByName(String name);
+
+  @Query(value = "SELECT\n"
+      + "    r.*\n"
+      + "FROM\n"
+      + "    referencedata.roles r\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.roles r\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(r.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<Role> findAllWithoutSnapshots(Pageable pageable);
 }

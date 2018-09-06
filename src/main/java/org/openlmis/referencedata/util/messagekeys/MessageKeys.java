@@ -65,6 +65,7 @@ public abstract class MessageKeys {
   protected static final String DATE = "date";
   protected static final String BOOLEAN = "boolean";
   protected static final String ID_MISMATCH = "idMismatch";
+  protected static final String JAVERS = "javers";
 
   // Entities
   protected static final String LOT = "lot";
@@ -105,6 +106,10 @@ public abstract class MessageKeys {
       "orderableDisplayCategoryRepository";
   protected static final String FIRSTNAME = "firstName";
   protected static final String LASTNAME = "lastName";
+
+  // Javers
+  public static final String ERROR_JAVERS_EXISTING_ENTRY =
+      join(SERVICE_ERROR, JAVERS, "entryAlreadyExists");
 
   public static final String ERROR_IO = SERVICE_ERROR + ".io";
 

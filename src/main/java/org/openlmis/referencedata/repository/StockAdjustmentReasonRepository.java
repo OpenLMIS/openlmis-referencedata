@@ -19,13 +19,16 @@ import java.util.List;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 @JaversSpringDataAuditable
 public interface StockAdjustmentReasonRepository
-        extends PagingAndSortingRepository<StockAdjustmentReason, UUID> {
+        extends PagingAndSortingRepository<StockAdjustmentReason, UUID>,
+        BaseAuditableRepository<StockAdjustmentReason, UUID> {
 
   @Override
   <S extends StockAdjustmentReason> S save(S entity);
@@ -35,5 +38,23 @@ public interface StockAdjustmentReasonRepository
 
   @Query("SELECT r FROM StockAdjustmentReason r WHERE r.program.id = :programId")
   List<StockAdjustmentReason> findByProgramId(@Param("programId") UUID programId);
+
+  @Query(value = "SELECT\n"
+      + "    sar.*\n"
+      + "FROM\n"
+      + "    referencedata.stock_adjustment_reasons sar\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.stock_adjustment_reasons sar\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(sar.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<StockAdjustmentReason> findAllWithoutSnapshots(Pageable pageable);
 }
 

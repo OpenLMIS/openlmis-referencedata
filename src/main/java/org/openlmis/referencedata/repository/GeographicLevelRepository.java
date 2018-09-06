@@ -18,11 +18,15 @@ package org.openlmis.referencedata.repository;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.GeographicLevel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 @JaversSpringDataAuditable
 public interface GeographicLevelRepository extends
-    PagingAndSortingRepository<GeographicLevel, UUID> {
+    PagingAndSortingRepository<GeographicLevel, UUID>,
+    BaseAuditableRepository<GeographicLevel, UUID> {
 
   @Override
   <S extends GeographicLevel> S save(S entity);
@@ -31,4 +35,22 @@ public interface GeographicLevelRepository extends
   <S extends GeographicLevel> Iterable<S> save(Iterable<S> entities);
 
   <S extends GeographicLevel> S findByLevelNumber(Integer levelNumber);
+
+  @Query(value = "SELECT\n"
+      + "    gl.*\n"
+      + "FROM\n"
+      + "    referencedata.geographic_levels gl\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.geographic_levels gl\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(gl.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<GeographicLevel> findAllWithoutSnapshots(Pageable pageable);
 }

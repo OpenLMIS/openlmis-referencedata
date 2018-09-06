@@ -23,13 +23,16 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 @JaversSpringDataAuditable
 public interface ProgramRepository
-    extends JpaRepository<Program, UUID>, ProgramRepositoryCustom {
+    extends JpaRepository<Program, UUID>, ProgramRepositoryCustom,
+    BaseAuditableRepository<Program, UUID> {
   // Add custom Program related members here. See UserRepository.java for examples.
 
   @Override
@@ -61,4 +64,22 @@ public interface ProgramRepository
   List<Program> findByNameIgnoreCaseContaining(String name);
 
   List<Program> findByIdInAndNameIgnoreCaseContaining(Collection<UUID> ids, String name);
+
+  @Query(value = "SELECT\n"
+      + "    p.*\n"
+      + "FROM\n"
+      + "    referencedata.programs p\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.programs p\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(p.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<Program> findAllWithoutSnapshots(Pageable pageable);
 }

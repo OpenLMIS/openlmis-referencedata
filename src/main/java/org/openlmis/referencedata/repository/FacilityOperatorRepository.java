@@ -18,10 +18,32 @@ package org.openlmis.referencedata.repository;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.FacilityOperator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 @JaversSpringDataAuditable
 public interface FacilityOperatorRepository
-    extends PagingAndSortingRepository<FacilityOperator, UUID> {
-    //Add custom FacilityOperator related members here. See UserRepository.java for examples.
+    extends PagingAndSortingRepository<FacilityOperator, UUID>,
+    BaseAuditableRepository<FacilityOperator, UUID> {
+  //Add custom FacilityOperator related members here. See UserRepository.java for examples.
+
+  @Query(value = "SELECT\n"
+      + "    fo.*\n"
+      + "FROM\n"
+      + "    referencedata.facility_operators fo\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.facility_operators fo\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(fo.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<FacilityOperator> findAllWithoutSnapshots(Pageable pageable);
 }

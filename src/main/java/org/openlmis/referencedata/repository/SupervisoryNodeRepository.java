@@ -19,13 +19,35 @@ import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 @JaversSpringDataAuditable
 public interface SupervisoryNodeRepository
-    extends JpaRepository<SupervisoryNode, UUID>, SupervisoryNodeRepositoryCustom {
+    extends JpaRepository<SupervisoryNode, UUID>, SupervisoryNodeRepositoryCustom,
+    BaseAuditableRepository<SupervisoryNode, UUID> {
 
   <S extends SupervisoryNode> S findByCode(String code);
 
   boolean existsByCode(String code);
+
+  @Query(value = "SELECT\n"
+      + "    sn.*\n"
+      + "FROM\n"
+      + "    referencedata.supervisory_nodes sn\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.supervisory_nodes sn\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(sn.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<SupervisoryNode> findAllWithoutSnapshots(Pageable pageable);
 }

@@ -20,14 +20,36 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 @JaversSpringDataAuditable
 public interface FacilityTypeApprovedProductRepository
     extends PagingAndSortingRepository<FacilityTypeApprovedProduct, UUID>,
-    FacilityTypeApprovedProductRepositoryCustom {
+    FacilityTypeApprovedProductRepositoryCustom,
+    BaseAuditableRepository<FacilityTypeApprovedProduct, UUID> {
 
   FacilityTypeApprovedProduct findByFacilityTypeIdAndOrderableAndProgramId(
       UUID facilityTypeId, Orderable orderable, UUID programId
   );
+
+  @Query(value = "SELECT\n"
+      + "    ftap.*\n"
+      + "FROM\n"
+      + "    referencedata.facility_type_approved_products ftap\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.facility_type_approved_products ftap\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(ftap.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<FacilityTypeApprovedProduct> findAllWithoutSnapshots(Pageable pageable);
 }

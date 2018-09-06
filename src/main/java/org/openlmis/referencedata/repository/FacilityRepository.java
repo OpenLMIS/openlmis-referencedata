@@ -32,7 +32,8 @@ import org.springframework.data.repository.query.Param;
 
 @JaversSpringDataAuditable
 public interface FacilityRepository
-    extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom {
+    extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom,
+    BaseAuditableRepository<Facility, UUID> {
 
   @Query(value = "SELECT f.*"
       + " FROM referencedata.facilities f"
@@ -53,4 +54,21 @@ public interface FacilityRepository
 
   Page<Facility> findByActive(Boolean active, Pageable pageable);
 
+  @Query(value = "SELECT\n"
+      + "    f.*\n"
+      + "FROM\n"
+      + "    referencedata.facilities f\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.facilities f\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(f.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<Facility> findAllWithoutSnapshots(Pageable pageable);
 }

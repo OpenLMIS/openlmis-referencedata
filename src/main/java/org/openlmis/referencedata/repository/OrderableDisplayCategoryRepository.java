@@ -19,11 +19,33 @@ import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 @JaversSpringDataAuditable
 public interface OrderableDisplayCategoryRepository extends
-        PagingAndSortingRepository<OrderableDisplayCategory, UUID> {
+        PagingAndSortingRepository<OrderableDisplayCategory, UUID>,
+        BaseAuditableRepository<OrderableDisplayCategory, UUID> {
 
   OrderableDisplayCategory findByCode(Code code);
+
+  @Query(value = "SELECT\n"
+      + "    odc.*\n"
+      + "FROM\n"
+      + "    referencedata.orderable_display_categories odc\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.orderable_display_categories odc\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(odc.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<OrderableDisplayCategory> findAllWithoutSnapshots(Pageable pageable);
 }

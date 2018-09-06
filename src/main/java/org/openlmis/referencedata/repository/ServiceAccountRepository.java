@@ -18,8 +18,30 @@ package org.openlmis.referencedata.repository;
 import java.util.UUID;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.ServiceAccount;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 @JaversSpringDataAuditable
-public interface ServiceAccountRepository extends JpaRepository<ServiceAccount, UUID> {
+public interface ServiceAccountRepository extends JpaRepository<ServiceAccount, UUID>,
+      BaseAuditableRepository<ServiceAccount, UUID> {
+
+  @Query(value = "SELECT\n"
+      + "    sa.*\n"
+      + "FROM\n"
+      + "    referencedata.service_accounts sa\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.service_accounts sa\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(sa.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true)
+  Page<ServiceAccount> findAllWithoutSnapshots(Pageable pageable);
 }
