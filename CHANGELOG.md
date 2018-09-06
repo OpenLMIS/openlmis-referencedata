@@ -9,6 +9,8 @@ New functionality added in a backwards-compatible manner:
   * Added GET api/localeSettings endpoint for retrieving time zone information from properties.
 * [OLMIS-5262](https://openlmis.atlassian.net/browse/OLMIS-5262): Added ability to syncing FHIR-related reference data changes to Hearth FHIR server
 * [OLMIS-3885](https://openlmis.atlassian.net/browse/OLMIS-3885): Added versionId to orderable model.
+* [OLMIS-4942](https://openlmis.atlassian.net/browse/OLMIS-4942): Added loading currency, number and date settings from properties on startup.
+  * Also extended /localeSettings endpoint with currency, number and date settings.
   
 Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.
