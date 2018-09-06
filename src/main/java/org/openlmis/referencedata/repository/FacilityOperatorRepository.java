@@ -16,14 +16,12 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-@JaversSpringDataAuditable
 public interface FacilityOperatorRepository
     extends PagingAndSortingRepository<FacilityOperator, UUID>,
     BaseAuditableRepository<FacilityOperator, UUID> {

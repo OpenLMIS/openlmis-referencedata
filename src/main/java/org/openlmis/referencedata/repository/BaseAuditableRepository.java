@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import java.io.Serializable;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -27,6 +28,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * using the pagination and sorting abstraction to ensure.
  */
 @NoRepositoryBean
+@JaversSpringDataAuditable
 public interface BaseAuditableRepository<T, I extends Serializable>
     extends PagingAndSortingRepository<T, I> {
 

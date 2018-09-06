@@ -18,7 +18,6 @@ package org.openlmis.referencedata.repository;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
@@ -32,7 +31,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-@JaversSpringDataAuditable
 public interface UserRepository extends
     PagingAndSortingRepository<User, UUID>,
     UserRepositoryCustom,

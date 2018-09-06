@@ -19,7 +19,6 @@ import com.vividsolutions.jts.geom.Point;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.repository.custom.GeographicZoneRepositoryCustom;
@@ -29,7 +28,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-@JaversSpringDataAuditable
 public interface GeographicZoneRepository extends PagingAndSortingRepository<GeographicZone, UUID>,
                                                   GeographicZoneRepositoryCustom,
                                                   BaseAuditableRepository<GeographicZone, UUID> {

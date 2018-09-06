@@ -17,14 +17,12 @@ package org.openlmis.referencedata.repository;
 
 import java.util.Optional;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-@JaversSpringDataAuditable
 public interface CommodityTypeRepository
     extends PagingAndSortingRepository<CommodityType, UUID>,
     BaseAuditableRepository<CommodityType, UUID> {

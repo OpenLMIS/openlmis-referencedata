@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
@@ -25,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-@JaversSpringDataAuditable
 public interface FacilityTypeApprovedProductRepository
     extends PagingAndSortingRepository<FacilityTypeApprovedProduct, UUID>,
     FacilityTypeApprovedProductRepositoryCustom,

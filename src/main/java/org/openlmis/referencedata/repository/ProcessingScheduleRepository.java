@@ -17,7 +17,6 @@ package org.openlmis.referencedata.repository;
 
 import java.util.Optional;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-@JaversSpringDataAuditable
 public interface ProcessingScheduleRepository
       extends JpaRepository<ProcessingSchedule, UUID>,
       BaseAuditableRepository<ProcessingSchedule, UUID> {

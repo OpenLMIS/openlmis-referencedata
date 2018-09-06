@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
@@ -30,7 +29,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-@JaversSpringDataAuditable
 public interface FacilityRepository
     extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom,
     BaseAuditableRepository<Facility, UUID> {

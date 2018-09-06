@@ -20,7 +20,6 @@ import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WIT
 
 import java.util.List;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableIdentity;
@@ -34,7 +33,6 @@ import org.springframework.data.repository.query.Param;
 /**
  * Persistence repository for saving/finding {@link Orderable}.
  */
-@JaversSpringDataAuditable
 public interface OrderableRepository extends
     JpaRepository<Orderable, OrderableIdentity>, OrderableRepositoryCustom,
     BaseAuditableRepository<Orderable, OrderableIdentity> {

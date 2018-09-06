@@ -17,7 +17,6 @@ package org.openlmis.referencedata.repository;
 
 import java.util.List;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.custom.SupplyLineRepositoryCustom;
@@ -27,7 +26,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-@JaversSpringDataAuditable
 public interface SupplyLineRepository extends JpaRepository<SupplyLine, UUID>,
     SupplyLineRepositoryCustom,
     BaseAuditableRepository<SupplyLine, UUID> {

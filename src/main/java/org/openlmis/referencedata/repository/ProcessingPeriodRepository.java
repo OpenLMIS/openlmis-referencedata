@@ -18,7 +18,6 @@ package org.openlmis.referencedata.repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCustom;
@@ -27,7 +26,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-@JaversSpringDataAuditable
 public interface ProcessingPeriodRepository extends JpaRepository<ProcessingPeriod, UUID>,
     ProcessingPeriodRepositoryCustom,
     BaseAuditableRepository<ProcessingPeriod, UUID> {

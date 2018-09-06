@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
@@ -29,7 +28,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-@JaversSpringDataAuditable
 public interface ProgramRepository
     extends JpaRepository<Program, UUID>, ProgramRepositoryCustom,
     BaseAuditableRepository<Program, UUID> {

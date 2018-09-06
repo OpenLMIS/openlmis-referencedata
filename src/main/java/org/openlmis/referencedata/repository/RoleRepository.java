@@ -16,14 +16,12 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-@JaversSpringDataAuditable
 public interface RoleRepository extends JpaRepository<Role, UUID>,
       BaseAuditableRepository<Role, UUID> {
 

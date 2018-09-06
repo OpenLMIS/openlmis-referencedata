@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.repository.custom.RequisitionGroupRepositoryCustom;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-@JaversSpringDataAuditable
 public interface RequisitionGroupRepository
     extends JpaRepository<RequisitionGroup, UUID>, RequisitionGroupRepositoryCustom,
     BaseAuditableRepository<RequisitionGroup, UUID> {

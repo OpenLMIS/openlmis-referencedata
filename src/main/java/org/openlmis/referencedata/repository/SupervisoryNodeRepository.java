@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-@JaversSpringDataAuditable
 public interface SupervisoryNodeRepository
     extends JpaRepository<SupervisoryNode, UUID>, SupervisoryNodeRepositoryCustom,
     BaseAuditableRepository<SupervisoryNode, UUID> {

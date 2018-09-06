@@ -16,14 +16,12 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-@JaversSpringDataAuditable
 public interface GeographicLevelRepository extends
     PagingAndSortingRepository<GeographicLevel, UUID>,
     BaseAuditableRepository<GeographicLevel, UUID> {
