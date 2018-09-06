@@ -13,40 +13,22 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.locale;
+package org.openlmis.referencedata.util;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
-public final class LocaleDto {
+public class CustomSingleColumnMoneyUserTypeTest {
 
-  private String timeZoneId;
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(CustomSingleColumnMoneyUserType.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS)
+        .withIgnoredFields("columnMapper", "sqlTypes")
+        .verify();
+  }
 
-  private String currencyCode;
-
-  private String currencySymbol;
-
-  private String currencySymbolSide;
-
-  private Integer currencyDecimalPlaces;
-
-  private String groupingSeparator;
-
-  private Integer groupingSize;
-
-  private String decimalSeparator;
-
-  private String dateFormat;
-
-  private String dateTimeFormat;
 }

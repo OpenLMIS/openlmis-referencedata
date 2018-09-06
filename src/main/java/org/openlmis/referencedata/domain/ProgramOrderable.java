@@ -28,12 +28,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import org.openlmis.referencedata.CurrencyConfig;
 
 @Entity
 @Table(name = "program_orderables", schema = "referencedata",
@@ -77,8 +75,7 @@ public class ProgramOrderable extends BaseEntity {
 
   @Getter
   @Setter
-  @Type(type = "org.jadira.usertype.moneyandcurrency.joda.PersistentMoneyAmount",
-      parameters = {@Parameter(name = "currencyCode", value = CurrencyConfig.CURRENCY_CODE)})
+  @Type(type = "org.openlmis.referencedata.util.CustomSingleColumnMoneyUserType")
   private Money pricePerPack;
   
   private ProgramOrderable(Program program,

@@ -36,6 +36,15 @@ public class LocaleControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(response.getClass());
 
     assertEquals("UTC", response.getTimeZoneId());
+    assertEquals("USD", response.getCurrencyCode());
+    assertEquals("$", response.getCurrencySymbol());
+    assertEquals("left", response.getCurrencySymbolSide());
+    assertEquals(Integer.valueOf(2), response.getCurrencyDecimalPlaces());
+    assertEquals(",", response.getGroupingSeparator());
+    assertEquals(Integer.valueOf(3), response.getGroupingSize());
+    assertEquals(".", response.getDecimalSeparator());
+    assertEquals("dd/MM/yyyy", response.getDateFormat());
+    assertEquals("dd/MM/yyyy HH:mm:ss", response.getDateTimeFormat());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
