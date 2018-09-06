@@ -142,15 +142,9 @@ public class AuditLogInitializerIntegrationTest {
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
-  @Test
-  public void shouldCreateSnapshotsForCommodityTypes() {
-    //given
-    UUID commodityTypeId = UUID.randomUUID();
-    CommodityType commodityTypeParent = addCommodityTypeParent();
-    addCommodityType(commodityTypeId, commodityTypeParent.getId());
-
+  private void executeTest(UUID id, Class clazz) {
     //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(commodityTypeId, CommodityType.class);
+    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, clazz);
     List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
 
     assertThat(snapshots, hasSize(0));
@@ -170,8 +164,18 @@ public class AuditLogInitializerIntegrationTest {
     assertThat(globalId, instanceOf(InstanceId.class));
 
     InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(commodityTypeId));
-    assertThat(instanceId.getTypeName(), is("CommodityType"));
+    assertThat(instanceId.getCdoId(), is(id));
+    assertThat(instanceId.getTypeName(), is(clazz.getSimpleName()));
+  }
+
+  @Test
+  public void shouldCreateSnapshotsForCommodityTypes() {
+    //given
+    UUID commodityTypeId = UUID.randomUUID();
+    CommodityType commodityTypeParent = addCommodityTypeParent();
+    addCommodityType(commodityTypeId, commodityTypeParent.getId());
+
+    executeTest(commodityTypeId, CommodityType.class);
   }
 
   @Test
@@ -180,29 +184,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID facilityOperatorId = UUID.randomUUID();
     addFacilityOperator(facilityOperatorId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(facilityOperatorId, FacilityOperator.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(facilityOperatorId));
-    assertThat(instanceId.getTypeName(), is("FacilityOperator"));
+    executeTest(facilityOperatorId, FacilityOperator.class);
   }
 
   @Test
@@ -214,29 +196,7 @@ public class AuditLogInitializerIntegrationTest {
     GeographicZone geographicZone = addNewGeographicZone();
     addFacility(facilityId, geographicZone.getId(), facilityOperator.getId(), facilityType.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(facilityId, Facility.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(facilityId));
-    assertThat(instanceId.getTypeName(), is("Facility"));
+    executeTest(facilityId, Facility.class);
   }
 
   @Test
@@ -249,29 +209,7 @@ public class AuditLogInitializerIntegrationTest {
     addFtap(ftapId, program.getId(), orderable.getId(), orderable.getVersionId(),
         facilityType.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(ftapId, FacilityTypeApprovedProduct.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(ftapId));
-    assertThat(instanceId.getTypeName(), is("FacilityTypeApprovedProduct"));
+    executeTest(ftapId, FacilityTypeApprovedProduct.class);
   }
 
   @Test
@@ -280,29 +218,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID facilityTypeId = UUID.randomUUID();
     addFacilityType(facilityTypeId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(facilityTypeId, FacilityType.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(facilityTypeId));
-    assertThat(instanceId.getTypeName(), is("FacilityType"));
+    executeTest(facilityTypeId, FacilityType.class);
   }
 
   @Test
@@ -311,29 +227,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID geoLevelId = UUID.randomUUID();
     addGeographicLevel(geoLevelId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(geoLevelId, GeographicLevel.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(geoLevelId));
-    assertThat(instanceId.getTypeName(), is("GeographicLevel"));
+    executeTest(geoLevelId, GeographicLevel.class);
   }
 
   @Test
@@ -343,29 +237,7 @@ public class AuditLogInitializerIntegrationTest {
     GeographicZone zoneParent = addNewGeographicZone();
     addGeographicZone(geoZoneId, zoneParent.getLevel().getId(), zoneParent.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(geoZoneId, GeographicZone.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(geoZoneId));
-    assertThat(instanceId.getTypeName(), is("GeographicZone"));
+    executeTest(geoZoneId, GeographicZone.class);
   }
 
   @Test
@@ -375,29 +247,7 @@ public class AuditLogInitializerIntegrationTest {
     TradeItem tradeItem = addNewTradeItem();
     addLot(lotId, tradeItem.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(lotId, Lot.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(lotId));
-    assertThat(instanceId.getTypeName(), is("Lot"));
+    executeTest(lotId, Lot.class);
   }
 
   @Test
@@ -406,30 +256,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID orderableDisplayCategoryId = UUID.randomUUID();
     addOrderableDisplayCategory(orderableDisplayCategoryId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(orderableDisplayCategoryId,
-        OrderableDisplayCategory.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(orderableDisplayCategoryId));
-    assertThat(instanceId.getTypeName(), is("OrderableDisplayCategory"));
+    executeTest(orderableDisplayCategoryId, OrderableDisplayCategory.class);
   }
 
   @Test
@@ -439,29 +266,7 @@ public class AuditLogInitializerIntegrationTest {
     ProcessingSchedule processingSchedule = addNewProcessingSchedule();
     addProcessingPeriod(processingPeriodId, processingSchedule.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingPeriodId, ProcessingPeriod.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(processingPeriodId));
-    assertThat(instanceId.getTypeName(), is("ProcessingPeriod"));
+    executeTest(processingPeriodId, ProcessingPeriod.class);
   }
 
   @Test
@@ -470,30 +275,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID processingScheduleId = UUID.randomUUID();
     addProcessingSchedule(processingScheduleId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingScheduleId,
-        ProcessingSchedule.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(processingScheduleId));
-    assertThat(instanceId.getTypeName(), is("ProcessingSchedule"));
+    executeTest(processingScheduleId, ProcessingSchedule.class);
   }
 
   @Test
@@ -502,29 +284,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID programId = UUID.randomUUID();
     addProgram(programId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(programId, Program.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(programId));
-    assertThat(instanceId.getTypeName(), is("Program"));
+    executeTest(programId, Program.class);
   }
 
   @Test
@@ -538,29 +298,7 @@ public class AuditLogInitializerIntegrationTest {
     addRequisitionGroupProgramSchedule(id, facility.getId(), requisitionGroup.getId(),
         processingSchedule.getId(), program.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, RequisitionGroupProgramSchedule.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(id));
-    assertThat(instanceId.getTypeName(), is("RequisitionGroupProgramSchedule"));
+    executeTest(id, RequisitionGroupProgramSchedule.class);
   }
 
   @Test
@@ -570,29 +308,7 @@ public class AuditLogInitializerIntegrationTest {
     SupervisoryNode supervisoryNode = addNewSupervisoryNode();
     addRequisitionGroup(id, supervisoryNode.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, RequisitionGroup.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(id));
-    assertThat(instanceId.getTypeName(), is("RequisitionGroup"));
+    executeTest(id, RequisitionGroup.class);
   }
 
   @Test
@@ -601,29 +317,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID rightId = UUID.randomUUID();
     addRight(rightId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(rightId, Right.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(rightId));
-    assertThat(instanceId.getTypeName(), is("Right"));
+    executeTest(rightId, Right.class);
   }
 
   @Test
@@ -632,29 +326,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID roleId = UUID.randomUUID();
     addRole(roleId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(roleId, Role.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(roleId));
-    assertThat(instanceId.getTypeName(), is("Role"));
+    executeTest(roleId, Role.class);
   }
 
   @Test
@@ -663,29 +335,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID serviceAccountId = UUID.randomUUID();
     addServiceAccount(serviceAccountId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(serviceAccountId, ServiceAccount.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(serviceAccountId));
-    assertThat(instanceId.getTypeName(), is("ServiceAccount"));
+    executeTest(serviceAccountId, ServiceAccount.class);
   }
 
   @Test
@@ -695,30 +345,7 @@ public class AuditLogInitializerIntegrationTest {
     Program program = addNewProgram();
     addStockAdjustmentReason(stockAdjustmentReasonId, program.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(stockAdjustmentReasonId,
-        StockAdjustmentReason.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(stockAdjustmentReasonId));
-    assertThat(instanceId.getTypeName(), is("StockAdjustmentReason"));
+    executeTest(stockAdjustmentReasonId, StockAdjustmentReason.class);
   }
 
   @Test
@@ -729,29 +356,7 @@ public class AuditLogInitializerIntegrationTest {
     addSupervisoryNode(supervisoryNodeId, supervisoryNode.getId(),
         supervisoryNode.getFacility().getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(supervisoryNodeId, SupervisoryNode.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(supervisoryNodeId));
-    assertThat(instanceId.getTypeName(), is("SupervisoryNode"));
+    executeTest(supervisoryNodeId, SupervisoryNode.class);
   }
 
   @Test
@@ -764,29 +369,7 @@ public class AuditLogInitializerIntegrationTest {
     addSupplyLine(supplyLineId, supplyingFacility.getId(),
         supervisoryNode.getId(), program.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(supplyLineId, SupplyLine.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(supplyLineId));
-    assertThat(instanceId.getTypeName(), is("SupplyLine"));
+    executeTest(supplyLineId, SupplyLine.class);
   }
 
   @Test
@@ -795,29 +378,7 @@ public class AuditLogInitializerIntegrationTest {
     UUID tradeItemId = UUID.randomUUID();
     addTradeItem(tradeItemId);
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(tradeItemId, TradeItem.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(tradeItemId));
-    assertThat(instanceId.getTypeName(), is("TradeItem"));
+    executeTest(tradeItemId, TradeItem.class);
   }
 
   @Test
@@ -827,29 +388,7 @@ public class AuditLogInitializerIntegrationTest {
     Facility facility = addNewFacility();
     addUser(userId, facility.getId());
 
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(userId, User.class);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(userId));
-    assertThat(instanceId.getTypeName(), is("User"));
+    executeTest(userId, User.class);
   }
 
   private CommodityType addCommodityTypeParent() {
