@@ -142,32 +142,6 @@ public class AuditLogInitializerIntegrationTest {
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
-  private void executeTest(UUID id, Class clazz) {
-    //when
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, clazz);
-    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
-
-    assertThat(snapshots, hasSize(0));
-
-    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
-    auditLogInitializer.run();
-
-    snapshots = javers.findSnapshots(jqlQuery.build());
-
-    // then
-    assertThat(snapshots, hasSize(1));
-
-    CdoSnapshot snapshot = snapshots.get(0);
-    GlobalId globalId = snapshot.getGlobalId();
-
-    assertThat(globalId, is(notNullValue()));
-    assertThat(globalId, instanceOf(InstanceId.class));
-
-    InstanceId instanceId = (InstanceId) globalId;
-    assertThat(instanceId.getCdoId(), is(id));
-    assertThat(instanceId.getTypeName(), is(clazz.getSimpleName()));
-  }
-
   @Test
   public void shouldCreateSnapshotsForCommodityTypes() {
     //given
@@ -389,6 +363,32 @@ public class AuditLogInitializerIntegrationTest {
     addUser(userId, facility.getId());
 
     executeTest(userId, User.class);
+  }
+
+  private void executeTest(UUID id, Class clazz) {
+    //when
+    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, clazz);
+    List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
+
+    assertThat(snapshots, hasSize(0));
+
+    AuditLogInitializer auditLogInitializer = new AuditLogInitializer(applicationContext, javers);
+    auditLogInitializer.run();
+
+    snapshots = javers.findSnapshots(jqlQuery.build());
+
+    // then
+    assertThat(snapshots, hasSize(1));
+
+    CdoSnapshot snapshot = snapshots.get(0);
+    GlobalId globalId = snapshot.getGlobalId();
+
+    assertThat(globalId, is(notNullValue()));
+    assertThat(globalId, instanceOf(InstanceId.class));
+
+    InstanceId instanceId = (InstanceId) globalId;
+    assertThat(instanceId.getCdoId(), is(id));
+    assertThat(instanceId.getTypeName(), is(clazz.getSimpleName()));
   }
 
   private CommodityType addCommodityTypeParent() {
