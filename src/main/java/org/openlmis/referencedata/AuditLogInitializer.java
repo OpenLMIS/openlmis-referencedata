@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  * <a href="https://github.com/javers/javers/issues/214">this issue</a>.
  */
 @Component
-@Profile("refresh-db")
+@Profile("init-audit-log")
 @Order(20)
 @Transactional
 public class AuditLogInitializer implements CommandLineRunner {
