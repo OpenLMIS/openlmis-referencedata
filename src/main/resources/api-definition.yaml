@@ -1486,7 +1486,12 @@ resourceTypes:
                           repeat: false
                       supervisoryNodeId:
                           displayName: Supervisory Node ID
-                          description: The supervisory node to search for - required only for supervision rights.
+                          description: >
+                            The supervisory node to search for - if provided, results will contain
+                            only users that have at least one supervisory supervision role
+                            assignment for the given supervisory node; otherwise results will
+                            contain only users that have at least one home facility supervision
+                            role. For both cases, other parameters have to match.
                           type: string
                           required: false
                           repeat: false

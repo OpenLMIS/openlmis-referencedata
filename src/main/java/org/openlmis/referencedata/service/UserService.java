@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
@@ -182,29 +183,26 @@ public class UserService {
   }
 
   private Set<User> searchBySupervisionRight(Right right, UUID supervisoryNodeId,
-                                             UUID programId) {
-    if (supervisoryNodeId == null) {
-      throw new ValidationMessageException(UserMessageKeys.SUPERVISORY_NODE_ID_REQUIRED);
-    }
+      UUID programId) {
     if (programId == null) {
       throw new ValidationMessageException(UserMessageKeys.PROGRAM_ID_REQUIRED);
     }
 
-    SupervisoryNode supervisoryNode = supervisoryNodeRepository
-        .findOne(supervisoryNodeId);
+    Program program = Optional
+        .ofNullable(programRepository.findOne(programId))
+        .orElseThrow(() -> new ValidationMessageException(new Message(
+            ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId)));
 
-    if (supervisoryNode == null) {
-      throw new ValidationMessageException(new Message(
-          SupervisoryNodeMessageKeys.ERROR_NOT_FOUND, supervisoryNodeId));
+    if (null == supervisoryNodeId) {
+      return userRepository.findUsersBySupervisionRight(right, program);
     }
 
-    Program program = programRepository.findOne(programId);
+    SupervisoryNode supervisoryNode = Optional
+        .ofNullable(supervisoryNodeRepository.findOne(supervisoryNodeId))
+        .orElseThrow(() -> new ValidationMessageException(new Message(
+            SupervisoryNodeMessageKeys.ERROR_NOT_FOUND, supervisoryNodeId)));
 
-    if (program == null) {
-      throw new ValidationMessageException(new Message(
-          ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
-    }
-
-    return userRepository.findSupervisingUsersBy(right, supervisoryNode, program);
+    return userRepository.findUsersBySupervisionRight(right, supervisoryNode, program);
   }
+
 }

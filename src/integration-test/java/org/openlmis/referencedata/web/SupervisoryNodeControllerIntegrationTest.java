@@ -399,7 +399,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
     given(rightRepository.findOne(rightId)).willReturn(right);
     given(programRepository.findOne(programId)).willReturn(program);
-    given(userRepository.findSupervisingUsersBy(right, supervisoryNode, program))
+    given(userRepository.findUsersBySupervisionRight(right, supervisoryNode, program))
         .willReturn(supervisingUsers);
 
     UserDto[] response = restAssured

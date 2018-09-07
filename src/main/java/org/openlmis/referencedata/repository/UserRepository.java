@@ -60,8 +60,20 @@ public interface UserRepository extends
       + "   AND ra.supervisorynodeid = :supervisoryNode" 
       + "   AND ra.programid = :program",
       nativeQuery = true)
-  Set<User> findSupervisingUsersBy(@Param("right") Right right,
+  Set<User> findUsersBySupervisionRight(@Param("right") Right right,
       @Param("supervisoryNode") SupervisoryNode supervisoryNode,
+      @Param("program") Program program);
+
+  @Query(value = "SELECT DISTINCT u.*"
+      + " FROM referencedata.users u"
+      + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id"
+      + "   JOIN referencedata.roles r ON r.id = ra.roleid"
+      + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
+      + " WHERE rr.rightid = :right"
+      + "   AND ra.supervisorynodeid IS NULL"
+      + "   AND ra.programid = :program",
+      nativeQuery = true)
+  Set<User> findUsersBySupervisionRight(@Param("right") Right right,
       @Param("program") Program program);
 
   @Query(value = "SELECT DISTINCT u.*"

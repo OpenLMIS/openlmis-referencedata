@@ -237,7 +237,7 @@ public class SupervisoryNodeController extends BaseController {
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
     
-    Set<User> supervisingUsers = userRepository.findSupervisingUsersBy(right, supervisoryNode,
+    Set<User> supervisingUsers = userRepository.findUsersBySupervisionRight(right, supervisoryNode,
         program);
 
     return supervisingUsers.stream().map(this::exportToDto).collect(toSet());

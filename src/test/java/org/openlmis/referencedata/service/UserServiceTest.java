@@ -242,14 +242,29 @@ public class UserServiceTest {
     when(supervisoryNodeRepository.findOne(SUPERVISORY_NODE_ID))
         .thenReturn(supervisoryNode);
     when(programRepository.findOne(PROGRAM_ID)).thenReturn(program);
-    when(userRepository.findSupervisingUsersBy(right, supervisoryNode, program))
+    when(userRepository.findUsersBySupervisionRight(right, supervisoryNode, program))
         .thenReturn(expected);
 
     Set<User> users = userService.rightSearch(RIGHT_ID, PROGRAM_ID,
         SUPERVISORY_NODE_ID, null);
 
     assertEquals(expected, users);
-    verify(userRepository).findSupervisingUsersBy(right, supervisoryNode, program);
+    verify(userRepository).findUsersBySupervisionRight(right, supervisoryNode, program);
+  }
+
+  @Test
+  public void rightSearchShouldFindBySupervisionAssignmentWithoutSupervisoryNode() {
+    Set<User> expected = newHashSet(user, user2);
+    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(right.getType()).thenReturn(RightType.SUPERVISION);
+    when(programRepository.findOne(PROGRAM_ID)).thenReturn(program);
+    when(userRepository.findUsersBySupervisionRight(right, program))
+        .thenReturn(expected);
+
+    Set<User> users = userService.rightSearch(RIGHT_ID, PROGRAM_ID, null, null);
+
+    assertEquals(expected, users);
+    verify(userRepository).findUsersBySupervisionRight(right, program);
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -314,19 +329,6 @@ public class UserServiceTest {
     } finally {
       verifyZeroInteractions(userRepository, supervisoryNodeRepository,
           programRepository, facilityRepository);
-    }
-  }
-
-  @Test(expected = ValidationMessageException.class)
-  public void rightSearchShouldRequireSupervisoryNodeIdForSupervisoryRights() {
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
-    when(right.getType()).thenReturn(RightType.SUPERVISION);
-
-    try {
-      userService.rightSearch(RIGHT_ID, PROGRAM_ID, null, null);
-    } finally {
-      verifyZeroInteractions(userRepository, supervisoryNodeRepository,
-          facilityRepository, programRepository);
     }
   }
 
