@@ -229,6 +229,14 @@ expected use-case for this is when this service is deployed through the
 
 Environment variables common to all services are listed here: https://github.com/OpenLMIS/openlmis-template-service/blob/master/README.md#environment-variables
 
+* **FHIR_CLIENT_ENABLED** - Whether FHIR client is required. If set to `true`, the service will send a request each time when facility or geographic zone is created or updated. By default FHIR client will be disabled - either leave it blank or set to `false`.
+* **FHIR_CLIENT_VERSION** - Define FHIR server version. Available values: `DSTU2`, `DSTU2_HL7ORG`, `DSTU2_1`, `DSTU3`, `R4`. The value will be used only if FHIR client is enabled. By default the `DSTU3` will be used.
+* **FHIR_CLIENT_SERVER_URL** - Define FHIR server url. The value will be used only if FHIR client is enabled. By default the `${BASE_URL}/hapifhir` will be used.
+* **FHIR_CLIENT_SERVER_AUTH_MODE** - Define the way how to authorize to the FHIR server. Available values: `GENERATE_TOKEN` - client will use service-level token from the auth service, `USE_EXISTING_TOKEN` - client will use predefined token, `BASIC_AUTH` - client will use predefined username and password, `NONE` - client will not try to authorized itself. The value will be used only if FHIR client is enabled. By default the service will use service-level tokens. A blank value is equal to `NONE`.
+* **FHIR_CLIENT_SERVER_TOKEN** - Define token that will be used for authorization. The value will be used only if FHIR client is enabled and auth mode has been set to `USE_EXISTING_TOKEN`.
+* **FHIR_CLIENT_SERVER_USERNAME** - Define username that will be used for authorization. The value will be used only if FHIR client is enabled and auth mode has been set to `BASIC_AUTH`.
+* **FHIR_CLIENT_SERVER_PASSWORD** - Define password that will be used for authorization. The value will be used only if FHIR client is enabled and auth mode has been set to `BASIC_AUTH`.
+
 ## Audit Logging
 
 Services use JaVers to log changes made throughout the system. The audits logs for individual resources

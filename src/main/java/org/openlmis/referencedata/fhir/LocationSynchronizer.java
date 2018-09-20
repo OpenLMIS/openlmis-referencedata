@@ -17,10 +17,12 @@ package org.openlmis.referencedata.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.TokenClientParam;
+import java.util.Optional;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -33,6 +35,8 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private FhirContext context;
+  private IClientInterceptor authInterceptor;
+
   private String fhirServerUrl;
   private String serviceUrl;
 
@@ -71,6 +75,8 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
     IGenericClient client = context.newRestfulGenericClient(fhirServerUrl);
     client.registerInterceptor(loggingInterceptor);
 
+    Optional.ofNullable(authInterceptor).ifPresent(client::registerInterceptor);
+
     logger.trace(
         "Create identifier criterion for system {} and value {}",
         serviceUrl, olmisLocation.getId()
@@ -108,6 +114,11 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
 
   LocationSynchronizer<T, B> withServiceUrl(String serviceUrl) {
     this.serviceUrl = serviceUrl;
+    return this;
+  }
+
+  LocationSynchronizer<T, B> withAuthInterceptor(IClientInterceptor authInterceptor) {
+    this.authInterceptor = authInterceptor;
     return this;
   }
 

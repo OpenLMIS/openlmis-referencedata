@@ -16,7 +16,9 @@
 package org.openlmis.referencedata.fhir;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,15 +42,21 @@ public class FhirClientFactoryTest {
   @Mock
   private LocationFactory locationFactory;
 
+  @Mock
+  private AuthorizationFactory authorizationFactory;
+
   private FhirClientFactory factory = new FhirClientFactory();
 
   @Before
   public void setUp() {
+    when(authorizationFactory.build()).thenReturn(Optional.empty());
+
     ReflectionTestUtils.setField(factory, "fhirEnabled", FHIR_ENABLED);
     ReflectionTestUtils.setField(factory, "fhirVersion", FHIR_VERSION);
     ReflectionTestUtils.setField(factory, "fhirServerUrl", FHIR_SERVER_URL);
     ReflectionTestUtils.setField(factory, "serviceUrl", SERVICE_URL);
     ReflectionTestUtils.setField(factory, "locationFactory", locationFactory);
+    ReflectionTestUtils.setField(factory, "authorizationFactory", authorizationFactory);
 
     factory.afterPropertiesSet();
   }

@@ -37,13 +37,13 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
   static final FhirClient EMPTY_CLIENT = new FhirClient() {
   };
 
-  @Value("${featureFlags.fhirClient.enabled}")
+  @Value("${fhirClient.enabled}")
   private String fhirEnabled;
 
-  @Value("${featureFlags.fhirClient.Version}")
+  @Value("${fhirClient.version}")
   private String fhirVersion;
 
-  @Value("${featureFlags.fhirClient.serverUrl}")
+  @Value("${fhirClient.serverUrl}")
   private String fhirServerUrl;
 
   @Value("${service.url}")
@@ -51,6 +51,9 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
 
   @Autowired
   private LocationFactory locationFactory;
+
+  @Autowired
+  private AuthorizationFactory authorizationFactory;
 
   private FhirClient fhirClient;
 
@@ -68,6 +71,10 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
           .withContext(context)
           .withFhirServerUrl(fhirServerUrl)
           .withServiceUrl(serviceUrl);
+
+      authorizationFactory
+          .build()
+          .ifPresent(locationSynchronizer::withAuthInterceptor);
 
       LocationConverter locationConvert = LocationConverter
           .getInstance(version)

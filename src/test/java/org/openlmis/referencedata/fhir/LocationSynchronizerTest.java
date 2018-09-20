@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICreate;
 import ca.uhn.fhir.rest.gclient.ICreateTyped;
@@ -74,6 +75,9 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
   @Mock
   private IUpdateTyped updateTyped;
 
+  @Mock
+  private IClientInterceptor authInterceptor;
+
   private LocationSynchronizer<R, B> synchronizer;
 
   private Location olmisLocation;
@@ -94,7 +98,8 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
     synchronizer
         .withContext(context)
         .withFhirServerUrl(FHIR_SERVER_URL)
-        .withServiceUrl(SERVICE_URL);
+        .withServiceUrl(SERVICE_URL)
+        .withAuthInterceptor(authInterceptor);
 
     when(context.newRestfulGenericClient(FHIR_SERVER_URL)).thenReturn(client);
 

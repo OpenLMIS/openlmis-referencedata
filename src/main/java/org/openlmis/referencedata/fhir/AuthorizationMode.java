@@ -15,30 +15,26 @@
 
 package org.openlmis.referencedata.fhir;
 
-import lombok.AllArgsConstructor;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.GeographicZone;
+import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
-@AllArgsConstructor
-class DefaultFhirClient implements FhirClient {
-  private LocationFactory locationFactory;
-  private LocationConverter locationConvert;
-  private LocationSynchronizer locationSynchronizer;
+enum AuthorizationMode {
+  GENERATE_TOKEN,
+  USE_EXISTING_TOKEN,
+  BASIC_AUTH,
+  NONE;
 
-  @Override
-  public void synchronizeFacility(Facility facility) {
-    synchronize(locationFactory.createFor(facility));
+  public static AuthorizationMode fromString(String modeAsString) {
+    if (isBlank(modeAsString)) {
+      return AuthorizationMode.NONE;
+    }
+
+    for (AuthorizationMode next : AuthorizationMode.values()) {
+      if (equalsIgnoreCase(next.name(), modeAsString)) {
+        return next;
+      }
+    }
+
+    throw new IllegalArgumentException("Unsupported authorization mode: " + modeAsString);
   }
-
-  @Override
-  public void synchronizeGeographicZone(GeographicZone geographicZone) {
-    synchronize(locationFactory.createFor(geographicZone));
-  }
-
-  private void synchronize(Location location) {
-    IBaseResource resource = locationConvert.convert(location);
-    locationSynchronizer.synchronize(location, resource);
-  }
-
 }

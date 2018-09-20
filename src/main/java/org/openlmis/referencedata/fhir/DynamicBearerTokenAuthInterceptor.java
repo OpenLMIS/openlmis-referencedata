@@ -15,30 +15,22 @@
 
 package org.openlmis.referencedata.fhir;
 
+import ca.uhn.fhir.rest.api.Constants;
+import ca.uhn.fhir.rest.client.api.IHttpRequest;
+import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import lombok.AllArgsConstructor;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.service.AuthService;
 
 @AllArgsConstructor
-class DefaultFhirClient implements FhirClient {
-  private LocationFactory locationFactory;
-  private LocationConverter locationConvert;
-  private LocationSynchronizer locationSynchronizer;
+final class DynamicBearerTokenAuthInterceptor extends BearerTokenAuthInterceptor {
+  private AuthService authService;
 
   @Override
-  public void synchronizeFacility(Facility facility) {
-    synchronize(locationFactory.createFor(facility));
-  }
-
-  @Override
-  public void synchronizeGeographicZone(GeographicZone geographicZone) {
-    synchronize(locationFactory.createFor(geographicZone));
-  }
-
-  private void synchronize(Location location) {
-    IBaseResource resource = locationConvert.convert(location);
-    locationSynchronizer.synchronize(location, resource);
+  public void interceptRequest(IHttpRequest theRequest) {
+    String token = authService.obtainAccessToken();
+    theRequest.addHeader(
+        Constants.HEADER_AUTHORIZATION,
+        Constants.HEADER_AUTHORIZATION_VALPREFIX_BEARER + token);
   }
 
 }
