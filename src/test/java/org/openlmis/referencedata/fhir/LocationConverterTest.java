@@ -24,15 +24,12 @@ public class LocationConverterTest {
 
   @Test
   public void shouldGetInstanceBasedOnFhirVersion() {
-    assertThat(LocationConverter.getInstance(FhirVersionEnum.DSTU2))
-        .isInstanceOf(Dstu2LocationConverter.class);
-    assertThat(LocationConverter.getInstance(FhirVersionEnum.DSTU2_HL7ORG))
-        .isInstanceOf(Dstu2Hl7OrgLocationConverter.class);
-    assertThat(LocationConverter.getInstance(FhirVersionEnum.DSTU2_1))
-        .isInstanceOf(Dstu21LocationConverter.class);
     assertThat(LocationConverter.getInstance(FhirVersionEnum.DSTU3))
         .isInstanceOf(Dstu3LocationConverter.class);
-    assertThat(LocationConverter.getInstance(FhirVersionEnum.R4))
-        .isInstanceOf(R4LocationConverter.class);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void shouldThrowExceptionForUnsupportedVersion() {
+    LocationConverter.getInstance(FhirVersionEnum.DSTU2_HL7ORG);
   }
 }

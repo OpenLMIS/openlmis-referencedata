@@ -24,20 +24,11 @@ abstract class LocationConverter<T extends IBaseResource> implements Converter<L
   private String serviceUrl;
 
   static LocationConverter getInstance(FhirVersionEnum version) {
-    switch (version) {
-      case DSTU2:
-        return new Dstu2LocationConverter();
-      case DSTU2_HL7ORG:
-        return new Dstu2Hl7OrgLocationConverter();
-      case DSTU2_1:
-        return new Dstu21LocationConverter();
-      case DSTU3:
-        return new Dstu3LocationConverter();
-      case R4:
-        return new R4LocationConverter();
-      default:
-        throw new IllegalStateException("Unsupported FHIR version: " + version.name());
+    if (version == FhirVersionEnum.DSTU3) {
+      return new Dstu3LocationConverter();
     }
+
+    throw new IllegalStateException("Unsupported FHIR version: " + version.name());
   }
 
   @Override

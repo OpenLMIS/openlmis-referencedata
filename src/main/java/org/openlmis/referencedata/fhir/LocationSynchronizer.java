@@ -17,15 +17,14 @@ package org.openlmis.referencedata.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
-import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.TokenClientParam;
-import java.util.Optional;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.openlmis.referencedata.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private FhirContext context;
-  private IClientInterceptor authInterceptor;
+  private AuthService authService;
 
   private String fhirServerUrl;
   private String serviceUrl;
@@ -51,20 +50,11 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
   }
 
   static LocationSynchronizer getInstance(FhirVersionEnum version) {
-    switch (version) {
-      case DSTU2:
-        return new Dstu2LocationSynchronizer();
-      case DSTU2_HL7ORG:
-        return new Dstu2Hl7OrgLocationSynchronizer();
-      case DSTU2_1:
-        return new Dstu21LocationSynchronizer();
-      case DSTU3:
-        return new Dstu3LocationSynchronizer();
-      case R4:
-        return new R4LocationSynchronizer();
-      default:
-        throw new IllegalStateException("Unsupported FHIR version: " + version.name());
+    if (version == FhirVersionEnum.DSTU3) {
+      return new Dstu3LocationSynchronizer();
     }
+
+    throw new IllegalStateException("Unsupported FHIR version: " + version.name());
   }
 
   @Override
@@ -74,8 +64,7 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
 
     IGenericClient client = context.newRestfulGenericClient(fhirServerUrl);
     client.registerInterceptor(loggingInterceptor);
-
-    Optional.ofNullable(authInterceptor).ifPresent(client::registerInterceptor);
+    client.registerInterceptor(new DynamicBearerTokenAuthInterceptor(authService));
 
     logger.trace(
         "Create identifier criterion for system {} and value {}",
@@ -117,8 +106,8 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
     return this;
   }
 
-  LocationSynchronizer<T, B> withAuthInterceptor(IClientInterceptor authInterceptor) {
-    this.authInterceptor = authInterceptor;
+  LocationSynchronizer<T, B> withAuthService(AuthService authService) {
+    this.authService = authService;
     return this;
   }
 

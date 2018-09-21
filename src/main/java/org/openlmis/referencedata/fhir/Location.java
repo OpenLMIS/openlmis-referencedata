@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.fhir;
 
-import static org.apache.commons.lang.BooleanUtils.isTrue;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.openlmis.referencedata.fhir.Coding.AREA;
 import static org.openlmis.referencedata.fhir.Coding.SITE;
 

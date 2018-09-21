@@ -15,13 +15,13 @@
 
 package org.openlmis.referencedata.fhir;
 
-import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.BooleanUtils;
+import org.openlmis.referencedata.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -40,9 +40,6 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
   @Value("${fhirClient.enabled}")
   private String fhirEnabled;
 
-  @Value("${fhirClient.version}")
-  private String fhirVersion;
-
   @Value("${fhirClient.serverUrl}")
   private String fhirServerUrl;
 
@@ -53,7 +50,7 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
   private LocationFactory locationFactory;
 
   @Autowired
-  private AuthorizationFactory authorizationFactory;
+  private AuthService authService;
 
   private FhirClient fhirClient;
 
@@ -63,18 +60,15 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
       LOGGER.info("The FHIR feature is enabled");
       Preconditions.checkArgument(isNotBlank(fhirServerUrl), "The FHIR server url cannot be blank");
 
-      FhirVersionEnum version = getVersion();
+      FhirVersionEnum version = FhirVersionEnum.DSTU3;
       FhirContext context = version.newContext();
 
       LocationSynchronizer locationSynchronizer = LocationSynchronizer
           .getInstance(version)
           .withContext(context)
           .withFhirServerUrl(fhirServerUrl)
-          .withServiceUrl(serviceUrl);
-
-      authorizationFactory
-          .build()
-          .ifPresent(locationSynchronizer::withAuthInterceptor);
+          .withServiceUrl(serviceUrl)
+          .withAuthService(authService);
 
       LocationConverter locationConvert = LocationConverter
           .getInstance(version)
@@ -102,13 +96,4 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
     return true;
   }
 
-  private FhirVersionEnum getVersion() {
-    for (FhirVersionEnum next : FhirVersionEnum.values()) {
-      if (equalsIgnoreCase(next.name(), fhirVersion)) {
-        return next;
-      }
-    }
-
-    throw new IllegalArgumentException("Unsupported FHIR version: " + fhirVersion);
-  }
 }

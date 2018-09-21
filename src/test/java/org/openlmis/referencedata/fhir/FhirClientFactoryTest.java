@@ -16,9 +16,7 @@
 package org.openlmis.referencedata.fhir;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,13 +24,13 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.service.AuthService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FhirClientFactoryTest {
 
   private static final String FHIR_ENABLED = "true";
-  private static final String FHIR_VERSION = "DSTU2";
   private static final String FHIR_SERVER_URL = "http://localhost/fhir";
   private static final String SERVICE_URL = "http://localhost";
 
@@ -43,20 +41,17 @@ public class FhirClientFactoryTest {
   private LocationFactory locationFactory;
 
   @Mock
-  private AuthorizationFactory authorizationFactory;
+  private AuthService authService;
 
   private FhirClientFactory factory = new FhirClientFactory();
 
   @Before
   public void setUp() {
-    when(authorizationFactory.build()).thenReturn(Optional.empty());
-
     ReflectionTestUtils.setField(factory, "fhirEnabled", FHIR_ENABLED);
-    ReflectionTestUtils.setField(factory, "fhirVersion", FHIR_VERSION);
     ReflectionTestUtils.setField(factory, "fhirServerUrl", FHIR_SERVER_URL);
     ReflectionTestUtils.setField(factory, "serviceUrl", SERVICE_URL);
     ReflectionTestUtils.setField(factory, "locationFactory", locationFactory);
-    ReflectionTestUtils.setField(factory, "authorizationFactory", authorizationFactory);
+    ReflectionTestUtils.setField(factory, "authService", authService);
 
     factory.afterPropertiesSet();
   }
@@ -84,16 +79,6 @@ public class FhirClientFactoryTest {
 
     exception.expect(IllegalArgumentException.class);
     exception.expectMessage("The FHIR server url cannot be blank");
-
-    factory.afterPropertiesSet();
-  }
-
-  @Test
-  public void shouldThrowExceptionIfFhirVersionIsIncorrect() {
-    ReflectionTestUtils.setField(factory, "fhirVersion", "TEST");
-
-    exception.expect(IllegalArgumentException.class);
-    exception.expectMessage("Unsupported FHIR version: TEST");
 
     factory.afterPropertiesSet();
   }

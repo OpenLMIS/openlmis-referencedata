@@ -63,11 +63,7 @@ dependencies {
     compile 'net.sf.supercsv:super-csv-dozer:2.4.0'
 
     compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.4.0'
-    compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2:3.4.0'
-    compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2.1:3.4.0'
-    compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-hl7org-dstu2:3.4.0'
     compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:3.4.0'
-    compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:3.4.0'
 
     testCompile 'io.rest-assured:rest-assured:3.0.0'
     testCompile 'io.rest-assured:json-schema-validator:3.0.0'
