@@ -10,15 +10,15 @@ ALTER TABLE referencedata.orderable_identifiers DROP CONSTRAINT orderable_identi
 ALTER TABLE referencedata.program_orderables DROP CONSTRAINT fkp2b6lcwnyqul4yi2vnd2vvq50;
 ALTER TABLE referencedata.facility_type_approved_products DROP CONSTRAINT ftap_orderableid_fk;
 
--- Switch orderables primary key to id and versionid
-ALTER TABLE referencedata.orderables DROP CONSTRAINT orderables_pkey;
-ALTER TABLE referencedata.orderables ADD CONSTRAINT orderables_pkey PRIMARY KEY (id, versionid);
-
 -- Generate starting values for version ids and last updated
 UPDATE referencedata.orderables SET versionid = 1, lastupdated = now();
 UPDATE referencedata.orderable_identifiers SET orderableversionid = 1;
 UPDATE referencedata.program_orderables SET orderableversionid = 1;
 UPDATE referencedata.facility_type_approved_products SET orderableversionid = 1;
+
+-- Switch orderables primary key to id and versionid
+ALTER TABLE referencedata.orderables DROP CONSTRAINT orderables_pkey;
+ALTER TABLE referencedata.orderables ADD CONSTRAINT orderables_pkey PRIMARY KEY (id, versionid);
 
 -- Add multi-column foreign keys pointing to orderables multi-column primary key
 ALTER TABLE referencedata.orderable_identifiers
