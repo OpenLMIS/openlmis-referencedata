@@ -17,6 +17,7 @@ package org.openlmis.referencedata.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.rest.api.CacheControlDirective;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
@@ -66,20 +67,12 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
     client.registerInterceptor(loggingInterceptor);
     client.registerInterceptor(new DynamicBearerTokenAuthInterceptor(authService));
 
-    logger.trace(
-        "Create identifier criterion for system {} and value {}",
-        serviceUrl, olmisLocation.getId()
-    );
-
-    ICriterion criterion = new TokenClientParam("identifier")
-        .exactly()
-        .systemAndValues(serviceUrl, olmisLocation.getId().toString());
-
     logger.debug("Try to find resources by criterion");
     B bundle = client
         .search()
         .forResource(resourceClass)
-        .where(criterion)
+        .cacheControl(buildCacheControl())
+        .where(buildCriterion(olmisLocation))
         .returnBundle(bundleClass)
         .execute();
     T existing = getEntry(bundle);
@@ -136,6 +129,26 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
         .resource(fhirLocation)
         .encodedJson()
         .execute();
+  }
+
+  private ICriterion buildCriterion(Location olmisLocation) {
+    logger.trace(
+        "Create identifier criterion for system {} and value {}",
+        serviceUrl, olmisLocation.getId()
+    );
+
+    return new TokenClientParam("identifier")
+        .exactly()
+        .systemAndValues(serviceUrl, olmisLocation.getId().toString());
+  }
+
+  private CacheControlDirective buildCacheControl() {
+    CacheControlDirective cacheControl = new CacheControlDirective();
+    cacheControl.setNoCache(true);
+    cacheControl.setNoStore(true);
+    cacheControl.setMaxResults(1);
+
+    return cacheControl;
   }
 
 }

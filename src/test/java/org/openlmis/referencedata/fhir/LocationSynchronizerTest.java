@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.rest.api.CacheControlDirective;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICreate;
 import ca.uhn.fhir.rest.gclient.ICreateTyped;
@@ -115,6 +116,7 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
 
     when(client.search()).thenReturn(search);
     when(search.forResource(fhirLocation.getClass())).thenReturn(baseQuery);
+    when(baseQuery.cacheControl(any(CacheControlDirective.class))).thenReturn(baseQuery);
     when(baseQuery.where(any(ICriterion.class))).thenReturn(baseQuery);
     when(baseQuery.returnBundle(emptyBundle.getClass())).thenReturn(query);
   }
