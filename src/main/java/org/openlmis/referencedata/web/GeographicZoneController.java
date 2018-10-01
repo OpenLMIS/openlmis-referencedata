@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT;
-
 import com.vividsolutions.jts.geom.Point;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +28,10 @@ import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.fhir.FhirClient;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.service.GeographicZoneService;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +51,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Transactional
 public class GeographicZoneController extends BaseController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GeographicZoneController.class);
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(FacilityController.class);
 
   public static final String RESOURCE_PATH = "/geographicZones";
 
@@ -75,19 +73,29 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public GeographicZoneDto createGeographicZone(
-      @RequestBody GeographicZoneDto geographicZoneDto) {
-    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
+  public GeographicZoneDto createGeographicZone(@RequestBody GeographicZoneDto geographicZoneDto) {
+    Profiler profiler = new Profiler("CREATE_GEO_ZONE");
+    profiler.setLogger(XLOGGER);
 
-    LOGGER.debug("Creating new geographicZone");
+    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false, profiler);
+
+    XLOGGER.debug("Creating new geographicZone");
+    profiler.start("BUILD_GEO_ZONE_FROM_DTO");
     GeographicZone geographicZone = GeographicZone.newGeographicZone(geographicZoneDto);
     // Ignore provided id
     geographicZone.setId(null);
+
+    profiler.start("SAVE_TO_DB");
     GeographicZone zone = geographicZoneRepository.save(geographicZone);
 
+    profiler.start("SYNC_FHIR_RESOURCE");
     fhirClient.synchronizeGeographicZone(zone);
 
-    return toDto(zone);
+    GeographicZoneDto dto = toDto(zone, profiler);
+
+    profiler.stop().log();
+
+    return dto;
   }
 
 
@@ -100,15 +108,23 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<GeographicZoneSimpleDto> getAllGeographicZones(Pageable pageable) {
-    return geographicZoneRepository
-        .findAll(pageable)
-        .map(this::toSimpleDto);
+    Profiler profiler = new Profiler("GET_ALL_GEO_ZONES");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("FIND_ALL");
+    Page<GeographicZone> page = geographicZoneRepository.findAll(pageable);
+    List<GeographicZoneSimpleDto> dtos = toSimpleDto(page.getContent(), profiler);
+    Page<GeographicZoneSimpleDto> response = toPage(dtos, pageable,
+        page.getTotalElements(), profiler);
+
+    profiler.stop().log();
+    return response;
   }
 
   /**
    * Allows updating geographicZones.
    *
-   * @param geographicZoneId  UUID of geographicZone which we want to update.
+   * @param geographicZoneId UUID of geographicZone which we want to update.
    * @param geographicZoneDto A geographicZone bound to the request body.
    * @return the ResponseEntity containing the updated geographicZone.
    */
@@ -117,18 +133,27 @@ public class GeographicZoneController extends BaseController {
   @ResponseBody
   public GeographicZoneDto updateGeographicZone(@PathVariable("id") UUID geographicZoneId,
       @RequestBody GeographicZoneDto geographicZoneDto) {
+    Profiler profiler = new Profiler("UPDATE_GEO_ZONE");
+    profiler.setLogger(XLOGGER);
 
-    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
+    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false, profiler);
 
+    profiler.start("BUILD_GEO_ZONE_FROM_DTO");
     GeographicZone geoZoneToSave = GeographicZone.newGeographicZone(geographicZoneDto);
     geoZoneToSave.setId(geographicZoneId);
 
-    LOGGER.debug("Updating geographicZone");
+    XLOGGER.debug("Updating geographicZone");
+    profiler.start("SAVE");
     GeographicZone zone = geographicZoneRepository.save(geoZoneToSave);
 
+    profiler.start("SYNC_FHIR_RESOURCE");
     fhirClient.synchronizeGeographicZone(zone);
 
-    return toDto(zone);
+    GeographicZoneDto dto = toDto(zone, profiler);
+
+    profiler.stop().log();
+
+    return dto;
   }
 
   /**
@@ -141,13 +166,22 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicZoneDto getGeographicZone(@PathVariable("id") UUID geographicZoneId) {
+    Profiler profiler = new Profiler("GET_GEO_ZONE");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("FIND_ONE_BY_ID");
     GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
 
     if (geographicZone == null) {
+      profiler.stop().log();
       throw new NotFoundException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     }
 
-    return toDto(geographicZone);
+    GeographicZoneDto dto = toDto(geographicZone, profiler);
+
+    profiler.stop().log();
+
+    return dto;
   }
 
   /**
@@ -158,13 +192,23 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteGeographicZone(@PathVariable("id") UUID geographicZoneId) {
-    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
+    Profiler profiler = new Profiler("DELETE_GEO_ZONE");
+    profiler.setLogger(XLOGGER);
 
-    if (!geographicZoneRepository.exists(geographicZoneId)) {
+    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false, profiler);
+
+    profiler.start("CHECK_IF_GEO_ZONE_EXISTS");
+    boolean exists = geographicZoneRepository.exists(geographicZoneId);
+
+    if (!exists) {
+      profiler.stop().log();
       throw new NotFoundException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     }
 
+    profiler.start("DELETE_INSTANCE");
     geographicZoneRepository.delete(geographicZoneId);
+
+    profiler.stop().log();
   }
 
   /**
@@ -178,10 +222,18 @@ public class GeographicZoneController extends BaseController {
   @ResponseBody
   public Iterable<GeographicZoneSimpleDto> findGeographicZonesByLocation(
       @RequestBody Point location) {
-    rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    Profiler profiler = new Profiler("FIND_GEO_ZONES_BY_LOCATION");
+    profiler.setLogger(XLOGGER);
 
+    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, profiler);
+
+    profiler.start("FIND_IN_DB");
     List<GeographicZone> foundGeoZones = geographicZoneRepository.findByLocation(location);
-    return toSimpleDto(foundGeoZones);
+    List<GeographicZoneSimpleDto> dtos = toSimpleDto(foundGeoZones, profiler);
+
+    profiler.stop().log();
+
+    return dtos;
   }
 
   /**
@@ -196,9 +248,17 @@ public class GeographicZoneController extends BaseController {
   @ResponseBody
   public Page<GeographicZoneSimpleDto> search(@RequestBody Map<String, Object> queryParams,
       Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_GEO_ZONES");
+    profiler.setLogger(XLOGGER);
 
+    profiler.start("SEARCH_BY_PARAMS");
     Page<GeographicZone> page = geographicZoneService.search(queryParams, pageable);
-    return exportToDto(page, pageable);
+    List<GeographicZoneSimpleDto> dtos = toSimpleDto(page.getContent(), profiler);
+    Page<GeographicZoneSimpleDto> response = toPage(dtos, pageable,
+        page.getTotalElements(), profiler);
+
+    profiler.stop().log();
+    return response;
   }
 
   /**
@@ -222,34 +282,43 @@ public class GeographicZoneController extends BaseController {
       @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
           boolean returnJson,
       Pageable page) {
+    Profiler profiler = new Profiler("GET_AUDIT_LOG_OF_GEO_ZONE");
+    profiler.setLogger(XLOGGER);
 
-    rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, profiler);
 
-    //Return a 404 if the specified instance can't be found
-    GeographicZone instance = geographicZoneRepository.findOne(id);
-    if (instance == null) {
+    profiler.start("CHECK_IF_GEO_ZONE_EXISTS");
+    boolean exists = geographicZoneRepository.exists(id);
+
+    if (!exists) {
+      profiler.stop().log();
       throw new NotFoundException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     }
 
-    return getAuditLogResponse(GeographicZone.class, id, author, changedPropertyName, page,
-        returnJson);
+    profiler.start("GET_AUDIT_LOG");
+    ResponseEntity<String> response = getAuditLogResponse(
+        GeographicZone.class, id, author, changedPropertyName, page, returnJson
+    );
+
+    profiler.stop().log();
+    return response;
   }
 
-  private Page<GeographicZoneSimpleDto> exportToDto(Page<GeographicZone> page, Pageable pageable) {
-    List<GeographicZoneSimpleDto> list = page
-        .getContent()
-        .stream()
-        .map(this::toSimpleDto)
-        .collect(Collectors.toList());
-
-    return Pagination.getPage(list, pageable, page.getTotalElements());
-  }
-
-  private GeographicZoneDto toDto(GeographicZone geographicZone) {
+  private GeographicZoneDto toDto(GeographicZone geographicZone, Profiler profiler) {
+    profiler.start("EXPORT_GEO_ZONE_TO_DTO");
     GeographicZoneDto dto = new GeographicZoneDto();
     geographicZone.export(dto);
 
     return dto;
+  }
+
+  private List<GeographicZoneSimpleDto> toSimpleDto(List<GeographicZone> geographicZones,
+      Profiler profiler) {
+    profiler.start("EXPORT_GEO_ZONES_TO_SIMPLE_DTOS");
+    return geographicZones
+        .stream()
+        .map(this::toSimpleDto)
+        .collect(Collectors.toList());
   }
 
   private GeographicZoneSimpleDto toSimpleDto(GeographicZone geographicZone) {
@@ -257,12 +326,5 @@ public class GeographicZoneController extends BaseController {
     geographicZone.export(dto);
 
     return dto;
-  }
-
-  private Iterable<GeographicZoneSimpleDto> toSimpleDto(List<GeographicZone> geographicZones) {
-    return geographicZones
-        .stream()
-        .map(this::toSimpleDto)
-        .collect(Collectors.toList());
   }
 }

@@ -406,7 +406,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
+    given(geographicZoneRepository.exists(any(UUID.class))).willReturn(false);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -424,7 +424,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldGetAuditLog() {
-    given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(districtZone);
+    given(geographicZoneRepository.exists(any(UUID.class))).willReturn(true);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
