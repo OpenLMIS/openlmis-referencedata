@@ -33,6 +33,8 @@ import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.NamedResource;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -177,10 +179,12 @@ public class RightAssignmentRepositoryIntegrationTest
   }
   
   private Facility persistFacility() {
-    GeographicLevel geographicLevel = new GeographicLevel("GL1", 1);
+    GeographicLevel geographicLevel = new GeographicLevelDataBuilder().buildAsNew();
     geographicLevelRepository.save(geographicLevel);
     
-    GeographicZone geographicZone = new GeographicZone("G1", geographicLevel);
+    GeographicZone geographicZone = new GeographicZoneDataBuilder()
+        .withLevel(geographicLevel)
+        .buildAsNew();
     geographicZoneRepository.save(geographicZone);
     
     FacilityType facilityType = new FacilityType("FT1");

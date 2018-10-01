@@ -15,7 +15,9 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.RandomUtils;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -34,6 +36,7 @@ public class GeographicZoneDataBuilder {
   private Double latitude;
   private Double longitude;
   private Polygon boundary;
+  private Map<String, String> extraData;
 
   /**
    * Returns instance of {@link GeographicZoneDataBuilder} with sample data.
@@ -48,6 +51,7 @@ public class GeographicZoneDataBuilder {
     catchmentPopulation = RandomUtils.nextInt(0, 1000);
     latitude = RandomUtils.nextDouble(0, 200) - 100;
     longitude = RandomUtils.nextDouble(0, 200) - 100;
+    extraData = Maps.newHashMap();
   }
 
   /**
@@ -55,7 +59,7 @@ public class GeographicZoneDataBuilder {
    */
   public GeographicZone buildAsNew() {
     return new GeographicZone(code, name, level, parent, catchmentPopulation,
-        latitude, longitude, boundary);
+        latitude, longitude, boundary, extraData);
   }
 
   /**
@@ -68,14 +72,18 @@ public class GeographicZoneDataBuilder {
     return zone;
   }
 
+  public GeographicZoneDataBuilder withName(String name) {
+    this.name = name;
+    return this;
+  }
+
   public GeographicZoneDataBuilder withLevel(GeographicLevel level) {
     this.level = level;
     return this;
   }
 
-
-  public GeographicZoneDataBuilder withParent(GeographicZone zone) {
-    this.parent = zone;
+  public GeographicZoneDataBuilder withParent(GeographicZone parent) {
+    this.parent = parent;
     return this;
   }
 
@@ -83,4 +91,10 @@ public class GeographicZoneDataBuilder {
     this.boundary = boundary;
     return this;
   }
+
+  public GeographicZoneDataBuilder withExtraData(String key, String value) {
+    this.extraData.put(key, value);
+    return this;
+  }
+
 }

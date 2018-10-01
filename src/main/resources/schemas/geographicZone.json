@@ -31,6 +31,10 @@
     "longitude": {
       "type": "number",
       "title": "longitude"
+    },
+    "extraData": {
+      "type": "object",
+      "title": "extraData"
     }
   },
   "required": [

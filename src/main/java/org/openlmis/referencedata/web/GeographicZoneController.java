@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
@@ -101,22 +100,23 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<GeographicZoneSimpleDto> getAllGeographicZones(Pageable pageable) {
-
-    return (geographicZoneRepository.findAll(pageable)).map(this::toSimpleDto);
+    return geographicZoneRepository
+        .findAll(pageable)
+        .map(this::toSimpleDto);
   }
 
   /**
    * Allows updating geographicZones.
    *
-   * @param geographicZoneDto A geographicZone bound to the request body.
    * @param geographicZoneId  UUID of geographicZone which we want to update.
+   * @param geographicZoneDto A geographicZone bound to the request body.
    * @return the ResponseEntity containing the updated geographicZone.
    */
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public GeographicZoneDto updateGeographicZone(
-      @RequestBody GeographicZoneDto geographicZoneDto, @PathVariable("id") UUID geographicZoneId) {
+  public GeographicZoneDto updateGeographicZone(@PathVariable("id") UUID geographicZoneId,
+      @RequestBody GeographicZoneDto geographicZoneDto) {
 
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
 
@@ -140,15 +140,14 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public GeographicZoneDto getGeographicZone(
-      @PathVariable("id") UUID geographicZoneId) {
-
+  public GeographicZoneDto getGeographicZone(@PathVariable("id") UUID geographicZoneId) {
     GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
+
     if (geographicZone == null) {
       throw new NotFoundException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      return toDto(geographicZone);
     }
+
+    return toDto(geographicZone);
   }
 
   /**
@@ -161,12 +160,11 @@ public class GeographicZoneController extends BaseController {
   public void deleteGeographicZone(@PathVariable("id") UUID geographicZoneId) {
     rightService.checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
 
-    GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
-    if (geographicZone == null) {
+    if (!geographicZoneRepository.exists(geographicZoneId)) {
       throw new NotFoundException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      geographicZoneRepository.delete(geographicZone);
     }
+
+    geographicZoneRepository.delete(geographicZoneId);
   }
 
   /**
@@ -197,10 +195,9 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<GeographicZoneSimpleDto> search(@RequestBody Map<String, Object> queryParams,
-                                                                 Pageable pageable) {
+      Pageable pageable) {
 
     Page<GeographicZone> page = geographicZoneService.search(queryParams, pageable);
-
     return exportToDto(page, pageable);
   }
 
@@ -239,8 +236,12 @@ public class GeographicZoneController extends BaseController {
   }
 
   private Page<GeographicZoneSimpleDto> exportToDto(Page<GeographicZone> page, Pageable pageable) {
-    List<GeographicZoneSimpleDto> list = page.getContent().stream()
-        .map(this::toSimpleDto).collect(Collectors.toList());
+    List<GeographicZoneSimpleDto> list = page
+        .getContent()
+        .stream()
+        .map(this::toSimpleDto)
+        .collect(Collectors.toList());
+
     return Pagination.getPage(list, pageable, page.getTotalElements());
   }
 
@@ -251,13 +252,6 @@ public class GeographicZoneController extends BaseController {
     return dto;
   }
 
-  private Iterable<GeographicZoneDto> toDto(Iterable<GeographicZone> geographicZones) {
-    return StreamSupport
-        .stream(geographicZones.spliterator(), false)
-        .map(this::toDto)
-        .collect(Collectors.toList());
-  }
-
   private GeographicZoneSimpleDto toSimpleDto(GeographicZone geographicZone) {
     GeographicZoneSimpleDto dto = new GeographicZoneSimpleDto();
     geographicZone.export(dto);
@@ -265,9 +259,9 @@ public class GeographicZoneController extends BaseController {
     return dto;
   }
 
-  private Iterable<GeographicZoneSimpleDto> toSimpleDto(Iterable<GeographicZone> geographicZones) {
-    return StreamSupport
-        .stream(geographicZones.spliterator(), false)
+  private Iterable<GeographicZoneSimpleDto> toSimpleDto(List<GeographicZone> geographicZones) {
+    return geographicZones
+        .stream()
         .map(this::toSimpleDto)
         .collect(Collectors.toList());
   }

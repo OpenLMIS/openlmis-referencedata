@@ -57,9 +57,11 @@ public class GeographicLevelDataBuilder {
     return level;
   }
 
-  /**
-   * Sets level number for new {@link GeographicLevel}.
-   */
+  public GeographicLevelDataBuilder withName(String name) {
+    this.name = name;
+    return this;
+  }
+
   public GeographicLevelDataBuilder withLevelNumber(Integer levelNumber) {
     this.levelNumber = levelNumber;
     return this;

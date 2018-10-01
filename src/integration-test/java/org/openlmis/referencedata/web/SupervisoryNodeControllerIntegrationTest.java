@@ -59,6 +59,7 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Message;
@@ -104,7 +105,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     final GeographicLevel geoLevel = new GeographicLevel("geoCode", 1);
 
-    final GeographicZone geoZone = new GeographicZone("geoZoneCode", geoLevel);
+    final GeographicZone geoZone = new GeographicZoneDataBuilder()
+        .withLevel(geoLevel)
+        .build();
 
     facility = new Facility("facilityCode");
     facility.setActive(true);

@@ -47,14 +47,13 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.UploadResultDto;
 import org.openlmis.referencedata.service.IdealStockAmountSearchParams;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -74,10 +73,9 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   private ProcessingSchedule schedule;
 
   @Before
+  @Override
   public void setUp() {
-    facility = new Facility("facility-code");
-    GeographicLevel countryLevel = new GeographicLevel("Country", 1);
-    facility.setGeographicZone(new GeographicZone("TC", countryLevel));
+    facility = new FacilityDataBuilder().build();
 
     commodityType = new CommodityType("Name", "cSys", "cId", null, new ArrayList<>());
 
@@ -134,7 +132,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldDownloadCsvWithAllPossibleFields() throws IOException {
+  public void shouldDownloadCsvWithAllPossibleFields() {
 
     when(idealStockAmountService.search()).thenReturn(singletonList(isa));
 
@@ -154,7 +152,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldDownloadCsvWithHeadersOnly() throws IOException {
+  public void shouldDownloadCsvWithHeadersOnly() {
 
     when(idealStockAmountService.search())
         .thenReturn(Collections.emptyList());
@@ -171,7 +169,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void downloadShouldReturnUnauthorizedWithoutAuthorization() throws IOException {
+  public void downloadShouldReturnUnauthorizedWithoutAuthorization() {
 
     restAssured.given()
         .contentType("text/csv")

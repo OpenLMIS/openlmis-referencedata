@@ -16,8 +16,11 @@
 package org.openlmis.referencedata.domain;
 
 import com.vividsolutions.jts.geom.Polygon;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -25,6 +28,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +39,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @Table(name = "geographic_zones", schema = "referencedata")
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = {"code"}, callSuper = false)
 @TypeName("GeographicZone")
 @NamedQueries({
     @NamedQuery(name = "GeographicZone.findIdsByParent",
@@ -83,27 +88,10 @@ public class GeographicZone extends BaseEntity {
   @Setter
   private Polygon boundary;
 
-  public GeographicZone(String code, GeographicLevel level) {
-    this.code = code;
-    this.level = level;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof GeographicZone)) {
-      return false;
-    }
-    GeographicZone that = (GeographicZone) obj;
-    return Objects.equals(code, that.code);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(code);
-  }
+  @Column(name = "extradata", columnDefinition = "jsonb")
+  @Convert(converter = ExtraDataConverter.class)
+  @Getter
+  private Map<String, String> extraData = new HashMap<>();
 
   /**
    * Creates new geographic zone object based on data from {@link Importer}.
@@ -116,10 +104,7 @@ public class GeographicZone extends BaseEntity {
     geographicZone.setId(importer.getId());
     geographicZone.setCode(importer.getCode());
     geographicZone.setName(importer.getName());
-
-    if (null != importer.getLevel()) {
-      geographicZone.setLevel(GeographicLevel.newGeographicLevel(importer.getLevel()));
-    }
+    geographicZone.setLevel(GeographicLevel.newGeographicLevel(importer.getLevel()));
 
     if (null != importer.getParent()) {
       geographicZone.setParent(newGeographicZone(importer.getParent()));
@@ -130,6 +115,9 @@ public class GeographicZone extends BaseEntity {
     geographicZone.setLongitude(importer.getLongitude());
     
     geographicZone.setBoundary(importer.getBoundary());
+    Optional
+        .ofNullable(importer.getExtraData())
+        .ifPresent(data -> geographicZone.getExtraData().putAll(data));
 
     return geographicZone;
   }
@@ -143,10 +131,7 @@ public class GeographicZone extends BaseEntity {
     exporter.setId(id);
     exporter.setCode(code);
     exporter.setName(name);
-
-    if (null != level) {
-      exporter.setLevel(level);
-    }
+    exporter.setLevel(level);
 
     if (null != parent) {
       exporter.setParent(parent);
@@ -156,6 +141,7 @@ public class GeographicZone extends BaseEntity {
     exporter.setLatitude(latitude);
     exporter.setLongitude(longitude);
     exporter.setBoundary(boundary);
+    exporter.setExtraData(extraData);
   }
 
   public interface Exporter extends BaseExporter {
@@ -176,6 +162,8 @@ public class GeographicZone extends BaseEntity {
 
     void setParent(GeographicZone parent);
 
+    void setExtraData(Map<String, String> extraData);
+
   }
 
   public interface Importer extends BaseImporter {
@@ -195,6 +183,8 @@ public class GeographicZone extends BaseEntity {
     Polygon getBoundary();
 
     Importer getParent();
+
+    Map<String, String> getExtraData();
 
   }
 }

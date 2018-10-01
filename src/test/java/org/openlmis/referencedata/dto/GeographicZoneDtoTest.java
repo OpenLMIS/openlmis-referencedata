@@ -17,22 +17,20 @@ package org.openlmis.referencedata.dto;
 
 import static org.mockito.Mockito.mock;
 
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-public class FacilityDtoTest {
+public class GeographicZoneDtoTest {
 
   @Test
-  public void equalsContract() throws Exception {
+  public void equalsContract() {
     EqualsVerifier
-        .forClass(FacilityDto.class)
+        .forClass(GeographicZoneDto.class)
         .withRedefinedSuperclass()
-        .withPrefabValues(
-            Point.class,
-            mock(Point.class),
-            mock(Point.class))
+        .withPrefabValues(Polygon.class, mock(Polygon.class), mock(Polygon.class))
         .withPrefabValues(GeographicZoneSimpleDto.class,
             new GeographicZoneSimpleDto("code1", null, null, null, null, null, null),
             new GeographicZoneSimpleDto("code2", null, null, null, null, null, null))
@@ -40,5 +38,10 @@ public class FacilityDtoTest {
         .verify();
   }
 
+  @Test
+  public void shouldImplementToString() {
+    GeographicZoneDto dto = new GeographicZoneDto();
+    ToStringTestUtils.verify(GeographicZoneDto.class, dto);
+  }
 
 }

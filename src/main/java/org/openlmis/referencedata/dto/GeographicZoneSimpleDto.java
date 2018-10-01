@@ -16,17 +16,23 @@
 package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Getter
 @Setter
 public class GeographicZoneSimpleDto extends BaseDto implements
@@ -50,12 +56,26 @@ public class GeographicZoneSimpleDto extends BaseDto implements
     this.parent = new GeographicZoneSimpleDto();
     parent.export(this.parent);
   }
-  
+
   @Override
-  public void setBoundary(Polygon boundary) {}
-  
+  public void setBoundary(Polygon boundary) {
+    // unsupported operation
+  }
+
+  @Override
+  public void setExtraData(Map<String, String> extraData) {
+    // unsupported operation
+  }
+
   @Override
   public Polygon getBoundary() {
+    // unsupported operation
     return null;
+  }
+
+  @Override
+  public Map<String, String> getExtraData() {
+    // unsupported operation
+    return Maps.newHashMap();
   }
 }

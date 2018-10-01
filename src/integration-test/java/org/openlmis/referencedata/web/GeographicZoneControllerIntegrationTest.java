@@ -15,38 +15,37 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import guru.nidi.ramltester.junit.RamlMatchers;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.apache.http.HttpStatus;
+import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
-import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
-import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.dto.GeographicZoneDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -57,155 +56,145 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   private static final String RESOURCE_URL = "/api/geographicZones";
   private static final String SEARCH_URL = RESOURCE_URL + "/search";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
-  private static final String BYLOCATION_URL = RESOURCE_URL + "/byLocation";
-  private static final String PAGE = "page";
-  private static final String SIZE = "size";
-  private static final Integer PAGE_NUMBER = 0;
-  //Neither 0 nor Integer.MAX_VALUE work in this context
-  private static final Integer PAGE_SIZE = 1000;
+  private static final String BY_LOCATION_URL = RESOURCE_URL + "/byLocation";
+
   private static final String LEVEL_NUMBER = "levelNumber";
   private static final String PARENT = "parent";
 
-  private GeographicLevel countryLevel;
-  private GeographicLevel regionLevel;
-
-  private GeographicLevel districtLevel;
   private GeographicZone countryZone;
   private GeographicZone regionZone;
   private GeographicZone districtZone;
-  
+
+  private GeographicZoneDto countryZoneDto = new GeographicZoneDto();
+  private GeographicZoneDto regionZoneDto = new GeographicZoneDto();
+  private GeographicZoneDto districtZoneDto = new GeographicZoneDto();
+
   private GeometryFactory gf;
 
-  /**
-   * Constructor for tests.
-   */
-  public GeographicZoneControllerIntegrationTest() {
-    countryLevel = new GeographicLevel("Country", 1);
-    countryLevel.setId(UUID.randomUUID());
-    countryLevel.setName("Country");
+  @Override
+  @Before
+  public void setUp() {
+    super.setUp();
 
-    regionLevel = new GeographicLevel("Region", 1);
-    regionLevel.setId(UUID.randomUUID());
-    regionLevel.setName("Region");
+    countryZone = new GeographicZoneDataBuilder()
+        .withName("Country")
+        .withLevel(
+            new GeographicLevelDataBuilder()
+                .withName("Country")
+                .withLevelNumber(1)
+                .build()
+        )
+        .build();
 
-    districtLevel = new GeographicLevel("District", 1);
-    districtLevel.setId(UUID.randomUUID());
-    districtLevel.setName("District");
-    
-    countryZone = new GeographicZone("TC", countryLevel);
-    countryZone.setId(UUID.randomUUID());
-    countryZone.setName("Test Country");
-    countryZone.setCatchmentPopulation(100);
-    countryZone.setLongitude(56.19);
-    countryZone.setLatitude(33.15);
+    regionZone = new GeographicZoneDataBuilder()
+        .withName("Region")
+        .withParent(countryZone)
+        .withLevel(
+            new GeographicLevelDataBuilder()
+                .withName("Region")
+                .withLevelNumber(2)
+                .build()
+        )
+        .build();
 
-    regionZone = new GeographicZone("TR", regionLevel);
-    regionZone.setId(UUID.randomUUID());
-    regionZone.setName("Test Region");
-    regionZone.setCatchmentPopulation(400);
-    regionZone.setLongitude(41.76);
-    regionZone.setLatitude(68.55);
-    regionZone.setParent(countryZone);
-
-    districtZone = new GeographicZone("TD", districtLevel);
-    districtZone.setId(UUID.randomUUID());
-    districtZone.setName("Test District");
-    districtZone.setCatchmentPopulation(400);
-    districtZone.setLongitude(41.76);
-    districtZone.setLatitude(68.55);
-    districtZone.setParent(regionZone);
+    districtZone = new GeographicZoneDataBuilder()
+        .withName("District")
+        .withParent(regionZone)
+        .withLevel(
+            new GeographicLevelDataBuilder()
+                .withName("District")
+                .withLevelNumber(3)
+                .build()
+        )
+        .build();
 
     gf = new GeometryFactory();
+
+    countryZone.export(countryZoneDto);
+    regionZone.export(regionZoneDto);
+    districtZone.export(districtZoneDto);
+
+    given(geographicZoneRepository.save(any(GeographicZone.class))).willAnswer(new SaveAnswer<>());
+    given(geographicZoneRepository.findOne(countryZoneDto.getId())).willReturn(countryZone);
+    given(geographicZoneRepository.findOne(regionZoneDto.getId())).willReturn(regionZone);
+    given(geographicZoneRepository.findOne(districtZoneDto.getId())).willReturn(districtZone);
+
+    mockUserHasRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
   }
 
   @Test
   public void shouldDeleteGeographicZone() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
-    given(geographicZoneRepository.findOne(countryZone.getId())).willReturn(countryZone);
+    given(geographicZoneRepository.exists(countryZoneDto.getId())).willReturn(true);
 
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", countryZone.getId())
+        .pathParam(ID, countryZoneDto.getId())
         .when()
         .delete(ID_URL)
         .then()
-        .statusCode(204);
+        .statusCode(HttpStatus.SC_NO_CONTENT);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldPostGeographicZone() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
-    when(geographicZoneRepository.save(countryZone)).thenReturn(countryZone);
-
-    GeographicZone response = restAssured
+    restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(countryZone)
+        .body(countryZoneDto)
         .when()
         .post(RESOURCE_URL)
         .then()
-        .statusCode(201)
-        .extract().as(GeographicZone.class);
+        .statusCode(HttpStatus.SC_CREATED)
+        .body(hasSameFields(countryZoneDto, ID));
 
-    assertEquals(countryZone, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldPutGeographicZone() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
-    when(geographicZoneRepository.save(countryZone)).thenReturn(countryZone);
-
-    GeographicZone response = restAssured
+    restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", countryZone.getId())
-        .body(countryZone)
+        .pathParam(ID, countryZoneDto.getId())
+        .body(countryZoneDto)
         .when()
         .put(ID_URL)
         .then()
-        .statusCode(200)
-        .extract().as(GeographicZone.class);
+        .statusCode(HttpStatus.SC_OK)
+        .body(hasSameFields(countryZoneDto));
 
-    assertEquals(countryZone, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldGetAllGeographicZones() {
-
-    List<GeographicZone> geographicZones = Arrays.asList(countryZone, regionZone, districtZone);
+    List<GeographicZone> geographicZones = Lists
+        .newArrayList(countryZone, regionZone, districtZone);
     Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
 
-    PageRequest pageRequest = new PageRequest(PAGE_NUMBER, PAGE_SIZE);
-    given(geographicZoneRepository.findAll(pageRequest)).willReturn(geographicZonesPage);
+    given(geographicZoneRepository.findAll(pageable)).willReturn(geographicZonesPage);
 
-    Page<GeographicZoneSimpleDto> response = restAssured
+    restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam(PAGE, PAGE_NUMBER)
-        .queryParam(SIZE, PAGE_SIZE)
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .statusCode(HttpStatus.SC_OK)
+        .body(CONTENT, hasSize(geographicZones.size()))
+        .body(CONTENT_ID, hasSize(geographicZones.size()))
+        .body(CONTENT_ID, hasItems(countryZone.getId().toString(), regionZone.getId().toString(),
+            districtZone.getId().toString()));
 
-    assertEquals(geographicZones.size(), response.getContent().size());
-    assertEquals(geographicZones.size(), response.getNumberOfElements());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -214,13 +203,13 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     // given
     List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
 
-    given(geographicZoneService.search(any(Map.class), any(Pageable.class)))
+    given(geographicZoneService.search(anyMapOf(String.class, Object.class), any(Pageable.class)))
         .willReturn(Pagination.getPage(geographicZones, null, geographicZones.size()));
 
     Map<String, Object> requestBody = getSearchBody();
 
     // when
-    Page<GeographicZoneSimpleDto> response = restAssured
+    restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
@@ -228,67 +217,60 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .when()
         .post(SEARCH_URL)
         .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .statusCode(HttpStatus.SC_OK)
+        .body(CONTENT, hasSize(geographicZones.size()))
+        .body(CONTENT_ID, hasSize(geographicZones.size()))
+        .body(CONTENT_ID, hasItems(districtZone.getId().toString()));
 
     // then
-    List<GeographicZoneSimpleDto> result = response.getContent();
-    assertEquals(geographicZones.size(), result.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldGetGeographicZone() {
-
-    given(geographicZoneRepository.findOne(countryZone.getId())).willReturn(countryZone);
-
-    GeographicZone response = restAssured
+    restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", countryZone.getId())
+        .pathParam(ID, countryZoneDto.getId())
         .when()
         .get(ID_URL)
         .then()
-        .statusCode(200)
-        .extract().as(GeographicZone.class);
+        .statusCode(HttpStatus.SC_OK)
+        .body(hasSameFields(countryZoneDto));
 
-    assertEquals(countryZone, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void getShouldReturnUnauthorizedWithoutAuthorization() {
-
     restAssured
         .given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", countryZone.getId())
+        .pathParam(ID, countryZoneDto.getId())
         .when()
         .get(ID_URL)
         .then()
-        .statusCode(401);
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
-
     restAssured
         .given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
         .then()
-        .statusCode(401);
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void searchShouldReturnUnauthorizedWithoutAuthorization() {
-
     Map<String, Object> requestBody = getSearchBody();
 
     restAssured
@@ -298,7 +280,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .when()
         .post(SEARCH_URL)
         .then()
-        .statusCode(401);
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -310,7 +292,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     doThrow(new ValidationMessageException(
         GeographicZoneMessageKeys.ERROR_SEARCH_LACKS_PARAMS))
         .when(geographicZoneService)
-        .search(any(Map.class), any(Pageable.class));
+        .search(anyMapOf(String.class, Object.class), any(Pageable.class));
 
     restAssured
         .given()
@@ -320,109 +302,92 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .when()
         .post(SEARCH_URL)
         .then()
-        .statusCode(400);
+        .statusCode(HttpStatus.SC_BAD_REQUEST);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void putShouldReturnForbiddenOnUnauthorizedToken() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
+    mockUserHasNoRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", countryZone.getId())
-        .body(countryZone)
+        .pathParam(ID, countryZoneDto.getId())
+        .body(countryZoneDto)
         .when()
         .put(ID_URL)
         .then()
-        .statusCode(403);
+        .statusCode(HttpStatus.SC_FORBIDDEN);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void deleteShouldReturnForbiddenOnUnauthorizedToken() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
+    mockUserHasNoRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", countryZone.getId())
+        .pathParam(ID, countryZoneDto.getId())
         .when()
         .delete(ID_URL)
         .then()
-        .statusCode(403);
+        .statusCode(HttpStatus.SC_FORBIDDEN);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void postShouldReturnForbiddenOnUnauthorizedToken() {
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false);
+    mockUserHasNoRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(countryZone)
+        .body(countryZoneDto)
         .when()
         .post(RESOURCE_URL)
         .then()
-        .statusCode(403);
+        .statusCode(HttpStatus.SC_FORBIDDEN);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-  
+
   @Test
   public void findByLocationShouldFindGeographicZones() {
     // given
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-
     Point location = gf.createPoint(new Coordinate(3, 1));
     List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
     given(geographicZoneRepository.findByLocation(location))
         .willReturn(geographicZones);
 
     // when
-    GeographicZone[] response = restAssured
+    restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(location)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .post(BYLOCATION_URL)
+        .post(BY_LOCATION_URL)
         .then()
-        .statusCode(200)
-        .extract().as(GeographicZone[].class);
+        .statusCode(HttpStatus.SC_OK)
+        .body("", hasSize(geographicZones.size()))
+        .body(ID, hasSize(geographicZones.size()))
+        .body(ID, hasItems(districtZone.getId().toString()));
 
     // then
-    List<GeographicZone> result = Arrays.asList(response);
-    assertEquals(geographicZones.size(), result.size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-  
+
   @Test
   public void findByLocationShouldReturnForbiddenForUnauthorizedToken() {
-
-    doThrow(new UnauthorizedException(
-        new Message(MESSAGEKEY_ERROR_UNAUTHORIZED, RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT)))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
+    mockUserHasNoRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     Point location = gf.createPoint(new Coordinate(3, 1));
 
@@ -432,18 +397,15 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(location)
         .when()
-        .post(BYLOCATION_URL)
+        .post(BY_LOCATION_URL)
         .then()
-        .statusCode(403);
+        .statusCode(HttpStatus.SC_FORBIDDEN);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
     given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -453,10 +415,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
-    doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-    given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(null);
+    mockUserHasNoRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -465,9 +424,6 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldGetAuditLog() {
-    doNothing()
-        .when(rightService)
-        .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
     given(geographicZoneRepository.findOne(any(UUID.class))).willReturn(districtZone);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -478,10 +434,11 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   private Map<String, Object> getSearchBody() {
     Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put(PAGE, PAGE_NUMBER);
-    requestBody.put(SIZE, PAGE_SIZE);
-    requestBody.put(LEVEL_NUMBER, districtLevel.getLevelNumber());
-    requestBody.put(PARENT, regionZone.getId());
+    requestBody.put(PAGE, pageable.getPageNumber());
+    requestBody.put(SIZE, pageable.getPageSize());
+    requestBody.put(LEVEL_NUMBER, districtZoneDto.getLevel().getLevelNumber());
+    requestBody.put(PARENT, regionZoneDto.getId());
     return requestBody;
   }
+
 }

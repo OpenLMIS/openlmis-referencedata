@@ -46,8 +46,12 @@ import com.jayway.restassured.specification.RequestSpecification;
 import guru.nidi.ramltester.RamlDefinition;
 import guru.nidi.ramltester.RamlLoaders;
 import guru.nidi.ramltester.restassured.RestAssuredClient;
+import java.io.IOException;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
+import org.assertj.core.api.Assertions;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -123,7 +127,6 @@ public abstract class BaseWebIntegrationTest {
   private static final String CLIENT_ACCESS_TOKEN = "6d6896a5-e94c-4183-839d-911bc63174ff";
   private static final String CLIENT_ACCESS_TOKEN_HEADER = "Bearer " + CLIENT_ACCESS_TOKEN;
 
-
   protected static final String MESSAGEKEY_ERROR_UNAUTHORIZED =
       SystemMessageKeys.ERROR_UNAUTHORIZED;
   protected static final String MESSAGEKEY_ERROR_UNAUTHORIZED_GENERIC =
@@ -165,6 +168,11 @@ public abstract class BaseWebIntegrationTest {
       + "  \"authorities\": [\"TRUSTED_CLIENT\"],\n"
       + "  \"client_id\": \"trusted-client\"\n"
       + "}";
+
+  static final String PAGE = "page";
+  static final String SIZE = "size";
+  static final String CONTENT = "content";
+  static final String CONTENT_ID = CONTENT + "." + ID;
 
   protected Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
 
@@ -459,6 +467,10 @@ public abstract class BaseWebIntegrationTest {
     return request;
   }
 
+  <E> HasSameFields<E> hasSameFields(E value, String... ignoreFields) {
+    return new HasSameFields<>(value, ignoreFields);
+  }
+
   static class SaveAnswer<T extends BaseEntity> implements Answer<T> {
 
     @Override
@@ -474,6 +486,45 @@ public abstract class BaseWebIntegrationTest {
       }
 
       return obj;
+    }
+
+  }
+
+  private final class HasSameFields<T> extends BaseMatcher<T> {
+    private T value;
+    private String[] ignoreFields;
+
+    HasSameFields(T value, String... ignoreFields) {
+      this.value = value;
+      this.ignoreFields = ignoreFields;
+    }
+
+    @Override
+    public boolean matches(Object item) {
+      Object itemAsObject = item;
+
+      if (item instanceof String) {
+        itemAsObject = convertStringToObject((String) item);
+      }
+
+      Assertions.assertThat(itemAsObject)
+          .isNotNull()
+          .isInstanceOf(value.getClass())
+          .isEqualToIgnoringGivenFields(value, ignoreFields);
+      return true;
+    }
+
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("has same fields as " + value.toString());
+    }
+
+    private Object convertStringToObject(String input) {
+      try {
+        return objectMapper.readValue(input, value.getClass());
+      } catch (IOException exp) {
+        throw new IllegalStateException(exp);
+      }
     }
 
   }

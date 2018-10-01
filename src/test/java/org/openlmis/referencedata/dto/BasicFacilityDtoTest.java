@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.dto;
 
-import static org.mockito.Mockito.mock;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
@@ -29,10 +27,9 @@ public class BasicFacilityDtoTest {
     EqualsVerifier
         .forClass(BasicFacilityDto.class)
         .withRedefinedSuperclass()
-        .withPrefabValues(
-            GeographicZoneSimpleDto.class,
-            mock(GeographicZoneSimpleDto.class),
-            mock(GeographicZoneSimpleDto.class))
+        .withPrefabValues(GeographicZoneSimpleDto.class,
+            new GeographicZoneSimpleDto("code1", null, null, null, null, null, null),
+            new GeographicZoneSimpleDto("code2", null, null, null, null, null, null))
         .withRedefinedSubclass(FacilityDto.class)
         .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
         .verify();

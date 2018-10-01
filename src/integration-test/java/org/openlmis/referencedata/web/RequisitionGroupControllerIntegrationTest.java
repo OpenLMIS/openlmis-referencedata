@@ -53,6 +53,7 @@ import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -89,7 +90,9 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
 
     GeographicLevel geoLevel = new GeographicLevel("GL1", 1);
 
-    GeographicZone geoZone = new GeographicZone("GZ1", geoLevel);
+    GeographicZone geoZone = new GeographicZoneDataBuilder()
+        .withLevel(geoLevel)
+        .build();
 
     Facility facility = new Facility("F1");
     facility.setActive(true);
