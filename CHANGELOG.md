@@ -16,6 +16,7 @@ New functionality added in a backwards-compatible manner:
   * the _supervisoryNodeId_ parameter for the _/api/users/rightSearch_ is optional
     * if provided, results will contain only users that have at least one supervisory supervision role assignment for the given supervisory node
     * otherwise, results will contain only users that have at least one home facility supervision role. For both cases, other parameters have to match.
+* [OLMIS-5415](https://openlmis.atlassian.net/browse/OLMIS-5415): Added extra data field to geographic zone resources. 
   
 Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.
