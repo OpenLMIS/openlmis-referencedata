@@ -27,8 +27,10 @@ import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.fhir.FhirClient;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.service.GeographicZoneBuilder;
 import org.openlmis.referencedata.service.GeographicZoneService;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
+import org.openlmis.referencedata.validate.GeographicZoneValidator;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -39,6 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +65,12 @@ public class GeographicZoneController extends BaseController {
   private GeographicZoneService geographicZoneService;
 
   @Autowired
+  private GeographicZoneBuilder geographicZoneBuilder;
+
+  @Autowired
+  private GeographicZoneValidator geographicZoneValidator;
+
+  @Autowired
   private FhirClient fhirClient;
 
   /**
@@ -73,15 +82,20 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public GeographicZoneDto createGeographicZone(@RequestBody GeographicZoneDto geographicZoneDto) {
+  public GeographicZoneDto createGeographicZone(@RequestBody GeographicZoneDto geographicZoneDto,
+      BindingResult bindingResult) {
     Profiler profiler = new Profiler("CREATE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
 
     checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false, profiler);
 
+    profiler.start("VALIDATE_GEO_ZONE_DTO");
+    geographicZoneValidator.validate(geographicZoneDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
+
     XLOGGER.debug("Creating new geographicZone");
     profiler.start("BUILD_GEO_ZONE_FROM_DTO");
-    GeographicZone geographicZone = GeographicZone.newGeographicZone(geographicZoneDto);
+    GeographicZone geographicZone = geographicZoneBuilder.build(geographicZoneDto);
     // Ignore provided id
     geographicZone.setId(null);
 
@@ -132,14 +146,18 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicZoneDto updateGeographicZone(@PathVariable("id") UUID geographicZoneId,
-      @RequestBody GeographicZoneDto geographicZoneDto) {
+      @RequestBody GeographicZoneDto geographicZoneDto, BindingResult bindingResult) {
     Profiler profiler = new Profiler("UPDATE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
 
     checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false, profiler);
 
+    profiler.start("VALIDATE_GEO_ZONE_DTO");
+    geographicZoneValidator.validate(geographicZoneDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
+
     profiler.start("BUILD_GEO_ZONE_FROM_DTO");
-    GeographicZone geoZoneToSave = GeographicZone.newGeographicZone(geographicZoneDto);
+    GeographicZone geoZoneToSave = geographicZoneBuilder.build(geographicZoneDto);
     geoZoneToSave.setId(geographicZoneId);
 
     XLOGGER.debug("Updating geographicZone");

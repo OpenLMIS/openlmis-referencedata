@@ -119,6 +119,13 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     given(geographicZoneRepository.findOne(regionZoneDto.getId())).willReturn(regionZone);
     given(geographicZoneRepository.findOne(districtZoneDto.getId())).willReturn(districtZone);
 
+    given(geographicLevelRepository.findOne(countryZoneDto.getLevel().getId()))
+        .willReturn(countryZone.getLevel());
+    given(geographicLevelRepository.findOne(regionZoneDto.getLevel().getId()))
+        .willReturn(regionZone.getLevel());
+    given(geographicLevelRepository.findOne(districtZoneDto.getLevel().getId()))
+        .willReturn(districtZone.getLevel());
+
     mockUserHasRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
   }
 

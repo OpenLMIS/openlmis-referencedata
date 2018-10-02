@@ -16,50 +16,97 @@
 package org.openlmis.referencedata.validate;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.validate.FacilityValidator.ACTIVE;
 import static org.openlmis.referencedata.validate.FacilityValidator.CODE;
+import static org.openlmis.referencedata.validate.FacilityValidator.DESCRIPTION;
+import static org.openlmis.referencedata.validate.FacilityValidator.GEOGRAPHIC_ZONE;
+import static org.openlmis.referencedata.validate.FacilityValidator.LOCATION;
+import static org.openlmis.referencedata.validate.FacilityValidator.NAME;
+import static org.openlmis.referencedata.validate.FacilityValidator.SUPPORTED_PROGRAMS;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
+import com.google.common.collect.Sets;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import java.util.UUID;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.SupportedProgramDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
-public class FacilityValidatorTest {
+@SuppressWarnings("PMD.TooManyMethods")
+public class FacilityValidatorTest extends FhirResourceValidatorTest<FacilityDto, Facility> {
 
   @Mock
   private FacilityRepository facilityRepository;
 
   @InjectMocks
-  private Validator validator = new FacilityValidator();
+  private FacilityValidator validator;
 
-  private Errors errors;
-  private FacilityDto facilityDto;
+  private Facility facility = new FacilityDataBuilder()
+      .withSupportedProgram(new ProgramDataBuilder().build())
+      .withExtraData(FhirResourceValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString())
+      .build();
+  private FacilityDto facilityDto = new FacilityDto();
 
+  @Override
+  FhirResourceValidator<FacilityDto, Facility> getValidator() {
+    return validator;
+  }
+
+  @Override
+  Class<FacilityDto> getDtoDefinition() {
+    return FacilityDto.class;
+  }
+
+  @Override
+  FacilityDto getTarget() {
+    return facilityDto;
+  }
+
+  @Override
+  Facility getExistingResource() {
+    return facility;
+  }
+
+  @Override
   @Before
-  public void setUp() throws Exception {
-    facilityDto = new FacilityDto();
-    facilityDto.setCode("code");
+  public void setUp() {
+    super.setUp();
 
-    errors = new BeanPropertyBindingResult(facilityDto, "facilityDto");
+    facility.export(facilityDto);
 
-    when(facilityRepository.existsByCode(any(String.class))).thenReturn(false);
+    when(facilityRepository.findOne(facility.getId())).thenReturn(facility);
   }
 
   @Test
-  public void shouldNotFindErrorsWhenFacilityIsValid() throws Exception {
+  public void shouldNotFindErrorsWhenFacilityIsValid() {
+    mockUserRequest();
+
+    validator.validate(facilityDto, errors);
+
+    assertEquals(0, errors.getErrorCount());
+  }
+
+  @Test
+  public void shouldNotFindErrorsWhenFacilityIsValidWithoutSupportedPrograms() {
+    mockUserRequest();
+
+    facilityDto.setSupportedPrograms(Sets.newHashSet());
+    facility.setSupportedPrograms(Sets.newHashSet());
+
     validator.validate(facilityDto, errors);
 
     assertEquals(0, errors.getErrorCount());
@@ -93,40 +140,106 @@ public class FacilityValidatorTest {
   }
 
   @Test
-  public void shouldRejectWhenFacilityCodeAlreadyExistAndIdIsEmpty() {
-    when(facilityRepository.existsByCode(facilityDto.getCode())).thenReturn(true);
-    facilityDto.setId(null);
+  public void shouldRejectIfSupportedProgramCodeIsDuplicated() {
+    UUID programId = UUID.randomUUID();
+
+    Program program1 = new ProgramDataBuilder().withId(programId).build();
+    Program program2 = new ProgramDataBuilder().withId(programId).build();
+
+    new FacilityDataBuilder()
+        .withSupportedProgram(program1)
+        .withSupportedProgram(program2)
+        .build()
+        .export(facilityDto);
 
     validator.validate(facilityDto, errors);
 
-    assertErrorMessage(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+    assertErrorMessage(errors, SUPPORTED_PROGRAMS,
+        FacilityMessageKeys.ERROR_DUPLICATE_PROGRAM_SUPPORTED);
   }
 
   @Test
-  public void shouldRejectWhenFacilityCodeAlreadyExistAndIdIsDifferentThanFoundOne() {
-    Facility foundFacility = new Facility(facilityDto.getCode());
-    foundFacility.setId(UUID.randomUUID());
-    facilityDto.setId(UUID.randomUUID());
+  public void shouldRejectIfSupportedProgramIdIsDuplicated() {
+    String code = RandomStringUtils.randomAlphanumeric(10);
 
-    when(facilityRepository.existsByCode(facilityDto.getCode())).thenReturn(true);
-    when(facilityRepository.findFirstByCode(facilityDto.getCode())).thenReturn(foundFacility);
+    Program program1 = new ProgramDataBuilder().build();
+    Program program2 = new ProgramDataBuilder().build();
+
+    new FacilityDataBuilder()
+        .withSupportedProgram(program1)
+        .withSupportedProgram(program2)
+        .build()
+        .export(facilityDto);
+
+    for (SupportedProgramDto supportedProgram : facilityDto.getSupportedPrograms()) {
+      ReflectionTestUtils.setField(supportedProgram, "code", code);
+    }
 
     validator.validate(facilityDto, errors);
 
-    assertErrorMessage(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+    assertErrorMessage(errors, SUPPORTED_PROGRAMS,
+        FacilityMessageKeys.ERROR_DUPLICATE_PROGRAM_SUPPORTED);
   }
 
   @Test
-  public void shouldNotRejectWhenFacilityCodeAlreadyExistAndIdIsSameAsThanFoundOne() {
-    Facility foundFacility = new Facility(facilityDto.getCode());
-    foundFacility.setId(UUID.randomUUID());
-    facilityDto.setId(foundFacility.getId());
+  public void shouldRejectIfCodeWasChangedForFhirResource() {
+    facilityDto.setCode(facility.getCode() + "1234");
 
-    when(facilityRepository.existsByCode(facilityDto.getCode())).thenReturn(true);
-    when(facilityRepository.findFirstByCode(facilityDto.getCode())).thenReturn(foundFacility);
-
+    mockUserRequest();
     validator.validate(facilityDto, errors);
 
-    assertEquals(0, errors.getErrorCount());
+    assertErrorMessage(errors, CODE, FacilityMessageKeys.ERROR_FIELD_IS_INVARIANT);
+  }
+
+  @Test
+  public void shouldRejectIfNameWasChangedForFhirResource() {
+    facilityDto.setName(facility.getName() + "1234");
+
+    mockUserRequest();
+    validator.validate(facilityDto, errors);
+
+    assertErrorMessage(errors, NAME, FacilityMessageKeys.ERROR_FIELD_IS_INVARIANT);
+  }
+
+  @Test
+  public void shouldRejectIfDescriptionWasChangedForFhirResource() {
+    facilityDto.setDescription(facility.getDescription() + "1234");
+
+    mockUserRequest();
+    validator.validate(facilityDto, errors);
+
+    assertErrorMessage(errors, DESCRIPTION, FacilityMessageKeys.ERROR_FIELD_IS_INVARIANT);
+  }
+
+  @Test
+  public void shouldRejectIfGeographicZoneWasChangedForFhirResource() {
+    facilityDto.setGeographicZone(new GeographicZoneDataBuilder().build());
+
+    mockUserRequest();
+    validator.validate(facilityDto, errors);
+
+    assertErrorMessage(errors, GEOGRAPHIC_ZONE, FacilityMessageKeys.ERROR_FIELD_IS_INVARIANT);
+  }
+
+  @Test
+  public void shouldRejectIfActiveWasChangedForFhirResource() {
+    facilityDto.setActive(!facility.getActive());
+
+    mockUserRequest();
+    validator.validate(facilityDto, errors);
+
+    assertErrorMessage(errors, ACTIVE, FacilityMessageKeys.ERROR_FIELD_IS_INVARIANT);
+  }
+
+  @Test
+  public void shouldRejectIfLocationWasChangedForFhirResource() {
+    facilityDto.setLocation(new GeometryFactory()
+        .createPoint(new Coordinate(facility.getLocation().getX() + 10,
+            facility.getLocation().getY() - 10)));
+
+    mockUserRequest();
+    validator.validate(facilityDto, errors);
+
+    assertErrorMessage(errors, LOCATION, FacilityMessageKeys.ERROR_FIELD_IS_INVARIANT);
   }
 }

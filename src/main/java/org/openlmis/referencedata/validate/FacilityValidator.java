@@ -15,12 +15,14 @@
 
 package org.openlmis.referencedata.validate;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.SupportedProgramDto;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,51 +30,87 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 @Component
-public class FacilityValidator implements BaseValidator {
+public class FacilityValidator extends FhirResourceValidator<FacilityDto, Facility> {
 
-  protected static final String CODE = "code";
+  static final String CODE = "code";
+  static final String NAME = "name";
+  static final String DESCRIPTION = "description";
+  static final String GEOGRAPHIC_ZONE = "geographicZone";
+  static final String ACTIVE = "active";
+  static final String LOCATION = "location";
+  static final String SUPPORTED_PROGRAMS = "supportedPrograms";
 
   @Autowired
   private FacilityRepository facilityRepository;
 
-  @Override
-  public boolean supports(Class<?> clazz) {
-    return FacilityDto.class.equals(clazz);
+  public FacilityValidator() {
+    super(FacilityDto.class);
   }
 
   @Override
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors, FacilityMessageKeys.ERROR_NULL);
+    super.validate(target, errors);
+  }
+
+  @Override
+  void verifyResource(FacilityDto target, Errors errors) {
     rejectIfEmptyOrWhitespace(errors, CODE, FacilityMessageKeys.ERROR_CODE_REQUIRED);
 
-    FacilityDto facilityDto = (FacilityDto) target;
-    if (facilityRepository.existsByCode(facilityDto.getCode())
-            && (facilityDto.getId() == null
-            || !facilityRepository.findFirstByCode(facilityDto.getCode()).getId()
-            .equals(facilityDto.getId()))) {
-      rejectValue(errors, CODE, FacilityMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
-    }
-
-    if (facilityDto.getSupportedPrograms() != null) {
-      validateDuplicateProgramSupported(facilityDto.getSupportedPrograms());
+    if (!isEmpty(target.getSupportedPrograms())) {
+      validateDuplicateProgramSupported(target.getSupportedPrograms(), errors);
     }
   }
 
-  private void validateDuplicateProgramSupported(Set<SupportedProgramDto> supportedProgramDtos) {
+  @Override
+  Facility getExistingResource(FacilityDto target) {
+    return facilityRepository.findOne(target.getId());
+  }
 
-    boolean noDuplicateProgramCode = supportedProgramDtos.stream()
-            .map(SupportedProgramDto::getCode)
-            .filter(Objects::nonNull)
-            .allMatch(new HashSet<>()::add);
+  @Override
+  void verifyInvariants(FacilityDto target, Facility existing, Errors errors) {
+    rejectIfInvariantWasChanged(errors, CODE, existing.getCode(), target.getCode());
+    rejectIfInvariantWasChanged(errors, NAME, existing.getName(), target.getName());
+    rejectIfInvariantWasChanged(errors, DESCRIPTION,
+        existing.getDescription(), target.getDescription());
+    rejectIfInvariantWasChanged(errors, GEOGRAPHIC_ZONE,
+        existing.getGeographicZone().getId(), target.getGeographicZone().getId());
+    rejectIfInvariantWasChanged(errors, ACTIVE, existing.getActive(), target.getActive());
+    rejectIfInvariantWasChanged(errors, LOCATION, existing.getLocation(), target.getLocation());
+  }
 
-    boolean noDuplicateProgramId = supportedProgramDtos.stream()
-            .map(SupportedProgramDto::getId)
-            .filter(Objects::nonNull)
-            .allMatch(new HashSet<>()::add);
+  @Override
+  String getUnallowedKeyErrorMessage() {
+    return FacilityMessageKeys.ERROR_EXTRA_DATA_UNALLOWED_KEY;
+  }
 
+  @Override
+  String getModifiedKeyErrorMessage() {
+    return FacilityMessageKeys.ERROR_EXTRA_DATA_MODIFIED_KEY;
+  }
+
+  @Override
+  String getInvariantFieldErrorMessage() {
+    return FacilityMessageKeys.ERROR_FIELD_IS_INVARIANT;
+  }
+
+  private void validateDuplicateProgramSupported(Set<SupportedProgramDto> supportedProgramDtos,
+      Errors errors) {
+    boolean noDuplicateProgramCode = supportedProgramDtos
+        .stream()
+        .map(SupportedProgramDto::getCode)
+        .filter(Objects::nonNull)
+        .allMatch(new HashSet<>()::add);
+
+    boolean noDuplicateProgramId = supportedProgramDtos
+        .stream()
+        .map(SupportedProgramDto::getId)
+        .filter(Objects::nonNull)
+        .allMatch(new HashSet<>()::add);
 
     if (!(noDuplicateProgramCode && noDuplicateProgramId)) {
-      throw new ValidationMessageException(FacilityMessageKeys.ERROR_DUPLICATE_PROGRAM_SUPPORTED);
+      rejectValue(errors, SUPPORTED_PROGRAMS,
+          FacilityMessageKeys.ERROR_DUPLICATE_PROGRAM_SUPPORTED);
     }
   }
 }

@@ -17,11 +17,14 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.CascadeType;
@@ -76,7 +79,7 @@ import org.openlmis.referencedata.dto.NamedResource;
         }
     )
     })
-public class Facility extends BaseEntity {
+public class Facility extends BaseEntity implements FhirResource {
 
   public static final String TEXT = "text";
   public static final String WAREHOUSE_CODE = "warehouse";
@@ -158,7 +161,7 @@ public class Facility extends BaseEntity {
   @Convert(converter = ExtraDataConverter.class)
   @Getter
   @Setter
-  private Map<String, String> extraData;
+  private Map<String, String> extraData = new HashMap<>();
 
   public Facility(String code) {
     this.code = code;
@@ -236,7 +239,12 @@ public class Facility extends BaseEntity {
     code = importer.getCode();
     name = importer.getName();
     description = importer.getDescription();
-    extraData = importer.getExtraData();
+
+    extraData.clear();
+    Optional
+        .ofNullable(importer.getExtraData())
+        .ifPresent(data -> extraData.putAll(data));
+
     active = importer.getActive();
     goLiveDate = importer.getGoLiveDate();
     goDownDate = importer.getGoDownDate();
@@ -296,7 +304,7 @@ public class Facility extends BaseEntity {
     
     exporter.setLocation(location);
 
-    exporter.setExtraData(extraData);
+    exporter.setExtraData(Maps.newHashMap(extraData));
   }
 
   public boolean isWarehouse() {
@@ -312,9 +320,7 @@ public class Facility extends BaseEntity {
         .anyMatch(supported -> supported.isActiveFor(program));
   }
 
-  public interface Exporter {
-
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter {
 
     void setCode(String code);
 
@@ -347,9 +353,7 @@ public class Facility extends BaseEntity {
     void setExtraData(Map<String, String> extraData);
   }
 
-  public interface Importer {
-
-    UUID getId();
+  public interface Importer extends BaseImporter, FhirResource {
 
     String getCode();
 
@@ -377,6 +381,5 @@ public class Facility extends BaseEntity {
     
     Point getLocation();
     
-    Map<String, String> getExtraData();
   }
 }

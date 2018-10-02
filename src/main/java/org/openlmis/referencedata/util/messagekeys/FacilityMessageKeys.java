@@ -28,4 +28,8 @@ public abstract class FacilityMessageKeys extends MessageKeys {
   public static final String ERROR_ID_MISMATCH = join(ERROR, ID_MISMATCH);
   public static final String ERROR_DUPLICATE_PROGRAM_SUPPORTED =
           join(ERROR, SUPPORTED_PROGRAMS, DUPLICATED);
+  public static final String ERROR_EXTRA_DATA_UNALLOWED_KEY =
+      join(ERROR, EXTRA_DATA, UNALLOWED_KEY);
+  public static final String ERROR_EXTRA_DATA_MODIFIED_KEY = join(ERROR, EXTRA_DATA, MODIFIED_KEY);
+  public static final String ERROR_FIELD_IS_INVARIANT = join(ERROR, FIELD_IS_INVARIANT);
 }

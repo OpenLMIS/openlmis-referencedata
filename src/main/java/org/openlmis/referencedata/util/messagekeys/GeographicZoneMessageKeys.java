@@ -21,4 +21,12 @@ public abstract class GeographicZoneMessageKeys extends MessageKeys {
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
   public static final String ERROR_SEARCH_LACKS_PARAMS = join(ERROR, SEARCH, LACKS_PARAMETERS);
+
+  public static final String ERROR_CODE_REQUIRED = join(ERROR, CODE, REQUIRED);
+  public static final String ERROR_LEVEL_REQUIRED = join(ERROR, "level", REQUIRED);
+
+  public static final String ERROR_EXTRA_DATA_UNALLOWED_KEY =
+      join(ERROR, EXTRA_DATA, UNALLOWED_KEY);
+  public static final String ERROR_EXTRA_DATA_MODIFIED_KEY = join(ERROR, EXTRA_DATA, MODIFIED_KEY);
+  public static final String ERROR_FIELD_IS_INVARIANT = join(ERROR, FIELD_IS_INVARIANT);
 }

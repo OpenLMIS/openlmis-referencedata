@@ -51,6 +51,7 @@ public abstract class MessageKeys {
   protected static final String CODE = "code";
   protected static final String AND = "and";
   protected static final String ID = "id";
+  protected static final String EXTRA_DATA = "extraData";
   protected static final String IS_INVARIABLE = "isInvariable";
   protected static final String USERNAME = "username";
   protected static final String INVALID = "invalid";
@@ -66,6 +67,9 @@ public abstract class MessageKeys {
   protected static final String BOOLEAN = "boolean";
   protected static final String ID_MISMATCH = "idMismatch";
   protected static final String JAVERS = "javers";
+  protected static final String UNALLOWED_KEY = "unallowedKey";
+  protected static final String MODIFIED_KEY = "modifiedKey";
+  protected static final String FIELD_IS_INVARIANT = "fieldIsInvariant";
 
   // Entities
   protected static final String LOT = "lot";

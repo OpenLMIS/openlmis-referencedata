@@ -15,7 +15,10 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Polygon;
 import java.util.Map;
@@ -43,15 +46,27 @@ public class GeographicZoneSimpleDto extends BaseDto implements
   private Integer catchmentPopulation;
   private Double latitude;
   private Double longitude;
+
+  @JsonSerialize(as = GeographicZoneSimpleDto.class)
   private GeographicZoneSimpleDto parent;
 
-  @Override
+  @JsonSetter("level")
+  public void setLevel(GeographicLevelDto level) {
+    this.level = level;
+  }
+
+  @JsonIgnore
   public void setLevel(GeographicLevel level) {
     this.level = new GeographicLevelDto();
     level.export(this.level);
   }
 
-  @Override
+  @JsonSetter("parent")
+  public void setParent(GeographicZoneSimpleDto parent) {
+    this.parent = parent;
+  }
+
+  @JsonIgnore
   public void setParent(GeographicZone parent) {
     this.parent = new GeographicZoneSimpleDto();
     parent.export(this.parent);

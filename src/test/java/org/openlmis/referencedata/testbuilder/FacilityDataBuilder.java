@@ -19,6 +19,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -70,6 +71,7 @@ public class FacilityDataBuilder {
     openLmisAccessible = true;
     supportedPrograms = new HashSet<>();
     location = new GeometryFactory().createPoint(new Coordinate(54.5, 18.5));
+    extraData = new HashMap<>();
   }
 
   /**
@@ -174,5 +176,10 @@ public class FacilityDataBuilder {
   public Facility buildActive() {
     this.active = true;
     return build();
+  }
+
+  public FacilityDataBuilder withExtraData(String key, String value) {
+    this.extraData.put(key, value);
+    return this;
   }
 }

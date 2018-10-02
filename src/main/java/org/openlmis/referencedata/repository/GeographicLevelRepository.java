@@ -20,19 +20,11 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface GeographicLevelRepository extends
-    PagingAndSortingRepository<GeographicLevel, UUID>,
-    BaseAuditableRepository<GeographicLevel, UUID> {
+public interface GeographicLevelRepository
+    extends BaseAuditableRepository<GeographicLevel, UUID> {
 
-  @Override
-  <S extends GeographicLevel> S save(S entity);
-
-  @Override
-  <S extends GeographicLevel> Iterable<S> save(Iterable<S> entities);
-
-  <S extends GeographicLevel> S findByLevelNumber(Integer levelNumber);
+  GeographicLevel findByLevelNumber(Integer levelNumber);
 
   @Query(value = "SELECT\n"
       + "    gl.*\n"

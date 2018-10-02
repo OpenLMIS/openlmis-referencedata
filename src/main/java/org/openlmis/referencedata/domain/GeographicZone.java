@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Polygon;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,7 @@ import org.javers.core.metamodel.annotation.TypeName;
     @NamedQuery(name = "GeographicZone.findIdsByParent",
         query = "SELECT DISTINCT id FROM GeographicZone WHERE parent.id = :parentId")
     })
-public class GeographicZone extends BaseEntity {
+public class GeographicZone extends BaseEntity implements FhirResource {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
@@ -102,24 +103,36 @@ public class GeographicZone extends BaseEntity {
   public static GeographicZone newGeographicZone(Importer importer) {
     GeographicZone geographicZone = new GeographicZone();
     geographicZone.setId(importer.getId());
-    geographicZone.setCode(importer.getCode());
-    geographicZone.setName(importer.getName());
     geographicZone.setLevel(GeographicLevel.newGeographicLevel(importer.getLevel()));
 
     if (null != importer.getParent()) {
-      geographicZone.setParent(newGeographicZone(importer.getParent()));
+      geographicZone.setParent(GeographicZone.newGeographicZone(importer.getParent()));
     }
 
-    geographicZone.setCatchmentPopulation(importer.getCatchmentPopulation());
-    geographicZone.setLatitude(importer.getLatitude());
-    geographicZone.setLongitude(importer.getLongitude());
-    
-    geographicZone.setBoundary(importer.getBoundary());
-    Optional
-        .ofNullable(importer.getExtraData())
-        .ifPresent(data -> geographicZone.getExtraData().putAll(data));
+    geographicZone.updateFrom(importer);
 
     return geographicZone;
+  }
+
+  /**
+   * Updates data based on data from {@link Importer}.
+   *
+   * @param importer instance of {@link Importer}
+   */
+  public void updateFrom(Importer importer) {
+    code = importer.getCode();
+    name = importer.getName();
+
+    catchmentPopulation = importer.getCatchmentPopulation();
+    latitude = importer.getLatitude();
+    longitude = importer.getLongitude();
+
+    boundary = importer.getBoundary();
+
+    extraData.clear();
+    Optional
+        .ofNullable(importer.getExtraData())
+        .ifPresent(data -> extraData.putAll(data));
   }
 
   /**
@@ -141,7 +154,8 @@ public class GeographicZone extends BaseEntity {
     exporter.setLatitude(latitude);
     exporter.setLongitude(longitude);
     exporter.setBoundary(boundary);
-    exporter.setExtraData(extraData);
+
+    exporter.setExtraData(Maps.newHashMap(extraData));
   }
 
   public interface Exporter extends BaseExporter {
@@ -166,7 +180,7 @@ public class GeographicZone extends BaseEntity {
 
   }
 
-  public interface Importer extends BaseImporter {
+  public interface Importer extends BaseImporter, FhirResource {
 
     String getCode();
 
@@ -183,8 +197,6 @@ public class GeographicZone extends BaseEntity {
     Polygon getBoundary();
 
     Importer getParent();
-
-    Map<String, String> getExtraData();
 
   }
 }

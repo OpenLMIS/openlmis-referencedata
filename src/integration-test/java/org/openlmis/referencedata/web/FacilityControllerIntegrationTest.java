@@ -692,16 +692,18 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void postShouldCreateFacility() {
-
     doNothing()
         .when(rightService)
         .checkAdminRight(FACILITIES_MANAGE_RIGHT);
+
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
+    facilityDto.setId(null);
+
     given(programRepository.findByCode(any(Code.class))).willReturn(program);
     given(facilityRepository.save(facility)).willReturn(facility);
 
-    FacilityDto response = restAssured
+    restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -710,9 +712,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .extract().as(FacilityDto.class);
+        .body(hasSameFields(facilityDto, ID));
 
-    assertEquals(facilityDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -724,6 +725,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .checkAdminRight(FACILITIES_MANAGE_RIGHT);
     FacilityDto facilityDto = new FacilityDto();
     facility.export(facilityDto);
+    facilityDto.setId(null);
     given(programRepository.findByCode(any(Code.class))).willReturn(null);
 
     restAssured

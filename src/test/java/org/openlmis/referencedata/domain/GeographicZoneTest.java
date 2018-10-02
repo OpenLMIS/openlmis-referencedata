@@ -26,6 +26,8 @@ import org.openlmis.referencedata.dto.GeographicZoneDto;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 
 public class GeographicZoneTest {
+  private static final String LEVEL = "level";
+  private static final String PARENT = "parent";
 
   @Test
   public void equalsContract() {
@@ -84,6 +86,19 @@ public class GeographicZoneTest {
   }
 
   @Test
+  public void shouldUpdateFromImporter() {
+    GeographicZone importerAsDomain = new GeographicZoneDataBuilder().build();
+    GeographicZoneDto importer = new GeographicZoneDto();
+    importerAsDomain.export(importer);
+
+    GeographicZone existing = new GeographicZoneDataBuilder().build();
+    existing.updateFrom(importer);
+
+    assertThat(existing)
+        .isEqualToIgnoringGivenFields(importerAsDomain, "id", LEVEL, PARENT);
+  }
+
+  @Test
   public void shouldExportData() {
     GeographicZone instance = new GeographicZoneDataBuilder()
         .build();
@@ -91,7 +106,7 @@ public class GeographicZoneTest {
     GeographicZoneDto exporter = new GeographicZoneDto();
     instance.export(exporter);
 
-    assertThat(exporter).isEqualToIgnoringGivenFields(instance, "level", "parent");
+    assertThat(exporter).isEqualToIgnoringGivenFields(instance, LEVEL, PARENT);
     assertThat(exporter.getLevel()).isEqualToIgnoringGivenFields(instance.getLevel());
     assertThat(exporter.getParent()).isNull();
   }
@@ -105,10 +120,10 @@ public class GeographicZoneTest {
     GeographicZoneDto exporter = new GeographicZoneDto();
     instance.export(exporter);
 
-    assertThat(exporter).isEqualToIgnoringGivenFields(instance, "level", "parent");
+    assertThat(exporter).isEqualToIgnoringGivenFields(instance, LEVEL, PARENT);
     assertThat(exporter.getLevel()).isEqualToIgnoringGivenFields(instance.getLevel());
     assertThat(exporter.getParent())
         .isNotNull()
-        .isEqualToIgnoringGivenFields(instance.getParent(), "level", "parent");
+        .isEqualToIgnoringGivenFields(instance.getParent(), LEVEL, PARENT);
   }
 }

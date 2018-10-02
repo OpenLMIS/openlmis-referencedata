@@ -74,4 +74,9 @@ public class ProgramDataBuilder {
   public ProgramDataBuilder withoutId() {
     return withId(null);
   }
+
+  public ProgramDataBuilder withCode(String code) {
+    this.code = Code.code(code);
+    return this;
+  }
 }
