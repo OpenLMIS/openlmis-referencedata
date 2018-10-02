@@ -155,7 +155,10 @@ public class GeographicZone extends BaseEntity implements FhirResource {
     exporter.setLongitude(longitude);
     exporter.setBoundary(boundary);
 
-    exporter.setExtraData(Maps.newHashMap(extraData));
+    Map<String, String> newExtraData = Maps.newHashMap();
+    Optional.ofNullable(extraData).ifPresent(newExtraData::putAll);
+
+    exporter.setExtraData(newExtraData);
   }
 
   public interface Exporter extends BaseExporter {

@@ -304,7 +304,10 @@ public class Facility extends BaseEntity implements FhirResource {
     
     exporter.setLocation(location);
 
-    exporter.setExtraData(Maps.newHashMap(extraData));
+    Map<String, String> newExtraData = Maps.newHashMap();
+    Optional.ofNullable(extraData).ifPresent(newExtraData::putAll);
+
+    exporter.setExtraData(newExtraData);
   }
 
   public boolean isWarehouse() {
