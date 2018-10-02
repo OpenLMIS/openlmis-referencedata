@@ -18,18 +18,27 @@ package org.openlmis.referencedata.dto;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 
 public class BasicFacilityDtoTest {
 
   @Test
-  public void equalsContract() throws Exception {
+  public void equalsContract() {
+    GeographicZoneSimpleDto red = new GeographicZoneSimpleDto();
+    GeographicZoneSimpleDto black = new GeographicZoneSimpleDto();
+
+    new GeographicZoneDataBuilder()
+        .build()
+        .export(red);
+
+    new GeographicZoneDataBuilder()
+        .build()
+        .export(black);
 
     EqualsVerifier
         .forClass(BasicFacilityDto.class)
         .withRedefinedSuperclass()
-        .withPrefabValues(GeographicZoneSimpleDto.class,
-            new GeographicZoneSimpleDto("code1", null, null, null, null, null, null),
-            new GeographicZoneSimpleDto("code2", null, null, null, null, null, null))
+        .withPrefabValues(GeographicZoneSimpleDto.class, red, black)
         .withRedefinedSubclass(FacilityDto.class)
         .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
         .verify();
