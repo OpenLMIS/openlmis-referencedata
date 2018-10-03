@@ -712,7 +712,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(RESOURCE_URL)
         .then()
         .statusCode(201)
-        .body(hasSameFields(facilityDto, ID));
+        .body(isEqualToIgnoringGivenFields(facilityDto, ID));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

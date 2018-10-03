@@ -157,7 +157,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .post(RESOURCE_URL)
         .then()
         .statusCode(HttpStatus.SC_CREATED)
-        .body(hasSameFields(countryZoneDto, ID));
+        .body(isEqualToIgnoringGivenFields(countryZoneDto, ID));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -174,7 +174,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .put(ID_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
-        .body(hasSameFields(countryZoneDto));
+        .body(isEqualToIgnoringGivenFields(countryZoneDto));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -244,7 +244,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .get(ID_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
-        .body(hasSameFields(countryZoneDto));
+        .body(isEqualToIgnoringGivenFields(countryZoneDto));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

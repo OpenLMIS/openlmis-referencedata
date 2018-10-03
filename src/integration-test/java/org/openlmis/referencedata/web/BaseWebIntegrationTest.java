@@ -467,8 +467,9 @@ public abstract class BaseWebIntegrationTest {
     return request;
   }
 
-  <E> HasSameFields<E> hasSameFields(E value, String... ignoreFields) {
-    return new HasSameFields<>(value, ignoreFields);
+  <E> IsEqualToIgnoringGivenFields<E> isEqualToIgnoringGivenFields(E value,
+      String... ignoreFields) {
+    return new IsEqualToIgnoringGivenFields<>(value, ignoreFields);
   }
 
   static class SaveAnswer<T extends BaseEntity> implements Answer<T> {
@@ -490,11 +491,11 @@ public abstract class BaseWebIntegrationTest {
 
   }
 
-  private final class HasSameFields<T> extends BaseMatcher<T> {
+  private final class IsEqualToIgnoringGivenFields<T> extends BaseMatcher<T> {
     private T value;
     private String[] ignoreFields;
 
-    HasSameFields(T value, String... ignoreFields) {
+    IsEqualToIgnoringGivenFields(T value, String... ignoreFields) {
       this.value = value;
       this.ignoreFields = ignoreFields;
     }
