@@ -25,7 +25,7 @@ import org.springframework.validation.Errors;
 @AllArgsConstructor
 public abstract class FhirLocationValidator<D extends FhirLocation, E extends FhirLocation>
     implements BaseValidator {
-  static final String IS_FHIR_LOCATION_OWNER = "isFhirLocationOwner";
+  public static final String IS_FHIR_LOCATION_OWNER = "isFhirLocationOwner";
   static final String EXTRA_DATA = "extraData";
 
   private Class<D> dtoDefinition;

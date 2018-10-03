@@ -23,6 +23,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.openlmis.referencedata.domain.ExtraDataEntity;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.validate.FhirLocationValidator;
 
 public class GeographicZoneDataBuilder {
 
@@ -96,6 +97,10 @@ public class GeographicZoneDataBuilder {
   public GeographicZoneDataBuilder withExtraData(String key, String value) {
     this.extraData.put(key, value);
     return this;
+  }
+
+  public GeographicZoneDataBuilder withIsFhirLocationOwnerFlag() {
+    return withExtraData(FhirLocationValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
   }
 
 }

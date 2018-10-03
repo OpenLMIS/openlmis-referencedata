@@ -30,6 +30,7 @@ import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.validate.FhirLocationValidator;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityDataBuilder {
@@ -181,5 +182,9 @@ public class FacilityDataBuilder {
   public FacilityDataBuilder withExtraData(String key, String value) {
     this.extraData.put(key, value);
     return this;
+  }
+
+  public FacilityDataBuilder withIsFhirLocationOwnerFlag() {
+    return withExtraData(FhirLocationValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
   }
 }
