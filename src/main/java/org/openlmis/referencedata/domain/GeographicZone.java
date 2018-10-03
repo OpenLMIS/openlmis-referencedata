@@ -34,7 +34,6 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
-import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 
 @Entity
 @Table(name = "geographic_zones", schema = "referencedata")
@@ -46,7 +45,7 @@ import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
     @NamedQuery(name = "GeographicZone.findIdsByParent",
         query = "SELECT DISTINCT id FROM GeographicZone WHERE parent.id = :parentId")
     })
-public class GeographicZone extends BaseEntity implements FhirResource {
+public class GeographicZone extends BaseEntity implements FhirLocation {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
@@ -181,7 +180,7 @@ public class GeographicZone extends BaseEntity implements FhirResource {
 
   }
 
-  public interface Importer extends BaseImporter, ExtraDataImporter, FhirResource {
+  public interface Importer extends FhirLocation {
 
     String getCode();
 

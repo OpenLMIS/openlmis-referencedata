@@ -46,7 +46,6 @@ import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
-import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 import org.openlmis.referencedata.dto.NamedResource;
 
 @Entity
@@ -78,7 +77,7 @@ import org.openlmis.referencedata.dto.NamedResource;
         }
     )
     })
-public class Facility extends BaseEntity implements FhirResource {
+public class Facility extends BaseEntity implements FhirLocation {
 
   public static final String TEXT = "text";
   public static final String WAREHOUSE_CODE = "warehouse";
@@ -357,7 +356,7 @@ public class Facility extends BaseEntity implements FhirResource {
 
   }
 
-  public interface Importer extends BaseImporter, ExtraDataImporter, FhirResource {
+  public interface Importer extends FhirLocation {
 
     String getCode();
 

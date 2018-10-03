@@ -15,13 +15,9 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.util.Map;
-import java.util.UUID;
+import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 
-public interface FhirResource {
-
-  UUID getId();
-
-  Map<String, String> getExtraData();
+public interface FhirLocation extends BaseImporter, ExtraDataImporter {
 
 }

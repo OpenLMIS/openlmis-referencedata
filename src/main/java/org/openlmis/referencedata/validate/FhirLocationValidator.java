@@ -23,13 +23,13 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
-import org.openlmis.referencedata.domain.FhirResource;
+import org.openlmis.referencedata.domain.FhirLocation;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.Errors;
 
 @AllArgsConstructor
-public abstract class FhirResourceValidator<D extends FhirResource, E extends FhirResource>
+public abstract class FhirLocationValidator<D extends FhirLocation, E extends FhirLocation>
     implements BaseValidator {
   static final String IS_FHIR_LOCATION_OWNER = "isFhirLocationOwner";
   static final String EXTRA_DATA = "extraData";
@@ -87,7 +87,7 @@ public abstract class FhirResourceValidator<D extends FhirResource, E extends Fh
     rejectIfNotEqual(errors, oldValue, newValue, field, getInvariantFieldErrorMessage());
   }
 
-  private <T extends FhirResource> boolean isFlagSet(T target) {
+  private <T extends FhirLocation> boolean isFlagSet(T target) {
     String value = Optional
         .ofNullable(target.getExtraData())
         .orElse(Collections.emptyMap())

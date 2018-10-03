@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.validate.FhirResourceValidator.EXTRA_DATA;
-import static org.openlmis.referencedata.validate.FhirResourceValidator.IS_FHIR_LOCATION_OWNER;
+import static org.openlmis.referencedata.validate.FhirLocationValidator.EXTRA_DATA;
+import static org.openlmis.referencedata.validate.FhirLocationValidator.IS_FHIR_LOCATION_OWNER;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import org.junit.Before;
@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.BaseEntity;
-import org.openlmis.referencedata.domain.FhirResource;
+import org.openlmis.referencedata.domain.FhirLocation;
 import org.openlmis.referencedata.dto.BaseDto;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,10 +38,10 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 
 @RunWith(MockitoJUnitRunner.class)
-public abstract class FhirResourceValidatorTest
-    <D extends BaseDto & FhirResource, E extends BaseEntity & FhirResource> {
+public abstract class FhirLocationValidatorTest
+    <D extends BaseDto & FhirLocation, E extends BaseEntity & FhirLocation> {
 
-  abstract FhirResourceValidator<D, E> getValidator();
+  abstract FhirLocationValidator<D, E> getValidator();
 
   abstract Class<D> getDtoDefinition();
 

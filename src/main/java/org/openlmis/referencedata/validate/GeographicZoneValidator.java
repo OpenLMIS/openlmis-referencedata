@@ -25,7 +25,7 @@ import org.springframework.validation.Errors;
 
 @Component
 public class GeographicZoneValidator
-    extends FhirResourceValidator<GeographicZoneDto, GeographicZone> {
+    extends FhirLocationValidator<GeographicZoneDto, GeographicZone> {
 
   static final String CODE = "code";
   static final String NAME = "name";

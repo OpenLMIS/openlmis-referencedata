@@ -47,7 +47,7 @@ import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @SuppressWarnings("PMD.TooManyMethods")
-public class FacilityValidatorTest extends FhirResourceValidatorTest<FacilityDto, Facility> {
+public class FacilityValidatorTest extends FhirLocationValidatorTest<FacilityDto, Facility> {
 
   @Mock
   private FacilityRepository facilityRepository;
@@ -57,12 +57,12 @@ public class FacilityValidatorTest extends FhirResourceValidatorTest<FacilityDto
 
   private Facility facility = new FacilityDataBuilder()
       .withSupportedProgram(new ProgramDataBuilder().build())
-      .withExtraData(FhirResourceValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString())
+      .withExtraData(FhirLocationValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString())
       .build();
   private FacilityDto facilityDto = new FacilityDto();
 
   @Override
-  FhirResourceValidator<FacilityDto, Facility> getValidator() {
+  FhirLocationValidator<FacilityDto, Facility> getValidator() {
     return validator;
   }
 

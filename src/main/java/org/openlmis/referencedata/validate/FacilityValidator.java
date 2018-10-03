@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 @Component
-public class FacilityValidator extends FhirResourceValidator<FacilityDto, Facility> {
+public class FacilityValidator extends FhirLocationValidator<FacilityDto, Facility> {
 
   static final String CODE = "code";
   static final String NAME = "name";

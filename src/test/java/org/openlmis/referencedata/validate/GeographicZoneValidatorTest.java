@@ -39,7 +39,7 @@ import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class GeographicZoneValidatorTest
-    extends FhirResourceValidatorTest<GeographicZoneDto, GeographicZone> {
+    extends FhirLocationValidatorTest<GeographicZoneDto, GeographicZone> {
 
   @Mock
   private GeographicZoneRepository geographicZoneRepository;
@@ -49,12 +49,12 @@ public class GeographicZoneValidatorTest
 
   private GeographicZone geographicZone = new GeographicZoneDataBuilder()
       .withParent(new GeographicZoneDataBuilder().build())
-      .withExtraData(FhirResourceValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString())
+      .withExtraData(FhirLocationValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString())
       .build();
   private GeographicZoneDto geographicZoneDto = new GeographicZoneDto();
 
   @Override
-  FhirResourceValidator<GeographicZoneDto, GeographicZone> getValidator() {
+  FhirLocationValidator<GeographicZoneDto, GeographicZone> getValidator() {
     return validator;
   }
 
