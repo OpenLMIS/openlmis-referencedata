@@ -230,7 +230,6 @@ expected use-case for this is when this service is deployed through the
 Environment variables common to all services are listed here: https://github.com/OpenLMIS/openlmis-template-service/blob/master/README.md#environment-variables
 
 * **FHIR_CLIENT_ENABLED** - Whether FHIR client is required. If set to `true`, the service will send a request each time when facility or geographic zone is created or updated. By default FHIR client will be disabled - either leave it blank or set to `false`.
-* **FHIR_CLIENT_SERVER_URL** - Define FHIR server url. The value will be used only if FHIR client is enabled. By default the `${BASE_URL}/hapifhir` will be used. **Important**: for now, the client only supports `DSTU3` version of FHIR server.
 
 ## Audit Logging
 

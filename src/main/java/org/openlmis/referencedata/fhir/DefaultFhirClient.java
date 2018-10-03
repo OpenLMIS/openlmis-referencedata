@@ -15,25 +15,51 @@
 
 package org.openlmis.referencedata.fhir;
 
+import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @AllArgsConstructor
 class DefaultFhirClient implements FhirClient {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFhirClient.class);
+
+  private static final String SKIPPING_SYNC_PROCESS_MSG =
+      "Request came from FHIR server. Skipping synchronization process.";
+
   private LocationFactory locationFactory;
   private LocationConverter locationConvert;
   private LocationSynchronizer locationSynchronizer;
 
+  private String fhirServerUrl;
+
   @Override
-  public void synchronizeFacility(Facility facility) {
+  public void synchronizeFacility(Facility facility, HttpServletRequest request) {
+    if (isFromFhirServer(request)) {
+      LOGGER.info(SKIPPING_SYNC_PROCESS_MSG);
+      return;
+    }
+
     synchronize(locationFactory.createFor(facility));
   }
 
   @Override
-  public void synchronizeGeographicZone(GeographicZone geographicZone) {
+  public void synchronizeGeographicZone(GeographicZone geographicZone, HttpServletRequest request) {
+    if (isFromFhirServer(request)) {
+      LOGGER.info(SKIPPING_SYNC_PROCESS_MSG);
+      return;
+    }
+
     synchronize(locationFactory.createFor(geographicZone));
+  }
+
+  private boolean isFromFhirServer(HttpServletRequest request) {
+    return StringUtils.startsWith(request.getRequestURL(), fhirServerUrl);
   }
 
   private void synchronize(Location location) {

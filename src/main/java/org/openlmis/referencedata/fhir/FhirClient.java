@@ -15,16 +15,18 @@
 
 package org.openlmis.referencedata.fhir;
 
+import javax.servlet.http.HttpServletRequest;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
 
 public interface FhirClient {
 
-  default void synchronizeFacility(Facility facility) {
+  default void synchronizeFacility(Facility facility, HttpServletRequest request) {
     // nothing to do here
   }
 
-  default void synchronizeGeographicZone(GeographicZone geographicZone) {
+  default void synchronizeGeographicZone(GeographicZone geographicZone,
+      HttpServletRequest request) {
     // nothing to do here
   }
 

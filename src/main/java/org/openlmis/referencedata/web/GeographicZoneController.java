@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
@@ -83,6 +84,7 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public GeographicZoneDto createGeographicZone(@RequestBody GeographicZoneDto geographicZoneDto,
+      HttpServletRequest request,
       BindingResult bindingResult) {
     Profiler profiler = new Profiler("CREATE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
@@ -103,7 +105,7 @@ public class GeographicZoneController extends BaseController {
     GeographicZone zone = geographicZoneRepository.save(geographicZone);
 
     profiler.start("SYNC_FHIR_RESOURCE");
-    fhirClient.synchronizeGeographicZone(zone);
+    fhirClient.synchronizeGeographicZone(zone, request);
 
     GeographicZoneDto dto = toDto(zone, profiler);
 
@@ -146,7 +148,9 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public GeographicZoneDto updateGeographicZone(@PathVariable("id") UUID geographicZoneId,
-      @RequestBody GeographicZoneDto geographicZoneDto, BindingResult bindingResult) {
+      @RequestBody GeographicZoneDto geographicZoneDto,
+      HttpServletRequest request,
+      BindingResult bindingResult) {
     Profiler profiler = new Profiler("UPDATE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
 
@@ -165,7 +169,7 @@ public class GeographicZoneController extends BaseController {
     GeographicZone zone = geographicZoneRepository.save(geoZoneToSave);
 
     profiler.start("SYNC_FHIR_RESOURCE");
-    fhirClient.synchronizeGeographicZone(zone);
+    fhirClient.synchronizeGeographicZone(zone, request);
 
     GeographicZoneDto dto = toDto(zone, profiler);
 

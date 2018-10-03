@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -118,6 +119,7 @@ public class FacilityController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public FacilityDto createFacility(@RequestBody FacilityDto facilityDto,
+                                    HttpServletRequest request,
                                     BindingResult bindingResult) {
     Profiler profiler = new Profiler("CREATE_FACILITY");
     profiler.setLogger(XLOGGER);
@@ -138,7 +140,7 @@ public class FacilityController extends BaseController {
     XLOGGER.debug("Created new facility with id: ", facilityDto.getId());
 
     profiler.start("SYNC_FHIR_RESOURCE");
-    fhirClient.synchronizeFacility(newFacility);
+    fhirClient.synchronizeFacility(newFacility, request);
 
     FacilityDto dto = toDto(newFacility, profiler);
 
@@ -232,6 +234,7 @@ public class FacilityController extends BaseController {
   public FacilityDto saveFacility(
       @RequestBody FacilityDto facilityDto,
       @PathVariable("id") UUID facilityId,
+      HttpServletRequest request,
       BindingResult bindingResult) {
 
     Profiler profiler = new Profiler("UPDATE_FACILITY");
@@ -257,7 +260,7 @@ public class FacilityController extends BaseController {
     rightAssignmentService.regenerateRightAssignments();
 
     profiler.start("SYNC_FHIR_RESOURCE");
-    fhirClient.synchronizeFacility(facilityToSave);
+    fhirClient.synchronizeFacility(facilityToSave, request);
 
     XLOGGER.info("Saved facility with id: {}", facilityToSave.getId());
     FacilityDto dto = toDto(facilityToSave, profiler);

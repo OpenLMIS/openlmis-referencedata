@@ -16,8 +16,10 @@
 package org.openlmis.referencedata.fhir;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import javax.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +35,7 @@ import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 public class DefaultFhirClientTest {
 
   private static final String SERVICE_URL = "http://localhost";
+  private static final String FHIR_URL = "http://localhost/fhir";
 
   @Mock
   private LocationFactory locationFactory;
@@ -46,11 +49,15 @@ public class DefaultFhirClientTest {
   @Mock
   private IBaseResource resource;
 
+  @Mock
+  private HttpServletRequest request;
+
   private FhirClient client;
 
   @Before
   public void setUp() {
-    client = new DefaultFhirClient(locationFactory, locationConvert, locationSynchronizer);
+    client = new DefaultFhirClient(locationFactory, locationConvert,
+        locationSynchronizer, FHIR_URL);
   }
 
   @Test
@@ -62,12 +69,25 @@ public class DefaultFhirClientTest {
     // when
     when(locationFactory.createFor(facility)).thenReturn(location);
     when(locationConvert.convert(location)).thenReturn(resource);
-    client.synchronizeFacility(facility);
+    client.synchronizeFacility(facility, request);
 
     // then
     verify(locationFactory).createFor(facility);
     verify(locationConvert).convert(location);
     verify(locationSynchronizer).synchronize(location, resource);
+  }
+
+  @Test
+  public void shouldNotSynchronizeFacilityIfRequestCameFromFhirServer() {
+    // given
+    Facility facility = new FacilityDataBuilder().build();
+
+    // when
+    when(request.getRequestURL()).thenReturn(new StringBuffer(FHIR_URL));
+    client.synchronizeFacility(facility, request);
+
+    // then
+    verifyZeroInteractions(locationFactory, locationConvert, locationSynchronizer);
   }
 
   @Test
@@ -79,11 +99,24 @@ public class DefaultFhirClientTest {
     // when
     when(locationFactory.createFor(geographicZone)).thenReturn(location);
     when(locationConvert.convert(location)).thenReturn(resource);
-    client.synchronizeGeographicZone(geographicZone);
+    client.synchronizeGeographicZone(geographicZone, request);
 
     // then
     verify(locationFactory).createFor(geographicZone);
     verify(locationConvert).convert(location);
     verify(locationSynchronizer).synchronize(location, resource);
+  }
+
+  @Test
+  public void shouldNotSynchronizeGeographicZoneIfRequestCameFromFhirServer() {
+    // given
+    GeographicZone geographicZone = new GeographicZoneDataBuilder().build();
+
+    // when
+    when(request.getRequestURL()).thenReturn(new StringBuffer(FHIR_URL));
+    client.synchronizeGeographicZone(geographicZone, request);
+
+    // then
+    verifyZeroInteractions(locationFactory, locationConvert, locationSynchronizer);
   }
 }

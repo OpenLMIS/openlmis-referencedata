@@ -21,6 +21,7 @@ New functionality added in a backwards-compatible manner:
   * Added check for the isFhirLocationOwner flag which is stored in the extraData field in facility and geographic zone classes
     * only service-level and API key tokens can set and modify the flag
     * user is not be able to set this field - the error message should be shown
+  * If the FHIR client in the service is enabled and a request comes from an FHIR server, the service will not send a request to the FHIR server because this creates an endless loop of sending requests between those services.
   
 Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.
