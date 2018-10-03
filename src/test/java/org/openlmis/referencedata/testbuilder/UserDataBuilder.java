@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.openlmis.referencedata.domain.ExtraDataEntity;
 import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.User;
@@ -103,7 +104,8 @@ public class UserDataBuilder {
   public User buildAsNew() {
     return new User(
         username, firstName, lastName, jobTitle, timezone, homeFacilityId,
-        active, loginRestricted, roleAssignments, extraData, rightAssignments
+        active, loginRestricted, roleAssignments, new ExtraDataEntity(extraData),
+        rightAssignments
     );
   }
 

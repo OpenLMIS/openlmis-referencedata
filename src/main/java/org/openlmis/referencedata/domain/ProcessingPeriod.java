@@ -17,12 +17,10 @@ package org.openlmis.referencedata.domain;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import javax.persistence.Column;
-import javax.persistence.Convert;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -31,6 +29,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 
 @Entity
 @Table(name = "processing_periods", schema = "referencedata")
@@ -64,11 +64,8 @@ public class ProcessingPeriod extends BaseEntity {
   @Setter
   private LocalDate endDate;
 
-  @Column(name = "extradata", columnDefinition = "jsonb")
-  @Convert(converter = ExtraDataConverter.class)
-  @Getter
-  @Setter
-  private Map<String, String> extraData;
+  @Embedded
+  private ExtraDataEntity extraData = new ExtraDataEntity();
 
   private ProcessingPeriod(String name, ProcessingSchedule schedule,
                            LocalDate startDate, LocalDate endDate) {
@@ -97,7 +94,8 @@ public class ProcessingPeriod extends BaseEntity {
           importer.getEndDate());
     newPeriod.id = importer.getId();
     newPeriod.description = importer.getDescription();
-    newPeriod.extraData = importer.getExtraData();
+    newPeriod.extraData = ExtraDataEntity.defaultEntity(newPeriod.extraData);
+    newPeriod.extraData.updateFrom(importer.getExtraData());
     return newPeriod;
   }
 
@@ -128,7 +126,9 @@ public class ProcessingPeriod extends BaseEntity {
     exporter.setDescription(description);
     exporter.setStartDate(startDate);
     exporter.setEndDate(endDate);
-    exporter.setExtraData(extraData);
+
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.export(exporter);
 
     Optional<ProcessingSchedule.Exporter> exporterOptional =
         exporter.provideProcessingScheduleExporter();
@@ -161,8 +161,7 @@ public class ProcessingPeriod extends BaseEntity {
           && Objects.equals(processingSchedule, period.processingSchedule);
   }
 
-  public interface Exporter {
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter, ExtraDataExporter {
 
     void setName(String name);
 
@@ -180,11 +179,9 @@ public class ProcessingPeriod extends BaseEntity {
 
     boolean supportsDurationInMonths();
     
-    void setExtraData(Map<String, String> extraData);
   }
 
-  public interface Importer {
-    UUID getId();
+  public interface Importer extends BaseImporter, ExtraDataImporter {
 
     String getName();
 
@@ -196,7 +193,6 @@ public class ProcessingPeriod extends BaseEntity {
 
     LocalDate getEndDate();
     
-    Map<String, String> getExtraData();
   }
 
 }

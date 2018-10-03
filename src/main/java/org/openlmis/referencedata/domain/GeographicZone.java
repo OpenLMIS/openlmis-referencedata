@@ -15,19 +15,17 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Polygon;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import javax.persistence.Column;
-import javax.persistence.Convert;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,6 +33,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 
 @Entity
 @Table(name = "geographic_zones", schema = "referencedata")
@@ -89,10 +89,9 @@ public class GeographicZone extends BaseEntity implements FhirResource {
   @Setter
   private Polygon boundary;
 
-  @Column(name = "extradata", columnDefinition = "jsonb")
-  @Convert(converter = ExtraDataConverter.class)
-  @Getter
-  private Map<String, String> extraData = new HashMap<>();
+  @Embedded
+  @Setter(AccessLevel.PRIVATE)
+  private ExtraDataEntity extraData = new ExtraDataEntity();
 
   /**
    * Creates new geographic zone object based on data from {@link Importer}.
@@ -129,10 +128,8 @@ public class GeographicZone extends BaseEntity implements FhirResource {
 
     boundary = importer.getBoundary();
 
-    extraData.clear();
-    Optional
-        .ofNullable(importer.getExtraData())
-        .ifPresent(data -> extraData.putAll(data));
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.updateFrom(importer.getExtraData());
   }
 
   /**
@@ -155,13 +152,16 @@ public class GeographicZone extends BaseEntity implements FhirResource {
     exporter.setLongitude(longitude);
     exporter.setBoundary(boundary);
 
-    Map<String, String> newExtraData = Maps.newHashMap();
-    Optional.ofNullable(extraData).ifPresent(newExtraData::putAll);
-
-    exporter.setExtraData(newExtraData);
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.export(exporter);
   }
 
-  public interface Exporter extends BaseExporter {
+  @Override
+  public Map<String, String> getExtraData() {
+    return ExtraDataEntity.defaultEntity(extraData).getExtraData();
+  }
+
+  public interface Exporter extends BaseExporter, ExtraDataExporter {
 
     void setCode(String code);
 
@@ -179,11 +179,9 @@ public class GeographicZone extends BaseEntity implements FhirResource {
 
     void setParent(GeographicZone parent);
 
-    void setExtraData(Map<String, String> extraData);
-
   }
 
-  public interface Importer extends BaseImporter, FhirResource {
+  public interface Importer extends BaseImporter, ExtraDataImporter, FhirResource {
 
     String getCode();
 

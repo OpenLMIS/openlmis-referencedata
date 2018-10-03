@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Convert;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -35,6 +35,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 import org.openlmis.util.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,11 +96,8 @@ public class User extends BaseEntity {
   @Getter
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
 
-  @Column(name = "extradata", columnDefinition = "jsonb")
-  @Convert(converter = ExtraDataConverter.class)
-  @Getter
-  @Setter
-  private Map<String, String> extraData;
+  @Embedded
+  private ExtraDataEntity extraData = new ExtraDataEntity();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @DiffIgnore
@@ -115,7 +114,8 @@ public class User extends BaseEntity {
     homeFacilityId = importer.getHomeFacilityId();
     active = importer.isActive();
     loginRestricted = importer.isLoginRestricted();
-    extraData = importer.getExtraData();
+
+    extraData.updateFrom(importer.getExtraData());
   }
 
   /**
@@ -233,7 +233,10 @@ public class User extends BaseEntity {
     exporter.setHomeFacilityId(homeFacilityId);
     exporter.setActive(active);
     exporter.setLoginRestricted(loginRestricted);
-    exporter.setExtraData(extraData);
+
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.export(exporter);
+
     exporter.setJobTitle(jobTitle);
   }
 
@@ -254,9 +257,16 @@ public class User extends BaseEntity {
     return Objects.hash(username);
   }
 
-  public interface Exporter {
+  public void setExtraData(Map<String, String> extraData) {
+    this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
+    this.extraData.updateFrom(extraData);
+  }
 
-    void setId(UUID id);
+  public Map<String, String> getExtraData() {
+    return ExtraDataEntity.defaultEntity(extraData).getExtraData();
+  }
+
+  public interface Exporter extends BaseExporter, ExtraDataExporter {
 
     void setUsername(String username);
 
@@ -274,12 +284,9 @@ public class User extends BaseEntity {
 
     void setLoginRestricted(boolean loginRestricted);
 
-    void setExtraData(Map<String, String> extraData);
   }
 
-  public interface Importer {
-
-    UUID getId();
+  public interface Importer extends BaseImporter, ExtraDataImporter {
 
     String getUsername();
 
@@ -297,6 +304,5 @@ public class User extends BaseEntity {
 
     boolean isLoginRestricted();
 
-    Map<String, String> getExtraData();
   }
 }

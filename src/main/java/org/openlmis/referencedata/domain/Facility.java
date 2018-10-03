@@ -17,21 +17,18 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
-import javax.persistence.Convert;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -48,6 +45,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 import org.openlmis.referencedata.dto.NamedResource;
 
 @Entity
@@ -157,11 +156,8 @@ public class Facility extends BaseEntity implements FhirResource {
   @Setter
   private Point location;
 
-  @Column(name = "extradata", columnDefinition = "jsonb")
-  @Convert(converter = ExtraDataConverter.class)
-  @Getter
-  @Setter
-  private Map<String, String> extraData = new HashMap<>();
+  @Embedded
+  private ExtraDataEntity extraData = new ExtraDataEntity();
 
   public Facility(String code) {
     this.code = code;
@@ -240,10 +236,8 @@ public class Facility extends BaseEntity implements FhirResource {
     name = importer.getName();
     description = importer.getDescription();
 
-    extraData.clear();
-    Optional
-        .ofNullable(importer.getExtraData())
-        .ifPresent(data -> extraData.putAll(data));
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.updateFrom(importer.getExtraData());
 
     active = importer.getActive();
     goLiveDate = importer.getGoLiveDate();
@@ -304,10 +298,8 @@ public class Facility extends BaseEntity implements FhirResource {
     
     exporter.setLocation(location);
 
-    Map<String, String> newExtraData = Maps.newHashMap();
-    Optional.ofNullable(extraData).ifPresent(newExtraData::putAll);
-
-    exporter.setExtraData(newExtraData);
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.export(exporter);
   }
 
   public boolean isWarehouse() {
@@ -323,7 +315,17 @@ public class Facility extends BaseEntity implements FhirResource {
         .anyMatch(supported -> supported.isActiveFor(program));
   }
 
-  public interface Exporter extends BaseExporter {
+  public void setExtraData(Map<String, String> extraData) {
+    this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
+    this.extraData.updateFrom(extraData);
+  }
+
+  @Override
+  public Map<String, String> getExtraData() {
+    return ExtraDataEntity.defaultEntity(extraData).getExtraData();
+  }
+
+  public interface Exporter extends BaseExporter, ExtraDataExporter {
 
     void setCode(String code);
 
@@ -353,10 +355,9 @@ public class Facility extends BaseEntity implements FhirResource {
     
     void setLocation(Point location);
 
-    void setExtraData(Map<String, String> extraData);
   }
 
-  public interface Importer extends BaseImporter, FhirResource {
+  public interface Importer extends BaseImporter, ExtraDataImporter, FhirResource {
 
     String getCode();
 

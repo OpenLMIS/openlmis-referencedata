@@ -25,7 +25,6 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
@@ -45,6 +44,8 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.domain.BaseEntity.BaseExporter;
 import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
 /**
@@ -105,10 +106,8 @@ public class Orderable implements Identifiable {
   @Setter
   private Map<String, String> identifiers;
 
-  @Column(name = "extradata", columnDefinition = "jsonb")
-  @Convert(converter = ExtraDataConverter.class)
-  @Setter
-  private Map<String, String> extraData;
+  @Embedded
+  private ExtraDataEntity extraData = new ExtraDataEntity();
 
   @EmbeddedId
   private OrderableIdentity identity;
@@ -241,7 +240,9 @@ public class Orderable implements Identifiable {
     orderable.programOrderables = new ArrayList<>();
 
     orderable.identifiers = importer.getIdentifiers();
-    orderable.extraData = importer.getExtraData();
+
+    orderable.extraData = ExtraDataEntity.defaultEntity(orderable.extraData);
+    orderable.extraData.updateFrom(importer.getExtraData());
 
     orderable.identity = new OrderableIdentity(importer.getId(), importer.getVersionId());
 
@@ -264,12 +265,20 @@ public class Orderable implements Identifiable {
     exporter.setRoundToZero(roundToZero);
     exporter.setPrograms(ProgramOrderableDto.newInstance(programOrderables));
     exporter.setIdentifiers(identifiers);
-    exporter.setExtraData(extraData);
+
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.export(exporter);
+
     exporter.setVersionId(identity.getVersionId());
     exporter.setLastUpdated(lastUpdated);
   }
 
-  public interface Exporter extends BaseExporter {
+  public void setExtraData(Map<String, String> extraData) {
+    this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
+    this.extraData.updateFrom(extraData);
+  }
+
+  public interface Exporter extends BaseExporter, ExtraDataExporter {
 
     void setProductCode(String productCode);
 
@@ -289,14 +298,12 @@ public class Orderable implements Identifiable {
 
     void setIdentifiers(Map<String, String> identifiers);
 
-    void setExtraData(Map<String, String> extraData);
-    
     void setVersionId(Long versionId);
 
     void setLastUpdated(ZonedDateTime lastUpdated);
   }
 
-  public interface Importer extends BaseImporter {
+  public interface Importer extends BaseImporter, ExtraDataImporter {
 
     String getProductCode();
 
@@ -316,8 +323,6 @@ public class Orderable implements Identifiable {
 
     Map<String, String> getIdentifiers();
 
-    Map<String, String> getExtraData();
-    
     Long getVersionId();
   }
 }

@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.RandomUtils;
+import org.openlmis.referencedata.domain.ExtraDataEntity;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 
@@ -59,7 +60,7 @@ public class GeographicZoneDataBuilder {
    */
   public GeographicZone buildAsNew() {
     return new GeographicZone(code, name, level, parent, catchmentPopulation,
-        latitude, longitude, boundary, extraData);
+        latitude, longitude, boundary, new ExtraDataEntity(extraData));
   }
 
   /**
