@@ -15,13 +15,7 @@
 
 package org.openlmis.referencedata.validate;
 
-import static org.apache.commons.lang3.BooleanUtils.isTrue;
-import static org.apache.commons.lang3.BooleanUtils.toBooleanObject;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import java.util.Collections;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.openlmis.referencedata.domain.FhirLocation;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,7 +44,7 @@ public abstract class FhirLocationValidator<D extends FhirLocation, E extends Fh
       return;
     }
 
-    boolean currentFlag = isFlagSet(current);
+    boolean currentFlag = current.isFhirLocationOwnerSet();
 
     if (null == current.getId()) {
       if (currentFlag && isUserRequest()) {
@@ -58,7 +52,7 @@ public abstract class FhirLocationValidator<D extends FhirLocation, E extends Fh
       }
     } else {
       E existing = getExistingResource(current);
-      boolean existingFlag = isFlagSet(existing);
+      boolean existingFlag = existing.isFhirLocationOwnerSet();
 
       if (currentFlag != existingFlag && isUserRequest()) {
         rejectValue(errors, EXTRA_DATA, getModifiedKeyErrorMessage(),
@@ -85,19 +79,6 @@ public abstract class FhirLocationValidator<D extends FhirLocation, E extends Fh
 
   void rejectIfInvariantWasChanged(Errors errors, String field, Object oldValue, Object newValue) {
     rejectIfNotEqual(errors, oldValue, newValue, field, getInvariantFieldErrorMessage());
-  }
-
-  private <T extends FhirLocation> boolean isFlagSet(T target) {
-    String value = Optional
-        .ofNullable(target.getExtraData())
-        .orElse(Collections.emptyMap())
-        .get(IS_FHIR_LOCATION_OWNER);
-
-    if (isBlank(value)) {
-      return false;
-    }
-
-    return isTrue(toBooleanObject(value));
   }
 
   private boolean isUserRequest() {

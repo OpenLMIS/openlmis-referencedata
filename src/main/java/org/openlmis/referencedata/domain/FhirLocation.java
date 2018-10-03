@@ -15,9 +15,27 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
+import static org.apache.commons.lang3.BooleanUtils.toBooleanObject;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import java.util.Collections;
+import java.util.Optional;
 import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 
 public interface FhirLocation extends BaseImporter, ExtraDataImporter {
+
+  /**
+   * Checks if <strong>isFhirLocationOwner</strong> flag is set.
+   */
+  default boolean isFhirLocationOwnerSet() {
+    String value = Optional
+        .ofNullable(getExtraData())
+        .orElse(Collections.emptyMap())
+        .get("isFhirLocationOwner");
+
+    return !isBlank(value) && isTrue(toBooleanObject(value));
+  }
 
 }
