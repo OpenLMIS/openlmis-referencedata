@@ -49,7 +49,7 @@ public class GeographicZoneValidatorTest
 
   private GeographicZone geographicZone = new GeographicZoneDataBuilder()
       .withParent(new GeographicZoneDataBuilder().build())
-      .withIsFhirLocationOwnerFlag()
+      .withIsManagedExternallyFlag()
       .build();
   private GeographicZoneDto geographicZoneDto = new GeographicZoneDto();
 

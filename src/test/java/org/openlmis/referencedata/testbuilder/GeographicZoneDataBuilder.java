@@ -99,8 +99,8 @@ public class GeographicZoneDataBuilder {
     return this;
   }
 
-  public GeographicZoneDataBuilder withIsFhirLocationOwnerFlag() {
-    return withExtraData(FhirLocationValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
+  public GeographicZoneDataBuilder withIsManagedExternallyFlag() {
+    return withExtraData(FhirLocationValidator.IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
   }
 
 }

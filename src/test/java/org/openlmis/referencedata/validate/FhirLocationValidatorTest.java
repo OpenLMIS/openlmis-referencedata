@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.FhirLocationValidator.EXTRA_DATA;
-import static org.openlmis.referencedata.validate.FhirLocationValidator.IS_FHIR_LOCATION_OWNER;
+import static org.openlmis.referencedata.validate.FhirLocationValidator.IS_MANAGED_EXTERNALLY;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import org.junit.Before;
@@ -80,7 +80,7 @@ public abstract class FhirLocationValidatorTest
   @Test
   public void shouldRejectIfFhirFlagIsSetAndUserSentRequest() {
     target.setId(null);
-    target.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
+    target.getExtraData().put(IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
 
     mockUserRequest();
     getValidator().validate(target, errors);
@@ -91,7 +91,7 @@ public abstract class FhirLocationValidatorTest
   @Test
   public void shouldNotRejectIfFhirFlagIsSetAndRequestIsFromService() {
     target.setId(null);
-    target.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
+    target.getExtraData().put(IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
 
     getValidator().validate(target, errors);
 
@@ -101,7 +101,7 @@ public abstract class FhirLocationValidatorTest
   @Test
   public void shouldNotRejectIfFhirFlagWasNotSetForNewResource() {
     target.setId(null);
-    target.getExtraData().remove(IS_FHIR_LOCATION_OWNER);
+    target.getExtraData().remove(IS_MANAGED_EXTERNALLY);
 
     getValidator().validate(target, errors);
 
@@ -110,19 +110,28 @@ public abstract class FhirLocationValidatorTest
   }
 
   @Test
-  public void shouldRejectIfFhirFlagWasChanged() {
-    target.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.FALSE.toString());
-    entity.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
+  public void shouldRejectIfFhirFlagWasChangedAndUserSentRequest() {
+    target.getExtraData().put(IS_MANAGED_EXTERNALLY, Boolean.FALSE.toString());
+    entity.getExtraData().put(IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
 
+    mockUserRequest();
     getValidator().validate(target, errors);
 
     assertErrorMessage(errors, EXTRA_DATA, getValidator().getModifiedKeyErrorMessage());
   }
 
   @Test
+  public void shouldNotRejectIfFhirFlagWasChangedAndServiceSentRequest() {
+    target.getExtraData().put(IS_MANAGED_EXTERNALLY, Boolean.FALSE.toString());
+    entity.getExtraData().put(IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
+    getValidator().validate(target, errors);
+    assertEquals(0, errors.getErrorCount());
+  }
+
+  @Test
   public void shouldNotRejectIfFhirFlagWasNotChanged() {
-    target.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
-    entity.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
+    target.getExtraData().put(IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
+    entity.getExtraData().put(IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
 
     getValidator().validate(target, errors);
 

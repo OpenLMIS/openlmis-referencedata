@@ -57,7 +57,7 @@ public class FacilityValidatorTest extends FhirLocationValidatorTest<FacilityDto
 
   private Facility facility = new FacilityDataBuilder()
       .withSupportedProgram(new ProgramDataBuilder().build())
-      .withIsFhirLocationOwnerFlag()
+      .withIsManagedExternallyFlag()
       .build();
   private FacilityDto facilityDto = new FacilityDto();
 

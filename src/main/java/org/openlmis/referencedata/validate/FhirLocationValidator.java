@@ -25,7 +25,7 @@ import org.springframework.validation.Errors;
 @AllArgsConstructor
 public abstract class FhirLocationValidator<D extends FhirLocation, E extends FhirLocation>
     implements BaseValidator {
-  public static final String IS_FHIR_LOCATION_OWNER = "isFhirLocationOwner";
+  public static final String IS_MANAGED_EXTERNALLY = "isManagedExternally";
   static final String EXTRA_DATA = "extraData";
 
   private Class<D> dtoDefinition;
@@ -44,24 +44,31 @@ public abstract class FhirLocationValidator<D extends FhirLocation, E extends Fh
       return;
     }
 
-    boolean isFlagSetInNewResource = newResource.isFhirLocationOwnerSet();
-
     if (null == newResource.getId()) {
-      if (isFlagSetInNewResource && isUserRequest()) {
-        rejectValue(errors, EXTRA_DATA, getUnallowedKeyErrorMessage(), IS_FHIR_LOCATION_OWNER);
-      }
+      handleCreateEvent(newResource, errors);
     } else {
       E existingResource = getExistingResource(newResource);
-      boolean isFlagSetInExistingResource = existingResource.isFhirLocationOwnerSet();
+      handleUpdateEvent(newResource, existingResource, errors);
+    }
+  }
 
-      if (!isFlagSetInNewResource && isFlagSetInExistingResource) {
-        rejectValue(errors, EXTRA_DATA, getModifiedKeyErrorMessage(),
-            IS_FHIR_LOCATION_OWNER, String.valueOf(isFlagSetInNewResource));
-      }
+  private void handleCreateEvent(D newResource, Errors errors) {
+    if (newResource.isManagedExternally() && isUserRequest()) {
+      rejectValue(errors, EXTRA_DATA, getUnallowedKeyErrorMessage(), IS_MANAGED_EXTERNALLY);
+    }
+  }
 
-      if (!errors.hasErrors() && isFlagSetInNewResource && isUserRequest()) {
-        verifyInvariants(newResource, existingResource, errors);
-      }
+  private void handleUpdateEvent(D newResource, E existingResource, Errors errors) {
+    boolean isFlagSetInNewResource = newResource.isManagedExternally();
+    boolean isFlagSetInExistingResource = existingResource.isManagedExternally();
+
+    if (!isFlagSetInNewResource && isFlagSetInExistingResource && isUserRequest()) {
+      rejectValue(errors, EXTRA_DATA, getModifiedKeyErrorMessage(),
+          IS_MANAGED_EXTERNALLY, String.valueOf(isFlagSetInNewResource));
+    }
+
+    if (!errors.hasErrors() && isFlagSetInNewResource && isUserRequest()) {
+      verifyInvariants(newResource, existingResource, errors);
     }
   }
 

@@ -26,27 +26,27 @@ public class FhirLocationTest {
   private TestFhirLocation location = new TestFhirLocation();
 
   @Test
-  public void shouldReturnTrueIfIsFhirLocationOwnerFlagIsSetToTrue() {
+  public void shouldReturnTrueIfIsManagedExternallyFlagIsSetToTrue() {
     location.changeFlag(Boolean.TRUE.toString());
-    assertThat(location.isFhirLocationOwnerSet()).isTrue();
+    assertThat(location.isManagedExternally()).isTrue();
   }
 
   @Test
-  public void shouldReturnFalseIfIsFhirLocationOwnerFlagIsSetToFalse() {
+  public void shouldReturnFalseIfIsManagedExternallyFlagIsSetToFalse() {
     location.changeFlag(Boolean.FALSE.toString());
-    assertThat(location.isFhirLocationOwnerSet()).isFalse();
+    assertThat(location.isManagedExternally()).isFalse();
   }
 
   @Test
-  public void shouldReturnFalseIfIsFhirLocationOwnerFlagHasIncorrectValue() {
+  public void shouldReturnFalseIfIsManagedExternallyFlagHasIncorrectValue() {
     location.changeFlag("def");
-    assertThat(location.isFhirLocationOwnerSet()).isFalse();
+    assertThat(location.isManagedExternally()).isFalse();
   }
 
   @Test
-  public void shouldReturnFalseIfIsFhirLocationOwnerFlagIsNotSet() {
+  public void shouldReturnFalseIfIsManagedExternallyFlagIsNotSet() {
     location.changeFlag(null);
-    assertThat(location.isFhirLocationOwnerSet()).isFalse();
+    assertThat(location.isManagedExternally()).isFalse();
   }
 
   private static final class TestFhirLocation implements FhirLocation {
@@ -64,9 +64,9 @@ public class FhirLocationTest {
 
     void changeFlag(String value) {
       if (null == value) {
-        map.remove("isFhirLocationOwner");
+        map.remove("isManagedExternally");
       } else {
-        map.put("isFhirLocationOwner", value);
+        map.put("isManagedExternally", value);
       }
     }
   }

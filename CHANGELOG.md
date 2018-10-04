@@ -18,7 +18,7 @@ New functionality added in a backwards-compatible manner:
     * otherwise, results will contain only users that have at least one home facility supervision role. For both cases, other parameters have to match.
 * [OLMIS-5415](https://openlmis.atlassian.net/browse/OLMIS-5415): Handle requests from HAPI FHIR server:
   * Added extra data field to geographic zone resources.
-  * Added check for the isFhirLocationOwner flag which is stored in the extraData field in facility and geographic zone classes
+  * Added check for the `isManagedExternally` flag which is stored in the extraData field in facility and geographic zone classes
     * only service-level and API key tokens can set and modify the flag
     * user is not be able to set this field - the error message should be shown
   * If the FHIR client in the service is enabled and a request comes from an FHIR server, the service will not send a request to the FHIR server because this creates an endless loop of sending requests between those services.

@@ -184,7 +184,7 @@ public class FacilityDataBuilder {
     return this;
   }
 
-  public FacilityDataBuilder withIsFhirLocationOwnerFlag() {
-    return withExtraData(FhirLocationValidator.IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
+  public FacilityDataBuilder withIsManagedExternallyFlag() {
+    return withExtraData(FhirLocationValidator.IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
   }
 }

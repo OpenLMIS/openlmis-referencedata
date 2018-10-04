@@ -27,13 +27,13 @@ import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 public interface FhirLocation extends BaseImporter, ExtraDataImporter {
 
   /**
-   * Checks if <strong>isFhirLocationOwner</strong> flag is set.
+   * Checks if <strong>isManagedExternally</strong> flag is set.
    */
-  default boolean isFhirLocationOwnerSet() {
+  default boolean isManagedExternally() {
     String value = Optional
         .ofNullable(getExtraData())
         .orElse(Collections.emptyMap())
-        .get("isFhirLocationOwner");
+        .get("isManagedExternally");
 
     return !isBlank(value) && isTrue(toBooleanObject(value));
   }
