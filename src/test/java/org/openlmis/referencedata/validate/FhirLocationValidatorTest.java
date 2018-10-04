@@ -110,24 +110,13 @@ public abstract class FhirLocationValidatorTest
   }
 
   @Test
-  public void shouldRejectIfFhirFlagWasChangedAndUserSentRequest() {
+  public void shouldRejectIfFhirFlagWasChanged() {
     target.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.FALSE.toString());
     entity.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
 
-    mockUserRequest();
     getValidator().validate(target, errors);
 
     assertErrorMessage(errors, EXTRA_DATA, getValidator().getModifiedKeyErrorMessage());
-  }
-
-  @Test
-  public void shouldNotRejectIfFhirFlagWasChangedAndServiceSentRequest() {
-    target.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.FALSE.toString());
-    entity.getExtraData().put(IS_FHIR_LOCATION_OWNER, Boolean.TRUE.toString());
-
-    getValidator().validate(target, errors);
-
-    assertEquals(0, errors.getErrorCount());
   }
 
   @Test

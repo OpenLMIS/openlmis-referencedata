@@ -37,30 +37,30 @@ public abstract class FhirLocationValidator<D extends FhirLocation, E extends Fh
 
   @Override
   public void validate(Object target, Errors errors) {
-    D current = dtoDefinition.cast(target);
-    verifyResource(current, errors);
+    D newResource = dtoDefinition.cast(target);
+    verifyResource(newResource, errors);
 
     if (errors.hasErrors()) {
       return;
     }
 
-    boolean currentFlag = current.isFhirLocationOwnerSet();
+    boolean isFlagSetInNewResource = newResource.isFhirLocationOwnerSet();
 
-    if (null == current.getId()) {
-      if (currentFlag && isUserRequest()) {
+    if (null == newResource.getId()) {
+      if (isFlagSetInNewResource && isUserRequest()) {
         rejectValue(errors, EXTRA_DATA, getUnallowedKeyErrorMessage(), IS_FHIR_LOCATION_OWNER);
       }
     } else {
-      E existing = getExistingResource(current);
-      boolean existingFlag = existing.isFhirLocationOwnerSet();
+      E existingResource = getExistingResource(newResource);
+      boolean isFlagSetInExistingResource = existingResource.isFhirLocationOwnerSet();
 
-      if (currentFlag != existingFlag && isUserRequest()) {
+      if (!isFlagSetInNewResource && isFlagSetInExistingResource) {
         rejectValue(errors, EXTRA_DATA, getModifiedKeyErrorMessage(),
-            IS_FHIR_LOCATION_OWNER, String.valueOf(currentFlag));
+            IS_FHIR_LOCATION_OWNER, String.valueOf(isFlagSetInNewResource));
       }
 
-      if (!errors.hasErrors() && currentFlag && isUserRequest()) {
-        verifyInvariants(current, existing, errors);
+      if (!errors.hasErrors() && isFlagSetInNewResource && isUserRequest()) {
+        verifyInvariants(newResource, existingResource, errors);
       }
     }
   }
