@@ -89,7 +89,7 @@ public class GeographicZoneController extends BaseController {
     Profiler profiler = new Profiler("CREATE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
 
-    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false, profiler);
+    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, profiler);
 
     profiler.start("VALIDATE_GEO_ZONE_DTO");
     geographicZoneValidator.validate(geographicZoneDto, bindingResult);
@@ -154,7 +154,7 @@ public class GeographicZoneController extends BaseController {
     Profiler profiler = new Profiler("UPDATE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
 
-    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false, profiler);
+    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, profiler);
 
     profiler.start("VALIDATE_GEO_ZONE_DTO");
     geographicZoneValidator.validate(geographicZoneDto, bindingResult);
@@ -217,7 +217,7 @@ public class GeographicZoneController extends BaseController {
     Profiler profiler = new Profiler("DELETE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
 
-    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, false, profiler);
+    checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, profiler);
 
     profiler.start("CHECK_IF_GEO_ZONE_EXISTS");
     boolean exists = geographicZoneRepository.exists(geographicZoneId);

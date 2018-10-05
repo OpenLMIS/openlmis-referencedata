@@ -19,6 +19,7 @@ import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.BooleanUtils.toBooleanObject;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collections;
 import java.util.Optional;
 import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
@@ -29,6 +30,7 @@ public interface FhirLocation extends BaseImporter, ExtraDataImporter {
   /**
    * Checks if <strong>isManagedExternally</strong> flag is set.
    */
+  @JsonIgnore
   default boolean isManagedExternally() {
     String value = Optional
         .ofNullable(getExtraData())
