@@ -60,6 +60,7 @@ public abstract class BaseMigrationIntegrationTest {
   static final String TABLE_COMMODITY_TYPES = "commodity_types";
   static final String TABLE_DISPENSABLES = "dispensables";
   static final String TABLE_DISPENSABLE_ATTRIBUTES = "dispensable_attributes";
+  static final String TABLE_FACILITY_TYPES = "facility_types";
   static final String TABLE_ORDERABLES = "orderables";
   static final String TABLE_TRADE_ITEMS = "trade_items";
 

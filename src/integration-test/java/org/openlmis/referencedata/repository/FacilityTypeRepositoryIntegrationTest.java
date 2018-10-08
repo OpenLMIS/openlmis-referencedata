@@ -16,7 +16,11 @@
 package org.openlmis.referencedata.repository;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -106,9 +110,8 @@ public class FacilityTypeRepositoryIntegrationTest
     Page<FacilityType> facilityTypePage = facilityTypeRepository
         .findByActive(true, pageable);
 
-    assertEquals(2, facilityTypePage.getContent().size());
-    assertEquals(2, facilityTypePage.getTotalElements());
-    assertThat(facilityTypePage.getContent(), hasItems(type1));
+    assertThat(facilityTypePage.getContent(), not(hasItem(hasProperty("active", is(false)))));
+    assertThat(facilityTypePage.getContent(), hasItem(type1));
   }
 
   @Test
