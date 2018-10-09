@@ -15,12 +15,14 @@
 
 package org.openlmis.referencedata.fhir;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.service.RequestHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +38,11 @@ class DefaultFhirClient implements FhirClient {
   private LocationConverter locationConvert;
   private LocationSynchronizer locationSynchronizer;
 
-  private String fhirServerUrl;
+  private String fhirServerHost;
 
   @Override
   public void synchronizeFacility(Facility facility, HttpServletRequest request) {
-    if (isFromFhirServer(request)) {
+    if (shouldNotHandle(request)) {
       LOGGER.info(SKIPPING_SYNC_PROCESS_MSG);
       return;
     }
@@ -50,7 +52,7 @@ class DefaultFhirClient implements FhirClient {
 
   @Override
   public void synchronizeGeographicZone(GeographicZone geographicZone, HttpServletRequest request) {
-    if (isFromFhirServer(request)) {
+    if (shouldNotHandle(request)) {
       LOGGER.info(SKIPPING_SYNC_PROCESS_MSG);
       return;
     }
@@ -58,8 +60,27 @@ class DefaultFhirClient implements FhirClient {
     synchronize(locationFactory.createFor(geographicZone));
   }
 
-  private boolean isFromFhirServer(HttpServletRequest request) {
-    return StringUtils.startsWith(request.getRequestURL(), fhirServerUrl);
+  private boolean shouldNotHandle(HttpServletRequest request) {
+    InetAddress fhirHost;
+
+    try {
+      fhirHost = InetAddress.getByName(fhirServerHost);
+    } catch (UnknownHostException exp) {
+      LOGGER.error("Unknown host: " + fhirServerHost, exp);
+      return true;
+    }
+
+    String clientIpAddress = RequestHelper.getClientIpAddress(request);
+    InetAddress clientHost;
+
+    try {
+      clientHost = InetAddress.getByName(clientIpAddress);
+    } catch (UnknownHostException exp) {
+      LOGGER.error("Unknown host: " + clientIpAddress, exp);
+      return true;
+    }
+
+    return fhirHost.equals(clientHost);
   }
 
   private void synchronize(Location location) {

@@ -43,6 +43,9 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
   @Value("${fhirClient.serverUrl}")
   private String fhirServerUrl;
 
+  @Value("${fhirClient.serverHost}")
+  private String fhirServerHost;
+
   @Value("${service.url}")
   private String serviceUrl;
 
@@ -75,7 +78,7 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
           .withServiceUrl(serviceUrl);
 
       fhirClient = new DefaultFhirClient(locationFactory, locationConvert,
-          locationSynchronizer, fhirServerUrl);
+          locationSynchronizer, fhirServerHost);
     } else {
       LOGGER.info("The FHIR feature is disabled");
       fhirClient = EMPTY_CLIENT;

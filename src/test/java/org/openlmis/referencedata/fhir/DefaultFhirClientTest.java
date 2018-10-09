@@ -32,10 +32,12 @@ import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public class DefaultFhirClientTest {
 
   private static final String SERVICE_URL = "http://localhost";
-  private static final String FHIR_URL = "http://localhost/fhir";
+  private static final String FHIR_HOST = "127.0.0.1";
+  private static final String CLIENT_HOST = "127.0.0.7";
 
   @Mock
   private LocationFactory locationFactory;
@@ -57,7 +59,8 @@ public class DefaultFhirClientTest {
   @Before
   public void setUp() {
     client = new DefaultFhirClient(locationFactory, locationConvert,
-        locationSynchronizer, FHIR_URL);
+        locationSynchronizer, FHIR_HOST);
+    when(request.getRemoteAddr()).thenReturn(CLIENT_HOST);
   }
 
   @Test
@@ -83,7 +86,7 @@ public class DefaultFhirClientTest {
     Facility facility = new FacilityDataBuilder().build();
 
     // when
-    when(request.getRequestURL()).thenReturn(new StringBuffer(FHIR_URL));
+    when(request.getRemoteAddr()).thenReturn(FHIR_HOST);
     client.synchronizeFacility(facility, request);
 
     // then
@@ -113,7 +116,7 @@ public class DefaultFhirClientTest {
     GeographicZone geographicZone = new GeographicZoneDataBuilder().build();
 
     // when
-    when(request.getRequestURL()).thenReturn(new StringBuffer(FHIR_URL));
+    when(request.getRemoteAddr()).thenReturn(FHIR_HOST);
     client.synchronizeGeographicZone(geographicZone, request);
 
     // then
