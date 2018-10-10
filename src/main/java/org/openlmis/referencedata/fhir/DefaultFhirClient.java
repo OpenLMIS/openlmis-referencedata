@@ -15,16 +15,17 @@
 
 package org.openlmis.referencedata.fhir;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import javax.servlet.http.HttpServletRequest;
+import static org.apache.commons.lang3.StringUtils.startsWith;
+
 import lombok.AllArgsConstructor;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.service.RequestHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 @AllArgsConstructor
 class DefaultFhirClient implements FhirClient {
@@ -32,55 +33,51 @@ class DefaultFhirClient implements FhirClient {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFhirClient.class);
 
   private static final String SKIPPING_SYNC_PROCESS_MSG =
-      "Request came from FHIR server. Skipping synchronization process.";
+      "Request came from FHIR service. Skipping synchronization process.";
 
   private LocationFactory locationFactory;
   private LocationConverter locationConvert;
   private LocationSynchronizer locationSynchronizer;
 
-  private String fhirServerHost;
+  private String apiKeyPrefix;
 
   @Override
-  public void synchronizeFacility(Facility facility, HttpServletRequest request) {
-    if (shouldNotHandle(request)) {
+  public void synchronizeFacility(Facility facility) {
+    LOGGER.info("Synchronizing facility with id: {}", facility.getId());
+    if (shouldIgnore()) {
       LOGGER.info(SKIPPING_SYNC_PROCESS_MSG);
       return;
-    }
 
+    }
     synchronize(locationFactory.createFor(facility));
+    LOGGER.info("Synchronized facility with id: {}", facility.getId());
   }
 
   @Override
-  public void synchronizeGeographicZone(GeographicZone geographicZone, HttpServletRequest request) {
-    if (shouldNotHandle(request)) {
+  public void synchronizeGeographicZone(GeographicZone geographicZone) {
+    LOGGER.info("Synchronizing geographic zone with id: {}", geographicZone.getId());
+    if (shouldIgnore()) {
       LOGGER.info(SKIPPING_SYNC_PROCESS_MSG);
       return;
     }
 
     synchronize(locationFactory.createFor(geographicZone));
+    LOGGER.info("Synchronized geographic zone with id: {}", geographicZone.getId());
   }
 
-  private boolean shouldNotHandle(HttpServletRequest request) {
-    InetAddress fhirHost;
+  private boolean shouldIgnore() {
+    Authentication authentication = SecurityContextHolder
+        .getContext()
+        .getAuthentication();
 
-    try {
-      fhirHost = InetAddress.getByName(fhirServerHost);
-    } catch (UnknownHostException exp) {
-      LOGGER.error("Unknown host: " + fhirServerHost, exp);
-      return true;
+    if (authentication instanceof OAuth2Authentication) {
+      OAuth2Authentication auth2Authentication = (OAuth2Authentication) authentication;
+      String clientId = auth2Authentication.getOAuth2Request().getClientId();
+
+      return auth2Authentication.isClientOnly() && !startsWith(clientId, apiKeyPrefix);
     }
 
-    String clientIpAddress = RequestHelper.getClientIpAddress(request);
-    InetAddress clientHost;
-
-    try {
-      clientHost = InetAddress.getByName(clientIpAddress);
-    } catch (UnknownHostException exp) {
-      LOGGER.error("Unknown host: " + clientIpAddress, exp);
-      return true;
-    }
-
-    return fhirHost.equals(clientHost);
+    return true;
   }
 
   private void synchronize(Location location) {

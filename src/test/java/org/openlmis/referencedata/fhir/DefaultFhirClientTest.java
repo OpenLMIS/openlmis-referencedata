@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import javax.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,14 +29,17 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public class DefaultFhirClientTest {
 
   private static final String SERVICE_URL = "http://localhost";
-  private static final String FHIR_HOST = "127.0.0.1";
-  private static final String CLIENT_HOST = "127.0.0.7";
+  private static final String API_KEY_PREFIX = "prefix";
 
   @Mock
   private LocationFactory locationFactory;
@@ -52,15 +54,24 @@ public class DefaultFhirClientTest {
   private IBaseResource resource;
 
   @Mock
-  private HttpServletRequest request;
+  private SecurityContext securityContext;
+
+  @Mock
+  private OAuth2Authentication authentication;
+
 
   private FhirClient client;
 
   @Before
   public void setUp() {
     client = new DefaultFhirClient(locationFactory, locationConvert,
-        locationSynchronizer, FHIR_HOST);
-    when(request.getRemoteAddr()).thenReturn(CLIENT_HOST);
+        locationSynchronizer, API_KEY_PREFIX);
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.isClientOnly()).thenReturn(true);
+    when(authentication.getOAuth2Request()).thenReturn(createAuthRequest(API_KEY_PREFIX));
+
+    SecurityContextHolder.setContext(securityContext);
   }
 
   @Test
@@ -72,7 +83,7 @@ public class DefaultFhirClientTest {
     // when
     when(locationFactory.createFor(facility)).thenReturn(location);
     when(locationConvert.convert(location)).thenReturn(resource);
-    client.synchronizeFacility(facility, request);
+    client.synchronizeFacility(facility);
 
     // then
     verify(locationFactory).createFor(facility);
@@ -86,8 +97,8 @@ public class DefaultFhirClientTest {
     Facility facility = new FacilityDataBuilder().build();
 
     // when
-    when(request.getRemoteAddr()).thenReturn(FHIR_HOST);
-    client.synchronizeFacility(facility, request);
+    when(authentication.getOAuth2Request()).thenReturn(createAuthRequest("service-token"));
+    client.synchronizeFacility(facility);
 
     // then
     verifyZeroInteractions(locationFactory, locationConvert, locationSynchronizer);
@@ -102,7 +113,7 @@ public class DefaultFhirClientTest {
     // when
     when(locationFactory.createFor(geographicZone)).thenReturn(location);
     when(locationConvert.convert(location)).thenReturn(resource);
-    client.synchronizeGeographicZone(geographicZone, request);
+    client.synchronizeGeographicZone(geographicZone);
 
     // then
     verify(locationFactory).createFor(geographicZone);
@@ -116,10 +127,14 @@ public class DefaultFhirClientTest {
     GeographicZone geographicZone = new GeographicZoneDataBuilder().build();
 
     // when
-    when(request.getRemoteAddr()).thenReturn(FHIR_HOST);
-    client.synchronizeGeographicZone(geographicZone, request);
+    when(authentication.getOAuth2Request()).thenReturn(createAuthRequest("service-token"));
+    client.synchronizeGeographicZone(geographicZone);
 
     // then
     verifyZeroInteractions(locationFactory, locationConvert, locationSynchronizer);
+  }
+
+  private OAuth2Request createAuthRequest(String clientId) {
+    return new OAuth2Request(null, clientId, null, true, null, null, null, null, null);
   }
 }

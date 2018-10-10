@@ -48,7 +48,12 @@ public abstract class FhirLocationValidator<D extends FhirLocation, E extends Fh
       handleCreateEvent(newResource, errors);
     } else {
       E existingResource = getExistingResource(newResource);
-      handleUpdateEvent(newResource, existingResource, errors);
+
+      if (null == existingResource) {
+        handleCreateEvent(newResource, errors);
+      } else {
+        handleUpdateEvent(newResource, existingResource, errors);
+      }
     }
   }
 

@@ -54,6 +54,11 @@ public class GeographicZoneBuilder
       zone = new GeographicZone();
     } else {
       zone = geographicZoneRepository.findOne(importer.getId());
+
+      if (null == zone) {
+        zone = new GeographicZone();
+        zone.setId(importer.getId());
+      }
     }
 
     zone.updateFrom(importer);

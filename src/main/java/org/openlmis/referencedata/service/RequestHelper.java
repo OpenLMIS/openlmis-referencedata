@@ -21,8 +21,6 @@ import static org.springframework.web.util.UriUtils.encodeQueryParam;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -67,19 +65,6 @@ public final class RequestHelper {
    */
   static HttpEntity createEntity(String token) {
     return new HttpEntity(createHeadersWithAuth(token));
-  }
-
-  /**
-   * Gets Client's IP address from request.
-   */
-  public static String getClientIpAddress(HttpServletRequest request) {
-    String clientIpAddress = request.getHeader(com.google.common.net.HttpHeaders.X_FORWARDED_FOR);
-
-    if (StringUtils.isBlank(clientIpAddress)) {
-      clientIpAddress = request.getRemoteAddr();
-    }
-
-    return clientIpAddress;
   }
 
   private static HttpHeaders createHeadersWithAuth(String token) {

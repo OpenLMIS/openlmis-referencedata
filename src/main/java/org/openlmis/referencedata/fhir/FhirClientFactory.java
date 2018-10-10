@@ -43,11 +43,11 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
   @Value("${fhirClient.serverUrl}")
   private String fhirServerUrl;
 
-  @Value("${fhirClient.serverHost}")
-  private String fhirServerHost;
-
   @Value("${service.url}")
   private String serviceUrl;
+
+  @Value("${auth.server.clientId.apiKey.prefix}")
+  private String apiKeyPrefix;
 
   @Autowired
   private LocationFactory locationFactory;
@@ -78,7 +78,7 @@ public class FhirClientFactory implements FactoryBean<FhirClient>, InitializingB
           .withServiceUrl(serviceUrl);
 
       fhirClient = new DefaultFhirClient(locationFactory, locationConvert,
-          locationSynchronizer, fhirServerHost);
+          locationSynchronizer, apiKeyPrefix);
     } else {
       LOGGER.info("The FHIR feature is disabled");
       fhirClient = EMPTY_CLIENT;

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
@@ -55,7 +54,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Transactional
 public class GeographicZoneController extends BaseController {
 
-  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(FacilityController.class);
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(GeographicZoneController.class);
 
   public static final String RESOURCE_PATH = "/geographicZones";
 
@@ -84,7 +83,6 @@ public class GeographicZoneController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public GeographicZoneDto createGeographicZone(@RequestBody GeographicZoneDto geographicZoneDto,
-      HttpServletRequest request,
       BindingResult bindingResult) {
     Profiler profiler = new Profiler("CREATE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
@@ -105,7 +103,7 @@ public class GeographicZoneController extends BaseController {
     GeographicZone zone = geographicZoneRepository.save(geographicZone);
 
     profiler.start("SYNC_FHIR_RESOURCE");
-    fhirClient.synchronizeGeographicZone(zone, request);
+    fhirClient.synchronizeGeographicZone(zone);
 
     GeographicZoneDto dto = toDto(zone, profiler);
 
@@ -149,7 +147,6 @@ public class GeographicZoneController extends BaseController {
   @ResponseBody
   public GeographicZoneDto updateGeographicZone(@PathVariable("id") UUID geographicZoneId,
       @RequestBody GeographicZoneDto geographicZoneDto,
-      HttpServletRequest request,
       BindingResult bindingResult) {
     Profiler profiler = new Profiler("UPDATE_GEO_ZONE");
     profiler.setLogger(XLOGGER);
@@ -169,7 +166,7 @@ public class GeographicZoneController extends BaseController {
     GeographicZone zone = geographicZoneRepository.save(geoZoneToSave);
 
     profiler.start("SYNC_FHIR_RESOURCE");
-    fhirClient.synchronizeGeographicZone(zone, request);
+    fhirClient.synchronizeGeographicZone(zone);
 
     GeographicZoneDto dto = toDto(zone, profiler);
 

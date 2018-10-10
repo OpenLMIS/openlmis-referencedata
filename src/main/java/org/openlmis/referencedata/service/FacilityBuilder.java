@@ -79,6 +79,11 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
       facility = new Facility();
     } else {
       facility = facilityRepository.findOne(importer.getId());
+
+      if (null == facility) {
+        facility = new Facility();
+        facility.setId(importer.getId());
+      }
     }
 
     facility.updateFrom(importer);
