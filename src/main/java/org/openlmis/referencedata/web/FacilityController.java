@@ -253,11 +253,11 @@ public class FacilityController extends BaseController {
     profiler.start("SAVE_FACILITY");
     facilityToSave = facilityRepository.saveAndFlush(facilityToSave);
 
-    profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-    rightAssignmentService.regenerateRightAssignments();
-
     profiler.start("SYNC_FHIR_RESOURCE");
     fhirClient.synchronizeFacility(facilityToSave);
+
+    profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
+    rightAssignmentService.regenerateRightAssignments();
 
     XLOGGER.info("Saved facility with id: {}", facilityToSave.getId());
     FacilityDto dto = toDto(facilityToSave, profiler);
