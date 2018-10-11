@@ -312,7 +312,7 @@ reporting:
     - module: passfail
       criteria:
         Create Facility too slow: p90 of CreateFacility>500ms
-        Get All Minimal Facilities too slow: p90 of GetAllMinimalFacilities>500ms
+        Get All Minimal Facilities too slow: p90 of GetAllMinimalFacilities>1000ms
         Get First Ten Minimal Facilities too slow: p90 of GetFirstTenMinimalFacilities>500ms
         Get Facility Audit Log too slow: p90 of GetFacilityAuditLog>500ms
         Update Facility too slow: p90 of UpdateFacility>500ms
@@ -321,6 +321,6 @@ reporting:
         Get First ten Facilities By Boundary too slow: p90 of GetFirstTenFacilitiesByBoundary>500ms
         Delete Facility too slow: p90 of DeleteFacility>500ms
         Get Supplying Facilities too slow: p90 of GetSupplyingFacilities>500ms
-        Get All Facilities too slow: p90 of GetAllFacilities>4000ms
+        Get All Facilities too slow: p90 of GetAllFacilities>10000ms
 #        Find All Health Center Facilities too slow: p90 of FindAllHealthCenterFacilities>30000ms
 #        Find First Ten Health Center Facilities too slow: p90 of FindFirstTenHealthCenterFacilities>30000ms
