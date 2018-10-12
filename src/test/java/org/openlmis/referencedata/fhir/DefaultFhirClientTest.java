@@ -60,12 +60,15 @@ public class DefaultFhirClientTest {
   private OAuth2Authentication authentication;
 
 
-  private FhirClient client;
+  private DefaultFhirClient client;
 
   @Before
   public void setUp() {
-    client = new DefaultFhirClient(locationFactory, locationConvert,
-        locationSynchronizer, API_KEY_PREFIX);
+    client = new DefaultFhirClient();
+    client.setApiKeyPrefix(API_KEY_PREFIX);
+    client.setLocationSynchronizer(locationSynchronizer);
+    client.setLocationFactory(locationFactory);
+    client.setLocationConvert(locationConvert);
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.isClientOnly()).thenReturn(true);

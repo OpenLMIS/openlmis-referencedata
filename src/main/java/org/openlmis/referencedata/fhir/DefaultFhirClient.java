@@ -17,7 +17,7 @@ package org.openlmis.referencedata.fhir;
 
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
@@ -27,7 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
-@AllArgsConstructor
+@Setter
 class DefaultFhirClient implements FhirClient {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFhirClient.class);
