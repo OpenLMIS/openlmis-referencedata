@@ -15,61 +15,29 @@
 
 package org.openlmis.referencedata.fhir;
 
-import ca.uhn.fhir.context.FhirVersionEnum;
-import java.util.UUID;
+import lombok.Setter;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-abstract class LocationConverter<T extends IBaseResource> implements Converter<FhirLocation, T> {
+@Setter
+class LocationConverter<T extends IBaseResource> implements Converter<FhirLocation, T> {
 
+  private LocationConverterStrategy<T> strategy;
   private String serviceUrl;
-
-  static LocationConverter getInstance(FhirVersionEnum version) {
-    if (version == FhirVersionEnum.DSTU3) {
-      return new Dstu3LocationConverter();
-    }
-
-    throw new IllegalStateException("Unsupported FHIR version: " + version.name());
-  }
 
   @Override
   public T convert(FhirLocation input) {
-    T resource = createResource(input);
-    setName(resource, input);
-    setPhysicalType(resource, input);
-    setPartOf(resource, input);
-    setIdentifier(resource, input);
-    addSystemIdentifier(resource, serviceUrl, input.getId());
-    setAlias(resource, input);
-    setPosition(resource, input);
-    setDescription(resource, input);
-    setStatus(resource, input);
+    T resource = strategy.initiateResource();
+    strategy.setName(resource, input);
+    strategy.setPhysicalType(resource, input);
+    strategy.setPartOf(resource, input);
+    strategy.setIdentifier(resource, input);
+    strategy.addSystemIdentifier(resource, serviceUrl, input.getId());
+    strategy.setAlias(resource, input);
+    strategy.setPosition(resource, input);
+    strategy.setDescription(resource, input);
+    strategy.setStatus(resource, input);
 
     return resource;
   }
-
-  LocationConverter<T> withServiceUrl(String serviceUrl) {
-    this.serviceUrl = serviceUrl;
-    return this;
-  }
-
-  abstract T createResource(FhirLocation input);
-
-  abstract void setName(T resource, FhirLocation input);
-
-  abstract void setPhysicalType(T resource, FhirLocation input);
-
-  abstract void setPartOf(T resource, FhirLocation input);
-
-  abstract void setIdentifier(T resource, FhirLocation input);
-
-  abstract void addSystemIdentifier(T resource, String system, UUID value);
-
-  abstract void setAlias(T resource, FhirLocation input);
-
-  abstract void setPosition(T resource, FhirLocation input);
-
-  abstract void setDescription(T resource, FhirLocation input);
-
-  abstract void setStatus(T resource, FhirLocation input);
 
 }

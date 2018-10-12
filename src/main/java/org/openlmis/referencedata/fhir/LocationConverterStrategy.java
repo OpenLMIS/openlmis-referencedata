@@ -15,21 +15,28 @@
 
 package org.openlmis.referencedata.fhir;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.UUID;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.context.FhirVersionEnum;
-import org.junit.Test;
+public interface LocationConverterStrategy<T extends IBaseResource> {
 
-public class LocationConverterTest {
+  T initiateResource();
 
-  @Test
-  public void shouldGetInstanceBasedOnFhirVersion() {
-    assertThat(LocationConverter.getInstance(FhirVersionEnum.DSTU3))
-        .isInstanceOf(Dstu3LocationConverter.class);
-  }
+  void setName(T resource, FhirLocation input);
 
-  @Test(expected = IllegalStateException.class)
-  public void shouldThrowExceptionForUnsupportedVersion() {
-    LocationConverter.getInstance(FhirVersionEnum.DSTU2_HL7ORG);
-  }
+  void setPhysicalType(T resource, FhirLocation input);
+
+  void setPartOf(T resource, FhirLocation input);
+
+  void setIdentifier(T resource, FhirLocation input);
+
+  void addSystemIdentifier(T resource, String system, UUID value);
+
+  void setAlias(T resource, FhirLocation input);
+
+  void setPosition(T resource, FhirLocation input);
+
+  void setDescription(T resource, FhirLocation input);
+
+  void setStatus(T resource, FhirLocation input);
 }

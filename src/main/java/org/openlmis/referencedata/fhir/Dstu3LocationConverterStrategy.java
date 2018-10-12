@@ -27,20 +27,20 @@ import org.hl7.fhir.dstu3.model.Location.LocationStatus;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.exceptions.FHIRException;
 
-class Dstu3LocationConverter extends LocationConverter<Location> {
+class Dstu3LocationConverterStrategy implements LocationConverterStrategy<Location> {
 
   @Override
-  Location createResource(FhirLocation input) {
+  public Location initiateResource() {
     return new Location();
   }
 
   @Override
-  void setName(Location resource, FhirLocation input) {
+  public void setName(Location resource, FhirLocation input) {
     resource.setName(input.getName());
   }
 
   @Override
-  void setPhysicalType(Location resource, FhirLocation input) {
+  public void setPhysicalType(Location resource, FhirLocation input) {
     CodeableConcept physicalType = new CodeableConcept();
     input
         .getPhysicalType()
@@ -60,12 +60,12 @@ class Dstu3LocationConverter extends LocationConverter<Location> {
   }
 
   @Override
-  void setPartOf(Location resource, FhirLocation input) {
+  public void setPartOf(Location resource, FhirLocation input) {
     resource.setPartOf(new Reference(input.getPartOf().getReference()));
   }
 
   @Override
-  void setIdentifier(Location resource, FhirLocation input) {
+  public void setIdentifier(Location resource, FhirLocation input) {
     input
         .getIdentifier()
         .stream()
@@ -80,7 +80,7 @@ class Dstu3LocationConverter extends LocationConverter<Location> {
   }
 
   @Override
-  void addSystemIdentifier(Location resource, String system, UUID value) {
+  public void addSystemIdentifier(Location resource, String system, UUID value) {
     Identifier identifier = new Identifier();
     identifier.setSystem(system);
     identifier.setValue(value.toString());
@@ -89,14 +89,14 @@ class Dstu3LocationConverter extends LocationConverter<Location> {
   }
 
   @Override
-  void setAlias(Location resource, FhirLocation input) {
+  public void setAlias(Location resource, FhirLocation input) {
     input
         .getAlias()
         .forEach(resource::addAlias);
   }
 
   @Override
-  void setPosition(Location resource, FhirLocation input) {
+  public void setPosition(Location resource, FhirLocation input) {
     Optional
         .ofNullable(input.getPosition())
         .ifPresent(position -> {
@@ -109,12 +109,12 @@ class Dstu3LocationConverter extends LocationConverter<Location> {
   }
 
   @Override
-  void setDescription(Location resource, FhirLocation input) {
+  public void setDescription(Location resource, FhirLocation input) {
     resource.setDescription(input.getDescription());
   }
 
   @Override
-  void setStatus(Location resource, FhirLocation input) {
+  public void setStatus(Location resource, FhirLocation input) {
     Optional
         .ofNullable(input.getStatus())
         .ifPresent(status -> {

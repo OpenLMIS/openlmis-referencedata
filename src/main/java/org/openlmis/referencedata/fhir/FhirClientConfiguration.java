@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.FhirVersionEnum;
 import org.openlmis.referencedata.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import org.springframework.context.annotation.Lazy;
 @Lazy
 @Configuration
 public class FhirClientConfiguration {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(FhirClientConfiguration.class);
 
   @Autowired
@@ -64,14 +66,34 @@ public class FhirClientConfiguration {
   }
 
   /**
+   * Creates location converter strategy based on fhir context version.
+   */
+  @Bean
+  public LocationConverterStrategy converterStrategy() {
+    FhirVersionEnum version = fhirContext().getVersion().getVersion();
+    LocationConverterStrategy strategy = null;
+
+    if (version == FhirVersionEnum.DSTU3) {
+      strategy = new Dstu3LocationConverterStrategy();
+    }
+
+    if (null == strategy) {
+      throw new IllegalStateException("Unsupported FHIR version: " + version.name());
+    }
+
+    return strategy;
+  }
+
+  /**
    * Creates location converter based on fhir context version.
    */
   @Bean
   public LocationConverter locationConverter() {
-    FhirContext context = fhirContext();
-    return LocationConverter
-        .getInstance(context.getVersion().getVersion())
-        .withServiceUrl(serviceUrl);
+    LocationConverter converter = new LocationConverter();
+    converter.setServiceUrl(serviceUrl);
+    converter.setStrategy(converterStrategy());
+
+    return converter;
   }
 
   /**
