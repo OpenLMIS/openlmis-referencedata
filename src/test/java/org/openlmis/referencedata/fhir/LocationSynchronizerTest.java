@@ -15,15 +15,12 @@
 
 package org.openlmis.referencedata.fhir;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.rest.api.CacheControlDirective;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICreate;
@@ -40,17 +37,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.service.AuthService;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class LocationSynchronizerTest<R extends IBaseResource, B extends IBaseBundle> {
 
-  private static final String FHIR_SERVER_URL = "http://localhost/fhir";
   private static final String SERVICE_URL = "http://localhost";
-
-  @Mock
-  private FhirContext context;
 
   @Mock
   private IGenericClient client;
@@ -76,9 +68,6 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
   @Mock
   private IUpdateTyped updateTyped;
 
-  @Mock
-  private AuthService authService;
-
   private LocationSynchronizer<R, B> synchronizer;
 
   private FhirLocation olmisLocation;
@@ -96,13 +85,8 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
     emptyBundle = getEmptyBundle();
     bundle = getBundle(fhirLocation);
 
-    synchronizer
-        .withContext(context)
-        .withFhirServerUrl(FHIR_SERVER_URL)
-        .withServiceUrl(SERVICE_URL)
-        .withAuthService(authService);
-
-    when(context.newRestfulGenericClient(FHIR_SERVER_URL)).thenReturn(client);
+    synchronizer.setClient(client);
+    synchronizer.setServiceUrl(SERVICE_URL);
 
     when(client.create()).thenReturn(create);
     when(client.update()).thenReturn(update);
@@ -119,12 +103,6 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
     when(baseQuery.cacheControl(any(CacheControlDirective.class))).thenReturn(baseQuery);
     when(baseQuery.where(any(ICriterion.class))).thenReturn(baseQuery);
     when(baseQuery.returnBundle(emptyBundle.getClass())).thenReturn(query);
-  }
-
-  @Test
-  public void shouldGetInstanceBasedOnFhirVersion() {
-    assertThat(LocationSynchronizer.getInstance(getFhirVersion()))
-        .isInstanceOf(synchronizer.getClass());
   }
 
   @Test
@@ -157,8 +135,6 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
   }
 
   abstract LocationSynchronizer<R, B> getSynchronizer();
-
-  abstract FhirVersionEnum getFhirVersion();
 
   abstract R getFhirLocation();
 

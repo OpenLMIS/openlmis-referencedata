@@ -15,17 +15,14 @@
 
 package org.openlmis.referencedata.fhir;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.rest.api.CacheControlDirective;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.TokenClientParam;
+import lombok.Setter;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.openlmis.referencedata.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +31,10 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private FhirContext context;
-  private AuthService authService;
+  @Setter
+  private IGenericClient client;
 
-  private String fhirServerUrl;
+  @Setter
   private String serviceUrl;
 
   private Class<T> resourceClass;
@@ -50,23 +47,8 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
     this.removeVersion = removeVersion;
   }
 
-  static LocationSynchronizer getInstance(FhirVersionEnum version) {
-    if (version == FhirVersionEnum.DSTU3) {
-      return new Dstu3LocationSynchronizer();
-    }
-
-    throw new IllegalStateException("Unsupported FHIR version: " + version.name());
-  }
-
   @Override
   public void synchronize(FhirLocation olmisLocation, T fhirLocation) {
-    LoggingInterceptor loggingInterceptor = new LoggingInterceptor(true);
-    loggingInterceptor.setLogger(logger);
-
-    IGenericClient client = context.newRestfulGenericClient(fhirServerUrl);
-    client.registerInterceptor(loggingInterceptor);
-    client.registerInterceptor(new DynamicBearerTokenAuthInterceptor(authService));
-
     logger.debug("Try to find resources by criterion");
     B bundle = client
         .search()
@@ -82,26 +64,6 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
     } else {
       updateLocation(client, existing, fhirLocation);
     }
-  }
-
-  LocationSynchronizer<T, B> withContext(FhirContext context) {
-    this.context = context;
-    return this;
-  }
-
-  LocationSynchronizer<T, B> withFhirServerUrl(String fhirServerUrl) {
-    this.fhirServerUrl = fhirServerUrl;
-    return this;
-  }
-
-  LocationSynchronizer<T, B> withServiceUrl(String serviceUrl) {
-    this.serviceUrl = serviceUrl;
-    return this;
-  }
-
-  LocationSynchronizer<T, B> withAuthService(AuthService authService) {
-    this.authService = authService;
-    return this;
   }
 
   abstract T getEntry(B bundle);

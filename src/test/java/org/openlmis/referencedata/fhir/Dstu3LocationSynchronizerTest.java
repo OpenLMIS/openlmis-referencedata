@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.fhir;
 
-import ca.uhn.fhir.context.FhirVersionEnum;
 import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.dstu3.model.Location;
@@ -25,11 +24,6 @@ public class Dstu3LocationSynchronizerTest extends LocationSynchronizerTest<Loca
   @Override
   LocationSynchronizer<Location, Bundle> getSynchronizer() {
     return new Dstu3LocationSynchronizer();
-  }
-
-  @Override
-  FhirVersionEnum getFhirVersion() {
-    return FhirVersionEnum.DSTU3;
   }
 
   @Override

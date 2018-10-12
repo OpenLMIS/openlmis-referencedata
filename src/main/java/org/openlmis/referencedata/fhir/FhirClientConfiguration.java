@@ -17,6 +17,8 @@ package org.openlmis.referencedata.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import org.openlmis.referencedata.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,17 +54,37 @@ public class FhirClientConfiguration {
   }
 
   /**
+   * Creates FHIR communication client.
+   */
+  @Bean
+  public IGenericClient client() {
+    IGenericClient client = fhirContext().newRestfulGenericClient(fhirServerUrl);
+    client.registerInterceptor(new LoggingInterceptor(true));
+    client.registerInterceptor(new DynamicBearerTokenAuthInterceptor(authService));
+
+    return client;
+  }
+
+  /**
    * Creates location synchronizer based on fhir context version.
    */
   @Bean
   public LocationSynchronizer locationSynchronizer() {
-    FhirContext context = fhirContext();
-    return LocationSynchronizer
-        .getInstance(context.getVersion().getVersion())
-        .withContext(context)
-        .withFhirServerUrl(fhirServerUrl)
-        .withServiceUrl(serviceUrl)
-        .withAuthService(authService);
+    FhirVersionEnum version = fhirContext().getVersion().getVersion();
+    LocationSynchronizer synchronizer = null;
+
+    if (version == FhirVersionEnum.DSTU3) {
+      synchronizer = new Dstu3LocationSynchronizer();
+    }
+
+    if (null == synchronizer) {
+      throw new IllegalStateException("Unsupported FHIR version: " + version.name());
+    }
+
+    synchronizer.setServiceUrl(serviceUrl);
+    synchronizer.setClient(client());
+
+    return synchronizer;
   }
 
   /**
