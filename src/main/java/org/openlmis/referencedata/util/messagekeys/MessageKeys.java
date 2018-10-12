@@ -98,7 +98,6 @@ public abstract class MessageKeys {
   protected static final String FACILITY_TYPE_APPROVED_PRODUCT = "facilityTypeApprovedProduct";
   protected static final String SUPPORTED_PROGRAMS = "supportedPrograms";
   protected static final String SERVICE_ACCOUNT = "serviceAccount";
-  protected static final String FHIR = "fhir";
 
   // Common to subclasses
   protected static final String EMAIL = "email";

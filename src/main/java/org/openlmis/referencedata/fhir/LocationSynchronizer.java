@@ -17,6 +17,8 @@ package org.openlmis.referencedata.fhir;
 
 import ca.uhn.fhir.rest.api.CacheControlDirective;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.ICriterion;
+import ca.uhn.fhir.rest.gclient.TokenClientParam;
 import lombok.Setter;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -33,14 +35,11 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
   private IGenericClient client;
 
   @Setter
-  private CacheControlDirective cacheControlDirective;
+  private String serviceUrl;
 
-  @Setter
-  private CriterionBuilder criterionBuilder;
-
-  private final Class<T> resourceClass;
-  private final Class<B> bundleClass;
-  private final boolean removeVersion;
+  private Class<T> resourceClass;
+  private Class<B> bundleClass;
+  private boolean removeVersion;
 
   LocationSynchronizer(Class<T> resourceClass, Class<B> bundleClass, boolean removeVersion) {
     this.resourceClass = resourceClass;
@@ -54,8 +53,8 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
     B bundle = client
         .search()
         .forResource(resourceClass)
-        .cacheControl(cacheControlDirective)
-        .where(criterionBuilder.buildIdentifierCriterion(olmisLocation.getId()))
+        .cacheControl(buildCacheControl())
+        .where(buildCriterion(olmisLocation))
         .returnBundle(bundleClass)
         .execute();
     T existing = getEntry(bundle);
@@ -92,6 +91,26 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
         .resource(fhirLocation)
         .encodedJson()
         .execute();
+  }
+
+  private ICriterion buildCriterion(FhirLocation olmisLocation) {
+    logger.trace(
+        "Create identifier criterion for system {} and value {}",
+        serviceUrl, olmisLocation.getId()
+    );
+
+    return new TokenClientParam("identifier")
+        .exactly()
+        .systemAndValues(serviceUrl, olmisLocation.getId().toString());
+  }
+
+  private CacheControlDirective buildCacheControl() {
+    CacheControlDirective cacheControl = new CacheControlDirective();
+    cacheControl.setNoCache(true);
+    cacheControl.setNoStore(true);
+    cacheControl.setMaxResults(1);
+
+    return cacheControl;
   }
 
 }

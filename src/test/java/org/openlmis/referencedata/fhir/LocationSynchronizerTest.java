@@ -30,7 +30,6 @@ import ca.uhn.fhir.rest.gclient.IQuery;
 import ca.uhn.fhir.rest.gclient.IUntypedQuery;
 import ca.uhn.fhir.rest.gclient.IUpdate;
 import ca.uhn.fhir.rest.gclient.IUpdateTyped;
-import java.util.UUID;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Before;
@@ -47,15 +46,6 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
 
   @Mock
   private IGenericClient client;
-
-  @Mock
-  private CacheControlDirective cacheControlDirective;
-
-  @Mock
-  private CriterionBuilder criterionBuilder;
-
-  @Mock
-  private ICriterion criterion;
 
   @Mock
   private ICreate create;
@@ -96,10 +86,7 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
     bundle = getBundle(fhirLocation);
 
     synchronizer.setClient(client);
-    synchronizer.setCacheControlDirective(cacheControlDirective);
-    synchronizer.setCriterionBuilder(criterionBuilder);
-
-    when(criterionBuilder.buildIdentifierCriterion(any(UUID.class))).thenReturn(criterion);
+    synchronizer.setServiceUrl(SERVICE_URL);
 
     when(client.create()).thenReturn(create);
     when(client.update()).thenReturn(update);
@@ -113,8 +100,8 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
 
     when(client.search()).thenReturn(search);
     when(search.forResource(fhirLocation.getClass())).thenReturn(baseQuery);
-    when(baseQuery.cacheControl(cacheControlDirective)).thenReturn(baseQuery);
-    when(baseQuery.where(criterion)).thenReturn(baseQuery);
+    when(baseQuery.cacheControl(any(CacheControlDirective.class))).thenReturn(baseQuery);
+    when(baseQuery.where(any(ICriterion.class))).thenReturn(baseQuery);
     when(baseQuery.returnBundle(emptyBundle.getClass())).thenReturn(query);
   }
 

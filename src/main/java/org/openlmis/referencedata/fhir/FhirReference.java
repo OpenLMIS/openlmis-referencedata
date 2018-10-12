@@ -17,27 +17,20 @@ package org.openlmis.referencedata.fhir;
 
 import static org.openlmis.referencedata.web.BaseController.API_PATH;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.UUID;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@ToString(of = "reference")
-@EqualsAndHashCode(of = "reference")
+@Getter
+@EqualsAndHashCode
+@ToString
 public final class FhirReference {
 
-  @JsonIgnore
-  @Getter(AccessLevel.PACKAGE)
-  private final UUID resourceId;
-
   // Literal reference, Relative, internal or absolute URL
-  @Getter
   private final String reference;
 
   FhirReference(String serviceUrl, String path, UUID id) {
-    this.resourceId = id;
-    this.reference = String.format("%s%s%s/%s", serviceUrl, API_PATH, path, resourceId);
+    this.reference = serviceUrl + API_PATH + path + '/' + id;
   }
 }

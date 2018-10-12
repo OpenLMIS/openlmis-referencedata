@@ -27,7 +27,6 @@ public class FhirReferenceTest {
   public void equalsContract() {
     EqualsVerifier
         .forClass(FhirReference.class)
-        .withOnlyTheseFields("reference")
         .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
         .verify();
   }
@@ -35,7 +34,7 @@ public class FhirReferenceTest {
   @Test
   public void shouldImplementToString() {
     FhirReference dto = new FhirReference("service", "path", UUID.randomUUID());
-    ToStringTestUtils.verify(FhirReference.class, dto, "resourceId");
+    ToStringTestUtils.verify(FhirReference.class, dto);
   }
 
 }
