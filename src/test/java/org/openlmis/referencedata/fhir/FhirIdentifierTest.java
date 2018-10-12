@@ -15,22 +15,26 @@
 
 package org.openlmis.referencedata.fhir;
 
-import static org.openlmis.referencedata.web.BaseController.API_PATH;
-
 import java.util.UUID;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-@Getter
-@EqualsAndHashCode
-@ToString
-public final class Reference {
+public class FhirIdentifierTest {
 
-  // Literal reference, Relative, internal or absolute URL
-  private final String reference;
-
-  Reference(String serviceUrl, String path, UUID id) {
-    this.reference = serviceUrl + API_PATH + path + '/' + id;
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(FhirIdentifier.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
   }
+
+  @Test
+  public void shouldImplementToString() {
+    FhirIdentifier dto = new FhirIdentifier("service", "path", UUID.randomUUID());
+    ToStringTestUtils.verify(FhirIdentifier.class, dto, "SEPARATOR", "SYSTEM_RFC_3986");
+  }
+
 }

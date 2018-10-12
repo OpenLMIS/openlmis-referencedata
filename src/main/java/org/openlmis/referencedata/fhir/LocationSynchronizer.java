@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBundle>
-    implements Synchronizer<Location, T> {
+    implements Synchronizer<FhirLocation, T> {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -59,7 +59,7 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
   }
 
   @Override
-  public void synchronize(Location olmisLocation, T fhirLocation) {
+  public void synchronize(FhirLocation olmisLocation, T fhirLocation) {
     LoggingInterceptor loggingInterceptor = new LoggingInterceptor(true);
     loggingInterceptor.setLogger(logger);
 
@@ -131,7 +131,7 @@ abstract class LocationSynchronizer<T extends IBaseResource, B extends IBaseBund
         .execute();
   }
 
-  private ICriterion buildCriterion(Location olmisLocation) {
+  private ICriterion buildCriterion(FhirLocation olmisLocation) {
     logger.trace(
         "Create identifier criterion for system {} and value {}",
         serviceUrl, olmisLocation.getId()

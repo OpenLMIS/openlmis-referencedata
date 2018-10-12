@@ -15,20 +15,27 @@
 
 package org.openlmis.referencedata.fhir;
 
+import static org.apache.commons.lang3.StringUtils.joinWith;
+
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public abstract class Resource extends Element {
+@EqualsAndHashCode
+@ToString
+public final class FhirIdentifier {
 
-  private final String resourceType;
+  public static final String SYSTEM_RFC_3986 = "urn:ietf:rfc:3986";
+  private static final String SEPARATOR = "/";
 
-  Resource(UUID id, String resourceType) {
-    super(id);
-    this.resourceType = resourceType;
+  private final String system;
+  private final String value;
+
+  FhirIdentifier(String serviceUrl, String path, UUID uuid) {
+    this.system = SYSTEM_RFC_3986;
+    this.value = joinWith(SEPARATOR, serviceUrl + path, uuid);
   }
+
 }

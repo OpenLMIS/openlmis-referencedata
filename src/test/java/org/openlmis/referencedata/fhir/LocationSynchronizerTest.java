@@ -81,7 +81,7 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
 
   private LocationSynchronizer<R, B> synchronizer;
 
-  private Location olmisLocation;
+  private FhirLocation olmisLocation;
   private R fhirLocation;
 
   private B emptyBundle;
@@ -90,7 +90,7 @@ public abstract class LocationSynchronizerTest<R extends IBaseResource, B extend
   @Before
   public void setUp() {
     synchronizer = getSynchronizer();
-    olmisLocation = Location.newInstance(SERVICE_URL, new FacilityDataBuilder().build());
+    olmisLocation = FhirLocation.newInstance(SERVICE_URL, new FacilityDataBuilder().build());
     fhirLocation = getFhirLocation();
 
     emptyBundle = getEmptyBundle();

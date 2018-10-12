@@ -26,12 +26,12 @@ public class LocationFactory {
   @Value("${service.url}")
   private String serviceUrl;
 
-  public Location createFor(GeographicZone zone) {
-    return Location.newInstance(serviceUrl, zone);
+  public FhirLocation createFor(GeographicZone zone) {
+    return FhirLocation.newInstance(serviceUrl, zone);
   }
 
-  public Location createFor(Facility facility) {
-    return Location.newInstance(serviceUrl, facility);
+  public FhirLocation createFor(Facility facility) {
+    return FhirLocation.newInstance(serviceUrl, facility);
   }
 
 }

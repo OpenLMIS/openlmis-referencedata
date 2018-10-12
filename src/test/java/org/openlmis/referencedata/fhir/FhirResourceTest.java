@@ -15,20 +15,29 @@
 
 package org.openlmis.referencedata.fhir;
 
-import java.util.Arrays;
-import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import java.util.UUID;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-@Getter
-@EqualsAndHashCode
-@ToString
-public final class PhysicalType {
+public class FhirResourceTest {
 
-  private final List<Coding> coding;
-
-  PhysicalType(Coding... coding) {
-    this.coding = Arrays.asList(coding);
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(FhirResource.class)
+        .withRedefinedSuperclass()
+        .withRedefinedSubclass(FhirLocation.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
   }
+
+  @Test
+  public void shouldImplementToString() {
+    FhirResource dto = new FhirResource(UUID.randomUUID(), "resource") {
+    };
+    ToStringTestUtils.verify(FhirResource.class, dto);
+  }
+
 }

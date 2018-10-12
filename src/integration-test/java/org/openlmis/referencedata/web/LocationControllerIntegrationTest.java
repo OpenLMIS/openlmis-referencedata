@@ -29,8 +29,8 @@ import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.fhir.Coding;
-import org.openlmis.referencedata.fhir.Identifier;
+import org.openlmis.referencedata.fhir.FhirCoding;
+import org.openlmis.referencedata.fhir.FhirIdentifier;
 import org.openlmis.referencedata.fhir.Status;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
@@ -103,7 +103,7 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
         GeographicLevelController.RESOURCE_PATH + '/' + zone.getLevel().getId());
     checkPartOf(response, LocationController.RESOURCE_PATH + '/' + zone.getParent().getId());
     checkPosition(response, zone.getLongitude(), zone.getLatitude());
-    checkPhysicalType(response, Coding.AREA);
+    checkPhysicalType(response, FhirCoding.AREA);
   }
 
   private void assertLocation(ValidatableResponse response, Facility facility) {
@@ -125,7 +125,7 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
     checkPartOf(response,
         LocationController.RESOURCE_PATH + '/' + facility.getGeographicZone().getId());
     checkPosition(response, facility.getLocation().getX(), facility.getLocation().getY());
-    checkPhysicalType(response, Coding.SITE);
+    checkPhysicalType(response, FhirCoding.SITE);
   }
 
   private void checkPartOf(ValidatableResponse response, String path) {
@@ -135,7 +135,7 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private void checkIdentifier(ValidatableResponse response, int idx, String path) {
     response
-        .body("[0].identifier[" + idx + "].system", is(Identifier.SYSTEM_RFC_3986))
+        .body("[0].identifier[" + idx + "].system", is(FhirIdentifier.SYSTEM_RFC_3986))
         .body("[0].identifier[" + idx + "].value", is(serviceUrl + path));
   }
 
@@ -146,7 +146,7 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
 
-  private void checkPhysicalType(ValidatableResponse response, Coding coding) {
+  private void checkPhysicalType(ValidatableResponse response, FhirCoding coding) {
     response
         .body("[0].physicalType.coding", hasSize(1))
         .body("[0].physicalType.coding[0].system", is(coding.getSystem()))

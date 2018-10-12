@@ -80,7 +80,7 @@ class DefaultFhirClient implements FhirClient {
     return true;
   }
 
-  private void synchronize(Location location) {
+  private void synchronize(FhirLocation location) {
     IBaseResource resource = locationConvert.convert(location);
     locationSynchronizer.synchronize(location, resource);
   }

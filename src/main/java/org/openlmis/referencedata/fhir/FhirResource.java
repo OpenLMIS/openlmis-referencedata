@@ -16,28 +16,19 @@
 package org.openlmis.referencedata.fhir;
 
 import java.util.UUID;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.junit.Test;
-import org.openlmis.referencedata.ToStringTestUtils;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-public class ResourceTest {
+@Getter
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public abstract class FhirResource extends FhirElement {
 
-  @Test
-  public void equalsContract() {
-    EqualsVerifier
-        .forClass(Resource.class)
-        .withRedefinedSuperclass()
-        .withRedefinedSubclass(Location.class)
-        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
-        .verify();
+  private final String resourceType;
+
+  FhirResource(UUID id, String resourceType) {
+    super(id);
+    this.resourceType = resourceType;
   }
-
-  @Test
-  public void shouldImplementToString() {
-    Resource dto = new Resource(UUID.randomUUID(), "resource") {
-    };
-    ToStringTestUtils.verify(Resource.class, dto);
-  }
-
 }

@@ -15,25 +15,26 @@
 
 package org.openlmis.referencedata.fhir;
 
+import java.util.UUID;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 import org.openlmis.referencedata.ToStringTestUtils;
 
-public class PhysicalTypeTest {
+public class FhirReferenceTest {
 
   @Test
   public void equalsContract() {
     EqualsVerifier
-        .forClass(PhysicalType.class)
+        .forClass(FhirReference.class)
         .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
         .verify();
   }
 
   @Test
   public void shouldImplementToString() {
-    PhysicalType dto = new PhysicalType(Coding.AREA, Coding.SITE);
-    ToStringTestUtils.verify(PhysicalType.class, dto);
+    FhirReference dto = new FhirReference("service", "path", UUID.randomUUID());
+    ToStringTestUtils.verify(FhirReference.class, dto);
   }
 
 }

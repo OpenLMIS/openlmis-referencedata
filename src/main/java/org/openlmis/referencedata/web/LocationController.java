@@ -19,7 +19,7 @@ import static org.openlmis.referencedata.util.Pagination.handlePage;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.openlmis.referencedata.fhir.Location;
+import org.openlmis.referencedata.fhir.FhirLocation;
 import org.openlmis.referencedata.fhir.LocationFactory;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
@@ -48,8 +48,8 @@ public class LocationController extends BaseController {
    */
   @GetMapping(RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
-  public List<Location> getLocations() {
-    List<Location> list = new ArrayList<>();
+  public List<FhirLocation> getLocations() {
+    List<FhirLocation> list = new ArrayList<>();
 
     handlePage(
         geographicZoneRepository::findAll,

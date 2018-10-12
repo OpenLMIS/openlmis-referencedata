@@ -18,34 +18,36 @@ package org.openlmis.referencedata.fhir;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
+import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Identifier;
+import org.hl7.fhir.dstu3.model.Location;
 import org.hl7.fhir.dstu3.model.Location.LocationPositionComponent;
 import org.hl7.fhir.dstu3.model.Location.LocationStatus;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.exceptions.FHIRException;
 
-class Dstu3LocationConverter extends LocationConverter<org.hl7.fhir.dstu3.model.Location> {
+class Dstu3LocationConverter extends LocationConverter<Location> {
 
   @Override
-  org.hl7.fhir.dstu3.model.Location createResource(Location input) {
-    return new org.hl7.fhir.dstu3.model.Location();
+  Location createResource(FhirLocation input) {
+    return new Location();
   }
 
   @Override
-  void setName(org.hl7.fhir.dstu3.model.Location resource, Location input) {
+  void setName(Location resource, FhirLocation input) {
     resource.setName(input.getName());
   }
 
   @Override
-  void setPhysicalType(org.hl7.fhir.dstu3.model.Location resource, Location input) {
-    org.hl7.fhir.dstu3.model.CodeableConcept physicalType =
-        new org.hl7.fhir.dstu3.model.CodeableConcept();
+  void setPhysicalType(Location resource, FhirLocation input) {
+    CodeableConcept physicalType = new CodeableConcept();
     input
         .getPhysicalType()
         .getCoding()
         .stream()
         .map(elem -> {
-          org.hl7.fhir.dstu3.model.Coding coding = new org.hl7.fhir.dstu3.model.Coding();
+          Coding coding = new Coding();
           coding.setSystem(elem.getSystem());
           coding.setCode(elem.getCode());
           coding.setDisplay(elem.getDisplay());
@@ -58,12 +60,12 @@ class Dstu3LocationConverter extends LocationConverter<org.hl7.fhir.dstu3.model.
   }
 
   @Override
-  void setPartOf(org.hl7.fhir.dstu3.model.Location resource, Location input) {
+  void setPartOf(Location resource, FhirLocation input) {
     resource.setPartOf(new Reference(input.getPartOf().getReference()));
   }
 
   @Override
-  void setIdentifier(org.hl7.fhir.dstu3.model.Location resource, Location input) {
+  void setIdentifier(Location resource, FhirLocation input) {
     input
         .getIdentifier()
         .stream()
@@ -78,8 +80,7 @@ class Dstu3LocationConverter extends LocationConverter<org.hl7.fhir.dstu3.model.
   }
 
   @Override
-  void addSystemIdentifier(org.hl7.fhir.dstu3.model.Location resource,
-      String system, UUID value) {
+  void addSystemIdentifier(Location resource, String system, UUID value) {
     Identifier identifier = new Identifier();
     identifier.setSystem(system);
     identifier.setValue(value.toString());
@@ -88,14 +89,14 @@ class Dstu3LocationConverter extends LocationConverter<org.hl7.fhir.dstu3.model.
   }
 
   @Override
-  void setAlias(org.hl7.fhir.dstu3.model.Location resource, Location input) {
+  void setAlias(Location resource, FhirLocation input) {
     input
         .getAlias()
         .forEach(resource::addAlias);
   }
 
   @Override
-  void setPosition(org.hl7.fhir.dstu3.model.Location resource, Location input) {
+  void setPosition(Location resource, FhirLocation input) {
     Optional
         .ofNullable(input.getPosition())
         .ifPresent(position -> {
@@ -108,12 +109,12 @@ class Dstu3LocationConverter extends LocationConverter<org.hl7.fhir.dstu3.model.
   }
 
   @Override
-  void setDescription(org.hl7.fhir.dstu3.model.Location resource, Location input) {
+  void setDescription(Location resource, FhirLocation input) {
     resource.setDescription(input.getDescription());
   }
 
   @Override
-  void setStatus(org.hl7.fhir.dstu3.model.Location resource, Location input) {
+  void setStatus(Location resource, FhirLocation input) {
     Optional
         .ofNullable(input.getStatus())
         .ifPresent(status -> {

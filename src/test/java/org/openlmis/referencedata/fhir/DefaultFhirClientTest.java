@@ -78,7 +78,7 @@ public class DefaultFhirClientTest {
   public void shouldSynchronizeFacility() {
     //given
     Facility facility = new FacilityDataBuilder().build();
-    Location location = Location.newInstance(SERVICE_URL, facility);
+    FhirLocation location = FhirLocation.newInstance(SERVICE_URL, facility);
 
     // when
     when(locationFactory.createFor(facility)).thenReturn(location);
@@ -108,7 +108,7 @@ public class DefaultFhirClientTest {
   public void shouldSynchronizeGeographicZone() {
     //given
     GeographicZone geographicZone = new GeographicZoneDataBuilder().build();
-    Location location = Location.newInstance(SERVICE_URL, geographicZone);
+    FhirLocation location = FhirLocation.newInstance(SERVICE_URL, geographicZone);
 
     // when
     when(locationFactory.createFor(geographicZone)).thenReturn(location);

@@ -19,7 +19,7 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import java.util.UUID;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-abstract class LocationConverter<T extends IBaseResource> implements Converter<Location, T> {
+abstract class LocationConverter<T extends IBaseResource> implements Converter<FhirLocation, T> {
 
   private String serviceUrl;
 
@@ -32,7 +32,7 @@ abstract class LocationConverter<T extends IBaseResource> implements Converter<L
   }
 
   @Override
-  public T convert(Location input) {
+  public T convert(FhirLocation input) {
     T resource = createResource(input);
     setName(resource, input);
     setPhysicalType(resource, input);
@@ -52,24 +52,24 @@ abstract class LocationConverter<T extends IBaseResource> implements Converter<L
     return this;
   }
 
-  abstract T createResource(Location input);
+  abstract T createResource(FhirLocation input);
 
-  abstract void setName(T resource, Location input);
+  abstract void setName(T resource, FhirLocation input);
 
-  abstract void setPhysicalType(T resource, Location input);
+  abstract void setPhysicalType(T resource, FhirLocation input);
 
-  abstract void setPartOf(T resource, Location input);
+  abstract void setPartOf(T resource, FhirLocation input);
 
-  abstract void setIdentifier(T resource, Location input);
+  abstract void setIdentifier(T resource, FhirLocation input);
 
   abstract void addSystemIdentifier(T resource, String system, UUID value);
 
-  abstract void setAlias(T resource, Location input);
+  abstract void setAlias(T resource, FhirLocation input);
 
-  abstract void setPosition(T resource, Location input);
+  abstract void setPosition(T resource, FhirLocation input);
 
-  abstract void setDescription(T resource, Location input);
+  abstract void setDescription(T resource, FhirLocation input);
 
-  abstract void setStatus(T resource, Location input);
+  abstract void setStatus(T resource, FhirLocation input);
 
 }

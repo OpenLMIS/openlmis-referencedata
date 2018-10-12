@@ -16,25 +16,17 @@
 package org.openlmis.referencedata.fhir;
 
 import java.util.UUID;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.junit.Test;
-import org.openlmis.referencedata.ToStringTestUtils;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-public class IdentifierTest {
+@Getter
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@EqualsAndHashCode
+@ToString
+public abstract class FhirElement {
 
-  @Test
-  public void equalsContract() {
-    EqualsVerifier
-        .forClass(Identifier.class)
-        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
-        .verify();
-  }
-
-  @Test
-  public void shouldImplementToString() {
-    Identifier dto = new Identifier("service", "path", UUID.randomUUID());
-    ToStringTestUtils.verify(Identifier.class, dto, "SEPARATOR", "SYSTEM_RFC_3986");
-  }
-
+  private final UUID id;
 }

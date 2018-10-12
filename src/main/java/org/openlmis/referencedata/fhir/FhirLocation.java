@@ -16,8 +16,8 @@
 package org.openlmis.referencedata.fhir;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
-import static org.openlmis.referencedata.fhir.Coding.AREA;
-import static org.openlmis.referencedata.fhir.Coding.SITE;
+import static org.openlmis.referencedata.fhir.FhirCoding.AREA;
+import static org.openlmis.referencedata.fhir.FhirCoding.SITE;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
@@ -40,20 +40,20 @@ import org.openlmis.referencedata.web.ProgramController;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class Location extends Resource {
+public final class FhirLocation extends FhirResource {
   static final String RESOURCE_TYPE_NAME = "Location";
 
   private final List<String> alias;
-  private final List<Identifier> identifier;
+  private final List<FhirIdentifier> identifier;
 
   private String name;
-  private Position position;
-  private PhysicalType physicalType;
-  private Reference partOf;
+  private FhirPosition position;
+  private FhirPhysicalType physicalType;
+  private FhirReference partOf;
   private String description;
   private String status;
 
-  private Location(UUID id) {
+  private FhirLocation(UUID id) {
     super(id, RESOURCE_TYPE_NAME);
 
     this.alias = Lists.newArrayList();
@@ -61,68 +61,68 @@ public final class Location extends Resource {
   }
 
   /**
-   * Creates new instance of Location based on data from {@link GeographicZone}.
+   * Creates new instance of FHIR Location based on data from {@link GeographicZone}.
    */
-  static Location newInstance(String serviceUrl, GeographicZone zone) {
-    Location location = new Location(zone.getId());
-    location.addAlias(zone.getCode());
-    location.addIdentifier(
+  static FhirLocation newInstance(String serviceUrl, GeographicZone zone) {
+    FhirLocation fhirLocation = new FhirLocation(zone.getId());
+    fhirLocation.addAlias(zone.getCode());
+    fhirLocation.addIdentifier(
         serviceUrl, GeographicLevelController.RESOURCE_PATH, zone.getLevel().getId());
-    location.name = zone.getName();
-    location.position = new Position(zone.getLongitude(), zone.getLatitude());
-    location.physicalType = new PhysicalType(AREA);
+    fhirLocation.name = zone.getName();
+    fhirLocation.position = new FhirPosition(zone.getLongitude(), zone.getLatitude());
+    fhirLocation.physicalType = new FhirPhysicalType(AREA);
 
     Optional
         .ofNullable(zone.getParent())
         .ifPresent(parent ->
-            location.partOf =
-                new Reference(serviceUrl, LocationController.RESOURCE_PATH, parent.getId()));
+            fhirLocation.partOf =
+                new FhirReference(serviceUrl, LocationController.RESOURCE_PATH, parent.getId()));
 
-    return location;
+    return fhirLocation;
   }
 
   /**
-   * Creates new instance of Location based on data from {@link Facility}.
+   * Creates new instance of FHIR Location based on data from {@link Facility}.
    */
-  static Location newInstance(String serviceUrl, Facility facility) {
-    Location location = new Location(facility.getId());
-    location.addAlias(facility.getCode());
+  static FhirLocation newInstance(String serviceUrl, Facility facility) {
+    FhirLocation fhirLocation = new FhirLocation(facility.getId());
+    fhirLocation.addAlias(facility.getCode());
 
     Optional
         .ofNullable(facility.getSupportedPrograms())
         .orElse(Collections.emptySet())
-        .forEach(sp -> location.addIdentifier(
+        .forEach(sp -> fhirLocation.addIdentifier(
             serviceUrl, ProgramController.RESOURCE_PATH, sp.programId()));
 
-    location.addIdentifier(
+    fhirLocation.addIdentifier(
         serviceUrl, FacilityTypeController.RESOURCE_PATH, facility.getType().getId());
 
     Optional
         .ofNullable(facility.getOperator())
-        .ifPresent(operator -> location.addIdentifier(
+        .ifPresent(operator -> fhirLocation.addIdentifier(
             serviceUrl, FacilityOperatorController.RESOURCE_PATH, operator.getId()));
 
-    location.name = facility.getName();
+    fhirLocation.name = facility.getName();
 
     Optional
         .ofNullable(facility.getLocation())
-        .ifPresent(point -> location.position = new Position(point.getX(), point.getY()));
+        .ifPresent(point -> fhirLocation.position = new FhirPosition(point.getX(), point.getY()));
 
-    location.physicalType = new PhysicalType(SITE);
+    fhirLocation.physicalType = new FhirPhysicalType(SITE);
 
     Optional
         .ofNullable(facility.getGeographicZone())
         .ifPresent(zone ->
-            location.partOf =
-                new Reference(serviceUrl, LocationController.RESOURCE_PATH, zone.getId()));
+            fhirLocation.partOf =
+                new FhirReference(serviceUrl, LocationController.RESOURCE_PATH, zone.getId()));
 
-    location.description = facility.getDescription();
+    fhirLocation.description = facility.getDescription();
 
-    location.status = isTrue(facility.getActive())
+    fhirLocation.status = isTrue(facility.getActive())
         ? Status.ACTIVE.toString()
         : Status.INACTIVE.toString();
 
-    return location;
+    return fhirLocation;
   }
 
   private void addAlias(String alias) {
@@ -130,7 +130,7 @@ public final class Location extends Resource {
   }
 
   private void addIdentifier(String serviceUrl, String path, UUID uuid) {
-    identifier.add(new Identifier(serviceUrl, path, uuid));
+    identifier.add(new FhirIdentifier(serviceUrl, path, uuid));
   }
 
 }

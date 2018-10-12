@@ -16,11 +16,12 @@
 package org.openlmis.referencedata.fhir;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.openlmis.referencedata.fhir.Coding.SITE;
+import static org.openlmis.referencedata.fhir.FhirCoding.SITE;
 
 import java.util.UUID;
 import org.assertj.core.api.Condition;
 import org.hl7.fhir.dstu3.model.Identifier;
+import org.hl7.fhir.dstu3.model.Location;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +39,9 @@ public class Dstu3LocationConverterTest {
 
   @Test
   public void shouldCovertOpenLmisLocationToFhirLocation() {
-    Location olmisLocation = Location.newInstance(SERVICE_URL, new FacilityDataBuilder().build());
-    org.hl7.fhir.dstu3.model.Location fhirLocation = converter.convert(olmisLocation);
+    FhirLocation olmisLocation = FhirLocation
+        .newInstance(SERVICE_URL, new FacilityDataBuilder().build());
+    Location fhirLocation = converter.convert(olmisLocation);
 
     assertThat(fhirLocation.getName()).isEqualTo(olmisLocation.getName());
 
@@ -91,7 +93,7 @@ public class Dstu3LocationConverterTest {
   public void shouldAddSystemIdentifier() {
     UUID id = UUID.randomUUID();
 
-    org.hl7.fhir.dstu3.model.Location resource = new org.hl7.fhir.dstu3.model.Location();
+    Location resource = new Location();
     converter.addSystemIdentifier(resource, SERVICE_URL, id);
 
     assertThat(resource.getIdentifier()).hasSize(1);

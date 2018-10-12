@@ -15,29 +15,19 @@
 
 package org.openlmis.referencedata.fhir;
 
-import java.util.UUID;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.junit.Test;
-import org.openlmis.referencedata.ToStringTestUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-public class ElementTest {
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+public enum FhirCoding {
+  AREA("http://hl7.org/fhir/location-physical-type", "area", "Area"),
+  SITE("http://hl7.org/fhir/location-physical-type", "si", "Site");
 
-  @Test
-  public void equalsContract() {
-    EqualsVerifier
-        .forClass(Element.class)
-        .withRedefinedSubclass(Resource.class)
-        .withRedefinedSubclass(Location.class)
-        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
-        .verify();
-  }
-
-  @Test
-  public void shouldImplementToString() {
-    Element dto = new Element(UUID.randomUUID()) {
-    };
-    ToStringTestUtils.verify(Element.class, dto);
-  }
-
+  private final String system;
+  private final String code;
+  private final String display;
 }

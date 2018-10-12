@@ -17,7 +17,7 @@ package org.openlmis.referencedata.fhir;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-interface Synchronizer<I extends Element, O extends IBaseResource> {
+interface Synchronizer<I extends FhirElement, O extends IBaseResource> {
 
   void synchronize(I olmisInstance, O fhirInstance);
 

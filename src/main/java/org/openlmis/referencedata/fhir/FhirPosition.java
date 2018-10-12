@@ -15,25 +15,16 @@
 
 package org.openlmis.referencedata.fhir;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.junit.Test;
-import org.openlmis.referencedata.ToStringTestUtils;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-public class PositionTest {
-
-  @Test
-  public void equalsContract() {
-    EqualsVerifier
-        .forClass(Position.class)
-        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
-        .verify();
-  }
-
-  @Test
-  public void shouldImplementToString() {
-    Position dto = new Position(10.5, 15.37);
-    ToStringTestUtils.verify(Position.class, dto);
-  }
-
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+public final class FhirPosition {
+  private final Double longitude;
+  private final Double latitude;
 }

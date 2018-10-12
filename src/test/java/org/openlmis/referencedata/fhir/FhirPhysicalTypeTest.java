@@ -15,27 +15,25 @@
 
 package org.openlmis.referencedata.fhir;
 
-import static org.apache.commons.lang3.StringUtils.joinWith;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-import java.util.UUID;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+public class FhirPhysicalTypeTest {
 
-@Getter
-@EqualsAndHashCode
-@ToString
-public final class Identifier {
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(FhirPhysicalType.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .verify();
+  }
 
-  public static final String SYSTEM_RFC_3986 = "urn:ietf:rfc:3986";
-  private static final String SEPARATOR = "/";
-
-  private final String system;
-  private final String value;
-
-  Identifier(String serviceUrl, String path, UUID uuid) {
-    this.system = SYSTEM_RFC_3986;
-    this.value = joinWith(SEPARATOR, serviceUrl + path, uuid);
+  @Test
+  public void shouldImplementToString() {
+    FhirPhysicalType dto = new FhirPhysicalType(FhirCoding.AREA, FhirCoding.SITE);
+    ToStringTestUtils.verify(FhirPhysicalType.class, dto);
   }
 
 }

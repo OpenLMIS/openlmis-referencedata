@@ -16,8 +16,8 @@
 package org.openlmis.referencedata.fhir;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.openlmis.referencedata.fhir.Coding.AREA;
-import static org.openlmis.referencedata.fhir.Coding.SITE;
+import static org.openlmis.referencedata.fhir.FhirCoding.AREA;
+import static org.openlmis.referencedata.fhir.FhirCoding.SITE;
 
 import java.util.Optional;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -36,14 +36,14 @@ import org.openlmis.referencedata.web.GeographicLevelController;
 import org.openlmis.referencedata.web.LocationController;
 import org.openlmis.referencedata.web.ProgramController;
 
-public class LocationTest {
+public class FhirLocationTest {
 
   private static final String SERVICE_URL = "http://localhost";
 
   @Test
   public void equalsContract() {
     EqualsVerifier
-        .forClass(Location.class)
+        .forClass(FhirLocation.class)
         .withRedefinedSuperclass()
         .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
         .verify();
@@ -51,8 +51,8 @@ public class LocationTest {
 
   @Test
   public void shouldImplementToString() {
-    Location dto = Location.newInstance("service-url", new FacilityDataBuilder().build());
-    ToStringTestUtils.verify(Location.class, dto, "LOCATION");
+    FhirLocation dto = FhirLocation.newInstance("service-url", new FacilityDataBuilder().build());
+    ToStringTestUtils.verify(FhirLocation.class, dto, "LOCATION");
   }
 
   @Test
@@ -60,31 +60,31 @@ public class LocationTest {
     GeographicZone zone = new GeographicZoneDataBuilder()
         .withParent(new GeographicZoneDataBuilder().build())
         .build();
-    Location location = Location.newInstance(SERVICE_URL, zone);
+    FhirLocation fhirLocation = FhirLocation.newInstance(SERVICE_URL, zone);
 
-    assertThat(location.getId())
+    assertThat(fhirLocation.getId())
         .isEqualTo(zone.getId());
-    assertThat(location.getResourceType())
-        .isEqualTo(Location.RESOURCE_TYPE_NAME);
-    assertThat(location.getAlias())
+    assertThat(fhirLocation.getResourceType())
+        .isEqualTo(FhirLocation.RESOURCE_TYPE_NAME);
+    assertThat(fhirLocation.getAlias())
         .hasSize(1)
         .contains(zone.getCode());
-    assertThat(location.getIdentifier())
+    assertThat(fhirLocation.getIdentifier())
         .hasSize(1)
-        .contains(new Identifier(SERVICE_URL,
+        .contains(new FhirIdentifier(SERVICE_URL,
             GeographicLevelController.RESOURCE_PATH, zone.getLevel().getId()));
-    assertThat(location.getName())
+    assertThat(fhirLocation.getName())
         .isEqualTo(zone.getName());
-    assertThat(location.getPosition())
-        .isEqualTo(new Position(zone.getLongitude(), zone.getLatitude()));
-    assertThat(location.getPhysicalType())
-        .isEqualTo(new PhysicalType(AREA));
-    assertThat(location.getPartOf())
-        .isEqualTo(new Reference(SERVICE_URL,
+    assertThat(fhirLocation.getPosition())
+        .isEqualTo(new FhirPosition(zone.getLongitude(), zone.getLatitude()));
+    assertThat(fhirLocation.getPhysicalType())
+        .isEqualTo(new FhirPhysicalType(AREA));
+    assertThat(fhirLocation.getPartOf())
+        .isEqualTo(new FhirReference(SERVICE_URL,
             LocationController.RESOURCE_PATH, zone.getParent().getId()));
-    assertThat(location.getDescription())
+    assertThat(fhirLocation.getDescription())
         .isNull();
-    assertThat(location.getStatus())
+    assertThat(fhirLocation.getStatus())
         .isNull();
   }
 
@@ -103,40 +103,40 @@ public class LocationTest {
     Optional.ofNullable(program).ifPresent(builder::withSupportedProgram);
     Facility facility = builder.build();
 
-    Location location = Location.newInstance(SERVICE_URL, facility);
+    FhirLocation fhirLocation = FhirLocation.newInstance(SERVICE_URL, facility);
 
-    assertThat(location.getId())
+    assertThat(fhirLocation.getId())
         .isEqualTo(facility.getId());
-    assertThat(location.getResourceType())
-        .isEqualTo(Location.RESOURCE_TYPE_NAME);
-    assertThat(location.getAlias())
+    assertThat(fhirLocation.getResourceType())
+        .isEqualTo(FhirLocation.RESOURCE_TYPE_NAME);
+    assertThat(fhirLocation.getAlias())
         .hasSize(1)
         .contains(facility.getCode());
-    assertThat(location.getIdentifier())
+    assertThat(fhirLocation.getIdentifier())
         .hasSize(null == program ? 2 : 3)
-        .contains(new Identifier(SERVICE_URL,
+        .contains(new FhirIdentifier(SERVICE_URL,
             FacilityTypeController.RESOURCE_PATH, facility.getType().getId()))
-        .contains(new Identifier(SERVICE_URL,
+        .contains(new FhirIdentifier(SERVICE_URL,
             FacilityOperatorController.RESOURCE_PATH, facility.getOperator().getId()));
 
     if (null != program) {
-      assertThat(location.getIdentifier())
-          .contains(new Identifier(SERVICE_URL,
+      assertThat(fhirLocation.getIdentifier())
+          .contains(new FhirIdentifier(SERVICE_URL,
               ProgramController.RESOURCE_PATH, program.getId()));
     }
 
-    assertThat(location.getName())
+    assertThat(fhirLocation.getName())
         .isEqualTo(facility.getName());
-    assertThat(location.getPosition())
-        .isEqualTo(new Position(facility.getLocation().getX(), facility.getLocation().getY()));
-    assertThat(location.getPhysicalType())
-        .isEqualTo(new PhysicalType(SITE));
-    assertThat(location.getPartOf())
-        .isEqualTo(new Reference(SERVICE_URL,
+    assertThat(fhirLocation.getPosition())
+        .isEqualTo(new FhirPosition(facility.getLocation().getX(), facility.getLocation().getY()));
+    assertThat(fhirLocation.getPhysicalType())
+        .isEqualTo(new FhirPhysicalType(SITE));
+    assertThat(fhirLocation.getPartOf())
+        .isEqualTo(new FhirReference(SERVICE_URL,
             LocationController.RESOURCE_PATH, facility.getGeographicZone().getId()));
-    assertThat(location.getDescription())
+    assertThat(fhirLocation.getDescription())
         .isEqualTo(facility.getDescription());
-    assertThat(location.getStatus())
+    assertThat(fhirLocation.getStatus())
         .isEqualTo(Status.ACTIVE.toString());
   }
 

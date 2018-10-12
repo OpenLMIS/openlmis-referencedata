@@ -17,7 +17,7 @@ package org.openlmis.referencedata.fhir;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-interface Converter<I extends Element, O extends IBaseResource> {
+interface Converter<I extends FhirElement, O extends IBaseResource> {
 
   O convert(I input);
 

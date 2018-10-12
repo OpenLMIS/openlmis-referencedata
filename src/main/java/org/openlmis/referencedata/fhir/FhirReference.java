@@ -15,19 +15,22 @@
 
 package org.openlmis.referencedata.fhir;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import static org.openlmis.referencedata.web.BaseController.API_PATH;
+
+import java.util.UUID;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum Coding {
-  AREA("http://hl7.org/fhir/location-physical-type", "area", "Area"),
-  SITE("http://hl7.org/fhir/location-physical-type", "si", "Site");
+@EqualsAndHashCode
+@ToString
+public final class FhirReference {
 
-  private final String system;
-  private final String code;
-  private final String display;
+  // Literal reference, Relative, internal or absolute URL
+  private final String reference;
+
+  FhirReference(String serviceUrl, String path, UUID id) {
+    this.reference = serviceUrl + API_PATH + path + '/' + id;
+  }
 }
