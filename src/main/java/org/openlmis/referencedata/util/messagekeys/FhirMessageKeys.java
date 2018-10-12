@@ -13,31 +13,12 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.fhir;
+package org.openlmis.referencedata.util.messagekeys;
 
-import static org.openlmis.referencedata.web.BaseController.API_PATH;
+public class FhirMessageKeys extends MessageKeys {
+  private static final String ERROR = join(SERVICE_ERROR, FHIR);
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+  public static final String ERROR_NOT_FOUND_LOCATION_FOR_RESOURCE =
+      join(ERROR, "notFoundLocationForResource");
 
-@ToString(of = "reference")
-@EqualsAndHashCode(of = "reference")
-public final class FhirReference {
-
-  @JsonIgnore
-  @Getter(AccessLevel.PACKAGE)
-  private final UUID resourceId;
-
-  // Literal reference, Relative, internal or absolute URL
-  @Getter
-  private final String reference;
-
-  FhirReference(String serviceUrl, String path, UUID id) {
-    this.resourceId = id;
-    this.reference = String.format("%s%s%s/%s", serviceUrl, API_PATH, path, resourceId);
-  }
 }
