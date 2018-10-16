@@ -84,6 +84,7 @@ dependencies {
     testCompile "org.powermock:powermock-module-junit4:1.7.+"
     testCompile "nl.jqno.equalsverifier:equalsverifier:2.4"
     testCompile "be.joengenduvel.java.verifiers:to-string:1.0.2"
+    testCompile 'org.togglz:togglz-testing:2.6.1.Final'
 }
 
 idea {
@@ -185,11 +186,14 @@ configure(checkApiIsRaml) {
 }
 
 test {
-    maxParallelForks = 10
     testLogging {
         events 'started', 'passed'
         exceptionFormat = 'full'
     }
+}
+
+tasks.withType(Test) {
+    maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
 }
 
 jacocoTestReport {
