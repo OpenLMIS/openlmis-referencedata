@@ -6,7 +6,6 @@ services:
     links:
       - db
       - log
-      - redis
     volumes:
       - '.:/app'
     command:
