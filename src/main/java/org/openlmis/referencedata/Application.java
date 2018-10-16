@@ -51,16 +51,10 @@ import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-import org.togglz.core.manager.EnumBasedFeatureProvider;
-import org.togglz.core.repository.StateRepository;
-import org.togglz.core.spi.FeatureProvider;
-import org.togglz.redis.RedisStateRepository;
-import redis.clients.jedis.JedisPool;
 
 @SpringBootApplication(scanBasePackages = "org.openlmis")
 @ImportResource("classpath*:/applicationContext.xml")
@@ -76,15 +70,6 @@ public class Application {
 
   @Value("${time.zoneId}")
   private String timeZoneId;
-
-  @Value("${redis.url}")
-  private String redisUrl;
-
-  @Value("${redis.port}")
-  private int redisPort;
-
-  @Value("${redis.password}")
-  private String redisPassword;
 
   @Autowired
   DialectName dialectName;
@@ -218,29 +203,6 @@ public class Application {
   @Bean
   public Clock clock() {
     return Clock.system(ZoneId.of(timeZoneId));
-  }
-
-  @Bean
-  JedisConnectionFactory connectionFactory() {
-    JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
-    connectionFactory.setHostName(redisUrl);
-    connectionFactory.setPort(redisPort);
-    connectionFactory.setPassword(redisPassword);
-    connectionFactory.setUsePool(true);
-    return connectionFactory;
-  }
-
-  @Bean
-  public FeatureProvider featureProvider() {
-    return new EnumBasedFeatureProvider(AvailableFeatures.class);
-  }
-
-  @Bean
-  StateRepository getStateRepository() {
-    return new RedisStateRepository.Builder()
-        .keyPrefix("togglz:")
-        .jedisPool(new JedisPool(redisUrl))
-        .build();
   }
 
   /**

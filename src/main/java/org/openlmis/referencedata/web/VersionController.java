@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import org.openlmis.referencedata.AvailableFeatures;
-import org.openlmis.referencedata.util.CrazyVersion;
 import org.openlmis.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +37,6 @@ public class VersionController {
   @RequestMapping("/referencedata")
   public Version display() {
     LOGGER.debug("Returning version");
-    if (!AvailableFeatures.SECRET_MESSAGE.isActive()) {
-      return new Version();
-    } else {
-      return new CrazyVersion();
-    }
+    return new Version();
   }
 }

@@ -3,16 +3,14 @@ services:
 
   referencedata:
     image: openlmis/referencedata
+    links:
+      - db
+      - log
     env_file: .env
-    depends_on: [db, log, redis]
 
   db:
     image: openlmis/postgres:9.6-postgis
     env_file: .env
-
-  redis:
-    image: redis:3.2.12
-    depends_on: [log]
 
   log:
     image: openlmis/rsyslog:1

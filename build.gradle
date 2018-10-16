@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-    id 'org.springframework.boot' version '1.5.16.RELEASE'
+    id 'org.springframework.boot' version '1.5.13.RELEASE'
     id "org.flywaydb.flyway" version "4.0"
     id "org.sonarqube" version "2.6.2"
     id "com.moowork.node" version "0.12"
@@ -33,7 +33,6 @@ repositories {
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
-    compile "org.springframework.boot:spring-boot-starter-data-redis"
     compile "org.springframework.boot:spring-boot-starter-actuator"
     compile 'org.javers:javers-spring-boot-starter-sql:2.8.1'
     compile "org.projectlombok:lombok:1.16.8"
@@ -65,11 +64,6 @@ dependencies {
 
     compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.4.0'
     compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:3.4.0'
-    
-    compile 'org.togglz:togglz-legacy-spring-boot-starter:2.6.1.Final'
-    compile 'org.togglz:togglz-console:2.6.1.Final'
-    compile 'org.togglz:togglz-spring-security:2.6.1.Final'
-    compile 'org.togglz:togglz-redis:2.6.1.Final'
 
     testCompile 'io.rest-assured:rest-assured:3.0.0'
     testCompile 'io.rest-assured:json-schema-validator:3.0.0'
@@ -185,7 +179,6 @@ configure(checkApiIsRaml) {
 }
 
 test {
-    maxParallelForks = 10
     testLogging {
         events 'started', 'passed'
         exceptionFormat = 'full'
