@@ -15,19 +15,33 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.util.CrazyVersion;
 import org.openlmis.util.Version;
+import org.togglz.junit.TogglzRule;
 
 public class VersionControllerTest {
+
+  @Rule
+  public TogglzRule togglzRule = TogglzRule.allEnabled(AvailableFeatures.class);
 
   private VersionController controller = new VersionController();
 
   @Test
-  public void displayShouldReturnVersion() {
+  public void displayShouldReturnCrazyVersion() {
     Version retVersion = controller.display();
     assertTrue("Version returned is not CrazyVersion", retVersion instanceof CrazyVersion);
+  }
+
+  @Test
+  public void displayShouldReturnOldVersion() {
+    togglzRule.disable(AvailableFeatures.SECRET_MESSAGE);
+    Version retVersion = controller.display();
+    assertFalse("Version returned is not old Version", retVersion instanceof CrazyVersion);
   }
 }
