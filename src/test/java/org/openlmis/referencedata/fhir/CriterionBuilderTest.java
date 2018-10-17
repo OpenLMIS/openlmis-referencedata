@@ -15,29 +15,29 @@
 
 package org.openlmis.referencedata.fhir;
 
-import static org.openlmis.referencedata.web.BaseController.API_PATH;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import ca.uhn.fhir.rest.gclient.ICriterion;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import org.junit.Test;
 
-@ToString(of = "reference")
-@EqualsAndHashCode(of = "reference")
-public final class FhirReference {
+public class CriterionBuilderTest {
 
-  @JsonIgnore
-  @Getter(AccessLevel.PACKAGE)
-  private final UUID resourceId;
+  private static final String SERVICE_URL = "http://localhost";
 
-  // Literal reference, Relative, internal or absolute URL
-  @Getter
-  private final String reference;
+  private CriterionBuilder builder = new CriterionBuilder(SERVICE_URL);
 
-  FhirReference(String serviceUrl, String path, UUID id) {
-    this.resourceId = id;
-    this.reference = String.format("%s%s%s/%s", serviceUrl, API_PATH, path, resourceId);
+  @Test
+  public void shouldBuildIdentifierCriterion() {
+    // given
+    UUID id = UUID.randomUUID();
+
+    // when
+    ICriterion criterion = builder.buildIdentifierCriterion(id);
+
+    // then
+    assertThat(criterion)
+        .hasFieldOrPropertyWithValue("myName", "identifier")
+        .hasFieldOrPropertyWithValue("myValue", SERVICE_URL + "|" + id.toString());
   }
 }
