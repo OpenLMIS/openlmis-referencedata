@@ -16,26 +16,93 @@
 package org.openlmis.referencedata.fhir;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.fhir.FhirCoding.SITE;
 
+import ca.uhn.fhir.rest.api.CacheControlDirective;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.ICriterion;
+import ca.uhn.fhir.rest.gclient.IQuery;
+import ca.uhn.fhir.rest.gclient.IUntypedQuery;
 import java.util.UUID;
 import org.assertj.core.api.Condition;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Location;
 import org.hl7.fhir.dstu3.model.StringType;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.util.messagekeys.FhirMessageKeys;
+import org.springframework.test.util.ReflectionTestUtils;
 
+@RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("PMD.TooManyMethods")
 public class Dstu3LocationConverterStrategyTest {
 
   private static final String SERVICE_URL = "http://localhost";
-  private Dstu3LocationConverterStrategy strategy = new Dstu3LocationConverterStrategy();
+  private static final String FULL_URL = "http://localhost/fhir/Location/345345/_history/1";
 
   private FhirLocation olmisLocation = FhirLocation
       .newInstance(SERVICE_URL, new FacilityDataBuilder().build());
 
   private Location result = new Location();
+
+  @Mock
+  private IGenericClient client;
+
+  @Mock
+  private CacheControlDirective cacheControlDirective;
+
+  @Mock
+  private CriterionBuilder criterionBuilder;
+
+  @Mock
+  private ICriterion criterion;
+
+  @Mock
+  private IUntypedQuery search;
+
+  @Mock
+  private IQuery baseQuery;
+
+  @Mock
+  private IQuery query;
+
+  private Dstu3LocationConverterStrategy strategy;
+
+  private Bundle emptyBundle;
+  private Bundle bundle;
+
+  @Before
+  public void setUp() {
+    strategy = new Dstu3LocationConverterStrategy(client, cacheControlDirective, criterionBuilder);
+
+    emptyBundle = new Bundle();
+
+    BundleEntryComponent entry = new BundleEntryComponent();
+    entry.setFullUrl(FULL_URL);
+
+    bundle = new Bundle();
+    bundle.addEntry(entry);
+
+    when(criterionBuilder.buildIdentifierCriterion(any(UUID.class))).thenReturn(criterion);
+
+    when(client.search()).thenReturn(search);
+    when(search.forResource(Location.class)).thenReturn(baseQuery);
+    when(baseQuery.cacheControl(cacheControlDirective)).thenReturn(baseQuery);
+    when(baseQuery.where(criterion)).thenReturn(baseQuery);
+    when(baseQuery.returnBundle(Bundle.class)).thenReturn(query);
+
+    when(query.execute()).thenReturn(bundle);
+  }
 
   @Test
   public void shouldInitiateResource() {
@@ -66,8 +133,27 @@ public class Dstu3LocationConverterStrategyTest {
     strategy.setPartOf(result, olmisLocation);
 
     assertThat(result.getPartOf()).isNotNull();
-    assertThat(result.getPartOf().getReference())
-        .isEqualTo(olmisLocation.getPartOf().getReference());
+    assertThat(result.getPartOf().getReference()).isEqualTo(FULL_URL);
+  }
+
+  @Test
+  public void shouldNotSetPartOfIfInputDoesNotHaveValue() {
+    ReflectionTestUtils.setField(olmisLocation, "partOf", null);
+
+    strategy.setPartOf(result, olmisLocation);
+
+    // getter always return an object
+    assertThat(result.getPartOf()).isNotNull();
+    assertThat(result.getPartOf().getReference()).isNull();
+  }
+
+  @Test
+  public void shouldThrowExceptionIfRelatedLocationWasNotFound() {
+    when(query.execute()).thenReturn(emptyBundle);
+
+    assertThatThrownBy(() -> strategy.setPartOf(result, olmisLocation))
+        .isInstanceOf(ValidationMessageException.class)
+        .hasMessageContaining(FhirMessageKeys.ERROR_NOT_FOUND_LOCATION_FOR_RESOURCE);
   }
 
   @Test

@@ -15,9 +15,17 @@
 
 package org.openlmis.referencedata.fhir;
 
+import ca.uhn.fhir.rest.api.CacheControlDirective;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Identifier;
@@ -26,8 +34,16 @@ import org.hl7.fhir.dstu3.model.Location.LocationPositionComponent;
 import org.hl7.fhir.dstu3.model.Location.LocationStatus;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.exceptions.FHIRException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.FhirMessageKeys;
 
+@AllArgsConstructor
 class Dstu3LocationConverterStrategy implements LocationConverterStrategy<Location> {
+
+  private final IGenericClient client;
+  private final CacheControlDirective cacheControlDirective;
+  private final CriterionBuilder criterionBuilder;
 
   @Override
   public Location initiateResource() {
@@ -61,7 +77,31 @@ class Dstu3LocationConverterStrategy implements LocationConverterStrategy<Locati
 
   @Override
   public void setPartOf(Location resource, FhirLocation input) {
-    resource.setPartOf(new Reference(input.getPartOf().getReference()));
+    FhirReference reference = input.getPartOf();
+
+    if (null == reference) {
+      return;
+    }
+
+    UUID resourceId = reference.getResourceId();
+
+    Bundle bundle = client
+        .search()
+        .forResource(Location.class)
+        .cacheControl(cacheControlDirective)
+        .where(criterionBuilder.buildIdentifierCriterion(resourceId))
+        .returnBundle(Bundle.class)
+        .execute();
+
+    List<BundleEntryComponent> entries = bundle.getEntry();
+    String url = CollectionUtils.isEmpty(entries) ? null : entries.get(0).getFullUrl();
+
+    if (StringUtils.isBlank(url)) {
+      throw new ValidationMessageException(
+          new Message(FhirMessageKeys.ERROR_NOT_FOUND_LOCATION_FOR_RESOURCE, resourceId));
+    }
+
+    resource.setPartOf(new Reference(url));
   }
 
   @Override

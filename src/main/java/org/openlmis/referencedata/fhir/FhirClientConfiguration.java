@@ -17,6 +17,7 @@ package org.openlmis.referencedata.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.rest.api.CacheControlDirective;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import org.openlmis.referencedata.service.AuthService;
@@ -66,6 +67,24 @@ public class FhirClientConfiguration {
   }
 
   /**
+   * Creates cache control directive.
+   */
+  @Bean
+  public CacheControlDirective cacheControlDirective() {
+    CacheControlDirective cacheControl = new CacheControlDirective();
+    cacheControl.setNoCache(true);
+    cacheControl.setNoStore(true);
+    cacheControl.setMaxResults(1);
+
+    return cacheControl;
+  }
+
+  @Bean
+  public CriterionBuilder criterionBuilder() {
+    return new CriterionBuilder(serviceUrl);
+  }
+
+  /**
    * Creates location synchronizer based on fhir context version.
    */
   @Bean
@@ -81,8 +100,9 @@ public class FhirClientConfiguration {
       throw new IllegalStateException("Unsupported FHIR version: " + version.name());
     }
 
-    synchronizer.setServiceUrl(serviceUrl);
     synchronizer.setClient(client());
+    synchronizer.setCacheControlDirective(cacheControlDirective());
+    synchronizer.setCriterionBuilder(criterionBuilder());
 
     return synchronizer;
   }
@@ -96,7 +116,8 @@ public class FhirClientConfiguration {
     LocationConverterStrategy strategy = null;
 
     if (version == FhirVersionEnum.DSTU3) {
-      strategy = new Dstu3LocationConverterStrategy();
+      strategy = new Dstu3LocationConverterStrategy(
+          client(), cacheControlDirective(), criterionBuilder());
     }
 
     if (null == strategy) {

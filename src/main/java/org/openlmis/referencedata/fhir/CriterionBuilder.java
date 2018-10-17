@@ -15,29 +15,22 @@
 
 package org.openlmis.referencedata.fhir;
 
-import static org.openlmis.referencedata.web.BaseController.API_PATH;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import ca.uhn.fhir.rest.gclient.ICriterion;
+import ca.uhn.fhir.rest.gclient.TokenClientParam;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
 
-@ToString(of = "reference")
-@EqualsAndHashCode(of = "reference")
-public final class FhirReference {
+@AllArgsConstructor
+class CriterionBuilder {
+  private final String serviceUrl;
 
-  @JsonIgnore
-  @Getter(AccessLevel.PACKAGE)
-  private final UUID resourceId;
-
-  // Literal reference, Relative, internal or absolute URL
-  @Getter
-  private final String reference;
-
-  FhirReference(String serviceUrl, String path, UUID id) {
-    this.resourceId = id;
-    this.reference = String.format("%s%s%s/%s", serviceUrl, API_PATH, path, resourceId);
+  /**
+   * Creates identifier criterion.
+   */
+  ICriterion buildIdentifierCriterion(UUID id) {
+    return new TokenClientParam("identifier")
+        .exactly()
+        .systemAndValues(serviceUrl, id.toString());
   }
+
 }
