@@ -19,14 +19,17 @@ import static java.util.stream.Collectors.toSet;
 import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -36,7 +39,6 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
-import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
@@ -68,6 +70,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class SupervisoryNodeController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupervisoryNodeController.class);
+  public static final String RESOURCE_PATH = "/supervisoryNodes";
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
@@ -82,9 +85,6 @@ public class SupervisoryNodeController extends BaseController {
   private UserRepository userRepository;
 
   @Autowired
-  private RightService rightService;
-
-  @Autowired
   private RightAssignmentService rightAssignmentService;
 
   @Autowired
@@ -96,7 +96,7 @@ public class SupervisoryNodeController extends BaseController {
    * @param supervisoryNodeDto A supervisoryNodeDto bound to the request body.
    * @return the created supervisoryNode.
    */
-  @RequestMapping(value = "/supervisoryNodes", method = RequestMethod.POST)
+  @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public SupervisoryNodeDto createSupervisoryNode(
@@ -121,7 +121,7 @@ public class SupervisoryNodeController extends BaseController {
    * @param supervisoryNodeId UUID of the supervisoryNode whose we want to get.
    * @return the SupervisoryNode.
    */
-  @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public SupervisoryNodeDto getSupervisoryNode(
@@ -142,7 +142,7 @@ public class SupervisoryNodeController extends BaseController {
    * @param supervisoryNodeId UUID of the supervisoryNode which we want to update.
    * @return the updated supervisoryNode.
    */
-  @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.PUT)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public SupervisoryNodeDto updateSupervisoryNode(
@@ -192,7 +192,7 @@ public class SupervisoryNodeController extends BaseController {
    *
    * @param supervisoryNodeId UUID of supervisoryNode whose we want to delete.
    */
-  @RequestMapping(value = "/supervisoryNodes/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteSupervisoryNode(@PathVariable("id") UUID supervisoryNodeId) {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
@@ -212,7 +212,7 @@ public class SupervisoryNodeController extends BaseController {
    * @param programId UUID of program.
    * @return the found users.
    */
-  @RequestMapping(value = "/supervisoryNodes/{id}/supervisingUsers", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/supervisingUsers", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Set<UserDto> findSupervisingUsers(
@@ -244,6 +244,43 @@ public class SupervisoryNodeController extends BaseController {
   }
 
   /**
+   * Find supervising facilities by program.
+   */
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/facilities", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Page<FacilityDto> findSupervisingFacilities(
+      @PathVariable("id") UUID supervisoryNodeId,
+      @RequestParam(value = "programId", required = false) UUID programId,
+      Pageable pageable) {
+    rightService.checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    SupervisoryNode supervisoryNode = Optional
+        .ofNullable(supervisoryNodeRepository.findOne(supervisoryNodeId))
+        .orElseThrow(() -> new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND));
+
+    Program program;
+
+    if (null == programId) {
+      program = null;
+    } else {
+      program = Optional
+          .ofNullable(programRepository.findOne(programId))
+          .orElseThrow(() -> new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND));
+    }
+
+    Set<Facility> facilities = supervisoryNode.getAllSupervisedFacilities(program);
+    Page<Facility> facilityPage = Pagination.getPage(facilities, pageable);
+    List<FacilityDto> facilityDtos = facilityPage
+        .getContent()
+        .stream()
+        .map(FacilityDto::newInstance)
+        .collect(Collectors.toList());
+
+    return Pagination.getPage(facilityDtos, pageable, facilities.size());
+  }
+
+  /**
    * Retrieves all Supervisory Nodes that are matching given query parameters
    * (code, name, zoneId, programId, facilityId, id - multiple).
    *
@@ -251,7 +288,7 @@ public class SupervisoryNodeController extends BaseController {
    * @param pageable    object used to encapsulate the pagination related values: page and size.
    * @return List of wanted Supervisory Nodes matching query parameters.
    */
-  @GetMapping("/supervisoryNodes")
+  @GetMapping(RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<SupervisoryNodeDto> search(@RequestParam MultiValueMap<String, Object> queryParams,
@@ -281,7 +318,7 @@ public class SupervisoryNodeController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/supervisoryNodes/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getSupervisoryNodeAuditLog(

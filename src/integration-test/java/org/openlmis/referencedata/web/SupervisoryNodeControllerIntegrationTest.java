@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -24,12 +25,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.NAME_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.PROGRAM_ID;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.ZONE_ID;
 
+import com.google.common.collect.Sets;
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Collections;
@@ -63,6 +66,8 @@ import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -76,6 +81,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SUPERVISING_USERS_URL = ID_URL + "/supervisingUsers";
+  private static final String SUPERVISING_FACILITIES_URL = ID_URL + "/facilities";
   private static final String RIGHT_ID_PARAM = "rightId";
   private static final String PAGE = "page";
   private static final String SIZE = "size";
@@ -257,22 +263,22 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     supervisoryNode.setDescription("OpenLMIS");
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
-    SupervisoryNodeDto supervisoryNodeDto = new SupervisoryNodeDto();
-    supervisoryNode.export(supervisoryNodeDto);
+    SupervisoryNodeDto newDto = new SupervisoryNodeDto();
+    supervisoryNode.export(newDto);
 
     SupervisoryNodeDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
-        .body(supervisoryNodeDto)
+        .body(newDto)
         .when()
         .put(ID_URL)
         .then()
         .statusCode(200)
         .extract().as(SupervisoryNodeDto.class);
 
-    assertEquals(supervisoryNodeDto, response);
+    assertEquals(newDto, response);
     assertEquals("OpenLMIS", response.getDescription());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -599,6 +605,93 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnSupervisingFacilities() {
+    SupervisoryNode spy = spy(supervisoryNode);
+    given(spy.getAllSupervisedFacilities(program)).willReturn(Sets.newHashSet(facility));
+
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(spy);
+    given(programRepository.findOne(programId)).willReturn(program);
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam(ID, supervisoryNodeId)
+        .queryParam(PROGRAM_ID, programId)
+        .when()
+        .get(SUPERVISING_FACILITIES_URL)
+        .then()
+        .statusCode(200)
+        .body("content", hasSize(1))
+        .body("content[0].id", is(facility.getId()));
+  }
+
+  @Test
+  public void shouldReturnUnauthorizedErrorIfTokenWasNotProvidedToGetSupervisingFacilities() {
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam(ID, supervisoryNodeId)
+        .when()
+        .get(SUPERVISING_FACILITIES_URL)
+        .then()
+        .statusCode(401);
+  }
+
+  @Test
+  public void shouldReturnForbiddenErrorIfUserDoesNotHaveRightToGetSupervisingFacilities() {
+    mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam(ID, supervisoryNodeId)
+        .when()
+        .get(SUPERVISING_FACILITIES_URL)
+        .then()
+        .statusCode(403)
+        .body(MESSAGE_KEY, is(MESSAGEKEY_ERROR_UNAUTHORIZED));
+  }
+
+  @Test
+  public void shouldThrowNotFoundErrorIfSupervisoryNodeDoesNotExistForGetSupervisingFacilities() {
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(null);
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam(ID, supervisoryNodeId)
+        .when()
+        .get(SUPERVISING_FACILITIES_URL)
+        .then()
+        .statusCode(404)
+        .body(MESSAGE_KEY, is(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND));
+  }
+
+  @Test
+  public void shouldThrowNotFoundErrorIfProgramDoesNotExistForGetSupervisingFacilities() {
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(programRepository.findOne(any(UUID.class))).willReturn(null);
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam(ID, supervisoryNodeId)
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .when()
+        .get(SUPERVISING_FACILITIES_URL)
+        .then()
+        .statusCode(404)
+        .body(MESSAGE_KEY, is(ProgramMessageKeys.ERROR_NOT_FOUND));
   }
 
   private ValidatableResponse searchForSupervisoryNode(HashMap<String, Object> queryParams,
