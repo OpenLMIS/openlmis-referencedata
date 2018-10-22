@@ -13,26 +13,19 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.dto;
+package org.openlmis.referencedata.util.messagekeys;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.openlmis.referencedata.domain.BaseEntity.BaseExporter;
-import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
+public abstract class SupplyPartnerMessageKeys extends MessageKeys {
 
-@Getter
-@Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@EqualsAndHashCode
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public abstract class BaseDto implements BaseImporter, BaseExporter {
-  private UUID id;
+  private static final String ERROR = join(SERVICE_ERROR, SUPPLY_PARTNER);
+  private static final String ASSOCIATIONS = "associations";
+
+  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
+  public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
+  public static final String ERROR_ID_MISMATCH = join(ERROR, ID_MISMATCH);
+  public static final String ERROR_CODE_DUPLICATED = join(ERROR, CODE, DUPLICATED);
+  public static final String ERROR_MISSING_FACILITIES =
+      join(ERROR, ASSOCIATIONS, "missingFacilities");
+  public static final String ERROR_MISSING_ORDERABLES =
+      join(ERROR, ASSOCIATIONS, "missingOrderables");
 }

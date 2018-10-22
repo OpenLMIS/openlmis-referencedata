@@ -54,6 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderableController extends BaseController {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableController.class);
+  public static final String RESOURCE_PATH = "/orderables";
 
   @Autowired
   private OrderableRepository repository;
@@ -73,7 +74,7 @@ public class OrderableController extends BaseController {
    * @return the orderable that was created.
    */
   @Transactional
-  @PutMapping("/orderables")
+  @PutMapping(RESOURCE_PATH)
   public OrderableDto create(@RequestBody OrderableDto orderableDto,
       BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
@@ -95,7 +96,7 @@ public class OrderableController extends BaseController {
    * @param pageable object used to encapsulate the pagination related values: page and size.
    * @return a page of orderables
    */
-  @GetMapping("/orderables")
+  @GetMapping(RESOURCE_PATH)
   public Page<OrderableDto> findAll(@RequestParam MultiValueMap<String, Object> queryParams,
       Pageable pageable) {
     XLOGGER.entry(queryParams, pageable);
@@ -125,7 +126,7 @@ public class OrderableController extends BaseController {
    * @param productId id of the chosen product
    * @return chosen product
    */
-  @GetMapping("/orderables/{id}")
+  @GetMapping(RESOURCE_PATH + "/{id}")
   public OrderableDto getChosenOrderable(
       @PathVariable("id") UUID productId,
       @RequestParam(required = false, value = "versionId") Long versionId) {
@@ -153,7 +154,7 @@ public class OrderableController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/orderables/{id}/auditLog", method = RequestMethod.GET)
+  @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getOrderableAuditLog(

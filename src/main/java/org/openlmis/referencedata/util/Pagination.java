@@ -15,7 +15,8 @@
 
 package org.openlmis.referencedata.util;
 
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -65,17 +66,15 @@ public class Pagination {
   /**
    * Convenience method for getPage(List originalList, Pageable pageable).
    */
-  public static <T> Page<T> getPage(Iterable<T> data, Pageable pageable) {
-    List<T> resultList = new ArrayList<>();
-    data.forEach(resultList::add);
-    return getPage(resultList, pageable);
+  public static <T> Page<T> getPage(Collection<T> data, Pageable pageable) {
+    return getPage(Lists.newArrayList(data), pageable);
   }
 
   /**
    * Return Page of the list using Page defaults.
    * See {@link #getPage(List, Pageable)}
    */
-  public static <T> Page<T> getPage(List<T> originalList) {
+  public static <T> Page<T> getPage(Collection<T> originalList) {
     return getPage(originalList, null);
   }
 

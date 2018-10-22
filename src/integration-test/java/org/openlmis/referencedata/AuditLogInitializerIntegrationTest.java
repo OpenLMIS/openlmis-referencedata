@@ -57,6 +57,7 @@ import org.openlmis.referencedata.domain.ServiceAccount;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
+import org.openlmis.referencedata.domain.SupplyPartner;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
@@ -365,6 +366,15 @@ public class AuditLogInitializerIntegrationTest {
     executeTest(userId, User.class);
   }
 
+  @Test
+  public void shouldCreateSnapshotsForSupplyPartner() {
+    //given
+    UUID supplyPartnerId = UUID.randomUUID();
+    addSupplyPartner(supplyPartnerId);
+
+    executeTest(supplyPartnerId, SupplyPartner.class);
+  }
+
   private void executeTest(UUID id, Class clazz) {
     //when
     QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, clazz);
@@ -597,23 +607,6 @@ public class AuditLogInitializerIntegrationTest {
         .executeUpdate();
   }
 
-  private void addOrderable(UUID id, UUID dispensableId) {
-    entityManager.flush();
-    entityManager
-        .createNativeQuery(SqlInsert.INSERT_ORDERABLE_SQL)
-        .setParameter(1, id)
-        .setParameter(2, "full product name")
-        .setParameter(3, 1L) // pack rounding threshold
-        .setParameter(4, 1L) //net content
-        .setParameter(5, SqlInsert.CODE)
-        .setParameter(6, true) //round to zero
-        .setParameter(7, SqlInsert.DESCRIPTION)
-        .setParameter(8, dispensableId) //dispensable id
-        .setParameter(9, 2L) // version Id
-        .setParameter(10, ZonedDateTime.now()) // last updated
-        .executeUpdate();
-  }
-
   private void addProcessingPeriod(UUID id, UUID processingScheduleId) {
     entityManager.flush();
     entityManager
@@ -778,6 +771,16 @@ public class AuditLogInitializerIntegrationTest {
         .setParameter(11, homeFacilityId)
         .setParameter(12, "") //job title
         .setParameter(13, "") //phone nr
+        .executeUpdate();
+  }
+
+  private void addSupplyPartner(UUID id) {
+    entityManager.flush();
+    entityManager
+        .createNativeQuery(SqlInsert.INSERT_SUPPLY_PARTNER_SQL)
+        .setParameter(1, id)
+        .setParameter(2, "abc") // name
+        .setParameter(3, "ABC") // code
         .executeUpdate();
   }
 }

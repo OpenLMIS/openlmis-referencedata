@@ -15,10 +15,19 @@
 
 package org.openlmis.referencedata.service;
 
+import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
+import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 
 interface DomainResourceBuilder<I, O> {
 
@@ -36,6 +45,28 @@ interface DomainResourceBuilder<I, O> {
     }
 
     return resource;
+  }
+
+  default <R extends Identifiable> List<R> findResources(Function<Set<UUID>, Iterable<R>> finder,
+      Set<UUID> ids, String errorMessage) {
+    Iterable<R> iterable = finder.apply(ids);
+
+    Map<UUID, R> resources = StreamSupport
+        .stream(iterable.spliterator(), false)
+        .collect(Collectors.toMap(Identifiable::getId, Function.identity()));
+
+    Set<UUID> missing = ids
+        .stream()
+        .map(id -> new ImmutablePair<>(id, resources.get(id)))
+        .filter(pair -> null == pair.getRight())
+        .map(ImmutablePair::getLeft)
+        .collect(Collectors.toSet());
+
+    if (!missing.isEmpty()) {
+      throw new ValidationMessageException(new Message(errorMessage));
+    }
+
+    return Lists.newArrayList(resources.values());
   }
 
 }
