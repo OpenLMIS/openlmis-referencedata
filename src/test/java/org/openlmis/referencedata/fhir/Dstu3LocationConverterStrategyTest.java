@@ -40,8 +40,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.FhirMessageKeys;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("PMD.TooManyMethods")
@@ -50,8 +50,10 @@ public class Dstu3LocationConverterStrategyTest {
   private static final String SERVICE_URL = "http://localhost";
   private static final String FULL_URL = "http://localhost/fhir/Location/345345/_history/1";
 
-  private FhirLocation olmisLocation = FhirLocation
+  private FhirLocation facility = FhirLocation
       .newInstance(SERVICE_URL, new FacilityDataBuilder().build());
+  private FhirLocation geoZone = FhirLocation
+      .newInstance(SERVICE_URL, new GeographicZoneDataBuilder().withoutOptionalFields().build());
 
   private Location result = new Location();
 
@@ -111,14 +113,14 @@ public class Dstu3LocationConverterStrategyTest {
 
   @Test
   public void shouldSetName() {
-    strategy.setName(result, olmisLocation);
+    strategy.setName(result, facility);
 
-    assertThat(result.getName()).isEqualTo(olmisLocation.getName());
+    assertThat(result.getName()).isEqualTo(facility.getName());
   }
 
   @Test
   public void shouldSetPhysicalType() {
-    strategy.setPhysicalType(result, olmisLocation);
+    strategy.setPhysicalType(result, facility);
 
     assertThat(result.getPhysicalType()).isNotNull();
     assertThat(result.getPhysicalType().getCoding()).hasSize(1);
@@ -130,7 +132,7 @@ public class Dstu3LocationConverterStrategyTest {
 
   @Test
   public void shouldSetPartOf() {
-    strategy.setPartOf(result, olmisLocation);
+    strategy.setPartOf(result, facility);
 
     assertThat(result.getPartOf()).isNotNull();
     assertThat(result.getPartOf().getReference()).isEqualTo(FULL_URL);
@@ -138,9 +140,7 @@ public class Dstu3LocationConverterStrategyTest {
 
   @Test
   public void shouldNotSetPartOfIfInputDoesNotHaveValue() {
-    ReflectionTestUtils.setField(olmisLocation, "partOf", null);
-
-    strategy.setPartOf(result, olmisLocation);
+    strategy.setPartOf(result, geoZone);
 
     // getter always return an object
     assertThat(result.getPartOf()).isNotNull();
@@ -151,17 +151,17 @@ public class Dstu3LocationConverterStrategyTest {
   public void shouldThrowExceptionIfRelatedLocationWasNotFound() {
     when(query.execute()).thenReturn(emptyBundle);
 
-    assertThatThrownBy(() -> strategy.setPartOf(result, olmisLocation))
+    assertThatThrownBy(() -> strategy.setPartOf(result, facility))
         .isInstanceOf(ValidationMessageException.class)
         .hasMessageContaining(FhirMessageKeys.ERROR_NOT_FOUND_LOCATION_FOR_RESOURCE);
   }
 
   @Test
   public void shouldSetIdentifier() {
-    strategy.setIdentifier(result, olmisLocation);
+    strategy.setIdentifier(result, facility);
 
-    assertThat(result.getIdentifier()).hasSize(olmisLocation.getIdentifier().size());
-    olmisLocation
+    assertThat(result.getIdentifier()).hasSize(facility.getIdentifier().size());
+    facility
         .getIdentifier()
         .forEach(identifier -> assertThat(result.getIdentifier())
             .haveExactly(1, new Condition<Identifier>() {
@@ -187,10 +187,10 @@ public class Dstu3LocationConverterStrategyTest {
 
   @Test
   public void shouldSetAlias() {
-    strategy.setAlias(result, olmisLocation);
+    strategy.setAlias(result, facility);
 
-    assertThat(result.getAlias()).hasSize(olmisLocation.getAlias().size());
-    olmisLocation
+    assertThat(result.getAlias()).hasSize(facility.getAlias().size());
+    facility
         .getAlias()
         .forEach(alias -> assertThat(result.getAlias())
             .haveExactly(1, new Condition<StringType>() {
@@ -203,27 +203,43 @@ public class Dstu3LocationConverterStrategyTest {
 
   @Test
   public void shouldSetPosition() {
-    strategy.setPosition(result, olmisLocation);
+    strategy.setPosition(result, facility);
 
     assertThat(result.getPosition()).isNotNull();
     assertThat(result.getPosition().getLatitude().doubleValue())
-        .isEqualTo(olmisLocation.getPosition().getLatitude());
+        .isEqualTo(facility.getPosition().getLatitude());
     assertThat(result.getPosition().getLongitude().doubleValue())
-        .isEqualTo(olmisLocation.getPosition().getLongitude());
+        .isEqualTo(facility.getPosition().getLongitude());
+  }
+
+  @Test
+  public void shouldNotSetPositionIfFieldHasNullValue() {
+    strategy.setPosition(result, geoZone);
+
+    assertThat(result.getPosition()).isNotNull();
+    assertThat(result.getPosition().getLatitude()).isNull();
+    assertThat(result.getPosition().getLongitude()).isNull();
   }
 
   @Test
   public void shouldSetDescription() {
-    strategy.setDescription(result, olmisLocation);
+    strategy.setDescription(result, facility);
 
-    assertThat(result.getDescription()).isEqualTo(olmisLocation.getDescription());
+    assertThat(result.getDescription()).isEqualTo(facility.getDescription());
   }
 
   @Test
   public void shouldSetStatus() {
-    strategy.setStatus(result, olmisLocation);
+    strategy.setStatus(result, facility);
 
-    assertThat(result.getStatus().toCode()).isEqualTo(olmisLocation.getStatus());
+    assertThat(result.getStatus().toCode()).isEqualTo(facility.getStatus());
+  }
+
+  @Test
+  public void shouldNotSetStatusIfFieldHasNullValue() {
+    strategy.setStatus(result, geoZone);
+
+    assertThat(result.getStatus()).isNull();
   }
 
 }

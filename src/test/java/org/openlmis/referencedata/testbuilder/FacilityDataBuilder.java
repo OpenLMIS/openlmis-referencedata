@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -114,6 +116,34 @@ public class FacilityDataBuilder {
     facility.setId(id);
 
     return facility;
+  }
+
+  /**
+   * Sets a null value or empty collection for all optional fields.
+   */
+  public FacilityDataBuilder withoutOptionalFields() {
+    name = null;
+    description = null;
+    operator = null;
+    goLiveDate = null;
+    goDownDate = null;
+    comment = null;
+    openLmisAccessible = null;
+    supportedPrograms = Sets.newHashSet();
+    location = null;
+    extraData = Maps.newHashMap();
+
+    return this;
+  }
+
+  public FacilityDataBuilder withName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  public FacilityDataBuilder withDescription(String description) {
+    this.description = description;
+    return this;
   }
 
   /**

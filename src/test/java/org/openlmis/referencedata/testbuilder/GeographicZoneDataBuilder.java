@@ -25,6 +25,7 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.validate.FhirLocationValidator;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class GeographicZoneDataBuilder {
 
   private static int instanceNumber = 0;
@@ -74,6 +75,21 @@ public class GeographicZoneDataBuilder {
     return zone;
   }
 
+  /**
+   * Sets a null value or empty collection for all optional fields.
+   */
+  public GeographicZoneDataBuilder withoutOptionalFields() {
+    name = null;
+    parent = null;
+    catchmentPopulation = null;
+    latitude = null;
+    longitude = null;
+    boundary = null;
+    extraData = Maps.newHashMap();
+
+    return this;
+  }
+
   public GeographicZoneDataBuilder withName(String name) {
     this.name = name;
     return this;
@@ -91,6 +107,16 @@ public class GeographicZoneDataBuilder {
 
   public GeographicZoneDataBuilder withBoundary(Polygon boundary) {
     this.boundary = boundary;
+    return this;
+  }
+
+  public GeographicZoneDataBuilder withLatitude(Number latitude) {
+    this.latitude = latitude.doubleValue();
+    return this;
+  }
+
+  public GeographicZoneDataBuilder withLongitude(Number longitude) {
+    this.longitude = longitude.doubleValue();
     return this;
   }
 
