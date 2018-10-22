@@ -2364,10 +2364,16 @@ resourceTypes:
           description: Returns a page of approved products by search criteria
           queryParameters:
             facilityType:
+                description: >
+                  If set, the endpoint will try to find FTAPs related to the given facility type.
+                  If repeated, the endpoint will try to find FTAPs related to ANY of the given
+                  facility types. For example, if there are FTAPs related with A, B and, C facility
+                  types (one for each type) and in the request there are id of A and C facility
+                  types, the endpoint will return two FTAPs.
                 displayName: facility type
                 type: string
                 required: false
-                repeat: false
+                repeat: true
             program:
                 displayName: program
                 type: string

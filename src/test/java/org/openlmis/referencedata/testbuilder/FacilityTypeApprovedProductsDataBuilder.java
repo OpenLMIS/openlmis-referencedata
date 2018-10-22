@@ -59,14 +59,23 @@ public class FacilityTypeApprovedProductsDataBuilder {
     return this;
   }
 
+  public FacilityTypeApprovedProductsDataBuilder withMaxPeriodsOfStock(Double maxPeriodsOfStock) {
+    this.maxPeriodsOfStock = maxPeriodsOfStock;
+    return this;
+  }
+
   /**
    * Builds instance of {@link FacilityTypeApprovedProduct}.
    */
   public FacilityTypeApprovedProduct build() {
-    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct(orderable, program,
-        facilityType, maxPeriodsOfStock, minPeriodsOfStock, emergencyOrderPoint);
+    FacilityTypeApprovedProduct ftap = buildAsNew();
     ftap.setId(id);
 
     return ftap;
+  }
+
+  public FacilityTypeApprovedProduct buildAsNew() {
+    return new FacilityTypeApprovedProduct(orderable, program,
+          facilityType, maxPeriodsOfStock, minPeriodsOfStock, emergencyOrderPoint);
   }
 }

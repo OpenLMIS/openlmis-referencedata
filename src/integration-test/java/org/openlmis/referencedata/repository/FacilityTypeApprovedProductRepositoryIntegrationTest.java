@@ -17,13 +17,19 @@ package org.openlmis.referencedata.repository;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isOneOf;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +51,8 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -350,11 +358,11 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(generateProduct(facilityType2, false));
 
     Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(FACILITY_TYPE_CODE, null, null);
+        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, null);
     assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
 
-    result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, null, null);
+    result = ftapRepository.searchProducts(singletonList(FACILITY_TYPE2_CODE), null, null);
     assertEquals(2, result.getContent().size());
     for (FacilityTypeApprovedProduct ftap : result) {
       assertEquals(FACILITY_TYPE2_CODE, ftap.getFacilityType().getCode());
@@ -366,19 +374,21 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(generateProduct(facilityType1, true));
 
     Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(FACILITY_TYPE_CODE, PROGRAM_CODE, null);
+        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), PROGRAM_CODE, null);
     assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
     assertEquals(PROGRAM_CODE, result.iterator().next().getProgram().getCode().toString());
 
-    result = ftapRepository.searchProducts(FACILITY_TYPE2_CODE, "nonExistingCode", null);
+    result = ftapRepository
+        .searchProducts(singletonList(FACILITY_TYPE2_CODE), "nonExistingCode", null);
     assertEquals(0, result.getContent().size());
   }
 
   @Test
   public void searchShouldReturnEmptyPageNotNull() {
     // given and when
-    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts("abc", null, null);
+    Page<FacilityTypeApprovedProduct> actual = ftapRepository
+        .searchProducts(singletonList("abc"), null, null);
 
     // then
     assertNotNull(actual);
@@ -394,9 +404,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(generateProduct(facilityType1, program2, orderable2));
 
     // when
-    Pageable pageable = new PageRequest(1, 2);
+    Pageable pageRequest = new PageRequest(1, 2);
     Page<FacilityTypeApprovedProduct> actual =
-        ftapRepository.searchProducts(FACILITY_TYPE_CODE, null, pageable);
+        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, pageRequest);
 
     // then
     assertNotNull(actual);
@@ -405,6 +415,32 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     assertEquals(2, actual.getTotalPages());
     assertEquals(4, actual.getTotalElements());
     assertEquals(2, actual.getContent().size());
+  }
+
+  @Test
+  public void shouldSearchBySeveralFacilityTypes() {
+    // given
+    ftapRepository.save(generateProduct(facilityType1, true));
+    ftapRepository.save(generateProduct(facilityType1, false));
+    ftapRepository.save(generateProduct(facilityType2, program2, orderable1));
+    ftapRepository.save(generateProduct(facilityType2, program2, orderable2));
+    ftapRepository.save(generateProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true));
+    ftapRepository.save(generateProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), false));
+    ftapRepository.save(generateProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true));
+
+    // when
+    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
+        Lists.newArrayList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE), null, new PageRequest(0, 10));
+
+    // then
+    assertThat(actual, is(notNullValue()));
+    assertThat(actual.getContent(), hasSize(4));
+    assertThat(actual.getContent(),
+        hasItems(hasProperty("facilityType",
+            hasProperty("code", isOneOf(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE)))));
   }
 
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {
@@ -435,12 +471,12 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
 
   private FacilityTypeApprovedProduct getFacilityTypeApprovedProduct(
       FacilityType facilityType, Program program, Orderable orderable) {
-    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
-    ftap.setFacilityType(facilityType);
-    ftap.setProgram(program);
-    ftap.setOrderable(orderable);
-    ftap.setMaxPeriodsOfStock(12.00);
-    return ftap;
+    return new FacilityTypeApprovedProductsDataBuilder()
+        .withFacilityType(facilityType)
+        .withOrderable(orderable)
+        .withProgram(program)
+        .withMaxPeriodsOfStock(12.00)
+        .buildAsNew();
   }
 
 }

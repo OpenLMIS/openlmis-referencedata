@@ -73,6 +73,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private OrderableDisplayCategory orderableDisplayCategory;
 
   @Before
+  @Override
   public void setUp() {
     program = new Program("programCode");
     program.setPeriodsSkippable(true);
@@ -369,7 +370,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   public void shouldSearchFtaps() {
 
     given(facilityTypeApprovedProductRepository
-        .searchProducts(eq(facilityType1.getCode()), eq(program.getCode().toString()),
+        .searchProducts(eq(Lists.newArrayList(facilityType1.getCode())),
+            eq(program.getCode().toString()),
             any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
 
@@ -396,7 +398,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     Pageable pageable = new PageRequest(0, 10);
     given(facilityTypeApprovedProductRepository
-        .searchProducts(facilityType1.getCode(), program.getCode().toString(), pageable))
+        .searchProducts(Lists.newArrayList(facilityType1.getCode()),
+            program.getCode().toString(), pageable))
         .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
 
     PageImplRepresentation response = restAssured
