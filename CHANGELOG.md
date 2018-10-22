@@ -23,6 +23,9 @@ New functionality added in a backwards-compatible manner:
     * user is not be able to set this field - the error message should be shown
   * If the FHIR client in the service is enabled and a request comes from an FHIR server, the service will not send a request to the FHIR server because this creates an endless loop of sending requests between those services.
   * Added special facility type for FHIR resources.
+* [OLMIS-5140](https://openlmis.atlassian.net/browse/OLMIS-5140): Added supply partner resource
+  * Added ability to find FTAPs for several facility types
+  * Added ability to retrieve all supervising facilities for the given supervisory node.
   
 Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.

@@ -85,6 +85,7 @@ import org.openlmis.referencedata.repository.ServiceAccountRepository;
 import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
+import org.openlmis.referencedata.repository.SupplyPartnerRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
@@ -307,6 +308,9 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected FacilityTypeService facilityTypeService;
+
+  @MockBean
+  protected SupplyPartnerRepository supplyPartnerRepository;
 
   /**
    * Constructor for test.
