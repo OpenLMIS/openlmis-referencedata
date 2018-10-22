@@ -260,9 +260,9 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
 
 1. Storeroom Manager
   * rights:
-    * Requisition View
-    * Requisition Delete
-    * Requisition Create
+    * Requisitions View
+    * Requisitions Delete
+    * Requisitions Create
     * Proofs of Delivery Manage
   * users:
     * administrator - has this role for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
@@ -275,9 +275,9 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
 2. Store Manager
   * rights:
-    * Requisition View
-    * Requisition Delete
-    * Requisition Authorize
+    * Requisitions View
+    * Requisitions Delete
+    * Requisitions Authorize
   * users:
     * administrator - has this role for Family Planning & Essential Meds at home facility, SN1/FP approval point
         and SN2/EM approval point
@@ -292,8 +292,8 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
 3. District Storeroom Manager
   * rights:
-    * Requisition View
-    * Requisition Approve
+    * Requisitions View
+    * Requisitions Approve
   * users:
     * administrator - has this role for Family Planning & Essential Meds at SN2/EM approval
         point and SN1/FP approval point
@@ -301,8 +301,8 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
         point, SN1.1/FP approval sub point and SN1.2/FP approval sub point 2
 4. Program Supervisor
   * rights:
-    * Requisition View
-    * Requisition Approve
+    * Requisitions View
+    * Requisitions Approve
   * users:
     * administrator - has this role for Family Planning & Essential Meds at SN2/EM approval
         point and SN1/FP approval point
@@ -353,7 +353,7 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * wclerk1 - has this role for Family Planning at home facility
 9. Requisition Viewer
   * rights:
-    * Requisition View
+    * Requisitions View
   * users:
     * wclerk1 - has this role for Family Planning at home facility
     * wclerk2 - has this role for Family Planning & Essential Meds at home facility
@@ -377,6 +377,11 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * System Ideal Stock Amounts Manage
     * CCE Manage
     * Service Accounts Manage
+    * Manage stock sources
+    * Manage stock organizations
+    * Manage programs
+    * Manage stock destinations
+    * Manage stock card line item reasons
   * users:
     * administrator
     * admin
@@ -398,6 +403,12 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * rivo - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
     * vsrmanager2 - has this role for EPI at home facility
+13. Reporting Personnel
+  * rights:
+    * Edit report templates
+    * View reports
+  * users:
+    * administrator
 
 
 Passwords for these user accounts come from the
