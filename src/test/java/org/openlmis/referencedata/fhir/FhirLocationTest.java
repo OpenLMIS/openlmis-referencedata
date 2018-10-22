@@ -19,15 +19,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.openlmis.referencedata.fhir.FhirCoding.AREA;
 import static org.openlmis.referencedata.fhir.FhirCoding.SITE;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import java.util.Optional;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityOperatorDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.web.FacilityOperatorController;
@@ -56,10 +59,27 @@ public class FhirLocationTest {
   }
 
   @Test
-  public void shouldCreateInstanceFromGeographicZone() {
+  public void shouldCreateInstanceFromGeographicZoneWithOnlyMandatoryFields() {
     GeographicZone zone = new GeographicZoneDataBuilder()
-        .withParent(new GeographicZoneDataBuilder().build())
+        .withoutOptionalFields()
         .build();
+
+    testCreateInstanceFromGeographicZone(zone);
+  }
+
+  @Test
+  public void shouldCreateInstanceFromGeographicZoneWithOptionalFields() {
+    GeographicZone zone = new GeographicZoneDataBuilder()
+        .withName("abc")
+        .withParent(new GeographicZoneDataBuilder().build())
+        .withLatitude(10)
+        .withLongitude(10)
+        .build();
+
+    testCreateInstanceFromGeographicZone(zone);
+  }
+
+  private void testCreateInstanceFromGeographicZone(GeographicZone zone) {
     FhirLocation fhirLocation = FhirLocation.newInstance(SERVICE_URL, zone);
 
     assertThat(fhirLocation.getId())
@@ -75,13 +95,24 @@ public class FhirLocationTest {
             GeographicLevelController.RESOURCE_PATH, zone.getLevel().getId()));
     assertThat(fhirLocation.getName())
         .isEqualTo(zone.getName());
-    assertThat(fhirLocation.getPosition())
-        .isEqualTo(new FhirPosition(zone.getLongitude(), zone.getLatitude()));
+
+    if (null != zone.getLatitude() && null != zone.getLongitude()) {
+      assertThat(fhirLocation.getPosition())
+          .isEqualTo(new FhirPosition(zone.getLongitude(), zone.getLatitude()));
+    } else {
+      assertThat(fhirLocation.getPosition())
+          .isNull();
+    }
+
     assertThat(fhirLocation.getPhysicalType())
         .isEqualTo(new FhirPhysicalType(AREA));
-    assertThat(fhirLocation.getPartOf())
-        .isEqualTo(new FhirReference(SERVICE_URL,
-            LocationController.RESOURCE_PATH, zone.getParent().getId()));
+
+    Optional
+        .ofNullable(zone.getParent())
+        .ifPresent(parent ->
+            assertThat(fhirLocation.getPartOf())
+                .isEqualTo(new FhirReference(SERVICE_URL,
+                    LocationController.RESOURCE_PATH, parent.getId())));
     assertThat(fhirLocation.getDescription())
         .isNull();
     assertThat(fhirLocation.getStatus())
@@ -89,20 +120,28 @@ public class FhirLocationTest {
   }
 
   @Test
-  public void shouldCreateInstanceFromFacility() {
-    testCreateInstanceFromFacility(new ProgramDataBuilder().build());
+  public void shouldCreateInstanceFromFacilityWithOnlyMandatoryFields() {
+    Facility facility = new FacilityDataBuilder()
+        .withoutOptionalFields()
+        .build();
+
+    testCreateInstanceFromFacility(facility);
   }
 
   @Test
-  public void shouldCreateInstanceFromFacilityWithoutSupportedPrograms() {
-    testCreateInstanceFromFacility(null);
+  public void shouldCreateInstanceFromFacilityWithOptionalFields() {
+    Facility facility = new FacilityDataBuilder()
+        .withName("def")
+        .withDescription("sample description")
+        .withOperator(new FacilityOperatorDataBuilder().build())
+        .withSupportedProgram(new ProgramDataBuilder().build())
+        .withLocation(new GeometryFactory().createPoint(new Coordinate(0, 0)))
+        .build();
+
+    testCreateInstanceFromFacility(facility);
   }
 
-  private void testCreateInstanceFromFacility(Program program) {
-    FacilityDataBuilder builder = new FacilityDataBuilder();
-    Optional.ofNullable(program).ifPresent(builder::withSupportedProgram);
-    Facility facility = builder.build();
-
+  private void testCreateInstanceFromFacility(Facility facility) {
     FhirLocation fhirLocation = FhirLocation.newInstance(SERVICE_URL, facility);
 
     assertThat(fhirLocation.getId())
@@ -112,23 +151,37 @@ public class FhirLocationTest {
     assertThat(fhirLocation.getAlias())
         .hasSize(1)
         .contains(facility.getCode());
-    assertThat(fhirLocation.getIdentifier())
-        .hasSize(null == program ? 2 : 3)
-        .contains(new FhirIdentifier(SERVICE_URL,
-            FacilityTypeController.RESOURCE_PATH, facility.getType().getId()))
-        .contains(new FhirIdentifier(SERVICE_URL,
-            FacilityOperatorController.RESOURCE_PATH, facility.getOperator().getId()));
 
-    if (null != program) {
-      assertThat(fhirLocation.getIdentifier())
-          .contains(new FhirIdentifier(SERVICE_URL,
-              ProgramController.RESOURCE_PATH, program.getId()));
-    }
+    int identifierCount = CollectionUtils.size(facility.getSupportedPrograms())
+        + 1 // facility type is always set
+        + (null == facility.getOperator() ? 0 : 1);
+
+    assertThat(fhirLocation.getIdentifier())
+        .hasSize(identifierCount)
+        .contains(new FhirIdentifier(SERVICE_URL,
+            FacilityTypeController.RESOURCE_PATH, facility.getType().getId()));
+
+    Optional
+        .ofNullable(facility.getOperator())
+        .ifPresent(operator ->
+            assertThat(fhirLocation.getIdentifier())
+                .contains(new FhirIdentifier(SERVICE_URL,
+                    FacilityOperatorController.RESOURCE_PATH, operator.getId())));
+
+    facility
+        .getSupportedPrograms()
+        .forEach(supported ->
+            assertThat(fhirLocation.getIdentifier())
+                .contains(new FhirIdentifier(SERVICE_URL,
+                    ProgramController.RESOURCE_PATH, supported.programId())));
 
     assertThat(fhirLocation.getName())
         .isEqualTo(facility.getName());
-    assertThat(fhirLocation.getPosition())
-        .isEqualTo(new FhirPosition(facility.getLocation().getX(), facility.getLocation().getY()));
+    Optional
+        .ofNullable(facility.getLocation())
+        .ifPresent(location ->
+            assertThat(fhirLocation.getPosition())
+                .isEqualTo(new FhirPosition(location.getX(), location.getY())));
     assertThat(fhirLocation.getPhysicalType())
         .isEqualTo(new FhirPhysicalType(SITE));
     assertThat(fhirLocation.getPartOf())

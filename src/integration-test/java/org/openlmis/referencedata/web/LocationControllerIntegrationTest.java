@@ -117,11 +117,11 @@ public class LocationControllerIntegrationTest extends BaseWebIntegrationTest {
         .body("[0].status", is(Status.ACTIVE.toString()));
 
     checkIdentifier(response, 0,
-        ProgramController.RESOURCE_PATH + '/' + supportedProgramId);
-    checkIdentifier(response, 1,
         FacilityTypeController.RESOURCE_PATH + '/' + facility.getType().getId());
-    checkIdentifier(response, 2,
+    checkIdentifier(response, 1,
         FacilityOperatorController.RESOURCE_PATH + '/' + facility.getOperator().getId());
+    checkIdentifier(response, 2,
+        ProgramController.RESOURCE_PATH + '/' + supportedProgramId);
     checkPartOf(response,
         LocationController.RESOURCE_PATH + '/' + facility.getGeographicZone().getId());
     checkPosition(response, facility.getLocation().getX(), facility.getLocation().getY());

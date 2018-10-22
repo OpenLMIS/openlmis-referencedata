@@ -65,18 +65,26 @@ public final class FhirLocation extends FhirResource {
    */
   static FhirLocation newInstance(String serviceUrl, GeographicZone zone) {
     FhirLocation fhirLocation = new FhirLocation(zone.getId());
+
+    // mandatory
     fhirLocation.addAlias(zone.getCode());
     fhirLocation.addIdentifier(
         serviceUrl, GeographicLevelController.RESOURCE_PATH, zone.getLevel().getId());
-    fhirLocation.name = zone.getName();
-    fhirLocation.position = new FhirPosition(zone.getLongitude(), zone.getLatitude());
     fhirLocation.physicalType = new FhirPhysicalType(AREA);
 
+    // optional
+    Optional
+        .ofNullable(zone.getName())
+        .ifPresent(name -> fhirLocation.name = name);
     Optional
         .ofNullable(zone.getParent())
         .ifPresent(parent ->
             fhirLocation.partOf =
                 new FhirReference(serviceUrl, LocationController.RESOURCE_PATH, parent.getId()));
+
+    if (null != zone.getLatitude() && null != zone.getLongitude()) {
+      fhirLocation.position = new FhirPosition(zone.getLongitude(), zone.getLatitude());
+    }
 
     return fhirLocation;
   }
@@ -86,41 +94,37 @@ public final class FhirLocation extends FhirResource {
    */
   static FhirLocation newInstance(String serviceUrl, Facility facility) {
     FhirLocation fhirLocation = new FhirLocation(facility.getId());
-    fhirLocation.addAlias(facility.getCode());
 
+    // mandatory
+    fhirLocation.addAlias(facility.getCode());
+    fhirLocation.partOf = new FhirReference(serviceUrl, LocationController.RESOURCE_PATH,
+        facility.getGeographicZone().getId());
+    fhirLocation.addIdentifier(serviceUrl, FacilityTypeController.RESOURCE_PATH,
+        facility.getType().getId());
+    fhirLocation.status = isTrue(facility.getActive())
+        ? Status.ACTIVE.toString()
+        : Status.INACTIVE.toString();
+    fhirLocation.physicalType = new FhirPhysicalType(SITE);
+
+    // optional
+    Optional
+        .ofNullable(facility.getName())
+        .ifPresent(name -> fhirLocation.name = name);
+    Optional
+        .ofNullable(facility.getDescription())
+        .ifPresent(description -> fhirLocation.description = description);
+    Optional
+        .ofNullable(facility.getOperator())
+        .ifPresent(operator -> fhirLocation.addIdentifier(
+            serviceUrl, FacilityOperatorController.RESOURCE_PATH, operator.getId()));
     Optional
         .ofNullable(facility.getSupportedPrograms())
         .orElse(Collections.emptySet())
         .forEach(sp -> fhirLocation.addIdentifier(
             serviceUrl, ProgramController.RESOURCE_PATH, sp.programId()));
-
-    fhirLocation.addIdentifier(
-        serviceUrl, FacilityTypeController.RESOURCE_PATH, facility.getType().getId());
-
-    Optional
-        .ofNullable(facility.getOperator())
-        .ifPresent(operator -> fhirLocation.addIdentifier(
-            serviceUrl, FacilityOperatorController.RESOURCE_PATH, operator.getId()));
-
-    fhirLocation.name = facility.getName();
-
     Optional
         .ofNullable(facility.getLocation())
         .ifPresent(point -> fhirLocation.position = new FhirPosition(point.getX(), point.getY()));
-
-    fhirLocation.physicalType = new FhirPhysicalType(SITE);
-
-    Optional
-        .ofNullable(facility.getGeographicZone())
-        .ifPresent(zone ->
-            fhirLocation.partOf =
-                new FhirReference(serviceUrl, LocationController.RESOURCE_PATH, zone.getId()));
-
-    fhirLocation.description = facility.getDescription();
-
-    fhirLocation.status = isTrue(facility.getActive())
-        ? Status.ACTIVE.toString()
-        : Status.INACTIVE.toString();
 
     return fhirLocation;
   }
