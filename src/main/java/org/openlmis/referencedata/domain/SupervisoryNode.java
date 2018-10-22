@@ -136,7 +136,7 @@ public class SupervisoryNode extends BaseEntity {
    * Note, this does not get the facility attached to this supervisory node. "All supervised
    * facilities" means all facilities supervised by this node and all recursive child nodes.
    *
-   * @param program program to check
+   * @param program program to check, can be null.
    * @return all supervised facilities
    */
   public Set<Facility> getAllSupervisedFacilities(Program program) {
@@ -146,12 +146,13 @@ public class SupervisoryNode extends BaseEntity {
     Set<Facility> supervisedFacilities = new HashSet<>();
 
     profiler.start("CHECK_IF_REQ_GROUP_SUPPORTS_PROGRAM");
-    if (requisitionGroup != null && requisitionGroup.supports(program)) {
+
+    if (requisitionGroup != null && (null == program || requisitionGroup.supports(program))) {
       profiler.start("REQ_GROUP_GET_MEMBER_FACILITIES");
       Set<Facility> facilities = requisitionGroup
           .getMemberFacilities()
           .stream()
-          .filter(member -> member.supports(program))
+          .filter(member -> null == program || member.supports(program))
           .collect(Collectors.toSet());
       supervisedFacilities.addAll(facilities);
     }

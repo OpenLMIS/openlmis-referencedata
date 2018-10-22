@@ -98,6 +98,15 @@ public class SupervisoryNodeTest {
 
   @Test
   public void shouldGetAllIndirectSupervisedFacilities() {
+    testGetAllIndirectSupervisedFacilities(program);
+  }
+
+  @Test
+  public void shouldGetAllSupervisedFacilitiesIfProgramIsNotProvided() {
+    testGetAllIndirectSupervisedFacilities(null);
+  }
+
+  private void testGetAllIndirectSupervisedFacilities(Program program) {
     //given
     SupervisoryNode supervisoryNode2 = new SupervisoryNodeDataBuilder().build();
     RequisitionGroup requisitionGroup2 = new RequisitionGroup("RG2", "RGN2", supervisoryNode2);
@@ -105,7 +114,7 @@ public class SupervisoryNodeTest {
     addSupportedPrograms(requisitionGroup2);
     RequisitionGroupProgramSchedule requisitionGroupProgramSchedule2 =
         RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
-            requisitionGroup2, program, processingSchedule, false);
+            requisitionGroup2, this.program, processingSchedule, false);
     requisitionGroup2.setRequisitionGroupProgramSchedules(
         Collections.singletonList(requisitionGroupProgramSchedule2));
     supervisoryNode2.setRequisitionGroup(requisitionGroup2);
