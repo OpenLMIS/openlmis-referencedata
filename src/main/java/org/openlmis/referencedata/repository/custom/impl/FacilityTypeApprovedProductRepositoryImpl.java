@@ -15,9 +15,9 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
@@ -87,21 +87,24 @@ public class FacilityTypeApprovedProductRepositoryImpl
   }
 
   @Override
-  public Page<FacilityTypeApprovedProduct> searchProducts(String facilityTypeCode,
+  public Page<FacilityTypeApprovedProduct> searchProducts(List<String> facilityTypeCodes,
                                                           String programCode,
                                                           Pageable pageable) {
-    checkNotNull(facilityTypeCode);
-
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    countQuery = prepareQuery(facilityTypeCodes, programCode, countQuery, true);
+
+    Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    if (count == 0) {
+      return Pagination.getPage(Collections.emptyList());
+    }
 
     CriteriaQuery<FacilityTypeApprovedProduct> ftapQuery =
         builder.createQuery(FacilityTypeApprovedProduct.class);
-    ftapQuery = prepareQuery(facilityTypeCode, programCode, ftapQuery, false);
+    ftapQuery = prepareQuery(facilityTypeCodes, programCode, ftapQuery, false);
 
-    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery = prepareQuery(facilityTypeCode, programCode, countQuery, true);
-
-    Long count = entityManager.createQuery(countQuery).getSingleResult();
 
     Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
     List<FacilityTypeApprovedProduct> resultList = entityManager.createQuery(ftapQuery)
@@ -153,7 +156,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     return query;
   }
 
-  private <T> CriteriaQuery<T> prepareQuery(String facilityTypeCode,
+  private <T> CriteriaQuery<T> prepareQuery(List<String> facilityTypeCodes,
                                             String programCode,
                                             CriteriaQuery<T> query,
                                             boolean count) {
@@ -169,8 +172,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
       conjunctionPredicate = builder.and(conjunctionPredicate,
           builder.equal(program.get(CODE), Code.code(programCode)));
     }
-    conjunctionPredicate = builder.and(conjunctionPredicate,
-        builder.equal(ft.get(CODE), facilityTypeCode));
+    conjunctionPredicate = builder.and(conjunctionPredicate, ft.get(CODE).in(facilityTypeCodes));
     Join<FacilityTypeApprovedProduct, Orderable> orderable = ftap.join("orderable");
     Join<Orderable, List<ProgramOrderable>> programOrderables =
         orderable.joinList("programOrderables");

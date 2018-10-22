@@ -27,7 +27,7 @@ public interface FacilityTypeApprovedProductRepositoryCustom {
                                                    Boolean fullSupply, List<UUID> orderableIds,
                                                    Pageable pageable);
 
-  Page<FacilityTypeApprovedProduct> searchProducts(String facilityTypeCode,
+  Page<FacilityTypeApprovedProduct> searchProducts(List<String> facilityTypeCodes,
                                                    String programCode,
                                                    Pageable pageable);
 }

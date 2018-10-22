@@ -20,7 +20,6 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -31,7 +30,6 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.FacilityTypeApprovedProductBuilder;
-import org.openlmis.referencedata.service.FacilityTypeApprovedProductService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.slf4j.Logger;
@@ -43,6 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,9 +62,6 @@ public class FacilityTypeApprovedProductController extends BaseController {
 
   @Autowired
   private OrderableRepository orderableRepository;
-
-  @Autowired
-  private FacilityTypeApprovedProductService approvedProductService;
 
   @Autowired
   private FacilityTypeApprovedProductBuilder facilityTypeApprovedProductBuilder;
@@ -159,10 +155,14 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.GET)
   @ResponseBody
   public Page<ApprovedProductDto> searchFacilityTypeApprovedProducts(
-        @RequestParam Map<String, String> queryParams, Pageable pageable) {
+        @RequestParam MultiValueMap<String, Object> queryParams, Pageable pageable) {
 
-    Page<FacilityTypeApprovedProduct> ftaps =
-        approvedProductService.search(queryParams, pageable);
+    FacilityTypeApprovedProductSearchParams searchParams =
+        new FacilityTypeApprovedProductSearchParams(queryParams);
+
+    Page<FacilityTypeApprovedProduct> ftaps = repository
+        .searchProducts(searchParams.getFacilityTypeCodes(), searchParams.getProgram(), pageable);
+
     return Pagination.getPage(toDto(ftaps.getContent()), pageable, ftaps.getTotalElements());
   }
 
