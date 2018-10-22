@@ -382,6 +382,7 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * Manage programs
     * Manage stock destinations
     * Manage stock card line item reasons
+    * View rights
   * users:
     * administrator
     * admin
