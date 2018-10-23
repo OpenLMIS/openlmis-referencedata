@@ -18,7 +18,7 @@ package org.openlmis.referencedata.web;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
@@ -150,6 +150,8 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldCreateSupplyPartner() {
+    supplyPartnerDto.setId(null);
+
     ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -160,14 +162,14 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
         .then()
         .statusCode(HttpStatus.SC_CREATED);
 
-    assertResponseBody(response, "", is(not(supplyPartnerDto.getId().toString())));
+    assertResponseBody(response, "", is(notNullValue(String.class)));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldReturnBadRequestIfRequestBodyIsInvalidInPostSupplyPartners() {
-    supplyPartnerDto.getAssociations().get(0).setFacilities(Lists.newArrayList());
+    supplyPartnerDto.setId(UUID.randomUUID());
 
     restAssured
         .given()
@@ -178,7 +180,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
         .post(RESOURCE_PATH)
         .then()
         .statusCode(HttpStatus.SC_BAD_REQUEST)
-        .body(MESSAGE_KEY, is(SupplyPartnerMessageKeys.ERROR_MISSING_FACILITIES));
+        .body(MESSAGE_KEY, is(SupplyPartnerMessageKeys.ERROR_ID_PROVIDED));
 
     // we don't check request body because of the purpose of the test
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.validates());
