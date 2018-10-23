@@ -70,13 +70,19 @@ public final class SupplyPartnerAssociationDto extends BaseDto
   @Override
   @JsonIgnore
   public UUID getProgramId() {
-    return null == program ? null : program.getId();
+    return Optional
+        .ofNullable(program)
+        .map(BaseDto::getId)
+        .orElse(null);
   }
 
   @Override
   @JsonIgnore
   public UUID getSupervisoryNodeId() {
-    return null == supervisoryNode ? null : supervisoryNode.getId();
+    return Optional
+        .ofNullable(supervisoryNode)
+        .map(BaseDto::getId)
+        .orElse(null);
   }
 
   @Override
