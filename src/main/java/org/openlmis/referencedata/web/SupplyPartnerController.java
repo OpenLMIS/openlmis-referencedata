@@ -87,7 +87,7 @@ public class SupplyPartnerController extends BaseController {
     profiler.start("FIND_SUPPLY_PARTNERS");
     Page<SupplyPartner> supplyPartners = supplyPartnerRepository.findAll(pageable);
 
-    List<SupplyPartnerDto> supplyPartnerDtos = toDto(supplyPartners.getContent(), profiler);
+    List<SupplyPartnerDto> supplyPartnerDtos = toDtos(supplyPartners.getContent(), profiler);
 
     profiler.start("CREATE_FINAL_RESULT_PAGE");
     Page<SupplyPartnerDto> page = Pagination.getPage(supplyPartnerDtos, pageable,
@@ -226,7 +226,7 @@ public class SupplyPartnerController extends BaseController {
     return supplyPartner;
   }
 
-  private List<SupplyPartnerDto> toDto(List<SupplyPartner> partners, Profiler profiler) {
+  private List<SupplyPartnerDto> toDtos(List<SupplyPartner> partners, Profiler profiler) {
     profiler.start("EXPORT_SUPPLY_PARTNERS_TO_DTOS");
     return partners
         .stream()
