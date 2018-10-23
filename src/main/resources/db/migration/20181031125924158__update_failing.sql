@@ -1,1 +1,0 @@
-UPDATE facilities SET code = 'ABC';
