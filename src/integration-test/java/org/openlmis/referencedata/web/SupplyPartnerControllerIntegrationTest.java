@@ -92,7 +92,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
         Sets.newHashSet(orderable.getId()), new PageRequest(0, 1)))
         .willReturn(Pagination.getPage(Lists.newArrayList(orderable)));
 
-    mockUserHasRight(RightName.SUPPLY_PARTNER_MANAGE);
+    mockUserHasRight(RightName.SUPPLY_PARTNERS_MANAGE);
   }
 
   @Test
@@ -132,7 +132,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldReturnForbiddenIfUserHasNoRightsInGetSupplyPartners() {
-    mockUserHasNoRight(RightName.SUPPLY_PARTNER_MANAGE);
+    mockUserHasNoRight(RightName.SUPPLY_PARTNERS_MANAGE);
 
     restAssured
         .given()
@@ -201,7 +201,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldReturnForbiddenIfUserHasNoRightsInPostSupplyPartners() {
-    mockUserHasNoRight(RightName.SUPPLY_PARTNER_MANAGE);
+    mockUserHasNoRight(RightName.SUPPLY_PARTNERS_MANAGE);
 
     restAssured
         .given()
@@ -250,7 +250,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldReturnForbiddenIfUserHasNoRightsInGetSupplyPartner() {
-    mockUserHasNoRight(RightName.SUPPLY_PARTNER_MANAGE);
+    mockUserHasNoRight(RightName.SUPPLY_PARTNERS_MANAGE);
 
     restAssured
         .given()
@@ -337,7 +337,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldReturnForbiddenIfUserHasNoRightsInPutSupplyPartner() {
-    mockUserHasNoRight(RightName.SUPPLY_PARTNER_MANAGE);
+    mockUserHasNoRight(RightName.SUPPLY_PARTNERS_MANAGE);
 
     restAssured
         .given()
@@ -365,7 +365,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldReturnForbiddenIfUserHasNoRightsInGetAuditLog() {
-    mockUserHasNoRight(RightName.SUPPLY_PARTNER_MANAGE);
+    mockUserHasNoRight(RightName.SUPPLY_PARTNERS_MANAGE);
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_PATH);
 

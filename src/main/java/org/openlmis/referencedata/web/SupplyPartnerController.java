@@ -82,7 +82,7 @@ public class SupplyPartnerController extends BaseController {
     Profiler profiler = new Profiler("GET_SUPPLY_PARTNERS");
     profiler.setLogger(XLOGGER);
 
-    checkAdminRight(RightName.SUPPLY_PARTNER_MANAGE, profiler);
+    checkAdminRight(RightName.SUPPLY_PARTNERS_MANAGE, profiler);
 
     profiler.start("FIND_SUPPLY_PARTNERS");
     Page<SupplyPartner> supplyPartners = supplyPartnerRepository.findAll(pageable);
@@ -109,7 +109,7 @@ public class SupplyPartnerController extends BaseController {
     Profiler profiler = new Profiler("CREATE_SUPPLY_PARTNER");
     profiler.setLogger(XLOGGER);
 
-    checkAdminRight(RightName.SUPPLY_PARTNER_MANAGE, profiler);
+    checkAdminRight(RightName.SUPPLY_PARTNERS_MANAGE, profiler);
 
     profiler.start("BUILD_SUPPLY_PARTNER_FROM_DTO");
     supplyPartnerDto.setId(null);
@@ -135,7 +135,7 @@ public class SupplyPartnerController extends BaseController {
     Profiler profiler = new Profiler("GET_SUPPLY_PARTNER");
     profiler.setLogger(XLOGGER);
 
-    checkAdminRight(RightName.SUPPLY_PARTNER_MANAGE, profiler);
+    checkAdminRight(RightName.SUPPLY_PARTNERS_MANAGE, profiler);
 
     SupplyPartner supplyPartner = findSupplyPartner(id, profiler);
 
@@ -162,7 +162,7 @@ public class SupplyPartnerController extends BaseController {
       throw new ValidationMessageException(SupplyPartnerMessageKeys.ERROR_ID_MISMATCH);
     }
 
-    checkAdminRight(RightName.SUPPLY_PARTNER_MANAGE, profiler);
+    checkAdminRight(RightName.SUPPLY_PARTNERS_MANAGE, profiler);
 
     profiler.start("BUILD_SUPPLY_PARTNER_FROM_DTO");
     SupplyPartner supplyPartner = supplyPartnerBuilder.build(supplyPartnerDto);
@@ -201,7 +201,7 @@ public class SupplyPartnerController extends BaseController {
     Profiler profiler = new Profiler("GET_AUDIT_LOG");
     profiler.setLogger(XLOGGER);
 
-    checkAdminRight(RightName.SUPPLY_PARTNER_MANAGE, profiler);
+    checkAdminRight(RightName.SUPPLY_PARTNERS_MANAGE, profiler);
     findSupplyPartner(id, profiler);
 
     profiler.start("GET_AUDIT_LOG");

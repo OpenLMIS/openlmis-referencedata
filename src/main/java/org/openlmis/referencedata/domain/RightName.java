@@ -34,7 +34,7 @@ public class RightName {
   public static final String SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE =
       "SYSTEM_IDEAL_STOCK_AMOUNTS_MANAGE";
   public static final String SERVICE_ACCOUNTS_MANAGE = "SERVICE_ACCOUNTS_MANAGE";
-  public static final String SUPPLY_PARTNER_MANAGE = "SUPPLY_PARTNER_MANAGE";
+  public static final String SUPPLY_PARTNERS_MANAGE = "SUPPLY_PARTNERS_MANAGE";
 
   private RightName() {
     throw new UnsupportedOperationException();
