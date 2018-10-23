@@ -112,7 +112,10 @@ public class SupplyPartnerController extends BaseController {
     checkAdminRight(RightName.SUPPLY_PARTNERS_MANAGE, profiler);
 
     profiler.start("BUILD_SUPPLY_PARTNER_FROM_DTO");
-    supplyPartnerDto.setId(null);
+    if (null != supplyPartnerDto.getId()) {
+      throw new ValidationMessageException(SupplyPartnerMessageKeys.ERROR_ID_PROVIDED);
+    }
+
     SupplyPartner supplyPartner = supplyPartnerBuilder.build(supplyPartnerDto);
 
     profiler.start("SAVE");

@@ -24,6 +24,7 @@ public abstract class SupplyPartnerMessageKeys extends MessageKeys {
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
   public static final String ERROR_ID_MISMATCH = join(ERROR, ID_MISMATCH);
   public static final String ERROR_CODE_DUPLICATED = join(ERROR, CODE, DUPLICATED);
+  public static final String ERROR_ID_PROVIDED = join(ERROR, ID, "provided");
   public static final String ERROR_MISSING_FACILITIES =
       join(ERROR, ASSOCIATIONS, "missingFacilities");
   public static final String ERROR_MISSING_ORDERABLES =
