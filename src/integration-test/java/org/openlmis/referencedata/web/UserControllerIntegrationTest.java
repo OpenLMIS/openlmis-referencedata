@@ -77,7 +77,6 @@ import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.DetailedRoleAssignmentDto;
-import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -109,7 +108,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String HAS_RIGHT_URL = ID_URL + "/hasRight";
   private static final String PROGRAMS_URL = ID_URL + "/programs";
   private static final String SUPPORTED_PROGRAMS_URL = ID_URL + "/supportedPrograms";
-  private static final String SUPERVISED_FACILITIES_URL = ID_URL + "/supervisedFacilities";
   private static final String FULFILLMENT_FACILITIES_URL = ID_URL + "/fulfillmentFacilities";
   private static final String PERMISSION_STRINGS_URL = ID_URL + "/permissionStrings";
   private static final String FACILITIES_URL = ID_URL + "/facilities";
@@ -658,87 +656,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     getUserSupportedPrograms()
         .then()
         .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetUserSupervisedFacilities() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-
-    FacilityDto[] response = getUserSupervisedFacilities()
-        .then()
-        .statusCode(200)
-        .extract().as(FacilityDto[].class);
-
-    assertThat(response.length, is(2));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetUserSupervisedFacilitiesWithNoRightIfUserRequestsTheirOwnRecord() {
-    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
-
-    FacilityDto[] response = getUserSupervisedFacilities()
-        .then()
-        .statusCode(200)
-        .extract().as(FacilityDto[].class);
-
-    assertThat(response.length, is(2));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldRejectGetUserSupervisedFacilitiesIfUserHasNoRight() {
-    mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT);
-
-    String messageKey = getUserSupervisedFacilities()
-        .then()
-        .statusCode(403)
-        .extract()
-        .path(MESSAGE_KEY);
-
-    assertThat(messageKey, Matchers.is(equalTo(MESSAGEKEY_ERROR_UNAUTHORIZED)));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void getUserSupervisedFacilitiesShouldReturnNotFoundForNonExistingUser() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-
-    given(userRepository.findOne(userId)).willReturn(null);
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam(RIGHT_ID_STRING, supervisionRightId)
-        .queryParam(PROGRAM_ID_STRING, program2Id)
-        .pathParam("id", userId)
-        .when()
-        .get(SUPERVISED_FACILITIES_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void getUserSupervisedFacilitiesShouldReturnBadRequestForNonExistingUuid() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-
-    given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
-    given(programRepository.findOne(program1Id)).willReturn(null);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam(RIGHT_ID_STRING, supervisionRightId)
-        .queryParam(PROGRAM_ID_STRING, program1Id)
-        .pathParam("id", userId)
-        .when()
-        .get(SUPERVISED_FACILITIES_URL)
-        .then()
-        .statusCode(400);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -1319,21 +1236,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .pathParam("id", userId)
         .when()
         .get(SUPPORTED_PROGRAMS_URL);
-  }
-
-  private Response getUserSupervisedFacilities() {
-    given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
-    given(programRepository.findOne(program2Id)).willReturn(program2);
-
-    return restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam(RIGHT_ID_STRING, supervisionRightId)
-        .queryParam(PROGRAM_ID_STRING, program2Id)
-        .pathParam("id", userId)
-        .when()
-        .get(SUPERVISED_FACILITIES_URL);
   }
 
   private Response getUserFulfillmentFacilities() {
