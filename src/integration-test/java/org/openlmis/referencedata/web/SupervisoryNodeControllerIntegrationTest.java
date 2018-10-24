@@ -241,7 +241,12 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectPostSupervisoryNodeIfCodeIsDuplicated() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.existsByCode(supervisoryNodeDto.getCode())).willReturn(true);
+
+    SupervisoryNode existing = new SupervisoryNodeDataBuilder()
+        .withCode(supervisoryNode.getCode())
+        .build();
+
+    given(supervisoryNodeRepository.findByCode(supervisoryNode.getCode())).willReturn(existing);
 
     restAssured
         .given()
@@ -280,6 +285,39 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     assertEquals(newDto, response);
     assertEquals("OpenLMIS", response.getDescription());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldUpdateSupervisoryNode() {
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder();
+    SupervisoryNode existing = builder.build();
+
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
+
+    builder.withName("Updated Name");
+    SupervisoryNodeDto newDto = new SupervisoryNodeDto();
+    builder
+        .build()
+        .export(newDto);
+
+    SupervisoryNodeDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .body(newDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(SupervisoryNodeDto.class);
+
+    assertEquals(newDto, response);
+    assertEquals("Updated Name", response.getName());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -327,7 +365,12 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectPutSupervisoryNodeIfCodeIsDuplicated() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.existsByCode(supervisoryNodeDto.getCode())).willReturn(true);
+
+    SupervisoryNode existing = new SupervisoryNodeDataBuilder()
+        .withCode(supervisoryNode.getCode())
+        .build();
+
+    given(supervisoryNodeRepository.findByCode(supervisoryNode.getCode())).willReturn(existing);
 
     restAssured
         .given()

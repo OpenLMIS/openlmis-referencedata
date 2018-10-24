@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.validate;
 
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
@@ -64,7 +65,8 @@ public class SupervisoryNodeValidator implements BaseValidator {
 
     SupervisoryNodeDto node = (SupervisoryNodeDto) target;
 
-    if (repository.existsByCode(node.getCode())) {
+    SupervisoryNode existingWithCode = repository.findByCode(node.getCode());
+    if (null != existingWithCode && !existingWithCode.getId().equals(node.getId())) {
       rejectValue(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
     }
   }
