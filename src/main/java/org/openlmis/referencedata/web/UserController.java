@@ -513,50 +513,6 @@ public class UserController extends BaseController {
   }
 
   /**
-   * Get all the facilities that the user supervises, by right and program.
-   *
-   * @param userId    id of user to get supervised facilities
-   * @param rightId   right to check
-   * @param programId program to check
-   * @return a set of supervised facilities
-   */
-  @RequestMapping(value = "/users/{userId}/supervisedFacilities", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Set<FacilityDto> getUserSupervisedFacilities(
-      @PathVariable(USER_ID) UUID userId,
-      @RequestParam(value = "rightId") UUID rightId,
-      @RequestParam(value = "programId") UUID programId) {
-    Profiler profiler = new Profiler("GET_USER_SUPERVISED_FACILITIES");
-    profiler.setLogger(LOGGER);
-
-    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
-
-    profiler.start("GET_USER");
-    User user = (User) validateId(userId, userRepository).orElseThrow(() ->
-        new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId)));
-
-    profiler.start("GET_RIGHT");
-    Right right = (Right) validateId(rightId, rightRepository).orElseThrow(() ->
-        new ValidationMessageException(
-            new Message(RightMessageKeys.ERROR_NOT_FOUND_WITH_ID, rightId)));
-
-    profiler.start("GET_PROGRAM");
-    Program program = (Program) validateId(programId, programRepository).orElseThrow(() ->
-        new ValidationMessageException(
-            new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId)));
-
-    profiler.start("GET_SUPERVISED_FACILITIES");
-    Set<Facility> supervisedFacilities = user.getSupervisedFacilities(right, program);
-
-    profiler.start(PROFILER_TO_DTO);
-    Set<FacilityDto> result = facilitiesToDto(supervisedFacilities);
-
-    profiler.stop().log();
-    return result;
-  }
-
-  /**
    * Get all the facilities that the user has fulfillment rights for.
    *
    * @param userId id of user to get fulfillment facilities
