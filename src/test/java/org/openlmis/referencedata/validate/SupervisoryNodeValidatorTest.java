@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
@@ -78,7 +79,11 @@ public class SupervisoryNodeValidatorTest {
 
   @Test
   public void shouldRejectIfCodeIsDuplicated() {
-    when(repository.existsByCode(DC1)).thenReturn(true);
+    SupervisoryNode existing = new SupervisoryNodeDataBuilder()
+        .withCode(DC1)
+        .build();
+
+    when(repository.findByCode(DC1)).thenReturn(existing);
 
     new SupervisoryNodeDataBuilder()
         .withCode(DC1)
@@ -88,6 +93,23 @@ public class SupervisoryNodeValidatorTest {
     validator.validate(dto, errors);
 
     assertErrorMessage(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+  }
+
+  @Test
+  public void shouldNotRejectIfUpdatingSupervisoryNode() {
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder().withCode(DC1);
+    SupervisoryNode existing = builder.build();
+
+    when(repository.findByCode(DC1)).thenReturn(existing);
+
+    builder
+        .withName("Updated Name")
+        .build()
+        .export(dto);
+
+    validator.validate(dto, errors);
+
+    assertEquals(0, errors.getErrorCount());
   }
 
   @Test
