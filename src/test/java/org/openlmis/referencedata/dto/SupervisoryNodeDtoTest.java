@@ -15,24 +15,34 @@
 
 package org.openlmis.referencedata.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.vividsolutions.jts.geom.Polygon;
-import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-@Getter
-@Setter
-public final class GeographicZoneDto extends GeographicZoneSimpleDto {
-  private Polygon boundary;
-  private Map<String, Object> extraData;
+public class SupervisoryNodeDtoTest {
+
+  @Test
+  public void equalsContract() {
+    FacilityDto red = new FacilityDto();
+    FacilityDto black = new FacilityDto();
+
+    new FacilityDataBuilder().build().export(red);
+    new FacilityDataBuilder().build().export(black);
+
+    EqualsVerifier
+        .forClass(SupervisoryNodeDto.class)
+        .withRedefinedSuperclass()
+        .withPrefabValues(FacilityDto.class, red, black)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    SupervisoryNodeDto dto = new SupervisoryNodeDto();
+    ToStringTestUtils.verify(SupervisoryNodeDto.class, dto);
+  }
+
 }

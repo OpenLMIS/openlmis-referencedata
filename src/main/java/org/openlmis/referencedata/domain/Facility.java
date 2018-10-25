@@ -314,13 +314,13 @@ public class Facility extends BaseEntity implements FhirLocation {
         .anyMatch(supported -> supported.isActiveFor(program));
   }
 
-  public void setExtraData(Map<String, String> extraData) {
+  public void setExtraData(Map<String, Object> extraData) {
     this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
     this.extraData.updateFrom(extraData);
   }
 
   @Override
-  public Map<String, String> getExtraData() {
+  public Map<String, Object> getExtraData() {
     return ExtraDataEntity.defaultEntity(extraData).getExtraData();
   }
 

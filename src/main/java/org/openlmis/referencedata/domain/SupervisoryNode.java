@@ -16,11 +16,12 @@
 package org.openlmis.referencedata.domain;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -34,6 +35,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
+import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -83,6 +86,9 @@ public class SupervisoryNode extends BaseEntity {
   @Setter
   private RequisitionGroup requisitionGroup;
 
+  @Embedded
+  private ExtraDataEntity extraData = new ExtraDataEntity();
+
   /**
    * Static factory method for constructing a new supervisory node using an importer (DTO).
    *
@@ -112,8 +118,12 @@ public class SupervisoryNode extends BaseEntity {
       }
     }
 
+    Map<String, Object> extraData = importer.getExtraData();
+    ExtraDataEntity extraDataEntity = new ExtraDataEntity(extraData);
+
     SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getCode(), importer.getName(),
-        importer.getDescription(), facility, parentNode, childNodes, requisitionGroup);
+        importer.getDescription(), facility, parentNode, childNodes, requisitionGroup,
+        extraDataEntity);
     newSupervisoryNode.setId(importer.getId());
 
     return newSupervisoryNode;
@@ -190,6 +200,9 @@ public class SupervisoryNode extends BaseEntity {
     this.parentNode = supervisoryNode.getParentNode();
     this.childNodes = supervisoryNode.getChildNodes();
     this.requisitionGroup = supervisoryNode.getRequisitionGroup();
+
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.updateFrom(supervisoryNode.getExtraData());
   }
 
   /**
@@ -206,6 +219,18 @@ public class SupervisoryNode extends BaseEntity {
     exporter.setParentNode(parentNode);
     exporter.setChildNodes(childNodes);
     exporter.setRequisitionGroup(requisitionGroup);
+
+    extraData = ExtraDataEntity.defaultEntity(extraData);
+    extraData.export(exporter);
+  }
+
+  public Map<String, Object> getExtraData() {
+    return this.extraData.getExtraData();
+  }
+
+  public void setExtraData(Map<String, Object> extraData) {
+    this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
+    this.extraData.updateFrom(extraData);
   }
 
   @Override
@@ -225,8 +250,7 @@ public class SupervisoryNode extends BaseEntity {
     return Objects.hash(code);
   }
 
-  public interface Exporter {
-    void setId(UUID id);
+  public interface Exporter extends BaseExporter, ExtraDataExporter {
 
     void setCode(String code);
 
@@ -243,8 +267,7 @@ public class SupervisoryNode extends BaseEntity {
     void setRequisitionGroup(RequisitionGroup requisitionGroup);
   }
 
-  public interface Importer {
-    UUID getId();
+  public interface Importer extends BaseImporter, ExtraDataImporter {
 
     String getCode();
 

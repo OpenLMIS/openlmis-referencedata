@@ -16,8 +16,10 @@
 package org.openlmis.referencedata.testbuilder;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.openlmis.referencedata.domain.ExtraDataEntity;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -34,6 +36,7 @@ public class SupervisoryNodeDataBuilder {
   private SupervisoryNode parentNode;
   private Set<SupervisoryNode> childNodes;
   private RequisitionGroup requisitionGroup;
+  private Map<String, Object> extraData;
 
   /**
    * Returns instance of {@link SupervisoryNodeDataBuilder} with sample data.
@@ -54,7 +57,7 @@ public class SupervisoryNodeDataBuilder {
    */
   public SupervisoryNode build() {
     SupervisoryNode node = new SupervisoryNode(code, name, description, facility, parentNode,
-        childNodes, requisitionGroup);
+        childNodes, requisitionGroup, new ExtraDataEntity(extraData));
     node.setId(id);
 
     return node;

@@ -33,7 +33,7 @@ public class ExtraDataEntityTest {
   private static final String VALUE = "value";
 
   private ExtraDataEntity entity = new ExtraDataEntity();
-  private Map<String, String> importer = ImmutableMap
+  private Map<String, Object> importer = ImmutableMap
       .of(KEY, VALUE);
 
   @Test

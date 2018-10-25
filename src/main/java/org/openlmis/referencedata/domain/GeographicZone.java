@@ -156,7 +156,7 @@ public class GeographicZone extends BaseEntity implements FhirLocation {
   }
 
   @Override
-  public Map<String, String> getExtraData() {
+  public Map<String, Object> getExtraData() {
     return ExtraDataEntity.defaultEntity(extraData).getExtraData();
   }
 

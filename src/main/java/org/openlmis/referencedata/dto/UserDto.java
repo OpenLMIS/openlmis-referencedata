@@ -42,6 +42,6 @@ public final class UserDto extends BaseDto implements User.Exporter, User.Import
   private UUID homeFacilityId;
   private boolean active;
   private boolean loginRestricted;
-  private Map<String, String> extraData;
+  private Map<String, Object> extraData;
   private Set<RoleAssignmentDto> roleAssignments = Sets.newHashSet();
 }

@@ -47,10 +47,14 @@ public final class FacilityDto extends BasicFacilityDto {
   private String comment;
   private Boolean openLmisAccessible;
   private Point location;
-  private Map<String, String> extraData;
+  private Map<String, Object> extraData;
 
   @Getter
   private Set<SupportedProgramDto> supportedPrograms;
+
+  public FacilityDto(UUID id) {
+    setId(id);
+  }
 
   /**
    * Creates new instance of {@link FacilityDto} based on passed facility.
@@ -60,10 +64,6 @@ public final class FacilityDto extends BasicFacilityDto {
     facility.export(dto);
 
     return dto;
-  }
-
-  public FacilityDto(UUID id) {
-    setId(id);
   }
 
   @JsonSetter("operator")

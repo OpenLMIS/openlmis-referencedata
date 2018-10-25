@@ -16,18 +16,31 @@
 package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 
+@Getter
+@Setter
 @NoArgsConstructor
-public class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
+@AllArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public final class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
 
   @JsonProperty
   @Getter
@@ -113,14 +126,11 @@ public class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
 
   @Override
   public Set<SupervisoryNode.Importer> getChildNodes() {
-    if (this.childNodes == null) {
-      return null;
-    }
+    Set<SupervisoryNodeBaseDto> collection = Optional
+        .ofNullable(childNodes)
+        .orElse(Collections.emptySet());
 
-    Set<SupervisoryNode.Importer> childNodes = new HashSet<>();
-    childNodes.addAll(this.childNodes);
-    return childNodes;
+    return new HashSet<>(collection);
   }
-
 
 }

@@ -19,14 +19,14 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 
 public class ExtraDataBuilder {
-  private Map<String, String> data = Maps.newHashMap();
+  private Map<String, Object> data = Maps.newHashMap();
 
   public ExtraDataBuilder add(String key, String value) {
     this.data.put(key, value);
     return this;
   }
 
-  public Map<String, String> build() {
+  public Map<String, Object> build() {
     return data;
   }
 }

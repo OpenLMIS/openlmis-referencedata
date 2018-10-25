@@ -28,11 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-public class ExtraDataConverter implements AttributeConverter<Map<String, String>, String> {
+public class ExtraDataConverter implements AttributeConverter<Map<String, Object>, String> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExtraDataConverter.class);
-  private static final TypeReference<Map<String, String>> TYPE_REF =
-      new TypeReference<Map<String, String>>() {
+  private static final TypeReference<Map<String, Object>> TYPE_REF =
+      new TypeReference<Map<String, Object>>() {
       };
 
   private final ObjectMapper objectMapper;
@@ -46,7 +46,7 @@ public class ExtraDataConverter implements AttributeConverter<Map<String, String
   }
 
   @Override
-  public String convertToDatabaseColumn(@NotNull Map<String, String> extraData) {
+  public String convertToDatabaseColumn(@NotNull Map<String, Object> extraData) {
     if (CollectionUtils.isEmpty(extraData)) {
       return null;
     }
@@ -61,12 +61,13 @@ public class ExtraDataConverter implements AttributeConverter<Map<String, String
 
   @Override
   @NotNull
-  public Map<String, String> convertToEntityAttribute(@NotNull String extraDataDataAsString) {
+  public Map<String, Object> convertToEntityAttribute(@NotNull String extraDataDataAsString) {
     if (StringUtils.isBlank(extraDataDataAsString)) {
       return Maps.newHashMap();
     }
 
     try {
+      // IMPORTANT: any type of collection (array, list, set) will be converted to list.
       return objectMapper.readValue(extraDataDataAsString, TYPE_REF);
     } catch (IOException ex) {
       LOGGER.error("Can't convert string to extraData", ex);

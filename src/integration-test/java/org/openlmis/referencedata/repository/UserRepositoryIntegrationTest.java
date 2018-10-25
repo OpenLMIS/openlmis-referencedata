@@ -261,7 +261,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test
   public void findByExtraDataShouldFindDataWhenParametersMatch() throws JsonProcessingException {
     //given
-    Map<String, String> extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
+    Map<String, Object> extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);
     String extraDataJson = mapper.writeValueAsString(extraData);
     User expectedUser = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
     expectedUser.setExtraData(extraData);

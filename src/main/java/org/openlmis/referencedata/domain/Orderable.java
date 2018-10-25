@@ -273,7 +273,7 @@ public class Orderable implements Identifiable {
     exporter.setLastUpdated(lastUpdated);
   }
 
-  public void setExtraData(Map<String, String> extraData) {
+  public void setExtraData(Map<String, Object> extraData) {
     this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
     this.extraData.updateFrom(extraData);
   }

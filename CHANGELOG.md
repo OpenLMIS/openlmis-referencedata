@@ -27,6 +27,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-5140](https://openlmis.atlassian.net/browse/OLMIS-5140): Added supply partner resource
   * Added ability to find FTAPs for several facility types
   * Added ability to retrieve all supervising facilities for the given supervisory node.
+* [OLMIS-5143](https://openlmis.atlassian.net/browse/OLMIS-5143): Added `extraData` field to supervisory node resource
   
 Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.
