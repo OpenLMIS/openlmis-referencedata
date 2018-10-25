@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.eq;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -39,6 +40,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyPartner;
 import org.openlmis.referencedata.dto.SupplyPartnerDto;
+import org.openlmis.referencedata.repository.custom.SupplyPartnerRepositoryCustom;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
@@ -97,7 +99,8 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldGetSupplyPartners() {
-    given(supplyPartnerRepository.findAll(pageable))
+    given(supplyPartnerRepository.search(
+        any(SupplyPartnerRepositoryCustom.SearchParams.class), eq(pageable)))
         .willReturn(Pagination.getPage(Lists.newArrayList(supplyPartner)));
 
     ValidatableResponse response = restAssured

@@ -22,7 +22,9 @@ import static org.openlmis.referencedata.util.messagekeys.SystemMessageKeys.ERRO
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
@@ -139,9 +141,10 @@ public final class SearchParams {
    * @return parsed list of UUIDs
    */
   public Set<UUID> getUuids(String key) {
-    Collection<Object> values = get(key);
-
-    return values.stream()
+    return Optional
+        .ofNullable(get(key))
+        .orElse(Collections.emptyList())
+        .stream()
         .map(value -> parse((String) value, key))
         .collect(toSet());
   }

@@ -3242,6 +3242,14 @@ resourceTypes:
       get:
           is: [ secured, paginated ]
           description: Get a page of supply partners based on passed parameters.
+          queryParameters:
+              id:
+                  description: >
+                    This field presents a supply partner ID value. If repeated, all supply partners
+                    that match the given IDs values will be returned.
+                  type: string
+                  required: false
+                  repeat: true
           responses:
               200:
                   description: The request is valid and a page of supply partners has been returned.
