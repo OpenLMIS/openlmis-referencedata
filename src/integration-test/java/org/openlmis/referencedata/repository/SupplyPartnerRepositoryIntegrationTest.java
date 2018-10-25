@@ -15,7 +15,13 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.google.common.collect.Sets;
+import java.util.Collections;
 import java.util.UUID;
+import java.util.stream.IntStream;
+import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -25,6 +31,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyPartner;
+import org.openlmis.referencedata.repository.custom.SupplyPartnerRepositoryCustom;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
@@ -36,6 +43,9 @@ import org.openlmis.referencedata.testbuilder.SupplyPartnerAssociationDataBuilde
 import org.openlmis.referencedata.testbuilder.SupplyPartnerDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
 public class SupplyPartnerRepositoryIntegrationTest
@@ -64,6 +74,9 @@ public class SupplyPartnerRepositoryIntegrationTest
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
+
+  private SupplyPartner[] supplyPartners;
+  private Pageable pageable = new PageRequest(0, 10);
 
   @Override
   CrudRepository<SupplyPartner, UUID> getRepository() {
@@ -105,6 +118,7 @@ public class SupplyPartnerRepositoryIntegrationTest
             .buildAsNew());
 
     return new SupplyPartnerDataBuilder()
+        .withCode("supply-partner-" + getNextInstanceNumber())
         .withAssociation(new SupplyPartnerAssociationDataBuilder()
             .withProgram(program)
             .withSupervisoryNode(supervisoryNode)
@@ -112,6 +126,15 @@ public class SupplyPartnerRepositoryIntegrationTest
             .withOrderable(orderable)
             .buildAsNew())
         .buildAsNew();
+  }
+
+  @Before
+  public void setUp() {
+    supplyPartners = IntStream
+        .range(0, 10)
+        .mapToObj(idx -> generateInstance())
+        .peek(supplyPartnerRepository::save)
+        .toArray(SupplyPartner[]::new);
   }
 
   @Test(expected = DataIntegrityViolationException.class)
@@ -128,4 +151,23 @@ public class SupplyPartnerRepositoryIntegrationTest
     supplyPartnerRepository.saveAndFlush(withLowerCaseCode);
   }
 
+  @Test
+  public void shouldReturnAllSupplyPartnersIfIdsSetIsEmpty() {
+    SupplyPartnerRepositoryCustom.SearchParams searchParams = Collections::emptySet;
+
+    Page<SupplyPartner> search = supplyPartnerRepository.search(searchParams, pageable);
+    assertThat(search.getContent()).contains(supplyPartners);
+  }
+
+  @Test
+  public void shouldReturnSupplyPartnersWithGivenIds() {
+    SupplyPartnerRepositoryCustom.SearchParams searchParams = () -> Sets.newHashSet(
+        supplyPartners[0].getId(), supplyPartners[3].getId(),
+        supplyPartners[5].getId(), supplyPartners[9].getId());
+
+    Page<SupplyPartner> search = supplyPartnerRepository.search(searchParams, pageable);
+    assertThat(search.getContent())
+        .hasSize(4)
+        .contains(supplyPartners[0], supplyPartners[3], supplyPartners[5], supplyPartners[9]);
+  }
 }

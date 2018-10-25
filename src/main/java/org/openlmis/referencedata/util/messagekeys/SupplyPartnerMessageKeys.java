@@ -29,4 +29,5 @@ public abstract class SupplyPartnerMessageKeys extends MessageKeys {
       join(ERROR, ASSOCIATIONS, "missingFacilities");
   public static final String ERROR_MISSING_ORDERABLES =
       join(ERROR, ASSOCIATIONS, "missingOrderables");
+  public static final String ERROR_INVALID_PARAMS = join(ERROR, INVALID_PARAMS);
 }

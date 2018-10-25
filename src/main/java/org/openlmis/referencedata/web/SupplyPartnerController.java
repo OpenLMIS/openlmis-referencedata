@@ -41,6 +41,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,14 +79,17 @@ public class SupplyPartnerController extends BaseController {
    * @return List of supply partners.
    */
   @GetMapping
-  public Page<SupplyPartnerDto> getSupplyPartners(Pageable pageable) {
+  public Page<SupplyPartnerDto> getSupplyPartners(
+      @RequestParam MultiValueMap<String, Object> requestParams,
+      Pageable pageable) {
     Profiler profiler = new Profiler("GET_SUPPLY_PARTNERS");
     profiler.setLogger(XLOGGER);
 
     checkAdminRight(RightName.SUPPLY_PARTNERS_MANAGE, profiler);
 
     profiler.start("FIND_SUPPLY_PARTNERS");
-    Page<SupplyPartner> supplyPartners = supplyPartnerRepository.findAll(pageable);
+    SupplyPartnerSearchParams searchParams = new SupplyPartnerSearchParams(requestParams);
+    Page<SupplyPartner> supplyPartners = supplyPartnerRepository.search(searchParams, pageable);
 
     List<SupplyPartnerDto> supplyPartnerDtos = toDtos(supplyPartners.getContent(), profiler);
 

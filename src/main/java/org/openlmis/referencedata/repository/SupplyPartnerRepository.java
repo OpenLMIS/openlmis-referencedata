@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
 import org.openlmis.referencedata.domain.SupplyPartner;
+import org.openlmis.referencedata.repository.custom.SupplyPartnerRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +25,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface SupplyPartnerRepository
     extends JpaRepository<SupplyPartner, UUID>,
+    SupplyPartnerRepositoryCustom,
     BaseAuditableRepository<SupplyPartner, UUID> {
 
   @Query(value = "SELECT\n"
