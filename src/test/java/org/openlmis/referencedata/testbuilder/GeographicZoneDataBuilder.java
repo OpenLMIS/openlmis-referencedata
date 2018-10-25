@@ -39,7 +39,7 @@ public class GeographicZoneDataBuilder {
   private Double latitude;
   private Double longitude;
   private Polygon boundary;
-  private Map<String, String> extraData;
+  private Map<String, Object> extraData;
 
   /**
    * Returns instance of {@link GeographicZoneDataBuilder} with sample data.

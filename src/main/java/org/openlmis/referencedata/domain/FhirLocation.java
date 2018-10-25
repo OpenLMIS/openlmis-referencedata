@@ -32,12 +32,17 @@ public interface FhirLocation extends BaseImporter, ExtraDataImporter {
    */
   @JsonIgnore
   default boolean isManagedExternally() {
-    String value = Optional
+    Object value = Optional
         .ofNullable(getExtraData())
         .orElse(Collections.emptyMap())
         .get("isManagedExternally");
 
-    return !isBlank(value) && isTrue(toBooleanObject(value));
+    if (value instanceof String) {
+      String valueAsString = (String) value;
+      return !isBlank(valueAsString) && isTrue(toBooleanObject(valueAsString));
+    }
+
+    return false;
   }
 
 }

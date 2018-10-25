@@ -115,7 +115,7 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
   }
 
   @Override
-  public void setExtraData(Map<String, String> extraData) {
+  public void setExtraData(Map<String, Object> extraData) {
     // unsupported operation
   }
 }

@@ -54,7 +54,7 @@ public class FacilityDataBuilder {
   private Boolean openLmisAccessible;
   private Set<Program> supportedPrograms;
   private Point location;
-  private Map<String, String> extraData;
+  private Map<String, Object> extraData;
 
   /**
    * Returns instance of {@link FacilityDataBuilder} with sample data.

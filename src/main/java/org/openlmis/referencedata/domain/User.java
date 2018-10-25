@@ -257,12 +257,12 @@ public class User extends BaseEntity {
     return Objects.hash(username);
   }
 
-  public void setExtraData(Map<String, String> extraData) {
+  public void setExtraData(Map<String, Object> extraData) {
     this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
     this.extraData.updateFrom(extraData);
   }
 
-  public Map<String, String> getExtraData() {
+  public Map<String, Object> getExtraData() {
     return ExtraDataEntity.defaultEntity(extraData).getExtraData();
   }
 

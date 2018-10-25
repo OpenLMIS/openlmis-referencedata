@@ -119,7 +119,7 @@ public class BasicFacilityDto extends MinimalFacilityDto implements Facility.Imp
   }
 
   @Override
-  public Map<String, String> getExtraData() {
+  public Map<String, Object> getExtraData() {
     // unsupported operation
     return null;
   }

@@ -16,41 +16,46 @@
 package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.domain.SupervisoryNode.Importer;
 
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.Exporter,
     SupervisoryNode.Importer {
 
-  @Getter
-  @Setter
   private String code;
-
-  @JsonProperty
-  @Getter
   private FacilityDto facility;
-
-  @Getter
-  @Setter
   private String name;
-
-  @Getter
-  @Setter
   private String description;
-
-
+  private Map<String, Object> extraData;
 
   public SupervisoryNodeBaseDto(UUID id) {
     setId(id);
+  }
+
+  @JsonSetter
+  public void setFacility(FacilityDto facility) {
+    this.facility = facility;
   }
 
   @JsonIgnore
@@ -60,57 +65,42 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
       FacilityDto facilityDto = new FacilityDto(facility.getId());
       facilityDto.setGeographicZone(facility.getGeographicZone());
       this.facility = facilityDto;
-
     } else {
       this.facility = null;
     }
   }
 
-  public void setFacility(FacilityDto facility) {
-    this.facility = facility;
+  @Override
+  public void setParentNode(SupervisoryNode parentNode) {
+    // unsupported operation
   }
 
-  @JsonIgnore
   @Override
-  public void setParentNode(SupervisoryNode parentNode) {}
+  public void setChildNodes(Set<SupervisoryNode> childNodes) {
+    // unsupported operation
+  }
 
   @Override
-  public Set<SupervisoryNode.Importer> getChildNodes() {
+  public void setRequisitionGroup(RequisitionGroup requisitionGroup) {
+    // unsupported operation
+  }
+
+  @Override
+  public Importer getParentNode() {
+    // unsupported operation
     return null;
   }
 
-  @JsonIgnore
   @Override
-  public void setChildNodes(Set<SupervisoryNode> childNodes) {}
-
-  @JsonIgnore
-  @Override
-  public void setRequisitionGroup(RequisitionGroup requisitionGroup) {}
-
-  @Override
-  public SupervisoryNode.Importer getParentNode() {
-    return null;
+  public Set<Importer> getChildNodes() {
+    // unsupported operation
+    return Collections.emptySet();
   }
 
   @Override
   public RequisitionGroup.Importer getRequisitionGroup() {
+    // unsupported operation
     return null;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof SupervisoryNodeBaseDto)) {
-      return false;
-    }
-    SupervisoryNodeBaseDto that = (SupervisoryNodeBaseDto) obj;
-    return Objects.equals(getId(), that.getId()) && Objects.equals(code, that.code);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(getId(), code);
-  }
 }

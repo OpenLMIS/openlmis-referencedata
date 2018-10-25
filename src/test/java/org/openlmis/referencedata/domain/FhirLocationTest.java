@@ -50,7 +50,7 @@ public class FhirLocationTest {
   }
 
   private static final class TestFhirLocation implements FhirLocation {
-    private Map<String, String> map = Maps.newHashMap();
+    private Map<String, Object> map = Maps.newHashMap();
 
     @Override
     public UUID getId() {
@@ -58,11 +58,11 @@ public class FhirLocationTest {
     }
 
     @Override
-    public Map<String, String> getExtraData() {
+    public Map<String, Object> getExtraData() {
       return map;
     }
 
-    void changeFlag(String value) {
+    void changeFlag(Object value) {
       if (null == value) {
         map.remove("isManagedExternally");
       } else {

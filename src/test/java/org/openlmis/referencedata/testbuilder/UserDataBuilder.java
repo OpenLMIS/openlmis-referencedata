@@ -41,7 +41,7 @@ public class UserDataBuilder {
   private boolean active = true;
   private boolean loginRestricted = false;
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
-  private Map<String, String> extraData = new HashMap<>();
+  private Map<String, Object> extraData = new HashMap<>();
   private Set<RightAssignment> rightAssignments = new HashSet<>();
 
 

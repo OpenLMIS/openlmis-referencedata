@@ -71,16 +71,13 @@ public class SupplyLineControllerTest {
   private Facility supplyingFacility;
 
   @Mock
-  private SupplyLineDto supplyLine;
-
-  @Mock
-  private SupplyLineDto supplyLine2;
-
-  @Mock
   private RightService rightService;
 
   @InjectMocks
   private SupplyLineController supplyLineController = new SupplyLineController();
+
+  private SupplyLineDto supplyLine  = new SupplyLineDto();
+  private SupplyLineDto supplyLine2 = new SupplyLineDto();
 
   private UUID programId = UUID.randomUUID();
   private UUID supervisoryNodeId = UUID.randomUUID();

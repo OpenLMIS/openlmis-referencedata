@@ -15,7 +15,9 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
@@ -33,8 +35,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.UUID;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -43,33 +45,36 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class ExtraDataConverterTest {
 
-  private ObjectMapper objectMapper;
   private ExtraDataConverter converter;
 
-  private Map<String, String> extraData;
+  private Map<String, Object> extraData;
   private String extraDataAsString;
 
   private String expectedDatabaseValue;
   private Map<String, String> expectedEntityAttribute;
 
+  private boolean throwException;
+
   /**
    * Constructor for parameterized test.
    */
-  public ExtraDataConverterTest(Map<String, String> extraData, String extraDataAsString,
+  public ExtraDataConverterTest(Map<String, Object> extraData, String extraDataAsString,
       String expectedDatabaseValue, Map<String, String> expectedEntityAttribute,
-      Consumer<ObjectMapper> callback) {
+      boolean throwException) {
     this.extraData = extraData;
     this.extraDataAsString = extraDataAsString;
 
     this.expectedDatabaseValue = expectedDatabaseValue;
     this.expectedEntityAttribute = expectedEntityAttribute;
 
-    this.objectMapper = spy(ObjectMapper.class);
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
     this.converter = new ExtraDataConverter(objectMapper);
 
-    Optional
-        .ofNullable(callback)
-        .ifPresent(fun -> fun.accept(objectMapper));
+    this.throwException = throwException;
+
+    if (throwException) {
+      doThrowException(objectMapper);
+    }
   }
 
   /**
@@ -84,30 +89,38 @@ public class ExtraDataConverterTest {
     data.add(new Object[]{
         null, null,
         null, Maps.newHashMap(),
-        null});
+        false});
 
     // converter should handle empty values
     data.add(new Object[]{
         Maps.newHashMap(), "",
         null, Maps.newHashMap(),
-        null});
+        false});
     data.add(new Object[]{
         Maps.newHashMap(), "     ",
         null, Maps.newHashMap(),
-        null});
+        false});
 
     // converter should handle normal values
     data.add(new Object[]{
         ImmutableMap.of("a", "b"), "{\"c\":\"d\"}",
         "{\"a\":\"b\"}", ImmutableMap.of("c", "d"),
-        null});
+        false});
 
-    // converer should return default values if exception occurs
-    Consumer<ObjectMapper> callback = ExtraDataConverterTest::doThrowException;
+    // converter should handle array or collection values
+    String resourceId = UUID.randomUUID().toString();
+    data.add(new Object[]{
+        ImmutableMap.of("e", Lists.newArrayList(1, 2, 3), "f", Lists.newArrayList(resourceId)),
+        "{\"g\":[\"" + resourceId + "\"],\"h\":[4,5,6]}",
+        "{\"e\":[1,2,3],\"f\":[\"" + resourceId + "\"]}",
+        ImmutableMap.of("g", Lists.newArrayList(resourceId), "h", Lists.newArrayList(4, 5, 6)),
+        false});
+
+    // converter should return default values if exception occurs
     data.add(new Object[]{
         ImmutableMap.of("e", "f"), "{\"g\":\"h\"}",
         null, Maps.newHashMap(),
-        callback});
+        true});
 
     return data;
   }
@@ -122,6 +135,31 @@ public class ExtraDataConverterTest {
   public void shouldConvertToEntityAttribute() {
     assertThat(converter.convertToEntityAttribute(extraDataAsString))
         .isEqualTo(expectedEntityAttribute);
+  }
+
+  @Test
+  public void shouldBeAbleToBackToOriginalValue() {
+    // assumeThat causes the following test will not
+    // be executed if the throwException has been set.
+    Assume.assumeThat(throwException, is(false));
+
+    String databaseColumn = converter.convertToDatabaseColumn(extraData);
+    Map<String, Object> newExtraData = converter.convertToEntityAttribute(databaseColumn);
+
+    if (null == extraData) {
+      assertThat(newExtraData).isNotNull().isEmpty();
+    } else {
+      assertThat(newExtraData).isEqualTo(extraData);
+    }
+
+    Map<String, Object> entityAttribute = converter.convertToEntityAttribute(extraDataAsString);
+    String newExtraDataAsString = converter.convertToDatabaseColumn(entityAttribute);
+
+    if (isBlank(extraDataAsString)) {
+      assertThat(newExtraDataAsString).isNull();
+    } else {
+      assertThat(newExtraDataAsString).isEqualTo(extraDataAsString);
+    }
   }
 
   private static void doThrowException(ObjectMapper mapper) {

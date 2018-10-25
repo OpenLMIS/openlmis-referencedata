@@ -79,10 +79,6 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   @Autowired
   private ProgramRepository programRepository;
 
-  FacilityRepository getRepository() {
-    return this.repository;
-  }
-
   private FacilityType facilityType = new FacilityTypeDataBuilder().buildAsNew();
   private GeographicLevel geographicLevel = new GeographicLevelDataBuilder().buildAsNew();
   private GeographicZone geographicZone = new GeographicZoneDataBuilder()
@@ -110,6 +106,11 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     repository.save(facility);
     repository.save(facility1);
+  }
+
+  @Override
+  FacilityRepository getRepository() {
+    return this.repository;
   }
 
   @Test
@@ -186,19 +187,19 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     programRepository.save(program);
     programRepository.save(programTwo);
 
-    Facility facility =  getFacilityDataBuilder()
+    Facility newFacility =  getFacilityDataBuilder()
         .withSupportedProgram(program)
         .withSupportedProgram(programTwo)
         .buildAsNew();
-    repository.save(facility);
+    repository.save(newFacility);
 
     // when
     List<Facility> foundFacilities = repository
-        .search(null, facility.getName(), null, null, null, false);
+        .search(null, newFacility.getName(), null, null, null, false);
 
     // then
     assertEquals(1, foundFacilities.size());
-    assertEquals(facility.getId(), foundFacilities.get(0).getId());
+    assertEquals(newFacility.getId(), foundFacilities.get(0).getId());
   }
 
   @Test
@@ -224,8 +225,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   @Test
   public void shouldFindFacilitiesUsingExtraData() throws JsonProcessingException {
     // given
-    Map<String, String> extraDataRural = new ExtraDataBuilder().add("type", "rural").build();
-    Map<String, String> extraDataUrban = new ExtraDataBuilder().add("type", "urban").build();
+    Map<String, Object> extraDataRural = new ExtraDataBuilder().add("type", "rural").build();
+    Map<String, Object> extraDataUrban = new ExtraDataBuilder().add("type", "urban").build();
 
     facility.setExtraData(extraDataRural);
     facility1.setExtraData(extraDataUrban);
@@ -243,7 +244,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   @Test
   public void shouldFindFacilitiesByAllParams() throws JsonProcessingException {
     // given
-    Map<String, String> extraDataUrban = new ExtraDataBuilder().add("type", "urban").build();
+    Map<String, Object> extraDataUrban = new ExtraDataBuilder().add("type", "urban").build();
     facility1.setExtraData(extraDataUrban);
     repository.save(facility1);
 
@@ -354,7 +355,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
-  public void shouldFindFacilitiesByAllParamsWithConjunction() throws JsonProcessingException {
+  public void shouldFindFacilitiesByAllParamsWithConjunction() {
     List<Facility> foundFacilities = repository.search(
         facility.getCode(), "Facility", ImmutableSet.of(geographicZone.getId()),
         facilityType.getCode(), null, true);

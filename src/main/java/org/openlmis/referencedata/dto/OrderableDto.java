@@ -62,7 +62,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
 
   private Map<String, String> identifiers;
 
-  private Map<String, String> extraData;
+  private Map<String, Object> extraData;
 
   private Map<String, String> meta = new HashMap<>();
   

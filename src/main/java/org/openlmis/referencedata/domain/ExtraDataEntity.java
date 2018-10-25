@@ -33,12 +33,14 @@ import lombok.ToString;
 @ToString
 public class ExtraDataEntity {
 
-  @Column(name = "extradata", columnDefinition = "jsonb")
-  @Convert(converter = ExtraDataConverter.class)
+  // Because of https://openlmis.atlassian.net/browse/OLMIS-5143
+  // the type of a key in the extraData map has to be changed to Object.
   @Getter
-  private Map<String, String> extraData = new HashMap<>();
+  @Convert(converter = ExtraDataConverter.class)
+  @Column(name = "extradata", columnDefinition = "jsonb")
+  private Map<String, Object> extraData = new HashMap<>();
 
-  public ExtraDataEntity(Map<String, String> importer) {
+  public ExtraDataEntity(Map<String, Object> importer) {
     updateFrom(importer);
   }
 
@@ -49,7 +51,7 @@ public class ExtraDataEntity {
   /**
    * Update this from another.
    */
-  public void updateFrom(Map<String, String> importer) {
+  public void updateFrom(Map<String, Object> importer) {
     extraData.clear();
     Optional
         .ofNullable(importer)
@@ -60,7 +62,7 @@ public class ExtraDataEntity {
    * Exports current state of object.
    */
   public void export(ExtraDataExporter exporter) {
-    Map<String, String> newExtraData = Maps.newHashMap();
+    Map<String, Object> newExtraData = Maps.newHashMap();
     Optional.ofNullable(extraData).ifPresent(newExtraData::putAll);
 
     exporter.setExtraData(newExtraData);
@@ -68,13 +70,13 @@ public class ExtraDataEntity {
 
   public interface ExtraDataExporter {
 
-    void setExtraData(Map<String, String> extraData);
+    void setExtraData(Map<String, Object> extraData);
 
   }
 
   public interface ExtraDataImporter {
 
-    Map<String, String> getExtraData();
+    Map<String, Object> getExtraData();
 
   }
 

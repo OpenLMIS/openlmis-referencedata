@@ -39,7 +39,7 @@ public class ProcessingPeriodDto extends BaseDto
   private LocalDate startDate;
   private LocalDate endDate;
   private Integer durationInMonths;
-  private Map<String, String> extraData;
+  private Map<String, Object> extraData;
 
   @Override
   public int hashCode() {

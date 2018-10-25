@@ -40,7 +40,7 @@ public class OrderableDataBuilder {
   private boolean roundToZero;
   private List<ProgramOrderable> programOrderables;
   private Map<String, String> identifiers;
-  private Map<String, String> extraData;
+  private Map<String, Object> extraData;
   private Long versionId;
   private ZonedDateTime lastUpdated;
 

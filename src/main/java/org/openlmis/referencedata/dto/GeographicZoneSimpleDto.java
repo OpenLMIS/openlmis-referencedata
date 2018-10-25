@@ -78,7 +78,7 @@ public class GeographicZoneSimpleDto extends BaseDto implements
   }
 
   @Override
-  public void setExtraData(Map<String, String> extraData) {
+  public void setExtraData(Map<String, Object> extraData) {
     // unsupported operation
   }
 
@@ -89,7 +89,7 @@ public class GeographicZoneSimpleDto extends BaseDto implements
   }
 
   @Override
-  public Map<String, String> getExtraData() {
+  public Map<String, Object> getExtraData() {
     // unsupported operation
     return Maps.newHashMap();
   }
