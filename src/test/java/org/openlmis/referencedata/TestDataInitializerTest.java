@@ -16,8 +16,6 @@
 package org.openlmis.referencedata;
 
 import static org.mockito.Mockito.verify;
-import static org.openlmis.referencedata.TestDataInitializer.PROGRAM_ORDERABLES;
-import static org.openlmis.referencedata.TestDataInitializer.SCHEMA_PREFIX;
 
 import java.io.IOException;
 import org.junit.Test;
@@ -125,30 +123,6 @@ public class TestDataInitializerTest {
   private Resource facilityTypeApprovedProductsResource;
 
   @Mock
-  private Resource moreUsersResource;
-
-  @Mock
-  private Resource moreFacilitiesResource;
-
-  @Mock
-  private Resource moreOrderablesResource;
-
-  @Mock
-  private Resource moreRequisitionGroupMembersResource;
-
-  @Mock
-  private Resource moreSupportedProgramsResource;
-
-  @Mock
-  private Resource fullSupplyProductsResource;
-
-  @Mock
-  private Resource nonfullSupplyProductsResource;
-
-  @Mock
-  private Resource ftapResource;
-
-  @Mock
   private Resource2Db loader;
 
   @InjectMocks
@@ -179,7 +153,7 @@ public class TestDataInitializerTest {
     verify(loader).insertToDbFromCsv("referencedata.orderable_identifiers",
         orderableIdentifiersResource);
     verify(loader).insertToDbFromCsv("referencedata.programs", programsResource);
-    verify(loader).insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES,
+    verify(loader).insertToDbFromCsv("referencedata.program_orderables",
         programOrderablesResource);
     verify(loader).insertToDbFromCsv("referencedata.supply_lines", supplyLinesResource);
     verify(loader).insertToDbFromCsv("referencedata.users", usersResource);
@@ -203,19 +177,5 @@ public class TestDataInitializerTest {
     verify(loader).insertToDbFromCsv("referencedata.service_accounts", serviceAccountsResource);
     verify(loader).insertToDbFromCsv("referencedata.facility_type_approved_products",
         facilityTypeApprovedProductsResource);
-
-    // original performance data set
-    verify(loader).updateDbFromSql(moreUsersResource);
-    verify(loader).insertToDbFromCsv("referencedata.facilities", moreFacilitiesResource);
-    verify(loader).insertToDbFromCsv("referencedata.orderables", moreOrderablesResource);
-    verify(loader).insertToDbFromCsv("referencedata.requisition_group_members",
-        moreRequisitionGroupMembersResource);
-    verify(loader).insertToDbFromCsv("referencedata.supported_programs",
-        moreSupportedProgramsResource);
-    verify(loader).insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES,
-        fullSupplyProductsResource);
-    verify(loader).insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES,
-        nonfullSupplyProductsResource);
-    verify(loader).insertToDbFromCsv("referencedata.facility_type_approved_products", ftapResource);
   }
 }
