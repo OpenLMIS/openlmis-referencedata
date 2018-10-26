@@ -35,9 +35,6 @@ public class TestDataInitializer implements CommandLineRunner {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
   private static final String DEMO_DATA_PATH = "classpath:db/demo-data/";
 
-  static final String SCHEMA_PREFIX = "referencedata.";
-  static final String PROGRAM_ORDERABLES = "program_orderables";
-
   @Value(value = DEMO_DATA_PATH + "referencedata.geographic_levels.csv")
   private Resource geographicLevelsResource;
 
@@ -131,31 +128,6 @@ public class TestDataInitializer implements CommandLineRunner {
   @Value(value = DEMO_DATA_PATH + "referencedata.facility_type_approved_products.csv")
   private Resource facilityTypeApprovedProductsResource;
 
-  @Value(value = DEMO_DATA_PATH + "referencedata.users.sql")
-  private Resource moreUsersResource;
-
-  @Value(value = DEMO_DATA_PATH + "facilities.csv")
-  private Resource moreFacilitiesResource;
-
-  @Value(value = DEMO_DATA_PATH + "orderables.csv")
-  private Resource moreOrderablesResource;
-
-  @Value(value = DEMO_DATA_PATH + "requisition_group_members.csv")
-  private Resource moreRequisitionGroupMembersResource;
-
-  @Value(value = DEMO_DATA_PATH + "supported_programs.csv")
-  private Resource moreSupportedProgramsResource;
-
-  @Value(value = DEMO_DATA_PATH + "full_supply_products.csv")
-  private Resource fullSupplyProductsResource;
-
-  @Value(value = DEMO_DATA_PATH + "non-full_supply_products.csv")
-  private Resource nonfullSupplyProductsResource;
-
-  @Value(value = DEMO_DATA_PATH
-      + "facility_type_approved_products_for_Essential_Medicines___District_Hospital.csv")
-  private Resource ftapResource;
-
   private Resource2Db loader;
   
   @Autowired
@@ -190,7 +162,7 @@ public class TestDataInitializer implements CommandLineRunner {
     loader.insertToDbFromCsv("referencedata.orderables", orderablesResource);
     loader.insertToDbFromCsv("referencedata.orderable_identifiers", orderableIdentifiersResource);
     loader.insertToDbFromCsv("referencedata.programs", programsResource);
-    loader.insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES, programOrderablesResource);
+    loader.insertToDbFromCsv("referencedata.program_orderables", programOrderablesResource);
     loader.insertToDbFromCsv("referencedata.supply_lines", supplyLinesResource);
     loader.insertToDbFromCsv("referencedata.users", usersResource);
     loader.insertToDbFromCsv("referencedata.roles", rolesResource);
@@ -210,17 +182,6 @@ public class TestDataInitializer implements CommandLineRunner {
     loader.insertToDbFromCsv("referencedata.service_accounts", serviceAccountsResource);
     loader.insertToDbFromCsv("referencedata.facility_type_approved_products",
         facilityTypeApprovedProductsResource);
-
-    // original performance data set
-    loader.updateDbFromSql(moreUsersResource);
-    loader.insertToDbFromCsv("referencedata.facilities", moreFacilitiesResource);
-    loader.insertToDbFromCsv("referencedata.orderables", moreOrderablesResource);
-    loader.insertToDbFromCsv("referencedata.requisition_group_members",
-        moreRequisitionGroupMembersResource);
-    loader.insertToDbFromCsv("referencedata.supported_programs", moreSupportedProgramsResource);
-    loader.insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES, fullSupplyProductsResource);
-    loader.insertToDbFromCsv(SCHEMA_PREFIX + PROGRAM_ORDERABLES, nonfullSupplyProductsResource);
-    loader.insertToDbFromCsv("referencedata.facility_type_approved_products", ftapResource);
 
     XLOGGER.exit();
   }
