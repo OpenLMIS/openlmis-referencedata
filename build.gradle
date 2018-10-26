@@ -102,6 +102,10 @@ idea {
             }
         }
     }
+    module {
+        sourceDirs -= file('src/integration-test/java')
+        testSourceDirs += file('src/integration-test/java')
+    }
 }
 
 flyway {
