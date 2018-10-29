@@ -123,6 +123,18 @@ public class TestDataInitializerTest {
   private Resource facilityTypeApprovedProductsResource;
 
   @Mock
+  private Resource supplyPartnersResource;
+
+  @Mock
+  private Resource supplyPartnerAssociationsResource;
+
+  @Mock
+  private Resource supplyPartnerAssociationFacilitiesResource;
+
+  @Mock
+  private Resource supplyPartnerAssociationOrderablesResource;
+
+  @Mock
   private Resource2Db loader;
 
   @InjectMocks
@@ -177,5 +189,13 @@ public class TestDataInitializerTest {
     verify(loader).insertToDbFromCsv("referencedata.service_accounts", serviceAccountsResource);
     verify(loader).insertToDbFromCsv("referencedata.facility_type_approved_products",
         facilityTypeApprovedProductsResource);
+    verify(loader).insertToDbFromCsv("referencedata.supply_partners",
+        supplyPartnersResource);
+    verify(loader).insertToDbFromCsv("referencedata.supply_partner_associations",
+        supplyPartnerAssociationsResource);
+    verify(loader).insertToDbFromCsv("referencedata.supply_partner_association_facilities",
+        supplyPartnerAssociationFacilitiesResource);
+    verify(loader).insertToDbFromCsv("referencedata.supply_partner_association_orderables",
+        supplyPartnerAssociationOrderablesResource);
   }
 }

@@ -128,6 +128,18 @@ public class TestDataInitializer implements CommandLineRunner {
   @Value(value = DEMO_DATA_PATH + "referencedata.facility_type_approved_products.csv")
   private Resource facilityTypeApprovedProductsResource;
 
+  @Value(value = DEMO_DATA_PATH + "referencedata.supply_partners.csv")
+  private Resource supplyPartnersResource;
+
+  @Value(value = DEMO_DATA_PATH + "referencedata.supply_partner_associations.csv")
+  private Resource supplyPartnerAssociationsResource;
+
+  @Value(value = DEMO_DATA_PATH + "referencedata.supply_partner_association_facilities.csv")
+  private Resource supplyPartnerAssociationFacilitiesResource;
+
+  @Value(value = DEMO_DATA_PATH + "referencedata.supply_partner_association_orderables.csv")
+  private Resource supplyPartnerAssociationOrderablesResource;
+
   private Resource2Db loader;
   
   @Autowired
@@ -182,6 +194,14 @@ public class TestDataInitializer implements CommandLineRunner {
     loader.insertToDbFromCsv("referencedata.service_accounts", serviceAccountsResource);
     loader.insertToDbFromCsv("referencedata.facility_type_approved_products",
         facilityTypeApprovedProductsResource);
+
+    loader.insertToDbFromCsv("referencedata.supply_partners", supplyPartnersResource);
+    loader.insertToDbFromCsv("referencedata.supply_partner_associations",
+        supplyPartnerAssociationsResource);
+    loader.insertToDbFromCsv("referencedata.supply_partner_association_facilities",
+        supplyPartnerAssociationFacilitiesResource);
+    loader.insertToDbFromCsv("referencedata.supply_partner_association_orderables",
+        supplyPartnerAssociationOrderablesResource);
 
     XLOGGER.exit();
   }
