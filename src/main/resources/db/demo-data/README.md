@@ -412,6 +412,21 @@ Only in the EPI program. These amounts are defined for:
   * All seven commodity types 
   * Values range from 10,000 - 99,999
 
+## Supply Partners
+
+Defined in
+* referencedata.supply_partners.csv
+* referencedata.supply_partner_associations.csv
+* referencedata.supply_partner_association_facilities.csv
+* referencedata.supply_partner_association_orderables.csv
+
+1. CHAZ
+  * has two associations
+    * for CHAZ program at Lusaka province approval point (CHAZ)
+    * for CHAZ program at Lusaka district approval point (CHAZ)
+    * both contain all facilities from a related requisition groups
+    * each supports only half of available orderables for the CHAZ program
+
 # Additional Information
 
 The directory `demo-datasets/` holds IDs that are expected to exist from demo-data.
