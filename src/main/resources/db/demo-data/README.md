@@ -6,257 +6,204 @@ for use in production environments.
 
 Each .csv file contains demo data that corresponds to one database table.
 
+## Geographic Levels and Zones
+
+Defined in
+* referencedata.geographic_levels.csv
+* referencedata.geographic_zones.csv.
+
+| Name (code)                                      | Level    |
+|--------------------------------------------------|----------|
+| Malawi (Malawi)                                  | Country  |
+| Central Region  (Malawi-Central)                 | Region   |
+| Northern Region (Malawi-Northern)                | Region   |
+| Southern Region (Malawi-Southern)                | Region   |
+| Dedza District (Malawi-Central-Dedza)            | District |
+| Dowa District (Malawi-Central-Dowa)              | District |
+| Kasungu District (Malawi-Central-Kasungu)        | District |
+| Lilongwe District (Malawi-Central-Lilongwe)      | District |
+| Mchinji District (Malawi-Central-Mchinji)        | District |
+| Nkhotakota District (Malawi-Central-Nkhotakota)  | District |
+| Ntcheu District (Malawi-Central-Ntcheu)          | District |
+| Ntchisi District (Malawi-Central-Ntchisi)        | District |
+| Salima District (Malawi-Central-Salima)          | District |
+| Chitipa District (Malawi-Northern-Chitipa)       | District |
+| Karonga District (Malawi-Northern-Karonga)       | District |
+| Likoma District (Malawi-Northern-Likoma)         | District |
+| Mzimba District (Malawi-Northern-Mzimba)         | District |
+| Nkhata Bay District (Malawi-Northern-Nkhata Bay) | District |
+| Rumphi District (Malawi-Northern-Rumphi)         | District |
+| Balaka District (Malawi-Southern-Balaka)         | District |
+| Blantyre District (Malawi-Southern-Blantyre)     | District |
+| Chikwawa District (Malawi-Southern-Chikwawa)     | District |
+| Chiradzulu District (Malawi-Southern-Chiradzulu) | District |
+| Machinga District (Malawi-Southern-Machinga)     | District |
+| Mangochi District (Malawi-Southern-Mangochi)     | District |
+| Mulanje District (Malawi-Southern-Mulanje)       | District |
+| Mwanza District (Malawi-Southern-Mwanza)         | District |
+| Nsanje District (Malawi-Southern-Nsanje)         | District |
+| Thyolo District (Malawi-Southern-Thyolo)         | District |
+| Phalombe District (Malawi-Southern-Phalombe)     | District |
+| Zomba District (Malawi-Southern-Zomba)           | District |
+| Neno District (Malawi-Southern-Neno)             | District |
+| Balaka (Malawi-Southern-Balaka-Balaka)           | City     |
+| Mozambique (moz)                                 | Country  |
+| Niassa (niassa)                                  | Region   |
+| Cuamba (cuamba)                                  | District |
+| Lichinga (lichinga-distrito)                     | District |
+| Zambia (zambia)                                  | Country  |
+| Zambia Lusaka Province (zambia-lusaka-prov)      | Region   |
+| Zambia Lusaka District (zambia-lusaka-dist)      | District |
+| Zambia Lusaka (zambia-lusaka-city)               | City     |
+
+## Programs
+
+Defined in
+* referencedata.programs.csv
+
+| Name (code)             | active | Periods skippable | Skip authorization | Non full supply tab | Date physical stock count completed |
+|-------------------------|--------|-------------------|--------------------|---------------------|-------------------------------------|
+|Family Planning (PRG001) | true   | true              | false              | true                | false                               |
+|Essential Meds (PRG002)  | true   | false             | false              |                     | false                               |
+|New Program (PRG003)     | true   | false             | false              | false               | false                               |
+|EPI (PRG004)             | true   | false             | true               | false               | false                               |
+|CHAZ (PRG005)            | true   | true              | false              | true                | false                               |
+
 ## Facilities
 
 The facilities described below are defined in these files:
-referencedata.facilities.csv, referencedata.facility_operators.csv,
-referencedata.facility_types.csv, referencedata.supported_programs.csv,
-referencedata.supervisory_nodes.csv and referencedata.supply_lines.csv.
+* referencedata.facilities.csv,
+* referencedata.facility_operators.csv,
+* referencedata.facility_types.csv,
+* referencedata.supported_programs.csv,
+* referencedata.supervisory_nodes.csv,
+* referencedata.supply_lines.csv.
 
-1. HC01/Comfort Health Clinic
-  * type: Health Center
-  * programs: Family Planning and Essential Meds
-  * zone: Neno District
-  * this is the home facility for _administrator_, _srmanager2_ and _smanager2_ users
-  * this facility is in the requisition group RGFP1 and RGEM1
-2. HF01/Kankao Health Facility
-  * type: Health Center
-  * programs: Family Planning and Essential Meds
-  * zone: Zomba District
-  * this is the home facility for _srmanager4_ and _smanager4_ users
-  * this facility is in the requisition group RGEM1 and RGFP2
-3. HC02/Nandumbo Health Center
-  * type: Health Center
-  * programs: Family Planning
-  * zone: Phalombe District
-  * this is the home facility for _srmanager1_ and _smanager1_ users
-  * this facility is in the requisition group RGFP1
-4. HC03/Kalembo Health Center
-  * type: Health Center
-  * programs: Essential Meds and Family Planning
-  * zone: Thyolo District
-  * this is the home facility for _srmanager3_ and _smanager3_ users
-  * this facility is in the requisition group RGEM1 and RGFP3
-5. DH01/Balaka District Hospital
-  * type: District Hospital
-  * programs: Family Planning and Essential Meds
-  * zone: Balaka (City)
-  * this is the home facility for the _dsrmanager_ user
-  * this facility is in the requisition group RGEM1 and RGFP2
-6. WH01/Ntcheu District Warehouse
-  * type: Warehouse
-  * programs: Family Planning
-  * zone: Ntcheu District
-  * this is the home facility for _devadmin_ and _wclerk1_ users
-7. WH02/Balaka District Warehouse
-  * type: Warehouse
-  * programs: Family Planning and Essential Meds
-  * zone: Balaka (City)
-  * this is the home facility for _wclerk2_ user
+| Name (Code)                         | Type              | Programs                        | Geo Zone               | Home Facility for                    | Req Group    |
+|-------------------------------------|-------------------|---------------------------------|------------------------|--------------------------------------|--------------|
+| Comfort Health Clinic (HC01)        | Health Center     | Family Planning, Essential Meds | Neno District          | administrator, srmanager2, smanager2 | RGFP1, RGEM1 |
+| Kankao Health Facility (HF01)       | Health Center     | Family Planning, Essential Meds | Zomba District         | srmanager4, smanager4                | RGEM1, RGFP2 |
+| Nandumbo Health Center (HC02)       | Health Center     | Family Planning                 | Phalombe District      | srmanager1, smanager1                | RGFP1        |
+| Kalembo Health Center (HC03)        | Health Center     | Family Planning, Essential Meds | Thyolo District        | srmanager3, smanager3                | RGEM1, RGFP3 |
+| Balaka District Hospital (DH01)     | District Hospital | Family Planning, Essential Meds | Balaka (City)          | dsrmanager                           | RGEM1, RGFP2 |
+| Ntcheu District Warehouse (WH01)    | Warehouse         | Family Planning                 | Ntcheu District        | devadmin, wclerk1                    |              |
+| Balaka District Warehouse (WH02)    | Warehouse         | Family Planning, Essential Meds | Balaka (City)          | wclerk2                              |              |
+| Mozambique Central Warehouse (W001) | Warehouse         | EPI                             | Mozambique Country     | vwclerk1                             |              |
+| Depósito Provincial Niassa (P001)   | Provincial Store  | EPI                             | Niassa Province        | rivo                                 |              |
+| Depósito Distrital Cuamba (D001)    | District Store    | EPI                             | Cuamba District        | divo1, vsrmanager2                   | RGEPI1       |
+| Depósito Distrital Lichinga (D002)  | District Store    | EPI                             | Lichinga District      | divo2                                | RGEPI1       |
+| Lusaka Province Store (ZM-PS-L1)    | Province Store    | CHAZ                            | Zambia Lusaka Province |                                      |              |
+| Lusaka Province Warehouse (ZM-W-L1) | Warehouse         | CHAZ                            | Zambia Lusaka Province |                                      |              |
+| Lusaka District Store (ZM-DS-L1)    | District Store    | CHAZ                            | Zambia Lusaka District |                                      | RG-CHAZ-1    |
+| Lusaka District Warehouse (ZM-W-L2) | Warehouse         | CHAZ                            | Zambia Lusaka District |                                      |              |
+| Roma, Lusaka (ZM-HC-L4)             | Health Center     | CHAZ                            | Zambia Lusaka          | chaz                                 | RG-CHAZ-2    |
 
-**For EPI (Vaccines) Program**
 
-* Mozambique Central Warehouse (W001)
-  * type: Warehouse
-  * zone: Mozambique Country
-  * this is the home facility for the _vwclerk1_ user
-* Depósito Provincial Niassa (P001)
-  * type: Provincial Store
-  * zone: Niassa Province
-  * this is the home facility for the _rivo_ user
-* Depósito Distrital Cuamba (D001)
-  * type: District Store
-  * zone: Cuamba District
-  * this is the home facility for the _divo1_ and _vsrmanager2_ users
-  * this facility is in the requisition RGEPI1
-* Depósito Distrital Lichinga (D002)
-  * type: District Store
-  * zone: Lichinga District
-  * this is the home facility for the _divo2_ user
-  * this facility is in the requisition RGEPI1
+There are 16 facilities in the Cuamba district, all health centers. Though all of them can be used to demo, it is recommended to use the following facility:
 
-There are 16 facilities in the Cuamba district, all health centers. Though all of them can be used
- to demo, it is recommended to use the following facility:
+| Name (Code)   | Type          | Programs | Geo Zone        | Req Group |
+|---------------|---------------|----------|-----------------|-----------|
+| Cuamba (N003) | Health Center | EPI      | Cuamba District | RGEPI2    |
 
-* Cuamba (N003)
-  * type: Health Center
-  * zone: Cuamba District
-  * this facility is in the requisition group RGEPI2
+There are 25 facilities in the Lichinga district, all health centers. Though all of them can be used to demo, it is recommended to use the following facility:
 
-There are 25 facilities in the Lichinga district, all health centers. Though all of them can be used
- to demo, it is recommended to use the following facility:
+| Name (Code)     | Type          | Programs | Geo Zone          | Req Group |
+|-----------------|---------------|----------|-------------------|-----------|
+| Assumane (N036) | Health Center | EPI      | Lichinga District | RGEPI3    |
 
-* Assumane (N036)
-  * type: Health Center
-  * zone: Lichinga District
-  * this facility is in the requisition group RGEPI3
+There are 11 facilities in the Lusaka city, all health centers. Though all of them can be used to demo the requisition split feature, it is recommended to use the following facility:
 
-Additionally, there are many other facilities in other districts, but they are not used except to
- populate the system.
+| Name (Code)             | Type         | Programs | Geo Zone      | Req Group |
+|-------------------------|--------------|----------|---------------|-----------|
+| Roma, Lusaka (ZM-HC-L4) |Health Center | CHAZ     | Zambia Lusaka | RG-CHAZ-2 |
 
-## Geographic Levels and Zones
+Additionally, there are many other facilities in other districts, but they are not used except to populate the system.
 
-Defined in referencedata.geographic_levels.csv and referencedata.geographic_zones.csv.
+## Products
 
-1. Country
-  * Malawi/Malawi
-2. Region
-  * Malawi-Central/Central Region
-  * Malawi-Northern/Northern Region
-  * Malawi-Southern/Southern Region
-3. District
-  * Malawi-Central-Dedza/Dedza District
-  * Malawi-Central-Dowa/Dowa District
-  * Malawi-Central-Kasungu/Kasungu District
-  * Malawi-Central-Lilongwe/Lilongwe District
-  * Malawi-Central-Mchinji/Mchinji District
-  * Malawi-Central-Nkhotakota/Nkhotakota District
-  * Malawi-Central-Ntcheu/Ntcheu District
-  * Malawi-Central-Ntchisi/Ntchisi District
-  * Malawi-Central-Salima/Salima District
-  * Malawi-Northern-Chitipa/Chitipa District
-  * Malawi-Northern-Karonga/Karonga District
-  * Malawi-Northern-Likoma/Likoma District
-  * Malawi-Northern-Mzimba/Mzimba District
-  * Malawi-Northern-Nkhata Bay/Nkhata Bay District
-  * Malawi-Northern-Rumphi/Rumphi District
-  * Malawi-Southern-Balaka/Balaka District
-  * Malawi-Southern-Blantyre/Blantyre District
-  * Malawi-Southern-Chikwawa/Chikwawa District
-  * Malawi-Southern-Chiradzulu/Chiradzulu District
-  * Malawi-Southern-Machinga/Machinga District
-  * Malawi-Southern-Mangochi/Mangochi District
-  * Malawi-Southern-Mulanje/Mulanje District
-  * Malawi-Southern-Mwanza/Mwanza District
-  * Malawi-Southern-Nsanje/Nsanje District
-  * Malawi-Southern-Thyolo/Thyolo District
-  * Malawi-Southern-Phalombe/Phalombe District
-  * Malawi-Southern-Zomba/Zomba District
-  * Malawi-Southern-Neno/Neno District
-4. City
-  * Malawi-Southern-Balaka-Balaka/Balaka
+Defined in
+* referencedata.orderables.csv
+* referencedata.program_orderables.csv
+* referencedata.lots.csv
 
-**For EPI (Vaccines) Program**
 
-* Mozambique (moz) - Country
-  * Niassa (niassa) - Province
-    * Cuamba (cuamba) - District
-    * Lichinga (lichinga-distrito) - District
-  * and others...
+| Name (code)                                              | Category                          | Type                      | Program         | VVM   | Lot (expires)                                    |
+|----------------------------------------------------------|-----------------------------------|---------------------------|-----------------|-------|--------------------------------------------------|
+| Levora (C100)                                            | Oral Contraceptive                | Commodity Type            | Family Planning | false |                                                  |
+| Ortho-Novum (C200)                                       | Oral Contraceptive                | Commodity Type            | Family Planning | false |                                                  |
+| Depo-Estradiol (C300)                                    | Injectable Hormonal Contraceptive | Commodity Type            | Family Planning | false |                                                  |
+| Male Condom (C400)                                       | Barrier Method                    | Commodity Type            | Family Planning | false |                                                  |
+| Implanon  (C500)                                         | Implantable Contraceptive         | Commodity Type            | Family Planning | false |                                                  |
+| Levonorgestrel (C600)                                    | Implantable Contraceptive         | Commodity Type            | Family Planning | false |                                                  |
+| Acetylsalicylic Acid (C1)                                | Antibiotics                       | Trade Item                | Essential Meds  | false |                                                  |
+| Glibenclamide (C2)                                       | Antibiotics                       | Trade Item                | Essential Meds  | false |                                                  |
+| Streptococcus Pneumoniae Vaccine (C3)                    | Vaccines                          | Trade Item                | Essential Meds  | false |                                                  |
+| Streptococcus Pneumoniae Vaccine II (C4)                 | Vaccines                          | Commodity Type            | Essential Meds  | false |                                                  |
+| Depo-Estradiol (C300)                                    | Injectable Hormonal Contraceptive | Orderable                 | New program     | false |                                                  |
+| BCG (bcg20)                                              | Vaccines                          | Commodity Type, Orderable | EPI             | true  | BCGI2017A (2019-06-01), BCGI2017B (2019-07-01)   |
+| Polio                                                    | Vaccines                          | Commodity Type            | EPI             | true  |                                                  |
+| Polio (20 dose) (polio20)                                | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| IPV (ipv5)                                               | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Pentavalent                                              | Vaccines                          | Commodity Type            | EPI             | true  |                                                  |
+| Pentavalent (1 dose) (penta1)                            | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Pentavalent (10 dose) (penta10)                          | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| PCV (pcv10)                                              | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
+| Rotavirus (rota1)                                        | Vaccines                          | Commodity Type, Orderable | EPI             | true  | ROTAM2017A (2019-06-01), ROTAM2017B (2019-07-01) |
+| Measles (measles10)                                      | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
+| Tetanus (tetanus10)                                      | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
+| Syringe 5ml (syringe5ml)                                 | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Syringe 0.5ml (syringe05ml)                              | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Syringe 0.05ml (syringe005ml)                            | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Safety Box (safetybox)                                   | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Gas (Cylinder) (gas)                                     | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Diluent BCG (bcg20dil)                                   | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Diluent Measles (measles10dil)                           | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Nadolol (nadolol)                                        | Barrier method                    | Orderable                 | CHAZ            | false |                                                  |
+| Acetaminophen And Codeine (acetaminophen-codeine)        | Oral contraceptive                | Orderable                 | CHAZ            | false |                                                  |
+| Gesteira (gesteira)                                      | Barrier method                    | Orderable                 | CHAZ            | false |                                                  |
+| Utah Juniper (utah-juniper)                              | Anti-fungal                       | Orderable                 | CHAZ            | false |                                                  |
+| nasal (nasal)                                            | Anti-fungal                       | Orderable                 | CHAZ            | false |                                                  |
+| Glytone essentials rejuvenate daily (glytone-rejuvenate) | Analgesics                        | Orderable                 | CHAZ            | false |                                                  |
+| Ampicillin (ampicillin)                                  | Implantable contraceptive         | Orderable                 | CHAZ            | false |                                                  |
+| Fever - Infection (Fever-infection)                      | Injectable hormonal contraceptive | Orderable                 | CHAZ            | false |                                                  |
+| ZERIT (zerit)                                            | Vaccines                          | Orderable                 | CHAZ            | false |                                                  |
+| Lovenox (lovenox)                                        | Oral contraceptive                | Orderable                 | CHAZ            | false |                                                  |
+| Duloxetine (duloxetine)                                  | Analgesics                        | Orderable                 | CHAZ            | false |                                                  |
+| RELENZA (relenza)                                        | Oral contraceptive                | Orderable                 | CHAZ            | false |                                                  |
 
-## Programs and Products
-
-Defined in referencedata.programs.csv, referencedata.orderables.csv and
-referencedata.program_orderables.csv.
-
-1. Family Planning
-  * skipping requisition periods is enabled
-  * non-full-supply tab is enabled
-  * products: (all of these are Commodity Types)
-    * Oral Contraceptive
-      1. C100/Levora
-      2. C200/Ortho-Novum
-    * Injectable Hormonal Contraceptive
-      1. C300/Depo-Estradiol
-    * Barrier Method
-      1. C400/Male Condom
-    * Implantable Contraceptive
-      1. C500/Implanon
-      2. C600/Levonorgestrel
-2. Essential Meds
-  * products:
-    * Antibiotics
-      1. C1/Acetylsalicylic Acid (a Trade Item)
-      2. C2/Glibenclamide (a Trade Item)
-    * Vaccines
-      1. C3/Streptococcus Pneumoniae Vaccine (a Trade Item)
-      2. C4/Streptococcus Pneumoniae Vaccine II (a Commodity Type)
-3. PRG003/New program
-  * products:
-    * Injectable Hormonal Contraceptive
-      1. C300/Depo-Estradiol
-4. EPI
-  * products:
-    * Vaccines: (all are VVM enabled)
-      * BCG (bcg20) - Commodity Type and Orderable
-        * BCGI2017A - Lot, expires 2019-06-01
-        * BCGI2017B - Lot, expires 2019-07-01
-      * Polio - Commodity Type
-        * Polio (20 dose) (polio20) - Orderable
-        * IPV (ipv5) - Orderable
-      * Pentavalent - Commodity Type
-        * Pentavalent (1 dose) (penta1) - Orderable
-        * Pentavalent (10 dose) (penta10) - Orderable
-      * PCV (pcv10) - Commodity Type and Orderable
-      * Rotavirus (rota1) - Commodity Type and Orderable
-        * ROTAM2017A - Lot, expires 2019-06-01
-        * ROTAM2017B - Lot, expires 2019-07-01
-      * Measles (measles10) - Commodity Type and Orderable
-      * Tetanus (tetanus10) - Commodity Type and Orderable
-      * Syringe 5ml (syringe5ml) - Orderable
-      * Syringe 0.5ml (syringe05ml) - Orderable
-      * Syringe 0.05ml (syringe005ml) - Orderable
-      * Safety Box (safetybox) - Orderable
-      * Gas (Cylinder) (gas) - Orderable
-      * Diluent BCG (bcg20dil) - Orderable
-      * Diluent Measles (measles10dil) - Orderable
-
-Currently, all the products are generally approved at all the facility types.
-In the future we could add more differentiation by types of facilities in
-referencedata.facility_type_approved_products.csv.
+Currently, all the products are generally approved at all the facility types. In the future we
+could add more differentiation by types of facilities in 
+* referencedata.facility_type_approved_products.csv.
 
 ## Requisition Groups and Schedules
 
-Defined in referencedata.requisition_groups.csv, referencedata.processing_schedules.csv,
-referencedata.requisition_group_program_schedules.csv and
-referencedata.requisition_group_members.csv.
+Defined in
+* referencedata.processing_schedules.csv
+* referencedata.requisition_groups.csv
+* referencedata.requisition_group_members.csv
+* referencedata.requisition_group_program_schedules.csv
 
-1. RGFP1/RG Family Planning 1
-  * schedule: Monthly (Jan2017, Feb2017 ... Dec2017)
-  * facilities:
-    * HC01/Comfort Health Clinic
-    * HC02/Nandumbo Health Center
-2. RGEM1/RG Essential Meds 1
-  * schedule: Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018)
-  * facilities:
-    * HC01/Comfort Health Clinic
-    * HC03/Kalembo Health Center
-    * DH01/Balaka District Hospital
-    * HF01/Kankao Health Facility
-3. RGFP2/RG Family Planning 2
-  * schedule: Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018)
-  * facilities:
-    * DH01/Balaka District Hospital
-    * HF01/Kankao Health Facility
-4. RGFP3/RG Family Planning 3
-  * schedule: Monthly A (Jan2018, Feb2018 and Mar2018 report-only, Apr2018 ...)
-  * facilities:
-    * HC03/Kalembo Health Center
-
+| Name (code)                            | Schedule                                    | Facilities             |
+|----------------------------------------|---------------------------------------------|------------------------|
+| RG Family Planning 1 (RGFP1)           | Monthly (Jan2017, Feb2017, ...)             | HC01, HC02             |
+| RG Essential Meds 1 (RGEM1)            | Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018) | HC01, HC03, DH01, HF01 |
+| RG Family Planning 2 (RGFP2)           | Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018) | DH01, HF01             |
+| RG Family Planning 3 (RGFP3)           | Monthly A (Jan2018, Feb2018, ...)           | HC03                   |
+| RG EPI 1 (districts) (RGEPI1)          | Quarterly                                   | D001, D002             |
+| RG EPI 2 (health facilities) (RGEPI2)  | Monthly                                     | N003                   |
+| RG EPI 3 (health facilities) (RGEPI3)  | Monthly                                     | N036                   |
+| RG CHAZ 1 (districts) (RG-CHAZ-1)      | Monthly                                     | ZM-DS-L1               |
+| RG CHAZ 2 (health centers) (RG-CHAZ-2) | Monthly                                     | ZM-HC-L4               |
+    
 There are also 2 unused schedules, SCH004 and SCH005.
-
-**For EPI (Vaccines) Program**
-
-* RG EPI 1 (districts) (RGEPI1)
-  * schedule: Quarterly
-  * facilities:
-    * Depósito Distrital Cuamba (D001)
-    * Depósito Distrital Lichinga (D002)
-* RG EPI 2 (health facilities) (RGEPI2)
-  * schedule: Monthly
-  * facilities:
-    * Cuamba (N003)
-    * 15 others...
-* RG EPI 3 (health facilities) (RGEPI3)
-  * schedule: Monthly
-  * facilities:
-    * Assumane (N036)
-    * 24 others...
 
 ## Roles, Users and Rights
 
-Defined in referencedata.users.csv, referencedata.roles.csv, referencedata.role_assignments.csv,
-referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
+Defined in
+* referencedata.users.csv
+* referencedata.roles.csv
+* referencedata.role_rights.csv
+* referencedata.role_assignments.csv
 
 1. Storeroom Manager
   * rights:
@@ -273,6 +220,8 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
+    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
+        approval point (CHAZ) and home facility
 2. Store Manager
   * rights:
     * Requisitions View
@@ -290,6 +239,8 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
+    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
+        approval point (CHAZ) and home facility
 3. District Storeroom Manager
   * rights:
     * Requisitions View
@@ -299,6 +250,8 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
         point and SN1/FP approval point
     * dsrmanager - has this role for Family Planning & Essential Meds at SN2/EM approval
         point, SN1.1/FP approval sub point and SN1.2/FP approval sub point 2
+    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
+        approval point (CHAZ) and home facility
 4. Program Supervisor
   * rights:
     * Requisitions View
@@ -310,6 +263,8 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
         point supervisory node
     * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
     * rivo - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
+    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
+        approval point (CHAZ) and home facility
 5. Warehouse Clerk
   * rights:
     * Orders View
@@ -324,6 +279,7 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
     * wclerk1 - has this role for WH01/Ntcheu District Warehouse
     * wclerk2 - has this role for WH02/Balaka District Warehouse
     * vwclerk1 - has this role at W001/Mozambique Central Warehouse
+    * chaz - has this role at Lusaka Province Warehouse, Lusaka District Warehouse
 6. Delivery Approver
   * rights:
     * Proofs of Delivery Manage
@@ -346,6 +302,8 @@ referencedata.role_rights.csv and referencedata.supervisory_nodes.csv.
         and for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
     * srmanager1 - has this role for Family Planning at home facility
     * srmanager2 - has this role for Family Planning & Essential Meds at home facility
+    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
+        approval point (CHAZ) and home facility
 8. Stock Viewer
   * rights:
     * Stock Cards View
@@ -421,52 +379,27 @@ the rights, as additional rights have been added to later migrations.
 
 ## Supervisory Nodes and Supply Lines
 
-Defined in referencedata.supervisory_nodes.csv, referencedata.supply_lines.csv, referencedata.requisition_groups.csv
+Defined in
+* referencedata.supervisory_nodes.csv
+* referencedata.supply_lines.csv
+* referencedata.requisition_groups.csv
 
-1. SN1/FP approval point
-  * requisition group: RGFP1
-    * program: Family Planning
-  * supply lines:
-    * WH01/Ntcheu District Warehouse
-  * facility: HC01/Comfort Health Clinic
-2. SN1.1/FP Approval sub point
-  * requisition group: RGFP2
-    * program: Family Planning
-  * facility: DH01/Balaka District Hospital
-  * parent: SN1/FP approval point
-3. SN1.2/FP Approval sub point 2
-  * requisition group: RGFP3
-    * program: Family Planning
-  * facility: DH01/Balaka District Hospital
-  * parent: SN1/FP approval point
-4. SN2/EM approval point
-  * requisition group: RGEM1
-    * program: Essential Meds
-  * supply lines:
-    * WH02/Balaka District Warehouse
-  * facility: DH01/Balaka District Hospital
-
-**For EPI (Vaccines) Program**
-
-* SN-NIASSA-PROV/Niassa province approval point
-  * requisition group: RG EPI 1 (districts) (RGEPI1)
-  * facility: P001/Depósito Provincial Niassa
-  * supply lines:
-    * W001/Mozambique Central Warehouse
-* SN-CUAMBA-DIST/Cuamba district approval point
-  * requisition group: RG EPI 2 (health facilities) (RGEPI2)
-  * supply lines:
-    * D001/Depósito Distrital Cuamba
-  * facility: D001/Depósito Distrital Cuamba
-  * parent: SN-NIASSA-PROV/Niassa province approval point
-* SN-LICHINGA-DIST/Lichinga district approval point
-  * requisition group: RG EPI 3 (health facilities) (RGEPI3)
-  * facility: D002/Depósito Distrital Lichinga
-  * parent: SN-NIASSA-PROV/Niassa province approval point
+| Name (code)                                                 | Req group | Program         | Supply Lines | Facility | Parent              |
+|-------------------------------------------------------------|-----------|-----------------|--------------|----------|---------------------|
+| FP approval point (SN1)                                     | RGFP1     | Family Planning | WH01         | HC01     |                     |
+| FP Approval sub point (SN1.1)                               | RGFP2     | Family Planning | DH01         |          | SN1                 |
+| FP Approval sub point 2 (SN1.2)                             | RGFP3     | Family Planning | DH01         |          | SN1                 |
+| EM approval point (SN2)                                     | RGEM1     | Essential Meds  | WH02         | DH01     |                     |
+| Niassa province approval point (SN-NIASSA-PROV)             | RGEPI1    | EPI             | W001         | P001     |                     |
+| Cuamba district approval point (SN-CUAMBA-DIST)             | RGEPI2    | EPI             | D001         | D001     | SN-NIASSA-PROV      |
+| Lichinga district approval point (SN-LICHINGA-DIST)         | RGEPI3    | EPI             | D002         |          | SN-NIASSA-PROV      |
+| Lusaka province approval point (CHAZ) (SN-LUSAKA-PROV-CHAZ) | RG-CHAZ-1 | CHAZ            | ZM-W-L1      | ZM-PS-L1 |                     |
+| Lusaka district approval point (CHAZ) (SN-LUSAKA-DIST-CHAZ) | RG-CHAZ-2 | CHAZ            | ZM-W-L2      | ZM-DS-L1 | SN-LUSAKA-PROV-CHAZ |
 
 ## Ideal Stock Amounts
 
-Defined in referencedata.ideal_stock_amounts.csv.
+Defined in
+* referencedata.ideal_stock_amounts.csv.
 
 Only in the EPI program. These amounts are defined for:
  
