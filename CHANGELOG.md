@@ -38,6 +38,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-4949](https://openlmis.atlassian.net/browse/OLMIS-4949): Fixed problem with updating a facility
   * Made that the facility code is unique case insensitive
 * [OLMIS-5627](https://openlmis.atlassian.net/browse/OLMIS-5627): Fixed problem with updating a supervisory node
+* [OLMIS-5007](https://openlmis.atlassian.net/browse/OLMIS-5007): Marked `GET /api/facilities/supplying` endpoint as deprecated
 
 11.0.0 / 2018-08-16
 ===================
