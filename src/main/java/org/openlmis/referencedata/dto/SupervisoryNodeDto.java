@@ -17,21 +17,22 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.web.RequisitionGroupController;
+import org.openlmis.referencedata.web.SupervisoryNodeController;
 
 @Getter
 @Setter
@@ -42,17 +43,15 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
 
-  @JsonProperty
   @Getter
-  private SupervisoryNodeBaseDto parentNode;
+  private ObjectReferenceDto parentNode;
 
-  @JsonProperty
   @Getter
-  private RequisitionGroupBaseDto requisitionGroup;
+  private ObjectReferenceDto requisitionGroup;
 
-  @JsonProperty
-  private Set<SupervisoryNodeBaseDto> childNodes;
-
+  @Getter
+  @Setter
+  private Set<ObjectReferenceDto> childNodes;
 
   public SupervisoryNodeDto(UUID id) {
     super(id);
@@ -60,77 +59,71 @@ public final class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
 
   @JsonIgnore
   @Override
-  public void setFacility(Facility facility) {
-    if (facility != null) {
-      FacilityDto facilityDto = new FacilityDto();
-      facility.export(facilityDto);
-      setFacility(facilityDto);
-    } else {
-      setFacility((FacilityDto) null);
-    }
-  }
-
-  @JsonIgnore
-  @Override
   public void setParentNode(SupervisoryNode parentNode) {
-    if (parentNode != null) {
-      SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeDto();
-      parentNode.export(supervisoryNodeBaseDto);
-      setParentNode(supervisoryNodeBaseDto);
-    } else {
-      setParentNode((SupervisoryNodeBaseDto) null);
-    }
+    this.parentNode = null != parentNode
+        ? new ObjectReferenceDto(
+            getServiceUrl(), SupervisoryNodeController.RESOURCE_PATH, parentNode.getId())
+        : null;
   }
 
-  public void setParentNode(SupervisoryNodeBaseDto parentNode) {
+  @JsonSetter("parentNode")
+  public void setParentNode(ObjectReferenceDto parentNode) {
     this.parentNode = parentNode;
   }
 
   @JsonIgnore
   @Override
-  public void setChildNodes(Set<SupervisoryNode> childNodes) {
-    if (childNodes != null) {
-      Set<SupervisoryNodeBaseDto> supervisoryNodeBaseDtos = new HashSet<>();
-
-      for (SupervisoryNode childNode : childNodes) {
-        SupervisoryNodeBaseDto supervisoryNodeBaseDto = new SupervisoryNodeBaseDto();
-        childNode.export(supervisoryNodeBaseDto);
-        supervisoryNodeBaseDtos.add(supervisoryNodeBaseDto);
-      }
-
-      setChildNodeDtos(supervisoryNodeBaseDtos);
-    } else {
-      setChildNodeDtos(null);
-    }
-  }
-
-  public void setChildNodeDtos(Set<SupervisoryNodeBaseDto> childNodes) {
-    this.childNodes = childNodes;
+  public void assignChildNodes(Set<SupervisoryNode> childNodes) {
+    this.childNodes = Optional
+        .ofNullable(childNodes)
+        .orElse(Collections.emptySet())
+        .stream()
+        .map(node -> new ObjectReferenceDto(
+            getServiceUrl(), SupervisoryNodeController.RESOURCE_PATH, node.getId()))
+        .collect(Collectors.toSet());
   }
 
   @JsonIgnore
   @Override
   public void setRequisitionGroup(RequisitionGroup requisitionGroup) {
-    if (requisitionGroup != null) {
-      RequisitionGroupBaseDto requisitionGroupBaseDto = new RequisitionGroupDto();
-      requisitionGroup.export(requisitionGroupBaseDto);
-      setRequisitionGroup(requisitionGroupBaseDto);
-    } else {
-      setRequisitionGroup((RequisitionGroupBaseDto) null);
-    }
+    this.requisitionGroup = null != requisitionGroup
+        ? new ObjectReferenceDto(
+            getServiceUrl(), RequisitionGroupController.RESOURCE_PATH, requisitionGroup.getId())
+        : null;
   }
 
-  public void setRequisitionGroup(RequisitionGroupBaseDto requisitionGroup) {
+  @JsonSetter("requisitionGroup")
+  public void setRequisitionGroup(ObjectReferenceDto requisitionGroup) {
     this.requisitionGroup = requisitionGroup;
   }
 
   @Override
-  public Set<SupervisoryNode.Importer> getChildNodes() {
-    Set<SupervisoryNodeBaseDto> collection = Optional
-        .ofNullable(childNodes)
-        .orElse(Collections.emptySet());
+  @JsonIgnore
+  public UUID getParentNodeId() {
+    return Optional
+        .ofNullable(parentNode)
+        .map(BaseDto::getId)
+        .orElse(null);
+  }
 
-    return new HashSet<>(collection);
+  @Override
+  @JsonIgnore
+  public Set<UUID> getChildNodeIds() {
+    return Optional
+        .ofNullable(childNodes)
+        .orElse(Collections.emptySet())
+        .stream()
+        .map(BaseDto::getId)
+        .collect(Collectors.toSet());
+  }
+
+  @Override
+  @JsonIgnore
+  public UUID getRequisitionGroupId() {
+    return Optional
+        .ofNullable(requisitionGroup)
+        .map(BaseDto::getId)
+        .orElse(null);
   }
 
 }

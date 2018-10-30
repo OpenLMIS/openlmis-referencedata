@@ -17,7 +17,9 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -26,12 +28,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.NAME_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.PROGRAM_ID;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.ZONE_ID;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -39,19 +43,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityOperator;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.RequisitionGroup;
-import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightType;
@@ -62,7 +63,9 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
-import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Message;
@@ -83,8 +86,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private static final String SUPERVISING_USERS_URL = ID_URL + "/supervisingUsers";
   private static final String SUPERVISING_FACILITIES_URL = ID_URL + "/facilities";
   private static final String RIGHT_ID_PARAM = "rightId";
-  private static final String PAGE = "page";
-  private static final String SIZE = "size";
 
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;
@@ -92,53 +93,50 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private Facility facility;
   private Program program;
   private Right right;
-  private RequisitionGroupProgramSchedule requisitionGroupProgramSchedule;
-  private RequisitionGroup requisitionGroup;
   private UUID facilityId;
   private UUID programId;
   private UUID rightId;
   private UUID zoneId;
 
+  @Override
+  @Before
+  public void setUp() {
+    super.setUp();
 
-  /**
-   * Constructor for tests.
-   */
-  public SupervisoryNodeControllerIntegrationTest() {
-    FacilityOperator facilityOperator = new FacilityOperator();
-    facilityOperator.setCode("facilityOperator");
+    facility = new FacilityDataBuilder().build();
 
-    final FacilityType facilityType = new FacilityType("facilityTypeCode");
-
-    final GeographicLevel geoLevel = new GeographicLevel("geoCode", 1);
-
-    final GeographicZone geoZone = new GeographicZoneDataBuilder()
-        .withLevel(geoLevel)
+    supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .withRequisitionGroup(new RequisitionGroupDataBuilder().build())
+        .withParentNode(new SupervisoryNodeDataBuilder().build())
+        .withChildNode(new SupervisoryNodeDataBuilder().build())
         .build();
 
-    facility = new Facility("facilityCode");
-    facility.setActive(true);
-    facility.setGeographicZone(geoZone);
-    facility.setType(facilityType);
-    facility.setOperator(facilityOperator);
-    facility.setEnabled(true);
-
-    supervisoryNode = new SupervisoryNodeDataBuilder().withoutId().withFacility(facility).build();
     supervisoryNodeDto = new SupervisoryNodeDto();
+    supervisoryNodeDto.setServiceUrl(baseUri);
     supervisoryNode.export(supervisoryNodeDto);
-    supervisoryNodeId = UUID.randomUUID();
+    supervisoryNodeId = supervisoryNode.getId();
 
-    program = new Program("PRO-1");
-    requisitionGroup = new RequisitionGroup();
-    requisitionGroup.setSupervisoryNode(supervisoryNode);
-    requisitionGroupProgramSchedule = new RequisitionGroupProgramSchedule();
-    requisitionGroupProgramSchedule.setRequisitionGroup(requisitionGroup);
+    program = new ProgramDataBuilder().build();
 
     right = Right.newRight("right1", RightType.SUPERVISION);
     
-    facilityId = UUID.randomUUID();
+    facilityId = facility.getId();
     programId = UUID.randomUUID();
     rightId = UUID.randomUUID();
     zoneId = UUID.randomUUID();
+
+    when(facilityRepository.findOne(supervisoryNodeDto.getFacilityId()))
+        .thenReturn(facility);
+    when(requisitionGroupRepository.findOne(supervisoryNodeDto.getRequisitionGroupId()))
+        .thenReturn(supervisoryNode.getRequisitionGroup());
+    when(supervisoryNodeRepository.findOne(supervisoryNodeDto.getParentNodeId()))
+        .thenReturn(supervisoryNode.getParentNode());
+    when(supervisoryNodeRepository.findAll(supervisoryNodeDto.getChildNodeIds()))
+        .thenReturn(Lists.newArrayList(supervisoryNode.getChildNodes()));
+
+    when(supervisoryNodeRepository.save(any(SupervisoryNode.class)))
+        .thenAnswer(new SaveAnswer<>());
   }
 
   @Test
@@ -184,7 +182,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldPostSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    SupervisoryNodeDto response = restAssured
+    ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -192,10 +190,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .when()
         .post(RESOURCE_URL)
         .then()
-        .statusCode(201)
-        .extract().as(SupervisoryNodeDto.class);
+        .statusCode(201);
 
-    assertEquals(supervisoryNodeDto, response);
+    assertResponseBody(response, is(notNullValue(String.class)));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -265,32 +262,36 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldPutSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    supervisoryNode.setDescription("OpenLMIS");
+    supervisoryNodeDto.setDescription("OpenLMIS");
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
-    SupervisoryNodeDto newDto = new SupervisoryNodeDto();
-    supervisoryNode.export(newDto);
-
-    SupervisoryNodeDto response = restAssured
+    ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
-        .body(newDto)
+        .body(supervisoryNodeDto)
         .when()
         .put(ID_URL)
         .then()
-        .statusCode(200)
-        .extract().as(SupervisoryNodeDto.class);
+        .statusCode(200);
 
-    assertEquals(newDto, response);
-    assertEquals("OpenLMIS", response.getDescription());
+    assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldUpdateSupervisoryNode() {
-    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder();
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+        .withFacility(supervisoryNode.getFacility())
+        .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
+        .withParentNode(supervisoryNode.getParentNode());
+
+    supervisoryNode
+        .getChildNodes()
+        .forEach(builder::withChildNode);
+
     SupervisoryNode existing = builder.build();
 
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
@@ -299,25 +300,23 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
     builder.withName("Updated Name");
-    SupervisoryNodeDto newDto = new SupervisoryNodeDto();
+    supervisoryNodeDto = new SupervisoryNodeDto();
     builder
         .build()
-        .export(newDto);
+        .export(supervisoryNodeDto);
 
-    SupervisoryNodeDto response = restAssured
+    ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", supervisoryNodeId)
-        .body(newDto)
+        .body(supervisoryNodeDto)
         .when()
         .put(ID_URL)
         .then()
-        .statusCode(200)
-        .extract().as(SupervisoryNodeDto.class);
+        .statusCode(200);
 
-    assertEquals(newDto, response);
-    assertEquals("Updated Name", response.getName());
+    assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -405,7 +404,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
-    SupervisoryNodeDto response = restAssured
+    ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -413,10 +412,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .when()
         .get(ID_URL)
         .then()
-        .statusCode(200)
-        .extract().as(SupervisoryNodeDto.class);
+        .statusCode(200);
 
-    assertEquals(supervisoryNodeDto, response);
+    assertResponseBody(response, is(supervisoryNode.getId().toString()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -670,7 +668,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .then()
         .statusCode(200)
         .body("content", hasSize(1))
-        .body("content[0].id", is(facility.getId()));
+        .body("content[0].id", is(facility.getId().toString()));
   }
 
   @Test
@@ -748,5 +746,18 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
       .get(RESOURCE_URL)
       .then()
       .statusCode(expectedCode);
+  }
+
+  private void assertResponseBody(ValidatableResponse response, Matcher<String> idMatcher) {
+    response
+        .body(ID, idMatcher)
+        .body("code", is(supervisoryNodeDto.getCode()))
+        .body("name", is(supervisoryNodeDto.getName()))
+        .body("description", is(supervisoryNodeDto.getDescription()))
+        .body("facility.id", is(supervisoryNodeDto.getFacilityId().toString()))
+        .body("parentNode.id", is(supervisoryNodeDto.getParentNodeId().toString()))
+        .body("requisitionGroup.id", is(supervisoryNodeDto.getRequisitionGroupId().toString()))
+        .body("childNodes.id", hasItems(supervisoryNodeDto.getChildNodeIds()
+            .stream().map(Objects::toString).toArray(String[]::new)));
   }
 }

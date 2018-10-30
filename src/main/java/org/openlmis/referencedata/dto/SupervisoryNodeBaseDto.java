@@ -20,8 +20,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,43 +33,44 @@ import lombok.ToString;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.domain.SupervisoryNode.Importer;
+import org.openlmis.referencedata.web.FacilityController;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"serviceUrl"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.Exporter,
     SupervisoryNode.Importer {
 
+  @Setter
+  @Getter(AccessLevel.PROTECTED)
+  @JsonIgnore
+  private String serviceUrl;
+
   private String code;
-  private FacilityDto facility;
+  private ObjectReferenceDto facility;
   private String name;
   private String description;
   private Map<String, Object> extraData;
 
-  public SupervisoryNodeBaseDto(UUID id) {
+  SupervisoryNodeBaseDto(UUID id) {
     setId(id);
   }
 
   @JsonSetter
-  public void setFacility(FacilityDto facility) {
+  public void setFacility(ObjectReferenceDto facility) {
     this.facility = facility;
   }
 
   @JsonIgnore
   @Override
   public void setFacility(Facility facility) {
-    if (facility != null) {
-      FacilityDto facilityDto = new FacilityDto(facility.getId());
-      facilityDto.setGeographicZone(facility.getGeographicZone());
-      this.facility = facilityDto;
-    } else {
-      this.facility = null;
-    }
+    this.facility = null != facility
+        ? new ObjectReferenceDto(serviceUrl, FacilityController.RESOURCE_PATH, facility.getId())
+        : null;
   }
 
   @Override
@@ -76,7 +79,7 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   }
 
   @Override
-  public void setChildNodes(Set<SupervisoryNode> childNodes) {
+  public void assignChildNodes(Set<SupervisoryNode> childNodes) {
     // unsupported operation
   }
 
@@ -86,21 +89,32 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   }
 
   @Override
-  public Importer getParentNode() {
+  @JsonIgnore
+  public UUID getFacilityId() {
+    return Optional
+        .ofNullable(facility)
+        .map(BaseDto::getId)
+        .orElse(null);
+  }
+
+  @Override
+  @JsonIgnore
+  public UUID getParentNodeId() {
     // unsupported operation
     return null;
   }
 
   @Override
-  public Set<Importer> getChildNodes() {
+  @JsonIgnore
+  public Set<UUID> getChildNodeIds() {
     // unsupported operation
     return Collections.emptySet();
   }
 
   @Override
-  public RequisitionGroup.Importer getRequisitionGroup() {
+  @JsonIgnore
+  public UUID getRequisitionGroupId() {
     // unsupported operation
     return null;
   }
-
 }

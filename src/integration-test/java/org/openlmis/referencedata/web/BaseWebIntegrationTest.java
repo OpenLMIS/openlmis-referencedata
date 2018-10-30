@@ -177,7 +177,7 @@ public abstract class BaseWebIntegrationTest {
 
   protected Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
 
-  @Value("${auth.server.baseUrl}")
+  @Value("${service.url}")
   protected String baseUri;
 
   @Rule

@@ -79,6 +79,21 @@ public class SupervisoryNodeDataBuilder {
     return this;
   }
 
+  public SupervisoryNodeDataBuilder withRequisitionGroup(RequisitionGroup requisitionGroup) {
+    this.requisitionGroup = requisitionGroup;
+    return this;
+  }
+
+  public SupervisoryNodeDataBuilder withParentNode(SupervisoryNode parentNode) {
+    this.parentNode = parentNode;
+    return this;
+  }
+
+  public SupervisoryNodeDataBuilder withChildNode(SupervisoryNode childNode) {
+    this.childNodes.add(childNode);
+    return this;
+  }
+
   /**
    * Sets code for new {@link SupervisoryNode}.
    *

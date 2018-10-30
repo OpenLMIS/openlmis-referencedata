@@ -29,7 +29,6 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.service.RequisitionGroupService;
 import org.openlmis.referencedata.service.RightAssignmentService;
-import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
@@ -45,10 +44,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -58,6 +59,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class RequisitionGroupController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RequisitionGroupController.class);
+
+  public static final String RESOURCE_PATH = "/requisitionGroups";
+  private static final String ID_PATH = RESOURCE_PATH + "/{id}";
+  private static final String AUDIT_LOG_PATH = ID_PATH + "/auditLog";
+  private static final String SEARCH_PATH = RESOURCE_PATH + "/search";
 
   @Autowired
   @Qualifier("requisitionGroupValidator")
@@ -70,9 +76,6 @@ public class RequisitionGroupController extends BaseController {
   private RequisitionGroupService requisitionGroupService;
 
   @Autowired
-  private RightService rightService;
-  
-  @Autowired
   private RightAssignmentService rightAssignmentService;
 
   /**
@@ -81,7 +84,7 @@ public class RequisitionGroupController extends BaseController {
    * @param requisitionGroupDto a requisition group bound to the request body.
    * @return the created RequisitionGroupDto.
    */
-  @RequestMapping(value = "/requisitionGroups", method = RequestMethod.POST)
+  @PostMapping(RESOURCE_PATH)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public RequisitionGroupDto createRequisitionGroup(
@@ -90,8 +93,7 @@ public class RequisitionGroupController extends BaseController {
     Profiler profiler = new Profiler("CREATE_NEW_REQUISITION_GROUP");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+    checkAdminRight(REQUISITION_GROUPS_MANAGE, profiler);
 
     profiler.start("VALIDATE_REQUISITION_GROUP_DTO");
     validator.validate(requisitionGroupDto, bindingResult);
@@ -124,7 +126,7 @@ public class RequisitionGroupController extends BaseController {
    *
    * @return the RequisitionGroupDtos.
    */
-  @RequestMapping(value = "/requisitionGroups", method = RequestMethod.GET)
+  @GetMapping(RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<RequisitionGroupDto> getAllRequisitionGroups() {
@@ -143,7 +145,7 @@ public class RequisitionGroupController extends BaseController {
    * @param requisitionGroupId the UUID of requisition group whose we want to get.
    * @return the RequisitionGroupDto.
    */
-  @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.GET)
+  @GetMapping(ID_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public RequisitionGroupDto getRequisitionGroup(
@@ -164,7 +166,7 @@ public class RequisitionGroupController extends BaseController {
    * @param requisitionGroupId UUID of requisition group which we want to update.
    * @return the updated RequisitionGroupDto.
    */
-  @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.PUT)
+  @PutMapping(ID_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public RequisitionGroupDto updateRequisitionGroup(
@@ -175,8 +177,7 @@ public class RequisitionGroupController extends BaseController {
     Profiler profiler = new Profiler("UPDATE_REQUISITION_GROUP");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+    checkAdminRight(REQUISITION_GROUPS_MANAGE, profiler);
 
     profiler.start("VALIDATE_REQUISITION_GROUP");
     validator.validate(requisitionGroupDto, bindingResult);
@@ -220,15 +221,14 @@ public class RequisitionGroupController extends BaseController {
    *
    * @param requisitionGroupId UUID of requisition group whose we want to delete.
    */
-  @RequestMapping(value = "/requisitionGroups/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping(ID_PATH)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteRequisitionGroup(@PathVariable("id") UUID requisitionGroupId) {
 
     Profiler profiler = new Profiler("DELETE_REQUISITION_GROUP");
     profiler.setLogger(LOGGER);
 
-    profiler.start("CHECK_ADMIN");
-    rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
+    checkAdminRight(REQUISITION_GROUPS_MANAGE, profiler);
 
     profiler.start("FIND_REQUISITION_GROUP");
     RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
@@ -256,7 +256,7 @@ public class RequisitionGroupController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/requisitionGroups/{id}/auditLog", method = RequestMethod.GET)
+  @GetMapping(AUDIT_LOG_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ResponseEntity<String> getRequisitionGroupAuditLog(
@@ -287,7 +287,7 @@ public class RequisitionGroupController extends BaseController {
    * @param pageable object used to encapsulate the pagination related values: page and size.
    * @return Page of wanted Requisition Groups matching query parameters.
    */
-  @RequestMapping(value = "/requisitionGroups/search", method = RequestMethod.POST)
+  @PostMapping(SEARCH_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Page<RequisitionGroupDto> search(@RequestBody Map<String, Object> queryParams,

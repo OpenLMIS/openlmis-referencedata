@@ -15,10 +15,13 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -97,24 +100,30 @@ public class SupervisoryNode extends BaseEntity {
   public static SupervisoryNode newSupervisoryNode(Importer importer) {
     Facility facility = null;
 
-    if (importer.getFacility() != null) {
-      facility = Facility.newFacility(importer.getFacility());
+    if (importer.getFacilityId() != null) {
+      facility = new Facility();
+      facility.setId(importer.getFacilityId());
     }
 
     SupervisoryNode parentNode = null;
-    if (importer.getParentNode() != null) {
-      parentNode = SupervisoryNode.newSupervisoryNode(importer.getParentNode());
+    if (importer.getParentNodeId() != null) {
+      parentNode = new SupervisoryNode();
+      parentNode.setId(importer.getParentNodeId());
     }
 
     RequisitionGroup requisitionGroup = null;
-    if (importer.getRequisitionGroup() != null) {
-      requisitionGroup = RequisitionGroup.newRequisitionGroup(importer.getRequisitionGroup());
+    if (importer.getRequisitionGroupId() != null) {
+      requisitionGroup = new RequisitionGroup();
+      requisitionGroup.setId(importer.getRequisitionGroupId());
     }
 
     Set<SupervisoryNode> childNodes = new HashSet<>();
-    if (importer.getChildNodes() != null) {
-      for (Importer childNodeImporter : importer.getChildNodes()) {
-        childNodes.add(SupervisoryNode.newSupervisoryNode(childNodeImporter));
+    if (importer.getChildNodeIds() != null) {
+      for (UUID childNodeId : importer.getChildNodeIds()) {
+        SupervisoryNode child = new SupervisoryNode();
+        child.setId(childNodeId);
+
+        childNodes.add(child);
       }
     }
 
@@ -138,6 +147,23 @@ public class SupervisoryNode extends BaseEntity {
   public void assignParentNode(SupervisoryNode parentNode) {
     this.parentNode = parentNode;
     parentNode.childNodes.add(this);
+  }
+
+  /**
+   * Assign this node's set of child supervisory nodes. Also add this node to the child's parent
+   * nodes.
+   */
+  public void assignChildNodes(Set<SupervisoryNode> childNodes) {
+    if (null == this.childNodes) {
+      this.childNodes = new HashSet<>();
+    }
+
+    this.childNodes.clear();
+
+    Optional
+        .ofNullable(childNodes)
+        .orElse(Collections.emptySet())
+        .forEach(child -> child.assignParentNode(this));
   }
 
   /**
@@ -190,19 +216,15 @@ public class SupervisoryNode extends BaseEntity {
   /**
    * Copy values of attributes into new or updated SupervisoryNode.
    *
-   * @param supervisoryNode SupervisoryNode with new values.
+   * @param importer importer with new values.
    */
-  public void updateFrom(SupervisoryNode supervisoryNode) {
-    this.code = supervisoryNode.getCode();
-    this.name = supervisoryNode.getName();
-    this.description = supervisoryNode.getDescription();
-    this.facility = supervisoryNode.getFacility();
-    this.parentNode = supervisoryNode.getParentNode();
-    this.childNodes = supervisoryNode.getChildNodes();
-    this.requisitionGroup = supervisoryNode.getRequisitionGroup();
+  public void updateFrom(SupervisoryNode.Importer importer) {
+    this.code = importer.getCode();
+    this.name = importer.getName();
+    this.description = importer.getDescription();
 
     extraData = ExtraDataEntity.defaultEntity(extraData);
-    extraData.updateFrom(supervisoryNode.getExtraData());
+    extraData.updateFrom(importer.getExtraData());
   }
 
   /**
@@ -217,7 +239,7 @@ public class SupervisoryNode extends BaseEntity {
     exporter.setDescription(description);
     exporter.setFacility(facility);
     exporter.setParentNode(parentNode);
-    exporter.setChildNodes(childNodes);
+    exporter.assignChildNodes(childNodes);
     exporter.setRequisitionGroup(requisitionGroup);
 
     extraData = ExtraDataEntity.defaultEntity(extraData);
@@ -262,7 +284,7 @@ public class SupervisoryNode extends BaseEntity {
 
     void setParentNode(SupervisoryNode parentNode);
 
-    void setChildNodes(Set<SupervisoryNode> childNodes);
+    void assignChildNodes(Set<SupervisoryNode> childNodes);
 
     void setRequisitionGroup(RequisitionGroup requisitionGroup);
   }
@@ -275,12 +297,12 @@ public class SupervisoryNode extends BaseEntity {
 
     String getDescription();
 
-    Facility.Importer getFacility();
+    UUID getFacilityId();
 
-    SupervisoryNode.Importer getParentNode();
+    UUID getParentNodeId();
 
-    Set<SupervisoryNode.Importer> getChildNodes();
+    Set<UUID> getChildNodeIds();
 
-    RequisitionGroup.Importer getRequisitionGroup();
+    UUID getRequisitionGroupId();
   }
 }
