@@ -1638,7 +1638,7 @@ resourceTypes:
       /supplying:
           get:
               is: [ secured ]
-              description: Returns a list of facilities.
+              description: WARNING! Deprecated. Returns a list of facilities.
               queryParameters:
                   programId:
                       displayName: programId
