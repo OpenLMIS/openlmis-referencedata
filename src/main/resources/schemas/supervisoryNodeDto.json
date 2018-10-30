@@ -22,18 +22,22 @@
     },
     "facility": {
       "type": "object",
-      "$ref": "facility.json"
+      "$ref": "referenceObjectDto.json"
     },
     "parentNode": {
       "type": "object",
-      "$ref": "supervisoryNodeDto.json"
+      "$ref": "referenceObjectDto.json"
+    },
+    "requisitionGroup": {
+      "type": "object",
+      "$ref": "referenceObjectDto.json"
     },
     "childNodes": {
       "type": "array",
       "title": "childNodes",
       "items": {
         "type": "object",
-        "$ref": "supervisoryNodeDto.json"
+        "$ref": "referenceObjectDto.json"
       },
       "uniqueItems": false
     },

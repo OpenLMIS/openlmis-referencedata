@@ -39,6 +39,7 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
+import org.openlmis.referencedata.service.SupervisoryNodeBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
@@ -48,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -90,6 +92,12 @@ public class SupervisoryNodeController extends BaseController {
   @Autowired
   private SupervisoryNodeValidator validator;
 
+  @Autowired
+  private SupervisoryNodeBuilder builder;
+
+  @Value("${service.url}")
+  private String serviceUrl;
+
   /**
    * Allows creating new supervisoryNode. If the id is specified, it will be ignored.
    *
@@ -109,7 +117,7 @@ public class SupervisoryNodeController extends BaseController {
     throwValidationMessageExceptionIfErrors(bindingResult);
 
     supervisoryNodeDto.setId(null);
-    SupervisoryNode supervisoryNode = SupervisoryNode.newSupervisoryNode(supervisoryNodeDto);
+    SupervisoryNode supervisoryNode = builder.build(supervisoryNodeDto);
     supervisoryNodeRepository.save(supervisoryNode);
     LOGGER.info("Created new supervisoryNode with id: {}", supervisoryNode.getId());
     return exportToDto(supervisoryNode);
@@ -161,17 +169,8 @@ public class SupervisoryNodeController extends BaseController {
     validator.validate(supervisoryNodeDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    profiler.start("FIND_SUPERVISORY_NODE");
-    SupervisoryNode supervisoryNodeToUpdate =
-        supervisoryNodeRepository.findOne(supervisoryNodeId);
-
-    if (supervisoryNodeToUpdate == null) {
-      profiler.start("CREATE_SUPERVISORY_NODE");
-      supervisoryNodeToUpdate = new SupervisoryNode();
-    }
-
-    profiler.start("IMPORT_SUPERVISORY_NODE_FROM_DTO");
-    supervisoryNodeToUpdate.updateFrom(SupervisoryNode.newSupervisoryNode(supervisoryNodeDto));
+    profiler.start("BUILD_DOMAIN_OBJ_FROM_DTO");
+    SupervisoryNode supervisoryNodeToUpdate = builder.build(supervisoryNodeDto);
 
     profiler.start("SAVE_SUPERVISORY_NODE");
     supervisoryNodeRepository.saveAndFlush(supervisoryNodeToUpdate);
@@ -347,18 +346,22 @@ public class SupervisoryNodeController extends BaseController {
 
     if (supervisoryNode != null) {
       supervisoryNodeDto = new SupervisoryNodeDto();
+      supervisoryNodeDto.setServiceUrl(serviceUrl);
       supervisoryNode.export(supervisoryNodeDto);
     }
 
     return supervisoryNodeDto;
   }
 
-  private Page<SupervisoryNodeDto> exportToDto(Page<SupervisoryNode> supervisoryNodePage,
+  private Page<SupervisoryNodeDto> exportToDto(Page<SupervisoryNode> page,
       Pageable pageable) {
-    List<SupervisoryNodeDto> dtoPage = supervisoryNodePage.getContent().stream()
+    List<SupervisoryNodeDto> content = page
+        .getContent()
+        .stream()
         .map(this::exportToDto)
         .collect(Collectors.toList());
-    return Pagination.getPage(dtoPage, pageable, supervisoryNodePage.getTotalElements());
+
+    return Pagination.getPage(content, pageable, page.getTotalElements());
   }
 
   private UserDto exportToDto(User user) {

@@ -15,26 +15,24 @@
 
 package org.openlmis.referencedata.dto;
 
+import java.util.UUID;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 import org.openlmis.referencedata.ToStringTestUtils;
-import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 
 public class SupervisoryNodeDtoTest {
 
   @Test
   public void equalsContract() {
-    FacilityDto red = new FacilityDto();
-    FacilityDto black = new FacilityDto();
-
-    new FacilityDataBuilder().build().export(red);
-    new FacilityDataBuilder().build().export(black);
+    ObjectReferenceDto red = new ObjectReferenceDto("", "", UUID.randomUUID());
+    ObjectReferenceDto black = new ObjectReferenceDto("", "", UUID.randomUUID());
 
     EqualsVerifier
         .forClass(SupervisoryNodeDto.class)
+        .withIgnoredFields("serviceUrl")
         .withRedefinedSuperclass()
-        .withPrefabValues(FacilityDto.class, red, black)
+        .withPrefabValues(ObjectReferenceDto.class, red, black)
         .suppress(Warning.NONFINAL_FIELDS)
         .verify();
   }

@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
@@ -46,6 +47,7 @@ public class SupervisoryNodeTest {
     facility2 = new Facility("C2");
     supervisoryNode1 = new SupervisoryNodeDataBuilder().build();
     requisitionGroup1 = new RequisitionGroup("RG1", "RGN1", supervisoryNode1);
+    requisitionGroup1.setId(UUID.randomUUID());
     requisitionGroup1.setMemberFacilities(Sets.newHashSet(facility2, new Facility("C3")));
     addSupportedPrograms(requisitionGroup1);
     processingSchedule = new ProcessingSchedule(Code.code("PS1"), "Schedule1");

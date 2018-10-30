@@ -33,6 +33,7 @@ public class SupervisoryNodeBaseDtoTest {
 
     EqualsVerifier
         .forClass(SupervisoryNodeBaseDto.class)
+        .withIgnoredFields("serviceUrl")
         .withRedefinedSuperclass()
         .withRedefinedSubclass(SupervisoryNodeDto.class)
         .withPrefabValues(FacilityDto.class, red, black)
