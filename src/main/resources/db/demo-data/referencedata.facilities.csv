@@ -3,9 +3,12 @@ e6799d64-d10d-4011-b8c2-0e4d4a3f65ce,true,HC01,,,true,,,Comfort Health Clinic,tr
 7938919f-6f61-4d1a-a4dc-923c31e9cd45,true,HF01,,,true,,,Kankao Health Facility,true,2c48a33f-a3c7-4540-be02-78d3d513f961,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,ac1d268b-ce10-455f-bf87-9c667da8f060,,POINT(34.922379 -15.054833)
 176c4276-1fb1-4507-8ad2-cdfba0f47445,true,HC02,,,true,,,Nandumbo Health Center,true,5abca1a8-6e6f-4a9d-bf42-8ed97b9ac365,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,ac1d268b-ce10-455f-bf87-9c667da8f060,,POINT(35.225225 -14.851849)
 5b39f0fb-5c47-4551-b983-1e30ac6df65d,true,HC03,,,true,,,Kalembo Health Center,true,a358a514-5246-4798-981c-6f0691a93e6c,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,ac1d268b-ce10-455f-bf87-9c667da8f060,,POINT(35.170829 -14.84291)
+bfe3eac5-9961-4d44-a492-431865bbcb23,true,HC04,,,true,,2018-01-01,Lilongwe Health Center,true,bf2b810b-cdbf-48b2-b569-149b3cf42390,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
 13037147-1769-4735-90a7-b9b310d128b8,true,DH01,,,true,,,Balaka District Hospital,true,bf2b810b-cdbf-48b2-b569-149b3cf42387,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,663b1d34-cc17-4d60-9619-e553e45aa441,,POINT(34.949166 -14.984722)
 19121381-9f3d-4e77-b9e5-d3f59fc1639e,true,WH01,,,true,,,Ntcheu District Warehouse,true,f754e928-cfb3-4ab0-af68-3a9703e39b52,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,e2faaa9e-4b2d-4212-bb60-fd62970b2113,,POINT(34.638646 -14.817427)
 9318b2ea-9ae0-42b2-a7e1-353683f54000,true,WH02,,,true,,,Balaka District Warehouse,true,bf2b810b-cdbf-48b2-b569-149b3cf42387,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,e2faaa9e-4b2d-4212-bb60-fd62970b2113,,POINT(34.961348 -14.985039)
+749b9f83-487b-4b83-925a-c43632491782,true,WH03,,,true,,2018-01-01,Lilongwe District Warehouse,true,50293982-602a-4046-ac29-d7f83a8a13e10,,e2faaa9e-4b2d-4212-bb60-fd62970b2113,,
+752a6979-cb5f-416b-b73b-527e2b6569c4,true,DS01,,,true,,2018-01-01,Lilongwe District Store,true,50293982-602a-4046-ac29-d7f83a8a13e10,,5fc213c6-1bd7-46f0-9883-57c05250ca90,,
 7fc9bda8-ad8a-468d-8244-38e1918527d5,true,N003,,,true,,2010-09-01,"Cuamba, Cuamba",true,9b8cfb5a-217a-4261-a64f-16ca06ae79fa,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,ac1d268b-ce10-455f-bf87-9c667da8f060,,POINT(36.533773 -14.800088)
 4774fc63-a0c8-4a29-a01d-5b6b48632175,true,N007,,,true,,2010-09-01,"Lurio, Cuamba",true,9b8cfb5a-217a-4261-a64f-16ca06ae79fa,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,ac1d268b-ce10-455f-bf87-9c667da8f060,,POINT(36.852509 -14.78975)
 a205764b-3998-4c89-afac-2bc9d737c8d3,true,N008,,,true,,2010-09-01,"Macaue-2, Cuamba",true,9b8cfb5a-217a-4261-a64f-16ca06ae79fa,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,ac1d268b-ce10-455f-bf87-9c667da8f060,,POINT(36.533773 -14.800088)
@@ -2728,18 +2731,3 @@ e3ae63d6-571e-47ab-971b-26f6abfd9626,true,hGQQMaRyr,,,true,,,Fixflex,true,58d511
 66f36eee-fd9b-45e6-854c-0b53ffa8acda,true,rV1BVgT,,,true,,,Lotstring,true,58d51132-de7d-49f6-ba8d-fd2b5673c3ff,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,ac1d268b-ce10-455f-bf87-9c667da8f060,,
 3f0ca47d-fbc2-4cb5-9625-fe9b85fb5cf6,true,6YFaymY,,,true,,,Fintone,true,0bbd69c1-e20f-48f5-aae4-26dcd8aa7602,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,ac1d268b-ce10-455f-bf87-9c667da8f060,,
 55ec8e71-040a-40c6-8007-426003ee6d4a,true,wDMfPY,,,true,,,Ventosanzap,true,58d51132-de7d-49f6-ba8d-fd2b5673c3ff,9456c3e9-c4a6-4a28-9e08-47ceb16a4121,663b1d34-cc17-4d60-9619-e553e45aa441,,
-b2ccff55-3ff3-420b-b573-c1494c51dd44,true,ZM-PS-L1,,,true,,2018-01-01,Lusaka Province Store,true,0bbd69c1-e20f-48f5-aae4-26dcd8aa7602,,caecea08-6b2f-4ba9-98b2-b87702ba57ba,,
-425f2190-0dce-4aaf-bc49-5438cb636fdd,true,ZM-W-L1,,,true,,2018-01-01,Lusaka Province Warehouse,true,0bbd69c1-e20f-48f5-aae4-26dcd8aa7603,,e2faaa9e-4b2d-4212-bb60-fd62970b2113,,
-752a6979-cb5f-416b-b73b-527e2b6569c4,true,ZM-DS-L1,,,true,,2018-01-01,Lusaka District Store,true,50293982-602a-4046-ac29-d7f83a8a13e9,,5fc213c6-1bd7-46f0-9883-57c05250ca90,,
-749b9f83-487b-4b83-925a-c43632491782,true,ZM-W-L2,,,true,,2018-01-01,Lusaka District Warehouse,true,50293982-602a-4046-ac29-d7f83a8a13e10,,e2faaa9e-4b2d-4212-bb60-fd62970b2113,,
-2d5caf92-7fbd-4e44-89eb-a60b67504f4f,true,ZM-HC-L1,,,true,,2018-01-01,"Sunningdale, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42387,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-932773bd-a5b8-460d-9a9c-5d764b58e5ce,true,ZM-HC-L2,,,true,,2018-01-01,"Kabulonga, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42388,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-07ce077a-02da-4fce-8d89-51143f4069a5,true,ZM-HC-L3,,,true,,2018-01-01,"Acacia, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42389,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-bfe3eac5-9961-4d44-a492-431865bbcb23,true,ZM-HC-L4,,,true,,2018-01-01,"Roma, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42390,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-b09d11c3-78b5-40d5-a0d5-52d6db6de758,true,ZM-HC-L5,,,true,,2018-01-01,"Avondale, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42391,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-61f74d0a-7413-4392-acd6-a85fb017484b,true,ZM-HC-L6,,,true,,2018-01-01,"Longacres, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42392,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-3e12a230-2685-4a19-85c5-f947b86c2d17,true,ZM-HC-L7,,,true,,2018-01-01,"Makeni, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42393,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-44040382-78d5-4b27-9319-593dbe68c1de,true,ZM-HC-L8,,,true,,2018-01-01,"Chalala, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42394,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-f45f2050-8559-400e-a62f-a3dec22db03d,true,ZM-HC-L9,,,true,,2018-01-01,"Libala, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42395,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-b6c42fbe-747c-419b-968d-430f41d90ffe,true,ZM-HC-L10,,,true,,2018-01-01,"Chainda, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42396,,ac1d268b-ce10-455f-bf87-9c667da8f060,,
-5a70ec45-9884-4579-86d5-9b208ea1931f,true,ZM-HC-L11,,,true,,2018-01-01,"Foxdale, Lusaka",true,bf2b810b-cdbf-48b2-b569-149b3cf42397,,ac1d268b-ce10-455f-bf87-9c667da8f060,,

@@ -47,6 +47,7 @@ Defined in
 | Zomba District (Malawi-Southern-Zomba)           | District |
 | Neno District (Malawi-Southern-Neno)             | District |
 | Balaka (Malawi-Southern-Balaka-Balaka)           | City     |
+| Lilongwe (Malawi-Central-Lilongwe-Lilongwe)      | City     |
 | Mozambique (moz)                                 | Country  |
 | Niassa (niassa)                                  | Region   |
 | Cuamba (cuamba)                                  | District |
@@ -88,11 +89,9 @@ The facilities described below are defined in these files:
 | Depósito Provincial Niassa (P001)   | Provincial Store  | EPI                             | Niassa Province    | rivo                                 |              |
 | Depósito Distrital Cuamba (D001)    | District Store    | EPI                             | Cuamba District    | divo1, vsrmanager2                   | RGEPI1       |
 | Depósito Distrital Lichinga (D002)  | District Store    | EPI                             | Lichinga District  | divo2                                | RGEPI1       |
-| Lusaka Province Store (ZM-PS-L1)    | Province Store    | CHAZ                            | Southern Region    |                                      |              |
-| Lusaka Province Warehouse (ZM-W-L1) | Warehouse         | CHAZ                            | Southern Region    |                                      |              |
-| Lusaka District Store (ZM-DS-L1)    | District Store    | CHAZ                            | Balaka District    |                                      | RG-CHAZ-1    |
-| Lusaka District Warehouse (ZM-W-L2) | Warehouse         | CHAZ                            | Balaka District    |                                      |              |
-| Roma, Lusaka (ZM-HC-L4)             | Health Center     | CHAZ                            | Balaka             | chaz                                 | RG-CHAZ-2    |
+| Lilongwe District Warehouse (WH03)  | Warehouse         | CHAZ                            | Lilongwe District  |                                      |              |
+| Lilongwe District Store (DS01)      | District Store    | CHAZ                            | Lilongwe District  |                                      |              |
+| Lilongwe Health Center (HC04)       | Health Center     | CHAZ                            | Lilongwe           | chaz                                 | RG-CHAZ-1    |
 
 
 There are 16 facilities in the Cuamba district, all health centers. Though all of them can be used to demo, it is recommended to use the following facility:
@@ -107,11 +106,11 @@ There are 25 facilities in the Lichinga district, all health centers. Though all
 |-----------------|---------------|----------|-------------------|-----------|
 | Assumane (N036) | Health Center | EPI      | Lichinga District | RGEPI3    |
 
-There are 11 facilities in the Lusaka city, all health centers. Though all of them can be used to demo the requisition split feature, it is recommended to use the following facility:
+There are 1 facility (health center) in the Lilongwe city and it can be used to demo the **requisition split feature**:
 
-| Name (Code)             | Type         | Programs | Geo Zone      | Req Group |
-|-------------------------|--------------|----------|---------------|-----------|
-| Roma, Lusaka (ZM-HC-L4) |Health Center | CHAZ     | Balaka        | RG-CHAZ-2 |
+| Name (Code)                   | Type         | Programs | Geo Zone | Req Group |
+|-------------------------------|--------------|----------|----------|-----------|
+| Lilongwe Health Center (HC04) |Health Center | CHAZ     | Lilongwe | RG-CHAZ-1 |
 
 Additionally, there are many other facilities in other districts, but they are not used except to populate the system.
 
@@ -188,8 +187,7 @@ Defined in
 | RG EPI 1 (districts) (RGEPI1)          | Quarterly                                   | D001, D002             |
 | RG EPI 2 (health facilities) (RGEPI2)  | Monthly                                     | N003                   |
 | RG EPI 3 (health facilities) (RGEPI3)  | Monthly                                     | N036                   |
-| RG CHAZ 1 (districts) (RG-CHAZ-1)      | Monthly                                     | ZM-DS-L1               |
-| RG CHAZ 2 (health centers) (RG-CHAZ-2) | Monthly                                     | ZM-HC-L4               |
+| RG CHAZ 1 (health centers) (RG-CHAZ-1) | Monthly                                     | HC04                   |
     
 There are also 2 unused schedules, SCH004 and SCH005.
 
@@ -380,17 +378,16 @@ Defined in
 * referencedata.supply_lines.csv
 * referencedata.requisition_groups.csv
 
-| Name (code)                                                 | Req group | Program         | Supply Lines | Facility | Parent              |
-|-------------------------------------------------------------|-----------|-----------------|--------------|----------|---------------------|
-| FP approval point (SN1)                                     | RGFP1     | Family Planning | WH01         | HC01     |                     |
-| FP Approval sub point (SN1.1)                               | RGFP2     | Family Planning | DH01         |          | SN1                 |
-| FP Approval sub point 2 (SN1.2)                             | RGFP3     | Family Planning | DH01         |          | SN1                 |
-| EM approval point (SN2)                                     | RGEM1     | Essential Meds  | WH02         | DH01     |                     |
-| Niassa province approval point (SN-NIASSA-PROV)             | RGEPI1    | EPI             | W001         | P001     |                     |
-| Cuamba district approval point (SN-CUAMBA-DIST)             | RGEPI2    | EPI             | D001         | D001     | SN-NIASSA-PROV      |
-| Lichinga district approval point (SN-LICHINGA-DIST)         | RGEPI3    | EPI             | D002         |          | SN-NIASSA-PROV      |
-| Lusaka province approval point (CHAZ) (SN-LUSAKA-PROV-CHAZ) | RG-CHAZ-1 | CHAZ            | ZM-W-L1      | ZM-PS-L1 |                     |
-| Lusaka district approval point (CHAZ) (SN-LUSAKA-DIST-CHAZ) | RG-CHAZ-2 | CHAZ            | ZM-W-L2      | ZM-DS-L1 | SN-LUSAKA-PROV-CHAZ |
+| Name (code)                                                   | Req group | Program         | Supply Lines | Facility | Parent         |
+|---------------------------------------------------------------|-----------|-----------------|--------------|----------|----------------|
+| FP approval point (SN1)                                       | RGFP1     | Family Planning | WH01         | HC01     |                |
+| FP Approval sub point (SN1.1)                                 | RGFP2     | Family Planning | DH01         |          | SN1            |
+| FP Approval sub point 2 (SN1.2)                               | RGFP3     | Family Planning | DH01         |          | SN1            |
+| EM approval point (SN2)                                       | RGEM1     | Essential Meds  | WH02         | DH01     |                |
+| Niassa province approval point (SN-NIASSA-PROV)               | RGEPI1    | EPI             | W001         | P001     |                |
+| Cuamba district approval point (SN-CUAMBA-DIST)               | RGEPI2    | EPI             | D001         | D001     | SN-NIASSA-PROV |
+| Lichinga district approval point (SN-LICHINGA-DIST)           | RGEPI3    | EPI             | D002         |          | SN-NIASSA-PROV |
+| Lusaka district approval point (CHAZ) (SN-LILONGWE-DIST-CHAZ) | RG-CHAZ-1 | CHAZ            | WH03         | DS01     |                |
 
 ## Ideal Stock Amounts
 
