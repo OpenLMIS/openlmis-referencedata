@@ -51,10 +51,6 @@ Defined in
 | Niassa (niassa)                                  | Region   |
 | Cuamba (cuamba)                                  | District |
 | Lichinga (lichinga-distrito)                     | District |
-| Zambia (zambia)                                  | Country  |
-| Zambia Lusaka Province (zambia-lusaka-prov)      | Region   |
-| Zambia Lusaka District (zambia-lusaka-dist)      | District |
-| Zambia Lusaka (zambia-lusaka-city)               | City     |
 
 ## Programs
 
@@ -79,24 +75,24 @@ The facilities described below are defined in these files:
 * referencedata.supervisory_nodes.csv,
 * referencedata.supply_lines.csv.
 
-| Name (Code)                         | Type              | Programs                        | Geo Zone               | Home Facility for                    | Req Group    |
-|-------------------------------------|-------------------|---------------------------------|------------------------|--------------------------------------|--------------|
-| Comfort Health Clinic (HC01)        | Health Center     | Family Planning, Essential Meds | Neno District          | administrator, srmanager2, smanager2 | RGFP1, RGEM1 |
-| Kankao Health Facility (HF01)       | Health Center     | Family Planning, Essential Meds | Zomba District         | srmanager4, smanager4                | RGEM1, RGFP2 |
-| Nandumbo Health Center (HC02)       | Health Center     | Family Planning                 | Phalombe District      | srmanager1, smanager1                | RGFP1        |
-| Kalembo Health Center (HC03)        | Health Center     | Family Planning, Essential Meds | Thyolo District        | srmanager3, smanager3                | RGEM1, RGFP3 |
-| Balaka District Hospital (DH01)     | District Hospital | Family Planning, Essential Meds | Balaka (City)          | dsrmanager                           | RGEM1, RGFP2 |
-| Ntcheu District Warehouse (WH01)    | Warehouse         | Family Planning                 | Ntcheu District        | devadmin, wclerk1                    |              |
-| Balaka District Warehouse (WH02)    | Warehouse         | Family Planning, Essential Meds | Balaka (City)          | wclerk2                              |              |
-| Mozambique Central Warehouse (W001) | Warehouse         | EPI                             | Mozambique Country     | vwclerk1                             |              |
-| Depósito Provincial Niassa (P001)   | Provincial Store  | EPI                             | Niassa Province        | rivo                                 |              |
-| Depósito Distrital Cuamba (D001)    | District Store    | EPI                             | Cuamba District        | divo1, vsrmanager2                   | RGEPI1       |
-| Depósito Distrital Lichinga (D002)  | District Store    | EPI                             | Lichinga District      | divo2                                | RGEPI1       |
-| Lusaka Province Store (ZM-PS-L1)    | Province Store    | CHAZ                            | Zambia Lusaka Province |                                      |              |
-| Lusaka Province Warehouse (ZM-W-L1) | Warehouse         | CHAZ                            | Zambia Lusaka Province |                                      |              |
-| Lusaka District Store (ZM-DS-L1)    | District Store    | CHAZ                            | Zambia Lusaka District |                                      | RG-CHAZ-1    |
-| Lusaka District Warehouse (ZM-W-L2) | Warehouse         | CHAZ                            | Zambia Lusaka District |                                      |              |
-| Roma, Lusaka (ZM-HC-L4)             | Health Center     | CHAZ                            | Zambia Lusaka          | chaz                                 | RG-CHAZ-2    |
+| Name (Code)                         | Type              | Programs                        | Geo Zone           | Home Facility for                    | Req Group    |
+|-------------------------------------|-------------------|---------------------------------|--------------------|--------------------------------------|--------------|
+| Comfort Health Clinic (HC01)        | Health Center     | Family Planning, Essential Meds | Neno District      | administrator, srmanager2, smanager2 | RGFP1, RGEM1 |
+| Kankao Health Facility (HF01)       | Health Center     | Family Planning, Essential Meds | Zomba District     | srmanager4, smanager4                | RGEM1, RGFP2 |
+| Nandumbo Health Center (HC02)       | Health Center     | Family Planning                 | Phalombe District  | srmanager1, smanager1                | RGFP1        |
+| Kalembo Health Center (HC03)        | Health Center     | Family Planning, Essential Meds | Thyolo District    | srmanager3, smanager3                | RGEM1, RGFP3 |
+| Balaka District Hospital (DH01)     | District Hospital | Family Planning, Essential Meds | Balaka (City)      | dsrmanager                           | RGEM1, RGFP2 |
+| Ntcheu District Warehouse (WH01)    | Warehouse         | Family Planning                 | Ntcheu District    | devadmin, wclerk1                    |              |
+| Balaka District Warehouse (WH02)    | Warehouse         | Family Planning, Essential Meds | Balaka (City)      | wclerk2                              |              |
+| Mozambique Central Warehouse (W001) | Warehouse         | EPI                             | Mozambique Country | vwclerk1                             |              |
+| Depósito Provincial Niassa (P001)   | Provincial Store  | EPI                             | Niassa Province    | rivo                                 |              |
+| Depósito Distrital Cuamba (D001)    | District Store    | EPI                             | Cuamba District    | divo1, vsrmanager2                   | RGEPI1       |
+| Depósito Distrital Lichinga (D002)  | District Store    | EPI                             | Lichinga District  | divo2                                | RGEPI1       |
+| Lusaka Province Store (ZM-PS-L1)    | Province Store    | CHAZ                            | Southern Region    |                                      |              |
+| Lusaka Province Warehouse (ZM-W-L1) | Warehouse         | CHAZ                            | Southern Region    |                                      |              |
+| Lusaka District Store (ZM-DS-L1)    | District Store    | CHAZ                            | Balaka District    |                                      | RG-CHAZ-1    |
+| Lusaka District Warehouse (ZM-W-L2) | Warehouse         | CHAZ                            | Balaka District    |                                      |              |
+| Roma, Lusaka (ZM-HC-L4)             | Health Center     | CHAZ                            | Balaka             | chaz                                 | RG-CHAZ-2    |
 
 
 There are 16 facilities in the Cuamba district, all health centers. Though all of them can be used to demo, it is recommended to use the following facility:
@@ -115,7 +111,7 @@ There are 11 facilities in the Lusaka city, all health centers. Though all of th
 
 | Name (Code)             | Type         | Programs | Geo Zone      | Req Group |
 |-------------------------|--------------|----------|---------------|-----------|
-| Roma, Lusaka (ZM-HC-L4) |Health Center | CHAZ     | Zambia Lusaka | RG-CHAZ-2 |
+| Roma, Lusaka (ZM-HC-L4) |Health Center | CHAZ     | Balaka        | RG-CHAZ-2 |
 
 Additionally, there are many other facilities in other districts, but they are not used except to populate the system.
 
