@@ -64,7 +64,7 @@ Defined in
 |Essential Meds (PRG002)  | true   | false             | false              |                     | false                               |
 |New Program (PRG003)     | true   | false             | false              | false               | false                               |
 |EPI (PRG004)             | true   | false             | true               | false               | false                               |
-|CHAZ (PRG005)            | true   | true              | false              | true                | false                               |
+|ARV (PRG005)             | true   | true              | false              | true                | false                               |
 
 ## Facilities
 
@@ -89,9 +89,9 @@ The facilities described below are defined in these files:
 | Depósito Provincial Niassa (P001)   | Provincial Store  | EPI                             | Niassa Province    | rivo                                 |              |
 | Depósito Distrital Cuamba (D001)    | District Store    | EPI                             | Cuamba District    | divo1, vsrmanager2                   | RGEPI1       |
 | Depósito Distrital Lichinga (D002)  | District Store    | EPI                             | Lichinga District  | divo2                                | RGEPI1       |
-| Lilongwe District Warehouse (WH03)  | Warehouse         | CHAZ                            | Lilongwe District  |                                      |              |
-| Lilongwe District Store (DS01)      | District Store    | CHAZ                            | Lilongwe District  |                                      |              |
-| Lilongwe Health Center (HC04)       | Health Center     | CHAZ                            | Lilongwe           | chaz                                 | RG-CHAZ-1    |
+| Lilongwe District Warehouse (WH03)  | Warehouse         | ARV                             | Lilongwe District  |                                      |              |
+| Lilongwe District Store (DS01)      | District Store    | ARV                             | Lilongwe District  |                                      |              |
+| Lilongwe Health Center (HC04)       | Health Center     | ARV                             | Lilongwe           | chaz                                 | RG-ARV-1     |
 
 
 There are 16 facilities in the Cuamba district, all health centers. Though all of them can be used to demo, it is recommended to use the following facility:
@@ -110,7 +110,7 @@ There are 1 facility (health center) in the Lilongwe city and it can be used to 
 
 | Name (Code)                   | Type         | Programs | Geo Zone | Req Group |
 |-------------------------------|--------------|----------|----------|-----------|
-| Lilongwe Health Center (HC04) |Health Center | CHAZ     | Lilongwe | RG-CHAZ-1 |
+| Lilongwe Health Center (HC04) |Health Center | ARV      | Lilongwe | RG-ARV-1  |
 
 Additionally, there are many other facilities in other districts, but they are not used except to populate the system.
 
@@ -122,49 +122,49 @@ Defined in
 * referencedata.lots.csv
 
 
-| Name (code)                                              | Category                          | Type                      | Program         | VVM   | Lot (expires)                                    |
-|----------------------------------------------------------|-----------------------------------|---------------------------|-----------------|-------|--------------------------------------------------|
-| Levora (C100)                                            | Oral Contraceptive                | Commodity Type            | Family Planning | false |                                                  |
-| Ortho-Novum (C200)                                       | Oral Contraceptive                | Commodity Type            | Family Planning | false |                                                  |
-| Depo-Estradiol (C300)                                    | Injectable Hormonal Contraceptive | Commodity Type            | Family Planning | false |                                                  |
-| Male Condom (C400)                                       | Barrier Method                    | Commodity Type            | Family Planning | false |                                                  |
-| Implanon  (C500)                                         | Implantable Contraceptive         | Commodity Type            | Family Planning | false |                                                  |
-| Levonorgestrel (C600)                                    | Implantable Contraceptive         | Commodity Type            | Family Planning | false |                                                  |
-| Acetylsalicylic Acid (C1)                                | Antibiotics                       | Trade Item                | Essential Meds  | false |                                                  |
-| Glibenclamide (C2)                                       | Antibiotics                       | Trade Item                | Essential Meds  | false |                                                  |
-| Streptococcus Pneumoniae Vaccine (C3)                    | Vaccines                          | Trade Item                | Essential Meds  | false |                                                  |
-| Streptococcus Pneumoniae Vaccine II (C4)                 | Vaccines                          | Commodity Type            | Essential Meds  | false |                                                  |
-| Depo-Estradiol (C300)                                    | Injectable Hormonal Contraceptive | Orderable                 | New program     | false |                                                  |
-| BCG (bcg20)                                              | Vaccines                          | Commodity Type, Orderable | EPI             | true  | BCGI2017A (2019-06-01), BCGI2017B (2019-07-01)   |
-| Polio                                                    | Vaccines                          | Commodity Type            | EPI             | true  |                                                  |
-| Polio (20 dose) (polio20)                                | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| IPV (ipv5)                                               | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Pentavalent                                              | Vaccines                          | Commodity Type            | EPI             | true  |                                                  |
-| Pentavalent (1 dose) (penta1)                            | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Pentavalent (10 dose) (penta10)                          | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| PCV (pcv10)                                              | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
-| Rotavirus (rota1)                                        | Vaccines                          | Commodity Type, Orderable | EPI             | true  | ROTAM2017A (2019-06-01), ROTAM2017B (2019-07-01) |
-| Measles (measles10)                                      | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
-| Tetanus (tetanus10)                                      | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
-| Syringe 5ml (syringe5ml)                                 | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Syringe 0.5ml (syringe05ml)                              | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Syringe 0.05ml (syringe005ml)                            | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Safety Box (safetybox)                                   | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Gas (Cylinder) (gas)                                     | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Diluent BCG (bcg20dil)                                   | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Diluent Measles (measles10dil)                           | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
-| Nadolol (nadolol)                                        | Barrier method                    | Orderable                 | CHAZ            | false |                                                  |
-| Acetaminophen And Codeine (acetaminophen-codeine)        | Oral contraceptive                | Orderable                 | CHAZ            | false |                                                  |
-| Gesteira (gesteira)                                      | Barrier method                    | Orderable                 | CHAZ            | false |                                                  |
-| Utah Juniper (utah-juniper)                              | Anti-fungal                       | Orderable                 | CHAZ            | false |                                                  |
-| nasal (nasal)                                            | Anti-fungal                       | Orderable                 | CHAZ            | false |                                                  |
-| Glytone essentials rejuvenate daily (glytone-rejuvenate) | Analgesics                        | Orderable                 | CHAZ            | false |                                                  |
-| Ampicillin (ampicillin)                                  | Implantable contraceptive         | Orderable                 | CHAZ            | false |                                                  |
-| Fever - Infection (Fever-infection)                      | Injectable hormonal contraceptive | Orderable                 | CHAZ            | false |                                                  |
-| ZERIT (zerit)                                            | Vaccines                          | Orderable                 | CHAZ            | false |                                                  |
-| Lovenox (lovenox)                                        | Oral contraceptive                | Orderable                 | CHAZ            | false |                                                  |
-| Duloxetine (duloxetine)                                  | Analgesics                        | Orderable                 | CHAZ            | false |                                                  |
-| RELENZA (relenza)                                        | Oral contraceptive                | Orderable                 | CHAZ            | false |                                                  |
+| Name (code)                                                    | Category                          | Type                      | Program         | VVM   | Lot (expires)                                    |
+|----------------------------------------------------------------|-----------------------------------|---------------------------|-----------------|-------|--------------------------------------------------|
+| Levora (C100)                                                  | Oral Contraceptive                | Commodity Type            | Family Planning | false |                                                  |
+| Ortho-Novum (C200)                                             | Oral Contraceptive                | Commodity Type            | Family Planning | false |                                                  |
+| Depo-Estradiol (C300)                                          | Injectable Hormonal Contraceptive | Commodity Type            | Family Planning | false |                                                  |
+| Male Condom (C400)                                             | Barrier Method                    | Commodity Type            | Family Planning | false |                                                  |
+| Implanon  (C500)                                               | Implantable Contraceptive         | Commodity Type            | Family Planning | false |                                                  |
+| Levonorgestrel (C600)                                          | Implantable Contraceptive         | Commodity Type            | Family Planning | false |                                                  |
+| Acetylsalicylic Acid (C1)                                      | Antibiotics                       | Trade Item                | Essential Meds  | false |                                                  |
+| Glibenclamide (C2)                                             | Antibiotics                       | Trade Item                | Essential Meds  | false |                                                  |
+| Streptococcus Pneumoniae Vaccine (C3)                          | Vaccines                          | Trade Item                | Essential Meds  | false |                                                  |
+| Streptococcus Pneumoniae Vaccine II (C4)                       | Vaccines                          | Commodity Type            | Essential Meds  | false |                                                  |
+| Depo-Estradiol (C300)                                          | Injectable Hormonal Contraceptive | Orderable                 | New program     | false |                                                  |
+| BCG (bcg20)                                                    | Vaccines                          | Commodity Type, Orderable | EPI             | true  | BCGI2017A (2019-06-01), BCGI2017B (2019-07-01)   |
+| Polio                                                          | Vaccines                          | Commodity Type            | EPI             | true  |                                                  |
+| Polio (20 dose) (polio20)                                      | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| IPV (ipv5)                                                     | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Pentavalent                                                    | Vaccines                          | Commodity Type            | EPI             | true  |                                                  |
+| Pentavalent (1 dose) (penta1)                                  | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Pentavalent (10 dose) (penta10)                                | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| PCV (pcv10)                                                    | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
+| Rotavirus (rota1)                                              | Vaccines                          | Commodity Type, Orderable | EPI             | true  | ROTAM2017A (2019-06-01), ROTAM2017B (2019-07-01) |
+| Measles (measles10)                                            | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
+| Tetanus (tetanus10)                                            | Vaccines                          | Commodity Type, Orderable | EPI             | true  |                                                  |
+| Syringe 5ml (syringe5ml)                                       | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Syringe 0.5ml (syringe05ml)                                    | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Syringe 0.05ml (syringe005ml)                                  | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Safety Box (safetybox)                                         | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Gas (Cylinder) (gas)                                           | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Diluent BCG (bcg20dil)                                         | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Diluent Measles (measles10dil)                                 | Vaccines                          | Orderable                 | EPI             | true  |                                                  |
+| Abacavir 300mg Tables (ARV0001)                                | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Lamivudine/Zidovudine/Nevirapine 30/60/50mg (ARV0002)          | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Tenofovir/Emitricitabine/Efavirenz 300mg/200mg/600mg (ARV0003) | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Abacavir oral solution 20mg/ml (ARV0004)                       | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Zidovudine/Lamivudine 300/150mg Tablets (ARV0005)              | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Efavirenz 200mg (ARV0006)                                      | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Nevirapine Tablets for Oral Susp 50mg (ARV0007)                | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Abacavir/Lamivudine 60/30mg (ARV0008)                          | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Tenofovir 300mg Tablets (ARV0009)                              | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Co-trimoxazole 120mg Tablets (ARV0010)                         | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Efavirenz 50mg (ARV0011)                                       | ARV                               | Orderable                 | ARV             | false |                                                  |
+| Lamivudine/Zidovudine 30/60mg (Pead) (ARV0012)                 | ARV                               | Orderable                 | ARV             | false |                                                  |
 
 Currently, all the products are generally approved at all the facility types. In the future we
 could add more differentiation by types of facilities in 
@@ -178,16 +178,16 @@ Defined in
 * referencedata.requisition_group_members.csv
 * referencedata.requisition_group_program_schedules.csv
 
-| Name (code)                            | Schedule                                    | Facilities             |
-|----------------------------------------|---------------------------------------------|------------------------|
-| RG Family Planning 1 (RGFP1)           | Monthly (Jan2017, Feb2017, ...)             | HC01, HC02             |
-| RG Essential Meds 1 (RGEM1)            | Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018) | HC01, HC03, DH01, HF01 |
-| RG Family Planning 2 (RGFP2)           | Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018) | DH01, HF01             |
-| RG Family Planning 3 (RGFP3)           | Monthly A (Jan2018, Feb2018, ...)           | HC03                   |
-| RG EPI 1 (districts) (RGEPI1)          | Quarterly                                   | D001, D002             |
-| RG EPI 2 (health facilities) (RGEPI2)  | Monthly                                     | N003                   |
-| RG EPI 3 (health facilities) (RGEPI3)  | Monthly                                     | N036                   |
-| RG CHAZ 1 (health centers) (RG-CHAZ-1) | Monthly                                     | HC04                   |
+| Name (code)                           | Schedule                                    | Facilities             |
+|---------------------------------------|---------------------------------------------|------------------------|
+| RG Family Planning 1 (RGFP1)          | Monthly (Jan2017, Feb2017, ...)             | HC01, HC02             |
+| RG Essential Meds 1 (RGEM1)           | Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018) | HC01, HC03, DH01, HF01 |
+| RG Family Planning 2 (RGFP2)          | Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018) | DH01, HF01             |
+| RG Family Planning 3 (RGFP3)          | Monthly A (Jan2018, Feb2018, ...)           | HC03                   |
+| RG EPI 1 (districts) (RGEPI1)         | Quarterly                                   | D001, D002             |
+| RG EPI 2 (health facilities) (RGEPI2) | Monthly                                     | N003                   |
+| RG EPI 3 (health facilities) (RGEPI3) | Monthly                                     | N036                   |
+| RG ARV 1 (health centers) (RG-ARV-1)  | Monthly                                     | HC04                   |
     
 There are also 2 unused schedules, SCH004 and SCH005.
 
@@ -214,8 +214,7 @@ Defined in
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
-        approval point (CHAZ) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
 2. Store Manager
   * rights:
     * Requisitions View
@@ -233,8 +232,7 @@ Defined in
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
-        approval point (CHAZ) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
 3. District Storeroom Manager
   * rights:
     * Requisitions View
@@ -244,8 +242,7 @@ Defined in
         point and SN1/FP approval point
     * dsrmanager - has this role for Family Planning & Essential Meds at SN2/EM approval
         point, SN1.1/FP approval sub point and SN1.2/FP approval sub point 2
-    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
-        approval point (CHAZ) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
 4. Program Supervisor
   * rights:
     * Requisitions View
@@ -257,8 +254,7 @@ Defined in
         point supervisory node
     * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
     * rivo - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
-    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
-        approval point (CHAZ) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
 5. Warehouse Clerk
   * rights:
     * Orders View
@@ -273,7 +269,7 @@ Defined in
     * wclerk1 - has this role for WH01/Ntcheu District Warehouse
     * wclerk2 - has this role for WH02/Balaka District Warehouse
     * vwclerk1 - has this role at W001/Mozambique Central Warehouse
-    * chaz - has this role at Lusaka Province Warehouse, Lusaka District Warehouse
+    * chaz - has this role at Lilongwe District Warehouse
 6. Delivery Approver
   * rights:
     * Proofs of Delivery Manage
@@ -296,8 +292,7 @@ Defined in
         and for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
     * srmanager1 - has this role for Family Planning at home facility
     * srmanager2 - has this role for Family Planning & Essential Meds at home facility
-    * chaz - has this role for CHAZ at Lusaka district approval point (CHAZ), Lusaka province
-        approval point (CHAZ) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
 8. Stock Viewer
   * rights:
     * Stock Cards View
@@ -387,7 +382,7 @@ Defined in
 | Niassa province approval point (SN-NIASSA-PROV)               | RGEPI1    | EPI             | W001         | P001     |                |
 | Cuamba district approval point (SN-CUAMBA-DIST)               | RGEPI2    | EPI             | D001         | D001     | SN-NIASSA-PROV |
 | Lichinga district approval point (SN-LICHINGA-DIST)           | RGEPI3    | EPI             | D002         |          | SN-NIASSA-PROV |
-| Lusaka district approval point (CHAZ) (SN-LILONGWE-DIST-CHAZ) | RG-CHAZ-1 | CHAZ            | WH03         | DS01     |                |
+| Lilongwe district approval point (ARV) (SN-LILONGWE-DIST-ARV) | RG-ARV-1  | ARV             | WH03         | DS01     |                |
 
 ## Ideal Stock Amounts
 
@@ -413,12 +408,11 @@ Defined in
 * referencedata.supply_partner_association_facilities.csv
 * referencedata.supply_partner_association_orderables.csv
 
-1. CHAZ
-  * has two associations
-    * for CHAZ program at Lusaka province approval point (CHAZ)
-    * for CHAZ program at Lusaka district approval point (CHAZ)
-    * both contain all facilities from a related requisition groups
-    * each supports only half of available orderables for the CHAZ program
+1. ARV
+  * has one association
+    * for ARV program at Lilongwe district approval point (ARV)
+    * contain all facilities from a related requisition groups
+    * supports only half of available orderables for the ARV program
 
 # Additional Information
 
