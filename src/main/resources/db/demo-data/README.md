@@ -76,22 +76,24 @@ The facilities described below are defined in these files:
 * referencedata.supervisory_nodes.csv,
 * referencedata.supply_lines.csv.
 
-| Name (Code)                         | Type              | Programs                        | Geo Zone           | Home Facility for                    | Req Group    |
-|-------------------------------------|-------------------|---------------------------------|--------------------|--------------------------------------|--------------|
-| Comfort Health Clinic (HC01)        | Health Center     | Family Planning, Essential Meds | Neno District      | administrator, srmanager2, smanager2 | RGFP1, RGEM1 |
-| Kankao Health Facility (HF01)       | Health Center     | Family Planning, Essential Meds | Zomba District     | srmanager4, smanager4                | RGEM1, RGFP2 |
-| Nandumbo Health Center (HC02)       | Health Center     | Family Planning                 | Phalombe District  | srmanager1, smanager1                | RGFP1        |
-| Kalembo Health Center (HC03)        | Health Center     | Family Planning, Essential Meds | Thyolo District    | srmanager3, smanager3                | RGEM1, RGFP3 |
-| Balaka District Hospital (DH01)     | District Hospital | Family Planning, Essential Meds | Balaka (City)      | dsrmanager                           | RGEM1, RGFP2 |
-| Ntcheu District Warehouse (WH01)    | Warehouse         | Family Planning                 | Ntcheu District    | devadmin, wclerk1                    |              |
-| Balaka District Warehouse (WH02)    | Warehouse         | Family Planning, Essential Meds | Balaka (City)      | wclerk2                              |              |
-| Mozambique Central Warehouse (W001) | Warehouse         | EPI                             | Mozambique Country | vwclerk1                             |              |
-| Depósito Provincial Niassa (P001)   | Provincial Store  | EPI                             | Niassa Province    | rivo                                 |              |
-| Depósito Distrital Cuamba (D001)    | District Store    | EPI                             | Cuamba District    | divo1, vsrmanager2                   | RGEPI1       |
-| Depósito Distrital Lichinga (D002)  | District Store    | EPI                             | Lichinga District  | divo2                                | RGEPI1       |
-| Lilongwe District Warehouse (WH03)  | Warehouse         | ARV                             | Lilongwe District  |                                      |              |
-| Lilongwe District Store (DS01)      | District Store    | ARV                             | Lilongwe District  |                                      |              |
-| Lilongwe Health Center (HC04)       | Health Center     | ARV                             | Lilongwe           | chaz                                 | RG-ARV-1     |
+| Name (Code)                             | Type              | Programs                        | Geo Zone           | Home Facility for                    | Req Group    |
+|-----------------------------------------|-------------------|---------------------------------|--------------------|--------------------------------------|--------------|
+| Comfort Health Clinic (HC01)            | Health Center     | Family Planning, Essential Meds | Neno District      | administrator, srmanager2, smanager2 | RGFP1, RGEM1 |
+| Kankao Health Facility (HF01)           | Health Center     | Family Planning, Essential Meds | Zomba District     | srmanager4, smanager4                | RGEM1, RGFP2 |
+| Nandumbo Health Center (HC02)           | Health Center     | Family Planning                 | Phalombe District  | srmanager1, smanager1                | RGFP1        |
+| Kalembo Health Center (HC03)            | Health Center     | Family Planning, Essential Meds | Thyolo District    | srmanager3, smanager3                | RGEM1, RGFP3 |
+| Balaka District Hospital (DH01)         | District Hospital | Family Planning, Essential Meds | Balaka (City)      | dsrmanager                           | RGEM1, RGFP2 |
+| Ntcheu District Warehouse (WH01)        | Warehouse         | Family Planning                 | Ntcheu District    | devadmin, wclerk1                    |              |
+| Balaka District Warehouse (WH02)        | Warehouse         | Family Planning, Essential Meds | Balaka (City)      | wclerk2                              |              |
+| Mozambique Central Warehouse (W001)     | Warehouse         | EPI                             | Mozambique Country | vwclerk1                             |              |
+| Depósito Provincial Niassa (P001)       | Provincial Store  | EPI                             | Niassa Province    | rivo                                 |              |
+| Depósito Distrital Cuamba (D001)        | District Store    | EPI                             | Cuamba District    | divo1, vsrmanager2                   | RGEPI1       |
+| Depósito Distrital Lichinga (D002)      | District Store    | EPI                             | Lichinga District  | divo2                                | RGEPI1       |
+| Lilongwe District Warehouse (WH03)      | Warehouse         | ARV                             | Lilongwe District  |                                      |              |
+| CHAZ Lilongwe District Warehouse (WH04) | Warehouse         | ARV                             | Lilongwe District  |                                      |              |
+| Lilongwe District Store (DS01)          | District Store    | ARV                             | Lilongwe District  |                                      |              |
+| CHAZ Lilongwe District Store (DS02)     | District Store    | ARV                             | Lilongwe District  |                                      |              |
+| Lilongwe Health Center (HC04)           | Health Center     | ARV                             | Lilongwe           | chaz                                 | RG-ARV-1     |
 
 
 There are 16 facilities in the Cuamba district, all health centers. Though all of them can be used to demo, it is recommended to use the following facility:
@@ -373,16 +375,17 @@ Defined in
 * referencedata.supply_lines.csv
 * referencedata.requisition_groups.csv
 
-| Name (code)                                                   | Req group | Program         | Supply Lines | Facility | Parent         |
-|---------------------------------------------------------------|-----------|-----------------|--------------|----------|----------------|
-| FP approval point (SN1)                                       | RGFP1     | Family Planning | WH01         | HC01     |                |
-| FP Approval sub point (SN1.1)                                 | RGFP2     | Family Planning | DH01         |          | SN1            |
-| FP Approval sub point 2 (SN1.2)                               | RGFP3     | Family Planning | DH01         |          | SN1            |
-| EM approval point (SN2)                                       | RGEM1     | Essential Meds  | WH02         | DH01     |                |
-| Niassa province approval point (SN-NIASSA-PROV)               | RGEPI1    | EPI             | W001         | P001     |                |
-| Cuamba district approval point (SN-CUAMBA-DIST)               | RGEPI2    | EPI             | D001         | D001     | SN-NIASSA-PROV |
-| Lichinga district approval point (SN-LICHINGA-DIST)           | RGEPI3    | EPI             | D002         |          | SN-NIASSA-PROV |
-| Lilongwe district approval point (ARV) (SN-LILONGWE-DIST-ARV) | RG-ARV-1  | ARV             | WH03         | DS01     |                |
+| Name (code)                                                   | Req group | Program         | Supply Lines | Facility | Parent         | Partner Nodes         |
+|---------------------------------------------------------------|-----------|-----------------|--------------|----------|----------------|-----------------------|
+| FP approval point (SN1)                                       | RGFP1     | Family Planning | WH01         | HC01     |                |                       |
+| FP Approval sub point (SN1.1)                                 | RGFP2     | Family Planning | DH01         |          | SN1            |                       |
+| FP Approval sub point 2 (SN1.2)                               | RGFP3     | Family Planning | DH01         |          | SN1            |                       |
+| EM approval point (SN2)                                       | RGEM1     | Essential Meds  | WH02         | DH01     |                |                       |
+| Niassa province approval point (SN-NIASSA-PROV)               | RGEPI1    | EPI             | W001         | P001     |                |                       |
+| Cuamba district approval point (SN-CUAMBA-DIST)               | RGEPI2    | EPI             | D001         | D001     | SN-NIASSA-PROV |                       |
+| Lichinga district approval point (SN-LICHINGA-DIST)           | RGEPI3    | EPI             | D002         |          | SN-NIASSA-PROV |                       |
+| Lilongwe district approval point (ARV) (SN-LILONGWE-DIST-ARV) | RG-ARV-1  | ARV             | WH03         | DS01     |                | SN-CHAZ-LILONGWE-DIST |
+| CHAZ Lilongwe (SN-CHAZ-LILONGWE-DIST)                         |           | ARV             | WH04         | DS02     |                |                       |
 
 ## Ideal Stock Amounts
 
@@ -408,11 +411,9 @@ Defined in
 * referencedata.supply_partner_association_facilities.csv
 * referencedata.supply_partner_association_orderables.csv
 
-1. ARV
-  * has one association
-    * for ARV program at Lilongwe district approval point (ARV)
-    * contain all facilities from a related requisition groups
-    * supports only half of available orderables for the ARV program
+| Name (code)    | Programs | Supervisory Nodes | Facilities | Orderables                                           |
+|----------------|----------|-------------------|------------|------------------------------------------------------|
+| CHAZ (SP-CHAZ) | ARV      | CHAZ Lilongwe     | HC04       | ARV0002, ARV0004, ARV0006, ARV0008, ARV0010, ARV0012 |
 
 # Additional Information
 
