@@ -216,7 +216,7 @@ Defined in
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
 2. Store Manager
   * rights:
     * Requisitions View
@@ -234,7 +234,7 @@ Defined in
     * divo2 - has this role for EPI at home facility
     * rivo - has this role for EPI at home facility
     * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
 3. District Storeroom Manager
   * rights:
     * Requisitions View
@@ -244,7 +244,7 @@ Defined in
         point and SN1/FP approval point
     * dsrmanager - has this role for Family Planning & Essential Meds at SN2/EM approval
         point, SN1.1/FP approval sub point and SN1.2/FP approval sub point 2
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
 4. Program Supervisor
   * rights:
     * Requisitions View
@@ -256,7 +256,7 @@ Defined in
         point supervisory node
     * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
     * rivo - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
 5. Warehouse Clerk
   * rights:
     * Orders View
@@ -271,7 +271,7 @@ Defined in
     * wclerk1 - has this role for WH01/Ntcheu District Warehouse
     * wclerk2 - has this role for WH02/Balaka District Warehouse
     * vwclerk1 - has this role at W001/Mozambique Central Warehouse
-    * chaz - has this role at Lilongwe District Warehouse
+    * chaz - has this role at Lilongwe District Warehouse and CHAZ Lilongwe District Warehouse
 6. Delivery Approver
   * rights:
     * Proofs of Delivery Manage
@@ -294,7 +294,7 @@ Defined in
         and for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
     * srmanager1 - has this role for Family Planning at home facility
     * srmanager2 - has this role for Family Planning & Essential Meds at home facility
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV) and home facility
+    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
 8. Stock Viewer
   * rights:
     * Stock Cards View
