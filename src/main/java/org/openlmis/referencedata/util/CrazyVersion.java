@@ -13,36 +13,18 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web;
+package org.openlmis.referencedata.util;
 
-import org.openlmis.referencedata.AvailableFeatures;
-import org.openlmis.referencedata.util.CrazyVersion;
+import lombok.Getter;
 import org.openlmis.util.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller used for displaying service's version information.
- */
-@RestController
-public class VersionController {
+public class CrazyVersion extends Version {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(VersionController.class);
+  @Getter
+  private String specialMessage;
 
-  /**
-   * Displays version information.
-   *
-   * @return {Version} Returns version read from file.
-   */
-  @RequestMapping("/referencedata")
-  public Version display() {
-    LOGGER.debug("Returning version");
-    if (!AvailableFeatures.SECRET_MESSAGE.isActive()) {
-      return new Version();
-    } else {
-      return new CrazyVersion();
-    }
+  public CrazyVersion() {
+    super();
+    this.specialMessage = "The secret is unlocked";
   }
 }

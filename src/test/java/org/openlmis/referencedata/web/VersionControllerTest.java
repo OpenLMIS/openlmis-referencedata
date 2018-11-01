@@ -15,34 +15,33 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.util.CrazyVersion;
 import org.openlmis.util.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.togglz.junit.TogglzRule;
 
-/**
- * Controller used for displaying service's version information.
- */
-@RestController
-public class VersionController {
+public class VersionControllerTest {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(VersionController.class);
+  @Rule
+  public TogglzRule togglzRule = TogglzRule.allEnabled(AvailableFeatures.class);
 
-  /**
-   * Displays version information.
-   *
-   * @return {Version} Returns version read from file.
-   */
-  @RequestMapping("/referencedata")
-  public Version display() {
-    LOGGER.debug("Returning version");
-    if (!AvailableFeatures.SECRET_MESSAGE.isActive()) {
-      return new Version();
-    } else {
-      return new CrazyVersion();
-    }
+  private VersionController controller = new VersionController();
+
+  @Test
+  public void displayShouldReturnCrazyVersion() {
+    Version retVersion = controller.display();
+    assertTrue("Version returned is not CrazyVersion", retVersion instanceof CrazyVersion);
+  }
+
+  @Test
+  public void displayShouldReturnOldVersion() {
+    togglzRule.disable(AvailableFeatures.SECRET_MESSAGE);
+    Version retVersion = controller.display();
+    assertFalse("Version returned is not old Version", retVersion instanceof CrazyVersion);
   }
 }
