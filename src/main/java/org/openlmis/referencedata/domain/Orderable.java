@@ -34,6 +34,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -136,6 +138,12 @@ public class Orderable implements Identifiable {
     this.roundToZero = roundToZero;
     this.identity = new OrderableIdentity(id, versionId);
     this.lastUpdated = ZonedDateTime.now();
+  }
+
+  @PrePersist
+  @PreUpdate
+  public void updateLastUpdatedDate() {
+    lastUpdated = ZonedDateTime.now();
   }
   
   @Override
