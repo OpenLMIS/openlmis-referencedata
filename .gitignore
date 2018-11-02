@@ -12,3 +12,4 @@ gradlew*
 .tx/
 node_modules/
 demo-data/*.sql
+package-lock.json
