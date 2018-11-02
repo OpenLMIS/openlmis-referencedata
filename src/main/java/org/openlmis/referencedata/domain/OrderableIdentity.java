@@ -15,35 +15,36 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.openlmis.referencedata.domain.BaseEntity.UUID_TYPE;
+
 import java.io.Serializable;
+import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
+@Getter
+@Setter
 @Embeddable
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode
-public class OrderableIdentity implements Serializable {
+public class OrderableIdentity implements Identifiable, Serializable {
 
-  private static final String UUID_TYPE = "pg-uuid";
-
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.referencedata.util.ConditionalUuidGenerator")
   @Type(type = UUID_TYPE)
-  @Getter
-  @Setter
   private UUID id;
 
-  @Getter
-  @Setter
   private Long versionId;
+
+  OrderableIdentity(UUID id, Long versionId) {
+    // it seems like we can't use @GeneratedValue and @GenericGenerator annotations
+    // in the @Embeddable class like this one. That is why we generate a value for
+    // the id field manually but only if the passed value is null.
+    this.id = Optional.ofNullable(id).orElseGet(UUID::randomUUID);
+    this.versionId = Optional.ofNullable(versionId).orElse(1L);
+  }
+
 }

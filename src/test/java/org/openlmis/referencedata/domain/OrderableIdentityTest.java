@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.UUID;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
@@ -25,5 +28,29 @@ public class OrderableIdentityTest {
     EqualsVerifier
         .forClass(OrderableIdentity.class)
         .verify();
+  }
+
+  @Test
+  public void shouldInsertDefaultValues() {
+    // when
+    OrderableIdentity identity = new OrderableIdentity(null, null);
+
+    // then
+    assertThat(identity.getId()).isNotNull();
+    assertThat(identity.getVersionId()).isEqualTo(1L);
+  }
+
+  @Test
+  public void shouldUsePassedValues() {
+    // given
+    UUID id = UUID.randomUUID();
+    Long versionId = 100L;
+
+    // when
+    OrderableIdentity identity = new OrderableIdentity(id, versionId);
+
+    // then
+    assertThat(identity.getId()).isEqualTo(id);
+    assertThat(identity.getVersionId()).isEqualTo(versionId);
   }
 }

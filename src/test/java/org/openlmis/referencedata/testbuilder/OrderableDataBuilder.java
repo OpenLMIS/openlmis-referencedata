@@ -105,7 +105,7 @@ public class OrderableDataBuilder {
    */
   public Orderable buildAsNew() {
     Orderable orderable = new Orderable(productCode, dispensable, netContent, packRoundingTreshold,
-        roundToZero, id, versionId);
+        roundToZero, null, versionId);
     orderable.setFullProductName(fullProductName);
     orderable.setDescription(description);
     orderable.setProgramOrderables(programOrderables);
