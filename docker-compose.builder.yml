@@ -20,6 +20,7 @@ services:
     links:
       - db
       - log
+      - redis
     volumes:
       - '.:/app'
     entrypoint:

@@ -19,8 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Sets;
 import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -152,8 +155,8 @@ public class SupplyPartnerRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldReturnAllSupplyPartnersIfIdsSetIsEmpty() {
-    SupplyPartnerRepositoryCustom.SearchParams searchParams = Collections::emptySet;
+  public void shouldReturnAllSupplyPartnersIfNoParamsWereSet() {
+    SupplyPartnerRepositoryCustom.SearchParams searchParams = new TestSearchParams();
 
     Page<SupplyPartner> search = supplyPartnerRepository.search(searchParams, pageable);
     assertThat(search.getContent()).contains(supplyPartners);
@@ -161,13 +164,73 @@ public class SupplyPartnerRepositoryIntegrationTest
 
   @Test
   public void shouldReturnSupplyPartnersWithGivenIds() {
-    SupplyPartnerRepositoryCustom.SearchParams searchParams = () -> Sets.newHashSet(
-        supplyPartners[0].getId(), supplyPartners[3].getId(),
-        supplyPartners[5].getId(), supplyPartners[9].getId());
+    SupplyPartnerRepositoryCustom.SearchParams searchParams = new TestSearchParams(
+        Sets.newHashSet(
+            supplyPartners[0].getId(), supplyPartners[3].getId(),
+            supplyPartners[5].getId(), supplyPartners[9].getId()),
+        Collections.emptySet()
+    );
 
     Page<SupplyPartner> search = supplyPartnerRepository.search(searchParams, pageable);
     assertThat(search.getContent())
         .hasSize(4)
         .contains(supplyPartners[0], supplyPartners[3], supplyPartners[5], supplyPartners[9]);
+  }
+
+  @Test
+  public void shouldReturnSupplyPartnersWithForGivenSupervisoryNodeIds() {
+    SupplyPartnerRepositoryCustom.SearchParams searchParams = new TestSearchParams(
+        Collections.emptySet(),
+        Sets.newHashSet(
+            supplyPartners[0].getAssociations().get(0).getSupervisoryNode().getId(),
+            supplyPartners[7].getAssociations().get(0).getSupervisoryNode().getId())
+    );
+
+    Page<SupplyPartner> search = supplyPartnerRepository.search(searchParams, pageable);
+    assertThat(search.getContent())
+        .hasSize(2)
+        .contains(supplyPartners[0], supplyPartners[7]);
+  }
+
+  @Test
+  public void shouldReturnSupplyPartnersThatMatchAllSearchParams() {
+    SupplyPartnerRepositoryCustom.SearchParams searchParams = new TestSearchParams(
+        Sets.newHashSet(
+            supplyPartners[0].getId(),
+            supplyPartners[5].getId(),
+            supplyPartners[9].getId()),
+        Sets.newHashSet(
+            supplyPartners[0].getAssociations().get(0).getSupervisoryNode().getId(),
+            supplyPartners[2].getAssociations().get(0).getSupervisoryNode().getId(),
+            supplyPartners[5].getAssociations().get(0).getSupervisoryNode().getId(),
+            supplyPartners[8].getAssociations().get(0).getSupervisoryNode().getId())
+    );
+
+    Page<SupplyPartner> search = supplyPartnerRepository.search(searchParams, pageable);
+    assertThat(search.getContent())
+        .hasSize(2)
+        .contains(supplyPartners[0], supplyPartners[5]);
+  }
+
+  @Getter
+  private static final class TestSearchParams
+      implements SupplyPartnerRepositoryCustom.SearchParams {
+
+    private Set<UUID> ids;
+    private Set<UUID> supervisoryNodeIds;
+
+    TestSearchParams() {
+      this(Collections.emptySet(), Collections.emptySet());
+    }
+
+    TestSearchParams(Set<UUID> ids, Set<UUID> supervisoryNodeIds) {
+      this.ids = Optional
+          .ofNullable(ids)
+          .orElse(Collections.emptySet());
+
+      this.supervisoryNodeIds = Optional
+          .ofNullable(supervisoryNodeIds)
+          .orElse(Collections.emptySet());
+    }
   }
 }

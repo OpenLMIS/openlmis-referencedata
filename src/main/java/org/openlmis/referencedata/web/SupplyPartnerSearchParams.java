@@ -17,7 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_INVALID_PARAMS;
 
-import java.util.Collections;
+import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -33,8 +33,9 @@ import org.springframework.util.MultiValueMap;
 final class SupplyPartnerSearchParams implements SupplyPartnerRepositoryCustom.SearchParams {
 
   private static final String ID = "id";
+  private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
 
-  private static final List<String> ALL_PARAMETERS = Collections.singletonList(ID);
+  private static final List<String> ALL_PARAMETERS = Lists.newArrayList(ID, SUPERVISORY_NODE_ID);
 
   private SearchParams queryParams;
 
@@ -48,6 +49,10 @@ final class SupplyPartnerSearchParams implements SupplyPartnerRepositoryCustom.S
 
   public Set<UUID> getIds() {
     return queryParams.getUuids(ID);
+  }
+
+  public Set<UUID> getSupervisoryNodeIds() {
+    return queryParams.getUuids(SUPERVISORY_NODE_ID);
   }
 
   /**

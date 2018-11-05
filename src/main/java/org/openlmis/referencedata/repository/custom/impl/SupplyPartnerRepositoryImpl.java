@@ -24,10 +24,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.tuple.Pair;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyPartner;
+import org.openlmis.referencedata.domain.SupplyPartnerAssociation;
 import org.openlmis.referencedata.repository.custom.SupplyPartnerRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
@@ -36,6 +39,9 @@ import org.springframework.data.domain.Pageable;
 public class SupplyPartnerRepositoryImpl implements SupplyPartnerRepositoryCustom {
 
   private static final String ID = "id";
+
+  private static final String associations = "associations";
+  private static final String supervisoryNode = "supervisoryNode";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -90,6 +96,15 @@ public class SupplyPartnerRepositoryImpl implements SupplyPartnerRepositoryCusto
 
     if (!ids.isEmpty()) {
       where = builder.and(where, root.get(ID).in(ids));
+    }
+
+    Set<UUID> supervisoryNodeIds = Preconditions.checkNotNull(params.getSupervisoryNodeIds());
+
+    if (!supervisoryNodeIds.isEmpty()) {
+      Join<SupplyPartner, SupplyPartnerAssociation> associationsJoin = root.join(associations);
+      Join<SupplyPartnerAssociation, SupervisoryNode> supervisoryNodeJoin = associationsJoin
+          .join(supervisoryNode);
+      where = builder.and(where, supervisoryNodeJoin.get(ID).in(supervisoryNodeIds));
     }
 
     newQuery.where(where);

@@ -27,6 +27,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 import org.javers.core.metamodel.annotation.TypeName;
@@ -43,6 +44,7 @@ public final class SupplyPartnerAssociation extends BaseEntity {
   @JoinColumn(name = "programId", nullable = false)
   private Program program;
 
+  @Getter
   @ManyToOne
   @JoinColumn(name = "supervisoryNodeId", nullable = false)
   private SupervisoryNode supervisoryNode;

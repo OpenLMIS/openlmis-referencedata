@@ -3241,12 +3241,24 @@ resourceTypes:
       displayName: Supply Partners
       get:
           is: [ secured, paginated ]
-          description: Get a page of supply partners based on passed parameters.
+          description: >
+            Get a page of supply partners based on passed parameters. Please have in mind that only
+            supply partners that match all parameters will be returned.
           queryParameters:
               id:
                   description: >
                     This field presents a supply partner ID value. If repeated, all supply partners
                     that match the given IDs values will be returned.
+                  type: string
+                  required: false
+                  repeat: true
+              supervisoryNodeId:
+                  description: >
+                    This field presents a supervisory node ID value. It will be used to find a supply
+                    partner that have at least one association for the given supervisory node. Can
+                    be repeated but it cannot be used to narrow results. In other words, if provided
+                    many times, all supply partners that have at least one association for at least
+                    one supervisory node from the list will be returned.
                   type: string
                   required: false
                   repeat: true

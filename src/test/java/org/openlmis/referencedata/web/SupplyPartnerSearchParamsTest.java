@@ -28,6 +28,7 @@ import org.springframework.util.LinkedMultiValueMap;
 public class SupplyPartnerSearchParamsTest {
 
   private static final String ID = "id";
+  private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
 
   private LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
 
@@ -44,7 +45,9 @@ public class SupplyPartnerSearchParamsTest {
     queryMap.add(ID, "some-id");
     SupplyPartnerSearchParams params = new SupplyPartnerSearchParams(queryMap);
 
-    ToStringTestUtils.verify(SupplyPartnerSearchParams.class, params, "ID", "ALL_PARAMETERS");
+    ToStringTestUtils
+        .verify(SupplyPartnerSearchParams.class, params,
+            "ID", "SUPERVISORY_NODE_ID", "ALL_PARAMETERS");
   }
 
   @Test
@@ -68,6 +71,29 @@ public class SupplyPartnerSearchParamsTest {
     SupplyPartnerSearchParams params = new SupplyPartnerSearchParams(queryMap);
 
     assertThat(params.getIds()).isNotNull().isEmpty();
+  }
+
+  @Test
+  public void shouldReturnSetOfSupervisoryNodeIds() {
+    UUID[] ids = IntStream
+        .range(0, 10)
+        .mapToObj(idx -> UUID.randomUUID())
+        .peek(id -> queryMap.add(SUPERVISORY_NODE_ID, id.toString()))
+        .toArray(UUID[]::new);
+
+    SupplyPartnerSearchParams params = new SupplyPartnerSearchParams(queryMap);
+
+    assertThat(params.getSupervisoryNodeIds())
+        .hasSize(ids.length)
+        .contains(ids);
+  }
+
+  @Test
+  public void shouldReturnEmptySetOfSupervisoryNodeIdsIfNonHaveBeenProvided() {
+    queryMap.clear();
+    SupplyPartnerSearchParams params = new SupplyPartnerSearchParams(queryMap);
+
+    assertThat(params.getSupervisoryNodeIds()).isNotNull().isEmpty();
   }
 
 }

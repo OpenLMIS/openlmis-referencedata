@@ -29,6 +29,8 @@ public interface SupplyPartnerRepositoryCustom {
 
     Set<UUID> getIds();
 
+    Set<UUID> getSupervisoryNodeIds();
+
   }
 
 }
