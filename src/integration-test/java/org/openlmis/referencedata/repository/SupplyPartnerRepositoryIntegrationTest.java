@@ -163,7 +163,7 @@ public class SupplyPartnerRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldReturnSupplyPartnersWithGivenIds() {
+  public void shouldReturnSupplyPartnersForGivenIds() {
     SupplyPartnerRepositoryCustom.SearchParams searchParams = new TestSearchParams(
         Sets.newHashSet(
             supplyPartners[0].getId(), supplyPartners[3].getId(),
@@ -178,7 +178,7 @@ public class SupplyPartnerRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldReturnSupplyPartnersWithForGivenSupervisoryNodeIds() {
+  public void shouldReturnSupplyPartnersForGivenSupervisoryNodeIds() {
     SupplyPartnerRepositoryCustom.SearchParams searchParams = new TestSearchParams(
         Collections.emptySet(),
         Sets.newHashSet(
