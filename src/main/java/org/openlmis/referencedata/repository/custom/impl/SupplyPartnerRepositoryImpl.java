@@ -40,8 +40,8 @@ public class SupplyPartnerRepositoryImpl implements SupplyPartnerRepositoryCusto
 
   private static final String ID = "id";
 
-  private static final String associations = "associations";
-  private static final String supervisoryNode = "supervisoryNode";
+  private static final String ASSOCIATIONS = "associations";
+  private static final String SUPERVISORY_NODE = "supervisoryNode";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -101,9 +101,9 @@ public class SupplyPartnerRepositoryImpl implements SupplyPartnerRepositoryCusto
     Set<UUID> supervisoryNodeIds = Preconditions.checkNotNull(params.getSupervisoryNodeIds());
 
     if (!supervisoryNodeIds.isEmpty()) {
-      Join<SupplyPartner, SupplyPartnerAssociation> associationsJoin = root.join(associations);
+      Join<SupplyPartner, SupplyPartnerAssociation> associationsJoin = root.join(ASSOCIATIONS);
       Join<SupplyPartnerAssociation, SupervisoryNode> supervisoryNodeJoin = associationsJoin
-          .join(supervisoryNode);
+          .join(SUPERVISORY_NODE);
       where = builder.and(where, supervisoryNodeJoin.get(ID).in(supervisoryNodeIds));
     }
 
