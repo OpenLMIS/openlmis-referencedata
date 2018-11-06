@@ -169,7 +169,7 @@ Defined in
 | Lamivudine/Zidovudine 30/60mg (Pead) (ARV0012)                 | ARV                               | Orderable                 | ARV             | false |                                                  |
 
 Currently, all the products are generally approved at all the facility types. In the future we
-could add more differentiation by types of facilities in 
+could add more differentiation by types of facilities in
 * referencedata.facility_type_approved_products.csv.
 
 ## Requisition Groups and Schedules
@@ -190,7 +190,7 @@ Defined in
 | RG EPI 2 (health facilities) (RGEPI2) | Monthly                                     | N003                   |
 | RG EPI 3 (health facilities) (RGEPI3) | Monthly                                     | N036                   |
 | RG ARV 1 (health centers) (RG-ARV-1)  | Monthly                                     | HC04                   |
-    
+
 There are also 2 unused schedules, SCH004 and SCH005.
 
 ## Roles, Users and Rights
@@ -208,55 +208,95 @@ Defined in
     * Requisitions Create
     * Proofs of Delivery Manage
   * users:
-    * administrator - has this role for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
-    * srmanager2, srmanager4 - has this role for Family Planning & Essential Meds at home facility
-    * srmanager1 - has this role for Family Planning at home facility
-    * srmanager3 - has this role for Essential Meds & Family Planning at home facility
-    * divo1 - has this role for EPI at home facility
-    * divo2 - has this role for EPI at home facility
-    * rivo - has this role for EPI at home facility
-    * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
+    * administrator
+        * Family Planning, SN1/FP approval point
+        * Essential Meds, SN2/EM approval point
+        * ARV, Lilongwe district approval point (ARV)
+    * srmanager2, srmanager4
+        * Family Planning, home facility
+        * Essential Meds, home facility
+    * srmanager1
+        * Family Planning, home facility
+        * ARV, Lilongwe district approval point (ARV)
+    * srmanager3
+        * Essential Meds, home facility
+        * Family Planning, home facility
+    * divo1
+        * EPI, home facility
+    * divo2
+        * EPI, home facility
+    * rivo
+        * EPI, home facility
+    * vsrmanager1
+        * EPI, SN-CUAMBA-DIST/Cuamba district approval point
 2. Store Manager
   * rights:
     * Requisitions View
     * Requisitions Delete
     * Requisitions Authorize
   * users:
-    * administrator - has this role for Family Planning & Essential Meds at home facility, SN1/FP approval point
-        and SN2/EM approval point
-    * smanager1 - has this role for Family Planning at home facility
-    * smanager2 - has this role for Family Planning at home facility and SN1/FP approval point
-        & for Essential Meds at home facility and SN2/EM approval point
-    * smanager3 - has this role for Essential Meds & Family Planning at home facility
-    * smanager4 - has this role for Family Planning & Essential Meds at home facility
-    * divo1 - has this role for EPI at home facility
-    * divo2 - has this role for EPI at home facility
-    * rivo - has this role for EPI at home facility
-    * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
+    * administrator
+         * Family Planning, home facility
+         * Family Planning, SN1/FP approval point
+         * Essential Meds, SN2/EM approval point
+         * ARV, Lilongwe district approval point (ARV)
+    * smanager1
+         * Family Planning, home facility
+         * ARV, Lilongwe district approval point (ARV)
+    * smanager2
+         * Family Planning, home facility
+         * Family Planning, SN1/FP approval point
+         * Essential Meds, home facility
+         * Essential Meds, SN2/EM approval point
+    * smanager3
+         * Essential Meds, home facility
+         * Family Planning, home facility
+    * smanager4
+         * Family Planning, home facility
+         * Essential Meds, home facility
+    * divo1
+         * EPI, home facility
+    * divo2
+         * EPI, home facility
+    * rivo
+         * EPI, home facility
+    * vsrmanager1
+         * EPI, SN-CUAMBA-DIST/Cuamba district approval point
 3. District Storeroom Manager
   * rights:
     * Requisitions View
     * Requisitions Approve
   * users:
-    * administrator - has this role for Family Planning & Essential Meds at SN2/EM approval
-        point and SN1/FP approval point
-    * dsrmanager - has this role for Family Planning & Essential Meds at SN2/EM approval
-        point, SN1.1/FP approval sub point and SN1.2/FP approval sub point 2
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
+    * administrator
+         * Family Planning, SN1/FP approval point
+         * Essential Meds, SN2/EM approval point
+         * ARV, Lilongwe district approval point (ARV)
+    * dsrmanager
+         * Family Planning, SN1/FP approval point
+         * Family Planning, SN1.1/FP approval sub point
+         * Family Planning, SN1.2/FP approval sub point 2
+         * Essential Meds, SN2/EM approval point
+         * ARV, Lilongwe district approval point (ARV)
+    * chaz
+         * ARV, CHAZ Lilongwe
 4. Program Supervisor
   * rights:
     * Requisitions View
     * Requisitions Approve
   * users:
-    * administrator - has this role for Family Planning & Essential Meds at SN2/EM approval
-        point and SN1/FP approval point
-    * psupervisor - has this role for Family Planning & Essential Meds at SN1/FP approval
-        point supervisory node
-    * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * rivo - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
+    * administrator
+         * Family Planning, SN1/FP approval point
+         * Essential Meds, SN2/EM approval point
+         * ARV, Lilongwe district approval point (ARV)
+    * psupervisor
+         * Family Planning, SN1/FP approval point
+         * ARV, Lilongwe district approval point (ARV)
+    * divo1
+         * EPI, SN-CUAMBA-DIST/Cuamba district approval point
+    * rivo
+         * EPI, SN-NIASSA-PROV/Niassa province approval point
+    * chaz
+         * ARV, CHAZ Lilongwe
 5. Warehouse Clerk
   * rights:
     * Orders View
@@ -264,48 +304,73 @@ Defined in
     * Shipments View
     * Shipments Edit
   * users:
-    * administrator - has this role for WH01/Ntcheu District Warehouse and WH02/Balaka District Warehouse
-    * divo1 - has this role at D001/Depósito Distrital Cuamba
-    * divo2 - has this role at D002/Depósito Distrital Lichinga
-    * rivo - has this role at P001/Depósito Provincial Niassa
-    * wclerk1 - has this role for WH01/Ntcheu District Warehouse
-    * wclerk2 - has this role for WH02/Balaka District Warehouse
-    * vwclerk1 - has this role at W001/Mozambique Central Warehouse
-    * chaz - has this role at Lilongwe District Warehouse and CHAZ Lilongwe District Warehouse
+    * administrator
+         * WH01/Ntcheu District Warehouse
+         * WH02/Balaka District Warehouse
+    * divo1
+         * D001/Depósito Distrital Cuamba
+    * divo2
+         * D002/Depósito Distrital Lichinga
+    * rivo
+         * P001/Depósito Provincial Niassa
+    * wclerk1
+         * WH01/Ntcheu District Warehouse
+         * Lilongwe District Warehouse
+    * wclerk2
+         * WH02/Balaka District Warehouse
+    * vwclerk1 - has this role at
+         * W001/Mozambique Central Warehouse
+    * chaz
+         * CHAZ Lilongwe District Warehouse
 6. Delivery Approver
   * rights:
     * Proofs of Delivery Manage
   * users:
-    * administrator - has this role for Family Planning at SN1/FP approval point
-    * divo1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * smanager1, smanager2, smanager4, srmanager1, srmanager2, srmanager4 - has this role for Family Planning
-        at SN1/FP approval point and for Essential Meds at SN2/EM approval point
-    * smanager3, srmanager3 - has this role for Essential Meds at SN2/EM approval point
+    * administrator
+         * Family Planning, SN1/FP approval point
+    * divo1
+         * EPI, SN-CUAMBA-DIST/Cuamba district approval point
+    * smanager1, smanager2, smanager4, srmanager1, srmanager2, srmanager4
+         * Family Planning, SN1/FP approval point
+         * Essential Meds, SN2/EM approval point
+    * smanager3, srmanager3
+         * Essential Meds, SN2/EM approval point
 7. Stock Manager
   * rights:
     * Stock Cards View
     * Stock Adjust
     * Stock Inventories Edit
   * users:
-    * divo1 - has this role for EPI at home facility
-    * divo2 - has this role for EPI at home facility
-    * rivo - has this role for EPI at home facility
-    * administrator - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
-        and for Family Planning & Essential Meds at SN1/FP approval point and SN2/EM approval point
-    * srmanager1 - has this role for Family Planning at home facility
-    * srmanager2 - has this role for Family Planning & Essential Meds at home facility
-    * chaz - has this role for ARV at Lilongwe district approval point (ARV), CHAZ Lilongwe and home facility
+    * divo1
+         * EPI, home facility
+    * divo2
+         * EPI, home facility
+    * rivo
+         * EPI, home facility
+    * administrator
+         * EPI, SN-NIASSA-PROV/Niassa province approval point
+         * Family Planning, SN1/FP approval point
+         * Essential Meds, SN2/EM approval point
+    * srmanager1
+         * Family Planning, home facility
+    * srmanager2
+         * Family Planning, home facility
+         * Essential Meds, home facility
 8. Stock Viewer
   * rights:
     * Stock Cards View
   * users:
-    * wclerk1 - has this role for Family Planning at home facility
+    * wclerk1
+         * Family Planning, home facility
 9. Requisition Viewer
   * rights:
     * Requisitions View
   * users:
-    * wclerk1 - has this role for Family Planning at home facility
-    * wclerk2 - has this role for Family Planning & Essential Meds at home facility
+    * wclerk1
+         * Family Planning, home facility
+    * wclerk2
+         * Family Planning, home facility
+         * Essential Meds, home facility
 10. System Administrator
   * rights:
     * Facilities Manage
@@ -341,19 +406,31 @@ Defined in
     * CCE Inventory View
     * CCE Inventory Edit
   * users:
-    * administrator - has this role for Family Planning at SN1/FP approval point and Essential Meds at SN2/EM approval point
-    * divo1 - has this role for EPI at home facility and SN-CUAMBA-DIST/Cuamba district approval point
-    * divo2 - has this role for EPI at home facility
-    * rivo - has this role for EPI at home facility
+    * administrator
+         * Family Planning, SN1/FP approval point
+         * Essential Meds, SN2/EM approval point
+    * divo1
+         * EPI, home facility
+         * EPI, SN-CUAMBA-DIST/Cuamba district approval point
+    * divo2
+         * EPI, home facility
+    * rivo
+         * EPI, home facility
 12. CCE Inventory Viewer
   * rights:
     * CCE Inventory View
   * users:
-    * administrator - has this role for Family Planning at SN1/FP approval point and Essential Meds at SN2/EM approval point
-    * divo2 - has this role for EPI at SN-LICHINGA-DIST/Lichinga district approval point
-    * rivo - has this role for EPI at SN-NIASSA-PROV/Niassa province approval point
-    * vsrmanager1 - has this role for EPI at SN-CUAMBA-DIST/Cuamba district approval point
-    * vsrmanager2 - has this role for EPI at home facility
+    * administrator
+         * Family Planning, SN1/FP approval point
+         * Essential Meds, SN2/EM approval point
+    * divo2
+         * EPI, SN-LICHINGA-DIST/Lichinga district approval point
+    * rivo
+         * EPI, SN-NIASSA-PROV/Niassa province approval point
+    * vsrmanager1
+         * EPI, SN-CUAMBA-DIST/Cuamba district approval point
+    * vsrmanager2
+         * EPI, home facility
 13. Reporting Personnel
   * rights:
     * Edit report templates
@@ -365,8 +442,8 @@ Defined in
 Passwords for these user accounts come from the
 [Authentication Service's demo data](https://github.com/OpenLMIS/openlmis-auth/tree/master/src/main/resources/db/demo-data).
 
-Rights themselves come from the 
-[bootstrap data](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/db/migration/20170206205310272__initial_bootstrap_data.sql). **NOTE:** This SQL script does not have all of 
+Rights themselves come from the
+[bootstrap data](https://github.com/OpenLMIS/openlmis-referencedata/blob/master/src/main/resources/db/migration/20170206205310272__initial_bootstrap_data.sql). **NOTE:** This SQL script does not have all of
 the rights, as additional rights have been added to later migrations.
 
 ## Supervisory Nodes and Supply Lines
@@ -394,14 +471,14 @@ Defined in
 * referencedata.ideal_stock_amounts.csv.
 
 Only in the EPI program. These amounts are defined for:
- 
+
 * Health facilities (all 41)
   * All monthly periods in 2017 and 2018
   * All seven commodity types
   * Values range from 1,000 - 10,000
 * District stores (2)
   * All quarterly periods in 2017 and 2018
-  * All seven commodity types 
+  * All seven commodity types
   * Values range from 10,000 - 99,999
 
 ## Supply Partners
