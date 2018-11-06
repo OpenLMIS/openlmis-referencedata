@@ -1377,7 +1377,20 @@ resourceTypes:
               displayName: User permission strings
               get:
                   is: [ secured ]
-                  description: Gets all permissions (in string format) associated with a user. The format is as follows; RightName|FacilityUUID|ProgramUUID for supervision rights, RightName|FacilityUUID for fulfillment rights, and RightName for general rights.
+                  description: >
+                      Gets a list of all permissions (in string format) associated with a user.
+                      The full format is RightName|FacilityUUID|ProgramUUID which grants the user
+                      access with the named Right, at the given Facility, for the given program.
+                      Where the nature of the Right determines exactly what that means.  Shorter
+                      forms are also available where components of the string are taken off the end.
+                      For example the Program might be ommitted which would imply the Right applies
+                      to the Facility, sans Program.  The shortest form would simply be the name of
+                      the Right, without Facility or Program.  This form is usually used for
+                      Administrative rights where the User's control is not limited by Program
+                      or Facility.  When a permission string is not present in this list, when the
+                      nature of the right requires it, then no access is granted to the user.
+                      These permission strings are never created directly, they are an artifact of
+                      granting Role Assignments to Users in the User resource.
                   responses:
                       "200":
                           body:
