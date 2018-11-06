@@ -332,6 +332,7 @@ Defined in
     * Manage stock destinations
     * Manage stock card line item reasons
     * View rights
+    * Manage supply partners
   * users:
     * administrator
     * admin
