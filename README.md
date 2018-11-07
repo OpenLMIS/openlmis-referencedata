@@ -80,6 +80,30 @@ $ gradle clean build
 $ gradle bootRun
 ```
 
+### Development Environment w/o development container (experimental)
+
+Optionally you may also launch a development environment outside of the devolopment container,
+however doing so means you're responsible for installing the appropriate tooling.  In the end the
+code built in the development container is the one that'll be used in production, and therefore is
+the authoritative source for build configuration.
+
+To build outside the development container you'll need:
+1. JDK 8
+2. Node (TODO add version)
+
+To use:
+
+```shell
+# to build
+./gradlew build
+
+# run integration tests
+./gradlew integrationTest
+
+# shutdown started containers
+./gradlew composeDownForced
+```
+
 ### <a name="buildimage">Build Deployment Image</a>
 The specialized docker-compose.builder.yml is geared toward CI and build servers for automated
 building, testing and docker image generation of the service.

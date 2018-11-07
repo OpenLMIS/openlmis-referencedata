@@ -8,13 +8,20 @@ services:
 
   db:
     image: openlmis/postgres:9.6-postgis
+    ports:
+      - "5432"
     env_file: .env
 
   redis:
     image: redis:3.2.12
+    ports:
+      - "6379"
     depends_on: [log]
 
   log:
     image: openlmis/rsyslog:1
+    ports:
+      - "514"
+      - "12514:514/udp"
     volumes:
       - '../logs/referencedata:/var/log'

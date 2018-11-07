@@ -9,6 +9,7 @@ plugins {
     id "org.flywaydb.flyway" version "4.0"
     id "org.sonarqube" version "2.6.2"
     id "com.moowork.node" version "0.12"
+    id 'com.avast.gradle.docker-compose' version '0.8.10'
 }
 
 apply plugin: 'java'
@@ -33,7 +34,6 @@ repositories {
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
-    compile "org.springframework.boot:spring-boot-starter-data-redis"
     compile "org.springframework.boot:spring-boot-starter-actuator"
     compile 'org.javers:javers-spring-boot-starter-sql:2.8.1'
     compile "org.projectlombok:lombok:1.16.8"
@@ -129,6 +129,54 @@ sourceSets {
     }
 }
 
+/*
+ * Checking for docker is a proxy for determining if docker-compose should be used
+ * to start needed services
+ */
+ext.checkForDocker = { ->
+    def result = exec {
+        def command = "command -v docker"
+        ignoreExitValue = true
+        executable "bash" args "-l", "-c", command
+    }
+    if (0 == result.getExitValue()) {
+        println "has Docker"
+        return true
+    } else {
+        println "Docker not found"
+        return false
+    }
+}
+
+/*
+ * Configures system and environment variables, for the given task, when said task is started
+ * with docker-compose plugin providing services.
+ */
+ext.configureForDockerCompose = { task ->
+    // source .env file for postgres username and password
+    def envProps = new Properties()
+    file('.env').withInputStream{ it -> envProps.load(it) }
+    def postgresUser = envProps.getProperty('POSTGRES_USER')
+    def postgresPass = envProps.getProperty('POSTGRES_PASSWORD')
+    task.environment "POSTGRES_USER", postgresUser
+    task. environment "POSTGRES_PASSWORD", postgresPass
+
+    // source log host and port from docker compose
+    def log = dockerCompose.servicesInfos.log.firstContainer
+    task.systemProperty 'log.host', log.host
+    task.systemProperty 'log.port', 12514
+    //task.systemProperty 'log.port', log.ports[514] this doesn't work yet https://github.com/avast/gradle-docker-compose-plugin/issues/176
+
+    // source postgres host and port from docker compose
+    def db = dockerCompose.servicesInfos.db.firstContainer
+    task.environment "DATABASE_URL", "jdbc:postgresql://${db.host}:${db.port}/open_lmis"
+
+    // source redis host and port from docker compose
+    def redis = dockerCompose.servicesInfos.redis.firstContainer
+    task.environment "REDIS_URL", redis.host
+    task.environment "REDIS_PORT", redis.ports[6379]
+}
+
 configurations {
     integrationTestCompile.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
@@ -145,6 +193,10 @@ task flywayTest(type: Test) {
     include '**/migration/**'
 }
 
+dockerCompose {
+    stopContainers = false
+}
+
 task integrationTest(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
@@ -156,6 +208,13 @@ task integrationTest(type: Test) {
     environment 'BASE_URL', "http://localhost"
 
     exclude '**/migration/**'
+    if (checkForDocker()) dockerCompose.isRequiredBy(integrationTest)
+
+    doFirst {
+        if(checkForDocker()) {
+            configureForDockerCompose(integrationTest)
+        }
+    }
 }
 
 flywayTest.mustRunAfter integrationTest
@@ -181,8 +240,10 @@ task generateMigration {
 }
 
 task checkApiIsRaml(type:Exec) {
-    executable "raml-cop"
-    args "src/main/resources/api-definition.yaml"
+    doLast {
+        executable "raml-cop"
+        args "src/main/resources/api-definition.yaml"
+    }
 }
 
 configure(checkApiIsRaml) {
@@ -191,10 +252,18 @@ configure(checkApiIsRaml) {
 }
 
 test {
+    testLogging.showStandardStreams = false // set to true for verbose console output
     maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
     testLogging {
         events 'started', 'passed'
         exceptionFormat = 'full'
+    }
+
+    if (checkForDocker()) dockerCompose.isRequiredBy(test)
+    doFirst {
+        if(checkForDocker()) {
+            configureForDockerCompose(test)
+        }
     }
 }
 

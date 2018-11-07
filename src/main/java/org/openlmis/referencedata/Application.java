@@ -51,7 +51,6 @@ import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
@@ -82,9 +81,6 @@ public class Application {
 
   @Value("${redis.port}")
   private int redisPort;
-
-  @Value("${redis.password}")
-  private String redisPassword;
 
   @Autowired
   DialectName dialectName;
@@ -221,16 +217,6 @@ public class Application {
   }
 
   @Bean
-  JedisConnectionFactory connectionFactory() {
-    JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
-    connectionFactory.setHostName(redisUrl);
-    connectionFactory.setPort(redisPort);
-    connectionFactory.setPassword(redisPassword);
-    connectionFactory.setUsePool(true);
-    return connectionFactory;
-  }
-
-  @Bean
   public FeatureProvider featureProvider() {
     return new EnumBasedFeatureProvider(AvailableFeatures.class);
   }
@@ -239,7 +225,7 @@ public class Application {
   StateRepository getStateRepository() {
     return new RedisStateRepository.Builder()
         .keyPrefix("togglz:")
-        .jedisPool(new JedisPool(redisUrl))
+        .jedisPool(new JedisPool(redisUrl, redisPort))
         .build();
   }
 
