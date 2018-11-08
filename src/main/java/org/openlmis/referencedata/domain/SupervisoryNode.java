@@ -145,8 +145,12 @@ public class SupervisoryNode extends BaseEntity {
    * @param parentNode parent supervisory node to assign.
    */
   public void assignParentNode(SupervisoryNode parentNode) {
-    this.parentNode = parentNode;
-    parentNode.childNodes.add(this);
+    if (null == parentNode) {
+      this.parentNode = null;
+    } else {
+      this.parentNode = parentNode;
+      parentNode.childNodes.add(this);
+    }
   }
 
   /**
@@ -158,6 +162,7 @@ public class SupervisoryNode extends BaseEntity {
       this.childNodes = new HashSet<>();
     }
 
+    this.childNodes.forEach(child -> child.assignParentNode(null));
     this.childNodes.clear();
 
     Optional

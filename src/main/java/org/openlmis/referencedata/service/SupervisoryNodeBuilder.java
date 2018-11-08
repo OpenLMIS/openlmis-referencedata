@@ -85,17 +85,9 @@ public class SupervisoryNodeBuilder
     }
 
     supervisoryNode.updateFrom(importer);
-
-    Optional
-        .ofNullable(facility)
-        .ifPresent(supervisoryNode::setFacility);
-    Optional
-        .ofNullable(parent)
-        .ifPresent(supervisoryNode::assignParentNode);
-    Optional
-        .ofNullable(requisitionGroup)
-        .ifPresent(supervisoryNode::setRequisitionGroup);
-
+    supervisoryNode.setFacility(facility);
+    supervisoryNode.assignParentNode(parent);
+    supervisoryNode.setRequisitionGroup(requisitionGroup);
     supervisoryNode.assignChildNodes(childNodes);
 
     return supervisoryNode;

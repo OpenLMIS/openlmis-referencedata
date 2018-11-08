@@ -17,10 +17,15 @@ package org.openlmis.referencedata.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import com.google.common.collect.Sets;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -366,5 +371,64 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
 
     assertEquals(1, result.getTotalElements());
     assertEquals(supervisoryNode, result.getContent().get(0));
+  }
+
+  @Test
+  public void shouldAssignChildNodes() {
+    // given
+    SupervisoryNode supervisoryNode1 = supervisoryNodeRepository.save(generateInstance());
+    SupervisoryNode supervisoryNode2 = supervisoryNodeRepository.save(generateInstance());
+    SupervisoryNode supervisoryNode3 = supervisoryNodeRepository.save(generateInstance());
+
+    // when
+    supervisoryNode1.assignChildNodes(Sets.newHashSet(supervisoryNode2, supervisoryNode3));
+
+    supervisoryNodeRepository.saveAndFlush(supervisoryNode1);
+
+    // then
+    supervisoryNode1 = supervisoryNodeRepository.getOne(supervisoryNode1.getId());
+    supervisoryNode2 = supervisoryNodeRepository.getOne(supervisoryNode2.getId());
+    supervisoryNode3 = supervisoryNodeRepository.getOne(supervisoryNode3.getId());
+
+    assertThat(supervisoryNode1, is(notNullValue()));
+    assertThat(supervisoryNode2, is(notNullValue()));
+    assertThat(supervisoryNode3, is(notNullValue()));
+
+    assertThat(supervisoryNode1.getChildNodes(), hasSize(2));
+    assertThat(supervisoryNode1.getChildNodes(), hasItems(supervisoryNode2, supervisoryNode3));
+
+    assertThat(supervisoryNode2.getParentNode(), is(supervisoryNode1));
+    assertThat(supervisoryNode3.getParentNode(), is(supervisoryNode1));
+  }
+
+  @Test
+  public void shouldRemoveChildNodes() {
+    // given
+    SupervisoryNode supervisoryNode1 = supervisoryNodeRepository.save(generateInstance());
+    SupervisoryNode supervisoryNode2 = supervisoryNodeRepository.save(generateInstance());
+    SupervisoryNode supervisoryNode3 = supervisoryNodeRepository.save(generateInstance());
+
+    supervisoryNode1.assignChildNodes(Sets.newHashSet(supervisoryNode2, supervisoryNode3));
+
+    supervisoryNodeRepository.saveAndFlush(supervisoryNode1);
+
+    // when
+    supervisoryNode1.assignChildNodes(Sets.newHashSet());
+
+    supervisoryNodeRepository.saveAndFlush(supervisoryNode1);
+
+    // then
+    supervisoryNode1 = supervisoryNodeRepository.getOne(supervisoryNode1.getId());
+    supervisoryNode2 = supervisoryNodeRepository.getOne(supervisoryNode2.getId());
+    supervisoryNode3 = supervisoryNodeRepository.getOne(supervisoryNode3.getId());
+
+    assertThat(supervisoryNode1, is(notNullValue()));
+    assertThat(supervisoryNode2, is(notNullValue()));
+    assertThat(supervisoryNode3, is(notNullValue()));
+
+    assertThat(supervisoryNode1.getChildNodes(), hasSize(0));
+
+    assertThat(supervisoryNode2.getParentNode(), is(nullValue()));
+    assertThat(supervisoryNode3.getParentNode(), is(nullValue()));
   }
 }
