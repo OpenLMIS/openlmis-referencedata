@@ -15,9 +15,21 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
+import static org.openlmis.referencedata.util.Pagination.NO_PAGINATION;
+import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_GLOBAL_UNIQUE;
+import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_INVALID_FACILITY;
+import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_INVALID_ORDERABLE;
+
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -27,10 +39,12 @@ import org.openlmis.referencedata.dto.SupplyPartnerAssociationDto;
 import org.openlmis.referencedata.dto.SupplyPartnerDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyPartnerRepository;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
@@ -58,6 +72,9 @@ public class SupplyPartnerBuilder
 
   @Autowired
   private OrderableRepository orderableRepository;
+
+  @Autowired
+  private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
 
   @Override
   public SupplyPartner build(SupplyPartnerDto importer) {
@@ -116,6 +133,111 @@ public class SupplyPartnerBuilder
         ids -> orderableRepository.findAllLatestByIds(ids, new PageRequest(0, ids.size())),
         dto.getOrderableIds(), OrderableMessageKeys.ERROR_NOT_FOUND);
 
+    validateFacilities(program, supervisoryNode, facilities);
+    validateOrderables(program, facilities, orderables);
+    validateGlobalAssociationUniqueness(program, supervisoryNode, facilities, orderables);
+
     return new SupplyPartnerAssociation(program, supervisoryNode, facilities, orderables);
+  }
+
+  /**
+   * Facilities in associations should be related to the given regular supervisory node by
+   * a requisition group. In other words, it should be impossible to add any facility but
+   * only facilities from the requisition group which is connected to the given regular
+   * supervisory node.
+   */
+  private void validateFacilities(Program program, SupervisoryNode supervisoryNode,
+      Collection<Facility> facilities) {
+    SupervisoryNode regularNode = supervisoryNode.getPartnerNodeOf();
+    Set<Facility> supervisedFacilities = regularNode.getAllSupervisedFacilities(program);
+
+    for (Facility facility : facilities) {
+      if (!supervisedFacilities.contains(facility)) {
+        throw new ValidationMessageException(
+            new Message(ERROR_INVALID_FACILITY, facility.getName()));
+      }
+    }
+
+  }
+
+  /**
+   * Only orderables for which FTAPs exists could be in associations. A list of available FTAPs
+   * should be retrieved based on facility types from facilities that are in the same association.
+   */
+  private void validateOrderables(Program program, Collection<Facility> facilities,
+      Collection<Orderable> orderables) {
+    List<String> facilityTypeCodes = facilities
+        .stream()
+        .map(Facility::getType)
+        .map(FacilityType::getCode)
+        .distinct()
+        .collect(Collectors.toList());
+
+    String programCode = program.getCode().toString();
+    PageRequest pageable = new PageRequest(DEFAULT_PAGE_NUMBER, NO_PAGINATION);
+    Set<UUID> approvedProductIds = facilityTypeApprovedProductRepository
+        .searchProducts(facilityTypeCodes, programCode, pageable)
+        .getContent()
+        .stream()
+        .map(FacilityTypeApprovedProduct::getOrderable)
+        .map(Orderable::getId)
+        .collect(Collectors.toSet());
+
+    Set<UUID> orderableIds = orderables
+        .stream()
+        .map(Orderable::getId)
+        .collect(Collectors.toSet());
+    orderableIds.removeAll(approvedProductIds);
+
+    if (!orderableIds.isEmpty()) {
+      UUID firstId = orderableIds.iterator().next();
+      Orderable first = orderables
+          .stream()
+          .filter(elem -> firstId.equals(elem.getId()))
+          .findFirst()
+          .orElseThrow(() -> new ValidationMessageException(OrderableMessageKeys.ERROR_NOT_FOUND));
+
+      throw new ValidationMessageException(
+          new Message(ERROR_INVALID_ORDERABLE, first.getFullProductName()));
+    }
+  }
+
+  /**
+   * The given supply partner should have only one association for the given
+   * program/node/facility/orderable combo, the check should be global. It means that other
+   * supply partner cannot have the same combo.
+   */
+  private void validateGlobalAssociationUniqueness(Program program, SupervisoryNode supervisoryNode,
+      Collection<Facility> facilities, Collection<Orderable> orderables) {
+
+    // Builder retrieves all supply partners instead of finding those that match combo
+    // (described in the method javadoc) because of number of operations needed to check.
+    // To do this in the right way we would need to execute X * Y calls to the database
+    // (where X - number of facilities, Y - number of orderables) to verify that there is
+    // exactly one supply partner for the given combo. For now, we assume that number of this
+    // resource will be small so currently, it is easier to simply retrieve all of them with
+    // the single call to the database and validate global unique in the memory.
+    List<SupplyPartnerAssociation> associations = supplyPartnerRepository
+        .findAll()
+        .stream()
+        .map(SupplyPartner::getAssociations)
+        .flatMap(Collection::stream)
+        .collect(Collectors.toList());
+
+    for (Facility facility : facilities) {
+      for (Orderable orderable : orderables) {
+        boolean exists = associations
+            .stream()
+            .anyMatch(association -> association
+                .match(program, supervisoryNode, facility, orderable));
+
+        if (exists) {
+          throw new ValidationMessageException(
+              new Message(ERROR_GLOBAL_UNIQUE,
+                  program.getName(), supervisoryNode.getCode(),
+                  facility.getName(), orderable.getFullProductName()));
+        }
+      }
+    }
   }
 }

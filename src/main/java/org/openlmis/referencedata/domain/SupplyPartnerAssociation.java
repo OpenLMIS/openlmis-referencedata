@@ -17,6 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.Entity;
@@ -40,6 +41,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @EqualsAndHashCode(callSuper = true)
 public final class SupplyPartnerAssociation extends BaseEntity {
 
+  @Getter
   @ManyToOne
   @JoinColumn(name = "programId", nullable = false)
   private Program program;
@@ -67,6 +69,20 @@ public final class SupplyPartnerAssociation extends BaseEntity {
       })
   @BatchSize(size = 25)
   private List<Orderable> orderables = Lists.newArrayList();
+
+  /**
+   * Checks if this association contains the given program, supervisory node, facility and
+   * orderable.
+   */
+  public boolean match(Program program, SupervisoryNode supervisoryNode,
+      Facility facility, Orderable orderable) {
+    boolean matchProgram = Objects.equals(program, this.program);
+    boolean matchNode = Objects.equals(supervisoryNode, this.supervisoryNode);
+    boolean hasFacility = facilities.contains(facility);
+    boolean hasOrderable = orderables.contains(orderable);
+
+    return matchProgram && matchNode && hasFacility && hasOrderable;
+  }
 
   /**
    * Exports current state of this object to exporter.

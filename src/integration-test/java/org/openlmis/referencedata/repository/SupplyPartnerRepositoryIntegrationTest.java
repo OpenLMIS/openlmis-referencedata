@@ -34,6 +34,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyPartner;
+import org.openlmis.referencedata.domain.SupplyPartnerAssociation;
 import org.openlmis.referencedata.repository.custom.SupplyPartnerRepositoryCustom;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
@@ -210,6 +211,45 @@ public class SupplyPartnerRepositoryIntegrationTest
     assertThat(search.getContent())
         .hasSize(2)
         .contains(supplyPartners[0], supplyPartners[5]);
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldThrowExceptionIfAssociationsHaveSameProgramAndNode() {
+    FacilityType facilityType = facilityTypeRepository.save(
+        new FacilityTypeDataBuilder()
+            .buildAsNew());
+
+    GeographicLevel geographicLevel = geographicLevelRepository.save(
+        new GeographicLevelDataBuilder()
+            .buildAsNew());
+
+    GeographicZone geographicZone = geographicZoneRepository.save(
+        new GeographicZoneDataBuilder()
+            .withLevel(geographicLevel)
+            .buildAsNew());
+
+    Facility facility = facilityRepository.save(
+        new FacilityDataBuilder()
+            .withType(facilityType)
+            .withGeographicZone(geographicZone)
+            .withoutOperator()
+            .buildAsNew());
+    Orderable orderable = orderableRepository.save(
+        new OrderableDataBuilder()
+            .buildAsNew());
+
+    SupplyPartner supplyPartner = generateInstance();
+
+    SupplyPartnerAssociation existing = supplyPartner.getAssociations().get(0);
+    supplyPartner.addAssociation(
+        new SupplyPartnerAssociationDataBuilder()
+            .withProgram(existing.getProgram())
+            .withSupervisoryNode(existing.getSupervisoryNode())
+            .withFacility(facility)
+            .withOrderable(orderable)
+            .buildAsNew());
+
+    supplyPartnerRepository.saveAndFlush(supplyPartner);
   }
 
   @Getter

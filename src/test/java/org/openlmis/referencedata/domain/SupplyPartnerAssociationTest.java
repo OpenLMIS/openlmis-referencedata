@@ -29,6 +29,18 @@ import org.openlmis.referencedata.testbuilder.SupplyPartnerAssociationDataBuilde
 
 public class SupplyPartnerAssociationTest {
 
+  private Program program = new ProgramDataBuilder().build();
+  private SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder().build();
+  private Facility facility = new FacilityDataBuilder().build();
+  private Orderable orderable = new OrderableDataBuilder().build();
+
+  private SupplyPartnerAssociation association = new SupplyPartnerAssociationDataBuilder()
+      .withProgram(program)
+      .withSupervisoryNode(supervisoryNode)
+      .withFacility(facility)
+      .withOrderable(orderable)
+      .build();
+
   @Test
   public void equalsContract() {
     EqualsVerifier
@@ -52,17 +64,6 @@ public class SupplyPartnerAssociationTest {
 
   @Test
   public void shouldExportCurrentState() {
-    Program program = new ProgramDataBuilder().build();
-    SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder().build();
-    Facility facility = new FacilityDataBuilder().build();
-    Orderable orderable = new OrderableDataBuilder().build();
-
-    SupplyPartnerAssociation association = new SupplyPartnerAssociationDataBuilder()
-        .withProgram(program)
-        .withSupervisoryNode(supervisoryNode)
-        .withFacility(facility)
-        .withOrderable(orderable)
-        .build();
     SupplyPartnerAssociationDto exporter = new SupplyPartnerAssociationDto();
     association.export(exporter);
 
@@ -72,4 +73,32 @@ public class SupplyPartnerAssociationTest {
     assertThat(exporter.getOrderableIds()).hasSize(1).contains(orderable.getId());
   }
 
+  @Test
+  public void shouldMatchIfParamsAreCorrect() {
+    assertThat(association.match(program, supervisoryNode, facility, orderable)).isTrue();
+  }
+
+  @Test
+  public void shouldNotMatchIfProgramIsIncorrect() {
+    Program another = new ProgramDataBuilder().build();
+    assertThat(association.match(another, supervisoryNode, facility, orderable)).isFalse();
+  }
+
+  @Test
+  public void shouldNotMatchIfSupervisoryNodeIsIncorrect() {
+    SupervisoryNode another = new SupervisoryNodeDataBuilder().build();
+    assertThat(association.match(program, another, facility, orderable)).isFalse();
+  }
+
+  @Test
+  public void shouldNotMatchIfFacilityIsNotInAssociation() {
+    Facility another = new FacilityDataBuilder().build();
+    assertThat(association.match(program, supervisoryNode, another, orderable)).isFalse();
+  }
+
+  @Test
+  public void shouldNotMatchIfOrderableIsNotInAssociation() {
+    Orderable another = new OrderableDataBuilder().build();
+    assertThat(association.match(program, supervisoryNode, facility, another)).isFalse();
+  }
 }

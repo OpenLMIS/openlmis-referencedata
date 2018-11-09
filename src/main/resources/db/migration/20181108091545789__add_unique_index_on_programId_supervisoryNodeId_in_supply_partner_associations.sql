@@ -1,0 +1,2 @@
+CREATE UNIQUE INDEX unq_supply_partner_association_programId_supervisoryNodeId
+ON supply_partner_associations (programId, supervisoryNodeId, supplyPartnerId);

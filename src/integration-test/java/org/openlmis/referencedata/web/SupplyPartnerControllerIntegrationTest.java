@@ -25,7 +25,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.UUID;
@@ -50,7 +49,6 @@ import org.openlmis.referencedata.testbuilder.SupplyPartnerDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -61,14 +59,17 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
   private static final String ID_URL = RESOURCE_PATH + SupplyPartnerController.ID_URL;
 
   private Program program = new ProgramDataBuilder().build();
-  private SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder().build();
+  private SupervisoryNode partnerNode = new SupervisoryNodeDataBuilder()
+      .withPartnerNodeOf(new SupervisoryNodeDataBuilder()
+          .build())
+      .build();
   private Facility facility = new FacilityDataBuilder().build();
   private Orderable orderable = new OrderableDataBuilder().build();
   private SupplyPartner supplyPartner = new SupplyPartnerDataBuilder()
       .withAssociation(
           new SupplyPartnerAssociationDataBuilder()
               .withProgram(program)
-              .withSupervisoryNode(supervisoryNode)
+              .withSupervisoryNode(partnerNode)
               .withFacility(facility)
               .withOrderable(orderable)
               .build())
@@ -86,13 +87,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
     given(supplyPartnerRepository.save(any(SupplyPartner.class)))
         .willAnswer(new SaveAnswer<>());
 
-    given(programRepository.findOne(program.getId())).willReturn(program);
-    given(supervisoryNodeRepository.findOne(supervisoryNode.getId())).willReturn(supervisoryNode);
-    given(facilityRepository.findAll(Sets.newHashSet(facility.getId())))
-        .willReturn(Lists.newArrayList(facility));
-    given(orderableRepository.findAllLatestByIds(
-        Sets.newHashSet(orderable.getId()), new PageRequest(0, 1)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable)));
+    given(supplyPartnerBuilder.build(any(SupplyPartnerDto.class))).willReturn(supplyPartner);
 
     mockUserHasRight(RightName.SUPPLY_PARTNERS_MANAGE);
   }
@@ -290,8 +285,6 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldUpdateSupplyPartner() {
-    given(supplyPartnerRepository.findOne(supplyPartner.getId())).willReturn(supplyPartner);
-
     ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -395,7 +388,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
         .body("code", is(supplyPartnerDto.getCode()))
         .body("associations", hasSize(1))
         .body("associations[0].program.id", is(program.getId().toString()))
-        .body("associations[0].supervisoryNode.id", is(supervisoryNode.getId().toString()))
+        .body("associations[0].supervisoryNode.id", is(partnerNode.getId().toString()))
         .body("associations[0].facilities", hasSize(1))
         .body("associations[0].facilities.id", hasItem(facility.getId().toString()))
         .body("associations[0].orderables", hasSize(1))

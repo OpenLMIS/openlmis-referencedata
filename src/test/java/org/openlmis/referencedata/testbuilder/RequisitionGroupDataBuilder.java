@@ -15,7 +15,8 @@
 
 package org.openlmis.referencedata.testbuilder;
 
-import java.util.Collections;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -47,8 +48,8 @@ public class RequisitionGroupDataBuilder {
     name = "Requisition Group " + instanceNumber;
     description = "some-description";
     supervisoryNode = new SupervisoryNodeDataBuilder().build();
-    requisitionGroupProgramSchedules = Collections.emptyList();
-    memberFacilities = Collections.emptySet();
+    requisitionGroupProgramSchedules = Lists.newArrayList();
+    memberFacilities = Sets.newHashSet();
   }
 
   /**
@@ -95,8 +96,14 @@ public class RequisitionGroupDataBuilder {
   /**
    * Sets member facilities for new {@link RequisitionGroup}.
    */
-  public RequisitionGroupDataBuilder withMemberFacilities(Set<Facility> memberFacilities) {
-    this.memberFacilities = memberFacilities;
+  public RequisitionGroupDataBuilder withMemberFacility(Facility memberFacility) {
+    this.memberFacilities.add(memberFacility);
+    return this;
+  }
+
+  public RequisitionGroupDataBuilder withRequisitionGroupProgramSchedule(
+      RequisitionGroupProgramSchedule schedule) {
+    this.requisitionGroupProgramSchedules.add(schedule);
     return this;
   }
 }

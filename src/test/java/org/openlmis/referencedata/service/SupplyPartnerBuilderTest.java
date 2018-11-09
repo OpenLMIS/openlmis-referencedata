@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
@@ -31,21 +33,28 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyPartner;
 import org.openlmis.referencedata.dto.ObjectReferenceDto;
+import org.openlmis.referencedata.dto.SupplyPartnerAssociationDto;
 import org.openlmis.referencedata.dto.SupplyPartnerDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyPartnerRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupProgramScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyPartnerAssociationDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyPartnerDataBuilder;
@@ -55,7 +64,9 @@ import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("PMD.TooManyMethods")
@@ -79,18 +90,39 @@ public class SupplyPartnerBuilderTest {
   @Mock
   private OrderableRepository orderableRepository;
 
+  @Mock
+  private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
+
   @InjectMocks
   private SupplyPartnerBuilder builder;
 
   private Program program = new ProgramDataBuilder().build();
-  private SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder().build();
-  private Facility facility = new FacilityDataBuilder().build();
+  private Facility facility = new FacilityDataBuilder()
+      .withSupportedProgram(program)
+      .build();
+  private RequisitionGroup requisitionGroup = new RequisitionGroupDataBuilder()
+      .withMemberFacility(facility)
+      .withRequisitionGroupProgramSchedule(new RequisitionGroupProgramScheduleDataBuilder()
+          .withProgram(program)
+          .build())
+      .build();
+  private SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder()
+      .withRequisitionGroup(requisitionGroup)
+      .build();
+  private SupervisoryNode partnerNode = new SupervisoryNodeDataBuilder()
+      .withPartnerNodeOf(supervisoryNode)
+      .build();
   private Orderable orderable = new OrderableDataBuilder().build();
+  private FacilityTypeApprovedProduct approvedProduct =
+      new FacilityTypeApprovedProductsDataBuilder()
+          .withOrderable(orderable)
+          .withFacilityType(facility.getType())
+          .build();
   private SupplyPartner supplyPartner = new SupplyPartnerDataBuilder()
       .withAssociation(
           new SupplyPartnerAssociationDataBuilder()
               .withProgram(program)
-              .withSupervisoryNode(supervisoryNode)
+              .withSupervisoryNode(partnerNode)
               .withFacility(facility)
               .withOrderable(orderable)
               .build())
@@ -104,12 +136,17 @@ public class SupplyPartnerBuilderTest {
     importer.setId(null);
 
     when(programRepository.findOne(program.getId())).thenReturn(program);
+    when(supervisoryNodeRepository.findOne(partnerNode.getId())).thenReturn(partnerNode);
     when(supervisoryNodeRepository.findOne(supervisoryNode.getId())).thenReturn(supervisoryNode);
     when(facilityRepository.findAll(Sets.newHashSet(facility.getId())))
         .thenReturn(Lists.newArrayList(facility));
     when(orderableRepository.findAllLatestByIds(
         Sets.newHashSet(orderable.getId()), new PageRequest(0, 1)))
         .thenReturn(Pagination.getPage(Lists.newArrayList(orderable)));
+    when(facilityTypeApprovedProductRepository
+        .searchProducts(eq(Collections.singletonList(facility.getType().getCode())),
+            eq(program.getCode().toString()), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct)));
   }
 
   @Test
@@ -187,7 +224,7 @@ public class SupplyPartnerBuilderTest {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
 
-    when(supervisoryNodeRepository.findOne(supervisoryNode.getId())).thenReturn(null);
+    when(supervisoryNodeRepository.findOne(partnerNode.getId())).thenReturn(null);
 
     builder.build(importer);
   }
@@ -255,6 +292,65 @@ public class SupplyPartnerBuilderTest {
     builder.build(importer);
   }
 
+  @Test
+  public void shouldThrowExceptionIfFacilityIsNotRelatedToRegularSupervisoryNode() {
+    Facility newFacility = new FacilityDataBuilder().build();
+
+    SupplyPartnerAssociationDto association = importer.getAssociations().get(0);
+    association.addFacility(newFacility);
+
+    when(facilityRepository.findAll(association.getFacilityIds()))
+        .thenReturn(Lists.newArrayList(facility, newFacility));
+
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupplyPartnerMessageKeys.ERROR_INVALID_FACILITY);
+    exception.expectMessage(newFacility.getName());
+
+    builder.build(importer);
+  }
+
+  @Test
+  public void shouldThrowExceptionIfOrderableIsNotRelatedByApprovedProduct() {
+    Orderable newOrderable = new OrderableDataBuilder().build();
+
+    SupplyPartnerAssociationDto association = importer.getAssociations().get(0);
+    association.addOrderable(newOrderable);
+
+    when(orderableRepository.findAllLatestByIds(
+        association.getOrderableIds(), new PageRequest(0, 2)))
+        .thenReturn(Pagination.getPage(Lists.newArrayList(orderable, newOrderable)));
+
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupplyPartnerMessageKeys.ERROR_INVALID_ORDERABLE);
+    exception.expectMessage(newOrderable.getFullProductName());
+
+    builder.build(importer);
+  }
+
+  @Test
+  public void shouldThrowExceptionIfAnotherSupplyPartnerHandleOrderable() {
+    SupplyPartner existing = new SupplyPartnerDataBuilder()
+        .withAssociation(
+            new SupplyPartnerAssociationDataBuilder()
+                .withProgram(program)
+                .withSupervisoryNode(partnerNode)
+                .withFacility(facility)
+                .withOrderable(orderable)
+                .build())
+        .build();
+
+    when(supplyPartnerRepository.findAll()).thenReturn(Lists.newArrayList(existing));
+
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupplyPartnerMessageKeys.ERROR_GLOBAL_UNIQUE);
+    exception.expectMessage(program.getName());
+    exception.expectMessage(partnerNode.getCode());
+    exception.expectMessage(facility.getName());
+    exception.expectMessage(orderable.getFullProductName());
+
+    builder.build(importer);
+  }
+
   private void assertBuiltResource(SupplyPartner built, UUID id) {
     assertThat(built)
         .hasFieldOrPropertyWithValue("id", id)
@@ -266,7 +362,7 @@ public class SupplyPartnerBuilderTest {
 
     assertThat(built.getAssociations().get(0))
         .hasFieldOrPropertyWithValue("program", program)
-        .hasFieldOrPropertyWithValue("supervisoryNode", supervisoryNode)
+        .hasFieldOrPropertyWithValue("supervisoryNode", partnerNode)
         .hasFieldOrPropertyWithValue("facilities", Lists.newArrayList(facility))
         .hasFieldOrPropertyWithValue("orderables", Lists.newArrayList(orderable));
   }

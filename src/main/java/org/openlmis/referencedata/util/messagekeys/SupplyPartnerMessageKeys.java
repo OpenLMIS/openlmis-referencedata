@@ -19,15 +19,32 @@ public abstract class SupplyPartnerMessageKeys extends MessageKeys {
 
   private static final String ERROR = join(SERVICE_ERROR, SUPPLY_PARTNER);
   private static final String ASSOCIATIONS = "associations";
+  private static final String FACILITIES = "facilities";
+  private static final String ORDERABLES = "orderables";
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR_NOT_FOUND, WITH, ID);
+
   public static final String ERROR_ID_MISMATCH = join(ERROR, ID_MISMATCH);
-  public static final String ERROR_CODE_DUPLICATED = join(ERROR, CODE, DUPLICATED);
   public static final String ERROR_ID_PROVIDED = join(ERROR, ID, "provided");
+
+  public static final String ERROR_CODE_REQUIRED = join(ERROR, CODE, REQUIRED);
+  public static final String ERROR_CODE_DUPLICATED = join(ERROR, CODE, DUPLICATED);
+
+  public static final String ERROR_NAME_REQUIRED = join(ERROR, NAME, REQUIRED);
+
+  public static final String ERROR_ASSOCIATION_DUPLICATED = join(ERROR, ASSOCIATIONS, DUPLICATED);
+  public static final String ERROR_GLOBAL_UNIQUE = join(ERROR, ASSOCIATIONS, "globalUnique");
+
   public static final String ERROR_MISSING_FACILITIES =
-      join(ERROR, ASSOCIATIONS, "missingFacilities");
+      join(ERROR, ASSOCIATIONS, FACILITIES, MISSING);
+  public static final String ERROR_INVALID_FACILITY =
+      join(ERROR, ASSOCIATIONS, FACILITIES, INVALID);
+
   public static final String ERROR_MISSING_ORDERABLES =
-      join(ERROR, ASSOCIATIONS, "missingOrderables");
+      join(ERROR, ASSOCIATIONS, ORDERABLES, MISSING);
+  public static final String ERROR_INVALID_ORDERABLE =
+      join(ERROR, ASSOCIATIONS, ORDERABLES, INVALID);
+
   public static final String ERROR_INVALID_PARAMS = join(ERROR, INVALID_PARAMS);
 }

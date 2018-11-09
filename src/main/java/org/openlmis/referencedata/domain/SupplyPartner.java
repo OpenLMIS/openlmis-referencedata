@@ -15,8 +15,12 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_CODE_REQUIRED;
+import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_NAME_REQUIRED;
+
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,7 +33,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 
 @Getter
 @Setter
@@ -59,9 +65,20 @@ public final class SupplyPartner extends BaseEntity {
     associations.add(association);
   }
 
+  /**
+   * Update data from the importer.
+   * @throws ValidationMessageException if code or name is blank.
+   */
   public void updateFrom(Importer importer) {
-    name = importer.getName();
-    code = importer.getCode();
+    name = Optional
+        .ofNullable(importer.getName())
+        .filter(StringUtils::isNotBlank)
+        .orElseThrow(() -> new ValidationMessageException(ERROR_NAME_REQUIRED));
+
+    code = Optional
+        .ofNullable(importer.getCode())
+        .filter(StringUtils::isNotBlank)
+        .orElseThrow(() -> new ValidationMessageException(ERROR_CODE_REQUIRED));
   }
 
   /**

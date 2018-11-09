@@ -70,6 +70,7 @@ public abstract class MessageKeys {
   protected static final String UNALLOWED_KEY = "unallowedKey";
   protected static final String MODIFIED_KEY = "modifiedKey";
   protected static final String FIELD_IS_INVARIANT = "fieldIsInvariant";
+  protected static final String MISSING = "missing";
 
   // Entities
   protected static final String LOT = "lot";

@@ -19,12 +19,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.dto.SupplyPartnerDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.SupplyPartnerAssociationDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyPartnerDataBuilder;
+import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
 
 public class SupplyPartnerTest {
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   @Test
   public void equalsContract() {
@@ -49,6 +56,66 @@ public class SupplyPartnerTest {
     newSupplyPartner.updateFrom(importer);
 
     assertThat(newSupplyPartner).isEqualToComparingOnlyGivenFields(supplyPartner, "name", "code");
+  }
+
+  @Test
+  public void shouldThrowExceptionWhileUpdateFromIfCodeWasNotSet() {
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupplyPartnerMessageKeys.ERROR_CODE_REQUIRED);
+
+    SupplyPartner supplyPartner = new SupplyPartnerDataBuilder().build();
+    SupplyPartnerDto importer = new SupplyPartnerDto();
+    supplyPartner.export(importer);
+
+    SupplyPartner newSupplyPartner = new SupplyPartner();
+
+    importer.setCode(null);
+    newSupplyPartner.updateFrom(importer);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhileUpdateFromIfCodeWasBlank() {
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupplyPartnerMessageKeys.ERROR_CODE_REQUIRED);
+
+    SupplyPartner supplyPartner = new SupplyPartnerDataBuilder().build();
+    SupplyPartnerDto importer = new SupplyPartnerDto();
+    supplyPartner.export(importer);
+
+    SupplyPartner newSupplyPartner = new SupplyPartner();
+
+    importer.setCode("          ");
+    newSupplyPartner.updateFrom(importer);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhileUpdateFromIfNameWasNotSet() {
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupplyPartnerMessageKeys.ERROR_NAME_REQUIRED);
+
+    SupplyPartner supplyPartner = new SupplyPartnerDataBuilder().build();
+    SupplyPartnerDto importer = new SupplyPartnerDto();
+    supplyPartner.export(importer);
+
+    SupplyPartner newSupplyPartner = new SupplyPartner();
+
+    importer.setName(null);
+    newSupplyPartner.updateFrom(importer);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhileUpdateFromIfNameWasBlank() {
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupplyPartnerMessageKeys.ERROR_NAME_REQUIRED);
+
+    SupplyPartner supplyPartner = new SupplyPartnerDataBuilder().build();
+    SupplyPartnerDto importer = new SupplyPartnerDto();
+    supplyPartner.export(importer);
+
+    SupplyPartner newSupplyPartner = new SupplyPartner();
+
+    importer.setName("       ");
+    newSupplyPartner.updateFrom(importer);
   }
 
   @Test
