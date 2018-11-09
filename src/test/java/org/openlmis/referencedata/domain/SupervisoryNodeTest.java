@@ -17,6 +17,9 @@ package org.openlmis.referencedata.domain;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -188,6 +191,122 @@ public class SupervisoryNodeTest {
   @Test
   public void shouldReturnFalseIfSupervisesFacilityNotByProgram() {
     assertFalse(supervisoryNode1.supervises(facility2, new Program("another")));
+  }
+
+  @Test
+  public void shouldAssignParentNode() {
+    SupervisoryNode parent = new SupervisoryNodeDataBuilder().build();
+    SupervisoryNode child = new SupervisoryNodeDataBuilder().build();
+
+    child.assignParentNode(parent);
+
+    assertThat(parent.getChildNodes(), hasItem(child));
+    assertThat(child.getParentNode(), is(parent));
+  }
+
+  @Test
+  public void shouldRemoveParentNode() {
+    SupervisoryNode parent = new SupervisoryNodeDataBuilder().build();
+    SupervisoryNode child = new SupervisoryNodeDataBuilder().build();
+
+    child.assignParentNode(parent);
+    child.assignParentNode(null);
+
+    assertThat(parent.getChildNodes(), hasSize(0));
+    assertThat(child.getParentNode(), is(nullValue()));
+  }
+
+  @Test
+  public void shouldAssignChildNodes() {
+    SupervisoryNode parent = new SupervisoryNodeDataBuilder()
+        .withChildNode(new SupervisoryNodeDataBuilder().build())
+        .withChildNode(new SupervisoryNodeDataBuilder().build())
+        .build();
+    SupervisoryNode child = new SupervisoryNodeDataBuilder().build();
+    Set<SupervisoryNode> children = Sets.newHashSet(child);
+
+    parent.assignChildNodes(children);
+
+    assertThat(parent.getChildNodes(), hasSize(1));
+    assertThat(parent.getChildNodes(), hasItem(child));
+    assertThat(child.getParentNode(), is(parent));
+  }
+
+  @Test
+  public void shouldRemoveChildNodes() {
+    SupervisoryNode child1 = new SupervisoryNodeDataBuilder().build();
+    SupervisoryNode child2 = new SupervisoryNodeDataBuilder().build();
+    SupervisoryNode parent = new SupervisoryNodeDataBuilder()
+        .withChildNode(child1)
+        .withChildNode(child2)
+        .build();
+
+    Set<SupervisoryNode> children = Sets.newHashSet(child1, child2);
+
+    parent.assignChildNodes(children);
+    parent.assignChildNodes(Sets.newHashSet());
+
+    assertThat(parent.getChildNodes(), hasSize(0));
+    assertThat(child1.getParentNode(), is(nullValue()));
+    assertThat(child2.getParentNode(), is(nullValue()));
+  }
+
+  @Test
+  public void shouldAssignPartnerNodes() {
+    SupervisoryNode partnerOf = new SupervisoryNodeDataBuilder()
+        .withPartnerNode(new SupervisoryNodeDataBuilder().build())
+        .withPartnerNode(new SupervisoryNodeDataBuilder().build())
+        .build();
+    SupervisoryNode partner = new SupervisoryNodeDataBuilder().build();
+    Set<SupervisoryNode> partners = Sets.newHashSet(partner);
+
+    partnerOf.assignPartnerNodes(partners);
+
+    assertThat(partnerOf.getPartnerNodes(), hasSize(1));
+    assertThat(partnerOf.getPartnerNodes(), hasItem(partner));
+    assertThat(partner.getPartnerNodeOf(), is(partnerOf));
+  }
+
+  @Test
+  public void shouldRemovePartnerNodes() {
+    SupervisoryNode partner1 = new SupervisoryNodeDataBuilder().build();
+    SupervisoryNode partner2 = new SupervisoryNodeDataBuilder().build();
+    SupervisoryNode partnerOf = new SupervisoryNodeDataBuilder()
+        .withPartnerNode(partner1)
+        .withPartnerNode(partner2)
+        .build();
+
+    Set<SupervisoryNode> partners = Sets.newHashSet(partner1, partner2);
+
+    partnerOf.assignPartnerNodes(partners);
+    partnerOf.assignPartnerNodes(Sets.newHashSet());
+
+    assertThat(partnerOf.getPartnerNodes(), hasSize(0));
+    assertThat(partner1.getPartnerNodeOf(), is(nullValue()));
+    assertThat(partner2.getPartnerNodeOf(), is(nullValue()));
+  }
+
+  @Test
+  public void shouldAssignPartnerNodeOf() {
+    SupervisoryNode partnerOf = new SupervisoryNodeDataBuilder().build();
+    SupervisoryNode partner = new SupervisoryNodeDataBuilder().build();
+
+    partner.assignPartnerNodeOf(partnerOf);
+
+    assertThat(partnerOf.getPartnerNodes(), hasItem(partner));
+    assertThat(partner.getPartnerNodeOf(), is(partnerOf));
+  }
+
+  @Test
+  public void shouldRemovePartnerNodeOf() {
+    SupervisoryNode partnerOf = new SupervisoryNodeDataBuilder().build();
+    SupervisoryNode partner = new SupervisoryNodeDataBuilder().build();
+
+    partner.assignPartnerNodeOf(partnerOf);
+    partner.assignPartnerNodeOf(null);
+
+    assertThat(partnerOf.getChildNodes(), hasSize(0));
+    assertThat(partner.getParentNode(), is(nullValue()));
   }
 
   private void addSupportedPrograms(RequisitionGroup group) {

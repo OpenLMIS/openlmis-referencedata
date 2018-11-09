@@ -58,6 +58,11 @@ public class SupervisoryNodeBuilder
         .map(obj -> findResource(
             supervisoryNodeRepository::findOne, obj, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
         .orElse(null);
+    final SupervisoryNode partnerNodeOf = Optional
+        .ofNullable(importer.getPartnerNodeOf())
+        .map(obj -> findResource(
+            supervisoryNodeRepository::findOne, obj, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
+        .orElse(null);
     final RequisitionGroup requisitionGroup = Optional
         .ofNullable(importer.getRequisitionGroup())
         .map(obj -> findResource(
@@ -65,6 +70,13 @@ public class SupervisoryNodeBuilder
         .orElse(null);
     final Set<SupervisoryNode> childNodes = Optional
         .ofNullable(importer.getChildNodes())
+        .map(nodes -> nodes.stream().map(BaseDto::getId).collect(Collectors.toSet()))
+        .map(ids -> findResources(
+            supervisoryNodeRepository::findAll, ids, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
+        .map(HashSet::new)
+        .orElse(new HashSet<>());
+    final Set<SupervisoryNode> partnerNodes = Optional
+        .ofNullable(importer.getPartnerNodes())
         .map(nodes -> nodes.stream().map(BaseDto::getId).collect(Collectors.toSet()))
         .map(ids -> findResources(
             supervisoryNodeRepository::findAll, ids, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
@@ -89,6 +101,8 @@ public class SupervisoryNodeBuilder
     supervisoryNode.assignParentNode(parent);
     supervisoryNode.setRequisitionGroup(requisitionGroup);
     supervisoryNode.assignChildNodes(childNodes);
+    supervisoryNode.assignPartnerNodeOf(partnerNodeOf);
+    supervisoryNode.assignPartnerNodes(partnerNodes);
 
     return supervisoryNode;
 

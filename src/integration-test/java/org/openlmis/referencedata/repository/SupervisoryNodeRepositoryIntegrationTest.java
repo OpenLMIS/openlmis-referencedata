@@ -363,7 +363,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
 
     requisitionGroupRepository.save(new RequisitionGroupDataBuilder()
         .withSupervisoryNode(supervisoryNode)
-        .withMemberFacilities(asSet(newFacility))
+        .withMemberFacility(newFacility)
         .buildAsNew());
 
     result = supervisoryNodeRepository
@@ -430,5 +430,64 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
 
     assertThat(supervisoryNode2.getParentNode(), is(nullValue()));
     assertThat(supervisoryNode3.getParentNode(), is(nullValue()));
+  }
+
+  @Test
+  public void shouldAssignPartnerNodes() {
+    // given
+    SupervisoryNode supervisoryNode1 = supervisoryNodeRepository.save(generateInstance());
+    SupervisoryNode supervisoryNode2 = supervisoryNodeRepository.save(generateInstance());
+    SupervisoryNode supervisoryNode3 = supervisoryNodeRepository.save(generateInstance());
+
+    // when
+    supervisoryNode1.assignPartnerNodes(Sets.newHashSet(supervisoryNode2, supervisoryNode3));
+
+    supervisoryNodeRepository.saveAndFlush(supervisoryNode1);
+
+    // then
+    supervisoryNode1 = supervisoryNodeRepository.getOne(supervisoryNode1.getId());
+    supervisoryNode2 = supervisoryNodeRepository.getOne(supervisoryNode2.getId());
+    supervisoryNode3 = supervisoryNodeRepository.getOne(supervisoryNode3.getId());
+
+    assertThat(supervisoryNode1, is(notNullValue()));
+    assertThat(supervisoryNode2, is(notNullValue()));
+    assertThat(supervisoryNode3, is(notNullValue()));
+
+    assertThat(supervisoryNode1.getPartnerNodes(), hasSize(2));
+    assertThat(supervisoryNode1.getPartnerNodes(), hasItems(supervisoryNode2, supervisoryNode3));
+
+    assertThat(supervisoryNode2.getPartnerNodeOf(), is(supervisoryNode1));
+    assertThat(supervisoryNode3.getPartnerNodeOf(), is(supervisoryNode1));
+  }
+
+  @Test
+  public void shouldRemovePartnerNodes() {
+    // given
+    SupervisoryNode supervisoryNode1 = supervisoryNodeRepository.save(generateInstance());
+    SupervisoryNode supervisoryNode2 = supervisoryNodeRepository.save(generateInstance());
+    SupervisoryNode supervisoryNode3 = supervisoryNodeRepository.save(generateInstance());
+
+    supervisoryNode1.assignPartnerNodes(Sets.newHashSet(supervisoryNode2, supervisoryNode3));
+
+    supervisoryNodeRepository.saveAndFlush(supervisoryNode1);
+
+    // when
+    supervisoryNode1.assignPartnerNodes(Sets.newHashSet());
+
+    supervisoryNodeRepository.saveAndFlush(supervisoryNode1);
+
+    // then
+    supervisoryNode1 = supervisoryNodeRepository.getOne(supervisoryNode1.getId());
+    supervisoryNode2 = supervisoryNodeRepository.getOne(supervisoryNode2.getId());
+    supervisoryNode3 = supervisoryNodeRepository.getOne(supervisoryNode3.getId());
+
+    assertThat(supervisoryNode1, is(notNullValue()));
+    assertThat(supervisoryNode2, is(notNullValue()));
+    assertThat(supervisoryNode3, is(notNullValue()));
+
+    assertThat(supervisoryNode1.getPartnerNodes(), hasSize(0));
+
+    assertThat(supervisoryNode2.getPartnerNodeOf(), is(nullValue()));
+    assertThat(supervisoryNode3.getPartnerNodeOf(), is(nullValue()));
   }
 }

@@ -53,6 +53,13 @@ public final class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
   @Setter
   private Set<ObjectReferenceDto> childNodes;
 
+  @Getter
+  private ObjectReferenceDto partnerNodeOf;
+
+  @Getter
+  @Setter
+  private Set<ObjectReferenceDto> partnerNodes;
+
   public SupervisoryNodeDto(UUID id) {
     super(id);
   }
@@ -73,9 +80,34 @@ public final class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
 
   @JsonIgnore
   @Override
+  public void setPartnerNodeOf(SupervisoryNode partnerNodeOf) {
+    this.partnerNodeOf = null != partnerNodeOf
+        ? new ObjectReferenceDto(
+        getServiceUrl(), SupervisoryNodeController.RESOURCE_PATH, partnerNodeOf.getId())
+        : null;
+  }
+
+  @JsonSetter("partnerNodeOf")
+  public void setPartnerNodeOf(ObjectReferenceDto partnerNodeOf) {
+    this.partnerNodeOf = partnerNodeOf;
+  }
+
+  @JsonIgnore
+  @Override
   public void assignChildNodes(Set<SupervisoryNode> childNodes) {
     this.childNodes = Optional
         .ofNullable(childNodes)
+        .orElse(Collections.emptySet())
+        .stream()
+        .map(node -> new ObjectReferenceDto(
+            getServiceUrl(), SupervisoryNodeController.RESOURCE_PATH, node.getId()))
+        .collect(Collectors.toSet());
+  }
+
+  @Override
+  public void assignPartnerNodes(Set<SupervisoryNode> partnerNodes) {
+    this.partnerNodes = Optional
+        .ofNullable(partnerNodes)
         .orElse(Collections.emptySet())
         .stream()
         .map(node -> new ObjectReferenceDto(
@@ -107,10 +139,28 @@ public final class SupervisoryNodeDto extends SupervisoryNodeBaseDto {
   }
 
   @Override
+  public UUID getPartnerNodeOfId() {
+    return Optional
+        .ofNullable(partnerNodeOf)
+        .map(BaseDto::getId)
+        .orElse(null);
+  }
+
+  @Override
   @JsonIgnore
   public Set<UUID> getChildNodeIds() {
     return Optional
         .ofNullable(childNodes)
+        .orElse(Collections.emptySet())
+        .stream()
+        .map(BaseDto::getId)
+        .collect(Collectors.toSet());
+  }
+
+  @Override
+  public Set<UUID> getPartnerNodeIds() {
+    return Optional
+        .ofNullable(partnerNodes)
         .orElse(Collections.emptySet())
         .stream()
         .map(BaseDto::getId)

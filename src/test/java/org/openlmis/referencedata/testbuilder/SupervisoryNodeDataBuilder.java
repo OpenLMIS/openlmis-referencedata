@@ -24,6 +24,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class SupervisoryNodeDataBuilder {
 
   private static int instanceNumber = 0;
@@ -35,6 +36,8 @@ public class SupervisoryNodeDataBuilder {
   private Facility facility;
   private SupervisoryNode parentNode;
   private Set<SupervisoryNode> childNodes;
+  private SupervisoryNode partnerNodeOf;
+  private Set<SupervisoryNode> partnerNodes;
   private RequisitionGroup requisitionGroup;
   private Map<String, Object> extraData;
 
@@ -49,6 +52,7 @@ public class SupervisoryNodeDataBuilder {
     name = "Supervisory Node " + instanceNumber;
     facility = new FacilityDataBuilder().build();
     childNodes = new HashSet<>();
+    partnerNodes = new HashSet<>();
     //TODO: requisition group builder
   }
 
@@ -57,7 +61,7 @@ public class SupervisoryNodeDataBuilder {
    */
   public SupervisoryNode build() {
     SupervisoryNode node = new SupervisoryNode(code, name, description, facility, parentNode,
-        childNodes, requisitionGroup, new ExtraDataEntity(extraData));
+        partnerNodeOf, childNodes, partnerNodes, requisitionGroup, new ExtraDataEntity(extraData));
     node.setId(id);
 
     return node;
@@ -89,8 +93,18 @@ public class SupervisoryNodeDataBuilder {
     return this;
   }
 
+  public SupervisoryNodeDataBuilder withPartnerNodeOf(SupervisoryNode partnerNodeOf) {
+    this.partnerNodeOf = partnerNodeOf;
+    return this;
+  }
+
   public SupervisoryNodeDataBuilder withChildNode(SupervisoryNode childNode) {
     this.childNodes.add(childNode);
+    return this;
+  }
+
+  public SupervisoryNodeDataBuilder withPartnerNode(SupervisoryNode partnerNode) {
+    this.partnerNodes.add(partnerNode);
     return this;
   }
 

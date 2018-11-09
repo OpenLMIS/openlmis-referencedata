@@ -68,12 +68,16 @@ public class SupervisoryNodeBuilderTest {
   private RequisitionGroup requisitionGroup = new RequisitionGroupDataBuilder().build();
   private SupervisoryNode parent = new SupervisoryNodeDataBuilder().build();
   private SupervisoryNode child = new SupervisoryNodeDataBuilder().build();
+  private SupervisoryNode partner = new SupervisoryNodeDataBuilder().build();
+  private SupervisoryNode partnerOf = new SupervisoryNodeDataBuilder().build();
 
   private SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder()
       .withFacility(facility)
       .withRequisitionGroup(requisitionGroup)
       .withParentNode(parent)
       .withChildNode(child)
+      .withPartnerNode(partner)
+      .withPartnerNodeOf(partnerOf)
       .build();
 
   private SupervisoryNodeDto importer = new SupervisoryNodeDto();
@@ -89,8 +93,12 @@ public class SupervisoryNodeBuilderTest {
         .thenReturn(requisitionGroup);
     when(supervisoryNodeRepository.findOne(parent.getId()))
         .thenReturn(parent);
+    when(supervisoryNodeRepository.findOne(partnerOf.getId()))
+        .thenReturn(partnerOf);
     when(supervisoryNodeRepository.findAll(Sets.newHashSet(child.getId())))
         .thenReturn(Lists.newArrayList(child));
+    when(supervisoryNodeRepository.findAll(Sets.newHashSet(partner.getId())))
+        .thenReturn(Lists.newArrayList(partner));
   }
 
   @Test
@@ -158,8 +166,30 @@ public class SupervisoryNodeBuilderTest {
   }
 
   @Test
+  public void shouldThrowExceptionIfPartnerNodeOfCouldNotBeFound() {
+    when(supervisoryNodeRepository.findOne(partnerOf.getId()))
+        .thenReturn(null);
+
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+
+    builder.build(importer);
+  }
+
+  @Test
   public void shouldThrowExceptionIfChildNodeCouldNotBeFound() {
     when(supervisoryNodeRepository.findAll(Sets.newHashSet(child.getId())))
+        .thenReturn(Lists.newArrayList());
+
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+
+    builder.build(importer);
+  }
+
+  @Test
+  public void shouldThrowExceptionIfPartnerNodeCouldNotBeFound() {
+    when(supervisoryNodeRepository.findAll(Sets.newHashSet(partner.getId())))
         .thenReturn(Lists.newArrayList());
 
     exception.expect(ValidationMessageException.class);
@@ -196,11 +226,29 @@ public class SupervisoryNodeBuilderTest {
   }
 
   @Test
+  public void shouldThrowExceptionIfPartnerNodeOfIdDoesNotExist() {
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+
+    importer.getPartnerNodeOf().setId(null);
+    builder.build(importer);
+  }
+
+  @Test
   public void shouldThrowExceptionIfChildNodeIdDoesNotExist() {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
 
     importer.getChildNodes().forEach(child -> child.setId(null));
+    builder.build(importer);
+  }
+
+  @Test
+  public void shouldThrowExceptionIfPartnerNodeIdDoesNotExist() {
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+
+    importer.getPartnerNodes().forEach(partner -> partner.setId(null));
     builder.build(importer);
   }
 
@@ -232,6 +280,15 @@ public class SupervisoryNodeBuilderTest {
   }
 
   @Test
+  public void shouldNotThrowExceptionIfPartnerNodeOfImporterDoesNotExist() {
+    importer.setPartnerNodeOf((ObjectReferenceDto) null);
+
+    SupervisoryNode built = builder.build(importer);
+
+    assertThat(built.getPartnerNodeOf()).isNull();
+  }
+
+  @Test
   public void shouldNotThrowExceptionIfChildNoteImporterDoesNotExist() {
     importer.setChildNodes(null);
 
@@ -240,15 +297,27 @@ public class SupervisoryNodeBuilderTest {
     assertThat(built.getChildNodes()).isNotNull().isEmpty();
   }
 
+  @Test
+  public void shouldNotThrowExceptionIfPartnerNoteImporterDoesNotExist() {
+    importer.setPartnerNodes(null);
+
+    SupervisoryNode built = builder.build(importer);
+
+    assertThat(built.getPartnerNodes()).isNotNull().isEmpty();
+  }
+
   private void assertBuiltResource(SupervisoryNode node, UUID id) {
     assertThat(node)
         .isEqualToIgnoringGivenFields(importer,
-            "id", "facility", "requisitionGroup", "parentNode", "childNodes")
+            "id", "facility", "requisitionGroup", "parentNode", "childNodes",
+            "partnerNodeOf", "partnerNodes")
         .hasFieldOrPropertyWithValue("id", id)
         .hasFieldOrPropertyWithValue("facility", facility)
         .hasFieldOrPropertyWithValue("requisitionGroup", requisitionGroup)
         .hasFieldOrPropertyWithValue("parentNode", parent)
-        .hasFieldOrPropertyWithValue("childNodes", Sets.newHashSet(child));
+        .hasFieldOrPropertyWithValue("childNodes", Sets.newHashSet(child))
+        .hasFieldOrPropertyWithValue("partnerNodeOf", partnerOf)
+        .hasFieldOrPropertyWithValue("partnerNodes", Sets.newHashSet(partner));
   }
 
 }

@@ -49,6 +49,7 @@ import org.slf4j.profiler.Profiler;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("SupervisoryNode")
+@SuppressWarnings("PMD.TooManyMethods")
 public class SupervisoryNode extends BaseEntity {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupervisoryNode.class);
@@ -79,10 +80,20 @@ public class SupervisoryNode extends BaseEntity {
   @Getter
   private SupervisoryNode parentNode;
 
+  @ManyToOne
+  @JoinColumn(name = "partnerId")
+  @Getter
+  private SupervisoryNode partnerNodeOf;
+
   @OneToMany(mappedBy = "parentNode")
   @Getter
   @DiffIgnore
   private Set<SupervisoryNode> childNodes;
+
+  @OneToMany(mappedBy = "partnerNodeOf")
+  @Getter
+  @DiffIgnore
+  private Set<SupervisoryNode> partnerNodes;
 
   @OneToOne(mappedBy = "supervisoryNode", fetch = FetchType.LAZY)
   @Getter
@@ -127,12 +138,28 @@ public class SupervisoryNode extends BaseEntity {
       }
     }
 
+    SupervisoryNode partnerNodeOf = null;
+    if (importer.getPartnerNodeOfId() != null) {
+      partnerNodeOf = new SupervisoryNode();
+      partnerNodeOf.setId(importer.getPartnerNodeOfId());
+    }
+
+    Set<SupervisoryNode> partnerNodes = new HashSet<>();
+    if (importer.getChildNodeIds() != null) {
+      for (UUID partnerNodeId : importer.getPartnerNodeIds()) {
+        SupervisoryNode partnerNode = new SupervisoryNode();
+        partnerNode.setId(partnerNodeId);
+
+        partnerNodes.add(partnerNode);
+      }
+    }
+
     Map<String, Object> extraData = importer.getExtraData();
     ExtraDataEntity extraDataEntity = new ExtraDataEntity(extraData);
 
     SupervisoryNode newSupervisoryNode = new SupervisoryNode(importer.getCode(), importer.getName(),
-        importer.getDescription(), facility, parentNode, childNodes, requisitionGroup,
-        extraDataEntity);
+        importer.getDescription(), facility, parentNode, partnerNodeOf, childNodes, partnerNodes,
+        requisitionGroup, extraDataEntity);
     newSupervisoryNode.setId(importer.getId());
 
     return newSupervisoryNode;
@@ -145,11 +172,12 @@ public class SupervisoryNode extends BaseEntity {
    * @param parentNode parent supervisory node to assign.
    */
   public void assignParentNode(SupervisoryNode parentNode) {
-    if (null == parentNode) {
-      this.parentNode = null;
-    } else {
+    if (null != parentNode) {
       this.parentNode = parentNode;
       parentNode.childNodes.add(this);
+    } else if (null != this.parentNode) {
+      this.parentNode.childNodes.remove(this);
+      this.parentNode = null;
     }
   }
 
@@ -162,13 +190,43 @@ public class SupervisoryNode extends BaseEntity {
       this.childNodes = new HashSet<>();
     }
 
-    this.childNodes.forEach(child -> child.assignParentNode(null));
+    this.childNodes.forEach(childNode -> childNode.parentNode = null);
     this.childNodes.clear();
 
     Optional
         .ofNullable(childNodes)
         .orElse(Collections.emptySet())
         .forEach(child -> child.assignParentNode(this));
+  }
+
+  /**
+   * Assign partner nodes for this supervisory node.
+   */
+  public void assignPartnerNodes(Set<SupervisoryNode> partnerNodes) {
+    if (null == this.partnerNodes) {
+      this.partnerNodes = new HashSet<>();
+    }
+
+    this.partnerNodes.forEach(partner -> partner.partnerNodeOf = null);
+    this.partnerNodes.clear();
+
+    Optional
+        .ofNullable(partnerNodes)
+        .orElse(Collections.emptySet())
+        .forEach(partner -> partner.assignPartnerNodeOf(this));
+  }
+
+  /**
+   * Assign a partner node of for this supervisory node.
+   */
+  public void assignPartnerNodeOf(SupervisoryNode partnerNodeOf) {
+    if (null != partnerNodeOf) {
+      this.partnerNodeOf = partnerNodeOf;
+      partnerNodeOf.partnerNodes.add(this);
+    } else if (null != this.partnerNodeOf) {
+      this.partnerNodeOf.partnerNodes.remove(this);
+      this.partnerNodeOf = null;
+    }
   }
 
   /**
@@ -244,7 +302,9 @@ public class SupervisoryNode extends BaseEntity {
     exporter.setDescription(description);
     exporter.setFacility(facility);
     exporter.setParentNode(parentNode);
+    exporter.setPartnerNodeOf(partnerNodeOf);
     exporter.assignChildNodes(childNodes);
+    exporter.assignPartnerNodes(partnerNodes);
     exporter.setRequisitionGroup(requisitionGroup);
 
     extraData = ExtraDataEntity.defaultEntity(extraData);
@@ -289,7 +349,11 @@ public class SupervisoryNode extends BaseEntity {
 
     void setParentNode(SupervisoryNode parentNode);
 
+    void setPartnerNodeOf(SupervisoryNode partnerNodeOf);
+
     void assignChildNodes(Set<SupervisoryNode> childNodes);
+
+    void assignPartnerNodes(Set<SupervisoryNode> partnerNodes);
 
     void setRequisitionGroup(RequisitionGroup requisitionGroup);
   }
@@ -306,8 +370,12 @@ public class SupervisoryNode extends BaseEntity {
 
     UUID getParentNodeId();
 
+    UUID getPartnerNodeOfId();
+
     Set<UUID> getChildNodeIds();
 
     UUID getRequisitionGroupId();
+
+    Set<UUID> getPartnerNodeIds();
   }
 }

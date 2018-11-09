@@ -79,12 +79,22 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
   }
 
   @Override
+  public void setPartnerNodeOf(SupervisoryNode partnerNodeOf) {
+    // unsupported operation
+  }
+
+  @Override
   public void assignChildNodes(Set<SupervisoryNode> childNodes) {
     // unsupported operation
   }
 
   @Override
   public void setRequisitionGroup(RequisitionGroup requisitionGroup) {
+    // unsupported operation
+  }
+
+  @Override
+  public void assignPartnerNodes(Set<SupervisoryNode> partnerNodes) {
     // unsupported operation
   }
 
@@ -106,7 +116,21 @@ public class SupervisoryNodeBaseDto extends BaseDto implements SupervisoryNode.E
 
   @Override
   @JsonIgnore
+  public UUID getPartnerNodeOfId() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  @JsonIgnore
   public Set<UUID> getChildNodeIds() {
+    // unsupported operation
+    return Collections.emptySet();
+  }
+
+  @Override
+  @JsonIgnore
+  public Set<UUID> getPartnerNodeIds() {
     // unsupported operation
     return Collections.emptySet();
   }

@@ -28,6 +28,10 @@
       "type": "object",
       "$ref": "referenceObjectDto.json"
     },
+    "partnerNodeOf": {
+      "type": "object",
+      "$ref": "referenceObjectDto.json"
+    },
     "requisitionGroup": {
       "type": "object",
       "$ref": "referenceObjectDto.json"
@@ -35,6 +39,15 @@
     "childNodes": {
       "type": "array",
       "title": "childNodes",
+      "items": {
+        "type": "object",
+        "$ref": "referenceObjectDto.json"
+      },
+      "uniqueItems": false
+    },
+    "partnerNodes": {
+      "type": "array",
+      "title": "partnerNodes",
       "items": {
         "type": "object",
         "$ref": "referenceObjectDto.json"
