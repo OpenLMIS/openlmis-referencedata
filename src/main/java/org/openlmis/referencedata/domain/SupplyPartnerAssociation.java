@@ -15,8 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
-import com.google.common.collect.Lists;
-import java.util.List;
+import com.google.common.collect.Sets;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -57,7 +56,7 @@ public final class SupplyPartnerAssociation extends BaseEntity {
       joinColumns = @JoinColumn(name = "supplyPartnerAssociationId", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "facilityId", nullable = false))
   @BatchSize(size = 25)
-  private List<Facility> facilities = Lists.newArrayList();
+  private Set<Facility> facilities = Sets.newHashSet();
 
   @ManyToMany
   @JoinTable(name = "supply_partner_association_orderables",
@@ -68,7 +67,7 @@ public final class SupplyPartnerAssociation extends BaseEntity {
           @JoinColumn(name = "orderableVersionId", nullable = false)
       })
   @BatchSize(size = 25)
-  private List<Orderable> orderables = Lists.newArrayList();
+  private Set<Orderable> orderables = Sets.newHashSet();
 
   /**
    * Checks if this association contains the given program, supervisory node, facility and

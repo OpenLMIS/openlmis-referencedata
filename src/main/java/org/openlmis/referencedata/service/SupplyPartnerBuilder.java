@@ -22,6 +22,7 @@ import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKe
 import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_INVALID_ORDERABLE;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -126,12 +127,12 @@ public class SupplyPartnerBuilder
     SupervisoryNode supervisoryNode = findResource(supervisoryNodeRepository::findOne,
         dto.getSupervisoryNode(), SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
 
-    List<Facility> facilities = findResources(facilityRepository::findAll,
-        dto.getFacilityIds(), FacilityMessageKeys.ERROR_NOT_FOUND);
+    Set<Facility> facilities = new HashSet<>(findResources(facilityRepository::findAll,
+        dto.getFacilityIds(), FacilityMessageKeys.ERROR_NOT_FOUND));
 
-    List<Orderable> orderables = findResources(
+    Set<Orderable> orderables = new HashSet<>(findResources(
         ids -> orderableRepository.findAllLatestByIds(ids, new PageRequest(0, ids.size())),
-        dto.getOrderableIds(), OrderableMessageKeys.ERROR_NOT_FOUND);
+        dto.getOrderableIds(), OrderableMessageKeys.ERROR_NOT_FOUND));
 
     validateFacilities(program, supervisoryNode, facilities);
     validateOrderables(program, facilities, orderables);

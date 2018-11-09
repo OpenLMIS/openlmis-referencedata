@@ -15,8 +15,8 @@
 
 package org.openlmis.referencedata.testbuilder;
 
-import com.google.common.collect.Lists;
-import java.util.List;
+import com.google.common.collect.Sets;
+import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Orderable;
@@ -28,8 +28,8 @@ public class SupplyPartnerAssociationDataBuilder {
   private UUID id = UUID.randomUUID();
   private Program program = new ProgramDataBuilder().build();
   private SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder().build();
-  private List<Facility> facilities = Lists.newArrayList();
-  private List<Orderable> orderables = Lists.newArrayList();
+  private Set<Facility> facilities = Sets.newHashSet();
+  private Set<Orderable> orderables = Sets.newHashSet();
 
   public SupplyPartnerAssociationDataBuilder withProgram(Program program) {
     this.program = program;

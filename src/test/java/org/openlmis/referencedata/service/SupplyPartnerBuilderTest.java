@@ -363,7 +363,7 @@ public class SupplyPartnerBuilderTest {
     assertThat(built.getAssociations().get(0))
         .hasFieldOrPropertyWithValue("program", program)
         .hasFieldOrPropertyWithValue("supervisoryNode", partnerNode)
-        .hasFieldOrPropertyWithValue("facilities", Lists.newArrayList(facility))
-        .hasFieldOrPropertyWithValue("orderables", Lists.newArrayList(orderable));
+        .hasFieldOrPropertyWithValue("facilities", Sets.newHashSet(facility))
+        .hasFieldOrPropertyWithValue("orderables", Sets.newHashSet(orderable));
   }
 }
