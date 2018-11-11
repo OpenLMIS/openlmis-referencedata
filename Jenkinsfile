@@ -67,7 +67,9 @@ pipeline {
             }
             post {
                 success {
-                    archive 'build/libs/*.jar,build/resources/main/api-definition.html, build/resources/main/  version.properties'
+                    archiveArtifacts artifacts: 'build/libs/*.jar,' +
+                            'build/resources/main/api-definition.html,' +
+                            'build/reports/dependency-check-report.html'
                 }
                 failure {
                     script {
