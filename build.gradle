@@ -329,6 +329,7 @@ apply from: "documentation.gradle"
 integrationTest.dependsOn copyRamlToBuild
 
 processResources {
+    finalizedBy npm_run_runApiHtmlConverter
     // update version information in build
     filesMatching('**/version.properties') {
         expand(project.properties)
