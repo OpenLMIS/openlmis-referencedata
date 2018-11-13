@@ -764,13 +764,12 @@ public class AuditLogInitializerIntegrationTest {
         .setParameter(4, "") //email
         .setParameter(5, "") //first name
         .setParameter(6, "") //last name
-        .setParameter(7, true) //login restricted
-        .setParameter(8, "") //time zone
-        .setParameter(9, "") //username
-        .setParameter(10,false) //verified
-        .setParameter(11, homeFacilityId)
-        .setParameter(12, "") //job title
-        .setParameter(13, "") //phone nr
+        .setParameter(7, "") //time zone
+        .setParameter(8, "") //username
+        .setParameter(9,false) //verified
+        .setParameter(10, homeFacilityId)
+        .setParameter(11, "") //job title
+        .setParameter(12, "") //phone nr
         .executeUpdate();
   }
 

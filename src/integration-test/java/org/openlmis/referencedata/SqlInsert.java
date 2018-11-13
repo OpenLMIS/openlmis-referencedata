@@ -126,7 +126,7 @@ final class SqlInsert {
 
   private static final String[] USER_FIELDS = {
       "id", "active", "allownotify", "email", "firstname", "lastname",
-      "loginrestricted", "timezone", "username", "verified", "homefacilityid",
+      "timezone", "username", "verified", "homefacilityid",
       "jobtitle", "phonenumber"
   };
 

@@ -5,6 +5,7 @@ Breaking changes:
 * [OLMIS-3341](https://openlmis.atlassian.net/browse/OLMIS-3341): Removed `DELETE /api/processingPeriods/{id}` endpoint
 * [OLMIS-4292](https://openlmis.atlassian.net/browse/OLMIS-4292): Removed `GET /api/users/{id}/supervisedFacilities` endpoint
 * [OLMIS-5635](https://openlmis.atlassian.net/browse/OLMIS-5635): Changed supervisory node structure
+* [OLMIS-5668](https://openlmis.atlassian.net/browse/OLMIS-5668): Removed login restricted from the User model
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-4940](https://openlmis.atlassian.net/browse/OLMIS-4940): Ensured that the microservice gets system time zone from configuration on startup:

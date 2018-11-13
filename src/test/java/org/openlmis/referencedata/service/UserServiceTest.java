@@ -367,7 +367,6 @@ public class UserServiceTest {
   private User generateUser() {
     return new UserDataBuilder()
         .withHomeFacilityId(UUID.randomUUID())
-        .withLoginRestrictedFlag()
         .withExtraData(EXTRA_DATA_KEY, EXTRA_DATA_VALUE)
         .build();
   }

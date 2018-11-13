@@ -68,10 +68,6 @@ public class UserSearchParamsTest {
     assertFalse(userSearchParams.isEmpty());
 
     userSearchParams = new UserSearchParams();
-    userSearchParams.setLoginRestricted(true);
-    assertFalse(userSearchParams.isEmpty());
-
-    userSearchParams = new UserSearchParams();
     userSearchParams.setExtraData(Collections.singletonMap(TEST, TEST));
     assertFalse(userSearchParams.isEmpty());
   }

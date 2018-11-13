@@ -142,7 +142,6 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         .withLastName(user.getLastName())
         .withHomeFacilityId(user.getHomeFacilityId())
         .withActive(user.isActive())
-        .withLoginRestricted(user.isLoginRestricted())
         .withId(Sets.newHashSet(user.getId().toString()))
         .build();
     Page<User> receivedUsers = repository.searchUsers(searchParams, null, pageable);
@@ -156,7 +155,6 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     assertEquals(user.getLastName(), receivedUser.getLastName());
     assertEquals(user.getHomeFacilityId(), receivedUser.getHomeFacilityId());
     assertEquals(user.isActive(), receivedUser.isActive());
-    assertEquals(user.isLoginRestricted(), receivedUser.isLoginRestricted());
   }
 
   @Test
@@ -280,7 +278,6 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     assertEquals(expectedUser.getTimezone(), user.getTimezone());
     assertEquals(expectedUser.getHomeFacilityId(), user.getHomeFacilityId());
     assertEquals(expectedUser.isActive(), user.isActive());
-    assertEquals(expectedUser.isLoginRestricted(), user.isLoginRestricted());
     assertEquals(expectedUser.getExtraData(), user.getExtraData());
   }
 

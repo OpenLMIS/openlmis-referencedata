@@ -86,11 +86,6 @@ public class User extends BaseEntity {
   @Setter
   private boolean active;
 
-  @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
-  @Getter
-  @Setter
-  private boolean loginRestricted;
-
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @DiffIgnore
   @Getter
@@ -113,7 +108,6 @@ public class User extends BaseEntity {
     timezone = importer.getTimezone();
     homeFacilityId = importer.getHomeFacilityId();
     active = importer.isActive();
-    loginRestricted = importer.isLoginRestricted();
 
     extraData.updateFrom(importer.getExtraData());
   }
@@ -232,7 +226,6 @@ public class User extends BaseEntity {
     exporter.setTimezone(timezone);
     exporter.setHomeFacilityId(homeFacilityId);
     exporter.setActive(active);
-    exporter.setLoginRestricted(loginRestricted);
 
     extraData = ExtraDataEntity.defaultEntity(extraData);
     extraData.export(exporter);
@@ -282,8 +275,6 @@ public class User extends BaseEntity {
 
     void setActive(boolean active);
 
-    void setLoginRestricted(boolean loginRestricted);
-
   }
 
   public interface Importer extends BaseImporter, ExtraDataImporter {
@@ -301,8 +292,6 @@ public class User extends BaseEntity {
     UUID getHomeFacilityId();
 
     boolean isActive();
-
-    boolean isLoginRestricted();
 
   }
 }

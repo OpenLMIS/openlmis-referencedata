@@ -211,7 +211,7 @@ public class UserController extends BaseController {
    * Returns all matching users. If no params provided, returns all users.
    *
    * @param requestParams request parameters (id, username, firstName, lastName, email,
-   *                      homeFacility, active, verified, loginRestricted).
+   *                      homeFacility, active, verified).
    *                      There can be multiple id params. Other params are ignored if id is
    *                      provided. When id is not provided and if other params have multiple
    *                      values, the first one is used.
@@ -343,7 +343,7 @@ public class UserController extends BaseController {
    * Returns all matching users sorted by username in alphabetically descending order.
    *
    * @param queryParams request parameters (username, firstName, lastName, email, homeFacility,
-   *                 active, verified, loginRestricted) and JSON extraData.
+   *                 active, verified) and JSON extraData.
    *
    *                 For firstName, lastName, email: finds any values that have entered
    *                 string value in any position of searched field. Not case sensitive.

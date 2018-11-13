@@ -25,7 +25,6 @@ import static org.openlmis.referencedata.validate.UserValidator.FIRST_NAME;
 import static org.openlmis.referencedata.validate.UserValidator.HOME_FACILITY_ID;
 import static org.openlmis.referencedata.validate.UserValidator.JOB_TITLE;
 import static org.openlmis.referencedata.validate.UserValidator.LAST_NAME;
-import static org.openlmis.referencedata.validate.UserValidator.LOGIN_RESTRICTED;
 import static org.openlmis.referencedata.validate.UserValidator.ROLE_ASSIGNMENTS;
 import static org.openlmis.referencedata.validate.UserValidator.TIMEZONE;
 import static org.openlmis.referencedata.validate.UserValidator.USERNAME;
@@ -241,18 +240,16 @@ public class UserValidatorTest {
     userDto.setTimezone("test-time-zone");
     userDto.setHomeFacilityId(UUID.randomUUID());
     userDto.setActive(!userDto.isActive());
-    userDto.setLoginRestricted(!userDto.isLoginRestricted());
     userDto.setExtraData(ImmutableMap.of("a", "b"));
     userDto.setRoleAssignments(Sets.newHashSet(new RoleAssignmentDto()));
     validator.validate(userDto, errors);
 
-    assertThat(errors.getErrorCount()).isGreaterThanOrEqualTo(8);
+    assertThat(errors.getErrorCount()).isGreaterThanOrEqualTo(7);
     assertErrorMessage(errors, USERNAME, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
     assertErrorMessage(errors, JOB_TITLE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
     assertErrorMessage(errors, TIMEZONE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
     assertErrorMessage(errors, HOME_FACILITY_ID, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
     assertErrorMessage(errors, ACTIVE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
-    assertErrorMessage(errors, LOGIN_RESTRICTED, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
     assertErrorMessage(errors, EXTRA_DATA, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
     assertErrorMessage(errors, ROLE_ASSIGNMENTS, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
   }

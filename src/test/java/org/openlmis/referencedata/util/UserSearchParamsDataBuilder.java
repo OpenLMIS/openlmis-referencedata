@@ -31,7 +31,6 @@ public class UserSearchParamsDataBuilder {
   private String lastName = "lastName";
   private String homeFacilityId = UUID.randomUUID().toString();
   private Boolean active = true;
-  private Boolean loginRestricted = true;
   private Map<String, String> extraData = emptyMap();
 
   /**
@@ -39,7 +38,7 @@ public class UserSearchParamsDataBuilder {
    */
   public UserSearchParams build() {
     return new UserSearchParams(id, username, firstName, lastName, homeFacilityId,
-        active, loginRestricted, extraData);
+        active, extraData);
   }
 
   /**
@@ -52,7 +51,6 @@ public class UserSearchParamsDataBuilder {
     lastName = null;
     homeFacilityId = null;
     active = null;
-    loginRestricted = null;
     extraData = null;
 
     return this;
@@ -85,11 +83,6 @@ public class UserSearchParamsDataBuilder {
 
   public UserSearchParamsDataBuilder withActive(Boolean active) {
     this.active = active;
-    return this;
-  }
-
-  public UserSearchParamsDataBuilder withLoginRestricted(Boolean loginRestricted) {
-    this.loginRestricted = loginRestricted;
     return this;
   }
 

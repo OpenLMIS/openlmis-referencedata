@@ -45,7 +45,6 @@ public class UserValidator implements BaseValidator {
   static final String TIMEZONE = "timezone";
   static final String HOME_FACILITY_ID = "homeFacilityId";
   static final String ACTIVE = "active";
-  static final String LOGIN_RESTRICTED = "loginRestricted";
   static final String EXTRA_DATA = "extraData";
   static final String ROLE_ASSIGNMENTS = "roleAssignments";
 
@@ -122,8 +121,6 @@ public class UserValidator implements BaseValidator {
     rejectIfInvariantWasChanged(errors, HOME_FACILITY_ID,
         db.getHomeFacilityId(), dto.getHomeFacilityId());
     rejectIfInvariantWasChanged(errors, ACTIVE, db.isActive(), dto.isActive());
-    rejectIfInvariantWasChanged(errors, LOGIN_RESTRICTED,
-        db.isLoginRestricted(), dto.isLoginRestricted());
     rejectIfInvariantWasChanged(errors, EXTRA_DATA, db.getExtraData(), dto.getExtraData());
 
     Set<RoleAssignmentDto> oldRoleAssignments = roleAssignmentRepository.findByUser(dto.getId());

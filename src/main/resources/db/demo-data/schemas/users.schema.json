@@ -42,11 +42,6 @@
       "formula": ""
     },
     {
-      "name": "loginRestricted",
-      "type": "Boolean",
-      "formula": ""
-    },
-    {
       "name": "allowNotify",
       "type": "Boolean",
       "formula": ""

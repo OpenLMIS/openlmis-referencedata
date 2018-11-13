@@ -46,7 +46,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   protected static final String LAST_NAME = "lastName";
   protected static final String HOME_FACILITY_ID = "homeFacilityId";
   protected static final String ACTIVE = "active";
-  protected static final String LOGIN_RESTRICTED = "loginRestricted";
   protected static final String ID = "id";
 
   @PersistenceContext
@@ -101,8 +100,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     predicate = addEqualsFilter(predicate, builder, root, HOME_FACILITY_ID,
         searchParams.getHomeFacilityUuid());
     predicate = addEqualsFilter(predicate, builder, root, ACTIVE, searchParams.getActive());
-    predicate = addEqualsFilter(predicate, builder, root, LOGIN_RESTRICTED,
-        searchParams.getLoginRestricted());
 
     Set<UUID> ids = Sets.newHashSet();
     ids.addAll(searchParams.getIds());

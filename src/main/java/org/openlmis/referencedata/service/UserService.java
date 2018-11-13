@@ -60,7 +60,6 @@ public class UserService {
   protected static final String HOME_FACILITY_ID = "homeFacilityId";
   protected static final String ACTIVE = "active";
   protected static final String VERIFIED = "verified";
-  protected static final String LOGIN_RESTRICTED = "loginRestricted";
   protected static final String EXTRA_DATA = "extraData";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
@@ -104,7 +103,7 @@ public class UserService {
    * Method returns all users with matched parameters.
    *
    * @param searchParams request parameters (username, firstName, lastName, email, homeFacility,
-   *                 active, verified, loginRestricted) and JSON extraData.
+   *                 active, verified) and JSON extraData.
    * @param pageable pagination parameters
    * @return Page of users
    */

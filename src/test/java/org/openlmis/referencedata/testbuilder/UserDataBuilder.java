@@ -39,7 +39,6 @@ public class UserDataBuilder {
   private String timezone = "UTC";
   private UUID homeFacilityId = null;
   private boolean active = true;
-  private boolean loginRestricted = false;
   private Set<RoleAssignment> roleAssignments = new HashSet<>();
   private Map<String, Object> extraData = new HashMap<>();
   private Set<RightAssignment> rightAssignments = new HashSet<>();
@@ -56,11 +55,6 @@ public class UserDataBuilder {
 
   public UserDataBuilder withHomeFacilityId(UUID homeFacilityId) {
     this.homeFacilityId = homeFacilityId;
-    return this;
-  }
-
-  public UserDataBuilder withLoginRestrictedFlag() {
-    this.loginRestricted = true;
     return this;
   }
 
@@ -104,7 +98,7 @@ public class UserDataBuilder {
   public User buildAsNew() {
     return new User(
         username, firstName, lastName, jobTitle, timezone, homeFacilityId,
-        active, loginRestricted, roleAssignments, new ExtraDataEntity(extraData),
+        active, roleAssignments, new ExtraDataEntity(extraData),
         rightAssignments
     );
   }

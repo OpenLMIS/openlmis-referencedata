@@ -24,10 +24,6 @@
       "type": "boolean",
       "title": "active"
     },
-    "loginRestricted": {
-      "type": "boolean",
-      "title": "loginRestricted"
-    },
     "extraData": {
       "type": "object",
       "title": "extraData"

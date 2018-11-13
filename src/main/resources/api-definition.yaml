@@ -1173,12 +1173,6 @@ resourceTypes:
                 type: boolean
                 required: false
                 repeat: false
-              loginRestricted:
-                displayName: loginRestricted
-                description: is login restricted
-                type: boolean
-                required: false
-                repeat: false
           responses:
               "200":
                   body:
