@@ -89,25 +89,11 @@ public class RightAssignmentService {
     profiler.start("DROP_RIGHT_ASSIGNMENTS");
     template.update(DELETE_SQL);
 
-    template.query("SELECT * FROM referencedata.right_assignments;", (ResultSet rs) -> {
-      XLOGGER.info("right with userid {} exists after drop",
-          UUID.fromString(rs.getString(USER_ID)));
-      XLOGGER.info("right with right {} exists after drop",
-          rs.getString(RIGHT_NAME));
-    });
-
     // Get a right assignment matrix from database
     profiler.start("GET_INTERMEDIATE_RIGHT_ASSIGNMENTS");
     List<RightAssignmentDto> dbRightAssignments = new ArrayList<>();
     try {
       dbRightAssignments = getRightAssignmentsFromDbResource(rightAssignmentsResource);
-      dbRightAssignments.stream().filter(
-          rightAssignmentDto -> rightAssignmentDto.getUserId()
-              .equals(UUID.fromString("f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0")))
-          .forEach(rs ->
-              XLOGGER.info("ra resource returned user {} right {} facility {} program {} node {}",
-                  rs.getUserId(), rs.getRightName(), rs.getFacilityId(), rs.getProgramId(),
-                  rs.getSupervisoryNodeId()));
     } catch (IOException ioe) {
       XLOGGER.warn("Error when getting right assignments: " + ioe.getMessage());
     }
