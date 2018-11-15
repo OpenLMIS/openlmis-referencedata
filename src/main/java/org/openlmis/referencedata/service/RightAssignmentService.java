@@ -33,6 +33,7 @@ import org.openlmis.referencedata.dto.RightAssignmentDto;
 import org.openlmis.referencedata.util.Resource2Db;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -78,23 +79,41 @@ public class RightAssignmentService {
   @Async("rightAssignmentTaskExecutor")
   @Transactional(isolation = Isolation.READ_COMMITTED)
   public Future<Void> regenerateRightAssignments() {
+    Profiler profiler = new Profiler("REGENERATE_RIGHT_ASSIGNMENTS");
+    profiler.setLogger(XLOGGER);
     XLOGGER.entry();
 
     // Drop existing rows; we are regenerating from scratch
-    XLOGGER.debug("Drop existing right assignments");
+    profiler.start("DROP_RIGHT_ASSIGNMENTS");
     template.update(DELETE_SQL);
 
+    template.query("SELECT * FROM referencedata.right_assignments;", (ResultSet rs) -> {
+      XLOGGER.info("right with userid {} exists after drop",
+          UUID.fromString(rs.getString("userid")));
+      XLOGGER.info("right with right {} exists after drop",
+          rs.getString("rightname"));
+    });
+
     // Get a right assignment matrix from database
-    XLOGGER.debug("Get intermediate right assignments from role assignments");
+    profiler.start("GET_INTERMEDIATE_RIGHT_ASSIGNMENTS");
     List<RightAssignmentDto> dbRightAssignments = new ArrayList<>();
     try {
       dbRightAssignments = getRightAssignmentsFromDbResource(rightAssignmentsResource);
+      dbRightAssignments.stream().filter(
+          rightAssignmentDto -> rightAssignmentDto.getUserId()
+              .equals(UUID.fromString("f72bf4ee-eb86-4bfd-be88-4f481f4e2fe0")))
+          .forEach(rs ->
+              XLOGGER.info("ra resource returned user {} right {} facility {} program {} node {}",
+                  rs.getUserId(), rs.getRightName(), rs.getFacilityId(), rs.getProgramId(),
+                  rs.getSupervisoryNodeId()));
     } catch (IOException ioe) {
       XLOGGER.warn("Error when getting right assignments: " + ioe.getMessage());
     }
 
+    profiler.start("RESOURCE_2_DB");
     Resource2Db r2db = new Resource2Db(template);
     try {
+      profiler.start("INSERT_INTO_DB");
       for (List partialRightAssignments : ListUtils.partition(dbRightAssignments, 100)) {
         insertFromDbRightAssignmentList(r2db, partialRightAssignments);
       }
@@ -103,6 +122,7 @@ public class RightAssignmentService {
     }
 
     XLOGGER.exit();
+    profiler.stop().log();
     return new AsyncResult<>(null);
   }
 
