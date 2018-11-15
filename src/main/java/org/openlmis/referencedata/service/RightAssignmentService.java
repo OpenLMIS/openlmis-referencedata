@@ -55,6 +55,8 @@ public class RightAssignmentService {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(RightAssignmentService.class);
 
+  private static final String USER_ID = "userid";
+  private static final String RIGHT_NAME = "rightname";
   private static final String RIGHT_ASSIGNMENTS_PATH = "classpath:db/right-assignments/";
 
   static final String DELETE_SQL = "DELETE FROM referencedata.right_assignments;";
@@ -89,9 +91,9 @@ public class RightAssignmentService {
 
     template.query("SELECT * FROM referencedata.right_assignments;", (ResultSet rs) -> {
       XLOGGER.info("right with userid {} exists after drop",
-          UUID.fromString(rs.getString("userid")));
+          UUID.fromString(rs.getString(USER_ID)));
       XLOGGER.info("right with right {} exists after drop",
-          rs.getString("rightname"));
+          rs.getString(RIGHT_NAME));
     });
 
     // Get a right assignment matrix from database
@@ -144,8 +146,8 @@ public class RightAssignmentService {
 
     // set column headers
     dataWithHeader.setLeft(Arrays.asList("id",
-        "userid",
-        "rightname",
+        USER_ID,
+        RIGHT_NAME,
         "facilityid",
         "programid"));
 
@@ -161,8 +163,8 @@ public class RightAssignmentService {
         (ResultSet rs, int rowNum) -> {
 
           RightAssignmentDto rightAssignmentMap = new RightAssignmentDto();
-          rightAssignmentMap.setUserId(UUID.fromString(rs.getString("userid")));
-          rightAssignmentMap.setRightName(rs.getString("rightname"));
+          rightAssignmentMap.setUserId(UUID.fromString(rs.getString(USER_ID)));
+          rightAssignmentMap.setRightName(rs.getString(RIGHT_NAME));
           if (null != rs.getString("facilityid")) {
             rightAssignmentMap.setFacilityId(UUID.fromString(rs.getString("facilityid")));
           }
