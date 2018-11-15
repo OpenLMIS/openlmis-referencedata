@@ -18,6 +18,7 @@ package org.openlmis.referencedata.repository.custom.impl;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
@@ -66,17 +68,23 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
   public Page<User> searchUsers(UserSearchParams searchParams, List<User> foundUsers,
       Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<User> query = builder.createQuery(User.class);
+
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-
-    query = prepareQuery(searchParams, foundUsers, query, false, pageable);
     countQuery = prepareQuery(searchParams, foundUsers, countQuery, true, pageable);
-
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
-    List<User> result = entityManager.createQuery(query)
-        .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
+    if (count == 0) {
+      return Pagination.getPage(Collections.emptyList());
+    }
+
+    CriteriaQuery<User> query = builder.createQuery(User.class);
+    query = prepareQuery(searchParams, foundUsers, query, false, pageable);
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+
+    List<User> result = entityManager
+        .createQuery(query)
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
         .getResultList();
 
     return Pagination.getPage(result, pageable, count);   
