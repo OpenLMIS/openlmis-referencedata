@@ -36,6 +36,9 @@ public abstract class SupplyPartnerMessageKeys extends MessageKeys {
   public static final String ERROR_ASSOCIATION_DUPLICATED = join(ERROR, ASSOCIATIONS, DUPLICATED);
   public static final String ERROR_GLOBAL_UNIQUE = join(ERROR, ASSOCIATIONS, "globalUnique");
 
+  public static final String ERROR_INVALID_SUPERVISORY_NODE =
+      join(ERROR, ASSOCIATIONS, SUPERVISORY_NODE, INVALID);
+
   public static final String ERROR_MISSING_FACILITIES =
       join(ERROR, ASSOCIATIONS, FACILITIES, MISSING);
   public static final String ERROR_INVALID_FACILITY =

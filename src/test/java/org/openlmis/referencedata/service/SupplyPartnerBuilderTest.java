@@ -293,6 +293,23 @@ public class SupplyPartnerBuilderTest {
   }
 
   @Test
+  public void shouldThrowExceptionIfSupervisoryNodeIsNotPartnerNodeOfRegularSupervisoryNode() {
+    SupervisoryNode newSupervisoryNode = new SupervisoryNodeDataBuilder().build();
+
+    SupplyPartnerAssociationDto association = importer.getAssociations().get(0);
+    association.setSupervisoryNode(newSupervisoryNode);
+
+    when(supervisoryNodeRepository.findOne(association.getSupervisoryNodeId()))
+        .thenReturn(newSupervisoryNode);
+
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupplyPartnerMessageKeys.ERROR_INVALID_SUPERVISORY_NODE);
+    exception.expectMessage(newSupervisoryNode.getCode());
+
+    builder.build(importer);
+  }
+
+  @Test
   public void shouldThrowExceptionIfFacilityIsNotRelatedToRegularSupervisoryNode() {
     Facility newFacility = new FacilityDataBuilder().build();
 

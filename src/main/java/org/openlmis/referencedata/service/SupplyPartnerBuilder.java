@@ -20,10 +20,12 @@ import static org.openlmis.referencedata.util.Pagination.NO_PAGINATION;
 import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_GLOBAL_UNIQUE;
 import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_INVALID_FACILITY;
 import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_INVALID_ORDERABLE;
+import static org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys.ERROR_INVALID_SUPERVISORY_NODE;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -149,7 +151,11 @@ public class SupplyPartnerBuilder
    */
   private void validateFacilities(Program program, SupervisoryNode supervisoryNode,
       Collection<Facility> facilities) {
-    SupervisoryNode regularNode = supervisoryNode.getPartnerNodeOf();
+    SupervisoryNode regularNode = Optional
+        .ofNullable(supervisoryNode.getPartnerNodeOf())
+        .orElseThrow(() -> new ValidationMessageException(
+            new Message(ERROR_INVALID_SUPERVISORY_NODE, supervisoryNode.getCode())));
+
     Set<Facility> supervisedFacilities = regularNode.getAllSupervisedFacilities(program);
 
     for (Facility facility : facilities) {
