@@ -28,7 +28,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -96,7 +95,7 @@ public class User extends BaseEntity {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   @DiffIgnore
-  @Getter(AccessLevel.PACKAGE)
+  @Getter
   private Set<RightAssignment> rightAssignments = new HashSet<>();
 
   private User(Importer importer) {
