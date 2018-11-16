@@ -193,11 +193,14 @@ public class UserController extends BaseController {
       assignRolesToUser(roleAssignmentDtos, userToSave);
     }
 
-    LOGGER.info("user with id {} has following right assignments {}", userToSave.getId(),
+    LOGGER.info("sent user with id {} has following right assignments {}", userToSave.getId(),
         userToSave.getRightAssignments());
 
     profiler.start("SAVE_USER");
-    userRepository.save(userToSave);
+    userToSave = userRepository.save(userToSave);
+
+    LOGGER.info("saved user with id {} has following right assignments {}", userToSave.getId(),
+        userToSave.getRightAssignments());
 
     profiler.start(PROFILER_TO_DTO);
     UserDto responseDto = exportUserToDto(userToSave);

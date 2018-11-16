@@ -36,12 +36,6 @@ public interface UserRepository extends
     UserRepositoryCustom,
     BaseAuditableRepository<User, UUID> {
 
-  @Override
-  <S extends User> S save(S entity);
-
-  @Override
-  <S extends User> Iterable<S> save(Iterable<S> entities);
-
   User findOneByUsernameIgnoreCase(@Param("username") String username);
 
   @Query(value = "SELECT u.*"

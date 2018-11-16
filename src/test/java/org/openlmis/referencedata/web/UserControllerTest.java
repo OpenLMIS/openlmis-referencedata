@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -186,9 +187,10 @@ public class UserControllerTest {
     warehouse1.setType(new FacilityType("warehouse"));
   }
 
-  public void preparePostOrPut() {
+  private void preparePostOrPut() {
     when(repository.findOne(userId)).thenReturn(user1);
     when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
+    when(repository.save(any(User.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
