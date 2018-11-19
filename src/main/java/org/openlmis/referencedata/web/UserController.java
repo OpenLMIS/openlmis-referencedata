@@ -649,6 +649,10 @@ public class UserController extends BaseController {
     profiler.start("GET_PERM_STRINGS_FROM_RIGHT_ASSIGNMENTS");
     Set<String> permissionStrings = rightAssignmentRepository.findByUser(userId);
 
+    User user = userRepository.findOne(userId);
+    XLOGGER.info("user {} found right assignments {}", userId, user.getRightAssignments());
+    XLOGGER.info("user {} permission strings", userId, permissionStrings);
+
     profiler.stop().log();
     XLOGGER.exit(permissionStrings);
     return ResponseEntity

@@ -991,6 +991,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
     given(userRepository.exists(userId)).willReturn(true);
+    given(userRepository.findOne(userId)).willReturn(user1);
     given(rightAssignmentRepository.findByUser(userId))
         .willReturn(Sets.newHashSet(ADMIN_RIGHT_NAME));
 
@@ -1011,6 +1012,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
     given(userRepository.exists(userId)).willReturn(true);
+    given(userRepository.findOne(userId)).willReturn(user1);
     given(rightAssignmentRepository.findByUser(userId))
         .willReturn(Sets.newHashSet(ADMIN_RIGHT_NAME));
 
