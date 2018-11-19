@@ -207,8 +207,8 @@ public class User extends BaseEntity {
    * Clears role and right assignments.
    */
   public void clearRoleAssignments() {
-    roleAssignments = new HashSet<>();
-    rightAssignments = new HashSet<>();
+    roleAssignments.clear();
+    rightAssignments.clear();
   }
 
   /**
