@@ -17,6 +17,8 @@ package org.openlmis.referencedata.domain;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,11 +27,13 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.testbuilder.DirectRoleAssignmentDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class UserTest {
 
   private static final String RIGHT_NAME = "right1";
@@ -202,6 +206,19 @@ public class UserTest {
     User newUser = User.newUser(importer);
 
     assertThat(newUser).isEqualToComparingFieldByField(user);
+  }
+
+  @Test
+  public void shouldCleanRoleAndRightAssignments() {
+    user.assignRoles(new DirectRoleAssignmentDataBuilder().withUser(user).build());
+
+    assertTrue(user.getRightAssignments().size() > 0);
+    assertTrue(user.getRoleAssignments().size() > 0);
+
+    user.clearRoleAssignments();
+
+    assertEquals(user.getRightAssignments().size(), 0);
+    assertEquals(user.getRoleAssignments().size(), 0);
   }
 
   private SupervisoryNode getSupervisoryHierarchy() {

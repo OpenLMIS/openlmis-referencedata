@@ -169,7 +169,8 @@ public class UserController extends BaseController {
     Profiler profiler = new Profiler("CREATE_USER");
     profiler.setLogger(LOGGER);
 
-    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userDto.getId(), profiler);
+    UUID userId = userDto.getId();
+    checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("VALIDATE_USER");
     userValidator.validate(userDto, bindingResult);
@@ -177,8 +178,17 @@ public class UserController extends BaseController {
       throw new ValidationMessageException(bindingResult.getFieldError().getDefaultMessage());
     }
 
-    profiler.start("CREATE_USER_FROM_DTO");
-    User userToSave = User.newUser(userDto);
+    User user;
+    profiler.start("USER_EXISTS_IN_DB_CHECK");
+    if (userId != null && userRepository.exists(userId)) {
+      profiler.start("GET_USER_FROM_DB");
+      user = userRepository.findOne(userId);
+      profiler.start("UPDATE_USER_FROM_DTO");
+      user.updateFrom(userDto);
+    } else {
+      profiler.start("CREATE_USER_FROM_DTO");
+      user = User.newUser(userDto);
+    }
 
     profiler.start("ASSIGN_ROLES_TO_USER");
     Set<RoleAssignmentDto> roleAssignmentDtos = userDto.getRoleAssignments();
@@ -190,20 +200,14 @@ public class UserController extends BaseController {
         throw new ValidationMessageException(UserMessageKeys.ERROR_ROLE_ID_NULL);
       }
 
-      assignRolesToUser(roleAssignmentDtos, userToSave);
+      assignRolesToUser(roleAssignmentDtos, user);
     }
 
-    LOGGER.info("sent user with id {} has following right assignments {}", userToSave.getId(),
-        userToSave.getRightAssignments());
-
     profiler.start("SAVE_USER");
-    userToSave = userRepository.save(userToSave);
-
-    LOGGER.info("saved user with id {} has following right assignments {}", userToSave.getId(),
-        userToSave.getRightAssignments());
+    user = userRepository.save(user);
 
     profiler.start(PROFILER_TO_DTO);
-    UserDto responseDto = exportUserToDto(userToSave);
+    UserDto responseDto = exportUserToDto(user);
 
     profiler.start("ADD_ROLE_ASSIGNMENTS_IDS_TO_RESPONSE");
     addRoleAssignmentIdsToUserDto(responseDto);
@@ -705,6 +709,7 @@ public class UserController extends BaseController {
 
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user) {
     LOGGER.debug("Assigning roles to user and saving");
+    user.clearRoleAssignments();
     for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
       RoleAssignment roleAssignment;
 

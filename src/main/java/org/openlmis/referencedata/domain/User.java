@@ -99,16 +99,7 @@ public class User extends BaseEntity {
   private Set<RightAssignment> rightAssignments = new HashSet<>();
 
   private User(Importer importer) {
-    id = importer.getId();
-    username = importer.getUsername();
-    firstName = importer.getFirstName();
-    lastName = importer.getLastName();
-    jobTitle = importer.getJobTitle();
-    timezone = importer.getTimezone();
-    homeFacilityId = importer.getHomeFacilityId();
-    active = importer.isActive();
-
-    extraData.updateFrom(importer.getExtraData());
+    updateFrom(importer);
   }
 
   /**
@@ -213,6 +204,14 @@ public class User extends BaseEntity {
   }
 
   /**
+   * Clears role and right assignments.
+   */
+  public void clearRoleAssignments() {
+    roleAssignments = new HashSet<>();
+    rightAssignments = new HashSet<>();
+  }
+
+  /**
    * Export this object to the specified exporter (DTO).
    *
    * @param exporter exporter to export to
@@ -230,6 +229,24 @@ public class User extends BaseEntity {
     extraData.export(exporter);
 
     exporter.setJobTitle(jobTitle);
+  }
+
+  /**
+   * Import data into this object from the specified importer (DTO).
+   *
+   * @param importer to import from
+   */
+  public void updateFrom(Importer importer) {
+    id = importer.getId();
+    username = importer.getUsername();
+    firstName = importer.getFirstName();
+    lastName = importer.getLastName();
+    jobTitle = importer.getJobTitle();
+    timezone = importer.getTimezone();
+    homeFacilityId = importer.getHomeFacilityId();
+    active = importer.isActive();
+
+    extraData.updateFrom(importer.getExtraData());
   }
 
   @Override
