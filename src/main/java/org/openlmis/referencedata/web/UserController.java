@@ -651,7 +651,7 @@ public class UserController extends BaseController {
 
     User user = userRepository.findOne(userId);
     XLOGGER.info("user {} found right assignments {}", userId, user.getRightAssignments());
-    XLOGGER.info("user {} permission strings", userId, permissionStrings);
+    XLOGGER.info("user {} permission strings {}", userId, permissionStrings);
 
     profiler.stop().log();
     XLOGGER.exit(permissionStrings);
