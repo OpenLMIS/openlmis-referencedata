@@ -203,8 +203,18 @@ public class UserController extends BaseController {
       assignRolesToUser(roleAssignmentDtos, user);
     }
 
+    XLOGGER.info("sent user with id {} has following right assignments {}", user.getId(),
+        user.getRightAssignments());
+    XLOGGER.info("sent user with id {} has following role assignments {}", user.getId(),
+        user.getRoleAssignments());
+
     profiler.start("SAVE_USER");
     user = userRepository.save(user);
+
+    XLOGGER.info("saved user with id {} has following right assignments {}", user.getId(),
+        user.getRightAssignments());
+    XLOGGER.info("saved user with id {} has following role assignments {}", user.getId(),
+        user.getRoleAssignments());
 
     profiler.start(PROFILER_TO_DTO);
     UserDto responseDto = exportUserToDto(user);
