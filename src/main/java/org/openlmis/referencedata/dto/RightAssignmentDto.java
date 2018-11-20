@@ -15,9 +15,9 @@
 
 package org.openlmis.referencedata.dto;
 
-import java.util.Objects;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,7 +32,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RightAssignmentDto extends BaseDto {
+@EqualsAndHashCode
+public class RightAssignmentDto {
   
   private UUID userId;
   private String rightName;
@@ -74,25 +75,5 @@ public class RightAssignmentDto extends BaseDto {
     columns[3] = facilityId != null ? facilityId.toString() : null;
     columns[4] = programId != null ? programId.toString() : null;
     return columns;
-  }
-  
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof RightAssignmentDto)) {
-      return false;
-    }
-    RightAssignmentDto that = (RightAssignmentDto) obj;
-    return Objects.equals(userId, that.userId)
-        && Objects.equals(rightName, that.rightName)
-        && Objects.equals(facilityId, that.facilityId)
-        && Objects.equals(programId, that.programId);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(userId, rightName, facilityId, programId);
   }
 }

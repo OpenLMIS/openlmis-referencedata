@@ -203,18 +203,8 @@ public class UserController extends BaseController {
       assignRolesToUser(roleAssignmentDtos, user);
     }
 
-    XLOGGER.info("sent user with id {} has following right assignments {}", user.getId(),
-        user.getRightAssignments());
-    XLOGGER.info("sent user with id {} has following role assignments {}", user.getId(),
-        user.getRoleAssignments());
-
     profiler.start("SAVE_USER");
     user = userRepository.save(user);
-
-    XLOGGER.info("saved user with id {} has following right assignments {}", user.getId(),
-        user.getRightAssignments());
-    XLOGGER.info("saved user with id {} has following role assignments {}", user.getId(),
-        user.getRoleAssignments());
 
     profiler.start(PROFILER_TO_DTO);
     UserDto responseDto = exportUserToDto(user);
@@ -658,11 +648,6 @@ public class UserController extends BaseController {
 
     profiler.start("GET_PERM_STRINGS_FROM_RIGHT_ASSIGNMENTS");
     Set<String> permissionStrings = rightAssignmentRepository.findByUser(userId);
-
-    User user = userRepository.findOne(userId);
-    XLOGGER.info("user {} found right assignments {}", userId, user.getRightAssignments());
-    XLOGGER.info("user {} found role assignments {}", userId, user.getRoleAssignments());
-    XLOGGER.info("user {} permission strings {}", userId, permissionStrings);
 
     profiler.stop().log();
     XLOGGER.exit(permissionStrings);
