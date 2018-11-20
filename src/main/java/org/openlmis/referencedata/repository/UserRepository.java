@@ -26,13 +26,13 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public interface UserRepository extends
-    PagingAndSortingRepository<User, UUID>,
+    JpaRepository<User, UUID>,
     UserRepositoryCustom,
     BaseAuditableRepository<User, UUID> {
 
