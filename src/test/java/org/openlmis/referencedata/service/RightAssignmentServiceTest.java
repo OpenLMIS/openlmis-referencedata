@@ -75,7 +75,7 @@ public class RightAssignmentServiceTest {
 
     // when
     Set<RightAssignmentDto> actual = rightAssignmentService
-        .convertForInsert(Collections.singletonList(expected), null);
+        .convertForInsert(Collections.singleton(expected), null);
 
     // then
     assertEquals(1, actual.size());
@@ -109,7 +109,7 @@ public class RightAssignmentServiceTest {
     
     // when
     Set<RightAssignmentDto> actual = rightAssignmentService
-        .convertForInsert(Collections.singletonList(rightAssignmentDto), resource);
+        .convertForInsert(Collections.singleton(rightAssignmentDto), resource);
 
     // then
     assertEquals(2, actual.size());

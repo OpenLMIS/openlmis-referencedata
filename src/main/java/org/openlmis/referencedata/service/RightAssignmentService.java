@@ -101,8 +101,12 @@ public class RightAssignmentService {
     profiler.start("RESOURCE_2_DB");
     Resource2Db r2db = new Resource2Db(template);
     try {
+      profiler.start("CHANGE_SUPERVISORY_NODES_TO_FACILITIES_IN_RIGHT_ASSIGNMENTS");
+      Set<RightAssignmentDto> rightAssignmentsToInsert = convertForInsert(dbRightAssignments,
+          supervisedFacilitiesResource);
+
       profiler.start("INSERT_INTO_DB");
-      for (List partialRightAssignments : Iterables.partition(dbRightAssignments, 100)) {
+      for (List partialRightAssignments : Iterables.partition(rightAssignmentsToInsert, 100)) {
         insertFromDbRightAssignmentList(r2db, partialRightAssignments);
       }
     } catch (IOException ioe) {
@@ -117,16 +121,10 @@ public class RightAssignmentService {
   private void insertFromDbRightAssignmentList(Resource2Db resource2Db,
       List<RightAssignmentDto> rightAssignmentDtos)
       throws IOException {
-
-    // Convert matrix to a set of right assignments to insert
-    XLOGGER.debug("Convert intermediate right assignments to right assignments for insert");
-    Set<RightAssignmentDto> rightAssignmentsToInsert = convertForInsert(rightAssignmentDtos,
-        supervisedFacilitiesResource);
-
     // Convert set of right assignments to insert to a set of SQL inserts
     XLOGGER.debug("Convert right assignments to SQL inserts");
     MutablePair dataWithHeader = new MutablePair<List<String>, List<Object[]>>();
-    dataWithHeader.setRight(rightAssignmentsToInsert.stream()
+    dataWithHeader.setRight(rightAssignmentDtos.stream()
         .map(rad -> rad.toColumnArray())
         .collect(Collectors.toList()));
 
@@ -166,7 +164,7 @@ public class RightAssignmentService {
     );
   }
 
-  Set<RightAssignmentDto> convertForInsert(List<RightAssignmentDto> rightAssignments,
+  Set<RightAssignmentDto> convertForInsert(Set<RightAssignmentDto> rightAssignments,
       Resource supervisedFacilitiesResource)
       throws IOException {
     Set<RightAssignmentDto> rightAssignmentsToInsert = new HashSet<>();
