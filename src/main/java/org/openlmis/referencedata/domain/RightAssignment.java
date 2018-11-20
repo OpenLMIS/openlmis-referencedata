@@ -21,13 +21,15 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
-@Table(name = "right_assignments")
+@Table(name = "right_assignments", uniqueConstraints =
+    @UniqueConstraint(columnNames = {"userid", "rightName", "facilityId", "programId"}))
 @NoArgsConstructor
 @TypeName("RightAssignment")
 @EqualsAndHashCode(of = {"rightName", "facilityId", "programId"}, callSuper = false)
