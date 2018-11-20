@@ -15,11 +15,11 @@
 
 package org.openlmis.referencedata.service;
 
+import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.openlmis.referencedata.dto.RightAssignmentDto;
 import org.openlmis.referencedata.util.Resource2Db;
@@ -68,7 +67,7 @@ public class RightAssignmentService {
   private Resource supervisedFacilitiesResource;
 
   @Autowired
-  JdbcTemplate template;
+  private JdbcTemplate template;
 
   /**
    * Re-generates right assignments. This operation needs to be transactional so that dropping 
@@ -91,9 +90,10 @@ public class RightAssignmentService {
 
     // Get a right assignment matrix from database
     profiler.start("GET_INTERMEDIATE_RIGHT_ASSIGNMENTS");
-    List<RightAssignmentDto> dbRightAssignments = new ArrayList<>();
+    Set<RightAssignmentDto> dbRightAssignments = new HashSet<>();
     try {
-      dbRightAssignments = getRightAssignmentsFromDbResource(rightAssignmentsResource);
+      dbRightAssignments =
+          new HashSet<>(getRightAssignmentsFromDbResource(rightAssignmentsResource));
     } catch (IOException ioe) {
       XLOGGER.warn("Error when getting right assignments: " + ioe.getMessage());
     }
@@ -102,7 +102,7 @@ public class RightAssignmentService {
     Resource2Db r2db = new Resource2Db(template);
     try {
       profiler.start("INSERT_INTO_DB");
-      for (List partialRightAssignments : ListUtils.partition(dbRightAssignments, 100)) {
+      for (List partialRightAssignments : Iterables.partition(dbRightAssignments, 100)) {
         insertFromDbRightAssignmentList(r2db, partialRightAssignments);
       }
     } catch (IOException ioe) {
