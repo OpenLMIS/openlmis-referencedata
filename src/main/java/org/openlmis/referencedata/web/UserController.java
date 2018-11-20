@@ -209,8 +209,7 @@ public class UserController extends BaseController {
         user.getRoleAssignments());
 
     profiler.start("SAVE_USER");
-    user = userRepository.saveAndFlush(user);
-    user = userRepository.findOne(user.getId());
+    user = userRepository.save(user);
 
     XLOGGER.info("saved user with id {} has following right assignments {}", user.getId(),
         user.getRightAssignments());
