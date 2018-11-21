@@ -119,8 +119,7 @@ public class RightAssignmentService {
   }
 
   private void insertFromDbRightAssignmentList(Resource2Db resource2Db,
-      List<RightAssignmentDto> rightAssignmentDtos)
-      throws IOException {
+      List<RightAssignmentDto> rightAssignmentDtos) {
     // Convert set of right assignments to insert to a set of SQL inserts
     XLOGGER.debug("Convert right assignments to SQL inserts");
     MutablePair dataWithHeader = new MutablePair<List<String>, List<Object[]>>();
