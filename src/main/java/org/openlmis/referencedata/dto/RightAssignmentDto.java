@@ -32,7 +32,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "supervisoryNodeId")
 public class RightAssignmentDto {
   
   private UUID userId;
