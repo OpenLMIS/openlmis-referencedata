@@ -19,6 +19,7 @@ public abstract class ProcessingPeriodMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, PROCESSING_PERIOD);
   private static final String START_DATE = "startDate";
   private static final String END_DATE = "endDate";
+  private static final String PROCESSING_SCHEDULE = "processingSchedule";
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_START_DATE_NULL = join(ERROR, START_DATE, NULL);
@@ -32,4 +33,5 @@ public abstract class ProcessingPeriodMessageKeys extends MessageKeys {
   public static final String ERROR_INVALID_SORTING_COLUMN = join(ERROR, "invalidSortingColumn");
   public static final String ERROR_SCHEDULE_ID_SINGLE_PARAMETER =
       join(ERROR, PROCESSING_SCHEDULE, ID, "singleParameter");
+  public static final String ERROR_SCHEDULE_NULL = join(ERROR, PROCESSING_SCHEDULE, NULL);
 }

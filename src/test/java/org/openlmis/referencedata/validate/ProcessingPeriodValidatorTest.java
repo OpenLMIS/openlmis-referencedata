@@ -54,6 +54,7 @@ public class ProcessingPeriodValidatorTest {
 
   private static final String START_DATE = "startDate";
   private static final String END_DATE = "endDate";
+  private static final String PROCESSING_SCHEDULE = "processingSchedule";
 
   private ProcessingPeriod processingPeriod;
   private Errors errors;
@@ -64,6 +65,15 @@ public class ProcessingPeriodValidatorTest {
     processingPeriod = initiateProcessingPeriod();
 
     errors = new BeanPropertyBindingResult(processingPeriod, "processingPeriod");
+  }
+
+  @Test
+  public void shouldRejectPeriodWithEmptyProcessingSchedule() {
+    processingPeriod.setProcessingSchedule(null);
+    validator.validate(processingPeriod, errors);
+    assertTrue(errors.hasErrors());
+    assertEquals(1, errors.getErrorCount());
+    assertErrorMessage(errors,PROCESSING_SCHEDULE, ProcessingPeriodMessageKeys.ERROR_SCHEDULE_NULL);
   }
 
   @Test
@@ -128,14 +138,13 @@ public class ProcessingPeriodValidatorTest {
     ProcessingPeriod savedProcessingPeriod = initiateProcessingPeriod();
     when(processingPeriodRepository.findOne(processingPeriod.getId()))
         .thenReturn(savedProcessingPeriod);
-
+    processingPeriod.setProcessingSchedule(processingSchedule);
     validator.validate(processingPeriod, errors);
 
     assertTrue(errors.hasErrors());
-    assertEquals(4, errors.getErrorCount());
+    assertEquals(3, errors.getErrorCount());
     assertErrorMessage(errors, START_DATE, ValidationMessageKeys.ERROR_IS_INVARIANT);
     assertErrorMessage(errors, END_DATE, ValidationMessageKeys.ERROR_IS_INVARIANT);
-    assertErrorMessage(errors, "processingSchedule", ValidationMessageKeys.ERROR_IS_INVARIANT);
     assertErrorMessage(errors, "durationInMonths", ValidationMessageKeys.ERROR_IS_INVARIANT);
   }
 

@@ -43,6 +43,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
   * Made that the facility code is unique case insensitive
 * [OLMIS-5627](https://openlmis.atlassian.net/browse/OLMIS-5627): Fixed problem with updating a supervisory node
 * [OLMIS-5007](https://openlmis.atlassian.net/browse/OLMIS-5007): Marked `GET /api/facilities/supplying` endpoint as deprecated
+* [OLMIS-4948](https://openlmis.atlassian.net/browse/OLMIS-4948): Fixed Internal server error by adding processing schedule message
 
 11.0.0 / 2018-08-16
 ===================
