@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -90,10 +91,9 @@ public class RightAssignmentService {
 
     // Get a right assignment matrix from database
     profiler.start("GET_INTERMEDIATE_RIGHT_ASSIGNMENTS");
-    Set<RightAssignmentDto> dbRightAssignments = new HashSet<>();
+    List<RightAssignmentDto> dbRightAssignments = new ArrayList<>();
     try {
-      dbRightAssignments =
-          new HashSet<>(getRightAssignmentsFromDbResource(rightAssignmentsResource));
+      dbRightAssignments = getRightAssignmentsFromDbResource(rightAssignmentsResource);
     } catch (IOException ioe) {
       XLOGGER.warn("Error when getting right assignments: " + ioe.getMessage());
     }
@@ -163,7 +163,7 @@ public class RightAssignmentService {
     );
   }
 
-  Set<RightAssignmentDto> convertForInsert(Set<RightAssignmentDto> rightAssignments,
+  Set<RightAssignmentDto> convertForInsert(List<RightAssignmentDto> rightAssignments,
       Resource supervisedFacilitiesResource)
       throws IOException {
     Set<RightAssignmentDto> rightAssignmentsToInsert = new HashSet<>();
