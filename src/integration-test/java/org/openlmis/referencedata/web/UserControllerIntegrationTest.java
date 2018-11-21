@@ -365,6 +365,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     when(userRepository.save(any(User.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(userRepository.saveAndFlush(any(User.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
 
     UserDto userDto = new UserDto();
 
@@ -815,6 +817,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     when(roleAssignmentRepository.findByUser(any(UUID.class))).thenReturn(Collections.emptySet());
     when(userRepository.save(any(User.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(userRepository.saveAndFlush(any(User.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
 
     User user = generateUser();
     UserDto userDto = new UserDto();
@@ -846,6 +850,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
     when(roleAssignmentRepository.findByUser(any(UUID.class))).thenReturn(Collections.emptySet());
     when(userRepository.save(any(User.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(userRepository.saveAndFlush(any(User.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
 
     User newUser = generateUser();

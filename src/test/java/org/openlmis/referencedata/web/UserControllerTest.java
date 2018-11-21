@@ -191,6 +191,8 @@ public class UserControllerTest {
     when(repository.findOne(userId)).thenReturn(user1);
     when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
     when(repository.save(any(User.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(repository.saveAndFlush(any(User.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test

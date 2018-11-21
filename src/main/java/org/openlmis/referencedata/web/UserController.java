@@ -200,6 +200,12 @@ public class UserController extends BaseController {
         throw new ValidationMessageException(UserMessageKeys.ERROR_ROLE_ID_NULL);
       }
 
+      // hibernate is first adding new assignments and then deleting duplicates
+      // which violates unique constraint on right_assignment table
+      // that is why we clear collections first and then use flush
+      user.clearRoleAssignments();
+      user = userRepository.saveAndFlush(user);
+
       assignRolesToUser(roleAssignmentDtos, user);
     }
 
@@ -709,7 +715,6 @@ public class UserController extends BaseController {
 
   private void assignRolesToUser(Set<RoleAssignmentDto> roleAssignmentDtos, User user) {
     LOGGER.debug("Assigning roles to user and saving");
-    user.clearRoleAssignments();
     for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
       RoleAssignment roleAssignment;
 
