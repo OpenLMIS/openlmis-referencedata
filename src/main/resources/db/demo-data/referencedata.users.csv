@@ -202,9 +202,9 @@ ffa9e2fc-9d8a-41ee-94a7-a5ed3f1166bf,NIA242,test177@test.com,Antelmo,Vargas,fals
 4ea74c62-401c-45fb-9ad0-c1c0b5b917ba,NIA254,test179@test.com,Abel,Coelho,false,false,true,adf1b735-f1b7-45b3-ae19-bddee068d7ac,
 b1d0f754-9f33-4611-b87f-fd3d15f75b16,NIA255,test180@test.com,Assuneelo,Lobo,false,false,true,e9a5f518-064e-4c24-98e7-0649b3399020,
 e78efd8f-03fd-46a7-9023-cbcd96df985e,NIA285,test189@test.com,earico,Mata,false,false,true,0df9060c-6b41-466e-84cc-f5503c979637,
-bc8ae4c4-6fed-4b99-9855-352d137dc93e,dmullord0,dmullord0@engadget.com,Deane,Mullord,true,false,true,,PDT
-320f2127-dc2a-4761-a0ce-2258dfe55aec,rderuggiero1,rderuggiero1@feedburner.com,Roi,De Ruggiero,false,false,false,,CET
-747f3592-1b41-4f4b-a5ec-9604614b3082,pbirdwhistle2,pbirdwhistle2@ca.gov,Paige,Birdwhistle,true,true,true,,PDT
+bc8ae4c4-6fed-4b99-9855-352d137dc93e,reporter1,dmullord0@engadget.com,Deane,Mullord,true,false,true,,PDT
+320f2127-dc2a-4761-a0ce-2258dfe55aec,reporter2,rderuggiero1@feedburner.com,Roi,De Ruggiero,false,false,false,,CET
+747f3592-1b41-4f4b-a5ec-9604614b3082,reporter3,pbirdwhistle2@ca.gov,Paige,Birdwhistle,true,true,true,,PDT
 6fedf618-049f-481a-a903-419627164739,ehowlin3,ehowlin3@meetup.com,Esra,Howlin,false,true,true,,PST
 dfa1c2a3-5ef2-40c8-bec6-0256ba32e7eb,pashborne4,pashborne4@altervista.org,Pooh,Ashborne,false,false,false,,PDT
 4eff1be4-79b2-434e-af96-ab8c3f7bcbf2,mtowey5,mtowey5@weather.com,May,Towey,true,true,true,,CET
