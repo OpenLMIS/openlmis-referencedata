@@ -33,7 +33,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class RightAssignmentDto {
+public final class RightAssignmentDto {
   
   private UUID userId;
   private String rightName;
