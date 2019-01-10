@@ -16,12 +16,17 @@
 package org.openlmis.referencedata;
 
 import org.togglz.core.Feature;
+import org.togglz.core.annotation.EnabledByDefault;
 import org.togglz.core.annotation.Label;
 import org.togglz.core.context.FeatureContext;
 
 public enum AvailableFeatures implements Feature {
   @Label("Your secret is safe with me")
-  SECRET_MESSAGE;
+  SECRET_MESSAGE,
+
+  @EnabledByDefault
+  @Label("Splitting requisitions for multiple suppliers")
+  REQUISITION_SPLIT;
 
   public boolean isActive() {
     return FeatureContext.getFeatureManager().isActive(this);
