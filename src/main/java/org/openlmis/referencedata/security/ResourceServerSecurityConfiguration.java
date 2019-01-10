@@ -93,7 +93,8 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
             "/health",
             "/referencedata/docs/**",
             "/localeSettings",
-            "/togglz-console/**"
+            "/togglz-console/**",
+            "/togglz"
         ).permitAll()
         .antMatchers("/**").fullyAuthenticated();
   }
