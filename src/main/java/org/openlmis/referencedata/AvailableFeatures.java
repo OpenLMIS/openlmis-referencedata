@@ -25,8 +25,8 @@ public enum AvailableFeatures implements Feature {
   SECRET_MESSAGE,
 
   @EnabledByDefault
-  @Label("Splitting requisitions for multiple suppliers")
-  REQUISITION_SPLIT;
+  @Label("Multiple suppliers")
+  MULTIPLE_SUPPLIERS;
 
   public boolean isActive() {
     return FeatureContext.getFeatureManager().isActive(this);
