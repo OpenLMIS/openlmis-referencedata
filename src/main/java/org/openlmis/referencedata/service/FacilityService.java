@@ -110,7 +110,7 @@ public class FacilityService {
     if (isEmpty(extraData)
         && isAllEmpty(code, name, facilityTypeCode)
         && null == zoneId) {
-      return facilityRepository.findAll();
+      return facilityRepository.findAllByOrderByNameAsc();
     }
 
     // find zone if given

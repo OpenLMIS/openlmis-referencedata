@@ -1,3 +1,9 @@
+12.0.1 / WIP
+==================
+
+Improvements:
+*[OLMIS-5527](https://openlmis.atlassian.net/browse/OLMIS-5527): On facility list screen, sort facility by name
+
 12.0.0 / 2018-12-12
 ===================
 

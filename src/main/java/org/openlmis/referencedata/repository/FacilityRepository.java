@@ -33,6 +33,8 @@ public interface FacilityRepository
     extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom,
     BaseAuditableRepository<Facility, UUID> {
 
+  List<Facility> findAllByOrderByNameAsc();
+
   @Query(value = "SELECT f.*"
       + " FROM referencedata.facilities f"
       + " WHERE ST_Covers(:boundary, f.location)",

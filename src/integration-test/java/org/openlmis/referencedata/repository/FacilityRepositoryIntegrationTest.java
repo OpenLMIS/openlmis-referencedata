@@ -160,6 +160,22 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
+  public void shouldFindAndSortFacilityByFacilityName() {
+    facility1.setName("Facility - z");
+    facility.setName("Facility - A");
+
+    repository.save(facility1);
+    repository.save(facility);
+
+    List<Facility> searchedAndSortedFacility = repository
+            .search(null, "Facility", null, null, null, false);
+
+    assertEquals(searchedAndSortedFacility.size(), 2);
+    assertEquals(searchedAndSortedFacility.get(0).getName(), facility.getName());
+    assertEquals(searchedAndSortedFacility.get(1).getName(), facility1.getName());
+  }
+
+  @Test
   public void shouldFindFacilitiesByFacilityType() {
     // given
     FacilityType anotherType = new FacilityTypeDataBuilder().buildAsNew();

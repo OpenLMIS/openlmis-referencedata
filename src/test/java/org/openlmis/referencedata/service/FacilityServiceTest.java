@@ -97,19 +97,19 @@ public class FacilityServiceTest {
 
   @Test
   public void shouldReturnAllIfZoneCodeAndNameNotProvidedForSearch() {
-    when(facilityRepository.findAll()).thenReturn(facilityList);
+    when(facilityRepository.findAllByOrderByNameAsc()).thenReturn(facilityList);
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(RECURSE, false);
     List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params));
 
-    verify(facilityRepository).findAll();
+    verify(facilityRepository).findAllByOrderByNameAsc();
     assertEquals(facilityList, actual);
   }
 
   @Test(expected = ValidationMessageException.class)
   public void shouldOnlyThrowValidationExceptionIfQueryMapCantBeParsed() {
-    when(facilityRepository.findAll()).thenReturn(facilityList);
+    when(facilityRepository.findAllByOrderByNameAsc()).thenReturn(facilityList);
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(CODE, "-1");
@@ -206,11 +206,11 @@ public class FacilityServiceTest {
 
   @Test
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
-    when(facilityRepository.findAll()).thenReturn(facilityList);
+    when(facilityRepository.findAllByOrderByNameAsc()).thenReturn(facilityList);
 
     List<Facility> actual = facilityService
         .searchFacilities(new FacilitySearchParams(new LinkedMultiValueMap<>()));
-    verify(facilityRepository).findAll();
+    verify(facilityRepository).findAllByOrderByNameAsc();
     assertEquals(facilityList, actual);
   }
 

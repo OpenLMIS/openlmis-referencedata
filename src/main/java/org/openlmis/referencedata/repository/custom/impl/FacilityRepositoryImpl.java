@@ -48,7 +48,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       + " INNER JOIN FETCH f.type AS t"
       + " LEFT OUTER JOIN FETCH f.operator AS o"
       + " LEFT OUTER JOIN FETCH f.supportedPrograms AS sp"
-      + " WHERE f.id in (:ids)";
+      + " WHERE f.id in (:ids) ORDER BY f.name";
 
   private static final String WHERE = "WHERE";
   private static final String OR = " OR ";
@@ -113,15 +113,15 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
     String query = Joiner.on(' ').join(sql);
 
-    Query nativeQuary = entityManager.createNativeQuery(query);
-    params.forEach(nativeQuary::setParameter);
+    Query nativeQuery = entityManager.createNativeQuery(query);
+    params.forEach(nativeQuery::setParameter);
 
-    SQLQuery sqlQuery = nativeQuary.unwrap(SQLQuery.class);
+    SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
     sqlQuery.addScalar("ID", PostgresUUIDType.INSTANCE);
 
     // appropriate scalar is added to native query
     @SuppressWarnings("unchecked")
-    List<UUID> ids = nativeQuary.getResultList();
+    List<UUID> ids = nativeQuery.getResultList();
 
     if (isEmpty(ids)) {
       return Collections.emptyList();
