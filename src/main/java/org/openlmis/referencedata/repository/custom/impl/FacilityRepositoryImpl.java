@@ -22,7 +22,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,10 +32,16 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
@@ -48,11 +56,15 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       + " INNER JOIN FETCH f.type AS t"
       + " LEFT OUTER JOIN FETCH f.operator AS o"
       + " LEFT OUTER JOIN FETCH f.supportedPrograms AS sp"
-      + " WHERE f.id in (:ids) ORDER BY f.name";
+      + " WHERE f.id in (:ids)";
 
   private static final String WHERE = "WHERE";
   private static final String OR = " OR ";
   private static final String AND = " AND ";
+  private static final String DEFAULT_SORT = "f.name ASC";
+  private static final String ASC = "ASC";
+  private static final String DESC = "DESC";
+  private static final String ORDER_BY = "ORDER BY";
 
   private static final String WITH_CODE = "UPPER(f.code) LIKE :code";
   private static final String WITH_NAME = "UPPER(f.name) LIKE :name";
@@ -74,8 +86,9 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * @param extraData         extra data
    * @return List of Facilities matching the parameters.
    */
-  public List<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
-                               String facilityTypeCode, String extraData, Boolean conjunction) {
+  public Page<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
+                               String facilityTypeCode, String extraData,
+                               Boolean conjunction, Pageable pageable) {
     List<String> sql = Lists.newArrayList(NATIVE_SELECT_BY_PARAMS);
     List<String> where = Lists.newArrayList();
     Map<String, Object> params = Maps.newHashMap();
@@ -123,13 +136,47 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     @SuppressWarnings("unchecked")
     List<UUID> ids = nativeQuery.getResultList();
 
+    Integer count = ids.size();
+
     if (isEmpty(ids)) {
-      return Collections.emptyList();
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
-    return entityManager
-        .createQuery(HQL_SELECT_BY_IDS, Facility.class)
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+
+    String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(HQL_SELECT_BY_IDS, ORDER_BY,
+            getOrderPredicate(pageable)));
+
+    List<Facility> facilities =  entityManager
+        .createQuery(hqlWithSort, Facility.class)
         .setParameter("ids", ids)
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
         .getResultList();
+
+    return Pagination.getPage(facilities, pageable, count);
+  }
+
+  private String getOrderPredicate(Pageable pageable) {
+    if (pageable.getSort() != null) {
+      List<String> orderPredicate = new ArrayList<String>();
+      List<String> sql = new ArrayList<String>();
+      Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+      Sort.Order order;
+      Sort.Direction sortDirection = Sort.Direction.ASC;
+
+      while (iterator.hasNext()) {
+        order = iterator.next();
+        orderPredicate.add("f.".concat(order.getProperty()));
+        sortDirection = order.getDirection();
+      }
+
+      sql.add(Joiner.on(",").join(orderPredicate));
+      sql.add(sortDirection.isAscending() ? ASC : DESC);
+
+      return Joiner.on(' ').join(sql);
+    }
+
+    return DEFAULT_SORT;
   }
 }

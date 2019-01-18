@@ -15,13 +15,15 @@
 
 package org.openlmis.referencedata.repository.custom;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface FacilityRepositoryCustom {
 
-  List<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
-                        String facilityTypeCode, String extraData, Boolean conjunction);
+  Page<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
+                        String facilityTypeCode, String extraData,
+                        Boolean conjunction, Pageable pageable);
 }

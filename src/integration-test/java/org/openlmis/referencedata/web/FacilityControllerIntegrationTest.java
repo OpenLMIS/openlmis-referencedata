@@ -112,6 +112,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
       new Coordinate(0, 2),
       new Coordinate(0, 0)
   };
+  private PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE);
 
   @Before
   @Override
@@ -254,9 +255,10 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
+    Page page = Pagination.getPage(listToReturn, pageable, 1);
     given(facilityService.searchFacilities(
-        new FacilitySearchParams(map)))
-        .willReturn(listToReturn);
+        new FacilitySearchParams(map), pageable))
+        .willReturn(page);
 
     PageImplRepresentation response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -299,8 +301,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityService.searchFacilities(new FacilitySearchParams(map)))
-        .willReturn(listToReturn);
+    Page page = Pagination.getPage(listToReturn, pageable, 1);
+    given(facilityService.searchFacilities(new FacilitySearchParams(map), pageable))
+        .willReturn(page);
 
     PageImplRepresentation response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -320,7 +323,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnBadRequestWhenSearchThrowsException() {
     // given
-    given(facilityService.searchFacilities(any())).willThrow(
+    given(facilityService.searchFacilities(any(), any())).willThrow(
         new ValidationMessageException("somethingWrong"));
 
     // when
@@ -364,8 +367,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<Facility> listToReturn = new ArrayList<>();
     listToReturn.add(facility);
-    given(facilityService.searchFacilities(new FacilitySearchParams(requestBody)))
-        .willReturn(listToReturn);
+    Page page = Pagination.getPage(listToReturn, pageable, 1);
+    given(facilityService.searchFacilities(new FacilitySearchParams(requestBody), pageable))
+        .willReturn(page);
 
     PageImplRepresentation response = restAssured.given()
         .queryParam("page", 0)

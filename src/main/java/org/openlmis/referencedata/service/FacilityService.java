@@ -22,12 +22,13 @@ import static org.apache.commons.lang3.StringUtils.isAllEmpty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import java.util.Collections;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -42,6 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
@@ -87,7 +91,10 @@ public class FacilityService {
       return facilityRepository.findAll(ids);
     }
 
-    return searchFacilities(new FacilitySearchParams(queryMap));
+    PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE);
+    Page page = this.searchFacilities(new FacilitySearchParams(queryMap), pageable);
+
+    return page.hasContent() ? page.getContent() : new ArrayList<>();
   }
 
   /**
@@ -98,7 +105,7 @@ public class FacilityService {
    *               May be null or empty
    * @return List of facilities. All facilities will be returned when map is null or empty
    */
-  public List<Facility> searchFacilities(FacilitySearchParams params) {
+  public Page<Facility> searchFacilities(FacilitySearchParams params, Pageable pageable) {
     final String code = params.getCode();
     final String name = params.getName();
     final String facilityTypeCode = params.getFacilityTypeCode();
@@ -110,7 +117,7 @@ public class FacilityService {
     if (isEmpty(extraData)
         && isAllEmpty(code, name, facilityTypeCode)
         && null == zoneId) {
-      return facilityRepository.findAllByOrderByNameAsc();
+      return facilityRepository.findAll(pageable);
     }
 
     // find zone if given
@@ -123,16 +130,16 @@ public class FacilityService {
       throw new ValidationMessageException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     }
 
-    List<Facility> facilities = findFacilities(
-        zoneId, code, name, facilityTypeCode, extraData, recurse
+    Page<Facility> facilities = findFacilities(
+        zoneId, code, name, facilityTypeCode, extraData, recurse, pageable
     );
 
-    return Optional.ofNullable(facilities).orElse(Collections.emptyList());
+    return facilities;
   }
 
-  private List<Facility> findFacilities(UUID zone, String code, String name,
+  private Page<Facility> findFacilities(UUID zone, String code, String name,
                                         String facilityTypeCode, Map extraData,
-                                        boolean recurse) {
+                                        boolean recurse, Pageable pageable) {
     Set<UUID> zones = Sets.newHashSet();
 
     if (null != zone) {
@@ -155,7 +162,7 @@ public class FacilityService {
     }
 
     return facilityRepository.search(code, name, zones, facilityTypeCode, extraDataString,
-        BooleanUtils.toBoolean(facilitySearchConjunction));
+        BooleanUtils.toBoolean(facilitySearchConjunction), pageable);
   }
 
 }

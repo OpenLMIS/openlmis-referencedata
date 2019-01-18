@@ -33,7 +33,7 @@ public interface FacilityRepository
     extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom,
     BaseAuditableRepository<Facility, UUID> {
 
-  List<Facility> findAllByOrderByNameAsc();
+  Page<Facility> findAll(Pageable pageable);
 
   @Query(value = "SELECT f.*"
       + " FROM referencedata.facilities f"

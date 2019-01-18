@@ -42,7 +42,10 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.web.FacilitySearchParams;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -58,6 +61,7 @@ public class FacilityServiceTest {
   private static final String FACILITY_NAME = "Facility";
   private static final String FACILITY_TYPE = "facility-type";
   private static final String FACILITY_CODE = "FAC1";
+
 
   @Mock
   private GeographicZoneRepository geographicZoneRepository;
@@ -87,6 +91,8 @@ public class FacilityServiceTest {
   @InjectMocks
   private FacilityService facilityService = new FacilityService();
 
+  private PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE);
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -97,26 +103,29 @@ public class FacilityServiceTest {
 
   @Test
   public void shouldReturnAllIfZoneCodeAndNameNotProvidedForSearch() {
-    when(facilityRepository.findAllByOrderByNameAsc()).thenReturn(facilityList);
+    when(facilityRepository.findAll(pageable)).thenReturn(
+            Pagination.getPage(facilityList, pageable, 2));
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(RECURSE, false);
-    List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params));
+    List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params),
+            pageable).getContent();
 
-    verify(facilityRepository).findAllByOrderByNameAsc();
+    verify(facilityRepository).findAll(pageable);
     assertEquals(facilityList, actual);
   }
 
   @Test(expected = ValidationMessageException.class)
   public void shouldOnlyThrowValidationExceptionIfQueryMapCantBeParsed() {
-    when(facilityRepository.findAllByOrderByNameAsc()).thenReturn(facilityList);
+    when(facilityRepository.findAll(pageable)).thenReturn(
+            Pagination.getPage(facilityList, pageable, 2));
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(CODE, "-1");
     params.add(NAME, "-1");
     params.add(ZONE_ID, "a");
     params.add(RECURSE, "a");
-    facilityService.searchFacilities(new FacilitySearchParams(params));
+    facilityService.searchFacilities(new FacilitySearchParams(params), pageable);
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -125,16 +134,17 @@ public class FacilityServiceTest {
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(ZONE_ID, UUID.randomUUID().toString());
-    facilityService.searchFacilities(new FacilitySearchParams(params));
+    facilityService.searchFacilities(new FacilitySearchParams(params), pageable);
   }
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfFacilityTypeDoesNotExist() {
     when(facilityTypeRepository.findOneByCode(any(String.class))).thenReturn(null);
+    PageRequest pageable = new PageRequest(0, 10, new Sort("name"));
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(ZONE_ID, UUID.randomUUID().toString());
-    facilityService.searchFacilities(new FacilitySearchParams(params));
+    facilityService.searchFacilities(new FacilitySearchParams(params), pageable);
   }
 
   @Test
@@ -206,11 +216,13 @@ public class FacilityServiceTest {
 
   @Test
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
-    when(facilityRepository.findAllByOrderByNameAsc()).thenReturn(facilityList);
+    when(facilityRepository.findAll(pageable)).thenReturn(
+        Pagination.getPage(facilityList, pageable, 2));
 
     List<Facility> actual = facilityService
-        .searchFacilities(new FacilitySearchParams(new LinkedMultiValueMap<>()));
-    verify(facilityRepository).findAllByOrderByNameAsc();
+        .searchFacilities(new FacilitySearchParams(new LinkedMultiValueMap<>()), pageable)
+            .getContent();
+    verify(facilityRepository).findAll(pageable);
     assertEquals(facilityList, actual);
   }
 
@@ -226,7 +238,7 @@ public class FacilityServiceTest {
     params.add(ZONE_ID, parentId.toString());
 
     final List<Facility> actual = facilityService
-        .searchFacilities(new FacilitySearchParams(params));
+        .searchFacilities(new FacilitySearchParams(params), pageable).getContent();
 
     verifyAfterSearchWithRecurse(actual);
   }
@@ -242,7 +254,8 @@ public class FacilityServiceTest {
     params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
     params.add(ZONE_ID, parentId.toString());
 
-    List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params));
+    List<Facility> actual = facilityService.searchFacilities(
+        new FacilitySearchParams(params), pageable).getContent();
 
     verifyAfterSearchWithoutRecurse(actual);
   }
@@ -260,8 +273,8 @@ public class FacilityServiceTest {
 
     when(facilityRepository
         .search(code, name, of(parentId, childId, childOfChildId),
-            FACILITY_TYPE, "{\"type\":\"rural\"}", false))
-        .thenReturn(Lists.newArrayList(facility2));
+            FACILITY_TYPE, "{\"type\":\"rural\"}", false, pageable))
+        .thenReturn(Pagination.getPage(Lists.newArrayList(facility2), pageable, 1));
 
     Map<String, String> extraData = new HashMap<>();
     extraData.put("type", "rural");
@@ -274,7 +287,8 @@ public class FacilityServiceTest {
     params.add(ZONE_ID, parentId.toString());
     params.add("extraData", extraData);
 
-    List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params));
+    List<Facility> actual = facilityService.searchFacilities(
+        new FacilitySearchParams(params), pageable).getContent();
 
     assertEquals(1, actual.size());
     assertThat(actual, hasItem(facility2));
@@ -290,9 +304,9 @@ public class FacilityServiceTest {
     params.add(RECURSE, true);
     params.add(CODE, FACILITY_CODE);
 
-    facilityService.searchFacilities(new FacilitySearchParams(params));
+    facilityService.searchFacilities(new FacilitySearchParams(params), pageable);
 
-    verify(facilityRepository).search(any(), any(), any(), any(), any(), eq(true));
+    verify(facilityRepository).search(any(), any(), any(), any(), any(), eq(true), any());
   }
 
   private void prepareForSearchWithRecurse() {
@@ -306,14 +320,15 @@ public class FacilityServiceTest {
     when(facilityRepository
         .search(
             FACILITY_CODE, FACILITY_NAME,
-            of(parentId, childId, childOfChildId), FACILITY_TYPE, null, false))
-        .thenReturn(Lists.newArrayList(facility, facility2));
+            of(parentId, childId, childOfChildId), FACILITY_TYPE, null, false, pageable))
+        .thenReturn(Pagination.getPage(Lists.newArrayList(facility, facility2), pageable, 2));
+
   }
 
   private void verifyAfterSearchWithRecurse(List<Facility> actual) {
     verify(facilityRepository)
         .search(FACILITY_CODE, FACILITY_NAME,
-            of(parentId, childId, childOfChildId), FACILITY_TYPE, null, false);
+            of(parentId, childId, childOfChildId), FACILITY_TYPE, null, false, pageable);
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(facility));
@@ -326,13 +341,13 @@ public class FacilityServiceTest {
     when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
 
     when(facilityRepository
-        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null, false))
-        .thenReturn(Lists.newArrayList(facility));
+        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null, false, pageable))
+        .thenReturn(Pagination.getPage(Lists.newArrayList(facility), pageable, 1));
   }
 
   private void verifyAfterSearchWithoutRecurse(List<Facility> actual) {
     verify(facilityRepository)
-        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null, false);
+        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null, false, pageable);
     verifyNoMoreInteractions(facilityRepository);
 
     assertEquals(1, actual.size());

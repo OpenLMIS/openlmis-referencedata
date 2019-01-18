@@ -41,6 +41,7 @@ import org.openlmis.referencedata.service.FacilityBuilder;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
@@ -460,10 +461,12 @@ public class FacilityController extends BaseController {
     FacilitySearchParams params = new FacilitySearchParams(map);
 
     profiler.start("SERVICE_SEARCH");
-    List<Facility> foundFacilities = facilityService.searchFacilities(params);
+    Page<Facility> foundFacilities = facilityService.searchFacilities(params, pageable);
 
-    List<BasicFacilityDto> facilityDtos = toBasicDto(foundFacilities, profiler);
-    Page<BasicFacilityDto> page = toPage(facilityDtos, pageable, profiler);
+    Page<BasicFacilityDto> page = Pagination.getPage(
+            toBasicDto(foundFacilities.getContent(), profiler),
+            pageable,
+            foundFacilities.getTotalElements());
 
     XLOGGER.exit(page);
     profiler.stop().log();
