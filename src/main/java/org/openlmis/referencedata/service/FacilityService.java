@@ -24,8 +24,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,6 +37,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
@@ -103,7 +106,8 @@ public class FacilityService {
    *
    * @param params request parameters (code, name, zone, type, recurse) and JSON extraData.
    *               May be null or empty
-   * @return List of facilities. All facilities will be returned when map is null or empty
+   * @param pageable object used to encapsulate the pagination related values: page, size and sort.
+   * @return Page of facilities. All facilities will be returned when map is null or empty
    */
   public Page<Facility> searchFacilities(FacilitySearchParams params, Pageable pageable) {
     final String code = params.getCode();
@@ -134,7 +138,7 @@ public class FacilityService {
         zoneId, code, name, facilityTypeCode, extraData, recurse, pageable
     );
 
-    return facilities;
+    return Optional.ofNullable(facilities).orElse(Pagination.getPage(Collections.emptyList()));
   }
 
   private Page<Facility> findFacilities(UUID zone, String code, String name,

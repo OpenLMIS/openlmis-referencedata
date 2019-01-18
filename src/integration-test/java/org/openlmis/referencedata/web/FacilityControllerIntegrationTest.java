@@ -82,6 +82,7 @@ import org.springframework.util.MultiValueMap;
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
+  public static final String SIZE = "size";
   private static final String PROGRAM_ID = "programId";
   private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
   private static final String RESOURCE_URL = "/api/facilities";
@@ -93,6 +94,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String NAME_KEY = "name";
   private static final String FULL_SUPPLY = "fullSupply";
   private static final String APPROVED_PRODUCTS = "/approvedProducts";
+  public static final String PAGE = "page";
+  public static final String CODE = "code";
 
   private UUID programId;
   private UUID orderableId1;
@@ -248,7 +251,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldFindFacilitiesWithSimilarCode() {
     String similarCode = "Facility";
     Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("code", similarCode);
+    requestBody.put(CODE, similarCode);
     MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
     requestBody.entrySet().stream()
         .forEach(entry -> map.add(entry.getKey(), entry.getValue()));
@@ -272,7 +275,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     Map<String, String> foundFacility = (LinkedHashMap) response.getContent().get(0);
     assertEquals(1, response.getContent().size());
-    assertEquals(facility.getCode(), foundFacility.get("code"));
+    assertEquals(facility.getCode(), foundFacility.get(CODE));
   }
 
   @Test
@@ -344,11 +347,23 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldNotFindFacilitiesWithIncorrectCodeAndName() {
 
     Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("code", "IncorrectCode");
+    requestBody.put(CODE, "IncorrectCode");
     requestBody.put(NAME_KEY, "NotSimilarName");
+
+    MultiValueMap<String, Object> transformedRequestBody = new LinkedMultiValueMap<>();
+    transformedRequestBody.add(CODE, "IncorrectCode");
+    transformedRequestBody.add(NAME_KEY, "NotSimilarName");
+
+
+    Page page = Pagination.getPage(Collections.emptyList(), pageable, 0);
+    given(facilityService.searchFacilities(
+            new FacilitySearchParams(transformedRequestBody), pageable))
+              .willReturn(page);
 
     PageImplRepresentation response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -372,8 +387,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(page);
 
     PageImplRepresentation response = restAssured.given()
-        .queryParam("page", 0)
-        .queryParam("size", 1)
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -387,7 +402,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(1, response.getTotalElements());
     assertEquals(1, response.getTotalPages());
     assertEquals(1, response.getNumberOfElements());
-    assertEquals(1, response.getSize());
+    assertEquals(Integer.MAX_VALUE, response.getSize());
     assertEquals(0, response.getNumber());
   }
 

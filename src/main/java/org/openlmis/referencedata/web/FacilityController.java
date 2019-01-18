@@ -442,7 +442,7 @@ public class FacilityController extends BaseController {
    * name parameter.
    *
    * @param queryParams request parameters (code, name, zone, recurse) and JSON extraData.
-   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @param pageable object used to encapsulate the pagination related values: page, size and sort.
    * @return List of wanted Facilities matching query parameters.
    */
   @RequestMapping(value = RESOURCE_PATH + "/search", method = RequestMethod.POST)

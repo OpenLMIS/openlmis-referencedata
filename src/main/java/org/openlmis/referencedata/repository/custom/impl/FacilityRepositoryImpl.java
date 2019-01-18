@@ -84,7 +84,8 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * @param geographicZoneIds Geographic zone IDs.
    * @param facilityTypeCode  Wanted facility type.
    * @param extraData         extra data
-   * @return List of Facilities matching the parameters.
+   * @param pageable object used to encapsulate the pagination related values: page, size and sort.
+   * @return Page of Facilities matching the parameters.
    */
   public Page<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
                                String facilityTypeCode, String extraData,
