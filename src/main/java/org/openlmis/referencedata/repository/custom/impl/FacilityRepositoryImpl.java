@@ -160,8 +160,8 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
   private String getOrderPredicate(Pageable pageable) {
     if (pageable.getSort() != null) {
-      List<String> orderPredicate = new ArrayList<String>();
-      List<String> sql = new ArrayList<String>();
+      List<String> orderPredicate = new ArrayList<>();
+      List<String> sql = new ArrayList<>();
       Iterator<Sort.Order> iterator = pageable.getSort().iterator();
       Sort.Order order;
       Sort.Direction sortDirection = Sort.Direction.ASC;

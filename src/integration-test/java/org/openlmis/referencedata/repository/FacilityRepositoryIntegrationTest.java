@@ -66,6 +66,7 @@ import org.springframework.data.domain.Sort;
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
 
+  public static final String FACILITY_SEARCH_KEY = "Facility";
   @Autowired
   private FacilityRepository repository;
 
@@ -92,7 +93,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   private Facility facility;
   private Facility facility1;
 
-  private PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE, Sort.Direction.ASC, "name");
+  private PageRequest pageable;
+  private PageRequest pageableWithNullSort;
 
   @Before
   public void setUp() {
@@ -110,6 +112,9 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     repository.save(facility);
     repository.save(facility1);
+
+    pageable = new PageRequest(0, Integer.MAX_VALUE, Sort.Direction.ASC, "name");
+    pageableWithNullSort = new PageRequest(0, Integer.MAX_VALUE);
   }
 
   @Override
@@ -165,6 +170,23 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
+  public void shouldFindAndSortFacilityByFacilityNameIfSortIsNull() {
+    facility1.setName("Facility - z");
+    facility.setName("Facility - A");
+
+    repository.save(facility1);
+    repository.save(facility);
+
+    List<Facility> searchedAndSortedFacility = repository
+            .search(null, FACILITY_SEARCH_KEY, null, null, null,
+                    false, pageableWithNullSort).getContent();
+
+    assertEquals(searchedAndSortedFacility.size(), 2);
+    assertEquals(searchedAndSortedFacility.get(0).getName(), facility.getName());
+    assertEquals(searchedAndSortedFacility.get(1).getName(), facility1.getName());
+  }
+
+  @Test
   public void shouldFindAndSortFacilityByFacilityName() {
     facility1.setName("Facility - z");
     facility.setName("Facility - A");
@@ -173,12 +195,13 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
 
     List<Facility> searchedAndSortedFacility = repository
-            .search(null, "Facility", null, null, null, false, pageable).getContent();
+            .search(null, FACILITY_SEARCH_KEY, null, null, null, false, pageable).getContent();
 
     assertEquals(searchedAndSortedFacility.size(), 2);
     assertEquals(searchedAndSortedFacility.get(0).getName(), facility.getName());
     assertEquals(searchedAndSortedFacility.get(1).getName(), facility1.getName());
   }
+
 
   @Test
   public void shouldFindFacilitiesByFacilityType() {
@@ -274,7 +297,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataUrban);
     List<Facility> foundFacilties = repository.search(
-        facility.getCode(), "Facility", ImmutableSet.of(geographicZone.getId()),
+        facility.getCode(), FACILITY_SEARCH_KEY, ImmutableSet.of(geographicZone.getId()),
         facilityType.getCode(), extraDataJson, false, pageable).getContent();
     // then
     assertEquals(2, foundFacilties.size());
@@ -378,7 +401,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   @Test
   public void shouldFindFacilitiesByAllParamsWithConjunction() {
     List<Facility> foundFacilities = repository.search(
-        facility.getCode(), "Facility", ImmutableSet.of(geographicZone.getId()),
+        facility.getCode(), FACILITY_SEARCH_KEY, ImmutableSet.of(geographicZone.getId()),
         facilityType.getCode(), null, true, pageable).getContent();
 
     // then
