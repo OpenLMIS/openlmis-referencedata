@@ -138,10 +138,16 @@ public class ProgramController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Program getChosenProgram(@PathVariable("id") UUID programId) {
+    Profiler profiler = new Profiler("GET_PROGRAM_BY_ID");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("FIND_PROGRAM_IN_DB");
     Program program = programRepository.findOne(programId);
     if (program == null) {
+      profiler.stop().log();
       throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     } else {
+      profiler.stop().log();
       return program;
     }
   }

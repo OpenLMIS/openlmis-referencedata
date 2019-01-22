@@ -135,12 +135,18 @@ public class SupervisoryNodeController extends BaseController {
   public SupervisoryNodeDto getSupervisoryNode(
       @PathVariable("id") UUID supervisoryNodeId) {
 
+    Profiler profiler = new Profiler("GET_SUPERVISORY_NODE");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("FIND_SUPERVISORY_NODE_IN_DB");
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
+      profiler.stop().log();
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      return exportToDto(supervisoryNode);
     }
+
+    profiler.stop().log();
+    return exportToDto(supervisoryNode);
   }
 
   /**
@@ -218,27 +224,42 @@ public class SupervisoryNodeController extends BaseController {
       @PathVariable("id") UUID supervisoryNodeId,
       @RequestParam("rightId") UUID rightId,
       @RequestParam("programId") UUID programId) {
+
+    Profiler profiler = new Profiler("GET_SUPERVISING_USERS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN_RIGHT");
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
+    profiler.start("FIND_SUPERVISORY_NODE_IN_DB");
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+
+    profiler.start("FIND_RIGHT_IN_DB");
     Right right = rightRepository.findOne(rightId);
+
+    profiler.start("FIND_PROGRAM_IN_DB");
     Program program = programRepository.findOne(programId);
 
     if (supervisoryNode == null) {
+      profiler.stop().log();
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     }
 
     if (right == null) {
+      profiler.stop().log();
       throw new ValidationMessageException(RightMessageKeys.ERROR_NOT_FOUND);
     }
 
     if (program == null) {
+      profiler.stop().log();
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
     
+    profiler.start("FIND_USERS_BY_SUPERVISION_RIGHT_IN_DB");
     Set<User> supervisingUsers = userRepository.findUsersBySupervisionRight(right, supervisoryNode,
         program);
 
+    profiler.stop().log();
     return supervisingUsers.stream().map(this::exportToDto).collect(toSet());
   }
 

@@ -165,11 +165,16 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public ProcessingPeriodDto getProcessingPeriod(@PathVariable("id") UUID periodId) {
+    Profiler profiler = new Profiler("GET_PERIOD_BY_ID");
+    profiler.setLogger(LOGGER);
 
+    profiler.start("FIND_PERIOD_IN_DB");
     ProcessingPeriod period = periodRepository.findOne(periodId);
     if (period == null) {
+      profiler.stop().log();
       throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
     } else {
+      profiler.stop().log();
       return exportToDto(period);
     }
   }

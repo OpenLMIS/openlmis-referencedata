@@ -38,6 +38,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -226,8 +227,13 @@ public class SupplyLineController extends BaseController {
   public Page<SupplyLineDto> searchSupplyLines(@RequestBody Map<String, Object> queryParams,
                                                Pageable pageable) {
 
+    Profiler profiler = new Profiler("SEARCH_FOR_SUPPLY_LINES");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("FIND_SUPPLY_LINES_IN_DB");
     Page<SupplyLine> page = supplyLineService.searchSupplyLines(queryParams, pageable);
 
+    profiler.stop().log();
     return exportToDto(page, pageable);
   }
 

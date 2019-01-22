@@ -36,6 +36,7 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -208,8 +209,13 @@ public class RightController extends BaseController {
           @RequestParam(value = "name", required = false) String name,
           @RequestParam(value = "type", required = false) String type) {
 
+    Profiler profiler = new Profiler("SEARCH_FOR_RIGHTS");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CHECK_ADMIN_RIGHT");
     rightService.checkAdminRight(RightName.RIGHTS_VIEW);
 
+    profiler.start("FIND_RIGHT_TYPES");
     RightType rightType = null;
     if (type != null) {
       try {
@@ -219,11 +225,15 @@ public class RightController extends BaseController {
                 .map(RightType::name)
                 .collect(Collectors.toSet()));
 
+        profiler.stop().log();
         throw new ValidationMessageException(new Message(RightMessageKeys.ERROR_TYPE_INVALID,
                 rightNames, ex));
       }
     }
+    profiler.start("SEARCH_FOR_RIGHTS_IN_DB");
     Set<Right> foundRights = rightRepository.searchRights(name, rightType);
+
+    profiler.stop().log();
     return exportToDtos(foundRights);
   }
 

@@ -144,31 +144,41 @@ public class ProcessingScheduleController extends BaseController {
   @ResponseBody
   public List<ProcessingScheduleDto> search(
       @RequestParam("programId") UUID programId, @RequestParam("facilityId") UUID facilityId) {
+    Profiler profiler = new Profiler("SEARCH_FOR_SCHEDULES");
+    profiler.setLogger(LOGGER);
 
+    profiler.start("FIND_PROGRAM_IN_DB");
     Program program = programRepository.findOne(programId);
+
+    profiler.start("FIND_FACILITY_IN_DB");
     Facility facility = facilityRepository.findOne(facilityId);
 
     if (program == null) {
+      profiler.stop().log();
       throw new ValidationMessageException(
           new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
 
     if (facility == null) {
+      profiler.stop().log();
       throw new ValidationMessageException(
           new Message(FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
     }
 
+    profiler.start("FIND_REQUISITION_GROUP_IN_DB");
     List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules =
         requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
             program, facility);
 
     List<ProcessingScheduleDto> schedules = new ArrayList<>();
     if (!requisitionGroupProgramSchedules.isEmpty()) {
+      profiler.start("EXPORT_TO_DTO");
       ProcessingScheduleDto scheduleDto = exportToDto(requisitionGroupProgramSchedules.get(0)
           .getProcessingSchedule());
       schedules.add(scheduleDto);
     }
 
+    profiler.stop().log();
     return schedules;
   }
 
