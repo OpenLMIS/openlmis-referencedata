@@ -145,8 +145,11 @@ public class SupervisoryNodeController extends BaseController {
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     }
 
+    profiler.start("EXPORT_TO_DTO");
+    SupervisoryNodeDto dto = exportToDto(supervisoryNode);
+
     profiler.stop().log();
-    return exportToDto(supervisoryNode);
+    return dto;
   }
 
   /**

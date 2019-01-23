@@ -233,8 +233,11 @@ public class RightController extends BaseController {
     profiler.start("SEARCH_FOR_RIGHTS_IN_DB");
     Set<Right> foundRights = rightRepository.searchRights(name, rightType);
 
+    profiler.start("EXPORT_TO_DTOS");
+    Set<RightDto> dtos = exportToDtos(foundRights);
+
     profiler.stop().log();
-    return exportToDtos(foundRights);
+    return dtos;
   }
 
   private RightDto exportToDto(Right right) {

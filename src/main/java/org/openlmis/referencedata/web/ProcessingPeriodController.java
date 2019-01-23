@@ -173,10 +173,13 @@ public class ProcessingPeriodController extends BaseController {
     if (period == null) {
       profiler.stop().log();
       throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      profiler.stop().log();
-      return exportToDto(period);
     }
+
+    profiler.start("EXPORT_TO_DTO");
+    ProcessingPeriodDto dto = exportToDto(period);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**

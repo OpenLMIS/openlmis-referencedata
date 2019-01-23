@@ -233,8 +233,11 @@ public class SupplyLineController extends BaseController {
     profiler.start("FIND_SUPPLY_LINES_IN_DB");
     Page<SupplyLine> page = supplyLineService.searchSupplyLines(queryParams, pageable);
 
+    profiler.start("EXPORT_TO_DTO");
+    Page<SupplyLineDto> dtosPage = exportToDto(page, pageable);
+
     profiler.stop().log();
-    return exportToDto(page, pageable);
+    return dtosPage;
   }
 
   /**
