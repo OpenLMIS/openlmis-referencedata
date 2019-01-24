@@ -174,6 +174,7 @@ public class FacilitySearchParamsTest {
     FacilitySearchParams params = new FacilitySearchParams(queryMap);
 
     ToStringTestUtils.verify(FacilitySearchParams.class, params,
-        "CODE", "NAME", "FACILITY_TYPE_CODE", "ZONE_ID", "RECURSE", "EXTRA_DATA", "ALL_PARAMETERS");
+        "CODE", "NAME", "FACILITY_TYPE_CODE", "ZONE_ID", "RECURSE", "EXTRA_DATA",
+        "ALL_PARAMETERS", "ID");
   }
 }

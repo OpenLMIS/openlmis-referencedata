@@ -1493,8 +1493,8 @@ resourceTypes:
   /facilities:
       displayName: Facility
       get:
-          is: [ secured ]
-          description: Get all facilities that are matching given request parameters. If no parameters, all facilities are returned.
+          is: [ secured, paginated ]
+          description: Returns a paginated list of all facilities that are matching given request parameters. If no parameters, all facilities are returned.
           queryParameters:
               id:
                   description: Facility id
@@ -1530,7 +1530,7 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-                      schema: facilityArray
+                      schema: facilityPage
       post:
           is: [ secured ]
           description: Creates new facility.

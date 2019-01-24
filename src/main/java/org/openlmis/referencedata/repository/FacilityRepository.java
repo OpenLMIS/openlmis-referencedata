@@ -33,7 +33,13 @@ public interface FacilityRepository
     extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom,
     BaseAuditableRepository<Facility, UUID> {
 
-  Page<Facility> findAll(Pageable pageable);
+  @Query(value = "SELECT f.*"
+      + " FROM referencedata.facilities f"
+      + " WHERE o.id in :ids"
+      + " ORDER BY ?#{#pageable}",
+      nativeQuery = true
+  )
+  Page<Facility> findAll(@Param("ids") Iterable<UUID> ids, Pageable pageable);
 
   @Query(value = "SELECT f.*"
       + " FROM referencedata.facilities f"
