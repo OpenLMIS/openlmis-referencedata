@@ -1493,7 +1493,7 @@ resourceTypes:
   /facilities:
       displayName: Facility
       get:
-          is: [ secured, paginated ]
+          is: [ secured, paginated, sorted ]
           description: Returns a paginated list of all facilities that are matching given request parameters. If no parameters, all facilities are returned.
           queryParameters:
               id:

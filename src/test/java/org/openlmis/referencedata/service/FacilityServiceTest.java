@@ -44,7 +44,6 @@ import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.web.FacilitySearchParams;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -277,17 +276,6 @@ public class FacilityServiceTest {
     assertThat(actual, hasItem(facility2));
   }
 
-  private void verifyAfterSearchWithRecurse(Page<Facility> actual) {
-    verify(facilityRepository)
-        .search(FACILITY_CODE, FACILITY_NAME,
-            of(parentId, childId, childOfChildId), FACILITY_TYPE, null,
-            Sets.newHashSet(), false, pageable);
-
-    assertEquals(2, actual.getTotalElements());
-    assertThat(actual, hasItem(facility));
-    assertThat(actual, hasItem(facility2));
-  }
-
   private void prepareForSearchWithoutRecurse() {
     when(geographicZoneRepository.exists(parentId)).thenReturn(true);
 
@@ -306,16 +294,6 @@ public class FacilityServiceTest {
     verifyNoMoreInteractions(facilityRepository);
 
     assertEquals(1, actual.size());
-    assertThat(actual, hasItem(facility));
-  }
-
-  private void verifyAfterSearchWithoutRecurse(Page<Facility> actual) {
-    verify(facilityRepository)
-        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE,
-            null, Sets.newHashSet(), false, pageable);
-    verifyNoMoreInteractions(facilityRepository);
-
-    assertEquals(1, actual.getTotalElements());
     assertThat(actual, hasItem(facility));
   }
 }

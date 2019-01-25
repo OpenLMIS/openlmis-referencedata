@@ -35,14 +35,6 @@ public interface FacilityRepository
 
   @Query(value = "SELECT f.*"
       + " FROM referencedata.facilities f"
-      + " WHERE o.id in :ids"
-      + " ORDER BY ?#{#pageable}",
-      nativeQuery = true
-  )
-  Page<Facility> findAll(@Param("ids") Iterable<UUID> ids, Pageable pageable);
-
-  @Query(value = "SELECT f.*"
-      + " FROM referencedata.facilities f"
       + " WHERE ST_Covers(:boundary, f.location)",
       nativeQuery = true
   )
