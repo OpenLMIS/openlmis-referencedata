@@ -18,10 +18,8 @@ package org.openlmis.referencedata.web;
 import static java.util.Arrays.asList;
 import static org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys.ERROR_INVALID_PARAMS;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -33,7 +31,6 @@ import org.springframework.util.MultiValueMap;
 @ToString
 public final class FacilitySearchParams {
 
-  private static final String ID = "id";
   private static final String CODE = "code";
   private static final String NAME = "name";
   private static final String FACILITY_TYPE_CODE = "type";
@@ -42,7 +39,7 @@ public final class FacilitySearchParams {
   private static final String EXTRA_DATA = "extraData";
 
   private static final List<String> ALL_PARAMETERS =
-      asList(CODE, NAME, FACILITY_TYPE_CODE, ZONE_ID, RECURSE, EXTRA_DATA, ID);
+      asList(CODE, NAME, FACILITY_TYPE_CODE, ZONE_ID, RECURSE, EXTRA_DATA);
 
   private SearchParams queryParams;
 
@@ -127,18 +124,6 @@ public final class FacilitySearchParams {
       return null;
     }
     return queryParams.getMap(EXTRA_DATA);
-  }
-
-  /**
-   * Gets {@link Set} of {@link UUID} for "id" key from params.
-   *
-   * @return List of ids from params, empty if there is no "id" param
-   */
-  public Set<UUID> getIds() {
-    if (!queryParams.containsKey(ID)) {
-      return Collections.emptySet();
-    }
-    return queryParams.getUuids(ID);
   }
 
   /**

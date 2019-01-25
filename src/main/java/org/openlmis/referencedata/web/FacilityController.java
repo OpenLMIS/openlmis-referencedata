@@ -423,19 +423,15 @@ public class FacilityController extends BaseController {
   @GetMapping(value = RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<FacilityDto> getFacilities(
-      @RequestParam MultiValueMap<String, Object> requestParams, Pageable pageable) {
+  public List<FacilityDto> getFacilities(
+      @RequestParam MultiValueMap<String, Object> requestParams) {
     Profiler profiler = new Profiler("GET_FACILITIES");
     profiler.setLogger(XLOGGER);
 
     profiler.start("FIND_FACILITIES");
-    FacilitySearchParams params = new FacilitySearchParams(requestParams);
+    List<Facility> facilities = facilityService.getFacilities(requestParams);
 
-    profiler.start("SERVICE_SEARCH");
-    Page<Facility> foundFacilities = facilityService.searchFacilities(params, pageable);
-
-    profiler.start("EXPORT_TO_DTO");
-    Page<FacilityDto> dto = toFacilityDto(foundFacilities, pageable, profiler);
+    List<FacilityDto> dto = toDto(facilities, profiler);
 
     profiler.stop().log();
     return dto;
@@ -538,18 +534,6 @@ public class FacilityController extends BaseController {
         .stream()
         .map(BasicFacilityDto::newInstance)
         .collect(Collectors.toList());
-  }
-
-  private Page<FacilityDto> toFacilityDto(Page<Facility> facilities,
-      Pageable pageable, Profiler profiler) {
-    profiler.start("EXPORT_FACILITIES_TO_DTO");
-
-    List<FacilityDto> facilityDtos = facilities.getContent()
-        .stream()
-        .map(FacilityDto::newInstance)
-        .collect(Collectors.toList());
-
-    return toPage(facilityDtos, pageable, facilities.getTotalElements(), profiler);
   }
 
 }

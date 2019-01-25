@@ -32,6 +32,8 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.Facility;
@@ -67,7 +69,6 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
   private static final String WITH_CODE = "UPPER(f.code) LIKE :code";
   private static final String WITH_NAME = "UPPER(f.name) LIKE :name";
   private static final String WITH_ZONE = "g.id IN (:zones)";
-  private static final String WITH_ID = "f.id IN (:ids)";
   private static final String WITH_TYPE = "t.code = :typeCode";
   private static final String WITH_EXTRA_DATA = "f.extradata @> (:extraData)\\:\\:jsonb";
 
@@ -87,7 +88,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * @return Page of Facilities matching the parameters.
    */
   public Page<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
-                               String facilityTypeCode, String extraData, Set<UUID> facilityIds,
+                               String facilityTypeCode, String extraData,
                                Boolean conjunction, Pageable pageable) {
     List<String> sql = Lists.newArrayList(NATIVE_SELECT_BY_PARAMS);
     List<String> where = Lists.newArrayList();
@@ -119,11 +120,6 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       params.put("extraData", extraData);
     }
 
-    if (isNotEmpty(facilityIds)) {
-      where.add(WITH_ID);
-      params.put("ids", facilityIds);
-    }
-
     if (!where.isEmpty()) {
       sql.add(WHERE);
       sql.add(Joiner.on(conjunction ? AND : OR).join(where));
@@ -147,14 +143,16 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+
     String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(HQL_SELECT_BY_IDS, ORDER_BY,
             getOrderPredicate(pageable)));
 
     List<Facility> facilities =  entityManager
         .createQuery(hqlWithSort, Facility.class)
         .setParameter("ids", ids)
-        .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getOffset())
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
         .getResultList();
 
     return Pagination.getPage(facilities, pageable, count);

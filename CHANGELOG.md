@@ -3,7 +3,6 @@
 
 Improvements:
 *[OLMIS-5527](https://openlmis.atlassian.net/browse/OLMIS-5527): On facility list screen, sort facility by name
-*[OLMIS-3773](https://openlmis.atlassian.net/browse/OLMIS-3773): Changed facility search by ids to return page
 
 12.0.0 / 2018-12-12
 ===================
