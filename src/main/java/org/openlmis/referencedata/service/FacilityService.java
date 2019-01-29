@@ -128,6 +128,8 @@ public class FacilityService {
       }
     }
 
+    LOGGER.info("Facility service search params: {}, {}, {}, {}, {}. {}, {}",
+        code, name, zones, facilityTypeCode, extraDataString, ids, pageable);
     return facilityRepository
         .search(code, name, zones, facilityTypeCode, extraDataString, ids, pageable);
   }
