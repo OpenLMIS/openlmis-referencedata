@@ -1,5 +1,8 @@
-12.0.1 / WIP
+13.0.0 / WIP
 ==================
+
+Breaking changes:
+*[OLMIS-3773](https://openlmis.atlassian.net/browse/OLMIS-3773): Changed facility search by ids to return page.
 
 Improvements:
 *[OLMIS-5527](https://openlmis.atlassian.net/browse/OLMIS-5527): On facility list screen, sort facility by name

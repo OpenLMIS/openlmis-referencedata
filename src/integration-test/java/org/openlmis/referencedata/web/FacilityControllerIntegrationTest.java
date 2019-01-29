@@ -490,20 +490,20 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldSearchWithEmptyParamsWhenNoParamsProvided() {
     List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
-    given(facilityService.getFacilities(new LinkedMultiValueMap<>()))
-        .willReturn(storedFacilities);
+    given(facilityService.searchFacilities(new FacilitySearchParams(new LinkedMultiValueMap<>()),
+        pageable)).willReturn(Pagination.getPage(storedFacilities));
 
-    FacilityDto[] response = restAssured
+    PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(FacilityDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    List<FacilityDto> facilities = asList(response);
-    assertThat(facilities.size(), is(2));
+    assertEquals(storedFacilities.size(), response.getContent().size());
+    assertEquals(storedFacilities.size(), response.getNumberOfElements());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     verifyZeroInteractions(rightService);
   }
@@ -518,9 +518,10 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     queryMap.add("id", facilityIdOne.toString());
     queryMap.add("id", facilityIdTwo.toString());
 
-    given(facilityService.getFacilities(queryMap)).willReturn(storedFacilities);
+    given(facilityService.searchFacilities(new FacilitySearchParams(queryMap), pageable))
+        .willReturn(Pagination.getPage(storedFacilities));
 
-    FacilityDto[] response = restAssured
+    PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("id", facilityIdOne)
@@ -529,10 +530,10 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(FacilityDto[].class);
+        .extract().as(PageImplRepresentation.class);
 
-    List<FacilityDto> facilities = asList(response);
-    assertThat(facilities.size(), is(2));
+    assertEquals(storedFacilities.size(), response.getContent().size());
+    assertEquals(storedFacilities.size(), response.getNumberOfElements());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     verifyZeroInteractions(rightService);
   }

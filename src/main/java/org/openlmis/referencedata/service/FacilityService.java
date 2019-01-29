@@ -22,15 +22,11 @@ import static org.apache.commons.lang3.StringUtils.isAllEmpty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -38,7 +34,6 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.web.FacilitySearchParams;
@@ -47,10 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 
 @Service
 public class FacilityService {
@@ -75,32 +68,6 @@ public class FacilityService {
   private ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * Method returns all facilities with matched parameters. When no valid parameters
-   * are given, returns all facilities.
-   *
-   * @param queryMap multi map with request parameters (id, code, name, zone, type, recurse)
-   *                 and JSON extraData. There can be multiple id params,
-   *                 if other params has multiple values, the first one is used.
-   *                 May be null or empty
-   * @return List of facilities. All facilities will be returned when map is null or empty
-   */
-  public List<Facility> getFacilities(MultiValueMap<String, Object> queryMap) {
-    if (isEmpty(queryMap)) {
-      return facilityRepository.findAll();
-    }
-
-    Set<UUID> ids = UuidUtil.getIds(queryMap);
-    if (!ids.isEmpty()) {
-      return facilityRepository.findAll(ids);
-    }
-
-    PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE);
-    Page page = this.searchFacilities(new FacilitySearchParams(queryMap), pageable);
-
-    return page.hasContent() ? page.getContent() : new ArrayList<>();
-  }
-
-  /**
    * Method returns all facilities with matched parameters. When no valid params are given,
    * returns all facilities
    *
@@ -116,6 +83,7 @@ public class FacilityService {
     final UUID zoneId = params.getZoneId();
     final Boolean recurse = params.isRecurse();
     final Map extraData = params.getExtraData();
+    final Set<UUID> ids = params.getIds();
 
     // validate query parameters
     if (isEmpty(extraData)
@@ -135,14 +103,14 @@ public class FacilityService {
     }
 
     Page<Facility> facilities = findFacilities(
-        zoneId, code, name, facilityTypeCode, extraData, recurse, pageable
+        zoneId, code, name, facilityTypeCode, extraData, ids, recurse, pageable
     );
 
     return Optional.ofNullable(facilities).orElse(Pagination.getPage(Collections.emptyList()));
   }
 
   private Page<Facility> findFacilities(UUID zone, String code, String name,
-                                        String facilityTypeCode, Map extraData,
+                                        String facilityTypeCode, Map extraData, Set<UUID> ids,
                                         boolean recurse, Pageable pageable) {
     Set<UUID> zones = Sets.newHashSet();
 
@@ -165,7 +133,7 @@ public class FacilityService {
       }
     }
 
-    return facilityRepository.search(code, name, zones, facilityTypeCode, extraDataString,
+    return facilityRepository.search(code, name, zones, facilityTypeCode, extraDataString, ids,
         BooleanUtils.toBoolean(facilitySearchConjunction), pageable);
   }
 

@@ -33,8 +33,6 @@ public interface FacilityRepository
     extends JpaRepository<Facility, UUID>, FacilityRepositoryCustom,
     BaseAuditableRepository<Facility, UUID> {
 
-  Page<Facility> findAll(Pageable pageable);
-
   @Query(value = "SELECT f.*"
       + " FROM referencedata.facilities f"
       + " WHERE ST_Covers(:boundary, f.location)",
