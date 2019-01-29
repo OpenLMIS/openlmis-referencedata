@@ -57,7 +57,6 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       + " WHERE f.id in (:ids)";
 
   private static final String WHERE = "WHERE";
-  private static final String OR = " OR ";
   private static final String AND = " AND ";
   private static final String DEFAULT_SORT = "f.name ASC";
   private static final String ASC = "ASC";
@@ -88,7 +87,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    */
   public Page<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
                                String facilityTypeCode, String extraData, Set<UUID> facilityIds,
-                               Boolean conjunction, Pageable pageable) {
+                               Pageable pageable) {
     List<String> sql = Lists.newArrayList(NATIVE_SELECT_BY_PARAMS);
     List<String> where = Lists.newArrayList();
     Map<String, Object> params = Maps.newHashMap();
@@ -126,7 +125,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
     if (!where.isEmpty()) {
       sql.add(WHERE);
-      sql.add(Joiner.on(conjunction ? AND : OR).join(where));
+      sql.add(Joiner.on(AND).join(where));
     }
 
     String query = Joiner.on(' ').join(sql);

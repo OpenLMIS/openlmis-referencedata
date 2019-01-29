@@ -20,8 +20,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -46,7 +44,6 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.web.FacilitySearchParams;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -211,7 +208,7 @@ public class FacilityServiceTest {
 
     when(facilityRepository
         .search(code, name, of(parentId, childId, childOfChildId),
-            FACILITY_TYPE, "{\"type\":\"rural\"}", Sets.newHashSet(), false, pageable))
+            FACILITY_TYPE, "{\"type\":\"rural\"}", Sets.newHashSet(), pageable))
         .thenReturn(Pagination.getPage(Lists.newArrayList(facility2), pageable, 1));
 
     Map<String, String> extraData = new HashMap<>();
@@ -232,22 +229,6 @@ public class FacilityServiceTest {
     assertThat(actual, hasItem(facility2));
   }
 
-  @Test
-  public void shouldSearchForFacilitiesUsingConjunction() {
-    prepareForSearchWithRecurse();
-
-    ReflectionTestUtils.setField(facilityService, "facilitySearchConjunction", "true");
-
-    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-    params.add(RECURSE, true);
-    params.add(CODE, FACILITY_CODE);
-
-    facilityService.searchFacilities(new FacilitySearchParams(params), pageable);
-
-    verify(facilityRepository).search(any(), any(), any(), any(), any(), anySetOf(UUID.class),
-        eq(true), any());
-  }
-
   private void prepareForSearchWithRecurse() {
 
     when(geographicZoneRepository.exists(parentId)).thenReturn(true);
@@ -260,7 +241,7 @@ public class FacilityServiceTest {
         .search(
             FACILITY_CODE, FACILITY_NAME,
             of(parentId, childId, childOfChildId), FACILITY_TYPE, null,
-            Sets.newHashSet(facility1Id, facility2Id), false, pageable))
+            Sets.newHashSet(facility1Id, facility2Id), pageable))
         .thenReturn(Pagination.getPage(Lists.newArrayList(facility, facility2), pageable, 2));
 
   }
@@ -269,7 +250,7 @@ public class FacilityServiceTest {
     verify(facilityRepository)
         .search(FACILITY_CODE, FACILITY_NAME,
             of(parentId, childId, childOfChildId), FACILITY_TYPE,null,
-            Sets.newHashSet(facility1Id, facility2Id), false, pageable);
+            Sets.newHashSet(facility1Id, facility2Id), pageable);
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(facility));
@@ -283,14 +264,14 @@ public class FacilityServiceTest {
 
     when(facilityRepository
         .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null,
-            Sets.newHashSet(facility1Id, facility2Id), false, pageable))
+            Sets.newHashSet(facility1Id, facility2Id), pageable))
         .thenReturn(Pagination.getPage(Lists.newArrayList(facility), pageable, 1));
   }
 
   private void verifyAfterSearchWithoutRecurse(List<Facility> actual) {
     verify(facilityRepository)
         .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null,
-            Sets.newHashSet(facility1Id, facility2Id), false, pageable);
+            Sets.newHashSet(facility1Id, facility2Id), pageable);
     verifyNoMoreInteractions(facilityRepository);
 
     assertEquals(1, actual.size());

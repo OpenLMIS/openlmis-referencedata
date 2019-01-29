@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -149,23 +150,20 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
-  public void shouldFindFacilitiesWithSimilarCodeOrName() {
-    searchFacilityAndCheckResults(facility.getCode(), "Facil", facility, 2);
+  public void shouldFindFacilitiesWithCodeAndName() {
+    searchFacilityAndCheckResults("F", "Facility", facility, 2);
   }
 
   @Test
-  public void shouldFindFacilitiesWithSimilarCodeOrNameIgnoringCase() {
-    searchFacilityAndCheckResults(facility.getCode().toLowerCase(), "facil", facility, 2);
-    searchFacilityAndCheckResults(facility.getCode().toUpperCase(), "FACIL", facility, 2);
+  public void shouldFindFacilitiesWithCodeOrNameIgnoringCase() {
     searchFacilityAndCheckResults("f", "fAcIl", facility, 2);
     searchFacilityAndCheckResults("F", "FAciL", facility, 2);
-    repository.save(facility);
   }
 
   @Test
   public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
     List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null, null,
-            null, Sets.newHashSet(), false, pageable).getContent();
+            null, Sets.newHashSet(), pageable).getContent();
     assertEquals(0, foundFacilties.size());
   }
 
@@ -178,7 +176,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
 
     List<Facility> searchedAndSortedFacility = repository
-        .search(null, FACILITY_SEARCH_KEY, null, null, null, Sets.newHashSet(), false,
+        .search(null, FACILITY_SEARCH_KEY, null, null, null, Sets.newHashSet(),
             pageableWithNullSort).getContent();
 
     assertEquals(searchedAndSortedFacility.size(), 2);
@@ -195,7 +193,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
 
     List<Facility> searchedAndSortedFacility = repository
-        .search(null, FACILITY_SEARCH_KEY, null, null, null, Sets.newHashSet(), false, pageable)
+        .search(null, FACILITY_SEARCH_KEY, null, null, null, Sets.newHashSet(), pageable)
         .getContent();
 
     assertEquals(searchedAndSortedFacility.size(), 2);
@@ -215,7 +213,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     List<Facility> foundFacilties = repository
-        .search(null, null, null, facilityType.getCode(), null, Sets.newHashSet(), false, pageable)
+        .search(null, null, null, facilityType.getCode(), null, Sets.newHashSet(), pageable)
         .getContent();
 
     // then
@@ -230,7 +228,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     List<Facility> foundFacilties = repository
         .search(null, null, null, null, null, Sets.newHashSet(facility1.getId(), facility2.getId()),
-            false, pageable).getContent();
+            pageable).getContent();
 
     assertEquals(2, foundFacilties.size());
     assertEquals(facility1.getId(), foundFacilties.get(0).getId());
@@ -255,7 +253,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     List<Facility> foundFacilities = repository
-        .search(null, newFacility.getName(), null, null, null, Sets.newHashSet(), false, pageable)
+        .search(null, newFacility.getName(), null, null, null, Sets.newHashSet(), pageable)
         .getContent();
 
     // then
@@ -277,7 +275,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // when
     List<Facility> foundFacilties = repository
         .search(null, null, ImmutableSet.of(geographicZone.getId()), null, null, Sets.newHashSet(),
-            false, pageable).getContent();
+            pageable).getContent();
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -298,7 +296,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataRural);
     List<Facility> foundFacilties = repository.search(null, null, null, null, extraDataJson,
-        Sets.newHashSet(), false, pageable).getContent();
+        Sets.newHashSet(), pageable).getContent();
 
     assertThat(foundFacilties, hasSize(1));
     assertThat(foundFacilties, hasItem(facility));
@@ -308,19 +306,19 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   public void shouldFindFacilitiesByAllParams() throws JsonProcessingException {
     // given
     Map<String, Object> extraDataUrban = new ExtraDataBuilder().add("type", "urban").build();
-    facility1.setExtraData(extraDataUrban);
-    repository.save(facility1);
+    facility.setExtraData(extraDataUrban);
+    repository.save(facility);
 
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataUrban);
-    List<Facility> foundFacilties = repository.search(
-        facility.getCode(), FACILITY_SEARCH_KEY, ImmutableSet.of(geographicZone.getId()),
-        facilityType.getCode(), extraDataJson, Sets.newHashSet(), false, pageable).getContent();
+    List<Facility> foundFacilities = repository.search(
+        facility.getCode(), facility.getName(), singleton(geographicZone.getId()),
+        facilityType.getCode(), extraDataJson, Sets.newHashSet(), pageable).getContent();
     // then
-    assertEquals(2, foundFacilties.size());
+    assertEquals(1, foundFacilities.size());
     assertThat(
-        foundFacilties.stream().map(Identifiable::getId).collect(Collectors.toSet()),
-        hasItems(facility1.getId(), facility.getId())
+        foundFacilities.stream().map(Identifiable::getId).collect(Collectors.toSet()),
+        hasItems(facility.getId())
     );
   }
 
@@ -415,17 +413,6 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
         .forEach(sp -> assertThat(sp.getLocallyFulfilled(), is(false)));
   }
 
-  @Test
-  public void shouldFindFacilitiesByAllParamsWithConjunction() {
-    List<Facility> foundFacilities = repository.search(
-        facility.getCode(), FACILITY_SEARCH_KEY, ImmutableSet.of(geographicZone.getId()),
-        facilityType.getCode(), null, Sets.newHashSet(), true, pageable).getContent();
-
-    // then
-    assertEquals(1, foundFacilities.size());
-    assertThat(foundFacilities, hasItem(facility));
-  }
-
   @Test(expected = DataIntegrityViolationException.class)
   public void shouldRejectIfFacilityCodeIsNotUniqueCaseInsensitive() {
     Facility facilityWithUpperCaseCode = getFacilityDataBuilder()
@@ -456,7 +443,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   private void searchFacilityAndCheckResults(String code, String name, Facility facility,
                                              int expectedSize) {
     List<Facility> foundFacilities = repository.search(code, name, null, null,
-            null, Sets.newHashSet(), false, pageable).getContent();
+            null, Sets.newHashSet(), pageable).getContent();
     assertThat(foundFacilities, hasSize(expectedSize));
     assertThat(foundFacilities, hasItem(hasProperty("name", equalTo(facility.getName()))));
   }

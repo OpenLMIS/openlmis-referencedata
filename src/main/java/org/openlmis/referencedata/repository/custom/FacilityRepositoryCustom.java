@@ -24,6 +24,5 @@ import org.springframework.data.domain.Pageable;
 public interface FacilityRepositoryCustom {
 
   Page<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
-                        String facilityTypeCode, String extraData, Set<UUID> ids,
-                        Boolean conjunction, Pageable pageable);
+      String facilityTypeCode, String extraData, Set<UUID> ids, Pageable pageable);
 }
