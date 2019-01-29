@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.commons.collections4.CollectionUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -82,6 +83,7 @@ public class FacilityService {
 
     // validate query parameters
     if (isEmpty(extraData)
+        && CollectionUtils.isEmpty(ids)
         && isAllEmpty(code, name, facilityTypeCode)
         && null == zoneId) {
       return facilityRepository.findAll(pageable);

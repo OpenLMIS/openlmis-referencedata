@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.service;
 
 import static com.google.common.collect.ImmutableSet.of;
+import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -158,6 +159,27 @@ public class FacilityServiceTest {
   }
 
   @Test
+  public void shouldReturnAllElementsIfOnlyIdsAreProvided() {
+    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(ID, facility1Id.toString());
+    params.add(ID, facility2Id.toString());
+
+    FacilitySearchParams searchParams = new FacilitySearchParams(params);
+
+    when(facilityRepository
+        .search(null, null, emptySet(), null, null, searchParams.getIds(), pageable))
+        .thenReturn(Pagination.getPage(facilityList, pageable, 2));
+
+
+    List<Facility> actual = facilityService
+        .searchFacilities(searchParams, pageable)
+        .getContent();
+
+    assertEquals(2, actual.size());
+    assertEquals(facilityList, actual);
+  }
+
+  @Test
   public void shouldSearchForFacilitiesInChildZonesIfRecurseOptionProvided() {
     prepareForSearchWithRecurse();
 
@@ -208,7 +230,7 @@ public class FacilityServiceTest {
 
     when(facilityRepository
         .search(code, name, of(parentId, childId, childOfChildId),
-            FACILITY_TYPE, "{\"type\":\"rural\"}", Sets.newHashSet(), pageable))
+            FACILITY_TYPE, "{\"type\":\"rural\"}", emptySet(), pageable))
         .thenReturn(Pagination.getPage(Lists.newArrayList(facility2), pageable, 1));
 
     Map<String, String> extraData = new HashMap<>();
