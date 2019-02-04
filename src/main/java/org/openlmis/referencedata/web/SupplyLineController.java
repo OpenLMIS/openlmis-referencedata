@@ -49,7 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Transactional
-@RequestMapping("supplyLines")
+@RequestMapping("api/supplyLines")
 public class SupplyLineController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupplyLineController.class);
@@ -86,7 +86,7 @@ public class SupplyLineController extends BaseController {
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   public Page<SupplyLineDto> searchSupplyLines(
-      MultiValueMap<String, Object> queryMap, Pageable pageable) {
+      @RequestParam MultiValueMap<String, Object> queryMap, Pageable pageable) {
     Profiler profiler = new Profiler("SEARCH_SUPPLY_LINES");
     profiler.setLogger(LOGGER);
 

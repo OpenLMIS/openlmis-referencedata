@@ -121,9 +121,8 @@ public class SupplyLineRepositoryIntegrationTest
     Page<SupplyLine> result = repository
         .search(supplyLines.get(0).getProgram().getId(), null, null, pageable);
 
-    assertThat(result.getContent(), hasSize(2));
+    assertThat(result.getContent(), hasSize(1));
     assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
-    assertThat(result.getContent().get(1).getProgram(), equalTo(supplyLines.get(0).getProgram()));
   }
 
   @Test

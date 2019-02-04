@@ -1005,7 +1005,13 @@ resourceTypes:
                   body:
                       application/json:
                           schema: supplyLinePage
-              401:
+              "400":
+                  body:
+                      application/json:
+              "401":
+                  body:
+                      application/json:
+              "404":
                   body:
                       application/json:
       post:

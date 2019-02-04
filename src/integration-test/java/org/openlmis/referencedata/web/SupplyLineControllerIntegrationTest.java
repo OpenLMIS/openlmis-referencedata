@@ -98,12 +98,12 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
   @Test
   public void searchShouldReturnBadRequestOnException() {
-    Map<String, Object> requestBody = getSearchParameters();
+    Map<String, Object> requestParams = getSearchParameters();
 
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .params(requestBody)
+        .params(requestParams)
         .param("some-unknown-parameter", "some-value")
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -122,7 +122,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .params("page", 1)
+        .params("page", 0)
         .params("size", 10)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
@@ -436,12 +436,12 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   }
 
   private Map<String,Object> getSearchParameters() {
-    Map<String, Object> paramters = new HashMap<>();
-    paramters.put("page", 1);
-    paramters.put("size", 10);
-    paramters.put(PROGRAM_ID, UUID.randomUUID());
-    paramters.put(SUPERVISORY_NODE_ID, UUID.randomUUID());
-    paramters.put(SUPPLYING_FACILITY_ID, UUID.randomUUID());
-    return paramters;
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("page", 0);
+    parameters.put("size", 10);
+    parameters.put(PROGRAM_ID, supplyLine.getProgram().getId());
+    parameters.put(SUPERVISORY_NODE_ID, supplyLine.getSupervisoryNode().getId());
+    parameters.put(SUPPLYING_FACILITY_ID, supplyLine.getSupplyingFacility().getId());
+    return parameters;
   }
 }
