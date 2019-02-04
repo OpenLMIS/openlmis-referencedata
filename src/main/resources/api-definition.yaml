@@ -2640,13 +2640,28 @@ resourceTypes:
                           schema: localizedErrorResponse
       get:
             is: [ secured ]
-            description: Get all roles.
+            description: >
+              Get all roles based on passed parameters. Please have in mind that only roles that
+              match all parameters will be returned.
+            queryParameters:
+                rightId:
+                    description: >
+                      This field presents a right ID value. It will be used to find a role that have
+                      at least one right that match the ID value. Can be repeated but it cannot be
+                      used to narrow results. In other words, if provided many times, all roles that
+                      have at least one right for at least one right ID from the lst will be
+                      returned.
+                    type: string
+                    required: false
+                    repeat: true
             responses:
                 "200":
+                    description: The request is valid and a list of roles has been returned.
                     body:
                         application/json:
                           schema: roleArray
                 401:
+                    description: The request does not contain a token or the token might be invalid.
                     body:
                       application/json:
       /{roleId}:

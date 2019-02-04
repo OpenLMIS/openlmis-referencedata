@@ -13,15 +13,20 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.util.messagekeys;
+package org.openlmis.referencedata.repository.custom;
 
-public abstract class RoleMessageKeys extends MessageKeys {
-  private static final String ERROR = join(SERVICE_ERROR, ROLE);
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import org.openlmis.referencedata.domain.Role;
 
-  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_DUPLICATED = join(ERROR, DUPLICATED);
-  public static final String ERROR_MUST_HAVE_A_RIGHT = join(ERROR, "mustHaveARight");
-  public static final String ERROR_RIGHTS_ARE_DIFFERENT_TYPES =
-      join(ERROR, "rightsAreDifferentTypes");
-  public static final String ERROR_INVALID_PARAMS = join(ERROR, SEARCH, INVALID_PARAMS);
+public interface RoleRepositoryCustom {
+
+  List<Role> search(SearchParams params);
+
+  interface SearchParams {
+
+    Set<UUID> getRightIds();
+
+  }
 }

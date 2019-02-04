@@ -60,23 +60,29 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
    */
   public RoleControllerIntegrationTest() {
     right1 = Right.newRight(RIGHT1_NAME, RightType.GENERAL_ADMIN);
+    right1.setId(UUID.randomUUID());
+
     right2 = Right.newRight(RIGHT2_NAME, RightType.GENERAL_ADMIN);
+    right2.setId(UUID.randomUUID());
+
     role = Role.newRole(ROLE_NAME, right1, right2);
     roleDto = new RoleDto();
     role.export(roleDto);
+
     roleId = UUID.randomUUID();
   }
 
   @Test
   public void shouldGetAllRoles() {
 
-    List<Role> storedRoles = Arrays.asList(role,
-        Role.newRole("role2", right1));
-    given(roleRepository.findAll()).willReturn(storedRoles);
+    List<Role> storedRoles = Arrays.asList(role, Role.newRole("role2", right1));
+    given(roleRepository.search(any())).willReturn(storedRoles);
 
     RoleDto[] response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam("rightId", right1.getId())
+        .queryParam("rightId", right2.getId())
         .when()
         .get(RESOURCE_URL)
         .then()

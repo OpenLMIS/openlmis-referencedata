@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -42,6 +43,8 @@ import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class RoleControllerTest {
@@ -104,16 +107,18 @@ public class RoleControllerTest {
   public void shouldGetAllRoles() {
     //given
     Set<RoleDto> expectedRoleDtos = Sets.newHashSet(role1Dto);
-    when(repository.findAll()).thenReturn(roles);
+    when(repository.search(any())).thenReturn(roles);
 
-    List<CountResource> usersCount = roles.stream()
+    List<CountResource> usersCount = roles
+        .stream()
         .map(role -> new CountResource(role.getId(), 1L))
         .collect(Collectors.toList());
-    expectedRoleDtos.stream().forEach(role -> role.setCount(1L));
+    expectedRoleDtos.forEach(role -> role.setCount(1L));
     when(roleAssignmentRepository.countUsersAssignedToRoles()).thenReturn(usersCount);
 
     //when
-    Set<RoleDto> roleDtos = controller.getAllRoles();
+    MultiValueMap<String, Object> queryParams = new LinkedMultiValueMap<>();
+    Set<RoleDto> roleDtos = controller.getAllRoles(queryParams);
 
     //then
     assertEquals(expectedRoleDtos, roleDtos);

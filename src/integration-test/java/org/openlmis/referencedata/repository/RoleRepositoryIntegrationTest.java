@@ -16,10 +16,25 @@
 package org.openlmis.referencedata.repository;
 
 import static java.lang.String.valueOf;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import lombok.Getter;
+import org.junit.Before;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.repository.custom.RoleRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -38,11 +53,70 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     return this.repository;
   }
 
+  private Role[] roles;
+
   @Override
   Role generateInstance() {
     int instanceNumber = this.getNextInstanceNumber();
     Right right = Right.newRight(valueOf(instanceNumber), RightType.GENERAL_ADMIN);
     rightRepository.save(right);
     return Role.newRole(valueOf(instanceNumber), right);
+  }
+
+  @Before
+  public void setUp() {
+    roles = IntStream
+        .range(0, 10)
+        .mapToObj(idx -> generateInstance())
+        .peek(repository::save)
+        .toArray(Role[]::new);
+  }
+
+  @Test
+  public void shouldFindAllRolesIfNoParamsWereSet() {
+    // given
+    TestSearchParams params = new TestSearchParams();
+
+    // when
+    List<Role> found = repository.search(params);
+
+    // then
+    assertThat(found)
+        .contains(roles);
+  }
+
+  @Test
+  public void shouldFindAllRolesForGivenRightIds() {
+    // given
+    Set<UUID> rightIds = Stream
+        .of(roles[0], roles[4], roles[7])
+        .map(Role::getRights)
+        .flatMap(Collection::stream)
+        .map(BaseEntity::getId)
+        .collect(Collectors.toSet());
+    TestSearchParams params = new TestSearchParams(rightIds);
+
+    // when
+    List<Role> found = repository.search(params);
+
+    // then
+    assertThat(found)
+        .hasSize(rightIds.size())
+        .contains(roles[0], roles[4], roles[7]);
+  }
+
+  @Getter
+  private static final class TestSearchParams implements RoleRepositoryCustom.SearchParams {
+    private Set<UUID> rightIds;
+
+    TestSearchParams() {
+      this(Collections.emptySet());
+    }
+
+    TestSearchParams(Set<UUID> rightIds) {
+      this.rightIds = Optional
+          .ofNullable(rightIds)
+          .orElse(Collections.emptySet());
+    }
   }
 }

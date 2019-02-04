@@ -46,6 +46,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,12 +82,15 @@ public class RoleController extends BaseController {
   @RequestMapping(value = "/roles", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Set<RoleDto> getAllRoles() {
+  public Set<RoleDto> getAllRoles(@RequestParam MultiValueMap<String, Object> queryParams) {
     Profiler profiler = new Profiler("GET_ALL_ROLES");
     profiler.setLogger(LOGGER);
 
+    profiler.start("CONVERT_TO_PARAMS");
+    RoleSearchParams params = new RoleSearchParams(queryParams);
+
     profiler.start("GET_ALL_ROLES_REPOSITORY");
-    Set<Role> roles = Sets.newHashSet(roleRepository.findAll());
+    Set<Role> roles = Sets.newHashSet(roleRepository.search(params));
 
     profiler.start("COUNT_ASSIGNED_USERS_TO_ROLES");
     List<CountResource> usersCount = roleAssignmentRepository.countUsersAssignedToRoles();
