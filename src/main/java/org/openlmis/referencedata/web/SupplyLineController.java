@@ -17,23 +17,13 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.SUPPLY_LINES_MANAGE;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.dto.SupplyLineDto;
-import org.openlmis.referencedata.dto.SupplyLineSimpleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
-import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
-import org.openlmis.referencedata.service.SupplyLineService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.slf4j.Logger;
@@ -44,36 +34,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @Transactional
+@RequestMapping("supplyLines")
 public class SupplyLineController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupplyLineController.class);
 
   @Autowired
-  private SupplyLineService supplyLineService;
-
-  @Autowired
   private SupplyLineRepository supplyLineRepository;
-
-  @Autowired
-  private ProgramRepository programRepository;
-
-  @Autowired
-  private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Autowired
-  private FacilityRepository facilityRepository;
 
   /**
    * Allows creating new supplyLines. If the id is specified, it will be ignored.
@@ -81,9 +63,8 @@ public class SupplyLineController extends BaseController {
    * @param supplyLineDto A supplyLine bound to the request body.
    * @return the created supplyLine.
    */
-  @RequestMapping(value = "/supplyLines", method = RequestMethod.POST)
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
   public SupplyLineDto createSupplyLine(@RequestBody SupplyLineDto supplyLineDto) {
     rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
     LOGGER.debug("Creating new supplyLine");
@@ -96,45 +77,52 @@ public class SupplyLineController extends BaseController {
   }
 
   /**
-   * Get all supplyLines.
+   * Search supply lines by given parameters.
    *
-   * @return the SupplyLineDtos.
+   * @param queryMap map of query parameters (programId, supervisoryNodeId, supplyingFacilityId)
+   * @param pageable pagination and sorting parameters
+   * @return page of supply sine dtos.
    */
-  @RequestMapping(value = "/supplyLines", method = RequestMethod.GET)
+  @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<SupplyLineDto> getAllSupplyLines() {
+  public Page<SupplyLineDto> searchSupplyLines(
+      MultiValueMap<String, Object> queryMap, Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_SUPPLY_LINES");
+    profiler.setLogger(LOGGER);
 
-    Iterable<SupplyLine> supplyLines = supplyLineRepository.findAll();
-    List<SupplyLineDto> supplyLineDtos = new ArrayList<>();
+    profiler.start("CREATE_SEARCH_PARAMS_CLASS");
+    SupplyLineSearchParams params = new SupplyLineSearchParams(queryMap);
 
-    for (SupplyLine supplyLine : supplyLines) {
-      supplyLineDtos.add(exportToDto(supplyLine));
-    }
+    profiler.start("REPOSITORY_SEARCH");
+    Page<SupplyLine> result = supplyLineRepository.search(params.getProgramId(),
+        params.getSupervisoryNodeId(), params.getSupplyingFacilityIds(), pageable);
 
-    return supplyLineDtos;
+    profiler.start("REPOSITORY_SEARCH");
+    Page<SupplyLineDto> page = exportToDto(result, pageable);
+
+    profiler.stop().log();
+    return page;
   }
 
   /**
    * Allows updating supplyLines.
    *
    * @param supplyLineDto A supplyLineDto bound to the request body.
-   * @param supplyLineId  UUID of supplyLine which we want to update.
+   * @param id            UUID of supplyLine which we want to update.
    * @return the updated supplyLine.
    */
-  @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.PUT)
+  @PutMapping("{id}")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public SupplyLineDto updateSupplyLine(@RequestBody SupplyLineDto supplyLineDto,
-                                        @PathVariable("id") UUID supplyLineId) {
+      @PathVariable UUID id) {
     rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
-    SupplyLine supplyLineToUpdate = supplyLineRepository.findOne(supplyLineId);
+    SupplyLine supplyLineToUpdate = supplyLineRepository.findOne(id);
     if (supplyLineToUpdate == null) {
       supplyLineToUpdate = new SupplyLine();
       LOGGER.debug("Creating new supplyLine");
     } else {
-      LOGGER.debug("Updating supplyLine with id: " + supplyLineId);
+      LOGGER.debug("Updating supplyLine with id: " + id);
     }
 
     supplyLineToUpdate.updateFrom(SupplyLine.newSupplyLine(supplyLineDto));
@@ -153,11 +141,10 @@ public class SupplyLineController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/supplyLines/{id}/auditLog", method = RequestMethod.GET)
+  @GetMapping("{id}/auditLog")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public ResponseEntity<String> getSupplyLineAuditLog(
-      @PathVariable("id") UUID id,
+      @PathVariable UUID id,
       @RequestParam(name = "author", required = false, defaultValue = "") String author,
       @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
           String changedPropertyName,
@@ -180,15 +167,13 @@ public class SupplyLineController extends BaseController {
   /**
    * Get chosen supplyLine.
    *
-   * @param supplyLineId UUID of supplyLine which we want to get.
+   * @param id UUID of supplyLine which we want to get.
    * @return the SupplyLine.
    */
-  @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.GET)
+  @GetMapping("{id}")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public SupplyLineDto getSupplyLine(@PathVariable("id") UUID supplyLineId) {
-
-    SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
+  public SupplyLineDto getSupplyLine(@PathVariable UUID id) {
+    SupplyLine supplyLine = supplyLineRepository.findOne(id);
     if (supplyLine == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -199,83 +184,19 @@ public class SupplyLineController extends BaseController {
   /**
    * Allows deleting supplyLine.
    *
-   * @param supplyLineId UUID of supplyLine which we want to delete
+   * @param id UUID of supplyLine which we want to delete
    */
-  @RequestMapping(value = "/supplyLines/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping("{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteSupplyLine(@PathVariable("id") UUID supplyLineId) {
+  public void deleteSupplyLine(@PathVariable UUID id) {
     rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
-    SupplyLine supplyLine = supplyLineRepository.findOne(supplyLineId);
+    SupplyLine supplyLine = supplyLineRepository.findOne(id);
     if (supplyLine == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     } else {
       supplyLineRepository.delete(supplyLine);
     }
-  }
-
-  /**
-   * Retrieves page of Geographic Zones matching given parameters.
-   *
-   * @param queryParams request parameters (program, supervisoryNode, supplyingFacility).
-   * @param pageable object used to encapsulate the pagination related values: page, size and sort.
-   * @return Page of matched Supply Lines.
-   */
-  @RequestMapping(value = "/supplyLines/search", method = RequestMethod.POST)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Page<SupplyLineDto> searchSupplyLines(@RequestBody Map<String, Object> queryParams,
-                                               Pageable pageable) {
-
-    Profiler profiler = new Profiler("SEARCH_FOR_SUPPLY_LINES");
-    profiler.setLogger(LOGGER);
-
-    profiler.start("FIND_SUPPLY_LINES_IN_DB");
-    Page<SupplyLine> page = supplyLineService.searchSupplyLines(queryParams, pageable);
-
-    profiler.start("EXPORT_TO_DTO");
-    Page<SupplyLineDto> dtosPage = exportToDto(page, pageable);
-
-    profiler.stop().log();
-    return dtosPage;
-  }
-
-  /**
-   * Returns all Supply Lines with matched parameters.
-   *
-   * @param programId         program of searched Supply Lines.
-   * @param supervisoryNodeId supervisory node of searched Supply Lines.
-   * @return a list of all Supply Lines matching provided parameters.
-   */
-  @RequestMapping(value = "/supplyLines/searchByUUID", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<SupplyLineSimpleDto> searchSupplyLinesByUuid(
-      @RequestParam(value = "programId") UUID programId,
-      @RequestParam(value = "supervisoryNodeId", required = false) UUID supervisoryNodeId,
-      @RequestParam(value = "supplyingFacilityId", required = false) UUID supplyingFacilityId) {
-
-    Program program = programRepository.findOne(programId);
-    SupervisoryNode supervisoryNode = null != supervisoryNodeId
-        ? supervisoryNodeRepository.findOne(supervisoryNodeId)
-        : null;
-    Facility supplyingFacility = null != supplyingFacilityId
-        ? facilityRepository.findOne(supplyingFacilityId)
-        : null;
-
-
-    List<SupplyLine> resultSupplyLine = supplyLineService.searchSupplyLines(
-        program, supervisoryNode, supplyingFacility
-    );
-
-    List<SupplyLineSimpleDto> result = new ArrayList<>();
-    for (SupplyLine supplyLine : resultSupplyLine) {
-      SupplyLineSimpleDto supplyLineSimpleDto = new SupplyLineSimpleDto();
-      supplyLine.export(supplyLineSimpleDto);
-      result.add(supplyLineSimpleDto);
-    }
-
-    return result;
   }
 
   private SupplyLineDto exportToDto(SupplyLine supplyLine) {

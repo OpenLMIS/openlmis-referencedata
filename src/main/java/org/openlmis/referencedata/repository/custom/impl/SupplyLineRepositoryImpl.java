@@ -15,9 +15,14 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static java.util.Collections.emptyList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -27,9 +32,6 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.custom.SupplyLineRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
@@ -45,64 +47,44 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   private EntityManager entityManager;
 
   /**
-   * Method returns all Supply lines with matched parameters.
-   *
-   * @param program           program of searched Supply Lines.
-   * @param supervisoryNode   supervisoryNode of searched Supply Lines.
-   * @param supplyingFacility supplyingFacility of searched Supply Lines.
-   * @return list of Supply Lines with matched parameters.
-   */
-  @Override
-  public List<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode,
-                                            Facility supplyingFacility) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<SupplyLine> query = builder.createQuery(SupplyLine.class);
-
-    query = prepareSearchQuery(query, program, supervisoryNode, supplyingFacility, null, false);
-
-    return entityManager.createQuery(query).getResultList();
-  }
-
-  /**
-   * Method returns page of Supply lines with matched parameters.
+   * Method returns page of supply lines with matched parameters.
    * Result can be sorted by supplying facility name if
    * "supplyingFacilityName" parameter is used in sort property in pageable object.
    *
-   * @param program           program of searched Supply Lines.
-   * @param supervisoryNode   supervisoryNode of searched Supply Lines.
-   * @param supplyingFacility supplyingFacility of searched Supply Lines.
-   * @param pageable          object with pagination and sorting parameters
-   * @return page of Supply Lines with matched parameters.
+   * @param programId            UUID of program
+   * @param supervisoryNodeId    UUID of supervisory node
+   * @param supplyingFacilityIds UUIDs of supplying facilities
+   * @param pageable             pagination and sorting parameters
+   * @return page of supply lines with matched parameters.
    */
   @Override
-  public Page<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode,
-                                            Facility supplyingFacility, Pageable pageable) {
+  public Page<SupplyLine> search(UUID programId, UUID supervisoryNodeId,
+      Set<UUID> supplyingFacilityIds, Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<SupplyLine> query = builder.createQuery(SupplyLine.class);
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-
-    query = prepareSearchQuery(query, program, supervisoryNode,
-        supplyingFacility, pageable, false);
-    countQuery = prepareSearchQuery(countQuery, program, supervisoryNode,
-        supplyingFacility, pageable, true);
-
+    countQuery = prepareSearchQuery(
+        countQuery, programId, supervisoryNodeId, supplyingFacilityIds, pageable, true);
     Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    if (count == 0) {
+      return Pagination.getPage(emptyList(), pageable, 0);
+    }
+
+    CriteriaQuery<SupplyLine> query = builder.createQuery(SupplyLine.class);
+    query = prepareSearchQuery(
+        query, programId, supervisoryNodeId, supplyingFacilityIds, pageable, false);
 
     List<SupplyLine> result = entityManager.createQuery(query)
         .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
+        .setFirstResult(pageable.getOffset())
         .getResultList();
 
     return Pagination.getPage(result, pageable, count);
   }
 
-  private <T> CriteriaQuery<T> prepareSearchQuery(CriteriaQuery<T> query,
-                                                  Program program,
-                                                  SupervisoryNode supervisoryNode,
-                                                  Facility supplyingFacility,
-                                                  Pageable pageable,
-                                                  boolean count) {
+  private <T> CriteriaQuery<T> prepareSearchQuery(CriteriaQuery<T> query, UUID programId,
+      UUID supervisoryNodeId, Set<UUID> supplyingFacilityIds, Pageable pageable, boolean count) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<SupplyLine> root = query.from(SupplyLine.class);
 
@@ -113,25 +95,18 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
 
     Predicate predicate = builder.conjunction();
 
-    if (program != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("program"), program));
+    if (programId != null) {
+      predicate = builder.and(predicate, builder.equal(root.get("program").get("id"), programId));
     }
 
-    if (supervisoryNode != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("supervisoryNode"), supervisoryNode));
+    if (supervisoryNodeId != null) {
+      predicate = builder
+          .and(predicate, builder.equal(root.get("supervisoryNode").get("id"), supervisoryNodeId));
     }
 
-    if (supplyingFacility != null) {
-      predicate = builder.and(
-          predicate,
-          builder.equal(
-              root.get("supplyingFacility"), supplyingFacility));
+    if (isNotEmpty(supplyingFacilityIds)) {
+      predicate = builder
+          .and(predicate, root.get("supplyingFacility").get("id").in(supplyingFacilityIds));
     }
 
     query.where(predicate);

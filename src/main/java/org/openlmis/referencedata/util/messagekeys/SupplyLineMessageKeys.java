@@ -19,7 +19,7 @@ public abstract class SupplyLineMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, SUPPLY_LINE);
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_SEARCH_LACKS_PARAMS = join(ERROR, SEARCH, LACKS_PARAMETERS);
+  public static final String ERROR_SEARCH_INVALID_PARAMS = join(ERROR, SEARCH, INVALID_PARAMS);
   public static final String ERROR_PROGRAM_SUPERVISORY_NODE_DUPLICATED =
       join(ERROR, PROGRAM, SUPERVISORY_NODE, DUPLICATED);
 }

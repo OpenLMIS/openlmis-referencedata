@@ -198,8 +198,6 @@ schemas:
 
   - supplyLine: !include schemas/supplyLineDto.json
 
-  - supplyLineQuery: !include schemas/supplyLineQuery.json
-
   - supplyLinePage: !include schemas/supplyLinePage.json
 
   - requisitionGroup: !include schemas/requisitionGroupDto.json
@@ -981,12 +979,32 @@ resourceTypes:
   /supplyLines:
       displayName: Supply Lines
       get:
-          is: [ secured ]
-          description: Get all supplyLines.
+          is: [ secured, paginated, sorted ]
+          description: Returns supply lines that are matching given search params.
+          queryParameters:
+              programId:
+                  displayName: programId
+                  description: program ID
+                  type: string
+                  required: false
+                  repeat: false
+              supervisoryNodeId:
+                  displayName: supervisoryNodeId
+                  description: supervisoryNode ID
+                  type: string
+                  required: false
+                  repeat: false
+              supplyingFacilityId:
+                  displayName: supplyingFacilityId
+                  description: supplyingFacility ID
+                  type: string
+                  required: false
+                  repeat: true
           responses:
               "200":
                   body:
-                    application/json:
+                      application/json:
+                          schema: supplyLinePage
               401:
                   body:
                       application/json:
@@ -1061,56 +1079,6 @@ resourceTypes:
                           schema: localizedErrorResponse
       /{id}/auditLog:
           type: instanceAuditLog
-      /search:
-          post:
-              is: [ secured, paginated, sorted ]
-              description: Filter Supply Lines by program, supervisory node and supplying facility. All properties are codes.
-              body:
-                  application/json:
-                      schema: supplyLineQuery
-              responses:
-                  "200":
-                      body:
-                          application/json:
-                              schema: supplyLinePage
-                  "400":
-                      body:
-                          application/json:
-                              schema: localizedErrorResponse
-                  401:
-                      body:
-                          application/json:
-      /searchByUUID:
-          get:
-              is: [ secured ]
-              description: Find Supply Lines with matched parameters.
-              queryParameters:
-                  programId:
-                      displayName: programId
-                      description: program ID
-                      type: string
-                      required: true
-                      repeat: false
-                  supervisoryNodeId:
-                      displayName: supervisoryNodeId
-                      description: supervisoryNode ID
-                      type: string
-                      required: false
-                      repeat: false
-                  supplyingFacilityId:
-                      displayName: supplyingFacilityId
-                      description: supplyingFacility ID
-                      type: string
-                      required: false
-                      repeat: false
-              responses:
-                  "200":
-                      body:
-                        application/json:
-                  "400":
-                      body:
-                        application/json:
-                          schema: localizedErrorResponse
 
   /users:
       displayName: User

@@ -4,6 +4,7 @@
 Breaking changes:
 * [OLMIS-3773](https://openlmis.atlassian.net/browse/OLMIS-3773): Changed facility search by ids to return page.
 * [OLMIS-3586](https://openlmis.atlassian.net/browse/OLMIS-3586): Changed `GET /api/facilities` and `POST /api/facilities/search` endpoints to do conjunction search.
+* [OLMIS-5000](https://openlmis.atlassian.net/browse/OLMIS-5000): Merged all supply line searching endpoints to on GET /api/supplyLines endpoint with programId, supervisoryNodeId and supplyingFacilityId (multiple) parameters.
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-5990](https://openlmis.atlassian.net/browse/OLMIS-5990): Added ability to search roles by right ID

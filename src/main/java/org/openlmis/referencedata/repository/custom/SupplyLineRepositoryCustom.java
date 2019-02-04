@@ -15,19 +15,14 @@
 
 package org.openlmis.referencedata.repository.custom;
 
-import java.util.List;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.SupervisoryNode;
+import java.util.Set;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface SupplyLineRepositoryCustom {
 
-  List<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode,
-                                     Facility supplyingFacility);
-
-  Page<SupplyLine> searchSupplyLines(Program program, SupervisoryNode supervisoryNode,
-                                     Facility supplyingFacility, Pageable pageable);
+  Page<SupplyLine> search(UUID programId, UUID supervisoryNodeId, Set<UUID> supplyingFacilityIds,
+      Pageable pageable);
 }

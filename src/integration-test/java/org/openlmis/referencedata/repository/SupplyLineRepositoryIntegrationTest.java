@@ -15,6 +15,12 @@
 
 package org.openlmis.referencedata.repository;
 
+import static java.util.Collections.singleton;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.javers.common.collections.Sets.asSet;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +44,9 @@ import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
 @SuppressWarnings("PMD.TooManyMethods")
@@ -66,6 +75,7 @@ public class SupplyLineRepositoryIntegrationTest
   private ProgramRepository programRepository;
 
   private List<SupplyLine> supplyLines;
+  private Pageable pageable = new PageRequest(0, 10);
 
   CrudRepository<SupplyLine, UUID> getRepository() {
     return repository;
@@ -82,48 +92,57 @@ public class SupplyLineRepositoryIntegrationTest
   @Before
   public void setUp() {
     supplyLines = new ArrayList<>();
-    for (int stockNumber = 0; stockNumber < 5; stockNumber++) {
+    for (int i = 0; i < 5; i++) {
       supplyLines.add(repository.save(generateInstance()));
     }
   }
 
   @Test
   public void shouldSearchSupplyLinesByAllParameters() {
-    SupplyLine supplyLine = cloneSupplyLine(supplyLines.get(0));
-    List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
-            supplyLine.getProgram(), supplyLine.getSupervisoryNode(), null);
+    Page<SupplyLine> result = repository.search(
+        supplyLines.get(0).getProgram().getId(),
+        supplyLines.get(0).getSupervisoryNode().getId(),
+        singleton(supplyLines.get(0).getSupplyingFacility().getId()),
+        pageable);
 
-    Assert.assertEquals(1, receivedSupplyLines.size());
-    for (SupplyLine receivedSupplyLine : receivedSupplyLines) {
-      Assert.assertEquals(
-              supplyLine.getProgram().getId(),
-              receivedSupplyLine.getProgram().getId());
-      Assert.assertEquals(
-              supplyLine.getSupervisoryNode().getId(),
-              receivedSupplyLine.getSupervisoryNode().getId());
-    }
+    assertThat(result.getContent(), hasSize(1));
+    assertThat(result.getContent().get(0), equalTo(supplyLines.get(0)));
   }
 
   @Test
   public void shouldSearchSupplyLinesWhenAllParametersAreNull() {
-    List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
-            null, null, null);
+    Page<SupplyLine> result = repository.search(null, null, null, pageable);
 
-    Assert.assertEquals(5, receivedSupplyLines.size());
+    assertThat(result.getContent(), hasSize(5));
   }
 
   @Test
-  public void shouldSearchSupplyLinesByProgram() {
-    SupplyLine supplyLine = cloneSupplyLine(supplyLines.get(0));
-    List<SupplyLine> receivedSupplyLines = repository.searchSupplyLines(
-            supplyLine.getProgram(), null, null);
+  public void shouldSearchSupplyLinesByProgramId() {
+    Page<SupplyLine> result = repository
+        .search(supplyLines.get(0).getProgram().getId(), null, null, pageable);
 
-    Assert.assertEquals(2, receivedSupplyLines.size());
-    for (SupplyLine receivedSupplyLine : receivedSupplyLines) {
-      Assert.assertEquals(
-              supplyLine.getProgram().getId(),
-              receivedSupplyLine.getProgram().getId());
-    }
+    assertThat(result.getContent(), hasSize(2));
+    assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
+    assertThat(result.getContent().get(1).getProgram(), equalTo(supplyLines.get(0).getProgram()));
+  }
+
+  @Test
+  public void shouldSearchSupplyLinesBySupervisoryNodeId() {
+    Page<SupplyLine> result = repository
+        .search(null, supplyLines.get(0).getSupervisoryNode().getId(), null, pageable);
+
+    assertThat(result.getContent(), hasSize(1));
+    assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
+  }
+
+  @Test
+  public void shouldSearchSupplyLinesBySupplyingFacilityIds() {
+    Page<SupplyLine> result = repository
+        .search(null, null, asSet(supplyLines.get(0).getSupplyingFacility().getId(),
+            supplyLines.get(1).getSupplyingFacility().getId()), pageable);
+
+    assertThat(result.getContent(), hasSize(2));
+    assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
   }
 
   @Test(expected = DataIntegrityViolationException.class)

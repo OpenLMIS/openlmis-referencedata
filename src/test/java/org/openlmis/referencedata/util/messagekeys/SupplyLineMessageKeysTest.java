@@ -27,7 +27,7 @@ public class SupplyLineMessageKeysTest {
         SupplyLineMessageKeys.ERROR_NOT_FOUND);
     assertEquals("referenceData.error.supplyLine.program.supervisoryNode.duplicated",
         SupplyLineMessageKeys.ERROR_PROGRAM_SUPERVISORY_NODE_DUPLICATED);
-    assertEquals("referenceData.error.supplyLine.search.lacksParameters",
-        SupplyLineMessageKeys.ERROR_SEARCH_LACKS_PARAMS);
+    assertEquals("referenceData.error.supplyLine.search.invalidParams",
+        SupplyLineMessageKeys.ERROR_SEARCH_INVALID_PARAMS);
   }
 }
