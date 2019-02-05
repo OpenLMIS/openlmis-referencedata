@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys.ERROR_SEARCH_INVALID_PARAMS;
 
 import java.util.List;
@@ -42,7 +41,7 @@ public final class SupplyLineSearchParams {
   private SearchParams queryParams;
 
   /**
-   * Wraps map of query params into an object.
+   * Wraps map of query params with an object.
    */
   public SupplyLineSearchParams(MultiValueMap<String, Object> queryMap) {
     queryParams = new SearchParams(queryMap);
@@ -50,15 +49,12 @@ public final class SupplyLineSearchParams {
   }
 
   /**
-   * Returns set of {@link UUID} for "supplyingFacilityId" key from params.
+   * Returns a set of supplying facility IDs from the request parameters.
    *
    * @return Set of supplying facility ids from params,
    *         empty if there is no "supplyingFacilityId" param
    */
   public Set<UUID> getSupplyingFacilityIds() {
-    if (!queryParams.containsKey(SUPPLYING_FACILITY_ID)) {
-      return emptySet();
-    }
     return queryParams.getUuids(SUPPLYING_FACILITY_ID);
   }
 
@@ -69,9 +65,6 @@ public final class SupplyLineSearchParams {
    * @return UUID value of program id or null if params doesn't contain "programId" key.
    */
   public UUID getProgramId() {
-    if (!queryParams.containsKey(PROGRAM_ID)) {
-      return null;
-    }
     return queryParams.getUuid(PROGRAM_ID);
   }
 
@@ -83,9 +76,6 @@ public final class SupplyLineSearchParams {
    *         or null if params doesn't contain "supervisoryNodeId" key.
    */
   public UUID getSupervisoryNodeId() {
-    if (!queryParams.containsKey(SUPERVISORY_NODE_ID)) {
-      return null;
-    }
     return queryParams.getUuid(SUPERVISORY_NODE_ID);
   }
 

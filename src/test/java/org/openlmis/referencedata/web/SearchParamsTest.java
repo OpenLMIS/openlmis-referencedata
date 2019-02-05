@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -124,6 +125,13 @@ public class SearchParamsTest {
     SearchParams searchParams = new SearchParams(map);
 
     assertEquals(id, searchParams.getUuid(key));
+  }
+
+  @Test
+  public void shouldReturnNullIfTheKeyIsNotPresentWhileGettingUuid() {
+    SearchParams searchParams = new SearchParams(map);
+
+    assertThat(searchParams.getUuid("id"), nullValue());
   }
 
   @Test

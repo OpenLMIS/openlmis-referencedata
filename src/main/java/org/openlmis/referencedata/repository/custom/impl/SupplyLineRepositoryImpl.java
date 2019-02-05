@@ -47,13 +47,13 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   private EntityManager entityManager;
 
   /**
-   * Method returns page of supply lines with matched parameters.
+   * Method returns a page of supply lines matching parameters.
    * Result can be sorted by supplying facility name if
    * "supplyingFacilityName" parameter is used in sort property in pageable object.
    *
-   * @param programId            UUID of program
-   * @param supervisoryNodeId    UUID of supervisory node
-   * @param supplyingFacilityIds UUIDs of supplying facilities
+   * @param programId            UUID of the program
+   * @param supervisoryNodeId    UUID of the supervisory node
+   * @param supplyingFacilityIds UUIDs of the supplying facilities
    * @param pageable             pagination and sorting parameters
    * @return page of supply lines with matched parameters.
    */

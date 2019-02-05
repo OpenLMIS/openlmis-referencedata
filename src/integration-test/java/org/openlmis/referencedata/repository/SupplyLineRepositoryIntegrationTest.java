@@ -92,9 +92,11 @@ public class SupplyLineRepositoryIntegrationTest
   @Before
   public void setUp() {
     supplyLines = new ArrayList<>();
-    for (int i = 0; i < 5; i++) {
-      supplyLines.add(repository.save(generateInstance()));
-    }
+    supplyLines.add(repository.save(generateInstance()));
+    supplyLines.add(repository.save(generateInstance()));
+    supplyLines.add(repository.save(generateInstance()));
+    supplyLines.add(repository.save(generateInstance()));
+    supplyLines.add(repository.save(generateInstance()));
   }
 
   @Test
@@ -110,7 +112,7 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldSearchSupplyLinesWhenAllParametersAreNull() {
+  public void shouldSearchSupplyLinesWhenSearchParametersAreNull() {
     Page<SupplyLine> result = repository.search(null, null, null, pageable);
 
     assertThat(result.getContent(), hasSize(5));
@@ -141,7 +143,8 @@ public class SupplyLineRepositoryIntegrationTest
             supplyLines.get(1).getSupplyingFacility().getId()), pageable);
 
     assertThat(result.getContent(), hasSize(2));
-    assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
+    assertThat(result.getContent().get(0), equalTo(supplyLines.get(0)));
+    assertThat(result.getContent().get(1), equalTo(supplyLines.get(1)));
   }
 
   @Test(expected = DataIntegrityViolationException.class)

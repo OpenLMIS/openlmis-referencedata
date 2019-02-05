@@ -115,15 +115,15 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   }
 
   @Test
-  public void shouldFindSupplyLinesWithParameters() {
+  public void shouldFindSupplyLinesWithoutParameters() {
+    Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
+
     given(supplyLineRepository.search(null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
 
     PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .params("page", 0)
-        .params("size", 10)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)

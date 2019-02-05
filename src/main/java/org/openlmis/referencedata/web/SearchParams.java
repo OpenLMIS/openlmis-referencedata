@@ -129,8 +129,10 @@ public final class SearchParams {
    * @return parsed UUID
    */
   public UUID getUuid(String key) {
-    String value = getFirst(key);
-    return parse(value, key);
+    if (!containsKey(key)) {
+      return null;
+    }
+    return parse(getFirst(key), key);
   }
 
   /**
