@@ -51,7 +51,7 @@ public class SupplyLineSearchParamsTest {
   }
 
   @Test
-  public void shouldGetSupplyingFacilityIdsFromParameters() {
+  public void shouldGetSupplyingFacilityIdsFromParametersIfKeyIsPresent() {
     final UUID supplyingFacilityId1 = UUID.randomUUID();
     final UUID supplyingFacilityId2 = UUID.randomUUID();
 
@@ -72,7 +72,7 @@ public class SupplyLineSearchParamsTest {
   }
 
   @Test
-  public void shouldGetProgramIdFromParameters() {
+  public void shouldGetProgramIdFromParametersIfKeyIsPresent() {
     UUID programId = UUID.randomUUID();
     queryMap.add(PROGRAM_ID, programId.toString());
 
@@ -89,7 +89,7 @@ public class SupplyLineSearchParamsTest {
   }
 
   @Test
-  public void shouldGetSupervisoryNodeIdFromParameters() {
+  public void shouldGetSupervisoryNodeIdFromParametersIfKeyIsPresent() {
     UUID supervisoryNodeId = UUID.randomUUID();
     queryMap.add(SUPERVISORY_NODE_ID, supervisoryNodeId.toString());
 
