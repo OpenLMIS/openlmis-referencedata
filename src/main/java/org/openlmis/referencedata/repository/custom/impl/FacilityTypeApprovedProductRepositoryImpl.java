@@ -49,13 +49,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private static final String COUNT_SELECT = "SELECT COUNT(ftap.id)";
   private static final String SEARCH_SELECT = "SELECT ftap";
   private static final String SEARCH_PRODUCTS_SQL = " FROM FacilityTypeApprovedProduct ftap"
-      + " INNER JOIN FETCH ftap.orderable o"
-      + " INNER JOIN FETCH ftap.program"
-      + " INNER JOIN FETCH ftap.facilityType ft"
-      + " INNER JOIN FETCH o.programOrderables po"
-      + " INNER JOIN FETCH po.program pop"
-      + " INNER JOIN FETCH po.orderableDisplayCategory"
-      + " LEFT OUTER JOIN FETCH o.identifiers"
+      + " INNER JOIN ftap.orderable AS o"
+      + " INNER JOIN ftap.program AS p"
+      + " INNER JOIN ftap.facilityType AS ft"
+      + " INNER JOIN o.programOrderables AS po"
+      + " INNER JOIN po.program AS pop"
+      + " INNER JOIN po.orderableDisplayCategory"
+      + " LEFT OUTER JOIN o.identifiers"
       + " WHERE ft.id = :facilityTypeId"
       + " AND po.active = TRUE"
       + " AND pop.id = p.id";
