@@ -49,13 +49,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private static final String COUNT_SELECT = "SELECT COUNT(ftap.id)";
   private static final String SEARCH_SELECT = "SELECT ftap";
   private static final String SEARCH_PRODUCTS_SQL = " FROM FacilityTypeApprovedProduct ftap"
-      + " INNER JOIN ftap.orderable o"
-      + " INNER JOIN ftap.program p"
-      + " INNER JOIN ftap.facilityType ft"
-      + " INNER JOIN o.programOrderables po"
-      + " INNER JOIN po.program pop"
-      + " INNER JOIN po.orderableDisplayCategory"
-      + " LEFT OUTER JOIN o.identifiers"
+      + " INNER JOIN FETCH ftap.orderable o"
+      + " INNER JOIN FETCH ftap.program"
+      + " INNER JOIN FETCH ftap.facilityType ft"
+      + " INNER JOIN FETCH o.programOrderables po"
+      + " INNER JOIN FETCH po.program pop"
+      + " INNER JOIN FETCH po.orderableDisplayCategory"
+      + " LEFT OUTER JOIN FETCH o.identifiers"
       + " WHERE ft.id = :facilityTypeId"
       + " AND po.active = TRUE"
       + " AND pop.id = p.id";
@@ -73,11 +73,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private EntityManager entityManager;
 
   @Override
-  public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId,
-                                                          UUID programId,
-                                                          Boolean fullSupply,
-                                                          List<UUID> orderableIds,
-                                                          Pageable pageable) {
+  public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID programId,
+      Boolean fullSupply, List<UUID> orderableIds, Pageable pageable) {
     TypedQuery<FacilityTypeApprovedProduct> query = (TypedQuery<FacilityTypeApprovedProduct>)
         createQuery(false, facilityTypeId, programId, orderableIds, fullSupply, pageable);
     TypedQuery<Long> countQuery = (TypedQuery<Long>) createQuery(true, facilityTypeId, programId,
@@ -137,9 +134,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
       query = entityManager.createQuery(SEARCH_SELECT + queryString.toString(),
           FacilityTypeApprovedProduct.class);
 
-      Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-      query.setMaxResults(maxAndFirst.getLeft());
-      query.setFirstResult(maxAndFirst.getRight());
+      query.setMaxResults(pageable.getPageSize());
+      query.setFirstResult(pageable.getOffset());
     }
 
     query.setParameter("facilityTypeId", facilityTypeId);
