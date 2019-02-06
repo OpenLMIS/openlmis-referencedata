@@ -145,7 +145,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
       query.setFirstResult(pageable.getOffset());
     }
 
-    parameters.forEach((paramName, paramValue) -> query.setParameter(paramName, paramValue));
+    parameters.forEach(query::setParameter);
 
     return query;
   }
