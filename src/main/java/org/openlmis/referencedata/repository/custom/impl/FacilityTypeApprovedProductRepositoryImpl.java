@@ -18,7 +18,9 @@ package org.openlmis.referencedata.repository.custom.impl;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -49,20 +51,15 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private static final String COUNT_SELECT = "SELECT COUNT(ftap.id)";
   private static final String SEARCH_SELECT = "SELECT ftap";
   private static final String SEARCH_PRODUCTS_SQL = " FROM FacilityTypeApprovedProduct ftap"
-      + " INNER JOIN ftap.orderable AS o"
-      + " INNER JOIN ftap.program AS p"
-      + " INNER JOIN ftap.facilityType AS ft"
-      + " INNER JOIN o.programOrderables AS po"
-      + " INNER JOIN po.program AS pop"
-      + " INNER JOIN po.orderableDisplayCategory"
-      + " LEFT OUTER JOIN o.identifiers"
-      + " WHERE ft.id = :facilityTypeId"
+      + " INNER JOIN ftap.orderable.programOrderables AS po"
+      + " WHERE ftap.facilityType.id = :facilityTypeId"
       + " AND po.active = TRUE"
-      + " AND pop.id = p.id";
+      + " AND po.program.id = ftap.program.id";
 
-  private static final String WITH_PROGRAM = " AND p.id = :programId";
+  private static final String WITH_PROGRAM = " AND ftap.program.id = :programId";
   private static final String WITH_FULL_SUPPLY = " AND po.fullSupply = :fullSupply";
-  private static final String WITH_ORDERABLE_IDS = " AND o.identity.id in :orderableIds";
+  private static final String WITH_ORDERABLE_IDS =
+      " AND ftap.orderable.identity.id in :orderableIds";
 
   private static final String PROGRAM = "program";
   private static final String FACILITY_TYPE = "facilityType";
@@ -75,12 +72,17 @@ public class FacilityTypeApprovedProductRepositoryImpl
   @Override
   public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID programId,
       Boolean fullSupply, List<UUID> orderableIds, Pageable pageable) {
-    TypedQuery<FacilityTypeApprovedProduct> query = (TypedQuery<FacilityTypeApprovedProduct>)
-        createQuery(false, facilityTypeId, programId, orderableIds, fullSupply, pageable);
     TypedQuery<Long> countQuery = (TypedQuery<Long>) createQuery(true, facilityTypeId, programId,
         orderableIds, fullSupply, pageable);
+    Long count = countQuery.getSingleResult();
+    if (count < 1) {
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
+    }
 
-    return new PageImpl<>(query.getResultList(), pageable, countQuery.getSingleResult());
+    TypedQuery<FacilityTypeApprovedProduct> query = (TypedQuery<FacilityTypeApprovedProduct>)
+        createQuery(false, facilityTypeId, programId, orderableIds, fullSupply, pageable);
+
+    return new PageImpl<>(query.getResultList(), pageable, count);
   }
 
   @Override
@@ -117,13 +119,18 @@ public class FacilityTypeApprovedProductRepositoryImpl
                                  List<UUID> orderableIds, Boolean fullSupply, Pageable pageable) {
     TypedQuery query;
     StringBuilder queryString = new StringBuilder(SEARCH_PRODUCTS_SQL);
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("facilityTypeId", facilityTypeId);
     if (null != programId) {
+      parameters.put("programId", programId);
       queryString.append(WITH_PROGRAM);
     }
     if (null != fullSupply) {
+      parameters.put("fullSupply", fullSupply);
       queryString.append(WITH_FULL_SUPPLY);
     }
     if (!isEmpty(orderableIds)) {
+      parameters.put("orderableIds", orderableIds);
       queryString.append(WITH_ORDERABLE_IDS);
     }
 
@@ -138,16 +145,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
       query.setFirstResult(pageable.getOffset());
     }
 
-    query.setParameter("facilityTypeId", facilityTypeId);
-    if (null != fullSupply) {
-      query.setParameter("fullSupply", fullSupply);
-    }
-    if (null != programId) {
-      query.setParameter("programId", programId);
-    }
-    if (!isEmpty(orderableIds)) {
-      query.setParameter("orderableIds", orderableIds);
-    }
+    parameters.forEach((paramName, paramValue) -> query.setParameter(paramName, paramValue));
 
     return query;
   }
