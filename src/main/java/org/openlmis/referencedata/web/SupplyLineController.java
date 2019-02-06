@@ -97,7 +97,7 @@ public class SupplyLineController extends BaseController {
     Page<SupplyLine> result = supplyLineRepository.search(params.getProgramId(),
         params.getSupervisoryNodeId(), params.getSupplyingFacilityIds(), pageable);
 
-    profiler.start("REPOSITORY_SEARCH");
+    profiler.start("BUILD_DTO");
     Page<SupplyLineDto> page = exportToDto(result, pageable);
 
     profiler.stop().log();
