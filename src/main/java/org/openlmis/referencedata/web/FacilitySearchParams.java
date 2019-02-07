@@ -26,12 +26,13 @@ import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.util.MultiValueMap;
 
 @EqualsAndHashCode
 @ToString
-public final class FacilitySearchParams {
+public final class FacilitySearchParams implements FacilityRepositoryCustom.SearchParams {
 
   private static final String ID = "id";
   private static final String CODE = "code";

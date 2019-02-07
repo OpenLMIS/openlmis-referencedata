@@ -36,11 +36,14 @@ import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
@@ -51,6 +54,7 @@ import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.SupportedProgramPrimaryKey;
+import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 import org.openlmis.referencedata.testbuilder.ExtraDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
@@ -162,8 +166,12 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   @Test
   public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
-    List<Facility> foundFacilties = repository.search("Ogorek", "Pomidor", null, null,
-            null, Sets.newHashSet(), pageable).getContent();
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams("Ogorek", "Pomidor", null, Sets.newHashSet());
+
+    List<Facility> foundFacilties = repository
+        .search(searchParams, Sets.newHashSet(), null, pageable)
+        .getContent();
     assertEquals(0, foundFacilties.size());
   }
 
@@ -175,9 +183,12 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility1);
     repository.save(facility);
 
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(null, FACILITY_SEARCH_KEY, null, Sets.newHashSet());
+
     List<Facility> searchedAndSortedFacility = repository
-        .search(null, FACILITY_SEARCH_KEY, null, null, null, Sets.newHashSet(),
-            pageableWithNullSort).getContent();
+        .search(searchParams, Sets.newHashSet(), null, pageableWithNullSort)
+        .getContent();
 
     assertEquals(searchedAndSortedFacility.size(), 2);
     assertEquals(searchedAndSortedFacility.get(0).getName(), facility.getName());
@@ -192,8 +203,11 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility1);
     repository.save(facility);
 
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(null, FACILITY_SEARCH_KEY, null, Sets.newHashSet());
+
     List<Facility> searchedAndSortedFacility = repository
-        .search(null, FACILITY_SEARCH_KEY, null, null, null, Sets.newHashSet(), pageable)
+        .search(searchParams, Sets.newHashSet(), null, pageable)
         .getContent();
 
     assertEquals(searchedAndSortedFacility.size(), 2);
@@ -211,14 +225,17 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     facility1.setType(anotherType);
     repository.save(facility1);
 
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(null, null, facilityType.getCode(), Sets.newHashSet());
+
     // when
-    List<Facility> foundFacilties = repository
-        .search(null, null, null, facilityType.getCode(), null, Sets.newHashSet(), pageable)
+    List<Facility> foundFacilities = repository
+        .search(searchParams, null, null, pageable)
         .getContent();
 
     // then
-    assertEquals(1, foundFacilties.size());
-    assertEquals(facility.getId(), foundFacilties.get(0).getId());
+    assertEquals(1, foundFacilities.size());
+    assertEquals(facility.getId(), foundFacilities.get(0).getId());
   }
 
   @Test
@@ -226,9 +243,12 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Facility facility2 = generateInstance();
     repository.save(facility2);
 
+    FacilityRepositoryCustom.SearchParams searchParams = new TestSearchParams(null, null, null,
+        Sets.newHashSet(facility1.getId(), facility2.getId()));
+
     List<Facility> foundFacilties = repository
-        .search(null, null, null, null, null, Sets.newHashSet(facility1.getId(), facility2.getId()),
-            pageable).getContent();
+        .search(searchParams, null, null, pageable)
+        .getContent();
 
     assertEquals(2, foundFacilties.size());
     assertEquals(facility1.getId(), foundFacilties.get(0).getId());
@@ -251,9 +271,12 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
         .buildAsNew();
     repository.save(newFacility);
 
+    FacilityRepositoryCustom.SearchParams searchParams = new TestSearchParams(
+        null, newFacility.getName(), null, Sets.newHashSet());
+
     // when
     List<Facility> foundFacilities = repository
-        .search(null, newFacility.getName(), null, null, null, Sets.newHashSet(), pageable)
+        .search(searchParams, null, null, pageable)
         .getContent();
 
     // then
@@ -272,10 +295,12 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     facility1.setGeographicZone(anotherZone);
     repository.save(facility1);
 
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(null, null, null, Sets.newHashSet());
+
     // when
     List<Facility> foundFacilties = repository
-        .search(null, null, ImmutableSet.of(geographicZone.getId()), null, null, Sets.newHashSet(),
-            pageable).getContent();
+        .search(searchParams, ImmutableSet.of(geographicZone.getId()), null, pageable).getContent();
 
     // then
     assertEquals(1, foundFacilties.size());
@@ -293,10 +318,14 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
     repository.save(facility1);
 
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(null, null, null, Sets.newHashSet());
+
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataRural);
-    List<Facility> foundFacilties = repository.search(null, null, null, null, extraDataJson,
-        Sets.newHashSet(), pageable).getContent();
+    List<Facility> foundFacilties = repository
+        .search(searchParams, null, extraDataJson, pageable)
+        .getContent();
 
     assertThat(foundFacilties, hasSize(1));
     assertThat(foundFacilties, hasItem(facility));
@@ -309,11 +338,13 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     facility.setExtraData(extraDataUrban);
     repository.save(facility);
 
+    FacilityRepositoryCustom.SearchParams searchParams = new TestSearchParams(
+        facility.getCode(), facility.getName(), facilityType.getCode(), Sets.newHashSet());
+
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataUrban);
     List<Facility> foundFacilities = repository.search(
-        facility.getCode(), facility.getName(), singleton(geographicZone.getId()),
-        facilityType.getCode(), extraDataJson, Sets.newHashSet(), pageable).getContent();
+        searchParams, singleton(geographicZone.getId()), extraDataJson, pageable).getContent();
     // then
     assertEquals(1, foundFacilities.size());
     assertThat(
@@ -442,8 +473,11 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
   private void searchFacilityAndCheckResults(String code, String name, Facility facility,
                                              int expectedSize) {
-    List<Facility> foundFacilities = repository.search(code, name, null, null,
-            null, Sets.newHashSet(), pageable).getContent();
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(code, name, null, Sets.newHashSet());
+    List<Facility> foundFacilities = repository
+        .search(searchParams, null, null, pageable)
+        .getContent();
     assertThat(foundFacilities, hasSize(expectedSize));
     assertThat(foundFacilities, hasItem(hasProperty("name", equalTo(facility.getName()))));
   }
@@ -454,5 +488,28 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     given(pageable.getPageSize()).willReturn(pageSize);
     given(pageable.getSort()).willReturn(null);
     return pageable;
+  }
+
+  @Getter
+  private static final class TestSearchParams
+      implements FacilityRepositoryCustom.SearchParams {
+
+    private String code;
+    private String name;
+    private String facilityTypeCode;
+    private Set<UUID> ids;
+
+    TestSearchParams() {
+      this(null, null, null, Collections.emptySet());
+    }
+
+    TestSearchParams(String code, String name, String facilityTypeCode, Set<UUID> ids) {
+      this.code = code;
+      this.name = name;
+      this.facilityTypeCode = facilityTypeCode;
+      this.ids = Optional
+          .ofNullable(ids)
+          .orElse(Collections.emptySet());
+    }
   }
 }

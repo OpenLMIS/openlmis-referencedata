@@ -15,30 +15,24 @@
 
 package org.openlmis.referencedata.service;
 
-import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.isAllEmpty;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.commons.collections4.CollectionUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.web.FacilitySearchParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,67 +67,52 @@ public class FacilityService {
    * @return Page of facilities. All facilities will be returned when map is null or empty
    */
   public Page<Facility> searchFacilities(FacilitySearchParams params, Pageable pageable) {
-    final String code = params.getCode();
-    final String name = params.getName();
-    final String facilityTypeCode = params.getFacilityTypeCode();
-    final UUID zoneId = params.getZoneId();
-    final Boolean recurse = params.isRecurse();
-    final Map extraData = params.getExtraData();
-    final Set<UUID> ids = params.getIds();
+    Profiler profiler = new Profiler("FACILITY_SERVICE_SEARCH");
+    profiler.setLogger(LOGGER);
 
-    // validate query parameters
-    if (isEmpty(extraData)
-        && CollectionUtils.isEmpty(ids)
-        && isAllEmpty(code, name, facilityTypeCode)
-        && null == zoneId) {
-      return facilityRepository.findAll(pageable);
-    }
-
-    // find zone if given
-    if (null != zoneId && !geographicZoneRepository.exists(zoneId)) {
+    profiler.start("CHECK_IF_GEO_ZONE_EXISTS");
+    if (null != params.getZoneId() && !geographicZoneRepository.exists(params.getZoneId())) {
       throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     }
 
-    // find facility type if given
-    if (facilityTypeCode != null && !facilityTypeRepository.existsByCode(facilityTypeCode)) {
+    profiler.start("CHECK_IF_FACILITY_TYPE_EXISTS");
+    if (params.getFacilityTypeCode() != null
+        && !facilityTypeRepository.existsByCode(params.getFacilityTypeCode())) {
       throw new ValidationMessageException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     }
 
-    Page<Facility> facilities = findFacilities(
-        zoneId, code, name, facilityTypeCode, extraData, ids, recurse, pageable
-    );
+    Page<Facility> facilities = findFacilities(params, pageable, profiler);
 
-    return Optional.ofNullable(facilities).orElse(Pagination.getPage(Collections.emptyList()));
+    profiler.stop().log();
+    return facilities;
   }
 
-  private Page<Facility> findFacilities(UUID zone, String code, String name,
-                                        String facilityTypeCode, Map extraData, Set<UUID> ids,
-                                        boolean recurse, Pageable pageable) {
+  private Page<Facility> findFacilities(FacilitySearchParams params, Pageable pageable,
+      Profiler profiler) {
+        
+    profiler.start("GET_GEOGRAPHIC_ZONES");
     Set<UUID> zones = Sets.newHashSet();
-
-    if (null != zone) {
-      zones.add(zone);
+    if (null != params.getZoneId()) {
+      zones.add(params.getZoneId());
+      if (params.isRecurse()) {
+        profiler.start("GET_ALL_ZONES_IN_HIERARCHY");
+        zones.addAll(geographicZoneService.getAllZonesInHierarchy(params.getZoneId()));
+      }
     }
 
-    if (recurse) {
-      zones.addAll(geographicZoneService.getAllZonesInHierarchy(zone));
-    }
-
+    profiler.start("PARSE_EXTRA_DATA");
     String extraDataString = null;
-
-    if (isNotEmpty(extraData)) {
+    if (isNotEmpty(params.getExtraData())) {
       try {
-        extraDataString = mapper.writeValueAsString(extraData);
+        extraDataString = mapper.writeValueAsString(params.getExtraData());
       } catch (JsonProcessingException jpe) {
         LOGGER.debug("Cannot serialize extra data query request body into JSON");
         extraDataString = null;
       }
     }
 
-    LOGGER.info("Facility service search params: {}, {}, {}, {}, {}. {}, {}",
-        code, name, zones, facilityTypeCode, extraDataString, ids, pageable);
-    return facilityRepository
-        .search(code, name, zones, facilityTypeCode, extraDataString, ids, pageable);
+    profiler.start("SEARCH_FOR_FACILITIES");
+    return facilityRepository.search(params, zones, extraDataString, pageable);
   }
 
 }

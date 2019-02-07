@@ -23,6 +23,17 @@ import org.springframework.data.domain.Pageable;
 
 public interface FacilityRepositoryCustom {
 
-  Page<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
-      String facilityTypeCode, String extraData, Set<UUID> ids, Pageable pageable);
+  Page<Facility> search(SearchParams params, Set<UUID> geographicZoneIds, String extraData,
+      Pageable pageable);
+
+  interface SearchParams {
+
+    String getCode();
+
+    String getName();
+
+    String getFacilityTypeCode();
+
+    Set<UUID> getIds();
+  }
 }

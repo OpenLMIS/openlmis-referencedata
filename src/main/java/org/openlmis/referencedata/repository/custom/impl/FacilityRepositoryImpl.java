@@ -77,35 +77,31 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * This method is supposed to retrieve all facilities with matched parameters.
    * Method is ignoring case for facility code and name.
    *
-   * @param code              Part of wanted code.
-   * @param name              Part of wanted name.
+   * @param searchParams      Params to search facilities by.
    * @param geographicZoneIds Geographic zone IDs.
-   * @param facilityTypeCode  Wanted facility type.
    * @param extraData         extra data
    * @param pageable object used to encapsulate the pagination related values: page, size and sort.
    * @return Page of Facilities matching the parameters.
    */
-  public Page<Facility> search(String code, String name, Set<UUID> geographicZoneIds,
-                               String facilityTypeCode, String extraData, Set<UUID> facilityIds,
-                               Pageable pageable) {
+  public Page<Facility> search(FacilityRepositoryCustom.SearchParams searchParams,
+      Set<UUID> geographicZoneIds, String extraData, Pageable pageable) {
     List<String> sql = Lists.newArrayList(NATIVE_SELECT_BY_PARAMS);
     List<String> where = Lists.newArrayList();
     Map<String, Object> params = Maps.newHashMap();
 
-
-    if (isNotBlank(code)) {
+    if (isNotBlank(searchParams.getCode())) {
       where.add(WITH_CODE);
-      params.put("code", "%" + code.toUpperCase() + "%");
+      params.put("code", "%" + searchParams.getCode().toUpperCase() + "%");
     }
 
-    if (isNotBlank(name)) {
+    if (isNotBlank(searchParams.getName())) {
       where.add(WITH_NAME);
-      params.put("name", "%" + name.toUpperCase() + "%");
+      params.put("name", "%" + searchParams.getName().toUpperCase() + "%");
     }
 
-    if (isNotBlank(facilityTypeCode)) {
+    if (isNotBlank(searchParams.getFacilityTypeCode())) {
       where.add(WITH_TYPE);
-      params.put("typeCode", facilityTypeCode);
+      params.put("typeCode", searchParams.getFacilityTypeCode());
     }
 
     if (isNotEmpty(geographicZoneIds)) {
@@ -118,9 +114,9 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       params.put("extraData", extraData);
     }
 
-    if (isNotEmpty(facilityIds)) {
+    if (isNotEmpty(searchParams.getIds())) {
       where.add(WITH_ID);
-      params.put("ids", facilityIds);
+      params.put("ids", searchParams.getIds());
     }
 
     if (!where.isEmpty()) {

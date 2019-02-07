@@ -98,19 +98,27 @@ public class FacilityServiceTest {
     facilityList = Lists.newArrayList(facility, facility2);
     when(facility.getId()).thenReturn(facility1Id);
     when(facility2.getId()).thenReturn(facility2Id);
+
+    when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
+    when(geographicZoneRepository.exists(parentId)).thenReturn(true);
   }
 
   @Test
-  public void shouldReturnAllIfZoneCodeAndNameNotProvidedForSearch() {
-    when(facilityRepository.findAll(pageable)).thenReturn(
-            Pagination.getPage(facilityList, pageable, 2));
-
+  public void shouldReturnFacilitiesIfZoneCodeAndNameNotProvidedForSearch() {
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add(CODE, FACILITY_CODE);
+    params.add(FACILITY_TYPE_CODE, FACILITY_TYPE);
+    params.add(ID, Sets.newHashSet(facility1Id, facility2Id));
     params.add(RECURSE, false);
-    List<Facility> actual = facilityService.searchFacilities(new FacilitySearchParams(params),
-            pageable).getContent();
 
-    verify(facilityRepository).findAll(pageable);
+    FacilitySearchParams searchParams = new FacilitySearchParams(params);
+
+    when(facilityRepository
+        .search(searchParams, emptySet(), null, pageable))
+        .thenReturn(Pagination.getPage(facilityList, pageable, 2));
+
+    List<Facility> actual = facilityService.searchFacilities(searchParams, pageable).getContent();
+
     assertEquals(facilityList, actual);
   }
 
@@ -129,7 +137,7 @@ public class FacilityServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfGeographicZoneDoesNotExist() {
-    when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(null);
+    when(geographicZoneRepository.exists(parentId)).thenReturn(false);
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(ZONE_ID, UUID.randomUUID().toString());
@@ -138,7 +146,7 @@ public class FacilityServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfFacilityTypeDoesNotExist() {
-    when(facilityTypeRepository.findOneByCode(any(String.class))).thenReturn(null);
+    when(facilityTypeRepository.existsByCode(any(String.class))).thenReturn(false);
     PageRequest pageable = new PageRequest(0, 10, new Sort("name"));
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
@@ -148,13 +156,15 @@ public class FacilityServiceTest {
 
   @Test
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
-    when(facilityRepository.findAll(pageable)).thenReturn(
-        Pagination.getPage(facilityList, pageable, 2));
+    FacilitySearchParams searchParams = new FacilitySearchParams(new LinkedMultiValueMap<>());
+
+    when(facilityRepository
+        .search(searchParams, emptySet(), null, pageable))
+        .thenReturn(Pagination.getPage(facilityList, pageable, 2));
 
     List<Facility> actual = facilityService
         .searchFacilities(new FacilitySearchParams(new LinkedMultiValueMap<>()), pageable)
             .getContent();
-    verify(facilityRepository).findAll(pageable);
     assertEquals(facilityList, actual);
   }
 
@@ -167,9 +177,8 @@ public class FacilityServiceTest {
     FacilitySearchParams searchParams = new FacilitySearchParams(params);
 
     when(facilityRepository
-        .search(null, null, emptySet(), null, null, searchParams.getIds(), pageable))
+        .search(searchParams, emptySet(), null, pageable))
         .thenReturn(Pagination.getPage(facilityList, pageable, 2));
-
 
     List<Facility> actual = facilityService
         .searchFacilities(searchParams, pageable)
@@ -181,8 +190,6 @@ public class FacilityServiceTest {
 
   @Test
   public void shouldSearchForFacilitiesInChildZonesIfRecurseOptionProvided() {
-    prepareForSearchWithRecurse();
-
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(RECURSE, true);
     params.add(CODE, FACILITY_CODE);
@@ -192,16 +199,18 @@ public class FacilityServiceTest {
     params.add(ID, facility1Id.toString());
     params.add(ID, facility2Id.toString());
 
-    final List<Facility> actual = facilityService
-        .searchFacilities(new FacilitySearchParams(params), pageable).getContent();
+    FacilitySearchParams searchParams = new FacilitySearchParams(params);
 
-    verifyAfterSearchWithRecurse(actual);
+    prepareForSearchWithRecurse(searchParams);
+
+    final List<Facility> actual = facilityService
+        .searchFacilities(searchParams, pageable).getContent();
+
+    verifyAfterSearchWithRecurse(actual, searchParams);
   }
 
   @Test
   public void shouldSearchForFacilitiesInParentZoneOnlyIfRecurseOptionIsOff() {
-    prepareForSearchWithoutRecurse();
-
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(RECURSE, false);
     params.add(CODE, FACILITY_CODE);
@@ -211,10 +220,12 @@ public class FacilityServiceTest {
     params.add(ID, facility1Id.toString());
     params.add(ID, facility2Id.toString());
 
+    prepareForSearchWithoutRecurse(params);
+
     List<Facility> actual = facilityService.searchFacilities(
         new FacilitySearchParams(params), pageable).getContent();
 
-    verifyAfterSearchWithoutRecurse(actual);
+    verifyAfterSearchWithoutRecurse(actual, params);
   }
 
   @Test
@@ -222,16 +233,8 @@ public class FacilityServiceTest {
     final String code = "FAC1";
     final String name = "Facility";
 
-    when(geographicZoneRepository.exists(parentId)).thenReturn(true);
     when(geographicZoneService.getAllZonesInHierarchy(parentId))
         .thenReturn(Sets.newHashSet(childId, childOfChildId));
-
-    when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
-
-    when(facilityRepository
-        .search(code, name, of(parentId, childId, childOfChildId),
-            FACILITY_TYPE, "{\"type\":\"rural\"}", emptySet(), pageable))
-        .thenReturn(Pagination.getPage(Lists.newArrayList(facility2), pageable, 1));
 
     Map<String, String> extraData = new HashMap<>();
     extraData.put("type", "rural");
@@ -244,6 +247,11 @@ public class FacilityServiceTest {
     params.add(ZONE_ID, parentId.toString());
     params.add("extraData", extraData);
 
+    when(facilityRepository
+        .search(new FacilitySearchParams(params), of(parentId, childId, childOfChildId),
+            "{\"type\":\"rural\"}", pageable))
+        .thenReturn(Pagination.getPage(Lists.newArrayList(facility2), pageable, 1));
+
     List<Facility> actual = facilityService.searchFacilities(
         new FacilitySearchParams(params), pageable).getContent();
 
@@ -251,49 +259,34 @@ public class FacilityServiceTest {
     assertThat(actual, hasItem(facility2));
   }
 
-  private void prepareForSearchWithRecurse() {
-
-    when(geographicZoneRepository.exists(parentId)).thenReturn(true);
+  private void prepareForSearchWithRecurse(FacilitySearchParams params) {
     when(geographicZoneService.getAllZonesInHierarchy(parentId))
         .thenReturn(Sets.newHashSet(childId, childOfChildId));
 
-    when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
-
     when(facilityRepository
-        .search(
-            FACILITY_CODE, FACILITY_NAME,
-            of(parentId, childId, childOfChildId), FACILITY_TYPE, null,
-            Sets.newHashSet(facility1Id, facility2Id), pageable))
+        .search(params, of(parentId, childId, childOfChildId), null, pageable))
         .thenReturn(Pagination.getPage(Lists.newArrayList(facility, facility2), pageable, 2));
-
   }
 
-  private void verifyAfterSearchWithRecurse(List<Facility> actual) {
+  private void verifyAfterSearchWithRecurse(List<Facility> actual, FacilitySearchParams params) {
     verify(facilityRepository)
-        .search(FACILITY_CODE, FACILITY_NAME,
-            of(parentId, childId, childOfChildId), FACILITY_TYPE,null,
-            Sets.newHashSet(facility1Id, facility2Id), pageable);
+        .search(params, of(parentId, childId, childOfChildId), null, pageable);
 
     assertEquals(2, actual.size());
     assertThat(actual, hasItem(facility));
     assertThat(actual, hasItem(facility2));
   }
 
-  private void prepareForSearchWithoutRecurse() {
-    when(geographicZoneRepository.exists(parentId)).thenReturn(true);
-
-    when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
-
+  private void prepareForSearchWithoutRecurse(MultiValueMap<String, Object> params) {
     when(facilityRepository
-        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null,
-            Sets.newHashSet(facility1Id, facility2Id), pageable))
+        .search(new FacilitySearchParams(params), of(parentId), null, pageable))
         .thenReturn(Pagination.getPage(Lists.newArrayList(facility), pageable, 1));
   }
 
-  private void verifyAfterSearchWithoutRecurse(List<Facility> actual) {
+  private void verifyAfterSearchWithoutRecurse(List<Facility> actual,
+      MultiValueMap<String, Object> params) {
     verify(facilityRepository)
-        .search(FACILITY_CODE, FACILITY_NAME, of(parentId), FACILITY_TYPE, null,
-            Sets.newHashSet(facility1Id, facility2Id), pageable);
+        .search(new FacilitySearchParams(params), of(parentId), null, pageable);
     verifyNoMoreInteractions(facilityRepository);
 
     assertEquals(1, actual.size());
