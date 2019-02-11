@@ -1504,7 +1504,7 @@ resourceTypes:
               "200":
                   body:
                     application/json:
-                      schema: facilityPage
+                      schema: basicFacilityPage
       post:
           is: [ secured ]
           description: Creates new facility.
