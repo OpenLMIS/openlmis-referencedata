@@ -1,48 +1,48 @@
-#execution:
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: orderables-get-first-10
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: orderables-get-10-by-id
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: orderables-get-by-program-code-name
-#
-#scenarios:
-#  orderables-get-first-10:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/orderables?page=0&size=10
-#        method: GET
-#        label: GetAnOrderablePageOfTen
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#
-#  orderables-get-10-by-id:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/orderables?id=8c74cdb8-2138-487d-a7ec-c7b55607c83a&id=d4dbd20e-8ce2-480e-a019-4a90d115719c&id=25665e10-cca7-44c0-b508-e95600d8fb99&id=4b0d49aa-aa15-4ccf-b91b-197f7cb35c16&id=f573f7d1-b90b-4c3c-8d8b-b8865315d32d&id=b42db3d0-b2a1-46db-abd0-99421878a4da&id=430e898a-59a8-465a-8431-98cd55bbe418&id=62e16def-53ef-46b5-8bf1-8dab9b0bcec1&id=142bc03c-f4fc-40a8-a1ef-efebc900b171&id=ef8cdc67-688a-4b9b-a253-a20889d74447&page=0&size=10
-#        method: GET
-#        label: GetAnOrderableByIdPageOfTen
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#
-#  orderables-get-by-program-code-name:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/orderables?code=C1&name=Acetylsalicylic&program=PRG002&page=0&size=10
-#        method: GET
-#        label: GetAnOrderableByProgramAndCodeAndName
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#
-#reporting:
-#    - module: passfail
-#      criteria:
-#        Get An Orderable Page Of Ten too slow: p90 of GetAnOrderablePageOfTen>500ms
-#        Get An Orderable By Id Page Of Ten too slow: p90 of GetAnOrderableByIdPageOfTen>500ms
-#        Get An Orderable By Program And Code And Name too slow: p90 of GetAnOrderableByProgramAndCodeAndName>500ms
+execution:
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: orderables-get-first-10
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: orderables-get-10-by-id
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: orderables-get-by-program-code-name
+
+scenarios:
+  orderables-get-first-10:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/orderables?page=0&size=10
+        method: GET
+        label: GetAnOrderablePageOfTen
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+
+  orderables-get-10-by-id:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/orderables?id=8c74cdb8-2138-487d-a7ec-c7b55607c83a&id=d4dbd20e-8ce2-480e-a019-4a90d115719c&id=25665e10-cca7-44c0-b508-e95600d8fb99&id=4b0d49aa-aa15-4ccf-b91b-197f7cb35c16&id=f573f7d1-b90b-4c3c-8d8b-b8865315d32d&id=b42db3d0-b2a1-46db-abd0-99421878a4da&id=430e898a-59a8-465a-8431-98cd55bbe418&id=62e16def-53ef-46b5-8bf1-8dab9b0bcec1&id=142bc03c-f4fc-40a8-a1ef-efebc900b171&id=ef8cdc67-688a-4b9b-a253-a20889d74447&page=0&size=10
+        method: GET
+        label: GetAnOrderableByIdPageOfTen
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+
+  orderables-get-by-program-code-name:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/orderables?code=C1&name=Acetylsalicylic&program=PRG002&page=0&size=10
+        method: GET
+        label: GetAnOrderableByProgramAndCodeAndName
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+
+reporting:
+    - module: passfail
+      criteria:
+        Get An Orderable Page Of Ten too slow: p90 of GetAnOrderablePageOfTen>500ms
+        Get An Orderable By Id Page Of Ten too slow: p90 of GetAnOrderableByIdPageOfTen>500ms
+        Get An Orderable By Program And Code And Name too slow: p90 of GetAnOrderableByProgramAndCodeAndName>500ms

@@ -1,55 +1,55 @@
-#execution:
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: download-ideal-stock-amounts-csv
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: get-ideal-stock-amounts
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: upload-ideal-stock-amounts-csv
-#
-#scenarios:
-#  download-ideal-stock-amounts-csv:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/idealStockAmounts?format=csv
-#        method: GET
-#        label: GetAnIdealStockAmountCSV
-#        headers:
-#          Authorization: Bearer ${access_token}
-#
-#  get-ideal-stock-amounts:
-#    variables:
-#      # Cuamba, Cuamba
-#      facility_id: 7fc9bda8-ad8a-468d-8244-38e1918527d5
-#      # BCG
-#      commodity_type_id: 99ccf663-3304-44ae-b2e0-a67fd5511e2a
-#      # Monthly, Jan2017
-#      processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/idealStockAmounts?facilityId=${facility_id}&commodityTypeId=${commodity_type_id}&processingPeriodId=${processing_period_id}
-#        method: GET
-#        label: GetIdealStockAmounts
-#        headers:
-#          Authorization: Bearer ${access_token}
-#
-#  upload-ideal-stock-amounts-csv:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/idealStockAmounts?format=csv
-#        method: POST
-#        label: UploadIdealStockAmounts
-#        headers:
-#          Authorization: Bearer ${access_token}
-#        upload-files:
-#          - param: file
-#            path: /tmp/resources/isa.csv
-#
-#reporting:
-#  - module: passfail
-#    criteria:
-#      Download Ideal Stock Amounts too slow: p90 of GetAnIdealStockAmountCSV>1100ms
-#      Get Ideal Stock Amounts too slow: p90 of GetIdealStockAmounts>500ms
-#      Upload Ideal Stock Amounts too slow: p90 of UploadIdealStockAmounts>3000ms
+execution:
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: download-ideal-stock-amounts-csv
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: get-ideal-stock-amounts
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: upload-ideal-stock-amounts-csv
+
+scenarios:
+  download-ideal-stock-amounts-csv:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/idealStockAmounts?format=csv
+        method: GET
+        label: GetAnIdealStockAmountCSV
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-ideal-stock-amounts:
+    variables:
+      # Cuamba, Cuamba
+      facility_id: 7fc9bda8-ad8a-468d-8244-38e1918527d5
+      # BCG
+      commodity_type_id: 99ccf663-3304-44ae-b2e0-a67fd5511e2a
+      # Monthly, Jan2017
+      processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/idealStockAmounts?facilityId=${facility_id}&commodityTypeId=${commodity_type_id}&processingPeriodId=${processing_period_id}
+        method: GET
+        label: GetIdealStockAmounts
+        headers:
+          Authorization: Bearer ${access_token}
+
+  upload-ideal-stock-amounts-csv:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/idealStockAmounts?format=csv
+        method: POST
+        label: UploadIdealStockAmounts
+        headers:
+          Authorization: Bearer ${access_token}
+        upload-files:
+          - param: file
+            path: /tmp/resources/isa.csv
+
+reporting:
+  - module: passfail
+    criteria:
+      Download Ideal Stock Amounts too slow: p90 of GetAnIdealStockAmountCSV>1100ms
+      Get Ideal Stock Amounts too slow: p90 of GetIdealStockAmounts>500ms
+      Upload Ideal Stock Amounts too slow: p90 of UploadIdealStockAmounts>3000ms

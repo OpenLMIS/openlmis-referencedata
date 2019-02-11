@@ -1,35 +1,35 @@
 # /api/facilities/${id}/approvedProducts endpoint is tested in another config files
 execution:
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facility-create
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facilities-get-minimal-all
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facilities-get-minimal-one-page
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facilities-get-audit-log
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facility-update
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facilities-get-one
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facilities-get-by-boundary-all
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facilities-get-by-boundary-one-page
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facilities-delete-one
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facilities-get-supplying
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facility-create
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facilities-get-minimal-all
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facilities-get-minimal-one-page
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facilities-get-audit-log
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facility-update
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facilities-get-one
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facilities-get-by-boundary-all
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facilities-get-by-boundary-one-page
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facilities-delete-one
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facilities-get-supplying
   - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: facilities-get-all
@@ -41,242 +41,242 @@ execution:
     scenario: facilities-search-one-page
 
 scenarios:
-#  facility-type-get-single:
-#    requests:
-#      - if: '${__javaScript(vars.get("facility_type") == null)}'
-#        then:
-#          - url: ${__P(base-uri)}/api/facilityTypes/ac1d268b-ce10-455f-bf87-9c667da8f060
-#            method: GET
-#            label: GetSingleFacilityType
-#            headers:
-#              Authorization: Bearer ${access_token}
-#              Content-Type: application/json
-#            jsr223:
-#              script-text: |
-#                import groovy.json.JsonSlurper
-#                import groovy.json.JsonOutput
-#
-#                def response = prev.getResponseDataAsString()
-#                def jsonSlurper = new JsonSlurper()
-#                def facilityType = jsonSlurper.parseText(response)
-#
-#                vars.put("facility_type", JsonOutput.toJson(facilityType))
-#  facility-operator-get-single:
-#    requests:
-#      - if: '${__javaScript(vars.get("facility_operator") == null)}'
-#        then:
-#          - url: ${__P(base-uri)}/api/facilityOperators/9456c3e9-c4a6-4a28-9e08-47ceb16a4121
-#            method: GET
-#            label: GetSingleFacilityOperator
-#            headers:
-#              Authorization: Bearer ${access_token}
-#              Content-Type: application/json
-#            jsr223:
-#              script-text: |
-#                import groovy.json.JsonSlurper
-#                import groovy.json.JsonOutput
-#
-#                def response = prev.getResponseDataAsString()
-#                def jsonSlurper = new JsonSlurper()
-#                def facilityOperator = jsonSlurper.parseText(response)
-#
-#                vars.put("facility_operator", JsonOutput.toJson(facilityOperator))
-#  geographic-zone-get-single:
-#    requests:
-#      - if: '${__javaScript(vars.get("geographic_zone") == null)}'
-#        then:
-#          - url: ${__P(base-uri)}/api/geographicZones/4e471242-da63-436c-8157-ade3e615c848
-#            method: GET
-#            label: GetSingleGeographicZone
-#            headers:
-#              Authorization: Bearer ${access_token}
-#              Content-Type: application/json
-#            jsr223:
-#              script-text: |
-#                import groovy.json.JsonSlurper
-#                import groovy.json.JsonOutput
-#
-#                def response = prev.getResponseDataAsString()
-#                def jsonSlurper = new JsonSlurper()
-#                def geographicZone = jsonSlurper.parseText(response)
-#
-#                vars.put("geographic_zone", JsonOutput.toJson(geographicZone))
-#  facility-create:
-#    requests:
-#      - include-scenario: get-user-token
-#      - include-scenario: facility-type-get-single
-#      - include-scenario: facility-operator-get-single
-#      - include-scenario: geographic-zone-get-single
-#      - url: ${__P(base-uri)}/api/facilities
-#        method: POST
-#        label: CreateFacility
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#        jsr223:
-#          execute: before
-#          script-text: |
-#            import groovy.json.JsonSlurper
-#            import groovy.json.JsonOutput
-#
-#            def jsonSlurper = new JsonSlurper()
-#            def random = new Random()
-#
-#            def facility = [
-#              code: "TF" + random.nextInt(),
-#              name: "Test facility",
-#              description: "This is a test facility",
-#              geographicZone: jsonSlurper.parseText(vars.get("geographic_zone")),
-#              type: jsonSlurper.parseText(vars.get("facility_type")),
-#              operator: jsonSlurper.parseText(vars.get("facility_operator")),
-#              active: "true",
-#              goLiveDate: '2017-11-29',
-#              comment: "Test comment",
-#              enabled: "true",
-#              openLmisAccessible: "true",
-#              supportedPrograms: [
-#                [ code: "PRG001", active: "true" ],
-#                [ code: "PRG002", active: "true" ]
-#              ]
-#            ]
-#
-#            vars.put("facility", JsonOutput.toJson(facility))
-#        body: ${facility}
-#        extract-jsonpath:
-#          facility_id: $.id
-#  facilities-get-minimal-all:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/facilities/minimal
-#        method: GET
-#        label: GetAllMinimalFacilities
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#  facilities-get-minimal-one-page:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/facilities/minimal?page=0&size=10
-#        method: GET
-#        label: GetFirstTenMinimalFacilities
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#  facilities-get-audit-log:
-#    requests:
-#      - include-scenario: facilities-get-one
-#      - url: ${__P(base-uri)}/api/facilities/${facility_id}/auditLog
-#        method: GET
-#        label: GetFacilityAuditLog
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#  facility-update:
-#    requests:
-#      - include-scenario: facilities-get-one
-#      - url: ${__P(base-uri)}/api/facilities/${facility_id}
-#        method: PUT
-#        label: UpdateFacility
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#        jsr223:
-#          execute: before
-#          script-text: |
-#            import groovy.json.JsonSlurper
-#            import groovy.json.JsonOutput
-#
-#            def response = prev.getResponseDataAsString()
-#            def jsonSlurper = new JsonSlurper()
-#
-#            def facility = jsonSlurper.parseText(response)
-#            facility.name = "Updated Test facility"
-#
-#            vars.put("facility", JsonOutput.toJson(facility))
-#        body: ${facility}
-#  facilities-get-one:
-#    requests:
-#      - include-scenario: facility-create
-#      - url: ${__P(base-uri)}/api/facilities/${facility_id}
-#        method: GET
-#        label: GetFacility
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#  facilities-get-by-boundary-all:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/facilities/byBoundary
-#        method: POST
-#        label: GetAllFacilitiesByBoundary
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#        jsr223:
-#          execute: before
-#          script-text: |
-#            import groovy.json.JsonOutput
-#
-#            def boundary = [
-#              type: "Polygon",
-#              coordinates: [
-#                [
-#                  [ 37.5, -7.5 ],
-#                  [ 37.5, -17.5 ],
-#                  [ 30, -17.5 ],
-#                  [ 30, -7.5 ],
-#                  [ 37.5, -7.5 ]
-#                ]
-#              ]
-#            ]
-#
-#            vars.put("boundary", JsonOutput.toJson(boundary))
-#        body: ${boundary}
-#  facilities-get-by-boundary-one-page:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/facilities/byBoundary?page=0&size=10
-#        method: POST
-#        label: GetFirstTenFacilitiesByBoundary
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#        jsr223:
-#          execute: before
-#          script-text: |
-#            import groovy.json.JsonOutput
-#
-#            def boundary = [
-#              type: "Polygon",
-#              coordinates: [
-#                [
-#                  [ 37.5, -7.5 ],
-#                  [ 37.5, -17.5 ],
-#                  [ 30, -17.5 ],
-#                  [ 30, -7.5 ],
-#                  [ 37.5, -7.5 ]
-#                ]
-#              ]
-#            ]
-#
-#            vars.put("boundary", JsonOutput.toJson(boundary))
-#        body: ${boundary}
-#  facilities-delete-one:
-#    requests:
-#      - include-scenario: facilities-get-one
-#      - url: ${__P(base-uri)}/api/facilities/${facility_id}
-#        method: DELETE
-#        label: DeleteFacility
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  facilities-get-supplying:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/facilities/supplying?programId=dce17f2e-af3e-40ad-8e00-3496adef44c3&supervisoryNodeId=fb38bd1c-beeb-4527-8345-900900329c10
-#        method: GET
-#        label: GetSupplyingFacilities
-#        headers:
-#          Authorization: Bearer ${access_token}
+  facility-type-get-single:
+    requests:
+      - if: '${__javaScript(vars.get("facility_type") == null)}'
+        then:
+          - url: ${__P(base-uri)}/api/facilityTypes/ac1d268b-ce10-455f-bf87-9c667da8f060
+            method: GET
+            label: GetSingleFacilityType
+            headers:
+              Authorization: Bearer ${access_token}
+              Content-Type: application/json
+            jsr223:
+              script-text: |
+                import groovy.json.JsonSlurper
+                import groovy.json.JsonOutput
+
+                def response = prev.getResponseDataAsString()
+                def jsonSlurper = new JsonSlurper()
+                def facilityType = jsonSlurper.parseText(response)
+
+                vars.put("facility_type", JsonOutput.toJson(facilityType))
+  facility-operator-get-single:
+    requests:
+      - if: '${__javaScript(vars.get("facility_operator") == null)}'
+        then:
+          - url: ${__P(base-uri)}/api/facilityOperators/9456c3e9-c4a6-4a28-9e08-47ceb16a4121
+            method: GET
+            label: GetSingleFacilityOperator
+            headers:
+              Authorization: Bearer ${access_token}
+              Content-Type: application/json
+            jsr223:
+              script-text: |
+                import groovy.json.JsonSlurper
+                import groovy.json.JsonOutput
+
+                def response = prev.getResponseDataAsString()
+                def jsonSlurper = new JsonSlurper()
+                def facilityOperator = jsonSlurper.parseText(response)
+
+                vars.put("facility_operator", JsonOutput.toJson(facilityOperator))
+  geographic-zone-get-single:
+    requests:
+      - if: '${__javaScript(vars.get("geographic_zone") == null)}'
+        then:
+          - url: ${__P(base-uri)}/api/geographicZones/4e471242-da63-436c-8157-ade3e615c848
+            method: GET
+            label: GetSingleGeographicZone
+            headers:
+              Authorization: Bearer ${access_token}
+              Content-Type: application/json
+            jsr223:
+              script-text: |
+                import groovy.json.JsonSlurper
+                import groovy.json.JsonOutput
+
+                def response = prev.getResponseDataAsString()
+                def jsonSlurper = new JsonSlurper()
+                def geographicZone = jsonSlurper.parseText(response)
+
+                vars.put("geographic_zone", JsonOutput.toJson(geographicZone))
+  facility-create:
+    requests:
+      - include-scenario: get-user-token
+      - include-scenario: facility-type-get-single
+      - include-scenario: facility-operator-get-single
+      - include-scenario: geographic-zone-get-single
+      - url: ${__P(base-uri)}/api/facilities
+        method: POST
+        label: CreateFacility
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonSlurper
+            import groovy.json.JsonOutput
+
+            def jsonSlurper = new JsonSlurper()
+            def random = new Random()
+
+            def facility = [
+              code: "TF" + random.nextInt(),
+              name: "Test facility",
+              description: "This is a test facility",
+              geographicZone: jsonSlurper.parseText(vars.get("geographic_zone")),
+              type: jsonSlurper.parseText(vars.get("facility_type")),
+              operator: jsonSlurper.parseText(vars.get("facility_operator")),
+              active: "true",
+              goLiveDate: '2017-11-29',
+              comment: "Test comment",
+              enabled: "true",
+              openLmisAccessible: "true",
+              supportedPrograms: [
+                [ code: "PRG001", active: "true" ],
+                [ code: "PRG002", active: "true" ]
+              ]
+            ]
+
+            vars.put("facility", JsonOutput.toJson(facility))
+        body: ${facility}
+        extract-jsonpath:
+          facility_id: $.id
+  facilities-get-minimal-all:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/facilities/minimal
+        method: GET
+        label: GetAllMinimalFacilities
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+  facilities-get-minimal-one-page:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/facilities/minimal?page=0&size=10
+        method: GET
+        label: GetFirstTenMinimalFacilities
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+  facilities-get-audit-log:
+    requests:
+      - include-scenario: facilities-get-one
+      - url: ${__P(base-uri)}/api/facilities/${facility_id}/auditLog
+        method: GET
+        label: GetFacilityAuditLog
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+  facility-update:
+    requests:
+      - include-scenario: facilities-get-one
+      - url: ${__P(base-uri)}/api/facilities/${facility_id}
+        method: PUT
+        label: UpdateFacility
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonSlurper
+            import groovy.json.JsonOutput
+
+            def response = prev.getResponseDataAsString()
+            def jsonSlurper = new JsonSlurper()
+
+            def facility = jsonSlurper.parseText(response)
+            facility.name = "Updated Test facility"
+
+            vars.put("facility", JsonOutput.toJson(facility))
+        body: ${facility}
+  facilities-get-one:
+    requests:
+      - include-scenario: facility-create
+      - url: ${__P(base-uri)}/api/facilities/${facility_id}
+        method: GET
+        label: GetFacility
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+  facilities-get-by-boundary-all:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/facilities/byBoundary
+        method: POST
+        label: GetAllFacilitiesByBoundary
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonOutput
+
+            def boundary = [
+              type: "Polygon",
+              coordinates: [
+                [
+                  [ 37.5, -7.5 ],
+                  [ 37.5, -17.5 ],
+                  [ 30, -17.5 ],
+                  [ 30, -7.5 ],
+                  [ 37.5, -7.5 ]
+                ]
+              ]
+            ]
+
+            vars.put("boundary", JsonOutput.toJson(boundary))
+        body: ${boundary}
+  facilities-get-by-boundary-one-page:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/facilities/byBoundary?page=0&size=10
+        method: POST
+        label: GetFirstTenFacilitiesByBoundary
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonOutput
+
+            def boundary = [
+              type: "Polygon",
+              coordinates: [
+                [
+                  [ 37.5, -7.5 ],
+                  [ 37.5, -17.5 ],
+                  [ 30, -17.5 ],
+                  [ 30, -7.5 ],
+                  [ 37.5, -7.5 ]
+                ]
+              ]
+            ]
+
+            vars.put("boundary", JsonOutput.toJson(boundary))
+        body: ${boundary}
+  facilities-delete-one:
+    requests:
+      - include-scenario: facilities-get-one
+      - url: ${__P(base-uri)}/api/facilities/${facility_id}
+        method: DELETE
+        label: DeleteFacility
+        headers:
+          Authorization: Bearer ${access_token}
+  facilities-get-supplying:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/facilities/supplying?programId=dce17f2e-af3e-40ad-8e00-3496adef44c3&supervisoryNodeId=fb38bd1c-beeb-4527-8345-900900329c10
+        method: GET
+        label: GetSupplyingFacilities
+        headers:
+          Authorization: Bearer ${access_token}
   facilities-get-all:
     requests:
       - include-scenario: get-user-token
@@ -307,16 +307,16 @@ scenarios:
 reporting:
     - module: passfail
       criteria:
-#        Create Facility too slow: p90 of CreateFacility>500ms
-#        Get All Minimal Facilities too slow: p90 of GetAllMinimalFacilities>1000ms
-#        Get First Ten Minimal Facilities too slow: p90 of GetFirstTenMinimalFacilities>500ms
-#        Get Facility Audit Log too slow: p90 of GetFacilityAuditLog>500ms
-#        Update Facility too slow: p90 of UpdateFacility>500ms
-#        Get Facility too slow: p90 of GetFacility>500ms
-#        Get All Facilities By Boundary too slow: p90 of GetAllFacilitiesByBoundary>500ms
-#        Get First ten Facilities By Boundary too slow: p90 of GetFirstTenFacilitiesByBoundary>500ms
-#        Delete Facility too slow: p90 of DeleteFacility>500ms
-#        Get Supplying Facilities too slow: p90 of GetSupplyingFacilities>500ms
+        Create Facility too slow: p90 of CreateFacility>500ms
+        Get All Minimal Facilities too slow: p90 of GetAllMinimalFacilities>1000ms
+        Get First Ten Minimal Facilities too slow: p90 of GetFirstTenMinimalFacilities>500ms
+        Get Facility Audit Log too slow: p90 of GetFacilityAuditLog>500ms
+        Update Facility too slow: p90 of UpdateFacility>500ms
+        Get Facility too slow: p90 of GetFacility>500ms
+        Get All Facilities By Boundary too slow: p90 of GetAllFacilitiesByBoundary>500ms
+        Get First ten Facilities By Boundary too slow: p90 of GetFirstTenFacilitiesByBoundary>500ms
+        Delete Facility too slow: p90 of DeleteFacility>500ms
+        Get Supplying Facilities too slow: p90 of GetSupplyingFacilities>500ms
         Get All Facilities too slow: p90 of GetAllFacilities>10000ms
         Find All Health Center Facilities too slow: p90 of FindAllHealthCenterFacilities>30000ms
         Find First Ten Health Center Facilities too slow: p90 of FindFirstTenHealthCenterFacilities>30000ms

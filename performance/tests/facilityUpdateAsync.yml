@@ -1,43 +1,43 @@
-#execution:
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: facility-update-async
-#
-#scenarios:
-#  facility-update-async:
-#    variables:
-#      # Lurio, Cuamba
-#      facility_id: 4774fc63-a0c8-4a29-a01d-5b6b48632175
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/facilities/${facility_id}
-#        method: GET
-#        label: GetGivenFacility
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#      - url: ${__P(base-uri)}/api/facilities/${facility_id}
-#        method: PUT
-#        label: UpdateFacilityAsync
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#        jsr223:
-#          execute: before
-#          script-text: |
-#            import groovy.json.JsonSlurper
-#            import groovy.json.JsonOutput
-#
-#            def response = prev.getResponseDataAsString()
-#            def jsonSlurper = new JsonSlurper()
-#
-#            def facility = jsonSlurper.parseText(response)
-#            facility.name = "Updated Test facility"
-#
-#            vars.put("facility", JsonOutput.toJson(facility))
-#        body: ${facility}
-#
-#reporting:
-#    - module: passfail
-#      criteria:
-#        Update Facility too slow: p90 of UpdateFacilityAsync>500ms
+execution:
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: facility-update-async
+
+scenarios:
+  facility-update-async:
+    variables:
+      # Lurio, Cuamba
+      facility_id: 4774fc63-a0c8-4a29-a01d-5b6b48632175
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/facilities/${facility_id}
+        method: GET
+        label: GetGivenFacility
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+      - url: ${__P(base-uri)}/api/facilities/${facility_id}
+        method: PUT
+        label: UpdateFacilityAsync
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonSlurper
+            import groovy.json.JsonOutput
+
+            def response = prev.getResponseDataAsString()
+            def jsonSlurper = new JsonSlurper()
+
+            def facility = jsonSlurper.parseText(response)
+            facility.name = "Updated Test facility"
+
+            vars.put("facility", JsonOutput.toJson(facility))
+        body: ${facility}
+
+reporting:
+    - module: passfail
+      criteria:
+        Update Facility too slow: p90 of UpdateFacilityAsync>500ms

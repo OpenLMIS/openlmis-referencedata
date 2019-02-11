@@ -1,224 +1,224 @@
-#execution:
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-get-one
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-get-all
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-search-one-page
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-has-right
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-get-one-permission-strings
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-get-one-programs
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-get-one-facilities
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: create-user
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: delete-user
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-get-one-supported-programs
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-get-one-fulfillment-facilities
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-get-one-role-assignments
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: users-search-by-right
-#
-#scenarios:
-#  users-get-one:
-#    variables:
-#      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/${user_id}
-#        method: GET
-#        label: GetUser
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-get-all:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users
-#        method: GET
-#        label: GetAllUsers
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-search-one-page:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/search?page=1&size=10
-#        method: POST
-#        label: GetAUserPageOfTen
-#        body: '{}'
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#  create-user:
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users
-#        method: PUT
-#        label: CreateUser
-#        headers:
-#          Authorization: Bearer ${access_token}
-#          Content-Type: application/json
-#        jsr223:
-#          execute: before
-#          script-text: |
-#            import groovy.json.JsonOutput;
-#
-#            def random = new Random();
-#
-#            def user = [
-#              username: random.nextInt().abs().toString(),
-#              firstName: "first-name",
-#              lastName: "last-name"
-#            ];
-#
-#            vars.put("user", JsonOutput.toJson(user));
-#        body: ${user}
-#        extract-jsonpath:
-#          user_id: $.id
-#  delete-user:
-#      requests:
-#        - include-scenario: create-user
-#        - url: ${__P(base-uri)}/api/users/${user_id}
-#          method: DELETE
-#          label: DeleteUser
-#          headers:
-#            Authorization: Bearer ${access_token}
-#  users-has-right:
-#    variables:
-#      # administrator
-#      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/rights
-#        method: GET
-#        label: GetAllRights
-#        headers:
-#          Authorization: Bearer ${access_token}
-#        extract-jsonpath:
-#          rightUuid:
-#            jsonpath: $.[:1].id
-#        jsr223:
-#          script-text: |
-#            String uuid = vars.get("rightUuid");
-#            uuid = uuid.replaceAll(/"|\[|\]/, "");
-#            vars.put("rightUuid", uuid);
-#      - url: ${__P(base-uri)}/api/users/${user_id}/hasRight?rightId=${rightUuid}
-#        method: GET
-#        label: UserHasRight
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-get-one-permission-strings:
-#    variables:
-#      # administrator
-#      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/${user_id}/permissionStrings
-#        method: GET
-#        label: GetUserPermissionStrings
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-get-one-programs:
-#    variables:
-#      # administrator
-#      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/${user_id}/programs
-#        method: GET
-#        label: GetUserPrograms
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-get-one-supported-programs:
-#    variables:
-#      # administrator
-#      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/${user_id}/supportedPrograms
-#        method: GET
-#        label: GetUserSupportedPrograms
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-get-one-facilities:
-#    variables:
-#      # administrator
-#      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/${user_id}/facilities
-#        method: GET
-#        label: GetUserFacilities
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-get-one-fulfillment-facilities:
-#    variables:
-#      # administrator
-#      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
-#      # ORDERS_VIEW
-#      right_id: 7b2da074-b754-4e49-bad3-2520651e5107
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/${user_id}/fulfillmentFacilities?rightId=${right_id}
-#        method: GET
-#        label: GetUserFulfillmentFacilities
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-get-one-role-assignments:
-#    variables:
-#      # administrator
-#      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/${user_id}/roleAssignments
-#        method: GET
-#        label: GetUserRoleAssignments
-#        headers:
-#          Authorization: Bearer ${access_token}
-#  users-search-by-right:
-#    variables:
-#      # USERS_MANAGE
-#      right_id: 3687ea98-8a1e-4347-984c-3fd97d072066
-#    requests:
-#      - include-scenario: get-user-token
-#      - url: ${__P(base-uri)}/api/users/rightSearch?rightId=${right_id}
-#        method: GET
-#        label: GetUsersByRight
-#        headers:
-#          Authorization: Bearer ${access_token}
-#
-#reporting:
-#    - module: passfail
-#      criteria:
-#        Get User too slow: p90 of GetUser>500ms
-#        Get All Users too slow: p90 of GetAllUsers>500ms
-#        Get a User Page of Ten too slow: p90 of GetAUserPageOfTen>500ms
-#        User Has Right too slow: p90 of UserHasRight>500ms
-#        Get User Permission Strings too slow: p90 of GetUserPermissionStrings>500ms
-#        Get User Programs too slow: p90 of GetUserPrograms>250ms
-#        Get User Supported Programs too slow: p90 of GetUserSupportedPrograms>500ms
-#        Get User Facilities too slow: p90 of GetUserFacilities>500ms
-#        Get User Fulfillment Facilities too slow: p90 of GetUserFulfillmentFacilities>40000ms
-#        Get User Role Assignments too slow: p90 of GetUserRoleAssignments>20000ms
-#        Create User too slow: p90 of CreateUser>500ms
-#        Delete User too slow: p90 of DeleteUser>500ms
-#        Get Users By Right too slow: p90 of GetUsersByRight>500ms
+execution:
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-get-one
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-get-all
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-search-one-page
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-has-right
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-get-one-permission-strings
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-get-one-programs
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-get-one-facilities
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: create-user
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: delete-user
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-get-one-supported-programs
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-get-one-fulfillment-facilities
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-get-one-role-assignments
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: users-search-by-right
+
+scenarios:
+  users-get-one:
+    variables:
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/${user_id}
+        method: GET
+        label: GetUser
+        headers:
+          Authorization: Bearer ${access_token}
+  users-get-all:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users
+        method: GET
+        label: GetAllUsers
+        headers:
+          Authorization: Bearer ${access_token}
+  users-search-one-page:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/search?page=1&size=10
+        method: POST
+        label: GetAUserPageOfTen
+        body: '{}'
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+  create-user:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users
+        method: PUT
+        label: CreateUser
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          execute: before
+          script-text: |
+            import groovy.json.JsonOutput;
+
+            def random = new Random();
+
+            def user = [
+              username: random.nextInt().abs().toString(),
+              firstName: "first-name",
+              lastName: "last-name"
+            ];
+
+            vars.put("user", JsonOutput.toJson(user));
+        body: ${user}
+        extract-jsonpath:
+          user_id: $.id
+  delete-user:
+      requests:
+        - include-scenario: create-user
+        - url: ${__P(base-uri)}/api/users/${user_id}
+          method: DELETE
+          label: DeleteUser
+          headers:
+            Authorization: Bearer ${access_token}
+  users-has-right:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/rights
+        method: GET
+        label: GetAllRights
+        headers:
+          Authorization: Bearer ${access_token}
+        extract-jsonpath:
+          rightUuid:
+            jsonpath: $.[:1].id
+        jsr223:
+          script-text: |
+            String uuid = vars.get("rightUuid");
+            uuid = uuid.replaceAll(/"|\[|\]/, "");
+            vars.put("rightUuid", uuid);
+      - url: ${__P(base-uri)}/api/users/${user_id}/hasRight?rightId=${rightUuid}
+        method: GET
+        label: UserHasRight
+        headers:
+          Authorization: Bearer ${access_token}
+  users-get-one-permission-strings:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/${user_id}/permissionStrings
+        method: GET
+        label: GetUserPermissionStrings
+        headers:
+          Authorization: Bearer ${access_token}
+  users-get-one-programs:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/${user_id}/programs
+        method: GET
+        label: GetUserPrograms
+        headers:
+          Authorization: Bearer ${access_token}
+  users-get-one-supported-programs:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/${user_id}/supportedPrograms
+        method: GET
+        label: GetUserSupportedPrograms
+        headers:
+          Authorization: Bearer ${access_token}
+  users-get-one-facilities:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/${user_id}/facilities
+        method: GET
+        label: GetUserFacilities
+        headers:
+          Authorization: Bearer ${access_token}
+  users-get-one-fulfillment-facilities:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+      # ORDERS_VIEW
+      right_id: 7b2da074-b754-4e49-bad3-2520651e5107
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/${user_id}/fulfillmentFacilities?rightId=${right_id}
+        method: GET
+        label: GetUserFulfillmentFacilities
+        headers:
+          Authorization: Bearer ${access_token}
+  users-get-one-role-assignments:
+    variables:
+      # administrator
+      user_id: a337ec45-31a0-4f2b-9b2e-a105c4b669bb
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/${user_id}/roleAssignments
+        method: GET
+        label: GetUserRoleAssignments
+        headers:
+          Authorization: Bearer ${access_token}
+  users-search-by-right:
+    variables:
+      # USERS_MANAGE
+      right_id: 3687ea98-8a1e-4347-984c-3fd97d072066
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/users/rightSearch?rightId=${right_id}
+        method: GET
+        label: GetUsersByRight
+        headers:
+          Authorization: Bearer ${access_token}
+
+reporting:
+    - module: passfail
+      criteria:
+        Get User too slow: p90 of GetUser>500ms
+        Get All Users too slow: p90 of GetAllUsers>500ms
+        Get a User Page of Ten too slow: p90 of GetAUserPageOfTen>500ms
+        User Has Right too slow: p90 of UserHasRight>500ms
+        Get User Permission Strings too slow: p90 of GetUserPermissionStrings>500ms
+        Get User Programs too slow: p90 of GetUserPrograms>250ms
+        Get User Supported Programs too slow: p90 of GetUserSupportedPrograms>500ms
+        Get User Facilities too slow: p90 of GetUserFacilities>500ms
+        Get User Fulfillment Facilities too slow: p90 of GetUserFulfillmentFacilities>40000ms
+        Get User Role Assignments too slow: p90 of GetUserRoleAssignments>20000ms
+        Create User too slow: p90 of CreateUser>500ms
+        Delete User too slow: p90 of DeleteUser>500ms
+        Get Users By Right too slow: p90 of GetUsersByRight>500ms
