@@ -41,7 +41,6 @@ import org.openlmis.referencedata.service.FacilityBuilder;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
@@ -423,7 +422,7 @@ public class FacilityController extends BaseController {
   @GetMapping(value = RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<FacilityDto> getFacilities(
+  public Page<BasicFacilityDto> getFacilities(
       @RequestParam MultiValueMap<String, Object> requestParams, Pageable pageable) {
     Profiler profiler = new Profiler("GET_FACILITIES");
     profiler.setLogger(XLOGGER);
@@ -435,7 +434,7 @@ public class FacilityController extends BaseController {
     Page<Facility> foundFacilities = facilityService.searchFacilities(params, pageable);
 
     profiler.start("EXPORT_TO_DTO");
-    Page<FacilityDto> dto = toFacilityDto(foundFacilities, pageable, profiler);
+    Page<BasicFacilityDto> dto = toBasicDto(foundFacilities, pageable, profiler);
 
     profiler.stop().log();
     return dto;
@@ -460,17 +459,13 @@ public class FacilityController extends BaseController {
 
     profiler.start("CONVERT_PARAMS");
     MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-    queryParams.entrySet().stream()
-        .forEach(entry -> map.add(entry.getKey(), entry.getValue()));
+    queryParams.forEach(map::add);
     FacilitySearchParams params = new FacilitySearchParams(map);
 
     profiler.start("SERVICE_SEARCH");
     Page<Facility> foundFacilities = facilityService.searchFacilities(params, pageable);
 
-    Page<BasicFacilityDto> page = Pagination.getPage(
-            toBasicDto(foundFacilities.getContent(), profiler),
-            pageable,
-            foundFacilities.getTotalElements());
+    Page<BasicFacilityDto> page = toBasicDto(foundFacilities, pageable, profiler);
 
     XLOGGER.exit(page);
     profiler.stop().log();
@@ -532,21 +527,13 @@ public class FacilityController extends BaseController {
     return toPage(minimalFacilityDtos, pageable, profiler);
   }
 
-  private List<BasicFacilityDto> toBasicDto(List<Facility> facilities, Profiler profiler) {
+  private Page<BasicFacilityDto> toBasicDto(Page<Facility> facilities, Pageable pageable,
+      Profiler profiler) {
     profiler.start("EXPORT_FACILITIES_TO_BASIC_DTO");
-    return facilities
+
+    List<BasicFacilityDto> facilityDtos = facilities.getContent()
         .stream()
         .map(BasicFacilityDto::newInstance)
-        .collect(Collectors.toList());
-  }
-
-  private Page<FacilityDto> toFacilityDto(Page<Facility> facilities,
-      Pageable pageable, Profiler profiler) {
-    profiler.start("EXPORT_FACILITIES_TO_DTO");
-
-    List<FacilityDto> facilityDtos = facilities.getContent()
-        .stream()
-        .map(FacilityDto::newInstance)
         .collect(Collectors.toList());
 
     return toPage(facilityDtos, pageable, facilities.getTotalElements(), profiler);

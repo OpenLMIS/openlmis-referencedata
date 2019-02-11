@@ -55,8 +55,8 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
   private static final String HQL_SELECT = "SELECT DISTINCT f"
       + " FROM Facility AS f"
-      + " INNER JOIN FETCH f.geographicZone AS g"
-      + " INNER JOIN FETCH f.type AS t";
+      + " INNER JOIN f.geographicZone AS g"
+      + " INNER JOIN f.type AS t";
 
   private static final String WHERE = "WHERE";
   private static final String AND = " AND ";
