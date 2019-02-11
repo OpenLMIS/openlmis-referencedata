@@ -48,13 +48,17 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       + " INNER JOIN referencedata.geographic_zones AS g ON f.geographiczoneid = g.id"
       + " INNER JOIN referencedata.facility_types AS t ON f.typeid = t.id";
 
-  private static final String HQL_SELECT_BY_IDS = "SELECT DISTINCT f"
+  private static final String HQL_COUNT = "SELECT DISTINCT COUNT(*)"
+      + " FROM Facility AS f"
+      + " INNER JOIN f.geographicZone AS g"
+      + " INNER JOIN f.type AS t";
+
+  private static final String HQL_SELECT = "SELECT DISTINCT f"
       + " FROM Facility AS f"
       + " INNER JOIN FETCH f.geographicZone AS g"
       + " INNER JOIN FETCH f.type AS t"
       + " LEFT OUTER JOIN FETCH f.operator AS o"
-      + " LEFT OUTER JOIN FETCH f.supportedPrograms AS sp"
-      + " WHERE f.id in (:ids)";
+      + " LEFT OUTER JOIN FETCH f.supportedPrograms AS sp";
 
   private static final String WHERE = "WHERE";
   private static final String AND = " AND ";
@@ -66,7 +70,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
   private static final String WITH_CODE = "UPPER(f.code) LIKE :code";
   private static final String WITH_NAME = "UPPER(f.name) LIKE :name";
   private static final String WITH_ZONE = "g.id IN (:zones)";
-  private static final String WITH_ID = "f.id IN (:ids)";
+  private static final String WITH_IDS = "f.id IN (:ids)";
   private static final String WITH_TYPE = "t.code = :typeCode";
   private static final String WITH_EXTRA_DATA = "f.extradata @> (:extraData)\\:\\:jsonb";
 
@@ -85,46 +89,18 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    */
   public Page<Facility> search(FacilityRepositoryCustom.SearchParams searchParams,
       Set<UUID> geographicZoneIds, String extraData, Pageable pageable) {
-    List<String> sql = Lists.newArrayList(NATIVE_SELECT_BY_PARAMS);
-    List<String> where = Lists.newArrayList();
+    if (null != extraData) {
+      return searchWithExtraData(searchParams, geographicZoneIds, extraData, pageable);
+    }
+    return searchWithoutExtraData(searchParams, geographicZoneIds, pageable);
+  }
+
+  private Page<Facility> searchWithExtraData(FacilityRepositoryCustom.SearchParams searchParams,
+      Set<UUID> geographicZoneIds, String extraData, Pageable pageable) {
+
     Map<String, Object> params = Maps.newHashMap();
-
-    if (isNotBlank(searchParams.getCode())) {
-      where.add(WITH_CODE);
-      params.put("code", "%" + searchParams.getCode().toUpperCase() + "%");
-    }
-
-    if (isNotBlank(searchParams.getName())) {
-      where.add(WITH_NAME);
-      params.put("name", "%" + searchParams.getName().toUpperCase() + "%");
-    }
-
-    if (isNotBlank(searchParams.getFacilityTypeCode())) {
-      where.add(WITH_TYPE);
-      params.put("typeCode", searchParams.getFacilityTypeCode());
-    }
-
-    if (isNotEmpty(geographicZoneIds)) {
-      where.add(WITH_ZONE);
-      params.put("zones", geographicZoneIds);
-    }
-
-    if (isNotBlank(extraData)) {
-      where.add(WITH_EXTRA_DATA);
-      params.put("extraData", extraData);
-    }
-
-    if (isNotEmpty(searchParams.getIds())) {
-      where.add(WITH_ID);
-      params.put("ids", searchParams.getIds());
-    }
-
-    if (!where.isEmpty()) {
-      sql.add(WHERE);
-      sql.add(Joiner.on(AND).join(where));
-    }
-
-    String query = Joiner.on(' ').join(sql);
+    String query =
+        prepareQuery(NATIVE_SELECT_BY_PARAMS, searchParams, geographicZoneIds, extraData, params);
 
     Query nativeQuery = entityManager.createNativeQuery(query);
     params.forEach(nativeQuery::setParameter);
@@ -136,18 +112,44 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     @SuppressWarnings("unchecked")
     List<UUID> ids = nativeQuery.getResultList();
 
-    Integer count = ids.size();
-
     if (isEmpty(ids)) {
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
-    String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(HQL_SELECT_BY_IDS, ORDER_BY,
-            getOrderPredicate(pageable)));
+    String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(HQL_SELECT, WHERE, WITH_IDS,
+        ORDER_BY, getOrderPredicate(pageable)));
 
     List<Facility> facilities =  entityManager
         .createQuery(hqlWithSort, Facility.class)
         .setParameter("ids", ids)
+        .setMaxResults(pageable.getPageSize())
+        .setFirstResult(pageable.getOffset())
+        .getResultList();
+
+    return Pagination.getPage(facilities, pageable, ids.size());
+  }
+
+  private Page<Facility> searchWithoutExtraData(FacilityRepositoryCustom.SearchParams searchParams,
+      Set<UUID> geographicZoneIds, Pageable pageable) {
+
+    Map<String, Object> params = Maps.newHashMap();
+    Query countQuery = entityManager.createQuery(prepareQuery(
+        HQL_COUNT, searchParams, geographicZoneIds, null, params), Long.class);
+    params.forEach(countQuery::setParameter);
+    Long count = (Long) countQuery.getSingleResult();
+
+    if (count < 1) {
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
+    }
+
+    params = Maps.newHashMap();
+    String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(
+        prepareQuery(HQL_SELECT, searchParams, geographicZoneIds, null, params),
+        ORDER_BY, getOrderPredicate(pageable)));
+
+    Query searchQuery = entityManager.createQuery(hqlWithSort, Facility.class);
+    params.forEach(searchQuery::setParameter);
+    List<Facility> facilities =  searchQuery
         .setMaxResults(pageable.getPageSize())
         .setFirstResult(pageable.getOffset())
         .getResultList();
@@ -176,5 +178,49 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     }
 
     return DEFAULT_SORT;
+  }
+
+  private String prepareQuery(String baseSql, FacilityRepositoryCustom.SearchParams searchParams,
+      Set<UUID> geographicZoneIds, String extraData, Map<String, Object> params) {
+
+    List<String> sql = Lists.newArrayList(baseSql);
+    List<String> where = Lists.newArrayList();
+
+    if (isNotBlank(searchParams.getCode())) {
+      where.add(WITH_CODE);
+      params.put("code", "%" + searchParams.getCode().toUpperCase() + "%");
+    }
+
+    if (isNotBlank(searchParams.getName())) {
+      where.add(WITH_NAME);
+      params.put("name", "%" + searchParams.getName().toUpperCase() + "%");
+    }
+
+    if (isNotBlank(searchParams.getFacilityTypeCode())) {
+      where.add(WITH_TYPE);
+      params.put("typeCode", searchParams.getFacilityTypeCode());
+    }
+
+    if (isNotEmpty(geographicZoneIds)) {
+      where.add(WITH_ZONE);
+      params.put("zones", geographicZoneIds);
+    }
+
+    if (isNotBlank(extraData)) {
+      where.add(WITH_EXTRA_DATA);
+      params.put("extraData", extraData);
+    }
+
+    if (isNotEmpty(searchParams.getIds())) {
+      where.add(WITH_IDS);
+      params.put("ids", searchParams.getIds());
+    }
+
+    if (!where.isEmpty()) {
+      sql.add(WHERE);
+      sql.add(Joiner.on(AND).join(where));
+    }
+
+    return Joiner.on(' ').join(sql);
   }
 }
