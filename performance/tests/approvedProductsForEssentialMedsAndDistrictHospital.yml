@@ -12,7 +12,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=true&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
-        label: GetApprovedFullSupplyProductsForDistrictHospital
+        label: Get1000ApprovedFullSupplyProductsForDistrictHospital
         headers:
           Authorization: Bearer ${access_token}
   non-full-supply-approved-products:
@@ -20,12 +20,12 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/facilities/13037147-1769-4735-90a7-b9b310d128b8/approvedProducts?fullSupply=false&programId=10845cb9-d365-4aaa-badd-b4fa39c6a26a
         method: GET
-        label: GetApprovedNonFullSupplyProductsForDistrictHospital
+        label: Get9000ApprovedNonFullSupplyProductsForDistrictHospital
         headers:
           Authorization: Bearer ${access_token}
 
 reporting:
     - module: passfail
       criteria:
-        Get Approved Full Supply Products For District Hospital too slow: p90 of GetApprovedFullSupplyProductsForDistrictHospital>1500ms
-        Get Approved Non Full Supply Products For District Hospital too slow: p90 of GetApprovedNonFullSupplyProductsForDistrictHospital>10000ms
+        Get 1000 Approved Full Supply Products For District Hospital too slow: p90 of Get1000ApprovedFullSupplyProductsForDistrictHospital>1500ms
+        Get 9000 Approved Non Full Supply Products For District Hospital too slow: p90 of Get9000ApprovedNonFullSupplyProductsForDistrictHospital>10000ms
