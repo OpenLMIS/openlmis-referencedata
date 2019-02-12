@@ -2,7 +2,7 @@
 ==================
 
 Breaking changes:
-* [OLMIS-3773](https://openlmis.atlassian.net/browse/OLMIS-3773): Changed facility search by ids to return page.
+* [OLMIS-3773](https://openlmis.atlassian.net/browse/OLMIS-3773): Changed `GET /api/facilities` to return page of BasicFacilityDto.
 * [OLMIS-3586](https://openlmis.atlassian.net/browse/OLMIS-3586): Changed `GET /api/facilities` and `POST /api/facilities/search` endpoints to do conjunction search.
 * [OLMIS-5000](https://openlmis.atlassian.net/browse/OLMIS-5000): Merged all supply line searching endpoints to on GET /api/supplyLines endpoint with programId, supervisoryNodeId and supplyingFacilityId (multiple) parameters.
 

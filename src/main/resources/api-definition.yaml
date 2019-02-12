@@ -1485,7 +1485,7 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: false
-              zone:
+              zoneId:
                   description: Facility zone id
                   type: string
                   required: false
