@@ -169,13 +169,11 @@ public class Application {
   @Bean
   @Profile("!production")
   public FlywayMigrationStrategy cleanMigrationStrategy() {
-    FlywayMigrationStrategy strategy = flyway -> {
+    return flyway -> {
       logger.info("Using clean-migrate flyway strategy -- production profile not active");
       flyway.clean();
       flyway.migrate();
     };
-
-    return strategy;
   }
 
   /**

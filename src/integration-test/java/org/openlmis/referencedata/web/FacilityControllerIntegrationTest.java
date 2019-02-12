@@ -469,6 +469,25 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
+    when(facilityTypeApprovedProductRepository
+        .searchProducts(any(UUID.class), any(UUID.class), any(Boolean.class), any(List.class),
+            any(Pageable.class)))
+        .thenThrow(new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND));
+
+    restAssured.given()
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam(FULL_SUPPLY, false)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldSearchWithEmptyParamsWhenNoParamsProvided() {
     List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
