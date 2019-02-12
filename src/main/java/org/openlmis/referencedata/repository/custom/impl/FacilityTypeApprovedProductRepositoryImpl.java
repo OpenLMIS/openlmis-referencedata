@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -32,6 +33,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -39,22 +42,33 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 public class FacilityTypeApprovedProductRepositoryImpl
     implements FacilityTypeApprovedProductRepositoryCustom {
 
-  private static final String COUNT_SELECT = "SELECT COUNT(ftap.id)";
+  private static final XLogger XLOGGER =
+      XLoggerFactory.getXLogger(FacilityTypeApprovedProductRepositoryImpl.class);
+
+  private static final String COUNT_SELECT = "SELECT COUNT(*)";
   private static final String SEARCH_SELECT = "SELECT ftap";
   private static final String SEARCH_PRODUCTS_SQL = " FROM FacilityTypeApprovedProduct ftap"
       + " INNER JOIN ftap.orderable.programOrderables AS po"
       + " WHERE ftap.facilityType.id = :facilityTypeId"
       + " AND po.active = TRUE"
       + " AND po.program.id = ftap.program.id";
+  private static final String SEARCH_FACILITY_TYPE_ID_BY_FACILITY_ID_QUERY =
+      "SELECT ft.id AS type_id FROM referencedata.facility_types AS ft"
+          + " JOIN referencedata.facilities f ON f.typeId = ft.id"
+          + " WHERE f.id = '%s'";
 
   private static final String WITH_PROGRAM = " AND ftap.program.id = :programId";
   private static final String WITH_FULL_SUPPLY = " AND po.fullSupply = :fullSupply";
@@ -70,8 +84,27 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private EntityManager entityManager;
 
   @Override
-  public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID programId,
+  public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID programId,
       Boolean fullSupply, List<UUID> orderableIds, Pageable pageable) {
+
+    Profiler profiler = new Profiler("FTAP_REPOSITORY_SEARCH");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("SEARCH_FACILITY_TYPE_ID");
+    Query query = entityManager.createNativeQuery(
+        String.format(SEARCH_FACILITY_TYPE_ID_BY_FACILITY_ID_QUERY, facilityId));
+    SQLQuery sql = query.unwrap(SQLQuery.class);
+    sql.addScalar("type_id", PostgresUUIDType.INSTANCE);
+
+    UUID facilityTypeId;
+    try {
+      facilityTypeId = (UUID) query.getSingleResult();
+    } catch (Exception ex) {
+      profiler.stop().log();
+      throw new ValidationMessageException(ex, FacilityMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    profiler.start("COUNT_QUERY");
     TypedQuery<Long> countQuery = (TypedQuery<Long>) createQuery(true, facilityTypeId, programId,
         orderableIds, fullSupply, pageable);
     Long count = countQuery.getSingleResult();
@@ -79,10 +112,14 @@ public class FacilityTypeApprovedProductRepositoryImpl
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
-    TypedQuery<FacilityTypeApprovedProduct> query = (TypedQuery<FacilityTypeApprovedProduct>)
+    profiler.start("SEARCH_QUERY");
+    TypedQuery<FacilityTypeApprovedProduct> searchQuery = (TypedQuery<FacilityTypeApprovedProduct>)
         createQuery(false, facilityTypeId, programId, orderableIds, fullSupply, pageable);
+    Page<FacilityTypeApprovedProduct> result =
+        Pagination.getPage(searchQuery.getResultList(), pageable, count);
 
-    return new PageImpl<>(query.getResultList(), pageable, count);
+    profiler.stop().log();
+    return result;
   }
 
   @Override

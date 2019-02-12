@@ -409,18 +409,17 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindApprovedProductsForFacility() {
     pageable = new PageRequest(0, Integer.MAX_VALUE);
-    when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
-    when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
-        eq(false), eq(null), eq(pageable)))
+    when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
+        eq(program.getId()), eq(false), eq(null), eq(pageable)))
         .thenReturn(new PageImpl<>(Collections.singletonList(
             new FacilityTypeApprovedProductsDataBuilder().build()), pageable, 1));
 
     PageImplRepresentation productDtos = restAssured.given()
-        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam(PROGRAM_ID, program.getId())
         .queryParam(FULL_SUPPLY, false)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
-        .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
+        .get(RESOURCE_URL + "/" + facility.getId() + APPROVED_PRODUCTS)
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
@@ -434,20 +433,19 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     pageable = new PageRequest(0, Integer.MAX_VALUE);
     List<UUID> orderableIds = asList(orderableId1, orderableId2);
 
-    when(facilityRepository.findOne(any(UUID.class))).thenReturn(facility);
-    when(facilityTypeApprovedProductRepository.searchProducts(any(UUID.class), any(UUID.class),
-        eq(false), eq(orderableIds), eq(pageable)))
+    when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
+        eq(program.getId()), eq(false), eq(orderableIds), eq(pageable)))
         .thenReturn(new PageImpl<>(Collections.singletonList(
             new FacilityTypeApprovedProductsDataBuilder().build()), pageable, 1));
 
     PageImplRepresentation productDtos = restAssured.given()
-        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam(PROGRAM_ID, program.getId())
         .queryParam(FULL_SUPPLY, false)
         .queryParam("orderableId", orderableId1)
         .queryParam("orderableId", orderableId2)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
-        .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
+        .get(RESOURCE_URL + "/" + facility.getId() + APPROVED_PRODUCTS)
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);
@@ -466,22 +464,6 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
         .then()
         .statusCode(401);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
-    when(facilityRepository.findOne(any(UUID.class))).thenReturn(null);
-
-    restAssured.given()
-        .queryParam(PROGRAM_ID, UUID.randomUUID())
-        .queryParam(FULL_SUPPLY, false)
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL + "/" + UUID.randomUUID() + APPROVED_PRODUCTS)
-        .then()
-        .statusCode(400);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

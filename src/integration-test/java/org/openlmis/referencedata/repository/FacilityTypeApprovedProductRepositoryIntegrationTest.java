@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
@@ -34,11 +35,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Facility;
@@ -51,8 +55,10 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,6 +67,9 @@ import org.springframework.data.domain.Pageable;
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   private static final double MAX_PERIODS_OF_STOCK_DELTA = 1e-15;
   private static final String FACILITY_TYPE_CODE = "facilityType";
@@ -215,7 +224,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getType().getId(), program.getId(), null, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, pageable);
 
     assertThat(page.getContent(), hasSize(2));
   }
@@ -230,7 +239,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = singletonList(orderableFullSupply.getId());
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getType().getId(), program.getId(), null, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, pageable);
 
     assertThat(page.getContent(), hasSize(1));
     assertEquals(page.getContent().get(0).getOrderable(), orderableFullSupply);
@@ -247,7 +256,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getType().getId(), program.getId(), null, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, pageable);
 
     assertThat(page.getContent(), hasSize(1));
   }
@@ -261,7 +270,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getType().getId(), program.getId(), true, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), true, orderableIds, pageable);
 
     assertThat(page.getContent(), hasSize(1));
 
@@ -285,7 +294,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getType().getId(), program.getId(), false, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), false, orderableIds, pageable);
 
     // At this point we have no non-full supply products
     assertEquals(0, page.getContent().size());
@@ -294,7 +303,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(generateProduct(facilityType1, false));
 
     page = ftapRepository
-        .searchProducts(facility.getType().getId(), program.getId(), false, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), false, orderableIds, pageable);
 
     // We should be able to find non-full supply product we have created
     assertEquals(1, page.getContent().size());
@@ -318,7 +327,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getType().getId(), null, true, orderableIds, pageable);
+        .searchProducts(facility.getId(), null, true, orderableIds, pageable);
 
     assertThat(page.getContent(), hasSize(1));
 
@@ -327,6 +336,17 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
 
     ftap = page.iterator().next();
     assertFacilityTypeApprovedProduct(ftap);
+  }
+
+  @Test
+  public void shouldThrowExceptionIfFacilityWasNotFound() {
+    ftapRepository.save(generateProduct(facilityType1, true));
+
+    expectedException.expectCause(isA(NoResultException.class));
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(FacilityMessageKeys.ERROR_NOT_FOUND);
+
+    ftapRepository.searchProducts(UUID.randomUUID(), null, true, emptyList(), pageable);
   }
 
   @Test

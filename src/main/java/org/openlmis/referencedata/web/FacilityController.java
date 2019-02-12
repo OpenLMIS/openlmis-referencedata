@@ -308,17 +308,9 @@ public class FacilityController extends BaseController {
     Profiler profiler = new Profiler("GET_FACILITY_APPROVED_PRODUCTS");
     profiler.setLogger(XLOGGER);
 
-    profiler.start("FIND_FACILITY");
-    Facility facility = facilityRepository.findOne(facilityId);
-
-    if (facility == null) {
-      profiler.stop().log();
-      throw new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND);
-    }
-
     profiler.start("FIND_APPROVED_PRODUCTS");
     Page<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
-        .searchProducts(facility.getType().getId(), programId, fullSupply, orderablesId, pageable);
+        .searchProducts(facilityId, programId, fullSupply, orderablesId, pageable);
 
     Page<ApprovedProductDto> list = toDto(products, pageable, profiler);
 

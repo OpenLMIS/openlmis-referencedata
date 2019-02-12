@@ -23,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface FacilityTypeApprovedProductRepositoryCustom {
 
-  Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityTypeId, UUID program,
+  Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID program,
                                                    Boolean fullSupply, List<UUID> orderableIds,
                                                    Pageable pageable);
 

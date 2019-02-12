@@ -20,7 +20,6 @@ import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Locale;
 import javax.annotation.PostConstruct;
-import org.flywaydb.core.Flyway;
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
 import org.javers.core.diff.ListCompareAlgorithm;
@@ -170,13 +169,10 @@ public class Application {
   @Bean
   @Profile("!production")
   public FlywayMigrationStrategy cleanMigrationStrategy() {
-    FlywayMigrationStrategy strategy = new FlywayMigrationStrategy() {
-      @Override
-      public void migrate(Flyway flyway) {
-        logger.info("Using clean-migrate flyway strategy -- production profile not active");
-        flyway.clean();
-        flyway.migrate();
-      }
+    FlywayMigrationStrategy strategy = flyway -> {
+      logger.info("Using clean-migrate flyway strategy -- production profile not active");
+      flyway.clean();
+      flyway.migrate();
     };
 
     return strategy;
