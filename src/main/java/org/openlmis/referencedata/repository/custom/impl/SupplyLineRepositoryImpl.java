@@ -35,11 +35,16 @@ import javax.persistence.criteria.Root;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.custom.SupplyLineRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupplyLineRepositoryImpl.class);
 
   private static final String SUPPLYING_FACILITY = "supplyingFacility";
 
@@ -60,17 +65,25 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   @Override
   public Page<SupplyLine> search(UUID programId, UUID supervisoryNodeId,
       Set<UUID> supplyingFacilityIds, Pageable pageable) {
+
+    Profiler profiler = new Profiler("SEARCH_SUPPLY_LINES_REPOSITORY");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("GET_CRITERIA_BUILDER");
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
+    profiler.start("COUNT_QUERY");
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
     countQuery = prepareSearchQuery(
         countQuery, programId, supervisoryNodeId, supplyingFacilityIds, pageable, true);
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
     if (count == 0) {
+      profiler.stop().log();
       return Pagination.getPage(emptyList(), pageable, 0);
     }
 
+    profiler.start("SEARCH_QUERY");
     CriteriaQuery<SupplyLine> query = builder.createQuery(SupplyLine.class);
     query = prepareSearchQuery(
         query, programId, supervisoryNodeId, supplyingFacilityIds, pageable, false);
@@ -80,6 +93,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
         .setFirstResult(pageable.getOffset())
         .getResultList();
 
+    profiler.stop().log();
     return Pagination.getPage(result, pageable, count);
   }
 
