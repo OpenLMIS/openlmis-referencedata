@@ -1,0 +1,82 @@
+execution:
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: get-supply-line
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: get-all-supply-lines
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: get-page-of-ten-supply-lines
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: get-supply-lines-by-supervisory-node-id
+  - concurrency: ${__P(scenario-concurrency,1)}
+    hold-for: ${__P(scenario-duration,60)}
+    scenario: get-supply-lines-by-program-id-and-supplying-facility-id
+
+scenarios:
+  get-supply-line:
+    variables:
+      # Ntcheu District Warehouse and Family Planning
+      supply_line_id: 54e16aae-35f1-489a-9819-0a677de50d19
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines/${supply_line_id}
+        method: GET
+        label: GetSupplyLine
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-all-supply-lines:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines
+        method: GET
+        label: GetAllSupplyLines
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-page-of-ten-supply-lines:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines?page=0&size=10
+        method: GET
+        label: GetPageOfTenSupplyLines
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-supply-lines-by-supervisory-node-id:
+    variables:
+      # FP approval point
+      supervisory_node_id: fb38bd1c-beeb-4527-8345-900900329c10
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines?supervisoryNodeId=${supervisory_node_id}
+        method: GET
+        label: GetSupplyLinesBySupervisoryNodeId
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-supply-lines-by-program-id-and-supplying-facility-id:
+    variables:
+      # Ntcheu District Warehouse
+      supplying_facility_id: 19121381-9f3d-4e77-b9e5-d3f59fc1639e
+      # Family Planning
+      program_id: dce17f2e-af3e-40ad-8e00-3496adef44c3
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines?programId=${program_id}&supplyingFacilityId=${supplying_facility_id}
+        method: GET
+        label: GetSupplyLinesByProgramIdAndSupplyingFacilityId
+        headers:
+          Authorization: Bearer ${access_token}
+
+reporting:
+  - module: passfail
+    criteria:
+      Get Supply Line too slow: p90 of GetSupplyLine>60000ms
+      Get All Supply Lines too slow: p90 of GetAllSupplyLines>60000ms
+      Get Page of Ten Supply Lines too slow: p90 of GetPageOfTenSupplyLines>60000ms
+      Get Supply Lines by Supervisory Node too slow: p90 of GetSupplyLinesBySupervisoryNodeId>60000ms
+      Get Supply Lines by Program and Supplying Facility too slow: p90 of GetSupplyLinesByProgramIdAndSupplyingFacilityId>60000ms
