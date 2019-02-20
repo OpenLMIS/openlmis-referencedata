@@ -26,7 +26,11 @@ public enum AvailableFeatures implements Feature {
 
   @EnabledByDefault
   @Label("Multiple suppliers")
-  MULTIPLE_SUPPLIERS;
+  MULTIPLE_SUPPLIERS,
+
+  @EnabledByDefault
+  @Label("Consolidate notifications")
+  CONSOLIDATE_NOTIFICATIONS;
 
   public boolean isActive() {
     return FeatureContext.getFeatureManager().isActive(this);
