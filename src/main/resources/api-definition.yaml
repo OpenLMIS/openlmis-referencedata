@@ -116,6 +116,10 @@ schemas:
 
   - orderable: !include schemas/orderable.json
 
+  - minimalOrderable: !include schemas/minimalOrderable.json
+
+  - orderableChildDto: !include schemas/orderableChildDto.json
+
   - orderablePage: !include schemas/orderablePage.json
 
   - processingPeriod: !include schemas/processingPeriod.json

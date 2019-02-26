@@ -19,11 +19,14 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.OrderableChild;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,6 +36,9 @@ public class OrderableBuilder {
 
   @Autowired
   private ProgramRepository programRepository;
+
+  @Autowired
+  private OrderableRepository orderableRepository;
 
   /**
    * Creates new instance based on data from {@link Orderable.Importer}.
@@ -65,6 +71,16 @@ public class OrderableBuilder {
           .collect(Collectors.toList());
 
       orderable.setProgramOrderables(programOrderables);
+    }
+
+    if (!isEmpty(importer.getChildren())) {
+      Set<OrderableChild> children = importer.getChildren().stream().map(
+          item -> {
+            Orderable child = orderableRepository
+                .findFirstByIdentityIdOrderByIdentityVersionIdDesc(item.getOrderable().getId());
+            return OrderableChild.newInstance(orderable, child, item.getQuantity());
+          }).collect(Collectors.toSet());
+      orderable.setChildren(children);
     }
 
     return orderable;

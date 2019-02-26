@@ -15,13 +15,14 @@
 
 package org.openlmis.referencedata.util;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Test;
@@ -34,8 +35,11 @@ import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.dto.MinimalOrderableDto;
+import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,6 +47,9 @@ public class OrderableBuilderTest {
 
   @Mock
   private ProgramRepository programRepository;
+
+  @Mock
+  private OrderableRepository orderableRepository;
 
   @InjectMocks
   private OrderableBuilder orderableBuilder;
@@ -63,6 +70,31 @@ public class OrderableBuilderTest {
     Orderable orderable = createOrderable(program1.getId(), program2.getId());
 
     assertOrderable(orderable, program1, program2);
+  }
+
+  @Test
+  public void shouldCreateOrderableWithChildren() {
+
+    Set<OrderableChildDto> childSet = new HashSet<>();
+    MinimalOrderableDto minimalOrderableDto = new MinimalOrderableDto();
+    minimalOrderableDto.setId(UUID.randomUUID());
+    OrderableChildDto childDto = new OrderableChildDto(minimalOrderableDto, 20L);
+    childSet.add(childDto);
+    OrderableDto orderableDto = new OrderableDto();
+
+    orderableDto.setChildren(childSet);
+    orderableDto.setNetContent(100L);
+    orderableDto.setPackRoundingThreshold(1L);
+    orderableDto.setRoundToZero(true);
+    orderableDto.setDispensable(Dispensable.createNew("each"));
+
+    Orderable child = createOrderable();
+    when(orderableRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(minimalOrderableDto.getId()))
+        .thenReturn(child);
+
+    Orderable orderable = orderableBuilder.newOrderable(orderableDto);
+    assertThat(orderable.getChildren().size(), is(1));
   }
 
   private Program createProgram(String code) {

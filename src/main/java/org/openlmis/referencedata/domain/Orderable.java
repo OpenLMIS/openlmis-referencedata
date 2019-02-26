@@ -17,6 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,17 +43,20 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.domain.BaseEntity.BaseExporter;
 import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
+import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
 /**
- * Products that are Orderable by Program.  An Orderable represent any medical commodities
- * that may be ordered/requisitioned, typically by a {@link Program}.
+ * Products that are Orderable by Program.  An Orderable represent any medical commodities that may
+ * be ordered/requisitioned, typically by a {@link Program}.
  */
 @Entity
 @TypeName("Orderable")
@@ -61,6 +65,7 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
         columnNames = {"code", "versionid"}))
 @NoArgsConstructor
 public class Orderable implements Identifiable {
+
   public static final String TRADE_ITEM = "tradeItem";
   public static final String COMMODITY_TYPE = "commodityType";
 
@@ -97,6 +102,13 @@ public class Orderable implements Identifiable {
   @Setter
   private List<ProgramOrderable> programOrderables;
 
+  @LazyCollection(LazyCollectionOption.FALSE)
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+  @DiffIgnore
+  @Setter
+  @Getter
+  private Set<OrderableChild> children;
+
   @ElementCollection(fetch = FetchType.EAGER)
   @MapKeyColumn(name = "key")
   @Column(name = "value")
@@ -120,7 +132,7 @@ public class Orderable implements Identifiable {
 
   /**
    * Default constructor.
-   * 
+   *
    * @param productCode product code
    * @param dispensable dispensable
    * @param netContent net content
@@ -140,31 +152,59 @@ public class Orderable implements Identifiable {
     this.lastUpdated = ZonedDateTime.now();
   }
 
+  /**
+   * Creates new instance based on data from {@link Importer}.
+   *
+   * @param importer instance of {@link Importer}
+   * @return new instance of Orderable.
+   */
+  public static Orderable newInstance(Importer importer) {
+    Orderable orderable = new Orderable();
+    orderable.productCode = Code.code(importer.getProductCode());
+    orderable.dispensable = Dispensable.createNew(importer.getDispensable());
+    orderable.fullProductName = importer.getFullProductName();
+    orderable.description = importer.getDescription();
+    orderable.netContent = importer.getNetContent();
+    orderable.packRoundingThreshold = importer.getPackRoundingThreshold();
+    orderable.roundToZero = importer.getRoundToZero();
+    orderable.programOrderables = new ArrayList<>();
+    orderable.children = new HashSet<>();
+
+    orderable.identifiers = importer.getIdentifiers();
+
+    orderable.extraData = ExtraDataEntity.defaultEntity(orderable.extraData);
+    orderable.extraData.updateFrom(importer.getExtraData());
+
+    orderable.identity = new OrderableIdentity(importer.getId(), importer.getVersionId());
+
+    return orderable;
+  }
+
   @PrePersist
   @PreUpdate
   public void updateLastUpdatedDate() {
     lastUpdated = ZonedDateTime.now();
   }
-  
+
   @Override
   public UUID getId() {
     return identity.getId();
   }
-  
+
   public void setId(UUID id) {
     identity.setId(id);
   }
-  
+
   public Long getVersionId() {
     return identity.getVersionId();
   }
-  
+
   /**
-  
    * Get the association to a {@link Program}.
+   *
    * @param program the Program this product is (maybe) in.
    * @return the association to the given {@link Program}, or null if this product is not in the
-   *        given program or is marked inactive.
+   *     given program or is marked inactive.
    */
   public ProgramOrderable getProgramOrderable(Program program) {
     for (ProgramOrderable programOrderable : programOrderables) {
@@ -177,8 +217,9 @@ public class Orderable implements Identifiable {
   }
 
   /**
-   * Returns the number of packs to order. For this Orderable given a desired number of
-   * dispensing units, will return the number of packs that should be ordered.
+   * Returns the number of packs to order. For this Orderable given a desired number of dispensing
+   * units, will return the number of packs that should be ordered.
+   *
    * @param dispensingUnits # of dispensing units we'd like to order for
    * @return the number of packs that should be ordered.
    */
@@ -215,6 +256,7 @@ public class Orderable implements Identifiable {
 
   /**
    * Determines equality based on product codes.
+   *
    * @param object another Orderable, ideally.
    * @return true if the two are semantically equal.  False otherwise.
    */
@@ -228,33 +270,6 @@ public class Orderable implements Identifiable {
   @Override
   public final int hashCode() {
     return Objects.hashCode(productCode);
-  }
-
-  /**
-   * Creates new instance based on data from {@link Importer}.
-   *
-   * @param importer instance of {@link Importer}
-   * @return new instance of Orderable.
-   */
-  public static Orderable newInstance(Importer importer) {
-    Orderable orderable = new Orderable();
-    orderable.productCode = Code.code(importer.getProductCode());
-    orderable.dispensable = Dispensable.createNew(importer.getDispensable());
-    orderable.fullProductName = importer.getFullProductName();
-    orderable.description = importer.getDescription();
-    orderable.netContent = importer.getNetContent();
-    orderable.packRoundingThreshold = importer.getPackRoundingThreshold();
-    orderable.roundToZero = importer.getRoundToZero();
-    orderable.programOrderables = new ArrayList<>();
-
-    orderable.identifiers = importer.getIdentifiers();
-
-    orderable.extraData = ExtraDataEntity.defaultEntity(orderable.extraData);
-    orderable.extraData.updateFrom(importer.getExtraData());
-
-    orderable.identity = new OrderableIdentity(importer.getId(), importer.getVersionId());
-
-    return orderable;
   }
 
   /**
@@ -272,6 +287,7 @@ public class Orderable implements Identifiable {
     exporter.setPackRoundingThreshold(packRoundingThreshold);
     exporter.setRoundToZero(roundToZero);
     exporter.setPrograms(ProgramOrderableDto.newInstance(programOrderables));
+    exporter.setChildren(OrderableChildDto.newInstance(children));
     exporter.setIdentifiers(identifiers);
 
     extraData = ExtraDataEntity.defaultEntity(extraData);
@@ -304,6 +320,8 @@ public class Orderable implements Identifiable {
 
     void setPrograms(Set<ProgramOrderableDto> programOrderables);
 
+    void setChildren(Set<OrderableChildDto> children);
+
     void setIdentifiers(Map<String, String> identifiers);
 
     void setVersionId(Long versionId);
@@ -328,6 +346,8 @@ public class Orderable implements Identifiable {
     Boolean getRoundToZero();
 
     Set<ProgramOrderableDto> getPrograms();
+
+    Set<OrderableChildDto> getChildren();
 
     Map<String, String> getIdentifiers();
 

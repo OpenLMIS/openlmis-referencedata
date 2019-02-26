@@ -73,15 +73,13 @@ import org.springframework.http.MediaType;
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
-  @Captor
-  public ArgumentCaptor<OrderableSearchParams> searchParamsArgumentCaptor;
-
   private static final String RESOURCE_URL = "/api/orderables";
   private static final String UNIT = "unit";
   private static final String NAME = "name";
   private static final String CODE = "code";
   private static final String PROGRAM_CODE = "program";
-
+  @Captor
+  public ArgumentCaptor<OrderableSearchParams> searchParamsArgumentCaptor;
   private OrderableDto orderableDto;
 
   private Orderable orderable;
@@ -94,7 +92,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     metaAttributes.put(META_KEY_VERSION_ID, "1");
     metaAttributes.put(META_KEY_LAST_UPDATED, zdtNow.toString());
     orderableDto = new OrderableDto(CODE, new DispensableDto(UNIT, null, null, UNIT),
-        NAME, null, 10L, 5L, false, Collections.emptySet(), null, null, metaAttributes, null);
+        NAME, null, 10L, 5L, false, Collections.emptySet(), Collections.emptySet(), null, null,
+        metaAttributes, null);
 
     orderable = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
         10, 5, false, orderableId, 1L);

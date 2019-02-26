@@ -32,6 +32,14 @@
       "type": "boolean",
       "title": "roundToZero"
     },
+    "children": {
+      "type": "array",
+      "title": "children",
+      "items": {
+        "type": "object",
+        "$ref": "orderableChildDto.json"
+      }
+    },
     "programs": {
       "type": "array",
       "title": "programs",

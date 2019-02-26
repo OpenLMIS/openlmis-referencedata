@@ -39,7 +39,8 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class OrderableDto extends BaseDto implements Orderable.Importer, Orderable.Exporter {
+public class OrderableDto extends MinimalOrderableDto implements Orderable.Importer,
+    Orderable.Exporter {
 
   public static final String META_KEY_VERSION_ID = "versionId";
   public static final String META_KEY_LAST_UPDATED = "lastUpdated";
@@ -60,12 +61,14 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
 
   private Set<ProgramOrderableDto> programs;
 
+  private Set<OrderableChildDto> children;
+
   private Map<String, String> identifiers;
 
   private Map<String, Object> extraData;
 
   private Map<String, String> meta = new HashMap<>();
-  
+
   @JsonIgnore
   private OrderableRepository orderableRepository;
 
@@ -107,7 +110,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
     this.dispensable = new DispensableDto();
     dispensable.export(this.dispensable);
   }
-  
+
   @Override
   @JsonIgnore
   public Long getVersionId() {
@@ -119,7 +122,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
       return latestOrderable.getVersionId();
     }
   }
-  
+
   @Override
   public void setVersionId(Long versionId) {
     meta.put(META_KEY_VERSION_ID, versionId.toString());
@@ -163,7 +166,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
         .hash(super.hashCode(), productCode, dispensable, fullProductName, description, netContent,
             packRoundingThreshold, roundToZero, programs, identifiers, extraData, meta);
   }
-  
+
   boolean isMetaEquals(OrderableDto that) {
     for (Map.Entry<String, String> metaEntry : meta.entrySet()) {
       String metaKey = metaEntry.getKey();
@@ -180,7 +183,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer, Orderab
         }
       }
     }
-    
+
     return true;
   }
 }
