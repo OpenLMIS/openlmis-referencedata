@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrderableChildTest {
@@ -64,6 +65,34 @@ public class OrderableChildTest {
     OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
 
     boolean result = orderableChild.equals(null);
+
+    assertFalse(result);
+  }
+
+  @Test
+  public void equalsShouldReturnFalseForUnequalOrderables() {
+    Orderable parent = new OrderableDataBuilder().build();
+    Orderable child = new OrderableDataBuilder().build();
+    Orderable child2 = new OrderableDataBuilder().build();
+
+    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
+    OrderableChild otherOrderableChild = OrderableChild.newInstance(parent, child2, 10L);
+
+    boolean result = orderableChild.equals(otherOrderableChild);
+
+    assertFalse(result);
+  }
+
+  @Test
+  public void equalsShouldReturnFalseForUnequalParents() {
+    Orderable parent = new OrderableDataBuilder().build();
+    Orderable parent2 = new OrderableDataBuilder().build();
+    Orderable child = new OrderableDataBuilder().build();
+
+    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
+    OrderableChild otherOrderableChild = OrderableChild.newInstance(parent2, child, 10L);
+
+    boolean result = orderableChild.equals(otherOrderableChild);
 
     assertFalse(result);
   }
