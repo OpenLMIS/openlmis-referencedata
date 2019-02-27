@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
@@ -68,7 +69,7 @@ public class OrderableChild extends BaseEntity {
    * @param parent parent orderable.
    * @param child kit constituent.
    * @param quantity quantity of constituent contained in kit.
-   * @return
+   * @return OrderableChild.
    */
   public static OrderableChild newInstance(Orderable parent, Orderable child, Long quantity) {
     OrderableChild orderableChild = new OrderableChild();
@@ -76,6 +77,23 @@ public class OrderableChild extends BaseEntity {
     orderableChild.setParent(parent);
     orderableChild.setQuantity(quantity);
     return orderableChild;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (Objects.isNull(other) || !(other instanceof OrderableChild)) {
+      return false;
+    }
+
+    OrderableChild orderableChild = (OrderableChild) other;
+
+    return Objects.equals(orderable, orderableChild.orderable)
+        && Objects.equals(parent, orderableChild.parent);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(parent, orderable);
   }
 
   /**

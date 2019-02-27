@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.domain;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -38,6 +40,32 @@ public class OrderableChildTest {
     assertEquals(orderableChild.getQuantity(), quantity);
     assertEquals(orderableChild.getOrderable(), child);
     assertEquals(orderableChild.getParent(), parent);
+  }
+
+  @Test
+  public void equalsShouldReturnTrue() {
+    Orderable parent = Mockito.mock(Orderable.class);
+    Orderable child = Mockito.mock(Orderable.class);
+
+    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
+    OrderableChild otherOrderableChild = OrderableChild.newInstance(parent, child, 10L);
+
+    boolean result = orderableChild.equals(otherOrderableChild);
+
+    assertTrue(result);
+  }
+
+
+  @Test
+  public void equalsShouldReturnFalseForNull() {
+    Orderable parent = Mockito.mock(Orderable.class);
+    Orderable child = Mockito.mock(Orderable.class);
+
+    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
+
+    boolean result = orderableChild.equals(null);
+
+    assertFalse(result);
   }
 
   @Test
