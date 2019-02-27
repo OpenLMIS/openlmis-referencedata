@@ -35,15 +35,12 @@ import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
-import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -55,17 +52,11 @@ import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
 @SuppressWarnings("PMD.TooManyMethods")
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(BlockJUnit4ClassRunner.class)
-@PrepareForTest({UserService.class})
 public class UserServiceTest {
 
   private static final String EXTRA_DATA_VALUE = "extraDataValue";
@@ -90,16 +81,10 @@ public class UserServiceTest {
   private FacilityRepository facilityRepository;
 
   @Mock
-  private SupervisoryNode supervisoryNode;
-
-  @Mock
   private RightRepository rightRepository;
 
   @Mock
   private Facility warehouse;
-
-  @Mock
-  private Program program;
 
   @Mock
   private Right right;
@@ -120,6 +105,7 @@ public class UserServiceTest {
 
   @Before
   public void setUp() throws JsonProcessingException {
+    MockitoAnnotations.initMocks(this);
     user = generateUser();
     user2 = mock(User.class);
     userSearch = new UserSearchParams(FIRST_NAME_SEARCH);
@@ -239,17 +225,16 @@ public class UserServiceTest {
     Set<User> expected = newHashSet(user, user2);
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.SUPERVISION);
-    when(supervisoryNodeRepository.findOne(SUPERVISORY_NODE_ID))
-        .thenReturn(supervisoryNode);
-    when(programRepository.findOne(PROGRAM_ID)).thenReturn(program);
-    when(userRepository.findUsersBySupervisionRight(right, supervisoryNode, program))
+    when(supervisoryNodeRepository.exists(SUPERVISORY_NODE_ID)).thenReturn(true);
+    when(programRepository.exists(PROGRAM_ID)).thenReturn(true);
+    when(userRepository.findUsersBySupervisionRight(RIGHT_ID, SUPERVISORY_NODE_ID, PROGRAM_ID))
         .thenReturn(expected);
 
     Set<User> users = userService.rightSearch(RIGHT_ID, PROGRAM_ID,
         SUPERVISORY_NODE_ID, null);
 
     assertEquals(expected, users);
-    verify(userRepository).findUsersBySupervisionRight(right, supervisoryNode, program);
+    verify(userRepository).findUsersBySupervisionRight(RIGHT_ID, SUPERVISORY_NODE_ID, PROGRAM_ID);
   }
 
   @Test
@@ -257,14 +242,14 @@ public class UserServiceTest {
     Set<User> expected = newHashSet(user, user2);
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.SUPERVISION);
-    when(programRepository.findOne(PROGRAM_ID)).thenReturn(program);
-    when(userRepository.findUsersBySupervisionRight(right, program))
+    when(programRepository.exists(PROGRAM_ID)).thenReturn(true);
+    when(userRepository.findUsersBySupervisionRight(RIGHT_ID, PROGRAM_ID))
         .thenReturn(expected);
 
     Set<User> users = userService.rightSearch(RIGHT_ID, PROGRAM_ID, null, null);
 
     assertEquals(expected, users);
-    verify(userRepository).findUsersBySupervisionRight(right, program);
+    verify(userRepository).findUsersBySupervisionRight(RIGHT_ID, PROGRAM_ID);
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -336,14 +321,13 @@ public class UserServiceTest {
   public void rightSearchShouldThrowExceptionForNonExistentProgram() {
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.SUPERVISION);
-    when(supervisoryNodeRepository.findOne(SUPERVISORY_NODE_ID))
-        .thenReturn(supervisoryNode);
-    when(programRepository.findOne(PROGRAM_ID)).thenReturn(null);
+    when(supervisoryNodeRepository.exists(SUPERVISORY_NODE_ID)).thenReturn(true);
+    when(programRepository.exists(PROGRAM_ID)).thenReturn(false);
 
     try {
       userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
     } finally {
-      verify(programRepository).findOne(PROGRAM_ID);
+      verify(programRepository).exists(PROGRAM_ID);
       verifyZeroInteractions(facilityRepository, userRepository);
     }
   }
@@ -352,14 +336,13 @@ public class UserServiceTest {
   public void rightSearchShouldThrowExceptionForNonExistentSupervisoryNode() {
     when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
     when(right.getType()).thenReturn(RightType.SUPERVISION);
-    when(supervisoryNodeRepository.findOne(SUPERVISORY_NODE_ID))
-        .thenReturn(null);
-    when(programRepository.findOne(PROGRAM_ID)).thenReturn(program);
+    when(supervisoryNodeRepository.exists(SUPERVISORY_NODE_ID)).thenReturn(false);
+    when(programRepository.exists(PROGRAM_ID)).thenReturn(true);
 
     try {
       userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
     } finally {
-      verify(supervisoryNodeRepository).findOne(SUPERVISORY_NODE_ID);
+      verify(supervisoryNodeRepository).exists(SUPERVISORY_NODE_ID);
       verifyZeroInteractions(facilityRepository, userRepository);
     }
   }

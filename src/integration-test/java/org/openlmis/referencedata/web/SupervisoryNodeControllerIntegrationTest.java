@@ -446,10 +446,10 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     Set<User> supervisingUsers = asSet(supervisingUser);
 
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
-    given(rightRepository.findOne(rightId)).willReturn(right);
-    given(programRepository.findOne(programId)).willReturn(program);
-    given(userRepository.findUsersBySupervisionRight(right, supervisoryNode, program))
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(rightRepository.exists(rightId)).willReturn(true);
+    given(programRepository.exists(programId)).willReturn(true);
+    given(userRepository.findUsersBySupervisionRight(rightId, supervisoryNodeId, programId))
         .willReturn(supervisingUsers);
 
     UserDto[] response = restAssured
@@ -474,9 +474,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void findSupervisingUsersShouldReturnBadRequestIfRightNotFound() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
-    given(rightRepository.findOne(rightId)).willReturn(null);
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(rightRepository.exists(rightId)).willReturn(false);
+    given(programRepository.exists(programId)).willReturn(true);
 
     restAssured
         .given()
@@ -498,9 +498,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
-    given(rightRepository.findOne(rightId)).willReturn(right);
-    given(programRepository.findOne(programId)).willReturn(null);
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(rightRepository.exists(rightId)).willReturn(true);
+    given(programRepository.exists(programId)).willReturn(false);
 
     restAssured
         .given()
@@ -546,9 +546,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(null);
-    given(rightRepository.findOne(rightId)).willReturn(right);
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
+    given(rightRepository.exists(rightId)).willReturn(true);
+    given(programRepository.exists(programId)).willReturn(true);
 
     restAssured
         .given()

@@ -231,6 +231,7 @@ public class RightController extends BaseController {
       }
     }
     profiler.start("SEARCH_FOR_RIGHTS_IN_DB");
+    LOGGER.debug("Searching for right with {} type and {} name", type, name);
     Set<Right> foundRights = rightRepository.searchRights(name, rightType);
 
     profiler.start("EXPORT_TO_DTOS");

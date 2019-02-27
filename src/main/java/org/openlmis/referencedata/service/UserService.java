@@ -19,14 +19,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
-import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -160,7 +157,7 @@ public class UserService {
     if (right.getType() == RightType.ORDER_FULFILLMENT) {
       return searchByFulfillmentRight(right, warehouseId);
     } else if (right.getType() == RightType.SUPERVISION) {
-      return searchBySupervisionRight(right, supervisoryNodeId, programId);
+      return searchBySupervisionRight(rightId, supervisoryNodeId, programId);
     } else {
       return userRepository.findUsersByDirectRight(right);
     }
@@ -181,27 +178,27 @@ public class UserService {
     return userRepository.findUsersByFulfillmentRight(right, warehouse);
   }
 
-  private Set<User> searchBySupervisionRight(Right right, UUID supervisoryNodeId,
+  private Set<User> searchBySupervisionRight(UUID rightId, UUID supervisoryNodeId,
       UUID programId) {
     if (programId == null) {
       throw new ValidationMessageException(UserMessageKeys.PROGRAM_ID_REQUIRED);
     }
 
-    Program program = Optional
-        .ofNullable(programRepository.findOne(programId))
-        .orElseThrow(() -> new ValidationMessageException(new Message(
-            ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId)));
-
-    if (null == supervisoryNodeId) {
-      return userRepository.findUsersBySupervisionRight(right, program);
+    if (!programRepository.exists(programId)) {
+      throw new ValidationMessageException(new Message(
+          ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
 
-    SupervisoryNode supervisoryNode = Optional
-        .ofNullable(supervisoryNodeRepository.findOne(supervisoryNodeId))
-        .orElseThrow(() -> new ValidationMessageException(new Message(
-            SupervisoryNodeMessageKeys.ERROR_NOT_FOUND, supervisoryNodeId)));
+    if (null == supervisoryNodeId) {
+      return userRepository.findUsersBySupervisionRight(rightId, programId);
+    }
 
-    return userRepository.findUsersBySupervisionRight(right, supervisoryNode, program);
+    if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
+      throw new ValidationMessageException(new Message(
+          SupervisoryNodeMessageKeys.ERROR_NOT_FOUND, supervisoryNodeId));
+    }
+
+    return userRepository.findUsersBySupervisionRight(rightId, supervisoryNodeId, programId);
   }
 
 }

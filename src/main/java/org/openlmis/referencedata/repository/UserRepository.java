@@ -19,9 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
-import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.repository.custom.UserRepositoryCustom;
 import org.springframework.data.domain.Page;
@@ -50,25 +48,25 @@ public interface UserRepository extends
       + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id" 
       + "   JOIN referencedata.roles r ON r.id = ra.roleid" 
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
-      + " WHERE rr.rightid = :right" 
-      + "   AND ra.supervisorynodeid = :supervisoryNode" 
-      + "   AND ra.programid = :program",
+      + " WHERE rr.rightid = :rightId"
+      + "   AND ra.supervisorynodeid = :supervisoryNodeId"
+      + "   AND ra.programid = :programId",
       nativeQuery = true)
-  Set<User> findUsersBySupervisionRight(@Param("right") Right right,
-      @Param("supervisoryNode") SupervisoryNode supervisoryNode,
-      @Param("program") Program program);
+  Set<User> findUsersBySupervisionRight(@Param("rightId") UUID rightId,
+      @Param("supervisoryNodeId") UUID supervisoryNodeId,
+      @Param("programId") UUID programId);
 
   @Query(value = "SELECT DISTINCT u.*"
       + " FROM referencedata.users u"
       + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id"
       + "   JOIN referencedata.roles r ON r.id = ra.roleid"
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
-      + " WHERE rr.rightid = :right"
+      + " WHERE rr.rightid = :rightId"
       + "   AND ra.supervisorynodeid IS NULL"
-      + "   AND ra.programid = :program",
+      + "   AND ra.programid = :programId",
       nativeQuery = true)
-  Set<User> findUsersBySupervisionRight(@Param("right") Right right,
-      @Param("program") Program program);
+  Set<User> findUsersBySupervisionRight(@Param("rightId") UUID rightId,
+      @Param("programId") UUID programId);
 
   @Query(value = "SELECT DISTINCT u.*"
       + " FROM referencedata.users u"

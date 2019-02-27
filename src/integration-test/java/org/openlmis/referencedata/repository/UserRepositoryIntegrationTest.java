@@ -306,8 +306,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         new SupervisionRoleAssignment(role, supervisingUser, program, supervisoryNode));
 
     //when
-    Set<User> supervisingUsers = repository.findUsersBySupervisionRight(right, supervisoryNode,
-        program);
+    Set<User> supervisingUsers = repository.findUsersBySupervisionRight(right.getId(),
+        supervisoryNode.getId(), program.getId());
 
     //then
     assertEquals(1, supervisingUsers.size());
@@ -326,7 +326,8 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         new SupervisionRoleAssignment(role, supervisingUser, program));
 
     //when
-    Set<User> supervisingUsers = repository.findUsersBySupervisionRight(right, program);
+    Set<User> supervisingUsers = repository.findUsersBySupervisionRight(right.getId(),
+        program.getId());
 
     //then
     assertEquals(1, supervisingUsers.size());
