@@ -167,8 +167,8 @@ public class RoleController extends BaseController {
   public RoleDto createRole(@RequestBody RoleDto roleDto) {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
-    Role storedRole = roleRepository.findFirstByName(roleDto.getName());
-    if (storedRole != null) {
+    Set<Role> storedRole = roleRepository.findByNameIgnoreCaseContaining(roleDto.getName());
+    if (!storedRole.isEmpty()) {
       LOGGER.warn("Role to create already exists");
       throw new DataIntegrityViolationException(RoleMessageKeys.ERROR_DUPLICATED);
     }

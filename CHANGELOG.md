@@ -60,6 +60,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-5627](https://openlmis.atlassian.net/browse/OLMIS-5627): Fixed problem with updating a supervisory node
 * [OLMIS-5007](https://openlmis.atlassian.net/browse/OLMIS-5007): Marked `GET /api/facilities/supplying` endpoint as deprecated
 * [OLMIS-4948](https://openlmis.atlassian.net/browse/OLMIS-4948): Fixed Internal server error by adding processing schedule message
+* [OLMIS-5850](https://openlmis.atlassian.net/browse/OLMIS-5850): Fixed the role name to be unique when different casing is used
 
 11.0.0 / 2018-08-16
 ===================
