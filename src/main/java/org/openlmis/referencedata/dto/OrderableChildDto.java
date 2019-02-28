@@ -32,7 +32,7 @@ import org.openlmis.referencedata.domain.OrderableChild;
 public class OrderableChildDto implements OrderableChild.Exporter, OrderableChild.Importer {
 
   @Getter
-  private MinimalOrderableDto orderable;
+  private ObjectReferenceDto orderable;
 
   @Getter
   @Setter
@@ -61,6 +61,7 @@ public class OrderableChildDto implements OrderableChild.Exporter, OrderableChil
 
   @Override
   public void setOrderable(Orderable orderable) {
-    this.orderable = MinimalOrderableDto.newInstance(orderable);
+    this.orderable = new ObjectReferenceDto();
+    this.orderable.setId(orderable.getId());
   }
 }

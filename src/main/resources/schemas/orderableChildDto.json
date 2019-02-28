@@ -6,7 +6,7 @@
   "properties": {
     "orderable": {
       "type": "object",
-      "$ref": "minimalOrderable.json"
+      "$ref": "referenceObjectDto.json"
     },
     "quantity": {
       "type": "number",

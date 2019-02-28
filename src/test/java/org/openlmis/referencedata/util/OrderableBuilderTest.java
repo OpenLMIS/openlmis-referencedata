@@ -15,10 +15,12 @@
 
 package org.openlmis.referencedata.util;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
@@ -35,12 +37,15 @@ import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
-import org.openlmis.referencedata.dto.MinimalOrderableDto;
+import org.openlmis.referencedata.dto.ObjectReferenceDto;
 import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrderableBuilderTest {
@@ -76,9 +81,9 @@ public class OrderableBuilderTest {
   public void shouldCreateOrderableWithChildren() {
 
     Set<OrderableChildDto> childSet = new HashSet<>();
-    MinimalOrderableDto minimalOrderableDto = new MinimalOrderableDto();
-    minimalOrderableDto.setId(UUID.randomUUID());
-    OrderableChildDto childDto = new OrderableChildDto(minimalOrderableDto, 20L);
+    ObjectReferenceDto objectReferenceDto = new ObjectReferenceDto();
+    objectReferenceDto.setId(UUID.randomUUID());
+    OrderableChildDto childDto = new OrderableChildDto(objectReferenceDto, 20L);
     childSet.add(childDto);
     OrderableDto orderableDto = new OrderableDto();
 
@@ -89,9 +94,12 @@ public class OrderableBuilderTest {
     orderableDto.setDispensable(Dispensable.createNew("each"));
 
     Orderable child = createOrderable();
+
+    Page<Orderable> orderablePage = new PageImpl<>(asList(child), new PageRequest(1, 100), 1);
+
     when(orderableRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(minimalOrderableDto.getId()))
-        .thenReturn(child);
+        .findAllLatestByIds(any(), any()))
+        .thenReturn(orderablePage);
 
     Orderable orderable = orderableBuilder.newOrderable(orderableDto);
     assertThat(orderable.getChildren().size(), is(1));

@@ -74,10 +74,20 @@ public class OrderableBuilder {
     }
 
     if (!isEmpty(importer.getChildren())) {
+      List<UUID> uuids = importer.getChildren()
+          .stream()
+          .map(item -> item.getOrderable().getId())
+          .collect(Collectors.toList());
+
+      Map<UUID, Orderable> childrenOrderables = orderableRepository
+          .findAllLatestByIds(uuids, null)
+          .getContent()
+          .stream()
+          .collect(Collectors.toMap(Orderable::getId, o -> o));
+
       Set<OrderableChild> children = importer.getChildren().stream().map(
           item -> {
-            Orderable child = orderableRepository
-                .findFirstByIdentityIdOrderByIdentityVersionIdDesc(item.getOrderable().getId());
+            Orderable child = childrenOrderables.get(item.getOrderable().getId());
             return OrderableChild.newInstance(orderable, child, item.getQuantity());
           }).collect(Collectors.toSet());
       orderable.setChildren(children);

@@ -27,7 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.referencedata.dto.MinimalOrderableDto;
+import org.openlmis.referencedata.dto.ObjectReferenceDto;
 
 @Entity
 @Table(name = "orderable_children", schema = "referencedata",
@@ -115,7 +115,7 @@ public class OrderableChild extends BaseEntity {
 
   public interface Importer {
 
-    MinimalOrderableDto getOrderable();
+    ObjectReferenceDto getOrderable();
 
     Long getQuantity();
   }

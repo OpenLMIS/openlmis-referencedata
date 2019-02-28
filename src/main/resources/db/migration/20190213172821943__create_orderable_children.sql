@@ -9,10 +9,17 @@ CREATE TABLE orderable_children
   parentVersionId    BIGINT not null,
   orderableId        uuid   not null,
   orderableVersionId BIGINT not null,
-  quantity           BIGINT not null,
-  extradata          jsonb  null
+  quantity           BIGINT not null
 );
 
 ALTER TABLE orderable_children
   ADD CONSTRAINT unq_orderable_parent_id
     UNIQUE (orderableid, orderableVersionId, parentid, parentVersionId);
+
+ALTER TABLE orderable_children
+  ADD FOREIGN KEY (parentId, parentVersionId)
+    REFERENCES orderables (id, versionId);
+
+ALTER TABLE orderable_children
+  ADD FOREIGN KEY (orderableId, orderableVersionId)
+    REFERENCES orderables (id, versionId);

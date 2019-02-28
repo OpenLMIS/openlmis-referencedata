@@ -39,7 +39,7 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class OrderableDto extends MinimalOrderableDto implements Orderable.Importer,
+public class OrderableDto extends BaseDto implements Orderable.Importer,
     Orderable.Exporter {
 
   public static final String META_KEY_VERSION_ID = "versionId";
