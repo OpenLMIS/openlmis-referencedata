@@ -13,6 +13,7 @@ New functionality added in a backwards-compatible manner:
 Improvements:
 * [OLMIS-5527](https://openlmis.atlassian.net/browse/OLMIS-5527): On facility list screen, sort facility by name
 * [OLMIS-4291](https://openlmis.atlassian.net/browse/OLMIS-4291): Improved performance of GET /api/facilities/{facility_id}/approvedProducts endpoint.
+* [OLMIS-6005](https://openlmis.atlassian.net/browse/OLMIS-6005): Improved performance of GET /api/supervisoryNodes/{supervisoryNode_id}/supervisingUsers endpoint.
 
 12.0.0 / 2018-12-12
 ===================
