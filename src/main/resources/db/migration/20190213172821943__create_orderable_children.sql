@@ -20,6 +20,12 @@ ALTER TABLE orderable_children
   ADD FOREIGN KEY (parentId, parentVersionId)
     REFERENCES orderables (id, versionId);
 
+CREATE INDEX idx_orderable_children_parent
+  ON orderable_children (parentId, parentVersionId);
+
 ALTER TABLE orderable_children
   ADD FOREIGN KEY (orderableId, orderableVersionId)
     REFERENCES orderables (id, versionId);
+
+CREATE INDEX idx_orderable_children_orderable
+  ON orderable_children (orderableId, orderableVersionId);
