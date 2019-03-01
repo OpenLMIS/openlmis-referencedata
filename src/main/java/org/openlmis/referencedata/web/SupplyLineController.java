@@ -18,10 +18,12 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.SUPPLY_LINES_MANAGE;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.dto.SupplyLineDto;
+import org.openlmis.referencedata.dto.SupplyLineDtoV2;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.util.Pagination;
@@ -30,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -53,6 +56,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class SupplyLineController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupplyLineController.class);
+
+  @Value("${service.url}")
+  private String sericeUrl;
 
   @Autowired
   private SupplyLineRepository supplyLineRepository;
@@ -85,8 +91,8 @@ public class SupplyLineController extends BaseController {
    */
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  public Page<SupplyLineDto> searchSupplyLines(
-      @RequestParam MultiValueMap<String, Object> queryMap, Pageable pageable) {
+  public Page<SupplyLineDto> searchSupplyLines(@RequestParam MultiValueMap<String, Object> queryMap,
+      Pageable pageable) {
     Profiler profiler = new Profiler("SEARCH_SUPPLY_LINES");
     profiler.setLogger(LOGGER);
 
@@ -99,6 +105,35 @@ public class SupplyLineController extends BaseController {
 
     profiler.start("BUILD_DTO");
     Page<SupplyLineDto> page = exportToDto(result, pageable);
+
+    profiler.stop().log();
+    return page;
+  }
+
+  /**
+   * Search supply lines by given parameters.
+   *
+   * @param queryMap map of query parameters (programId, supervisoryNodeId, supplyingFacilityId)
+   * @param pageable pagination and sorting parameters
+   * @return page of supply sine dtos.
+   */
+  @GetMapping("v2")
+  @ResponseStatus(HttpStatus.OK)
+  public Page<SupplyLineDtoV2> search(@RequestParam MultiValueMap<String, Object> queryMap,
+      Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_SUPPLY_LINES");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("CREATE_SEARCH_PARAMS_CLASS");
+    SupplyLineSearchParams params = new SupplyLineSearchParams(queryMap);
+
+    profiler.start("REPOSITORY_SEARCH");
+    Page<SupplyLine> result = supplyLineRepository.search(
+        params.getProgramId(), params.getSupervisoryNodeId(), params.getSupplyingFacilityIds(),
+        params.getExpand(), pageable);
+
+    profiler.start("BUILD_DTO_WITH_EXPAND");
+    Page<SupplyLineDtoV2> page = exportToDtoWithExpand(result, pageable, params.getExpand());
 
     profiler.stop().log();
     return page;
@@ -199,6 +234,17 @@ public class SupplyLineController extends BaseController {
     }
   }
 
+  private SupplyLineDtoV2 export(SupplyLine supplyLine, Set<String> expand) {
+    SupplyLineDtoV2 supplyLineDto = null;
+
+    if (supplyLine != null) {
+      supplyLineDto = SupplyLineDtoV2.newInstance(supplyLine, sericeUrl);
+      expandDto(supplyLineDto, supplyLine, expand);
+    }
+
+    return supplyLineDto;
+  }
+
   private SupplyLineDto exportToDto(SupplyLine supplyLine) {
     SupplyLineDto supplyLineDto = null;
 
@@ -213,6 +259,14 @@ public class SupplyLineController extends BaseController {
   private Page<SupplyLineDto> exportToDto(Page<SupplyLine> page, Pageable pageable) {
     List<SupplyLineDto> list = page.getContent().stream()
         .map(this::exportToDto).collect(Collectors.toList());
+    return Pagination.getPage(list, pageable, page.getTotalElements());
+  }
+
+  private Page<SupplyLineDtoV2> exportToDtoWithExpand(Page<SupplyLine> page, Pageable pageable,
+      Set<String> expand) {
+    List<SupplyLineDtoV2> list = page.getContent().stream()
+        .map(supplyLine -> export(supplyLine, expand))
+        .collect(Collectors.toList());
     return Pagination.getPage(list, pageable, page.getTotalElements());
   }
 }

@@ -34,6 +34,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class SupplyLineSearchParamsTest {
 
   @Rule
@@ -42,6 +43,7 @@ public class SupplyLineSearchParamsTest {
   private static final String PROGRAM_ID = "programId";
   private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
   private static final String SUPPLYING_FACILITY_ID = "supplyingFacilityId";
+  private static final String EXPAND = "expand";
 
   private MultiValueMap<String, Object> queryMap;
 
@@ -115,6 +117,26 @@ public class SupplyLineSearchParamsTest {
   }
 
   @Test
+  public void shouldGetExpandFromParametersIfKeyIsPresent() {
+    final String expand1 = "expand1";
+    final String expand2 = "expand2";
+
+    queryMap.add(EXPAND, expand1);
+    queryMap.add(EXPAND, expand2);
+
+    SupplyLineSearchParams params = new SupplyLineSearchParams(queryMap);
+
+    assertThat(params.getExpand(), hasItems(expand1, expand2));
+  }
+
+  @Test
+  public void shouldGetEmptySetIfMapHasNoExpandKey() {
+    SupplyLineSearchParams params = new SupplyLineSearchParams(queryMap);
+
+    assertThat(params.getExpand(), hasSize(0));
+  }
+
+  @Test
   public void equalsContract() {
     EqualsVerifier
         .forClass(SupplyLineSearchParams.class)
@@ -128,6 +150,6 @@ public class SupplyLineSearchParamsTest {
     SupplyLineSearchParams params = new SupplyLineSearchParams(queryMap);
 
     ToStringTestUtils.verify(SupplyLineSearchParams.class, params,
-        "PROGRAM_ID", "SUPERVISORY_NODE_ID", "SUPPLYING_FACILITY_ID", "ALL_PARAMETERS");
+        "PROGRAM_ID", "SUPERVISORY_NODE_ID", "SUPPLYING_FACILITY_ID", "ALL_PARAMETERS", "EXPAND");
   }
 }

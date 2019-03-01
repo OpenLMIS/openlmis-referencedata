@@ -20,6 +20,7 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 import static org.openlmis.referencedata.web.BaseController.API_PATH;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,9 @@ import org.javers.core.changelog.SimpleTextChangeLog;
 import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
 import org.javers.repository.jql.QueryBuilder;
+import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.service.ObjReferenceExpander;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -54,6 +57,9 @@ public abstract class BaseController {
 
   @Resource(name = "javersProvider")
   private Javers javers;
+
+  @Autowired
+  private ObjReferenceExpander objReferenceExpander;
 
   protected void checkAdminRight(String rightName, Profiler profiler) {
     checkAdminRight(rightName, true, null, profiler);
@@ -170,6 +176,10 @@ public abstract class BaseController {
                                    String changedPropertyName, Pageable page) {
     List<Change> changes = getChangesByType(type, id, author, changedPropertyName, page);
     return javers.processChangeList(changes, new SimpleTextChangeLog());
+  }
+
+  protected void expandDto(Object dto, BaseEntity entity, Set<String> expands) {
+    objReferenceExpander.expandDto(dto, entity, expands);
   }
 
   void validateCsvFile(MultipartFile csvFile) {

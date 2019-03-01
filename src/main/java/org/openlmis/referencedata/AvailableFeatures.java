@@ -30,7 +30,10 @@ public enum AvailableFeatures implements Feature {
 
   @EnabledByDefault
   @Label("Consolidate notifications")
-  CONSOLIDATE_NOTIFICATIONS;
+  CONSOLIDATE_NOTIFICATIONS,
+
+  @Label("Supply lines expand")
+  SUPPLY_LINES_EXPAND;
 
   public boolean isActive() {
     return FeatureContext.getFeatureManager().isActive(this);
