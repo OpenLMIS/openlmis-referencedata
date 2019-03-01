@@ -72,6 +72,68 @@ scenarios:
         headers:
           Authorization: Bearer ${access_token}
 
+  get-all-supply-lines-V2:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines/v2
+        method: GET
+        label: GetAllSupplyLinesV2
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-all-supply-lines-V2-expand:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines/v2?expand="supervisoryNode.requisitionGroup.memberFacilities"
+        method: GET
+        label: GetAllSupplyLinesV2Expand
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-page-of-ten-supply-lines-V2:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines/v2?page=0&size=10
+        method: GET
+        label: GetPageOfTenSupplyLinesV2
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-page-of-ten-supply-lines-V2-expand:
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines/v2?page=0&size=10?expand="supervisoryNode.requisitionGroup.memberFacilities"
+        method: GET
+        label: GetPageOfTenSupplyLinesV2Expand
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-supply-lines-by-supervisory-node-id-V2:
+    variables:
+      # FP approval point
+      supervisory_node_id: fb38bd1c-beeb-4527-8345-900900329c10
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines/v2?supervisoryNodeId=${supervisory_node_id}
+        method: GET
+        label: GetSupplyLinesBySupervisoryNodeIdV2
+        headers:
+          Authorization: Bearer ${access_token}
+
+  get-supply-lines-by-program-id-and-supplying-facility-id-V2:
+    variables:
+      # Ntcheu District Warehouse
+      supplying_facility_id: 19121381-9f3d-4e77-b9e5-d3f59fc1639e
+      # Family Planning
+      program_id: dce17f2e-af3e-40ad-8e00-3496adef44c3
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/supplyLines/v2?programId=${program_id}&supplyingFacilityId=${supplying_facility_id}
+        method: GET
+        label: GetSupplyLinesByProgramIdAndSupplyingFacilityIdV2
+        headers:
+          Authorization: Bearer ${access_token}
+
 reporting:
   - module: passfail
     criteria:
@@ -80,3 +142,9 @@ reporting:
       Get Page of Ten Supply Lines too slow: p90 of GetPageOfTenSupplyLines>60000ms
       Get Supply Lines by Supervisory Node too slow: p90 of GetSupplyLinesBySupervisoryNodeId>60000ms
       Get Supply Lines by Program and Supplying Facility too slow: p90 of GetSupplyLinesByProgramIdAndSupplyingFacilityId>60000ms
+      Get All Supply Lines V2 too slow: p90 of GetAllSupplyLinesV2>60000ms
+      Get All Supply Lines with expand V2 too slow: p90 of GetAllSupplyLinesV2Expand>60000ms
+      Get Page of Ten Supply Lines V2 too slow: p90 of GetPageOfTenSupplyLinesV2>60000ms
+      Get Page of Ten Supply Lines with expand V2 too slow: p90 of GetPageOfTenSupplyLinesV2Expand>60000ms
+      Get Supply Lines by Supervisory Node V2 too slow: p90 of GetSupplyLinesBySupervisoryNodeIdV2>60000ms
+      Get Supply Lines by Program and Supplying Facility V2 too slow: p90 of GetSupplyLinesByProgramIdAndSupplyingFacilityIdV2>60000ms
