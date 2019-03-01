@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -50,10 +51,11 @@ public class SupervisoryNodeDataBuilder {
     id = UUID.randomUUID();
     code = "SN" + instanceNumber;
     name = "Supervisory Node " + instanceNumber;
+    description = "desc";
     facility = new FacilityDataBuilder().build();
     childNodes = new HashSet<>();
     partnerNodes = new HashSet<>();
-    //TODO: requisition group builder
+    extraData = new HashMap<>();
   }
 
   /**

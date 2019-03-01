@@ -20,23 +20,20 @@ import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 import org.openlmis.referencedata.ToStringTestUtils;
 
-public class SupervisoryNodeBaseDtoTest {
+public class ProgramObjectReferenceDtoTest {
 
   @Test
   public void equalsContract() {
     EqualsVerifier
-        .forClass(SupervisoryNodeBaseDto.class)
-        .withIgnoredFields("serviceUrl")
+        .forClass(ProgramObjectReferenceDto.class)
         .withRedefinedSuperclass()
-        .withRedefinedSubclass(SupervisoryNodeDto.class)
         .suppress(Warning.NONFINAL_FIELDS)
         .verify();
   }
 
   @Test
   public void shouldImplementToString() {
-    SupervisoryNodeBaseDto dto = new SupervisoryNodeBaseDto();
-    ToStringTestUtils.verify(SupervisoryNodeBaseDto.class, dto);
+    ProgramObjectReferenceDto dto = new ProgramObjectReferenceDto();
+    ToStringTestUtils.verify(ProgramObjectReferenceDto.class, dto, "PROGRAMS");
   }
-
 }

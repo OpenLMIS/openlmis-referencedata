@@ -16,46 +16,57 @@
 package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.SupportedProgram;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class BasicFacilityDto extends MinimalFacilityDto
-    implements Facility.Importer, Facility.Exporter {
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true, exclude = "serviceUrl")
+@ToString(callSuper = true)
+public final class FacilityObjectReferenceDto extends ObjectReferenceDto
+    implements Facility.Exporter {
+
+  private static final String FACILITIES = "facilities";
+
+  @JsonIgnore
+  private String serviceUrl;
+
+  private String name;
+  private FacilityTypeDto type;
+  private GeographicZoneSimpleDto geographicZone;
+  private FacilityOperatorDto operator;
+  private String description;
+  private LocalDate goLiveDate;
+  private LocalDate goDownDate;
+  private String comment;
+  private Boolean openLmisAccessible;
+  private Point location;
+  private Map<String, Object> extraData;
   private String code;
   private Boolean active;
   private Boolean enabled;
-  private FacilityTypeDto type;
-  private GeographicZoneSimpleDto geographicZone;
+  private Set<SupportedProgramDto> supportedPrograms;
 
-  /**
-   * Creates new instance of {@link BasicFacilityDto} based on passed facility.
-   */
-  public static BasicFacilityDto newInstance(Facility facility) {
-    BasicFacilityDto dto = new BasicFacilityDto();
-    facility.export(dto);
-
-    return dto;
-  }
-
-  @JsonSetter("geographicZone")
-  public void setGeographicZone(GeographicZoneSimpleDto geographicZone) {
-    this.geographicZone = geographicZone;
+  public FacilityObjectReferenceDto(UUID id, String serviceUrl) {
+    super(serviceUrl, FACILITIES, id);
+    this.serviceUrl = serviceUrl;
   }
 
   @Override
@@ -63,11 +74,6 @@ public class BasicFacilityDto extends MinimalFacilityDto
   public void setGeographicZone(GeographicZone geographicZone) {
     this.geographicZone = new GeographicZoneSimpleDto();
     geographicZone.export(this.geographicZone);
-  }
-
-  @JsonSetter("type")
-  public void setType(FacilityTypeDto type) {
-    this.type = type;
   }
 
   @Override
@@ -78,50 +84,26 @@ public class BasicFacilityDto extends MinimalFacilityDto
   }
 
   @Override
-  public String getDescription() {
-    // unsupported operation
-    return null;
+  @JsonIgnore
+  public void setOperator(FacilityOperator operator) {
+    this.operator = new FacilityOperatorDto();
+    operator.export(this.operator);
   }
 
   @Override
-  public FacilityOperator.Importer getOperator() {
-    // unsupported operation
-    return null;
-  }
+  public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
+    if (supportedPrograms == null) {
+      this.supportedPrograms = null;
+    } else {
+      this.supportedPrograms = supportedPrograms
+          .stream()
+          .map(supportedProgram -> {
+            SupportedProgramDto supportedProgramDto = new SupportedProgramDto();
+            supportedProgram.export(supportedProgramDto);
 
-  @Override
-  public LocalDate getGoLiveDate() {
-    // unsupported operation
-    return null;
-  }
-
-  @Override
-  public LocalDate getGoDownDate() {
-    // unsupported operation
-    return null;
-  }
-
-  @Override
-  public String getComment() {
-    // unsupported operation
-    return null;
-  }
-
-  @Override
-  public Boolean getOpenLmisAccessible() {
-    // unsupported operation
-    return null;
-  }
-
-  @Override
-  public Point getLocation() {
-    // unsupported operation
-    return null;
-  }
-
-  @Override
-  public Map<String, Object> getExtraData() {
-    // unsupported operation
-    return null;
+            return supportedProgramDto;
+          })
+          .collect(Collectors.toSet());
+    }
   }
 }

@@ -15,37 +15,36 @@
 
 package org.openlmis.referencedata.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
+import org.openlmis.referencedata.domain.Program;
 
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@JsonInclude(Include.NON_NULL)
-public class ObjectReferenceDto extends BaseDto {
+public final class ProgramObjectReferenceDto extends ObjectReferenceDto
+    implements Program.Importer {
 
-  private static final String SEPARATOR = "/";
+  private static final String PROGRAMS = "programs";
 
-  @Getter
-  @Setter
-  private String href;
+  private String code;
+  private String name;
+  private String description;
+  private Boolean active;
+  private Boolean periodsSkippable;
+  private Boolean skipAuthorization;
+  private Boolean showNonFullSupplyTab;
+  private Boolean enableDatePhysicalStockCountCompleted;
 
-  /**
-   * Returns new object reference.
-   *
-   * @param serviceUrl base URL
-   * @param path       resource path
-   * @param id         object id
-   */
-  public ObjectReferenceDto(String serviceUrl, String path, UUID id) {
-    super(id);
-    this.href = StringUtils.joinWith(SEPARATOR, serviceUrl + path, id);
+  public ProgramObjectReferenceDto(UUID id, String serviceUrl) {
+    super(serviceUrl, PROGRAMS, id);
   }
 }
