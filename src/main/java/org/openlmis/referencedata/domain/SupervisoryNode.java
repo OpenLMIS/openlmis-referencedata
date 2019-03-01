@@ -75,12 +75,12 @@ public class SupervisoryNode extends BaseEntity {
   @Setter
   private Facility facility;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "parentid")
   @Getter
   private SupervisoryNode parentNode;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "partnerId")
   @Getter
   private SupervisoryNode partnerNodeOf;

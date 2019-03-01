@@ -17,9 +17,11 @@ package org.openlmis.referencedata.repository;
 
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.javers.common.collections.Sets.asSet;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -47,6 +50,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 
 @SuppressWarnings("PMD.TooManyMethods")
@@ -145,6 +149,90 @@ public class SupplyLineRepositoryIntegrationTest
     assertThat(result.getContent(), hasSize(2));
     assertThat(result.getContent().get(0), equalTo(supplyLines.get(0)));
     assertThat(result.getContent().get(1), equalTo(supplyLines.get(1)));
+  }
+
+  @Test
+  public void shouldSearchSupplyLinesByAllParametersWithoutExpand() {
+    Page<SupplyLine> result = repository.search(
+        supplyLines.get(0).getProgram().getId(),
+        supplyLines.get(0).getSupervisoryNode().getId(),
+        singleton(supplyLines.get(0).getSupplyingFacility().getId()),
+        null,
+        pageable);
+
+    assertThat(result.getContent(), hasSize(1));
+    assertThat(result.getContent().get(0), equalTo(supplyLines.get(0)));
+  }
+
+  @Test
+  @Ignore
+  public void shouldSearchSupplyLinesByAllParametersWithRequisitionGroupExpand() {
+    Page<SupplyLine> result = repository.search(
+        supplyLines.get(0).getProgram().getId(),
+        null,
+        singleton(supplyLines.get(0).getSupplyingFacility().getId()),
+        asSet("supervisoryNode.requisitionGroup"),
+        pageable);
+
+    assertThat(result.getContent(), hasSize(1));
+    assertThat(result.getContent().get(0), equalTo(supplyLines.get(0)));
+  }
+
+  @Test
+  @Ignore
+  public void shouldSearchSupplyLinesByAllParametersWithMemberFacilitiesExpand() {
+    Page<SupplyLine> result = repository.search(
+        supplyLines.get(0).getProgram().getId(),
+        supplyLines.get(0).getSupervisoryNode().getId(),
+        singleton(supplyLines.get(0).getSupplyingFacility().getId()),
+        asSet("supervisoryNode.requisitionGroup.memberFacilities"),
+        pageable);
+
+    assertThat(result.getContent(), hasSize(1));
+    assertThat(result.getContent().get(0), equalTo(supplyLines.get(0)));
+  }
+
+  @Test
+  public void shouldSearchSupplyLinesWhenSearchParametersAreNullWithoutExpand() {
+    Page<SupplyLine> result = repository.search(null, null, null, null, pageable);
+
+    assertThat(result.getContent(), hasSize(5));
+  }
+
+  @Test
+  public void shouldSearchSupplyLinesWithSortingWithoutExpand() {
+    Pageable pageable = new PageRequest(0, 10, new Sort(DESC, "supervisoryNode"));
+    Page<SupplyLine> result = repository.search(null, null, null, null, pageable);
+
+    assertThat(result.getContent(), hasSize(5));
+  }
+
+  @Test
+  public void shouldSearchSupplyLinesByProgramIdWithoutExpand() {
+    Page<SupplyLine> result = repository
+        .search(supplyLines.get(0).getProgram().getId(), null, null, null, pageable);
+
+    assertThat(result.getContent(), hasSize(1));
+    assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
+  }
+
+  @Test
+  public void shouldSearchSupplyLinesBySupervisoryNodeIdWithoutExpand() {
+    Page<SupplyLine> result = repository
+        .search(null, supplyLines.get(0).getSupervisoryNode().getId(), null, null, pageable);
+
+    assertThat(result.getContent(), hasSize(1));
+    assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
+  }
+
+  @Test
+  public void shouldSearchSupplyLinesBySupplyingFacilityIdsWithoutExpand() {
+    Page<SupplyLine> result = repository
+        .search(null, null, asSet(supplyLines.get(0).getSupplyingFacility().getId(),
+            supplyLines.get(1).getSupplyingFacility().getId()), null, pageable);
+
+    assertThat(result.getContent(), hasSize(2));
+    assertThat(result.getContent(), hasItems(supplyLines.get(0), supplyLines.get(1)));
   }
 
   @Test(expected = DataIntegrityViolationException.class)
