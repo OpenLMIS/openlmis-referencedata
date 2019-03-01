@@ -147,8 +147,8 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
     params.forEach(searchQuery::setParameter);
 
     List<SupplyLine> result = searchQuery
-        .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getOffset())
+        .setMaxResults(pageable != null ? pageable.getPageSize() : Integer.MAX_VALUE)
+        .setFirstResult(pageable != null ? pageable.getOffset() : 0)
         .getResultList();
 
     return Pagination.getPage(result, pageable, count);

@@ -29,6 +29,8 @@ class SqlConstants {
   static final String PARAMETER_PREFIX = ":";
   static final String ORDER_BY = "ORDER BY";
 
+  private SqlConstants() {}
+
   static String join(String... parameters) {
     return String.join(" ", parameters);
   }
@@ -52,6 +54,4 @@ class SqlConstants {
   static String parameter(String parameterName) {
     return ":" + parameterName;
   }
-
-  private SqlConstants() {}
 }
