@@ -175,7 +175,7 @@ public class SupervisoryNode extends BaseEntity {
     if (null != parentNode) {
       this.parentNode = parentNode;
       parentNode.childNodes.add(this);
-    } else if (null != this.parentNode) {
+    } else if (null != this.parentNode && null != this.parentNode.childNodes) {
       this.parentNode.childNodes.remove(this);
       this.parentNode = null;
     }
