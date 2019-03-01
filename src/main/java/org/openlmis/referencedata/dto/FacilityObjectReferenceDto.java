@@ -15,13 +15,14 @@
 
 package org.openlmis.referencedata.dto;
 
+import static java.util.stream.Collectors.toSet;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -71,6 +72,13 @@ public final class FacilityObjectReferenceDto extends ObjectReferenceDto
 
   @Override
   @JsonIgnore
+  public void setOperator(FacilityOperator operator) {
+    this.operator = new FacilityOperatorDto();
+    operator.export(this.operator);
+  }
+
+  @Override
+  @JsonIgnore
   public void setGeographicZone(GeographicZone geographicZone) {
     this.geographicZone = new GeographicZoneSimpleDto();
     geographicZone.export(this.geographicZone);
@@ -84,26 +92,20 @@ public final class FacilityObjectReferenceDto extends ObjectReferenceDto
   }
 
   @Override
-  @JsonIgnore
-  public void setOperator(FacilityOperator operator) {
-    this.operator = new FacilityOperatorDto();
-    operator.export(this.operator);
+  public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
+    if (supportedPrograms != null) {
+      this.supportedPrograms = supportedPrograms.stream()
+          .map(this::export)
+          .collect(toSet());
+    } else {
+      this.supportedPrograms = null;
+    }
   }
 
-  @Override
-  public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
-    if (supportedPrograms == null) {
-      this.supportedPrograms = null;
-    } else {
-      this.supportedPrograms = supportedPrograms
-          .stream()
-          .map(supportedProgram -> {
-            SupportedProgramDto supportedProgramDto = new SupportedProgramDto();
-            supportedProgram.export(supportedProgramDto);
+  private SupportedProgramDto export(SupportedProgram supportedProgram) {
+    SupportedProgramDto supportedProgramDto = new SupportedProgramDto();
+    supportedProgram.export(supportedProgramDto);
 
-            return supportedProgramDto;
-          })
-          .collect(Collectors.toSet());
-    }
+    return supportedProgramDto;
   }
 }

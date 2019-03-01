@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.dto;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
@@ -92,7 +93,7 @@ public final class SupervisoryNodeObjectReferenceDto extends ObjectReferenceDto 
     if (!isEmpty(childNodes)) {
       return childNodes.stream().map(SupervisoryNodeObjectReferenceDto::getId).collect(toSet());
     }
-    return null;
+    return emptySet();
   }
 
   @Override
@@ -108,7 +109,7 @@ public final class SupervisoryNodeObjectReferenceDto extends ObjectReferenceDto 
     if (!isEmpty(partnerNodes)) {
       return partnerNodes.stream().map(SupervisoryNodeObjectReferenceDto::getId).collect(toSet());
     }
-    return null;
+    return emptySet();
   }
 
   @Override
