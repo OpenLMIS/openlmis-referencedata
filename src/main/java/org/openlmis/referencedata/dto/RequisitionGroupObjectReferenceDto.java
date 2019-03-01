@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +60,13 @@ public final class RequisitionGroupObjectReferenceDto extends ObjectReferenceDto
     this.serviceUrl = serviceUrl;
   }
 
+  @JsonSetter("supervisoryNode")
+  public void setSupervisoryNode(SupervisoryNodeObjectReferenceDto supervisoryNode) {
+    this.supervisoryNode = supervisoryNode;
+  }
+
   @Override
+  @JsonIgnore
   public void setSupervisoryNode(SupervisoryNode supervisoryNode) {
     if (null != supervisoryNode) {
       this.supervisoryNode =
@@ -74,6 +81,7 @@ public final class RequisitionGroupObjectReferenceDto extends ObjectReferenceDto
   }
 
   @Override
+  @JsonIgnore
   public void setMemberFacilities(Set<Facility> memberFacilities) {
     // unsupported
   }

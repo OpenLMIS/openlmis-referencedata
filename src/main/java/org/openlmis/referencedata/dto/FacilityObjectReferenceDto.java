@@ -18,6 +18,7 @@ package org.openlmis.referencedata.dto;
 import static java.util.stream.Collectors.toSet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.Map;
@@ -70,6 +71,11 @@ public final class FacilityObjectReferenceDto extends ObjectReferenceDto
     this.serviceUrl = serviceUrl;
   }
 
+  @JsonSetter("operator")
+  public void setOperator(FacilityOperatorDto operator) {
+    this.operator = operator;
+  }
+
   @Override
   @JsonIgnore
   public void setOperator(FacilityOperator operator) {
@@ -77,11 +83,21 @@ public final class FacilityObjectReferenceDto extends ObjectReferenceDto
     operator.export(this.operator);
   }
 
+  @JsonSetter("geographicZone")
+  public void setGeographicZone(GeographicZoneSimpleDto geographicZone) {
+    this.geographicZone = geographicZone;
+  }
+
   @Override
   @JsonIgnore
   public void setGeographicZone(GeographicZone geographicZone) {
     this.geographicZone = new GeographicZoneSimpleDto();
     geographicZone.export(this.geographicZone);
+  }
+
+  @JsonSetter("type")
+  public void setType(FacilityTypeDto type) {
+    this.type = type;
   }
 
   @Override
@@ -92,6 +108,7 @@ public final class FacilityObjectReferenceDto extends ObjectReferenceDto
   }
 
   @Override
+  @JsonIgnore
   public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
     if (supportedPrograms != null) {
       this.supportedPrograms = supportedPrograms.stream()
