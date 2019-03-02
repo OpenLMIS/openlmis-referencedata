@@ -13,29 +13,27 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.dto;
 
-import org.togglz.core.Feature;
-import org.togglz.core.annotation.EnabledByDefault;
-import org.togglz.core.annotation.Label;
-import org.togglz.core.context.FeatureContext;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-public enum AvailableFeatures implements Feature {
-  @Label("Your secret is safe with me")
-  SECRET_MESSAGE,
+public class ProgramObjectReferenceDtoTest {
 
-  @EnabledByDefault
-  @Label("Multiple suppliers")
-  MULTIPLE_SUPPLIERS,
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(ProgramObjectReferenceDto.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
 
-  @EnabledByDefault
-  @Label("Consolidate notifications")
-  CONSOLIDATE_NOTIFICATIONS,
-
-  @Label("Supply lines expand")
-  SUPPLY_LINES_EXPAND;
-
-  public boolean isActive() {
-    return FeatureContext.getFeatureManager().isActive(this);
+  @Test
+  public void shouldImplementToString() {
+    ProgramObjectReferenceDto dto = new ProgramObjectReferenceDto();
+    ToStringTestUtils.verify(ProgramObjectReferenceDto.class, dto, "PROGRAMS");
   }
 }

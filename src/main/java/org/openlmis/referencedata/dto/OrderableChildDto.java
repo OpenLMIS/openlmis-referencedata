@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableChild;
 
@@ -32,7 +34,8 @@ import org.openlmis.referencedata.domain.OrderableChild;
 public class OrderableChildDto implements OrderableChild.Exporter, OrderableChild.Importer {
 
   @Getter
-  private ObjectReferenceDto orderable;
+  @JsonProperty("orderableRef")
+  private ObjectReferenceDto orderableRef;
 
   @Getter
   @Setter
@@ -60,8 +63,16 @@ public class OrderableChildDto implements OrderableChild.Exporter, OrderableChil
   }
 
   @Override
+  @JsonIgnore
+  public Orderable getOrderable() {
+    // unsupported operation
+    return null;
+  }
+
+  @Override
+  @JsonIgnore
   public void setOrderable(Orderable orderable) {
-    this.orderable = new ObjectReferenceDto();
-    this.orderable.setId(orderable.getId());
+    this.orderableRef = new ObjectReferenceDto();
+    this.orderableRef.setId(orderable.getId());
   }
 }

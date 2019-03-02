@@ -13,29 +13,9 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata;
+package org.openlmis.referencedata.util.messagekeys;
 
-import org.togglz.core.Feature;
-import org.togglz.core.annotation.EnabledByDefault;
-import org.togglz.core.annotation.Label;
-import org.togglz.core.context.FeatureContext;
+public class DtoExpansionMessageKeys extends MessageKeys {
 
-public enum AvailableFeatures implements Feature {
-  @Label("Your secret is safe with me")
-  SECRET_MESSAGE,
-
-  @EnabledByDefault
-  @Label("Multiple suppliers")
-  MULTIPLE_SUPPLIERS,
-
-  @EnabledByDefault
-  @Label("Consolidate notifications")
-  CONSOLIDATE_NOTIFICATIONS,
-
-  @Label("Supply lines expand")
-  SUPPLY_LINES_EXPAND;
-
-  public boolean isActive() {
-    return FeatureContext.getFeatureManager().isActive(this);
-  }
+  public static final String ERROR = join(SERVICE_ERROR, "dtoExpansion");
 }

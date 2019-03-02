@@ -151,6 +151,21 @@ public class SearchParamsTest {
   }
 
   @Test
+  public void shouldGetSetOfStringsFromParams() {
+    String key = "expand";
+    String value1 = "field1";
+    map.add(key, value1);
+    String value2 = "field2";
+    map.add(key, value2);
+    String value3 = "field3";
+    map.add(key, value3);
+
+    SearchParams searchParams = new SearchParams(map);
+
+    assertThat(searchParams.getStrings(key), hasItems(value1, value2, value3));
+  }
+
+  @Test
   public void shouldThrowExceptionIfIdHasWrongFormat() {
     exception.expect(ValidationMessageException.class);
 

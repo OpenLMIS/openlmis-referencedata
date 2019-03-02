@@ -27,7 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.TypeName;
-import org.openlmis.referencedata.dto.ObjectReferenceDto;
 
 @Entity
 @Table(name = "orderable_children", schema = "referencedata",
@@ -81,14 +80,19 @@ public class OrderableChild extends BaseEntity {
 
   @Override
   public boolean equals(Object other) {
-    if (Objects.isNull(other) || !(other instanceof OrderableChild)) {
+    if (Objects.isNull(other) || !this.canEqual(other)) {
       return false;
     }
 
     OrderableChild orderableChild = (OrderableChild) other;
 
-    return Objects.equals(orderable, orderableChild.orderable)
+    return canEqual(other) && Objects.equals(orderable, orderableChild.orderable)
         && Objects.equals(parent, orderableChild.parent);
+  }
+
+  @Override
+  public boolean canEqual(Object other) {
+    return (other instanceof OrderableChild);
   }
 
   @Override
@@ -115,7 +119,7 @@ public class OrderableChild extends BaseEntity {
 
   public interface Importer {
 
-    ObjectReferenceDto getOrderable();
+    Orderable getOrderable();
 
     Long getQuantity();
   }

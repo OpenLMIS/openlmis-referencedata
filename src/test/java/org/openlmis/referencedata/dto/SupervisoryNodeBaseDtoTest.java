@@ -19,24 +19,16 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 import org.openlmis.referencedata.ToStringTestUtils;
-import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 
 public class SupervisoryNodeBaseDtoTest {
 
   @Test
   public void equalsContract() {
-    FacilityDto red = new FacilityDto();
-    FacilityDto black = new FacilityDto();
-
-    new FacilityDataBuilder().build().export(red);
-    new FacilityDataBuilder().build().export(black);
-
     EqualsVerifier
         .forClass(SupervisoryNodeBaseDto.class)
         .withIgnoredFields("serviceUrl")
         .withRedefinedSuperclass()
         .withRedefinedSubclass(SupervisoryNodeDto.class)
-        .withPrefabValues(FacilityDto.class, red, black)
         .suppress(Warning.NONFINAL_FIELDS)
         .verify();
   }

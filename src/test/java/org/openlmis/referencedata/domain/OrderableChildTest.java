@@ -16,11 +16,10 @@
 package org.openlmis.referencedata.domain;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -29,6 +28,18 @@ import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrderableChildTest {
+
+  @Test
+  public void equalsContract() throws Exception {
+    EqualsVerifier
+        .forClass(OrderableChild.class)
+        .withRedefinedSuperclass()
+        .withPrefabValues(Orderable.class,
+            new OrderableDataBuilder().buildAsNew(),
+            new OrderableDataBuilder().buildAsNew())
+        .withOnlyTheseFields("parent", "orderable")
+        .verify();
+  }
 
   @Test
   public void shouldCreateNewOrderableChild() {
@@ -41,60 +52,6 @@ public class OrderableChildTest {
     assertEquals(orderableChild.getQuantity(), quantity);
     assertEquals(orderableChild.getOrderable(), child);
     assertEquals(orderableChild.getParent(), parent);
-  }
-
-  @Test
-  public void equalsShouldReturnTrue() {
-    Orderable parent = Mockito.mock(Orderable.class);
-    Orderable child = Mockito.mock(Orderable.class);
-
-    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
-    OrderableChild otherOrderableChild = OrderableChild.newInstance(parent, child, 10L);
-
-    boolean result = orderableChild.equals(otherOrderableChild);
-
-    assertTrue(result);
-  }
-
-
-  @Test
-  public void equalsShouldReturnFalseForNull() {
-    Orderable parent = Mockito.mock(Orderable.class);
-    Orderable child = Mockito.mock(Orderable.class);
-
-    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
-
-    boolean result = orderableChild.equals(null);
-
-    assertFalse(result);
-  }
-
-  @Test
-  public void equalsShouldReturnFalseForUnequalOrderables() {
-    Orderable parent = new OrderableDataBuilder().build();
-    Orderable child = new OrderableDataBuilder().build();
-    Orderable child2 = new OrderableDataBuilder().build();
-
-    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
-    OrderableChild otherOrderableChild = OrderableChild.newInstance(parent, child2, 10L);
-
-    boolean result = orderableChild.equals(otherOrderableChild);
-
-    assertFalse(result);
-  }
-
-  @Test
-  public void equalsShouldReturnFalseForUnequalParents() {
-    Orderable parent = new OrderableDataBuilder().build();
-    Orderable parent2 = new OrderableDataBuilder().build();
-    Orderable child = new OrderableDataBuilder().build();
-
-    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, 10L);
-    OrderableChild otherOrderableChild = OrderableChild.newInstance(parent2, child, 10L);
-
-    boolean result = orderableChild.equals(otherOrderableChild);
-
-    assertFalse(result);
   }
 
   @Test

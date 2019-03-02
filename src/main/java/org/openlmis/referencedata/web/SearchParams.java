@@ -151,6 +151,20 @@ public final class SearchParams {
         .collect(toSet());
   }
 
+  /**
+   * Gets set of {@link String} based on given key.
+   *
+   * @param key key for getting string values
+   * @return parsed set of strings
+   */
+  public Set<String> getStrings(String key) {
+    return Optional.ofNullable(get(key))
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(value -> (String) value)
+        .collect(toSet());
+  }
+
   private UUID parse(String value, String key) {
     return UuidUtil.fromString(value)
         .orElseThrow(() ->

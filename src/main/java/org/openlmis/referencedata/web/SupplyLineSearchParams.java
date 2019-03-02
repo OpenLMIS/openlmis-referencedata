@@ -34,9 +34,10 @@ public final class SupplyLineSearchParams {
   private static final String PROGRAM_ID = "programId";
   private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
   private static final String SUPPLYING_FACILITY_ID = "supplyingFacilityId";
+  private static final String EXPAND = "expand";
 
   private static final List<String> ALL_PARAMETERS =
-      asList(PROGRAM_ID, SUPERVISORY_NODE_ID, SUPPLYING_FACILITY_ID);
+      asList(PROGRAM_ID, SUPERVISORY_NODE_ID, SUPPLYING_FACILITY_ID, EXPAND);
 
   private SearchParams queryParams;
 
@@ -77,6 +78,17 @@ public final class SupplyLineSearchParams {
    */
   public UUID getSupervisoryNodeId() {
     return queryParams.getUuid(SUPERVISORY_NODE_ID);
+  }
+
+  /**
+   * Returns supervisory node id.
+   * If param value has incorrect format {@link ValidationMessageException} will be thrown.
+   *
+   * @return UUID value of supervisory node id
+   *         or null if params doesn't contain "supervisoryNodeId" key.
+   */
+  public Set<String> getExpand() {
+    return queryParams.getStrings(EXPAND);
   }
 
   /**

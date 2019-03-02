@@ -21,6 +21,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -59,6 +60,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   private static final String SUPPLYING_FACILITY_ID = "supplyingFacilityId";
 
   private static final String RESOURCE_URL = "/api/supplyLines";
+  private static final String V2_RESOURCE_URL = RESOURCE_URL + "/v2";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
 
   private SupplyLine supplyLine;
@@ -153,6 +155,100 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertEquals(1, response.getContent().size());
+  }
+
+  @Test
+  public void searchV2ShouldReturnBadRequestOnException() {
+    Map<String, Object> requestParams = getSearchParameters();
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .params(requestParams)
+        .param("some-unknown-parameter", "some-value")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(V2_RESOURCE_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindSupplyLinesWithoutParametersV2() {
+    Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
+
+    given(supplyLineRepository.search(null, null, emptySet(), emptySet(), pageable))
+        .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(V2_RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertEquals(1, response.getContent().size());
+  }
+
+  @Test
+  public void shouldFindSupplyLinesV2() {
+    given(supplyLineRepository.search(
+        supplyLine.getProgram().getId(),
+        supplyLine.getSupervisoryNode().getId(),
+        singleton(supplyLine.getSupplyingFacility().getId()),
+        emptySet(),
+        pageable))
+        .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
+
+    Map<String, Object> requestBody = getSearchParameters();
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .params(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(V2_RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertEquals(1, response.getContent().size());
+  }
+
+  @Test
+  public void shouldFindSupplyLinesV2WithExpand() {
+    given(supplyLineRepository.search(
+        supplyLine.getProgram().getId(),
+        supplyLine.getSupervisoryNode().getId(),
+        singleton(supplyLine.getSupplyingFacility().getId()),
+        asSet("supervisoryNode"),
+        pageable))
+        .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
+
+    Map<String, Object> requestBody = getSearchParameters();
+    requestBody.put("expand", "supervisoryNode");
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .params(requestBody)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(V2_RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);

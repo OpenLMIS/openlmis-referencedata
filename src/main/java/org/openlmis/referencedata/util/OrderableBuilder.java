@@ -76,7 +76,7 @@ public class OrderableBuilder {
     if (!isEmpty(importer.getChildren())) {
       List<UUID> uuids = importer.getChildren()
           .stream()
-          .map(item -> item.getOrderable().getId())
+          .map(item -> item.getOrderableRef().getId())
           .collect(Collectors.toList());
 
       Map<UUID, Orderable> childrenOrderables = orderableRepository
@@ -87,7 +87,7 @@ public class OrderableBuilder {
 
       Set<OrderableChild> children = importer.getChildren().stream().map(
           item -> {
-            Orderable child = childrenOrderables.get(item.getOrderable().getId());
+            Orderable child = childrenOrderables.get(item.getOrderableRef().getId());
             return OrderableChild.newInstance(orderable, child, item.getQuantity());
           }).collect(Collectors.toSet());
       orderable.setChildren(children);

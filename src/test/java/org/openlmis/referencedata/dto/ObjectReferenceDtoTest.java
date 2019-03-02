@@ -28,6 +28,7 @@ public class ObjectReferenceDtoTest {
     EqualsVerifier
         .forClass(ObjectReferenceDto.class)
         .withRedefinedSuperclass()
+        .withRedefinedSubclass(FacilityObjectReferenceDto.class)
         .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
         .verify();
   }
