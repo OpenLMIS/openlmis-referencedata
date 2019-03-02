@@ -120,7 +120,7 @@ scenarios:
   get-page-of-ten-supply-lines-V2-expand:
     requests:
       - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/supplyLines/v2?page=0&size=10?expand=supervisoryNode.requisitionGroup.memberFacilities
+      - url: ${__P(base-uri)}/api/supplyLines/v2?page=0&size=10&expand=supervisoryNode.requisitionGroup.memberFacilities
         method: GET
         label: GetPageOfTenSupplyLinesV2Expand
         headers:
