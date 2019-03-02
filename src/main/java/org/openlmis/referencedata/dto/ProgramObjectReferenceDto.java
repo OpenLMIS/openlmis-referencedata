@@ -31,7 +31,7 @@ import org.openlmis.referencedata.domain.Program;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public final class ProgramObjectReferenceDto extends ObjectReferenceDto
-    implements Program.Importer {
+    implements Program.Exporter {
 
   private static final String PROGRAMS = "programs";
 
