@@ -23,15 +23,15 @@ import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.AS;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.FROM;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.INNER_JOIN_FETCH;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ORDER_BY;
-import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT_COUNT;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT_DISTINCT;
+import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT_DISTINCT_COUNT;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.WHERE;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.and;
-import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.dot;
+import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.asParameter;
+import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.getField;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.in;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.isEqual;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.join;
-import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.parameter;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -81,21 +81,26 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
 
   private static final String FROM_SL = join(FROM, "SupplyLine", AS, SUPPLY_LINE_ALIAS);
   private static final String SELECT_SL = join(SELECT_DISTINCT, SUPPLY_LINE_ALIAS, FROM_SL);
-  private static final String COUNT_SL = join(SELECT_COUNT, FROM_SL);
+  private static final String COUNT_SL = join(SELECT_DISTINCT_COUNT, FROM_SL);
 
   private static final String SUPERVISORY_NODE_JOIN = join(INNER_JOIN_FETCH,
-      dot(SUPPLY_LINE_ALIAS, "supervisoryNode"), AS, SUPERVISORY_NODE_ALIAS);
+      getField(SUPPLY_LINE_ALIAS, "supervisoryNode"), AS, SUPERVISORY_NODE_ALIAS);
   private static final String REQUISITION_GROUP_JOIN = join(INNER_JOIN_FETCH,
-      dot(SUPERVISORY_NODE_ALIAS, "requisitionGroup"), AS, REQUISITION_GROUP_ALIAS);
+      getField(SUPERVISORY_NODE_ALIAS, "requisitionGroup"), AS, REQUISITION_GROUP_ALIAS);
   private static final String REQUISITION_GROUP_MEMBERS_JOIN = join(INNER_JOIN_FETCH,
-      dot(REQUISITION_GROUP_ALIAS, "memberFacilities"));
+      getField(REQUISITION_GROUP_ALIAS, "memberFacilities"));
 
   private static final String WITH_PROGRAM_ID =
-      isEqual(dot(SUPPLY_LINE_ALIAS, "program.id"), parameter(PROGRAM_ID));
+      isEqual(getField(SUPPLY_LINE_ALIAS, "program.id"), asParameter(PROGRAM_ID));
   private static final String WITH_SUPERVISORY_NODE_ID =
-      isEqual(dot(SUPPLY_LINE_ALIAS, "supervisoryNode.id"), parameter(SUPERVISORY_NODE_ID));
+      isEqual(getField(SUPPLY_LINE_ALIAS, "supervisoryNode.id"), asParameter(SUPERVISORY_NODE_ID));
   private static final String WITH_SUPPLYING_FACILITIES =
-      join(dot(SUPPLY_LINE_ALIAS, "supplyingFacility.id"), in(SUPPLYING_FACILITY_IDS));
+      join(getField(SUPPLY_LINE_ALIAS, "supplyingFacility.id"), in(SUPPLYING_FACILITY_IDS));
+
+  private static final String REQUISITION_GROUP_EXPAND =
+      getField("supervisoryNode", "requisitionGroup");
+  private static final String MEMBER_FACILITIES_EXPAND =
+      getField(REQUISITION_GROUP_EXPAND, "memberFacilities");
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -103,7 +108,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   /**
    * Method returns a page of supply lines matching parameters.
    * Result can be sorted by supplying facility name if
-   * "supplyingFacilityName" parameter is used in sort property in pageable object.
+   * "supplyingFacilityName" asParameter is used in sort property in pageable object.
    * Using expand
    *
    * @param programId            UUID of the program
@@ -134,9 +139,9 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
 
     String selectStatement = SELECT_SL;
     if (isNotEmpty(expand)) {
-      if (expand.contains("supervisoryNode.requisitionGroup")) {
+      if (expand.contains(REQUISITION_GROUP_EXPAND)) {
         selectStatement = join(SELECT_SL, SUPERVISORY_NODE_JOIN, REQUISITION_GROUP_JOIN);
-      } else if (expand.contains("supervisoryNode.requisitionGroup.memberFacilities")) {
+      } else if (expand.contains(MEMBER_FACILITIES_EXPAND)) {
         selectStatement = join(SELECT_SL, SUPERVISORY_NODE_JOIN, REQUISITION_GROUP_JOIN,
             REQUISITION_GROUP_MEMBERS_JOIN);
       }
@@ -157,7 +162,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   /**
    * Method returns a page of supply lines matching parameters.
    * Result can be sorted by supplying facility name if
-   * "supplyingFacilityName" parameter is used in sort property in pageable object.
+   * "supplyingFacilityName" asParameter is used in sort property in pageable object.
    *
    * @param programId            UUID of the program
    * @param supervisoryNodeId    UUID of the supervisory node
@@ -295,7 +300,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
           Spliterators.spliteratorUnknownSize(pageable.getSort().iterator(), Spliterator.ORDERED),
           false)
           .map(order -> join(
-              dot(SUPPLY_LINE_ALIAS, order.getProperty()),
+              getField(SUPPLY_LINE_ALIAS, order.getProperty()),
               order.getDirection().toString()))
           .collect(toList());
 

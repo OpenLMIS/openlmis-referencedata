@@ -20,13 +20,11 @@ import java.util.Collection;
 class SqlConstants {
 
   static final String SELECT_DISTINCT = "SELECT DISTINCT";
-  static final String SELECT_COUNT = join(SELECT_DISTINCT, "COUNT(*)");
+  static final String SELECT_DISTINCT_COUNT = join(SELECT_DISTINCT, "COUNT(*)");
   static final String FROM = "FROM";
   static final String AS = "AS";
   static final String WHERE = "WHERE";
-  static final String INNER_JOIN = "INNER JOIN";
-  static final String INNER_JOIN_FETCH = join(INNER_JOIN, "FETCH");
-  static final String PARAMETER_PREFIX = ":";
+  static final String INNER_JOIN_FETCH = "INNER JOIN FETCH";
   static final String ORDER_BY = "ORDER BY";
 
   private SqlConstants() {}
@@ -36,14 +34,14 @@ class SqlConstants {
   }
 
   static String in(String parameterName) {
-    return String.join("", "IN (", PARAMETER_PREFIX, parameterName, ")");
+    return String.format("IN (:%s)", parameterName);
   }
 
   static String and(Collection<String> conditions) {
     return String.join(" AND ", conditions);
   }
 
-  static String dot(String... fields) {
+  static String getField(String... fields) {
     return String.join(".", fields);
   }
 
@@ -51,7 +49,7 @@ class SqlConstants {
     return join(left, "=", right);
   }
 
-  static String parameter(String parameterName) {
+  static String asParameter(String parameterName) {
     return ":" + parameterName;
   }
 }
