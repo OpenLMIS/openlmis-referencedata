@@ -57,6 +57,10 @@
     "extraData": {
       "type": "object",
       "title": "extraData"
+    },
+    "href": {
+      "type": "string",
+      "title": "href"
     }
   },
   "required": ["id"]

@@ -35,6 +35,10 @@
     "enableDatePhysicalStockCountCompleted": {
       "type": ["null", "boolean"],
       "title": "enableDatePhysicalStockCountCompleted"
+    },
+    "href": {
+      "type": "string",
+      "title": "href"
     }
   },
   "required": ["id"]

@@ -64,6 +64,10 @@
         "$ref": "supportedProgram.json"
       },
       "uniqueItems": false
+    },
+    "href": {
+      "type": "string",
+      "title": "href"
     }
   },
   "required": ["id"]

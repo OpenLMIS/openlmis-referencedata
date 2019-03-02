@@ -36,6 +36,10 @@
       "title": "memberFacilities",
       "items": { "type": "object", "$ref": "facility.json" },
       "uniqueItems": false
+    },
+    "href": {
+      "type": "string",
+      "title": "href"
     }
   },
   "required": ["id"]
