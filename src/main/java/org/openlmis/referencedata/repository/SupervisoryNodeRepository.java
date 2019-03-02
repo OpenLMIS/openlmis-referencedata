@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRepositoryCustom;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface SupervisoryNodeRepository
     extends JpaRepository<SupervisoryNode, UUID>, SupervisoryNodeRepositoryCustom,
@@ -48,4 +50,14 @@ public interface SupervisoryNodeRepository
       + " ORDER BY ?#{#pageable}",
       nativeQuery = true)
   Page<SupervisoryNode> findAllWithoutSnapshots(Pageable pageable);
+
+  Set<SupervisoryNode> findByNameIgnoreCaseContaining(String name);
+
+  @Query(value = "SELECT\n"
+      + "    sn.*\n"
+      + "FROM\n"
+      + "    referencedata.supervisory_nodes sn\n"
+      + " WHERE UPPER(sn.code) = UPPER(:code)",
+      nativeQuery = true)
+  Set<SupervisoryNode> findByCodeCaseInsensetive(@Param("code") String code);
 }

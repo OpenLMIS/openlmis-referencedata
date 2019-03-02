@@ -26,4 +26,5 @@ public abstract class SupervisoryNodeMessageKeys extends MessageKeys {
   public static final String ERROR_CODE_MUST_BE_UNIQUE = join(ERROR, CODE, MUST_BE_UNIQUE);
   public static final String ERROR_NAME_REQUIRED = join(ERROR, NAME, REQUIRED);
   public static final String ERROR_INVALID_PARAMS = join(ERROR, SEARCH, INVALID_PARAMS);
+  public static final String ERROR_NAME_MUST_BE_UNIQUE = join(ERROR, NAME, MUST_BE_UNIQUE);
 }
