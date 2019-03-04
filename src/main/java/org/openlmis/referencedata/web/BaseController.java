@@ -31,7 +31,7 @@ import org.javers.core.json.JsonConverter;
 import org.javers.repository.jql.QueryBuilder;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.service.ObjReferenceExpander;
+import org.openlmis.referencedata.service.ObjectReferenceExpander;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -59,7 +59,7 @@ public abstract class BaseController {
   private Javers javers;
 
   @Autowired
-  private ObjReferenceExpander objReferenceExpander;
+  private ObjectReferenceExpander objectReferenceExpander;
 
   protected void checkAdminRight(String rightName, Profiler profiler) {
     checkAdminRight(rightName, true, null, profiler);
@@ -179,7 +179,7 @@ public abstract class BaseController {
   }
 
   protected void expandDto(Object dto, BaseEntity entity, Set<String> expands) {
-    objReferenceExpander.expandDto(dto, entity, expands);
+    objectReferenceExpander.expandDto(dto, entity, expands);
   }
 
   void validateCsvFile(MultipartFile csvFile) {

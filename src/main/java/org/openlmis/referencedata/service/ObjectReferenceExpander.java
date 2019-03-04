@@ -31,7 +31,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ObjReferenceExpander {
+public class ObjectReferenceExpander {
 
   private static final String EXPORT_METHOD_NAME = "export";
   private static final String EXPORTER_INTERFACE_NAME = "Exporter";

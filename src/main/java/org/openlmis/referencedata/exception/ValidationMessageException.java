@@ -24,7 +24,7 @@ import org.openlmis.referencedata.util.Message;
 public class ValidationMessageException extends BaseMessageException {
 
   /**
-   * Create new validation exception with the given message key.  Helper method that
+   * Creates new validation exception with the given message key.  Helper method that
    * uses {@link #ValidationMessageException(Message)}.
    * @param messageKey the messageKey of a {@link Message}.
    */
@@ -33,7 +33,7 @@ public class ValidationMessageException extends BaseMessageException {
   }
 
   /**
-   * Create a new validation exception with the given message.
+   * Creates a new validation exception with the given message.
    * @param message the message.
    */
   public ValidationMessageException(Message message) {
@@ -41,7 +41,7 @@ public class ValidationMessageException extends BaseMessageException {
   }
 
   /**
-   * Create a new validation exception with the given message and cause.
+   * Creates a new validation exception with the given message and cause.
    * @param message the message.
    * @param cause   the exception.
    */
@@ -50,7 +50,7 @@ public class ValidationMessageException extends BaseMessageException {
   }
 
   /**
-   * Create a new validation exception with the given message and cause.
+   * Creates a new validation exception with the given message and cause.
    * Message is constructed from message key and message parameters.
    * @param cause             the exception.
    * @param messageKey        the message key for new Message.
@@ -62,7 +62,7 @@ public class ValidationMessageException extends BaseMessageException {
   }
 
   /**
-   * Create a new validation exception with the given message and cause.
+   * Creates a new validation exception with the given message and cause.
    * Message is constructed from message key and message parameters.
    * @param messageKey        the message key for new Message.
    * @param messageParameters the parameters for Message.

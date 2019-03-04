@@ -29,10 +29,10 @@ import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 
-public class ObjReferenceExpanderTest {
+public class ObjectReferenceExpanderTest {
 
   @InjectMocks
-  private ObjReferenceExpander objReferenceExpander = new ObjReferenceExpander();
+  private ObjectReferenceExpander objectReferenceExpander = new ObjectReferenceExpander();
 
   private SupplyLine supplyLine = new SupplyLineDataBuilder()
       .withSupervisoryNode(new SupervisoryNodeDataBuilder()
@@ -48,14 +48,14 @@ public class ObjReferenceExpanderTest {
 
   @Test
   public void shouldExpandDtoWithField() {
-    objReferenceExpander.expandDto(supplyLineDto, supplyLine, asSet("supervisoryNode"));
+    objectReferenceExpander.expandDto(supplyLineDto, supplyLine, asSet("supervisoryNode"));
 
     assertThat(supplyLineDto.getSupervisoryNode().getFacility(), notNullValue());
   }
 
   @Test
   public void shouldExpandDtoWithNestedField() {
-    objReferenceExpander
+    objectReferenceExpander
         .expandDto(supplyLineDto, supplyLine, asSet("supervisoryNode.requisitionGroup"));
 
     assertThat(supplyLineDto.getSupervisoryNode().getRequisitionGroup().getSupervisoryNode(),
@@ -64,7 +64,7 @@ public class ObjReferenceExpanderTest {
 
   @Test
   public void shouldExpandDtoWithCollection() {
-    objReferenceExpander.expandDto(supplyLineDto,
+    objectReferenceExpander.expandDto(supplyLineDto,
         supplyLine, asSet("supervisoryNode.requisitionGroup.memberFacilities"));
 
     assertThat(supplyLineDto.getSupervisoryNode().getRequisitionGroup().getMemberFacilities(),
@@ -73,6 +73,6 @@ public class ObjReferenceExpanderTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfExpandFieldIsNotPresent() {
-    objReferenceExpander.expandDto(supplyLineDto, supplyLine, asSet("unknownField"));
+    objectReferenceExpander.expandDto(supplyLineDto, supplyLine, asSet("unknownField"));
   }
 }
