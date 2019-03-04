@@ -9,6 +9,7 @@ Breaking changes:
 New functionality added in a backwards-compatible manner:
 * [OLMIS-5990](https://openlmis.atlassian.net/browse/OLMIS-5990): Added ability to search roles by right ID
 * [OLMIS-683](https://openlmis.atlassian.net/browse/OLMIS-683): Update orderable model to Allow for definition of kits.
+* [OLMIS-6055](https://openlmis.atlassian.net/browse/OLMIS-6055): Added rights per superset report.
 
 Improvements:
 * [OLMIS-5527](https://openlmis.atlassian.net/browse/OLMIS-5527): On facility list screen, sort facility by name
