@@ -317,6 +317,6 @@ reporting:
         Get First ten Facilities By Boundary too slow: p90 of GetFirstTenFacilitiesByBoundary>500ms
         Delete Facility too slow: p90 of DeleteFacility>500ms
         Get Supplying Facilities too slow: p90 of GetSupplyingFacilities>500ms
-        Get All Facilities too slow: p90 of GetAllFacilities>1000ms
-        Find All Health Center Facilities too slow: p90 of FindAllHealthCenterFacilities>1000ms
+        Get All Facilities too slow: p90 of GetAllFacilities>1500ms
+        Find All Health Center Facilities too slow: p90 of FindAllHealthCenterFacilities>1500ms
         Find First Ten Health Center Facilities too slow: p90 of FindFirstTenHealthCenterFacilities>500ms
