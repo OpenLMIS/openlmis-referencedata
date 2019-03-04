@@ -21,6 +21,7 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.AS;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.FROM;
+import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ID;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.INNER_JOIN_FETCH;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ORDER_BY;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT_DISTINCT;
@@ -73,7 +74,10 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   private static final String SUPPLYING_FACILITY = "supplyingFacility";
   private static final String SUPPLYING_FACILITY_IDS = "supplyingFacilityIds";
   private static final String PROGRAM_ID = "programId";
-  private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
+  private static final String SUPERVISORY_NODE = "supervisoryNode";
+  private static final String SUPERVISORY_NODE_ID = SUPERVISORY_NODE + "Id";
+  private static final String MEMBER_FACILITIES = "memberFacilities";
+  private static final String REQUISITION_GROUP = "requisitionGroup";
 
   private static final String SUPPLY_LINE_ALIAS = "sl";
   private static final String SUPERVISORY_NODE_ALIAS = "sn";
@@ -84,23 +88,23 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   private static final String COUNT_SL = join(SELECT_DISTINCT_COUNT, FROM_SL);
 
   private static final String SUPERVISORY_NODE_JOIN = join(INNER_JOIN_FETCH,
-      getField(SUPPLY_LINE_ALIAS, "supervisoryNode"), AS, SUPERVISORY_NODE_ALIAS);
+      getField(SUPPLY_LINE_ALIAS, SUPERVISORY_NODE), AS, SUPERVISORY_NODE_ALIAS);
   private static final String REQUISITION_GROUP_JOIN = join(INNER_JOIN_FETCH,
-      getField(SUPERVISORY_NODE_ALIAS, "requisitionGroup"), AS, REQUISITION_GROUP_ALIAS);
+      getField(SUPERVISORY_NODE_ALIAS, REQUISITION_GROUP), AS, REQUISITION_GROUP_ALIAS);
   private static final String REQUISITION_GROUP_MEMBERS_JOIN = join(INNER_JOIN_FETCH,
-      getField(REQUISITION_GROUP_ALIAS, "memberFacilities"));
+      getField(REQUISITION_GROUP_ALIAS, MEMBER_FACILITIES));
 
   private static final String WITH_PROGRAM_ID =
-      isEqual(getField(SUPPLY_LINE_ALIAS, "program.id"), asParameter(PROGRAM_ID));
+      isEqual(getField(SUPPLY_LINE_ALIAS, "program", ID), asParameter(PROGRAM_ID));
   private static final String WITH_SUPERVISORY_NODE_ID =
-      isEqual(getField(SUPPLY_LINE_ALIAS, "supervisoryNode.id"), asParameter(SUPERVISORY_NODE_ID));
+      isEqual(getField(SUPPLY_LINE_ALIAS, SUPERVISORY_NODE, ID), asParameter(SUPERVISORY_NODE_ID));
   private static final String WITH_SUPPLYING_FACILITIES =
-      join(getField(SUPPLY_LINE_ALIAS, "supplyingFacility.id"), in(SUPPLYING_FACILITY_IDS));
+      join(getField(SUPPLY_LINE_ALIAS, SUPPLYING_FACILITY, ID), in(SUPPLYING_FACILITY_IDS));
 
   private static final String REQUISITION_GROUP_EXPAND =
-      getField("supervisoryNode", "requisitionGroup");
+      getField(SUPERVISORY_NODE, REQUISITION_GROUP);
   private static final String MEMBER_FACILITIES_EXPAND =
-      getField(REQUISITION_GROUP_EXPAND, "memberFacilities");
+      getField(REQUISITION_GROUP_EXPAND, MEMBER_FACILITIES);
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -218,17 +222,17 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
     Predicate predicate = builder.conjunction();
 
     if (programId != null) {
-      predicate = builder.and(predicate, builder.equal(root.get("program").get("id"), programId));
+      predicate = builder.and(predicate, builder.equal(root.get("program").get(ID), programId));
     }
 
     if (supervisoryNodeId != null) {
       predicate = builder
-          .and(predicate, builder.equal(root.get("supervisoryNode").get("id"), supervisoryNodeId));
+          .and(predicate, builder.equal(root.get(SUPERVISORY_NODE).get(ID), supervisoryNodeId));
     }
 
     if (isNotEmpty(supplyingFacilityIds)) {
       predicate = builder
-          .and(predicate, root.get("supplyingFacility").get("id").in(supplyingFacilityIds));
+          .and(predicate, root.get(SUPPLYING_FACILITY).get(ID).in(supplyingFacilityIds));
     }
 
     query.where(predicate);
