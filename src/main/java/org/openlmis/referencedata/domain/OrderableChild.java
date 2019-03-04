@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
@@ -23,6 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +37,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("OrderableChild")
+@EqualsAndHashCode(callSuper = false, of = {"parent", "orderable"})
 public class OrderableChild extends BaseEntity {
 
   @ManyToOne
@@ -78,28 +79,6 @@ public class OrderableChild extends BaseEntity {
     return orderableChild;
   }
 
-  @Override
-  public boolean equals(Object other) {
-    if (Objects.isNull(other) || !this.canEqual(other)) {
-      return false;
-    }
-
-    OrderableChild orderableChild = (OrderableChild) other;
-
-    return canEqual(other) && Objects.equals(orderable, orderableChild.orderable)
-        && Objects.equals(parent, orderableChild.parent);
-  }
-
-  @Override
-  public boolean canEqual(Object other) {
-    return (other instanceof OrderableChild);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(parent, orderable);
-  }
-
   /**
    * Exports current state of Orderable Child object.
    *
@@ -118,8 +97,6 @@ public class OrderableChild extends BaseEntity {
   }
 
   public interface Importer {
-
-    Orderable getOrderable();
 
     Long getQuantity();
   }

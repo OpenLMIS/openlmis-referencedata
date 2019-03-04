@@ -4,7 +4,7 @@
   "title": "Orderable Child",
   "description": "A single orderable child record",
   "properties": {
-    "orderableRef": {
+    "orderable": {
       "type": "object",
       "$ref": "referenceObjectDto.json"
     },
