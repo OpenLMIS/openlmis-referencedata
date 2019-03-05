@@ -28,8 +28,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
@@ -122,7 +120,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     program = new ProgramDataBuilder().build();
 
     right = Right.newRight("right1", RightType.SUPERVISION);
-
+    
     facilityId = facility.getId();
     programId = UUID.randomUUID();
     rightId = UUID.randomUUID();
@@ -402,10 +400,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldGetSupervisoryNodeFromDatabaseWhenNotInCache() {
+  public void shouldGetSupervisoryNode() {
 
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
@@ -419,89 +415,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .statusCode(200);
 
     assertResponseBody(response, is(supervisoryNode.getId().toString()));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldSaveSupervisoryNodeInCacheAfterGettingOneFromDatabase() {
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(false);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
-
-    ValidatableResponse response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supervisoryNodeId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(200);
-
-    assertResponseBody(response, is(supervisoryNode.getId().toString()));
-    verify(supervisoryNodeRedisRepository, times(1)).save(supervisoryNode);
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetSupervisoryNodeFromCache() {
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRedisRepository.findById(supervisoryNodeId)).willReturn(supervisoryNode);
-
-    ValidatableResponse response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supervisoryNodeId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(200);
-
-    assertResponseBody(response, is(supervisoryNode.getId().toString()));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(false);
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supervisoryNodeId)
-        .when()
-        .get(ID_URL)
-        .then()
-        .statusCode(404);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldDeleteSupervisoryNodeFromCacheAfterUpdate() {
-    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-
-    supervisoryNodeDto.setDescription("OpenLMIS");
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
-
-    ValidatableResponse response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supervisoryNodeId)
-        .body(supervisoryNodeDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200);
-
-    assertEquals(supervisoryNodeRedisRepository.findById(supervisoryNodeId), null);
-    assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
-
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -823,16 +736,16 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   private ValidatableResponse searchForSupervisoryNode(HashMap<String, Object> queryParams,
-      int expectedCode) {
+                                                       int expectedCode) {
     return restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParams(queryParams)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(expectedCode);
+      .given()
+      .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .queryParams(queryParams)
+      .when()
+      .get(RESOURCE_URL)
+      .then()
+      .statusCode(expectedCode);
   }
 
   private void assertResponseBody(ValidatableResponse response, Matcher<String> idMatcher) {

@@ -39,7 +39,6 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.SupervisoryNodeBuilder;
-import org.openlmis.referencedata.service.SupervisoryNodeService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
@@ -76,9 +75,6 @@ public class SupervisoryNodeController extends BaseController {
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Autowired
-  private SupervisoryNodeService supervisoryNodeService;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -141,8 +137,12 @@ public class SupervisoryNodeController extends BaseController {
     Profiler profiler = new Profiler("GET_SUPERVISORY_NODE");
     profiler.setLogger(LOGGER);
 
-    profiler.start("FIND_SUPERVISORY_NODE_SERVICE");
-    SupervisoryNode supervisoryNode = supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+    profiler.start("FIND_SUPERVISORY_NODE_IN_DB");
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+    if (supervisoryNode == null) {
+      profiler.stop().log();
+      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+    }
 
     profiler.start("EXPORT_TO_DTO");
     SupervisoryNodeDto dto = exportToDto(supervisoryNode);
@@ -181,7 +181,7 @@ public class SupervisoryNodeController extends BaseController {
     SupervisoryNode supervisoryNodeToUpdate = builder.build(supervisoryNodeDto);
 
     profiler.start("SAVE_SUPERVISORY_NODE");
-    supervisoryNodeService.updateSupervisoryNode(supervisoryNodeToUpdate);
+    supervisoryNodeRepository.saveAndFlush(supervisoryNodeToUpdate);
 
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
     rightAssignmentService.regenerateRightAssignments();
@@ -204,8 +204,12 @@ public class SupervisoryNodeController extends BaseController {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
-
-    return supervisoryNodeService.deleteSupervisoryNode(supervisoryNode);
+    if (supervisoryNode == null) {
+      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+    } else {
+      supervisoryNodeRepository.delete(supervisoryNode);
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
   }
 
   /**

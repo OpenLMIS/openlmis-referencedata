@@ -50,10 +50,6 @@ import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
@@ -84,9 +80,6 @@ public class Application {
 
   @Value("${redis.port}")
   private int redisPort;
-
-  @Value("${redis.password}")
-  private String redisPassword;
 
   @Autowired
   DialectName dialectName;
@@ -215,40 +208,6 @@ public class Application {
   @Bean
   public Clock clock() {
     return Clock.system(ZoneId.of(timeZoneId));
-  }
-
-  @Bean
-  JedisConnectionFactory connectionFactory() {
-    JedisConnectionFactory factory = new JedisConnectionFactory();
-    factory.setHostName(redisUrl);
-    factory.setPort(redisPort);
-    factory.setPassword(redisPassword);
-
-    factory.setUsePool(true);
-    return factory;
-  }
-
-  @Bean
-  public StringRedisSerializer stringRedisSerializer() {
-    StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-    return stringRedisSerializer;
-  }
-
-  /**
-   * Creates RedisTemplate instance.
-   *
-   * @param factory The Jedis Connection Factory to set connection
-   * @param <T> Generic type of objects
-   */
-  @Bean
-  public <T> RedisTemplate<String, T> redisTemplate(JedisConnectionFactory factory) {
-    RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
-    redisTemplate.setConnectionFactory(factory);
-    redisTemplate.setKeySerializer(stringRedisSerializer());
-    redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-    redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-    redisTemplate.setEnableTransactionSupport(true);
-    return redisTemplate;
   }
 
   @Bean
