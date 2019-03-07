@@ -19,9 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.UUID;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.domain.Facility;
@@ -102,7 +102,7 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
   }
 
   @Test
-  @JsonIgnore
+  @Ignore
   public void shouldSaveAndReturnTrueIfSupervisoryNodeExistsInCacheWithGivenId() {
     UUID supervisoryNodeId = supervisoryNode.getId();
 
@@ -112,7 +112,7 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
   }
 
   @Test
-  @JsonIgnore
+  @Ignore
   public void shouldFindSupervisoryNodeById() {
     UUID supervisoryNodeId = supervisoryNode.getId();
 
@@ -123,7 +123,7 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
   }
 
   @Test
-  @JsonIgnore
+  @Ignore
   public void shouldDeleteSupervisoryNode() {
     supervisoryNodeRedisRepository.delete(supervisoryNode);
 
@@ -131,7 +131,7 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
   }
 
   @Test
-  @JsonIgnore
+  @Ignore
   public void shouldFindSupervisoryNodeInDatabaseAndInCache() {
     SupervisoryNode supervisoryNodeFromDataBase = supervisoryNodeRepository
         .findOne(supervisoryNode.getId());
