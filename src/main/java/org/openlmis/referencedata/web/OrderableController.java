@@ -26,6 +26,7 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.OrderableService;
 import org.openlmis.referencedata.util.OrderableBuilder;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.validate.OrderableValidator;
 import org.slf4j.ext.XLogger;
@@ -78,13 +79,44 @@ public class OrderableController extends BaseController {
   public OrderableDto create(@RequestBody OrderableDto orderableDto,
       BindingResult bindingResult) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
-    orderableDto.setId(null);
     validator.validate(orderableDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
     Orderable orderable = orderableBuilder.newOrderable(orderableDto);
 
     return OrderableDto.newInstance(repository.save(orderable));
+  }
+
+  /**
+   * Update an Orderable.
+   *
+   * @param id the id of the Orderable to update.
+   * @param orderableDto the contents of how the Orderable should be updated.
+   * @param bindingResult the result of validation.
+   * @return the orderable that was updated.
+   */
+  @Transactional
+  @PutMapping(RESOURCE_PATH + "/{id}")
+  public OrderableDto update(@PathVariable("id") UUID id,
+      @RequestBody OrderableDto orderableDto,
+      BindingResult bindingResult) {
+
+    rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    if (false == UuidUtil.sameId(id, orderableDto.getId())) {
+      throw new ValidationMessageException(OrderableMessageKeys.ERROR_ID_MISMATCH);
+    }
+
+    validator.validate(orderableDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
+    Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(id);
+
+    if (null == foundOrderable) {
+      throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    Orderable savedOrderable = repository.save(orderableBuilder.newOrderable(orderableDto));
+    return OrderableDto.newInstance(savedOrderable);
   }
 
   /**

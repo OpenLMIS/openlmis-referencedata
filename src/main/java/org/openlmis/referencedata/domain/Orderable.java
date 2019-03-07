@@ -176,6 +176,7 @@ public class Orderable implements Identifiable {
     orderable.extraData.updateFrom(importer.getExtraData());
 
     orderable.identity = new OrderableIdentity(importer.getId(), importer.getVersionId());
+    orderable.lastUpdated = ZonedDateTime.now();
 
     return orderable;
   }

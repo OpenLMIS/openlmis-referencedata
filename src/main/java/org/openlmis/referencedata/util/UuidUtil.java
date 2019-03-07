@@ -26,9 +26,11 @@ import org.springframework.util.MultiValueMap;
 /**
  * Generic utility functions for {@link UUID}.
  */
-public class UuidUtil {
+public final class UuidUtil {
 
   private static final String ID = "id";
+
+  private UuidUtil() {}
 
   /**
    * Parses a String into a UUID safely.  Unlike {@link UUID#fromString(String)} however, this
@@ -48,6 +50,20 @@ public class UuidUtil {
     } catch (IllegalArgumentException iae) {
       return Optional.empty();
     }
+  }
+
+  /**
+   * Null-safe check to ensure Ids are equal.  See {@link UUID#equals(Object)}
+   * @param first the first UUID
+   * @param second the second UUID
+   * @return true if equal, false if not equal or either is null.e
+   */
+  public static boolean sameId(UUID first, UUID second) {
+    if (null == first) {
+      return false;
+    }
+
+    return first.equals(second);
   }
 
   /**

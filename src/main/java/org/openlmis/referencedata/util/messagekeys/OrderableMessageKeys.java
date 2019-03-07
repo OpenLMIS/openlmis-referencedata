@@ -20,6 +20,7 @@ public abstract class OrderableMessageKeys extends MessageKeys {
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NULL = join(ERROR, NULL);
+  public static final String ERROR_ID_MISMATCH = join(ERROR, ID_MISMATCH);
   public static final String ERROR_PRODUCT_CODE_REQUIRED = join(ERROR, "productCode", REQUIRED);
   public static final String ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED =
       join(ERROR, "packRoundingThreshold", REQUIRED);

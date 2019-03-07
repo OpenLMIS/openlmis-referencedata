@@ -15,17 +15,13 @@
 
 package org.openlmis.referencedata.validate;
 
-import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_DUPLICATED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NET_CONTENT_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NULL;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.repository.OrderableRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -36,9 +32,6 @@ import org.springframework.validation.Validator;
  */
 @Component
 public class OrderableValidator implements BaseValidator {
-
-  @Autowired
-  private OrderableRepository orderableRepository;
 
   /**
    * Checks if the given class definition is supported.
@@ -68,14 +61,5 @@ public class OrderableValidator implements BaseValidator {
     rejectIfNull(errors, "packRoundingThreshold", ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED);
     rejectIfNull(errors, "roundToZero", ERROR_ROUND_TO_ZERO_REQUIRED);
     rejectIfNull(errors, "netContent", ERROR_NET_CONTENT_REQUIRED);
-
-    if (!errors.hasErrors()) {
-      OrderableDto dto = (OrderableDto) target;
-      Code productCode = Code.code(dto.getProductCode());
-
-      if (orderableRepository.existsByProductCode(productCode)) {
-        errors.rejectValue("productCode", ERROR_DUPLICATED);
-      }
-    }
   }
 }

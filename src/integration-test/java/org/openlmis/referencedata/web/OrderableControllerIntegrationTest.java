@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.dto.OrderableDto.META_KEY_LAST_UPDATED;
 import static org.openlmis.referencedata.dto.OrderableDto.META_KEY_VERSION_ID;
-import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_DUPLICATED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NET_CONTENT_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
@@ -86,7 +85,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID orderableId = UUID.randomUUID();
 
   @Before
+  @Override
   public void setUp() {
+    super.setUp();
+
     ZonedDateTime zdtNow = ZonedDateTime.now();
     Map<String, String> metaAttributes = new HashMap<>();
     metaAttributes.put(META_KEY_VERSION_ID, "1");
@@ -101,6 +103,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     orderable.export(orderableDto);
 
     when(orderableRepository.save(any(Orderable.class))).thenReturn(orderable);
+    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
+        .willReturn(orderable);
   }
 
   @Test
@@ -120,6 +124,39 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertEquals(orderableDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void updateShouldUpdateOrderable() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+    when(orderableRepository.save(any(Orderable.class))).thenAnswer(i -> i.getArguments()[0]);
+
+    OrderableDto response1 = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(orderableDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(OrderableDto.class);
+
+    response1.setNetContent(11L);
+
+    OrderableDto response2 = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(response1)
+        .when()
+        .put(String.join("/", RESOURCE_URL, response1.getId().toString()))
+        .then()
+        .statusCode(200)
+        .extract().as(OrderableDto.class);
+
+    assertEquals(response1.getId(), response2.getId());
+    assertEquals(11L, response2.getNetContent().longValue());
   }
 
   @Test
@@ -224,16 +261,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     orderableDto.setNetContent(null);
 
     checkBadRequestBody(orderableDto, ERROR_NET_CONTENT_REQUIRED, RESOURCE_URL);
-  }
-
-  @Test
-  public void shouldRejectIfProductCodeDuplicated() {
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    when(orderableRepository.existsByProductCode(Code.code(orderableDto.getProductCode())))
-        .thenReturn(true);
-
-    checkBadRequestBody(orderableDto, ERROR_DUPLICATED, RESOURCE_URL);
   }
 
   @Test
