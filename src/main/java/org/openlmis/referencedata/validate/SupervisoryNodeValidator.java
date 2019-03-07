@@ -65,13 +65,6 @@ public class SupervisoryNodeValidator implements BaseValidator {
     rejectIfEmptyOrWhitespace(errors, NAME, SupervisoryNodeMessageKeys.ERROR_NAME_REQUIRED);
 
     SupervisoryNodeDto node = (SupervisoryNodeDto) target;
-    Set<SupervisoryNode> storedSupervisoryNode =
-            repository.findByNameIgnoreCaseContaining(
-                    node.getName());
-    if (null != storedSupervisoryNode && !storedSupervisoryNode.isEmpty()) {
-      rejectValue(errors,NAME,
-              SupervisoryNodeMessageKeys.ERROR_NAME_MUST_BE_UNIQUE);
-    }
 
     SupervisoryNode existingWithCode = repository.findByCode(node.getCode());
     if (null != existingWithCode && !existingWithCode.getId().equals(node.getId())) {
@@ -83,6 +76,13 @@ public class SupervisoryNodeValidator implements BaseValidator {
     if (null != existingSupervisoryNode && !existingSupervisoryNode.isEmpty()) {
       rejectValue(errors,CODE,
               SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+      Set<SupervisoryNode> storedSupervisoryNode =
+              repository.findByNameIgnoreCaseContaining(
+                      node.getName());
+      if (null != storedSupervisoryNode && !storedSupervisoryNode.isEmpty()) {
+        rejectValue(errors,NAME,
+                SupervisoryNodeMessageKeys.ERROR_NAME_MUST_BE_UNIQUE);
+      }
     }
   }
 }
