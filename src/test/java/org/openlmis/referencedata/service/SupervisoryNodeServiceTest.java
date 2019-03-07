@@ -153,4 +153,15 @@ public class SupervisoryNodeServiceTest {
     verifyZeroInteractions(supervisoryNodeRepository);
     verifyZeroInteractions(supervisoryNodeRedisRepository);
   }
+
+  @Test(expected = NotFoundException.class)
+  public void shouldThrowErrorNotFoundWhenDeletingNull() {
+    supervisoryNodeService.deleteSupervisoryNode(null);
+
+    assertThatThrownBy(() -> supervisoryNodeService.deleteSupervisoryNode(null))
+        .isInstanceOf(NotFoundException.class);
+
+    verifyZeroInteractions(supervisoryNodeRepository);
+    verifyZeroInteractions(supervisoryNodeRedisRepository);
+  }
 }
