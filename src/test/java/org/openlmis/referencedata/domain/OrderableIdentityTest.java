@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 
 import java.util.UUID;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -29,6 +30,34 @@ public class OrderableIdentityTest {
         .forClass(OrderableIdentity.class)
         .verify();
   }
+
+  @Test
+  public void equalsShouldBeOnId() {
+    // given
+    OrderableIdentity ident = new OrderableIdentity();
+    OrderableIdentity identDifferentId = new OrderableIdentity();
+
+    // when
+    boolean isEqual = ident.equals(identDifferentId);
+
+    // then
+    assertFalse(isEqual);
+  }
+
+  @Test
+  public void equalsShouldBeOnVersion() {
+    // given
+    OrderableIdentity ident = new OrderableIdentity();
+    OrderableIdentity identDifferentId = new OrderableIdentity(ident.getId(),
+        ident.getVersionId() + 1);
+
+    // when
+    boolean isEqual = ident.equals(identDifferentId);
+
+    // then
+    assertFalse(isEqual);
+  }
+
 
   @Test
   public void shouldInsertDefaultValues() {

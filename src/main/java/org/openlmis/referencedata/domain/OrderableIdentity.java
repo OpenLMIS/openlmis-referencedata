@@ -23,14 +23,12 @@ import java.util.UUID;
 import javax.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 @Getter
 @Setter
 @Embeddable
-@NoArgsConstructor
 @EqualsAndHashCode
 public class OrderableIdentity implements Identifiable, Serializable {
 
@@ -38,6 +36,10 @@ public class OrderableIdentity implements Identifiable, Serializable {
   private UUID id;
 
   private Long versionId;
+
+  OrderableIdentity() {
+    this(null, null);
+  }
 
   OrderableIdentity(UUID id, Long versionId) {
     // it seems like we can't use @GeneratedValue and @GenericGenerator annotations
