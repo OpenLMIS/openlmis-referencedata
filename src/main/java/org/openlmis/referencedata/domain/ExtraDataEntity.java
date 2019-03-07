@@ -39,7 +39,7 @@ public class ExtraDataEntity implements Serializable {
   @Getter
   @Convert(converter = ExtraDataConverter.class)
   @Column(name = "extradata", columnDefinition = "jsonb")
-  private transient Map<String, Object> extraData = new HashMap<>();
+  private Map<String, Object> extraData = new HashMap<>();
 
   public ExtraDataEntity(Map<String, Object> importer) {
     updateFrom(importer);

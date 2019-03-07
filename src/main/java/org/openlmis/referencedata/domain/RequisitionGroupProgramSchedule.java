@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -41,7 +40,7 @@ import org.javers.core.metamodel.annotation.TypeName;
         columnNames = {"requisitionGroupId", "programId"}))
 @NoArgsConstructor
 @TypeName("RequisitionGroupProgramSchedule")
-public class RequisitionGroupProgramSchedule extends BaseEntity implements Serializable {
+public class RequisitionGroupProgramSchedule extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "requisitionGroupId", nullable = false)
