@@ -51,10 +51,13 @@ public class SupervisoryNodeService {
     Profiler profiler = new Profiler("GET_SUPERVISORY_NODE");
     profiler.setLogger(LOGGER);
 
-    SupervisoryNode supervisoryNode;
-
     profiler.start("CHECK_IF_SUPERVISORY_NODE_EXISTS_IN_CACHE");
-    if (supervisoryNodeRedisRepository.exists(supervisoryNodeId)) {
+
+    SupervisoryNode supervisoryNode;
+    boolean supervisoryNodeIsInCache = supervisoryNodeRedisRepository
+        .existsInCache(supervisoryNodeId);
+
+    if (supervisoryNodeIsInCache) {
       profiler.start("GET_SUPERVISORY_NODE_FROM_CACHE");
       supervisoryNode = supervisoryNodeRedisRepository.findById(supervisoryNodeId);
     } else if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
@@ -90,7 +93,6 @@ public class SupervisoryNodeService {
    * @param supervisoryNode A supervisoryNode which we want to delete.
    */
   public ResponseEntity deleteSupervisoryNode(SupervisoryNode supervisoryNode) {
-
     if (supervisoryNode == null) {
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     } else {

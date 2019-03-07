@@ -18,7 +18,6 @@ package org.openlmis.referencedata.repository.custom.impl;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +26,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@Transactional
 public class SupervisoryNodeRedisRepositoryImpl implements SupervisoryNodeRedisRepository {
 
   private static final String HASH_KEY = "SUPERVISORY_NODE";
 
-  @Autowired
   private RedisTemplate<String, SupervisoryNode> redisTemplate;
   private HashOperations hashOperations;
 
+  @Autowired
   public SupervisoryNodeRedisRepositoryImpl(RedisTemplate<String, SupervisoryNode> redisTemplate) {
     this.redisTemplate = redisTemplate;
   }
@@ -46,31 +44,28 @@ public class SupervisoryNodeRedisRepositoryImpl implements SupervisoryNodeRedisR
   }
 
   @Override
-  public boolean exists(UUID supervisoryNodeId) {
-    SupervisoryNode supervisoryNode = (SupervisoryNode)this.hashOperations.get(
-        HASH_KEY, supervisoryNodeId.toString());
-    String key = String.format(HASH_KEY + ":%s", supervisoryNode.getId());
-    return hashOperations.hasKey(key, HASH_KEY);
+  public boolean existsInCache(UUID supervisoryNodeId) {
+    return hashOperations.hasKey(supervisoryNodeId.toString(), HASH_KEY);
   }
 
   @Override
   public SupervisoryNode findById(UUID supervisoryNodeId) {
-    return (SupervisoryNode)hashOperations.get(HASH_KEY, supervisoryNodeId);
+    return (SupervisoryNode)hashOperations
+        .get(HASH_KEY, supervisoryNodeId.toString());
   }
 
   @Override
   public void save(SupervisoryNode supervisoryNode) {
     if (null != supervisoryNode) {
-      final String key = String.format(HASH_KEY + ":%s", supervisoryNode.getId());
       hashOperations.put(HASH_KEY, supervisoryNode.getId(), supervisoryNode);
-      redisTemplate.expire(key, 24, TimeUnit.HOURS);
+      redisTemplate.expire(HASH_KEY, 24, TimeUnit.HOURS);
     }
   }
 
   @Override
   public void delete(SupervisoryNode supervisoryNode) {
     if (null != supervisoryNode) {
-      hashOperations.delete(HASH_KEY, supervisoryNode.getId());
+      hashOperations.delete(HASH_KEY, supervisoryNode.getId().toString());
     }
   }
 }

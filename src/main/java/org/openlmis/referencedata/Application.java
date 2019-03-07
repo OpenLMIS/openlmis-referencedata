@@ -47,12 +47,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -68,6 +69,7 @@ import redis.clients.jedis.JedisPool;
 @ImportResource("classpath*:/applicationContext.xml")
 @EntityScan(basePackageClasses = BaseEntity.class)
 @EnableAsync
+@EnableCaching
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class Application {
 
@@ -237,7 +239,6 @@ public class Application {
   /**
    * Creates RedisTemplate instance.
    *
-   * @param factory The Jedis Connection Factory to set connection
    * @param <T> Generic type of objects
    */
   @Bean
@@ -245,9 +246,10 @@ public class Application {
     RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(factory);
     redisTemplate.setKeySerializer(stringRedisSerializer());
-    redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-    redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-    redisTemplate.setEnableTransactionSupport(true);
+    redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
+    redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+    redisTemplate.setEnableTransactionSupport(false);
+
     return redisTemplate;
   }
 

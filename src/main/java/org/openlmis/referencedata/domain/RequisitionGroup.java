@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +50,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("RequisitionGroup")
-public class RequisitionGroup extends BaseEntity {
+public class RequisitionGroup extends BaseEntity implements Serializable {
 
   @Column(unique = true, nullable = false, columnDefinition = "text")
   @Getter

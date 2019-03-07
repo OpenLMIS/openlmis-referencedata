@@ -71,6 +71,9 @@ public class SupervisoryNodeServiceTest {
   public void setUp() {
     when(facilityRepository.findOne(facility.getId()))
         .thenReturn(facility);
+    UUID supervisoryNodeId = supervisoryNode.getId();
+
+    when(supervisoryNodeRepository.findOne(supervisoryNodeId)).thenReturn(supervisoryNode);
   }
 
   @Test
@@ -78,10 +81,12 @@ public class SupervisoryNodeServiceTest {
     UUID supervisoryNodeId = supervisoryNode.getId();
 
     when(supervisoryNodeRepository.exists(supervisoryNodeId)).thenReturn(true);
-    when(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).thenReturn(false);
+    when(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).thenReturn(false);
     when(supervisoryNodeRepository.findOne(supervisoryNodeId)).thenReturn(supervisoryNode);
 
-    SupervisoryNode supervisoryNode1 = supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+    SupervisoryNode supervisoryNode1 = supervisoryNodeService
+        .getSupervisoryNode(supervisoryNodeId);
+
     assertNotNull(supervisoryNode1);
     verify(supervisoryNodeRepository).findOne(supervisoryNodeId);
     verify(supervisoryNodeRedisRepository, never()).findById(any(UUID.class));
@@ -92,10 +97,11 @@ public class SupervisoryNodeServiceTest {
     UUID supervisoryNodeId = supervisoryNode.getId();
 
     when(supervisoryNodeRepository.exists(supervisoryNodeId)).thenReturn(true);
-    when(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).thenReturn(false);
+    when(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).thenReturn(false);
     when(supervisoryNodeRepository.findOne(supervisoryNodeId)).thenReturn(supervisoryNode);
 
-    SupervisoryNode supervisoryNode1 = supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+    SupervisoryNode supervisoryNode1 = supervisoryNodeService
+        .getSupervisoryNode(supervisoryNodeId);
 
     verify(supervisoryNodeRedisRepository).save(supervisoryNode1);
   }
@@ -105,14 +111,31 @@ public class SupervisoryNodeServiceTest {
     UUID supervisoryNodeId = supervisoryNode.getId();
 
     when(supervisoryNodeRepository.exists(supervisoryNodeId)).thenReturn(true);
-    when(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).thenReturn(true);
+    when(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).thenReturn(true);
     when(supervisoryNodeRedisRepository.findById(supervisoryNodeId)).thenReturn(supervisoryNode);
 
-    SupervisoryNode supervisoryNode1 = supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+    SupervisoryNode supervisoryNode1 = supervisoryNodeService
+        .getSupervisoryNode(supervisoryNodeId);
 
     verifyZeroInteractions(supervisoryNodeRepository);
     verify(supervisoryNodeRedisRepository, times(1)).findById(supervisoryNodeId);
     assertEquals(supervisoryNode1, supervisoryNode);
+  }
+
+  @Test
+  public void shouldGetSupervisoryNodeFromCacheWhenCalledTwice() {
+    UUID supervisoryNodeId = supervisoryNode.getId();
+
+    when(supervisoryNodeRepository.exists(supervisoryNodeId)).thenReturn(true);
+    supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+
+    when(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).thenReturn(true);
+    when(supervisoryNodeRedisRepository.findById(supervisoryNodeId)).thenReturn(supervisoryNode);
+    supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+
+    verify(supervisoryNodeRedisRepository, times(1)).save(supervisoryNode);
+    verify(supervisoryNodeRedisRepository, times(1)).findById(supervisoryNodeId);
+    assertEquals(supervisoryNode, supervisoryNodeRedisRepository.findById(supervisoryNodeId));
   }
 
   @Test(expected = NotFoundException.class)
@@ -120,7 +143,7 @@ public class SupervisoryNodeServiceTest {
     UUID supervisoryNodeId = supervisoryNode.getId();
 
     when(supervisoryNodeRepository.exists(supervisoryNodeId)).thenReturn(false);
-    when(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).thenReturn(false);
+    when(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).thenReturn(false);
 
     supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
 

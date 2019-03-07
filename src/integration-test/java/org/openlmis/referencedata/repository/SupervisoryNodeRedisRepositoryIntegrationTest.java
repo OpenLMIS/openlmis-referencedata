@@ -1,0 +1,144 @@
+/*
+ * This program is part of the OpenLMIS logistics management information system platform software.
+ * Copyright © 2017 VillageReach
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms
+ * of the GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details. You should have received a copy of
+ * the GNU Affero General Public License along with this program. If not, see
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
+ */
+
+package org.openlmis.referencedata.repository;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.UUID;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.repository.custom.SupervisoryNodeRedisRepository;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+@Transactional
+@ActiveProfiles("test")
+@RunWith(SpringRunner.class)
+@SpringBootTest()
+public class SupervisoryNodeRedisRepositoryIntegrationTest {
+
+  @Autowired
+  private FacilityRepository facilityRepository;
+
+  @Autowired
+  private FacilityTypeRepository facilityTypeRepository;
+
+  @Autowired
+  private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private GeographicLevelRepository geographicLevelRepository;
+
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
+
+  @Autowired
+  private SupervisoryNodeRedisRepository supervisoryNodeRedisRepository;
+
+  private Facility facility;
+  private FacilityType facilityType;
+  private GeographicLevel geographicLevel;
+  private GeographicZone geographicZone;
+
+  private SupervisoryNode supervisoryNode;
+
+  @Before
+  public void setUp() {
+    String code = "code";
+
+    geographicLevel = new GeographicLevel();
+    geographicLevel.setCode(code);
+    geographicLevel.setLevelNumber(1);
+    geographicLevelRepository.save(geographicLevel);
+
+    geographicZone = new GeographicZone();
+    geographicZone.setCode(code);
+    geographicZone.setLevel(geographicLevel);
+    geographicZoneRepository.save(geographicZone);
+
+    facilityType = new FacilityType();
+    facilityType.setCode(code);
+    facilityTypeRepository.save(facilityType);
+
+    facility = new Facility(code);
+    facility.setType(facilityType);
+    facility.setGeographicZone(geographicZone);
+    facility.setActive(true);
+    facility.setEnabled(true);
+    facilityRepository.save(facility);
+
+    supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .build();
+
+    supervisoryNodeRepository.save(supervisoryNode);
+    supervisoryNodeRedisRepository.save(supervisoryNode);
+  }
+
+  @Test
+  @JsonIgnore
+  public void shouldSaveAndReturnTrueIfSupervisoryNodeExistsInCacheWithGivenId() {
+    UUID supervisoryNodeId = supervisoryNode.getId();
+
+    boolean exists = supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId);
+
+    assertTrue(exists);
+  }
+
+  @Test
+  @JsonIgnore
+  public void shouldFindSupervisoryNodeById() {
+    UUID supervisoryNodeId = supervisoryNode.getId();
+
+    SupervisoryNode supervisoryNodeFromCache = supervisoryNodeRedisRepository
+        .findById(supervisoryNodeId);
+
+    assertNotNull(supervisoryNodeFromCache);
+  }
+
+  @Test
+  @JsonIgnore
+  public void shouldDeleteSupervisoryNode() {
+    supervisoryNodeRedisRepository.delete(supervisoryNode);
+
+    assertEquals(supervisoryNodeRedisRepository.existsInCache(supervisoryNode.getId()), false);
+  }
+
+  @Test
+  @JsonIgnore
+  public void shouldFindSupervisoryNodeInDatabaseAndInCache() {
+    SupervisoryNode supervisoryNodeFromDataBase = supervisoryNodeRepository
+        .findOne(supervisoryNode.getId());
+    assertNotNull(supervisoryNodeFromDataBase);
+
+    SupervisoryNode supervisoryNodeFromCache = supervisoryNodeRedisRepository
+        .findById(supervisoryNode.getId());
+    assertNotNull(supervisoryNodeFromCache);
+  }
+}

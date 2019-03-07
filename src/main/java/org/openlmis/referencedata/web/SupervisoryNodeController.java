@@ -142,7 +142,8 @@ public class SupervisoryNodeController extends BaseController {
     profiler.setLogger(LOGGER);
 
     profiler.start("FIND_SUPERVISORY_NODE_SERVICE");
-    SupervisoryNode supervisoryNode = supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+    SupervisoryNode supervisoryNode = supervisoryNodeService
+        .getSupervisoryNode(supervisoryNodeId);
 
     profiler.start("EXPORT_TO_DTO");
     SupervisoryNodeDto dto = exportToDto(supervisoryNode);

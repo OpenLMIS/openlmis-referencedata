@@ -20,11 +20,11 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 
 public interface SupervisoryNodeRedisRepository {
 
-  boolean exists(UUID supervisoryNodeId);
+  boolean existsInCache(UUID supervisoryNodeId);
 
   SupervisoryNode findById(UUID supervisoryNodeId);
 
-  public void save(SupervisoryNode supervisoryNode);
+  void save(SupervisoryNode supervisoryNode);
 
-  public void delete(SupervisoryNode supervisoryNode);
+  void delete(SupervisoryNode supervisoryNode);
 }

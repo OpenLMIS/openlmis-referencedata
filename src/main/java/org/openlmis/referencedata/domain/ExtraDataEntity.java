@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.domain;
 
 import com.google.common.collect.Maps;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,7 +32,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class ExtraDataEntity {
+public class ExtraDataEntity implements Serializable {
 
   // Because of https://openlmis.atlassian.net/browse/OLMIS-5143
   // the type of a key in the extraData map has to be changed to Object.

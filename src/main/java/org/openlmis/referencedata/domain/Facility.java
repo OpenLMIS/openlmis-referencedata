@@ -17,7 +17,10 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,6 +46,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
+import org.hibernate.spatial.JTSGeometryJavaTypeDescriptor;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
@@ -77,7 +81,7 @@ import org.openlmis.referencedata.dto.NamedResource;
         }
     )
     })
-public class Facility extends BaseEntity implements FhirLocation {
+public class Facility extends BaseEntity implements FhirLocation, Serializable {
 
   public static final String TEXT = "text";
   public static final String WAREHOUSE_CODE = "warehouse";
@@ -259,6 +263,20 @@ public class Facility extends BaseEntity implements FhirLocation {
    */
   public void addSupportedProgram(SupportedProgram supportedProgram) {
     supportedPrograms.add(supportedProgram);
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+    if (null != location) {
+      out.writeObject(JTSGeometryJavaTypeDescriptor.INSTANCE.toString(location));
+    }
+  }
+
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    String locationAsString = (String) in.readObject();
+    if (null != locationAsString) {
+      Geometry geometry = JTSGeometryJavaTypeDescriptor.INSTANCE.fromString(locationAsString);
+      location = JTSGeometryJavaTypeDescriptor.INSTANCE.unwrap(geometry, Point.class, null);
+    }
   }
 
   /**

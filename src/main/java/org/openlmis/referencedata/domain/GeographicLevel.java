@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,7 +31,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("GeographicLevel")
-public class GeographicLevel extends BaseEntity {
+public class GeographicLevel extends BaseEntity implements Serializable {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter

@@ -405,7 +405,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldGetSupervisoryNodeFromDatabaseWhenNotInCache() {
 
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(false);
+    given(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
@@ -425,7 +425,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldSaveSupervisoryNodeInCacheAfterGettingOneFromDatabase() {
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(false);
+    given(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
@@ -445,8 +445,10 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldGetSupervisoryNodeFromCache() {
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeRedisRepository.findById(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
         .given()
@@ -465,7 +467,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(false);
+    given(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
 
     restAssured
         .given()
@@ -485,7 +487,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     supervisoryNodeDto.setDescription("OpenLMIS");
-    given(supervisoryNodeRedisRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured

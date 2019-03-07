@@ -15,7 +15,10 @@
 
 package org.openlmis.referencedata.domain;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -32,6 +35,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
+import org.hibernate.spatial.JTSGeometryJavaTypeDescriptor;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
 
@@ -45,7 +49,7 @@ import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
     @NamedQuery(name = "GeographicZone.findIdsByParent",
         query = "SELECT DISTINCT id FROM GeographicZone WHERE parent.id = :parentId")
     })
-public class GeographicZone extends BaseEntity implements FhirLocation {
+public class GeographicZone extends BaseEntity implements FhirLocation, Serializable {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
@@ -158,6 +162,20 @@ public class GeographicZone extends BaseEntity implements FhirLocation {
   @Override
   public Map<String, Object> getExtraData() {
     return ExtraDataEntity.defaultEntity(extraData).getExtraData();
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+    if (null != boundary) {
+      out.writeObject(JTSGeometryJavaTypeDescriptor.INSTANCE.toString(boundary));
+    }
+  }
+
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    String boundryAsString = (String) in.readObject();
+    if (null != boundryAsString) {
+      Geometry geometry = JTSGeometryJavaTypeDescriptor.INSTANCE.fromString(boundryAsString);
+      boundary = JTSGeometryJavaTypeDescriptor.INSTANCE.unwrap(geometry, Polygon.class, null);
+    }
   }
 
   public interface Exporter extends BaseExporter, ExtraDataExporter {
