@@ -541,6 +541,21 @@ public class OrderableRepositoryIntegrationTest {
     checkSingleResultOrderableVersion(orderables, 2L);
   }
 
+  @Test
+  public void findFirstByIdentityIdOrderByIdentityVersionIdDescShouldReturnNewestVersion() {
+    // given
+    Orderable newestOrderable = createOrderableWithTwoVersions(SOME_CODE);
+
+    // when
+    Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(
+        newestOrderable.getId());
+
+    // then
+    assertEquals(newestOrderable, foundOrderable);
+    assertEquals(2L, foundOrderable.getVersionId().longValue());
+
+  }
+
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
                                                Orderable orderable, int expectedSize) {
     Code programCode = null == program ? null : program.getCode();
