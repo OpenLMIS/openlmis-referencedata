@@ -17,6 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -35,7 +36,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @AllArgsConstructor
 @Table(name = "programs", schema = "referencedata")
 @TypeName("Program")
-public class Program extends BaseEntity {
+public class Program extends BaseEntity implements Serializable {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Embedded
