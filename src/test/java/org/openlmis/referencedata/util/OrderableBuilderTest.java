@@ -101,8 +101,25 @@ public class OrderableBuilderTest {
         .findAllLatestByIds(any(), any()))
         .thenReturn(orderablePage);
 
-    Orderable orderable = orderableBuilder.newOrderable(orderableDto);
+    Orderable orderable = orderableBuilder.newOrderable(orderableDto, null);
     assertThat(orderable.getChildren().size(), is(1));
+  }
+
+  @Test
+  public void shouldCreateOrderableWithVersion1() {
+    Orderable orderable = createOrderable();
+
+    assertThat(orderable.getVersionId(), is(1L));
+  }
+
+  @Test
+  public void shouldIncrementVersionNumber() {
+
+    Orderable orderable = createOrderable();
+    OrderableDto orderableDto = createOrderableDto();
+
+    Orderable updatedOrderable = Orderable.updateFrom(orderable, orderableDto);
+    assertThat(updatedOrderable.getVersionId(), is(2L));
   }
 
   private Program createProgram(String code) {
@@ -124,6 +141,11 @@ public class OrderableBuilderTest {
   }
 
   private Orderable createOrderable(UUID... programIds) {
+    OrderableDto orderableDto = createOrderableDto(programIds);
+    return orderableBuilder.newOrderable(orderableDto, null);
+  }
+
+  private OrderableDto createOrderableDto(UUID... programIds) {
     Set<ProgramOrderableDto> programs = Sets.newHashSet();
 
     for (UUID programId : programIds) {
@@ -140,8 +162,7 @@ public class OrderableBuilderTest {
     orderableDto.setRoundToZero(true);
     orderableDto.setPrograms(programs);
     orderableDto.setDispensable(Dispensable.createNew("each"));
-
-    return orderableBuilder.newOrderable(orderableDto);
+    return orderableDto;
   }
 
 }

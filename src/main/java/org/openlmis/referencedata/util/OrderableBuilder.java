@@ -46,8 +46,9 @@ public class OrderableBuilder {
    * @param importer instance of {@link Orderable.Importer}
    * @return new instance of Orderable.
    */
-  public Orderable newOrderable(Orderable.Importer importer) {
-    Orderable orderable = Orderable.newInstance(importer);
+  public Orderable newOrderable(Orderable.Importer importer, Orderable persistedOrderable) {
+    Orderable orderable = (persistedOrderable == null) ? Orderable.newInstance(importer)
+        : Orderable.updateFrom(persistedOrderable, importer);
 
     if (!isEmpty(importer.getPrograms())) {
       Map<UUID, Program> programs = importer

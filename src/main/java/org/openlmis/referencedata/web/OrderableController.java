@@ -82,7 +82,7 @@ public class OrderableController extends BaseController {
     validator.validate(orderableDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    Orderable orderable = orderableBuilder.newOrderable(orderableDto);
+    Orderable orderable = orderableBuilder.newOrderable(orderableDto, null);
 
     return OrderableDto.newInstance(repository.save(orderable));
   }
@@ -115,7 +115,10 @@ public class OrderableController extends BaseController {
       throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
     }
 
-    Orderable savedOrderable = repository.save(orderableBuilder.newOrderable(orderableDto));
+    Orderable savedOrderable = repository
+        .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
+    XLOGGER.warn("Orderable updated: down stream services may not support versioned orderables: {}",
+        id);
     return OrderableDto.newInstance(savedOrderable);
   }
 

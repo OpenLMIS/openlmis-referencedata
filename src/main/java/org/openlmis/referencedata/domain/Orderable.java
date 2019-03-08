@@ -153,6 +153,20 @@ public class Orderable implements Identifiable {
   }
 
   /**
+   * Creates a new instance of orderable with an updated version from importer.
+   *
+   * @param persistedOrderable persisted orderable.
+   * @param importer importer.
+   * @return a new Orderable.
+   */
+  public static Orderable updateFrom(Orderable persistedOrderable, Importer importer) {
+    Orderable orderable = newInstance(importer);
+    orderable.identity = new OrderableIdentity(persistedOrderable.getId(),
+        persistedOrderable.getVersionId() + 1);
+    return orderable;
+  }
+
+  /**
    * Creates new instance based on data from {@link Importer}.
    *
    * @param importer instance of {@link Importer}
@@ -177,7 +191,6 @@ public class Orderable implements Identifiable {
 
     orderable.identity = new OrderableIdentity(importer.getId(), importer.getVersionId());
     orderable.lastUpdated = ZonedDateTime.now();
-
     return orderable;
   }
 
