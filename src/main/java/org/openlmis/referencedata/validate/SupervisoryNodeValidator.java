@@ -72,14 +72,15 @@ public class SupervisoryNodeValidator implements BaseValidator {
     }
     Set<SupervisoryNode> existingSupervisoryNode =
             repository.findByCodeCaseInsensetive(
-                    node.getCode());
+                    node.getCode(), node.getId());
     if (null != existingSupervisoryNode && !existingSupervisoryNode.isEmpty()) {
       rejectValue(errors,CODE,
               SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+
     }
     Set<SupervisoryNode> storedSupervisoryNode =
             repository.findByNameIgnoreCaseContaining(
-                    node.getName());
+                    node.getName(), node.getId());
     if (null != storedSupervisoryNode && !storedSupervisoryNode.isEmpty()) {
       rejectValue(errors,NAME,
               SupervisoryNodeMessageKeys.ERROR_NAME_MUST_BE_UNIQUE);
