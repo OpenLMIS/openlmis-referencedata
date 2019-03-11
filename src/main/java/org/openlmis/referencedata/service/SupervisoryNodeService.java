@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SupervisoryNodeService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisoryNodeController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisoryNodeService.class);
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
