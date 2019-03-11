@@ -1,0 +1,2 @@
+CREATE UNIQUE INDEX unq_case_insensetive_supervisory_node_name
+ON supervisory_nodes(LOWER(name))
