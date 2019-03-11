@@ -21,7 +21,6 @@ import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRedisRepository;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
-import org.openlmis.referencedata.web.SupervisoryNodeController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
