@@ -51,7 +51,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/supplyLines
         method: GET
-        label: GetAllSupplyLines
+        label: GetAll1000SupplyLines
         headers:
           Authorization: Bearer ${access_token}
 
@@ -95,7 +95,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/supplyLines/v2
         method: GET
-        label: GetAllSupplyLinesV2
+        label: GetAll1000SupplyLinesV2
         headers:
           Authorization: Bearer ${access_token}
 
@@ -104,7 +104,7 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/supplyLines/v2?expand=supervisoryNode.requisitionGroup.memberFacilities
         method: GET
-        label: GetAllSupplyLinesV2Expand
+        label: GetAll1000SupplyLinesV2Expand
         headers:
           Authorization: Bearer ${access_token}
 
@@ -156,12 +156,12 @@ reporting:
   - module: passfail
     criteria:
       Get Supply Line too slow: p90 of GetSupplyLine>60000ms
-      Get All Supply Lines too slow: p90 of GetAllSupplyLines>60000ms
+      Get All 1000 Supply Lines too slow: p90 of GetAll1000SupplyLines>60000ms
       Get Page of Ten Supply Lines too slow: p90 of GetPageOfTenSupplyLines>60000ms
       Get Supply Lines by Supervisory Node too slow: p90 of GetSupplyLinesBySupervisoryNodeId>60000ms
       Get Supply Lines by Program and Supplying Facility too slow: p90 of GetSupplyLinesByProgramIdAndSupplyingFacilityId>60000ms
-      Get All Supply Lines V2 too slow: p90 of GetAllSupplyLinesV2>60000ms
-      Get All Supply Lines with expand V2 too slow: p90 of GetAllSupplyLinesV2Expand>60000ms
+      Get All Supply Lines V2 too slow: p90 of GetAll1000SupplyLinesV2>60000ms
+      Get All Supply Lines with expand V2 too slow: p90 of GetAll1000SupplyLinesV2Expand>60000ms
       Get Page of Ten Supply Lines V2 too slow: p90 of GetPageOfTenSupplyLinesV2>60000ms
       Get Page of Ten Supply Lines with expand V2 too slow: p90 of GetPageOfTenSupplyLinesV2Expand>60000ms
       Get Supply Lines by Supervisory Node V2 too slow: p90 of GetSupplyLinesBySupervisoryNodeIdV2>60000ms
