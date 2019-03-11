@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,6 +43,7 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.custom.SupervisoryNodeRedisRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
+import org.slf4j.profiler.Profiler;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SupervisoryNodeServiceTest {
@@ -85,7 +87,7 @@ public class SupervisoryNodeServiceTest {
     when(supervisoryNodeRepository.findOne(supervisoryNodeId)).thenReturn(supervisoryNode);
 
     SupervisoryNode supervisoryNode1 = supervisoryNodeService
-        .getSupervisoryNode(supervisoryNodeId);
+        .getSupervisoryNode(supervisoryNodeId, mock(Profiler.class));
 
     assertNotNull(supervisoryNode1);
     verify(supervisoryNodeRepository).findOne(supervisoryNodeId);
@@ -101,7 +103,7 @@ public class SupervisoryNodeServiceTest {
     when(supervisoryNodeRepository.findOne(supervisoryNodeId)).thenReturn(supervisoryNode);
 
     SupervisoryNode supervisoryNode1 = supervisoryNodeService
-        .getSupervisoryNode(supervisoryNodeId);
+        .getSupervisoryNode(supervisoryNodeId, mock(Profiler.class));
 
     verify(supervisoryNodeRedisRepository).save(supervisoryNode1);
   }
@@ -115,7 +117,7 @@ public class SupervisoryNodeServiceTest {
     when(supervisoryNodeRedisRepository.findById(supervisoryNodeId)).thenReturn(supervisoryNode);
 
     SupervisoryNode supervisoryNode1 = supervisoryNodeService
-        .getSupervisoryNode(supervisoryNodeId);
+        .getSupervisoryNode(supervisoryNodeId, mock(Profiler.class));
 
     verifyZeroInteractions(supervisoryNodeRepository);
     verify(supervisoryNodeRedisRepository, times(1)).findById(supervisoryNodeId);
@@ -127,31 +129,15 @@ public class SupervisoryNodeServiceTest {
     UUID supervisoryNodeId = supervisoryNode.getId();
 
     when(supervisoryNodeRepository.exists(supervisoryNodeId)).thenReturn(true);
-    supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+    supervisoryNodeService.getSupervisoryNode(supervisoryNodeId, mock(Profiler.class));
 
     when(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).thenReturn(true);
     when(supervisoryNodeRedisRepository.findById(supervisoryNodeId)).thenReturn(supervisoryNode);
-    supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
+    supervisoryNodeService.getSupervisoryNode(supervisoryNodeId, mock(Profiler.class));
 
     verify(supervisoryNodeRedisRepository, times(1)).save(supervisoryNode);
     verify(supervisoryNodeRedisRepository, times(1)).findById(supervisoryNodeId);
     assertEquals(supervisoryNode, supervisoryNodeRedisRepository.findById(supervisoryNodeId));
-  }
-
-  @Test(expected = NotFoundException.class)
-  public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
-    UUID supervisoryNodeId = supervisoryNode.getId();
-
-    when(supervisoryNodeRepository.exists(supervisoryNodeId)).thenReturn(false);
-    when(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).thenReturn(false);
-
-    supervisoryNodeService.getSupervisoryNode(supervisoryNodeId);
-
-    assertThatThrownBy(() -> supervisoryNodeService.getSupervisoryNode(supervisoryNodeId))
-        .isInstanceOf(NotFoundException.class);
-
-    verifyZeroInteractions(supervisoryNodeRepository);
-    verifyZeroInteractions(supervisoryNodeRedisRepository);
   }
 
   @Test(expected = NotFoundException.class)
