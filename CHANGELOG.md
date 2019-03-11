@@ -17,10 +17,6 @@ Improvements:
 * [OLMIS-6005](https://openlmis.atlassian.net/browse/OLMIS-6005): Improved performance of GET /api/supervisoryNodes/{supervisoryNode_id}/supervisingUsers endpoint.
 * [OLMIS-5853](https://openlmis.atlassian.net/browse/OLMIS-5853): Add Unique Name constraint on Supervisory Node
 * [OLMIS-5852](https://openlmis.atlassian.net/browse/OLMIS-5852): Add Case Insensitive Unique Code constraint on Supervisory Node
-
-Bug fixes, security and performance improvements, also backwards-compatible:
-* [OLMIS-5981](https://openlmis.atlassian.net/browse/OLMIS-5981): Updated /supervisoryNodes/{supervisoryNode_id} PUT to throw exception when requisition group is missing.
-
 12.0.0 / 2018-12-12
 ===================
 

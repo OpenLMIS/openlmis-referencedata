@@ -75,41 +75,42 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   private UUID requisitionGroupId;
 
   private SupervisoryNode supervisoryNode;
-  private Facility facility;
+  private RequisitionGroupProgramSchedule requisitionGroupProgramSchedule;
+  private Program program;
+  private ProcessingSchedule processingSchedule;
 
   /**
    * Constructor for tests.
    */
   public RequisitionGroupControllerIntegrationTest() {
-    facility = new Facility("F1");
-    facility.setActive(true);
+    FacilityOperator facilityOperator = new FacilityOperator();
+    facilityOperator.setCode("FO1");
+
+    FacilityType facilityType = new FacilityType("FT1");
 
     GeographicLevel geoLevel = new GeographicLevel("GL1", 1);
+
     GeographicZone geoZone = new GeographicZoneDataBuilder()
         .withLevel(geoLevel)
         .build();
+
+    Facility facility = new Facility("F1");
+    facility.setActive(true);
     facility.setGeographicZone(geoZone);
-
-    FacilityType facilityType = new FacilityType("FT1");
     facility.setType(facilityType);
-
-    FacilityOperator facilityOperator = new FacilityOperator();
-    facilityOperator.setCode("FO1");
     facility.setOperator(facilityOperator);
 
     supervisoryNode = new SupervisoryNodeDataBuilder().withFacility(facility).build();
     supervisoryNode.setId(UUID.randomUUID());
 
-    Program program = new Program("PRO-1");
-    ProcessingSchedule processingSchedule =
-        new ProcessingSchedule(Code.code("SCH-1"), "Monthly Schedule");
+    program = new Program("PRO-1");
+    processingSchedule = new ProcessingSchedule(Code.code("SCH-1"), "Monthly Schedule");
 
     requisitionGroup = new RequisitionGroup("RG1", "Requisition Group 1", supervisoryNode);
     supervisoryNode.setRequisitionGroup(requisitionGroup);
 
-    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
-        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
-            requisitionGroup, program, processingSchedule, true);
+    requisitionGroupProgramSchedule = RequisitionGroupProgramSchedule
+        .newRequisitionGroupProgramSchedule(requisitionGroup, program, processingSchedule, true);
     requisitionGroupProgramSchedule.setId(UUID.randomUUID());
     List<RequisitionGroupProgramSchedule> schedules = new ArrayList<>();
     schedules.add(requisitionGroupProgramSchedule);
@@ -317,7 +318,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
-    requisitionGroupDto = new RequisitionGroupDto();
+    RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
     requisitionGroup.export(requisitionGroupDto);
 
     RequisitionGroupDto response = restAssured
@@ -338,39 +339,6 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   }
 
   @Test
-  public void shouldUpdateSupervisoryNodeInRequisitionGroup() {
-    mockUserHasRight(REQUISITION_GROUPS_MANAGE);
-
-    SupervisoryNode supervisoryNode1 = new SupervisoryNodeDataBuilder()
-        .withFacility(facility)
-        .build();
-
-    requisitionGroup.setSupervisoryNode(supervisoryNode1);
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
-    given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
-        .willReturn(requisitionGroup);
-
-    requisitionGroupDto = new RequisitionGroupDto();
-    requisitionGroup.export(requisitionGroupDto);
-
-    RequisitionGroupDto response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", requisitionGroupId)
-        .body(requisitionGroupDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(RequisitionGroupDto.class);
-
-    assertEquals(requisitionGroupDto, response);
-    assertEquals(requisitionGroupDto.getSupervisoryNode().getId(), supervisoryNode1.getId());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldRejectPutRequisitionGroupIfUserHasNoRight() {
     mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
 
@@ -379,7 +347,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
-    requisitionGroupDto = new RequisitionGroupDto();
+    RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
     requisitionGroup.export(requisitionGroupDto);
 
     String messageKey = restAssured
@@ -408,7 +376,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
-    requisitionGroupDto = new RequisitionGroupDto();
+    RequisitionGroupDto requisitionGroupDto = new RequisitionGroupDto();
     requisitionGroup.export(requisitionGroupDto);
 
     RequisitionGroupDto response = restAssured
