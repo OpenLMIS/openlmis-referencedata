@@ -253,21 +253,21 @@ public class SupervisoryNodeBuilderTest {
   }
 
   @Test
+  public void shouldThrowExceptionIfRequisitionGroupImporterDoesNotExist() {
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_REQUISITION_GROUP_REQUIRED);
+
+    importer.setRequisitionGroup((ObjectReferenceDto) null);
+    builder.build(importer);
+  }
+
+  @Test
   public void shouldNotThrowExceptionIfFacilityImporterDoesNotExist() {
     importer.setFacility((ObjectReferenceDto) null);
 
     SupervisoryNode built = builder.build(importer);
 
     assertThat(built.getFacility()).isNull();
-  }
-
-  @Test
-  public void shouldNotThrowExceptionIfRequisitionGroupImporterDoesNotExist() {
-    importer.setRequisitionGroup((ObjectReferenceDto) null);
-
-    SupervisoryNode built = builder.build(importer);
-
-    assertThat(built.getRequisitionGroup()).isNull();
   }
 
   @Test

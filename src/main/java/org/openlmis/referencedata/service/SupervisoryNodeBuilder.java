@@ -24,6 +24,7 @@ import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -67,7 +68,8 @@ public class SupervisoryNodeBuilder
         .ofNullable(importer.getRequisitionGroup())
         .map(obj -> findResource(
             requisitionGroupRepository::findOne, obj, RequisitionGroupMessageKeys.ERROR_NOT_FOUND))
-        .orElse(null);
+        .orElseThrow(() -> new ValidationMessageException(
+            SupervisoryNodeMessageKeys.ERROR_REQUISITION_GROUP_REQUIRED));
     final Set<SupervisoryNode> childNodes = Optional
         .ofNullable(importer.getChildNodes())
         .map(nodes -> nodes.stream().map(BaseDto::getId).collect(Collectors.toSet()))
