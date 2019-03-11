@@ -29,7 +29,6 @@ import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -165,11 +164,10 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  @Ignore
   public void shouldSearchSupplyLinesByAllParametersWithRequisitionGroupExpand() {
     Page<SupplyLine> result = repository.search(
         supplyLines.get(0).getProgram().getId(),
-        null,
+        supplyLines.get(0).getSupervisoryNode().getId(),
         singleton(supplyLines.get(0).getSupplyingFacility().getId()),
         asSet("supervisoryNode.requisitionGroup"),
         pageable);
@@ -179,7 +177,6 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  @Ignore
   public void shouldSearchSupplyLinesByAllParametersWithMemberFacilitiesExpand() {
     Page<SupplyLine> result = repository.search(
         supplyLines.get(0).getProgram().getId(),

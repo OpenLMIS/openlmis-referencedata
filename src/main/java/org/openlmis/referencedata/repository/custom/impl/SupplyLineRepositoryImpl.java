@@ -22,7 +22,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.AS;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.FROM;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ID;
-import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.INNER_JOIN_FETCH;
+import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.LEFT_JOIN_FETCH;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ORDER_BY;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT_DISTINCT;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT_DISTINCT_COUNT;
@@ -87,11 +87,11 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   private static final String SELECT_SL = join(SELECT_DISTINCT, SUPPLY_LINE_ALIAS, FROM_SL);
   private static final String COUNT_SL = join(SELECT_DISTINCT_COUNT, FROM_SL);
 
-  private static final String SUPERVISORY_NODE_JOIN = join(INNER_JOIN_FETCH,
+  private static final String SUPERVISORY_NODE_JOIN = join(LEFT_JOIN_FETCH,
       getField(SUPPLY_LINE_ALIAS, SUPERVISORY_NODE), AS, SUPERVISORY_NODE_ALIAS);
-  private static final String REQUISITION_GROUP_JOIN = join(INNER_JOIN_FETCH,
+  private static final String REQUISITION_GROUP_JOIN = join(LEFT_JOIN_FETCH,
       getField(SUPERVISORY_NODE_ALIAS, REQUISITION_GROUP), AS, REQUISITION_GROUP_ALIAS);
-  private static final String REQUISITION_GROUP_MEMBERS_JOIN = join(INNER_JOIN_FETCH,
+  private static final String REQUISITION_GROUP_MEMBERS_JOIN = join(LEFT_JOIN_FETCH,
       getField(REQUISITION_GROUP_ALIAS, MEMBER_FACILITIES));
 
   private static final String WITH_PROGRAM_ID =

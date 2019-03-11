@@ -24,7 +24,7 @@ class SqlConstants {
   static final String FROM = "FROM";
   static final String AS = "AS";
   static final String WHERE = "WHERE";
-  static final String INNER_JOIN_FETCH = "INNER JOIN FETCH";
+  static final String LEFT_JOIN_FETCH = "LEFT JOIN FETCH";
   static final String ORDER_BY = "ORDER BY";
   static final String ID = "id";
 
