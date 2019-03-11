@@ -15,8 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.UUID;
@@ -39,6 +41,7 @@ import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,4 +145,13 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
         .findById(supervisoryNode.getId());
     assertNotNull(supervisoryNodeFromCache);
   }
+
+  @Test
+  public void deserializeShouldBeAbleToRestoreComplexObjectAfterSerialization() {
+
+    JdkSerializationRedisSerializer serializer = new JdkSerializationRedisSerializer();
+
+    assertThat(serializer.deserialize(serializer.serialize(supervisoryNode)), is(supervisoryNode));
+  }
+
 }

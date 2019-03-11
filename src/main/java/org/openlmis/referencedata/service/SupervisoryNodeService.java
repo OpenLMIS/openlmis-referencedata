@@ -48,7 +48,7 @@ public class SupervisoryNodeService {
    * @return the SupervisoryNode.
    */
   public SupervisoryNode getSupervisoryNode(UUID supervisoryNodeId) {
-    Profiler profiler = new Profiler("GET_SUPERVISORY_NODE");
+    Profiler profiler = new Profiler("GET_SUPERVISORY_NODE_SERVICE");
     profiler.setLogger(LOGGER);
 
     profiler.start("CHECK_IF_SUPERVISORY_NODE_EXISTS_IN_CACHE");
@@ -78,7 +78,7 @@ public class SupervisoryNodeService {
    * @param supervisoryNodeToUpdate A supervisoryNodeToUpdate which we want to update.
    */
   public void updateSupervisoryNode(SupervisoryNode supervisoryNodeToUpdate) {
-    Profiler profiler = new Profiler("UPDATE_SUPERVISORY_NODE");
+    Profiler profiler = new Profiler("UPDATE_SUPERVISORY_NODE_SERVICE");
 
     profiler.start("DELETE_UPDATED_SUPERVISORY_NODE_FROM_CACHE");
     supervisoryNodeRedisRepository.delete(supervisoryNodeToUpdate);
