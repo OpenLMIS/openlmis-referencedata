@@ -149,4 +149,13 @@ public class SupervisoryNodeDataBuilder {
   public SupervisoryNodeDataBuilder withoutName() {
     return withName(null);
   }
+
+  /**
+   * Sets the requisition group to null for new {@link SupervisoryNode}.
+   *
+   * @return the builder instance
+   */
+  public SupervisoryNodeDataBuilder withoutRequisitionGroup() {
+    return withRequisitionGroup(null);
+  }
 }

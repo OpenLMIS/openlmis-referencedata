@@ -33,6 +33,7 @@ public class SupervisoryNodeValidator implements BaseValidator {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
+  private static final String REQUISITION_GROUP = "requisitionGroup";
 
   @Autowired
   private SupervisoryNodeRepository repository;
@@ -84,6 +85,10 @@ public class SupervisoryNodeValidator implements BaseValidator {
     if (null != storedSupervisoryNode && !storedSupervisoryNode.isEmpty()) {
       rejectValue(errors,NAME,
               SupervisoryNodeMessageKeys.ERROR_NAME_MUST_BE_UNIQUE);
+    }
+    if (null != node.getId() && null == node.getRequisitionGroup()) {
+      rejectValue(errors, REQUISITION_GROUP,
+          SupervisoryNodeMessageKeys.ERROR_REQUISITION_GROUP_REQUIRED);
     }
   }
 }

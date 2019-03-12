@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -152,6 +153,27 @@ public class RequisitionGroupRepositoryIntegrationTest
     group = repository.save(group);
 
     assertEquals(0, group.getRequisitionGroupProgramSchedules().size());
+  }
+
+  @Test
+  public void shouldUpdateRequisitionGroup() {
+    RequisitionGroup requisitionGroup = generateInstance();
+    requisitionGroup.setSupervisoryNode(supervisoryNode);
+    repository.save(requisitionGroup);
+
+    assertEquals(requisitionGroup.getSupervisoryNode(), supervisoryNode);
+
+    SupervisoryNode supervisoryNode1 = new SupervisoryNodeDataBuilder()
+        .withoutId()
+        .withFacility(facility)
+        .build();
+    supervisoryNodeRepository.save(supervisoryNode1);
+
+    requisitionGroup.setSupervisoryNode(supervisoryNode1);
+    repository.save(requisitionGroup);
+
+    assertEquals(requisitionGroup.getSupervisoryNode(), supervisoryNode1);
+    assertNull(supervisoryNode.getRequisitionGroup());
   }
 
   @Test

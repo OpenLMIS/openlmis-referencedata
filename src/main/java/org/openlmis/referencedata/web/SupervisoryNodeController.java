@@ -116,10 +116,10 @@ public class SupervisoryNodeController extends BaseController {
 
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
+    supervisoryNodeDto.setId(null);
     validator.validate(supervisoryNodeDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    supervisoryNodeDto.setId(null);
     SupervisoryNode supervisoryNode = builder.build(supervisoryNodeDto);
     supervisoryNodeRepository.save(supervisoryNode);
     LOGGER.info("Created new supervisoryNode with id: {}", supervisoryNode.getId());

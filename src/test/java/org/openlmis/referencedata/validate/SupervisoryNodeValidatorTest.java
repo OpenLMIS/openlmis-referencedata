@@ -25,9 +25,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -38,6 +40,7 @@ public class SupervisoryNodeValidatorTest {
 
   private static final String CODE = "code";
   private static final String DC1 = "DC1";
+  private static final String REQUISITION_GROUP = "requisitionGroup";
 
   @Mock
   private SupervisoryNodeRepository repository;
@@ -47,6 +50,7 @@ public class SupervisoryNodeValidatorTest {
 
   private SupervisoryNodeDto dto;
   private BeanPropertyBindingResult errors;
+  private RequisitionGroup requisitionGroup = new RequisitionGroupDataBuilder().build();
 
   @Before
   public void setUp() {
@@ -57,6 +61,7 @@ public class SupervisoryNodeValidatorTest {
   @Test
   public void shouldNotFindErrorsIfSupervisoryNodeIsValid() {
     new SupervisoryNodeDataBuilder()
+        .withRequisitionGroup(requisitionGroup)
         .build()
         .export(dto);
 
@@ -96,8 +101,36 @@ public class SupervisoryNodeValidatorTest {
   }
 
   @Test
+  public void shouldThrowExceptionIfRequisitionGroupIsMissingOnUpdate() {
+    new SupervisoryNodeDataBuilder()
+        .withoutRequisitionGroup()
+        .build()
+        .export(dto);
+
+    validator.validate(dto, errors);
+
+    assertErrorMessage(errors, REQUISITION_GROUP,
+        SupervisoryNodeMessageKeys.ERROR_REQUISITION_GROUP_REQUIRED);
+  }
+
+  @Test
+  public void shouldNotRejectIfRequisitionGroupIsMissingOnCreate() {
+    new SupervisoryNodeDataBuilder()
+        .withoutRequisitionGroup()
+        .withoutId()
+        .build()
+        .export(dto);
+
+    validator.validate(dto, errors);
+
+    assertEquals(0, errors.getErrorCount());
+  }
+
+  @Test
   public void shouldNotRejectIfUpdatingSupervisoryNode() {
-    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder().withCode(DC1);
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+        .withRequisitionGroup(requisitionGroup)
+        .withCode(DC1);
     SupervisoryNode existing = builder.build();
 
     when(repository.findByCode(DC1)).thenReturn(existing);

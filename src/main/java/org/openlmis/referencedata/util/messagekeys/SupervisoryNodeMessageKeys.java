@@ -17,6 +17,7 @@ package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class SupervisoryNodeMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, SUPERVISORY_NODE);
+  private static final String REQUISITION_GROUP = "requisitionGroup";
   private static final String CODE = "code";
 
   public static final String ERROR_NULL = join(ERROR, NULL);
@@ -27,4 +28,6 @@ public abstract class SupervisoryNodeMessageKeys extends MessageKeys {
   public static final String ERROR_NAME_REQUIRED = join(ERROR, NAME, REQUIRED);
   public static final String ERROR_INVALID_PARAMS = join(ERROR, SEARCH, INVALID_PARAMS);
   public static final String ERROR_NAME_MUST_BE_UNIQUE = join(ERROR, NAME, MUST_BE_UNIQUE);
+  public static final String ERROR_REQUISITION_GROUP_REQUIRED =
+      join(ERROR, REQUISITION_GROUP, REQUIRED);
 }

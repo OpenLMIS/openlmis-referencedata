@@ -62,6 +62,7 @@ import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.ObjectReferenceDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
@@ -261,6 +262,25 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldNotRejectPostSupervisoryNodeIfRequisitionGroupIsMissing() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    supervisoryNodeDto.setRequisitionGroup((ObjectReferenceDto) null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(supervisoryNodeDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(201);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPutSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
@@ -319,6 +339,41 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .statusCode(200);
 
     assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutSupervisoryNodeIfRequisitionGroupIsMissing() {
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+        .withFacility(supervisoryNode.getFacility())
+        .withRequisitionGroup(null)
+        .withParentNode(supervisoryNode.getParentNode())
+        .withRequisitionGroup(new RequisitionGroupDataBuilder().buildAsNew());
+
+    SupervisoryNode existing = builder.build();
+
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
+
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    builder
+        .withRequisitionGroup(null)
+        .build()
+        .export(supervisoryNodeDto);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .body(supervisoryNodeDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(400);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
