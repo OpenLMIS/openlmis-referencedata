@@ -29,6 +29,7 @@ import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
@@ -64,6 +65,7 @@ public class RefDataErrorHandling extends BaseHandler {
     CONSTRAINT_MAP.put("unq_supply_partner_code", SupplyPartnerMessageKeys.ERROR_CODE_DUPLICATED);
     CONSTRAINT_MAP.put("unq_supply_partner_association_programid_supervisorynodeid",
         SupplyPartnerMessageKeys.ERROR_ASSOCIATION_DUPLICATED);
+    CONSTRAINT_MAP.put("unq_role_name", RoleMessageKeys.ERROR_DUPLICATED);
   }
 
   /**

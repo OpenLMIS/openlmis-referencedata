@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,7 +42,6 @@ import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -161,24 +159,10 @@ public class RoleControllerTest {
   }
 
   @Test
-  public void shouldFindBySimilarNameIgnoringCase() {
-    //given
-    preparePostOrPut();
-
-    role1Dto.setName("newRole");
-    controller.createRole(role1Dto);
-    Set<Role> storedRole = repository.findByNameIgnoreCaseContaining(role1.getName());
-    assertTrue(storedRole.isEmpty());
-
-
-  }
-
-  @Test(expected = DataIntegrityViolationException.class)
   public void shouldNotCreateExistingRoleOnPost() {
     //given
     preparePostOrPut();
-    Set<Role> storedRole = repository.findByNameIgnoreCaseContaining(role1.getName());
-    when(!storedRole.isEmpty()).thenThrow(new DataIntegrityViolationException("Role exists"));
+
     //when
     controller.createRole(role1Dto);
   }

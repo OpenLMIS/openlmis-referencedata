@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.repository.custom.RoleRepositoryCustom;
@@ -46,6 +45,4 @@ public interface RoleRepository extends JpaRepository<Role, UUID>, RoleRepositor
       + " ORDER BY ?#{#pageable}",
       nativeQuery = true)
   Page<Role> findAllWithoutSnapshots(Pageable pageable);
-
-  Set<Role> findByNameIgnoreCaseContaining(String name);
 }

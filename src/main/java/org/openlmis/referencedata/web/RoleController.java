@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -166,12 +165,6 @@ public class RoleController extends BaseController {
   @ResponseBody
   public RoleDto createRole(@RequestBody RoleDto roleDto) {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
-
-    Set<Role> storedRole = roleRepository.findByNameIgnoreCaseContaining(roleDto.getName());
-    if (!storedRole.isEmpty()) {
-      LOGGER.warn("Role to create already exists");
-      throw new DataIntegrityViolationException(RoleMessageKeys.ERROR_DUPLICATED);
-    }
 
     populateRights(roleDto);
     Role newRole = Role.newRole(roleDto);
