@@ -62,6 +62,10 @@ public class ObjectReferenceExpander {
 
       Object entityProperty = PropertyUtils.getProperty(entity, propertyName);
 
+      if (entityProperty == null) {
+        return;
+      }
+
       if (entityProperty instanceof Collection) {
         expandCollection(dto, entityProperty, propertyName, parts.length == 2 ? parts[1] : null);
       } else {

@@ -17,6 +17,7 @@ package org.openlmis.referencedata.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.javers.common.collections.Sets.asSet;
 
 import org.junit.Before;
@@ -69,6 +70,15 @@ public class ObjectReferenceExpanderTest {
 
     assertThat(supplyLineDto.getSupervisoryNode().getRequisitionGroup().getMemberFacilities(),
         notNullValue());
+  }
+
+  @Test
+  public void shouldNotThrowAnExceptionIfEntityFieldIsNull() {
+    supplyLine.setSupervisoryNode(null);
+
+    objectReferenceExpander.expandDto(supplyLineDto, supplyLine, asSet("supervisoryNode"));
+
+    assertThat(supplyLineDto.getSupervisoryNode().getRequisitionGroup(), nullValue());
   }
 
   @Test(expected = ValidationMessageException.class)
