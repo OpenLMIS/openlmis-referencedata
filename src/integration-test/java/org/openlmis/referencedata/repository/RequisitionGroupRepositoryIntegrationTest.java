@@ -161,7 +161,8 @@ public class RequisitionGroupRepositoryIntegrationTest
     requisitionGroup.setSupervisoryNode(supervisoryNode);
     repository.save(requisitionGroup);
 
-    assertEquals(requisitionGroup.getSupervisoryNode(), supervisoryNode);
+    assertEquals(repository.findOne(requisitionGroup.getId()).getSupervisoryNode(),
+        supervisoryNode);
 
     SupervisoryNode supervisoryNode1 = new SupervisoryNodeDataBuilder()
         .withoutId()
@@ -172,7 +173,8 @@ public class RequisitionGroupRepositoryIntegrationTest
     requisitionGroup.setSupervisoryNode(supervisoryNode1);
     repository.save(requisitionGroup);
 
-    assertEquals(requisitionGroup.getSupervisoryNode(), supervisoryNode1);
+    assertEquals(repository.findOne(requisitionGroup.getId()).getSupervisoryNode(),
+        supervisoryNode1);
     assertNull(supervisoryNode.getRequisitionGroup());
   }
 

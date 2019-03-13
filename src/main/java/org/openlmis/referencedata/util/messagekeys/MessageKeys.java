@@ -39,6 +39,7 @@ public abstract class MessageKeys {
   protected static final String SEARCH = "search";
   protected static final String FAILED = "failed";
   protected static final String SAVING = "saving";
+  protected static final String SAVE = "save";
   protected static final String NUMBER = "number";
   protected static final String NUMERIC = "numeric";
   protected static final String EMPTY = "empty";

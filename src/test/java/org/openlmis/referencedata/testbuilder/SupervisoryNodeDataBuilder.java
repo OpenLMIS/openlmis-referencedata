@@ -158,4 +158,15 @@ public class SupervisoryNodeDataBuilder {
   public SupervisoryNodeDataBuilder withoutRequisitionGroup() {
     return withRequisitionGroup(null);
   }
+
+  /**
+   * Sets description for new {@link SupervisoryNode}.
+   *
+   * @param description  the description to be set
+   * @return the builder instance
+   */
+  public SupervisoryNodeDataBuilder withDescription(String description) {
+    this.description = description;
+    return this;
+  }
 }

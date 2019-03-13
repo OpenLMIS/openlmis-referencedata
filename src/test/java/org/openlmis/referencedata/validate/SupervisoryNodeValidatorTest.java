@@ -146,6 +146,25 @@ public class SupervisoryNodeValidatorTest {
   }
 
   @Test
+  public void shouldRejectIfUpdatingRequisitionGroupInSupervisoryNode() {
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+        .withRequisitionGroup(requisitionGroup);
+    SupervisoryNode existing = builder.build();
+
+    when(repository.findOne(existing.getId())).thenReturn(existing);
+
+    builder
+        .withRequisitionGroup(new RequisitionGroupDataBuilder().build())
+        .build()
+        .export(dto);
+
+    validator.validate(dto, errors);
+
+    assertErrorMessage(errors, REQUISITION_GROUP,
+        SupervisoryNodeMessageKeys.ERROR_UPDATING_REQUISITION_GROUP_IS_FORBIDDEN);
+  }
+
+  @Test
   public void shouldRejectIfNameIsNull() {
     new SupervisoryNodeDataBuilder()
         .withoutCode()

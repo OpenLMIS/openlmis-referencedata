@@ -284,8 +284,20 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldPutSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    supervisoryNodeDto.setDescription("OpenLMIS");
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+        .withFacility(supervisoryNode.getFacility())
+        .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
+        .withParentNode(supervisoryNode.getParentNode());
+
+    SupervisoryNode existing = builder.build();
+
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    builder
+        .withDescription("OpenLMIS")
+        .build()
+        .export(supervisoryNodeDto);
+
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
 
     ValidatableResponse response = restAssured
         .given()
@@ -299,6 +311,40 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .statusCode(200);
 
     assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectPutSupervisoryNodeWhenRequisitionGroupIsChanged() {
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+        .withFacility(supervisoryNode.getFacility())
+        .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
+        .withParentNode(supervisoryNode.getParentNode());
+
+    SupervisoryNode existing = builder.build();
+
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
+
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    builder
+        .withRequisitionGroup(new RequisitionGroupDataBuilder().build())
+        .build()
+        .export(supervisoryNodeDto);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .body(supervisoryNodeDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(400);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -346,7 +392,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldRejectPutSupervisoryNodeIfRequisitionGroupIsMissing() {
     SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
         .withFacility(supervisoryNode.getFacility())
-        .withRequisitionGroup(null)
         .withParentNode(supervisoryNode.getParentNode())
         .withRequisitionGroup(new RequisitionGroupDataBuilder().buildAsNew());
 
@@ -541,9 +586,21 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldDeleteSupervisoryNodeFromCacheAfterUpdate() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    supervisoryNodeDto.setDescription("OpenLMIS");
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+        .withFacility(supervisoryNode.getFacility())
+        .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
+        .withParentNode(supervisoryNode.getParentNode());
+
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    builder
+        .withDescription("OpenLMIS")
+        .build()
+        .export(supervisoryNodeDto);
+
+    SupervisoryNode existing = builder.build();
+
     given(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
 
     ValidatableResponse response = restAssured
         .given()

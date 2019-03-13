@@ -90,5 +90,16 @@ public class SupervisoryNodeValidator implements BaseValidator {
       rejectValue(errors, REQUISITION_GROUP,
           SupervisoryNodeMessageKeys.ERROR_REQUISITION_GROUP_REQUIRED);
     }
+    SupervisoryNode existingNode = repository.findOne(node.getId());
+    if (isRequisitionGroupChanged(existingNode, node)) {
+      rejectValue(errors, REQUISITION_GROUP,
+          SupervisoryNodeMessageKeys.ERROR_UPDATING_REQUISITION_GROUP_IS_FORBIDDEN);
+    }
+  }
+
+  private boolean isRequisitionGroupChanged(SupervisoryNode existing, SupervisoryNodeDto dto) {
+    return null != existing && null != dto.getRequisitionGroup()
+        && null != existing.getRequisitionGroup()
+        && existing.getRequisitionGroup().getId() != dto.getRequisitionGroup().getId();
   }
 }
