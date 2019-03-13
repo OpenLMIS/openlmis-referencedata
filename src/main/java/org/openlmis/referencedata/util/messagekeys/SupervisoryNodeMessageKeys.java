@@ -30,6 +30,6 @@ public abstract class SupervisoryNodeMessageKeys extends MessageKeys {
   public static final String ERROR_NAME_MUST_BE_UNIQUE = join(ERROR, NAME, MUST_BE_UNIQUE);
   public static final String ERROR_REQUISITION_GROUP_REQUIRED =
       join(ERROR, REQUISITION_GROUP, REQUIRED);
-  public static final String ERROR_UPDATING_REQUISITION_GROUP_IS_FORBIDDEN =
+  public static final String ERROR_UPDATING_REQUISITION_GROUP_SAVE_FAILED =
       join(ERROR, REQUISITION_GROUP, SAVE, FAILED);
 }

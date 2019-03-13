@@ -161,7 +161,7 @@ public class SupervisoryNodeValidatorTest {
     validator.validate(dto, errors);
 
     assertErrorMessage(errors, REQUISITION_GROUP,
-        SupervisoryNodeMessageKeys.ERROR_UPDATING_REQUISITION_GROUP_IS_FORBIDDEN);
+        SupervisoryNodeMessageKeys.ERROR_UPDATING_REQUISITION_GROUP_SAVE_FAILED);
   }
 
   @Test

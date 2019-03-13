@@ -20,7 +20,7 @@ Improvements:
 * [OLMIS-6004](https://openlmis.atlassian.net/browse/OLMIS-6004) : Add sortable parameter to program search api
 
 Bug fixes:
-* [OLMIS-5981](https://openlmis.atlassian.net/browse/OLMIS-5981): Updated /supervisoryNodes/{supervisoryNode_id} PUT to throw exception when requisition group is missing.
+* [OLMIS-5981](https://openlmis.atlassian.net/browse/OLMIS-5981): Updated /supervisoryNodes/{supervisoryNode_id} PUT to throw exception when requisition group is missing and when requisition group is changed to another.
 
 12.0.0 / 2018-12-12
 ===================
