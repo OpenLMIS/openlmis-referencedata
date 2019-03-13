@@ -100,6 +100,6 @@ public class SupervisoryNodeValidator implements BaseValidator {
   private boolean isRequisitionGroupChanged(SupervisoryNode existing, SupervisoryNodeDto dto) {
     return null != existing && null != dto.getRequisitionGroup()
         && null != existing.getRequisitionGroup()
-        && existing.getRequisitionGroup().getId() != dto.getRequisitionGroup().getId();
+        && !existing.getRequisitionGroup().getId().equals(dto.getRequisitionGroup().getId());
   }
 }

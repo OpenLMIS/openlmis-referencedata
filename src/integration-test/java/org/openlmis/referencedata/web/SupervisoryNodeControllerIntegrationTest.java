@@ -284,20 +284,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldPutSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
-        .withFacility(supervisoryNode.getFacility())
-        .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
-        .withParentNode(supervisoryNode.getParentNode());
-
-    SupervisoryNode existing = builder.build();
-
-    supervisoryNodeDto = new SupervisoryNodeDto();
-    builder
-        .withDescription("OpenLMIS")
-        .build()
-        .export(supervisoryNodeDto);
-
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    supervisoryNodeDto.setDescription("OpenLMIS");
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
         .given()
@@ -586,21 +574,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldDeleteSupervisoryNodeFromCacheAfterUpdate() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
-        .withFacility(supervisoryNode.getFacility())
-        .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
-        .withParentNode(supervisoryNode.getParentNode());
-
-    supervisoryNodeDto = new SupervisoryNodeDto();
-    builder
-        .withDescription("OpenLMIS")
-        .build()
-        .export(supervisoryNodeDto);
-
-    SupervisoryNode existing = builder.build();
-
+    supervisoryNodeDto.setDescription("OpenLMIS");
     given(supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
         .given()
