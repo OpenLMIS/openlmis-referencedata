@@ -151,12 +151,11 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldSearchSupplyLinesByAllParametersWithoutExpand() {
-    Page<SupplyLine> result = repository.search(
+  public void shouldSearchSupplyLinesByAllParametersV2() {
+    Page<SupplyLine> result = repository.searchV2(
         supplyLines.get(0).getProgram().getId(),
         supplyLines.get(0).getSupervisoryNode().getId(),
         singleton(supplyLines.get(0).getSupplyingFacility().getId()),
-        null,
         pageable);
 
     assertThat(result.getContent(), hasSize(1));
@@ -164,69 +163,43 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldSearchSupplyLinesByAllParametersWithRequisitionGroupExpand() {
-    Page<SupplyLine> result = repository.search(
-        supplyLines.get(0).getProgram().getId(),
-        supplyLines.get(0).getSupervisoryNode().getId(),
-        singleton(supplyLines.get(0).getSupplyingFacility().getId()),
-        asSet("supervisoryNode.requisitionGroup"),
-        pageable);
-
-    assertThat(result.getContent(), hasSize(1));
-    assertThat(result.getContent().get(0), equalTo(supplyLines.get(0)));
-  }
-
-  @Test
-  public void shouldSearchSupplyLinesByAllParametersWithMemberFacilitiesExpand() {
-    Page<SupplyLine> result = repository.search(
-        supplyLines.get(0).getProgram().getId(),
-        supplyLines.get(0).getSupervisoryNode().getId(),
-        singleton(supplyLines.get(0).getSupplyingFacility().getId()),
-        asSet("supervisoryNode.requisitionGroup.memberFacilities"),
-        pageable);
-
-    assertThat(result.getContent(), hasSize(1));
-    assertThat(result.getContent().get(0), equalTo(supplyLines.get(0)));
-  }
-
-  @Test
-  public void shouldSearchSupplyLinesWhenSearchParametersAreNullWithoutExpand() {
-    Page<SupplyLine> result = repository.search(null, null, null, null, pageable);
+  public void shouldSearchSupplyLinesWhenSearchParametersAreNullV2() {
+    Page<SupplyLine> result = repository.searchV2(null, null, null, pageable);
 
     assertThat(result.getContent(), hasSize(5));
   }
 
   @Test
-  public void shouldSearchSupplyLinesWithSortingWithoutExpand() {
+  public void shouldSearchSupplyLinesWithSortingV2() {
     Pageable pageable = new PageRequest(0, 10, new Sort(DESC, "supervisoryNode"));
-    Page<SupplyLine> result = repository.search(null, null, null, null, pageable);
+    Page<SupplyLine> result = repository.searchV2(null, null, null, pageable);
 
     assertThat(result.getContent(), hasSize(5));
   }
 
   @Test
-  public void shouldSearchSupplyLinesByProgramIdWithoutExpand() {
+  public void shouldSearchSupplyLinesByProgramIdV2() {
     Page<SupplyLine> result = repository
-        .search(supplyLines.get(0).getProgram().getId(), null, null, null, pageable);
+        .searchV2(supplyLines.get(0).getProgram().getId(), null, null, pageable);
 
     assertThat(result.getContent(), hasSize(1));
     assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
   }
 
   @Test
-  public void shouldSearchSupplyLinesBySupervisoryNodeIdWithoutExpand() {
+  public void shouldSearchSupplyLinesBySupervisoryNodeIdV2() {
     Page<SupplyLine> result = repository
-        .search(null, supplyLines.get(0).getSupervisoryNode().getId(), null, null, pageable);
+        .searchV2(null, supplyLines.get(0).getSupervisoryNode().getId(), null, pageable);
 
     assertThat(result.getContent(), hasSize(1));
     assertThat(result.getContent().get(0).getProgram(), equalTo(supplyLines.get(0).getProgram()));
   }
 
   @Test
-  public void shouldSearchSupplyLinesBySupplyingFacilityIdsWithoutExpand() {
+  public void shouldSearchSupplyLinesBySupplyingFacilityIdsV2() {
     Page<SupplyLine> result = repository
-        .search(null, null, asSet(supplyLines.get(0).getSupplyingFacility().getId(),
-            supplyLines.get(1).getSupplyingFacility().getId()), null, pageable);
+        .searchV2(null, null, asSet(supplyLines.get(0).getSupplyingFacility().getId(),
+            supplyLines.get(1).getSupplyingFacility().getId()), pageable);
 
     assertThat(result.getContent(), hasSize(2));
     assertThat(result.getContent(), hasItems(supplyLines.get(0), supplyLines.get(1)));

@@ -83,10 +83,6 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   private static final String SUPERVISORY_NODE_ALIAS = "sn";
   private static final String REQUISITION_GROUP_ALIAS = "rg";
 
-  private static final String FROM_SL = join(FROM, "SupplyLine", AS, SUPPLY_LINE_ALIAS);
-  private static final String SELECT_SL = join(SELECT_DISTINCT, SUPPLY_LINE_ALIAS, FROM_SL);
-  private static final String COUNT_SL = join(SELECT_DISTINCT_COUNT, FROM_SL);
-
   private static final String SUPERVISORY_NODE_JOIN = join(LEFT_JOIN_FETCH,
       getField(SUPPLY_LINE_ALIAS, SUPERVISORY_NODE), AS, SUPERVISORY_NODE_ALIAS);
   private static final String REQUISITION_GROUP_JOIN = join(LEFT_JOIN_FETCH,
@@ -94,17 +90,17 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   private static final String REQUISITION_GROUP_MEMBERS_JOIN = join(LEFT_JOIN_FETCH,
       getField(REQUISITION_GROUP_ALIAS, MEMBER_FACILITIES));
 
+  private static final String FROM_SL = join(FROM, "SupplyLine", AS, SUPPLY_LINE_ALIAS);
+  private static final String SELECT_SL = join(SELECT_DISTINCT, SUPPLY_LINE_ALIAS, FROM_SL,
+      SUPERVISORY_NODE_JOIN, REQUISITION_GROUP_JOIN, REQUISITION_GROUP_MEMBERS_JOIN);
+  private static final String COUNT_SL = join(SELECT_DISTINCT_COUNT, FROM_SL);
+
   private static final String WITH_PROGRAM_ID =
       isEqual(getField(SUPPLY_LINE_ALIAS, "program", ID), asParameter(PROGRAM_ID));
   private static final String WITH_SUPERVISORY_NODE_ID =
       isEqual(getField(SUPPLY_LINE_ALIAS, SUPERVISORY_NODE, ID), asParameter(SUPERVISORY_NODE_ID));
   private static final String WITH_SUPPLYING_FACILITIES =
       join(getField(SUPPLY_LINE_ALIAS, SUPPLYING_FACILITY, ID), in(SUPPLYING_FACILITY_IDS));
-
-  private static final String REQUISITION_GROUP_EXPAND =
-      getField(SUPERVISORY_NODE, REQUISITION_GROUP);
-  private static final String MEMBER_FACILITIES_EXPAND =
-      getField(REQUISITION_GROUP_EXPAND, MEMBER_FACILITIES);
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -118,13 +114,12 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
    * @param programId            UUID of the program
    * @param supervisoryNodeId    UUID of the supervisory node
    * @param supplyingFacilityIds UUIDs of the supplying facilities
-   * @param expand               set of expand parameters
    * @param pageable             pagination and sorting parameters
    * @return page of supply lines with matched parameters.
    */
   @Override
-  public Page<SupplyLine> search(UUID programId, UUID supervisoryNodeId,
-      Set<UUID> supplyingFacilityIds, Set<String> expand, Pageable pageable) {
+  public Page<SupplyLine> searchV2(UUID programId, UUID supervisoryNodeId,
+      Set<UUID> supplyingFacilityIds, Pageable pageable) {
 
     Profiler profiler = new Profiler("SEARCH_SUPPLY_LINES_WITH_EXPAND_REPOSITORY");
     profiler.setLogger(LOGGER);
@@ -141,18 +136,8 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
-    String selectStatement = SELECT_SL;
-    if (isNotEmpty(expand)) {
-      if (expand.contains(REQUISITION_GROUP_EXPAND)) {
-        selectStatement = join(SELECT_SL, SUPERVISORY_NODE_JOIN, REQUISITION_GROUP_JOIN);
-      } else if (expand.contains(MEMBER_FACILITIES_EXPAND)) {
-        selectStatement = join(SELECT_SL, SUPERVISORY_NODE_JOIN, REQUISITION_GROUP_JOIN,
-            REQUISITION_GROUP_MEMBERS_JOIN);
-      }
-    }
-
     Query searchQuery = entityManager.createQuery(
-        join(selectStatement, whereStatement, getOrderPredicate(pageable)), SupplyLine.class);
+        join(SELECT_SL, whereStatement, getOrderPredicate(pageable)), SupplyLine.class);
     params.forEach(searchQuery::setParameter);
 
     List<SupplyLine> result = searchQuery

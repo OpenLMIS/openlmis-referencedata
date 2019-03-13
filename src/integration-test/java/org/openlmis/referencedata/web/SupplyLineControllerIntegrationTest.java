@@ -21,7 +21,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -185,7 +184,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public void shouldFindSupplyLinesWithoutParametersV2() {
     Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
 
-    given(supplyLineRepository.search(null, null, emptySet(), emptySet(), pageable))
+    given(supplyLineRepository.searchV2(null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
 
     PageImplRepresentation response = restAssured
@@ -204,11 +203,10 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
   @Test
   public void shouldFindSupplyLinesV2() {
-    given(supplyLineRepository.search(
+    given(supplyLineRepository.searchV2(
         supplyLine.getProgram().getId(),
         supplyLine.getSupervisoryNode().getId(),
         singleton(supplyLine.getSupplyingFacility().getId()),
-        emptySet(),
         pageable))
         .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
 
@@ -231,11 +229,10 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
   @Test
   public void shouldFindSupplyLinesV2WithExpand() {
-    given(supplyLineRepository.search(
+    given(supplyLineRepository.searchV2(
         supplyLine.getProgram().getId(),
         supplyLine.getSupervisoryNode().getId(),
         singleton(supplyLine.getSupplyingFacility().getId()),
-        asSet("supervisoryNode"),
         pageable))
         .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
 
