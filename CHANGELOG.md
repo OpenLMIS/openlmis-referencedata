@@ -18,6 +18,7 @@ Improvements:
 * [OLMIS-5853](https://openlmis.atlassian.net/browse/OLMIS-5853): Add Unique Name constraint on Supervisory Node
 * [OLMIS-5852](https://openlmis.atlassian.net/browse/OLMIS-5852): Add Case Insensitive Unique Code constraint on Supervisory Node
 * [OLMIS-6004](https://openlmis.atlassian.net/browse/OLMIS-6004) : Add sortable parameter to program search api
+* [OLMIS-6056](https://openlmis.atlassian.net/browse/OLMIS-6056) : Added redis caching for getting Supervisory Node Dto and Program
 
 Bug fixes:
 * [OLMIS-5981](https://openlmis.atlassian.net/browse/OLMIS-5981): Updated /supervisoryNodes/{supervisoryNode_id} PUT to throw exception when requisition group is missing and when requisition group is changed to another.
