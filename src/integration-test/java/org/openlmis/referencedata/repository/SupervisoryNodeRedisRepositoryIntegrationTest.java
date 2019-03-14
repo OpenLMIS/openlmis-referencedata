@@ -15,15 +15,14 @@
 
 package org.openlmis.referencedata.repository;
 
-import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Map;
 import java.util.UUID;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.domain.Facility;
@@ -32,7 +31,8 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
-import org.openlmis.referencedata.repository.custom.SupervisoryNodeRedisRepository;
+import org.openlmis.referencedata.dto.SupervisoryNodeDto;
+import org.openlmis.referencedata.repository.custom.SupervisoryNodeDtoRedisRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityOperatorDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
@@ -40,8 +40,8 @@ import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,9 +71,13 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
-  private SupervisoryNodeRedisRepository supervisoryNodeRedisRepository;
+  private SupervisoryNodeDtoRedisRepository supervisoryNodeDtoRedisRepository;
 
   private SupervisoryNode supervisoryNode;
+  private SupervisoryNodeDto supervisoryNodeDto;
+
+  @Value("${service.url}")
+  protected String baseUri;
 
   @Before
   public void setUp() {
@@ -102,56 +106,45 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
         .withFacility(facility)
         .build();
 
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    supervisoryNodeDto.setServiceUrl(baseUri);
+    supervisoryNode.export(supervisoryNodeDto);
+
     supervisoryNodeRepository.save(supervisoryNode);
-    supervisoryNodeRedisRepository.save(supervisoryNode);
+    supervisoryNodeDtoRedisRepository.save(supervisoryNodeDto);
   }
 
   @Test
-  @Ignore
-  public void shouldSaveAndReturnTrueIfSupervisoryNodeExistsInCacheWithGivenId() {
-    UUID supervisoryNodeId = supervisoryNode.getId();
-
-    boolean exists = supervisoryNodeRedisRepository.existsInCache(supervisoryNodeId);
+  public void shouldReturnTrueIfSupervisoryNodeExistsInCacheWithGivenId() {
+    UUID supervisoryNodeId = supervisoryNodeDto.getId();
+    boolean exists = supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId);
 
     assertTrue(exists);
   }
 
   @Test
-  @Ignore
   public void shouldFindSupervisoryNodeById() {
-    UUID supervisoryNodeId = supervisoryNode.getId();
+    UUID supervisoryNodeId = supervisoryNodeDto.getId();
 
-    SupervisoryNode supervisoryNodeFromCache = supervisoryNodeRedisRepository
+    SupervisoryNodeDto supervisoryNodeFromCache = supervisoryNodeDtoRedisRepository
         .findById(supervisoryNodeId);
 
-    assertNotNull(supervisoryNodeFromCache);
+    assertNotNull(supervisoryNodeDto);
+    assertEquals(supervisoryNodeFromCache, supervisoryNodeDto);
   }
 
   @Test
   public void shouldDeleteSupervisoryNode() {
-    supervisoryNodeRedisRepository.delete(supervisoryNode);
+    supervisoryNodeDtoRedisRepository.delete(supervisoryNodeDto);
 
-    assertFalse(supervisoryNodeRedisRepository.existsInCache(supervisoryNode.getId()));
+    assertFalse(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNode.getId()));
   }
 
   @Test
-  @Ignore
-  public void shouldFindSupervisoryNodeInDatabaseAndInCache() {
-    SupervisoryNode supervisoryNodeFromDataBase = supervisoryNodeRepository
-        .findOne(supervisoryNode.getId());
-    assertNotNull(supervisoryNodeFromDataBase);
+  public void shouldReturnAllEntries() {
+    Map<Object, Object> found = supervisoryNodeDtoRedisRepository.findAll();
 
-    SupervisoryNode supervisoryNodeFromCache = supervisoryNodeRedisRepository
-        .findById(supervisoryNode.getId());
-    assertNotNull(supervisoryNodeFromCache);
-  }
-
-  @Test
-  public void deserializeShouldBeAbleToRestoreComplexObjectAfterSerialization() {
-
-    JdkSerializationRedisSerializer serializer = new JdkSerializationRedisSerializer();
-
-    assertThat(serializer.deserialize(serializer.serialize(supervisoryNode)), is(supervisoryNode));
+    assertNotNull(found);
   }
 
 }

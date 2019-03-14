@@ -21,6 +21,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
@@ -316,8 +318,10 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetProgram() {
+  public void shouldGetProgramFromDatabase() {
 
+    given(programRepository.exists(programId)).willReturn(true);
+    given(programRedisRepository.existsInCache(programId)).willReturn(false);
     given(programRepository.findOne(programId)).willReturn(program);
 
     Program response = restAssured
@@ -332,6 +336,47 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(Program.class);
 
     assertEquals(program, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetProgramFromCache() {
+
+    given(programRepository.exists(programId)).willReturn(true);
+    given(programRedisRepository.existsInCache(programId)).willReturn(true);
+    given(programRedisRepository.findById(programId)).willReturn(program);
+
+    Program response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program.class);
+
+    verify(programRedisRepository, times(1)).findById(programId);
+    assertEquals(program, response);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
+    given(supervisoryNodeRepository.exists(programId)).willReturn(false);
+    given(supervisoryNodeDtoRedisRepository.existsInCache(programId)).willReturn(false);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(404);
+
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
