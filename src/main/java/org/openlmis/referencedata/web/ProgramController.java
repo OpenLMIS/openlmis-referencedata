@@ -22,6 +22,7 @@ import static org.openlmis.referencedata.web.ProgramController.RESOURCE_PATH;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
@@ -145,24 +146,21 @@ public class ProgramController extends BaseController {
     Profiler profiler = new Profiler("GET_PROGRAM_BY_ID");
     profiler.setLogger(XLOGGER);
 
-    profiler.start("CHECK_IF_PROGRAM_EXISTS_IN_CACHE");
-    boolean programInCache = programRedisRepository
-        .existsInCache(programId);
-
     Program program;
 
-    if (programInCache) {
-      profiler.start("GET_PROGRAM_FROM_CACHE");
-      program = programRedisRepository.findById(programId);
-    } else if (!programRepository.exists(programId)) {
+    if (AvailableFeatures.REDIS_CACHING.isActive()) {
+      program = getProgramFromCache(programId, profiler);
+      profiler.stop().log();
+      return program;
+    }
+
+    if (!programRepository.exists(programId)) {
       profiler.stop().log();
       throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      profiler.start("GET_PROGRAM_FROM_DATABASE");
-      program = programRepository.findOne(programId);
-      profiler.start("SAVE_PROGRAM_IN_CACHE");
-      programRedisRepository.save(program);
     }
+
+    profiler.start("GET_PROGRAM_FROM_DATABASE");
+    program = programRepository.findOne(programId);
 
     profiler.stop().log();
     return program;
@@ -282,5 +280,31 @@ public class ProgramController extends BaseController {
 
     return getAuditLogResponse(Program.class, id, author, changedPropertyName, page,
         returnJson);
+  }
+
+  /**
+   * Get the program from cache.
+   */
+  private Program getProgramFromCache(UUID programId, Profiler profiler) {
+    Program program;
+
+    profiler.start("CHECK_IF_PROGRAM_EXISTS_IN_CACHE");
+    boolean programInCache = programRedisRepository
+        .existsInCache(programId);
+
+    if (programInCache) {
+      profiler.start("GET_PROGRAM_FROM_CACHE");
+      program = programRedisRepository.findById(programId);
+    } else if (!programRepository.exists(programId)) {
+      profiler.stop().log();
+      throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
+    } else {
+      profiler.start("GET_PROGRAM_FROM_DATABASE");
+      program = programRepository.findOne(programId);
+      profiler.start("SAVE_PROGRAM_IN_CACHE");
+      programRedisRepository.save(program);
+    }
+
+    return program;
   }
 }

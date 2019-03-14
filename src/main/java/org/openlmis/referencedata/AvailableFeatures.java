@@ -33,7 +33,10 @@ public enum AvailableFeatures implements Feature {
   CONSOLIDATE_NOTIFICATIONS,
 
   @Label("Supply lines expand")
-  SUPPLY_LINES_EXPAND;
+  SUPPLY_LINES_EXPAND,
+
+  @Label("Redis caching")
+  REDIS_CACHING;
 
   public boolean isActive() {
     return FeatureContext.getFeatureManager().isActive(this);

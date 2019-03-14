@@ -23,13 +23,16 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.Test;
+import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProgramDto;
@@ -37,9 +40,15 @@ import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.togglz.junit.TogglzRule;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
+
+  @Rule
+  public TogglzRule togglzRule = TogglzRule.builder(AvailableFeatures.class)
+      .disable(AvailableFeatures.REDIS_CACHING)
+      .build();
 
   private static final String RESOURCE_URL = "/api/programs";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -318,8 +327,9 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldGetProgramFromDatabase() {
+  public void shouldGetProgramFromDatabaseWhenNotInCache() {
 
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(programRepository.exists(programId)).willReturn(true);
     given(programRedisRepository.existsInCache(programId)).willReturn(false);
     given(programRepository.findOne(programId)).willReturn(program);
@@ -336,12 +346,35 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(Program.class);
 
     assertEquals(program, response);
+    verify(programRedisRepository, times(1)).save(program);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetProgram() {
+    given(programRepository.exists(programId)).willReturn(true);
+    given(programRepository.findOne(programId)).willReturn(program);
+
+    Program response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program.class);
+
+    assertEquals(program, response);
+    verifyZeroInteractions(programRedisRepository);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
   public void shouldGetProgramFromCache() {
 
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(programRepository.exists(programId)).willReturn(true);
     given(programRedisRepository.existsInCache(programId)).willReturn(true);
     given(programRedisRepository.findById(programId)).willReturn(program);
@@ -364,6 +397,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(programId)).willReturn(false);
     given(supervisoryNodeDtoRedisRepository.existsInCache(programId)).willReturn(false);
 
@@ -377,6 +411,24 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(404);
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldThrowErrorNotFoundWhenNotInDatabase() {
+    given(supervisoryNodeRepository.exists(programId)).willReturn(false);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(404);
+
+    verifyZeroInteractions(programRedisRepository);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

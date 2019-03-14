@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
@@ -141,27 +142,23 @@ public class SupervisoryNodeController extends BaseController {
     Profiler profiler = new Profiler("GET_SUPERVISORY_NODE");
     profiler.setLogger(LOGGER);
 
-    SupervisoryNode supervisoryNode;
-
-    profiler.start("CHECK_IF_SUPERVISORY_NODE_EXISTS_IN_CACHE");
     SupervisoryNodeDto supervisoryNodeDto;
-    boolean supervisoryNodeIsInCache = supervisoryNodeDtoRedisRepository
-        .existsInCache(supervisoryNodeId);
 
-    if (supervisoryNodeIsInCache) {
-      profiler.start("GET_SUPERVISORY_NODE_FROM_CACHE");
-      supervisoryNodeDto = supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId);
-    } else if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
+    if (AvailableFeatures.REDIS_CACHING.isActive()) {
+      supervisoryNodeDto = getSupervisoryNodeDtoFromCache(supervisoryNodeId, profiler);
+      profiler.stop().log();
+      return supervisoryNodeDto;
+    }
+
+    if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
       profiler.stop().log();
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      profiler.start("GET_SUPERVISORY_NODE_FROM_DATABASE");
-      supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
-      profiler.start("EXPORT_TO_DTO");
-      supervisoryNodeDto = exportToDto(supervisoryNode);
-      profiler.start("SAVE_SUPERVISORY_NODE_IN_CACHE");
-      supervisoryNodeDtoRedisRepository.save(supervisoryNodeDto);
     }
+
+    profiler.start("GET_SUPERVISORY_NODE_FROM_DATABASE");
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+    profiler.start("EXPORT_TO_DTO");
+    supervisoryNodeDto = exportToDto(supervisoryNode);
 
     profiler.stop().log();
     return supervisoryNodeDto;
@@ -372,6 +369,35 @@ public class SupervisoryNodeController extends BaseController {
 
     return getAuditLogResponse(SupervisoryNode.class, id, author, changedPropertyName, page,
         returnJson);
+  }
+
+  /**
+   * Get the supervisory node from cache.
+   */
+  private SupervisoryNodeDto getSupervisoryNodeDtoFromCache(UUID supervisoryNodeId,
+      Profiler profiler) {
+    SupervisoryNodeDto supervisoryNodeDto;
+    SupervisoryNode supervisoryNode;
+
+    profiler.start("CHECK_IF_SUPERVISORY_NODE_EXISTS_IN_CACHE");
+    boolean supervisoryNodeIsInCache = supervisoryNodeDtoRedisRepository
+        .existsInCache(supervisoryNodeId);
+
+    if (supervisoryNodeIsInCache) {
+      profiler.start("GET_SUPERVISORY_NODE_FROM_CACHE");
+      supervisoryNodeDto = supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId);
+    } else if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
+      profiler.stop().log();
+      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+    } else {
+      profiler.start("GET_SUPERVISORY_NODE_FROM_DATABASE");
+      supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+      profiler.start("EXPORT_TO_DTO");
+      supervisoryNodeDto = exportToDto(supervisoryNode);
+      profiler.start("SAVE_SUPERVISORY_NODE_IN_CACHE");
+      supervisoryNodeDtoRedisRepository.save(supervisoryNodeDto);
+    }
+    return supervisoryNodeDto;
   }
 
   private SupervisoryNodeDto exportToDto(SupervisoryNode supervisoryNode) {

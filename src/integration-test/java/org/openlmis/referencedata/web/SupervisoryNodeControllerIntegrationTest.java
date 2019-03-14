@@ -30,6 +30,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
@@ -51,7 +52,9 @@ import java.util.UUID;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
@@ -80,9 +83,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.togglz.junit.TogglzRule;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegrationTest {
+
+  @Rule
+  public TogglzRule togglzRule = TogglzRule.builder(AvailableFeatures.class)
+      .disable(AvailableFeatures.REDIS_CACHING)
+      .build();
 
   private static final String RESOURCE_URL = "/api/supervisoryNodes";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
@@ -492,6 +501,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldGetSupervisoryNodeFromDatabaseWhenNotInCache() {
 
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
@@ -512,6 +522,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldSaveSupervisoryNodeInCacheAfterGettingOneFromDatabase() {
+
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
@@ -533,6 +545,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldGetSupervisoryNodeFromCache() {
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId))
@@ -556,8 +569,66 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetSupervisoryNodeFromDatabase() {
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+
+    ValidatableResponse response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200);
+
+    assertResponseBody(response, is(supervisoryNode.getId().toString()));
+    verifyZeroInteractions(supervisoryNodeDtoRedisRepository);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotSaveSupervisoryNodeInCacheWhenFeatureFlagDisabled() {
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+
+    ValidatableResponse response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200);
+
+    assertResponseBody(response, is(supervisoryNode.getId().toString()));
+    verifyZeroInteractions(supervisoryNodeDtoRedisRepository);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldThrowErrorNotFoundWhenInDatabase() {
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
 
     restAssured
         .given()
