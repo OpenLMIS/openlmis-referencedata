@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.ArrayList;
@@ -84,5 +85,10 @@ public final class RequisitionGroupObjectReferenceDto extends ObjectReferenceDto
   @JsonIgnore
   public void setMemberFacilities(Set<Facility> memberFacilities) {
     // unsupported
+  }
+
+  @JsonGetter("memberFacilities")
+  public Set<BasicFacilityDto> getMemberFacilities() {
+    return this.memberFacilities;
   }
 }
