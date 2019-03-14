@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.internal.bind.TypeAdapters;
 import java.time.Clock;
 import java.time.ZoneId;
@@ -51,9 +52,10 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -225,7 +227,6 @@ public class Application {
     factory.setHostName(redisUrl);
     factory.setPort(redisPort);
     factory.setPassword(redisPassword);
-
     factory.setUsePool(true);
     return factory;
   }
@@ -238,19 +239,34 @@ public class Application {
 
   /**
    * Creates RedisTemplate instance.
-   *
-   * @param <T> Generic type of objects
    */
   @Bean
-  public <T> RedisTemplate<String, T> redisTemplate(JedisConnectionFactory factory) {
-    RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
+  public RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory factory,
+      ObjectMapper objectMapper) {
+    RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    Jackson2JsonRedisSerializer jackson2JsonRedisSerializer =
+        new Jackson2JsonRedisSerializer<>(Object.class);
     redisTemplate.setConnectionFactory(factory);
     redisTemplate.setKeySerializer(stringRedisSerializer());
-    redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
-    redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
-    redisTemplate.setEnableTransactionSupport(false);
+    redisTemplate.setDefaultSerializer(jackson2JsonRedisSerializer);
+    redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
+    redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
+    jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
 
     return redisTemplate;
+  }
+
+  /**
+   * Creates RedisCacheManager instance.
+   */
+  @Bean
+  public RedisCacheManager cacheManager(ObjectMapper objectMapper) {
+    RedisCacheManager redisCacheManager = new RedisCacheManager(redisTemplate(connectionFactory(),
+        objectMapper));
+    redisCacheManager.setTransactionAware(true);
+    redisCacheManager.setLoadRemoteCachesOnStartup(true);
+    redisCacheManager.setUsePrefix(true);
+    return redisCacheManager;
   }
 
   @Bean

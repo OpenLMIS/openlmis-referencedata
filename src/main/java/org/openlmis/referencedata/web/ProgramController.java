@@ -29,6 +29,7 @@ import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.custom.ProgramRedisRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.validate.ProgramValidator;
@@ -64,6 +65,9 @@ public class ProgramController extends BaseController {
 
   @Autowired
   private ProgramRepository programRepository;
+
+  @Autowired
+  private ProgramRedisRepository programRedisRepository;
 
   @Autowired
   private ProgramValidator validator;
@@ -141,15 +145,27 @@ public class ProgramController extends BaseController {
     Profiler profiler = new Profiler("GET_PROGRAM_BY_ID");
     profiler.setLogger(XLOGGER);
 
-    profiler.start("FIND_PROGRAM_IN_DB");
-    Program program = programRepository.findOne(programId);
-    if (program == null) {
+    profiler.start("CHECK_IF_PROGRAM_EXISTS_IN_CACHE");
+    boolean programInCache = programRedisRepository
+        .existsInCache(programId);
+
+    Program program;
+
+    if (programInCache) {
+      profiler.start("GET_PROGRAM_FROM_CACHE");
+      program = programRedisRepository.findById(programId);
+    } else if (!programRepository.exists(programId)) {
       profiler.stop().log();
       throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     } else {
-      profiler.stop().log();
-      return program;
+      profiler.start("GET_PROGRAM_FROM_DATABASE");
+      program = programRepository.findOne(programId);
+      profiler.start("SAVE_PROGRAM_IN_CACHE");
+      programRedisRepository.save(program);
     }
+
+    profiler.stop().log();
+    return program;
   }
 
   /**
