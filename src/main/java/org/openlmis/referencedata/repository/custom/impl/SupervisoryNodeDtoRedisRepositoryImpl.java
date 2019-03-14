@@ -55,10 +55,8 @@ public class SupervisoryNodeDtoRedisRepositoryImpl implements
   public SupervisoryNodeDto findById(UUID supervisoryNodeDtoId) {
     Map<Object, Object> found = findAll();
 
-    SupervisoryNodeDto supervisoryNodeDto = mapper.convertValue(
+    return mapper.convertValue(
         found.get(supervisoryNodeDtoId.toString()), SupervisoryNodeDto.class);
-
-    return supervisoryNodeDto;
   }
 
   @Override

@@ -53,8 +53,7 @@ public class ProgramRedisRepositoryImpl implements ProgramRedisRepository {
   @Override
   public Program findById(UUID programId) {
     Map<Object, Object> found = findAll();
-    Program program = mapper.convertValue(found.get(programId.toString()), Program.class);
-    return program;
+    return mapper.convertValue(found.get(programId.toString()), Program.class);
   }
 
   @Override
