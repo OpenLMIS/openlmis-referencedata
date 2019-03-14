@@ -760,6 +760,9 @@ resourceTypes:
 
               WARNING! Versioned orderables may not be fully supported by all consuming services.
               Using this rest-api to update orderables may break some functionality in downstream services.
+            body:
+              application/json:
+                schema: orderable
             responses:
               "200":
                 body:
@@ -770,6 +773,10 @@ resourceTypes:
                   application/json:
                       schema: localizedErrorResponse
               "403":
+                body:
+                  application/json:
+                    schema: localizedErrorResponse
+              "404":
                 body:
                   application/json:
                     schema: localizedErrorResponse

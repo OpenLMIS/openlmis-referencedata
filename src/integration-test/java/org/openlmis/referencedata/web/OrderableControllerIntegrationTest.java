@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.dto.OrderableDto.META_KEY_LAST_UPDATED;
 import static org.openlmis.referencedata.dto.OrderableDto.META_KEY_VERSION_ID;
+import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ID_MISMATCH;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NET_CONTENT_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
@@ -159,6 +160,33 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(11L, response2.getNetContent().longValue());
   }
 
+  @Test
+  public void updateShouldReturnBadRequestIfUrlAndDtoIdsDoNotMatch() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+    
+    checkBadRequestBody(orderableDto, ERROR_ID_MISMATCH,
+        String.join("/", RESOURCE_URL, UUID.randomUUID().toString()));
+  }
+
+  @Test
+  public void updateShouldReturnNotFoundIfOrderableNotFound() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
+        .willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(orderableDto)
+        .when()
+        .put(String.join("/", RESOURCE_URL, orderableDto.getId().toString()))
+        .then()
+        .statusCode(404);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+  
   @Test
   public void shouldCreateNewOrderableWithProgramOrderable() {
     mockUserHasRight(ORDERABLES_MANAGE);

@@ -103,7 +103,7 @@ public class OrderableController extends BaseController {
 
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
-    if (false == UuidUtil.sameId(id, orderableDto.getId())) {
+    if (!UuidUtil.sameId(id, orderableDto.getId())) {
       throw new ValidationMessageException(OrderableMessageKeys.ERROR_ID_MISMATCH);
     }
 
