@@ -233,8 +233,7 @@ public class Application {
 
   @Bean
   public StringRedisSerializer stringRedisSerializer() {
-    StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-    return stringRedisSerializer;
+    return new StringRedisSerializer();
   }
 
   /**
