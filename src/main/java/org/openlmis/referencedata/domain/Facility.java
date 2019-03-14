@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
@@ -81,7 +80,7 @@ import org.openlmis.referencedata.dto.NamedResource;
         }
     )
     })
-public class Facility extends BaseEntity implements FhirLocation, Serializable {
+public class Facility extends BaseEntity implements FhirLocation {
 
   public static final String TEXT = "text";
   public static final String WAREHOUSE_CODE = "warehouse";

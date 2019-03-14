@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -51,7 +50,7 @@ import org.slf4j.profiler.Profiler;
 @AllArgsConstructor
 @TypeName("SupervisoryNode")
 @SuppressWarnings("PMD.TooManyMethods")
-public class SupervisoryNode extends BaseEntity implements Serializable {
+public class SupervisoryNode extends BaseEntity {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupervisoryNode.class);
 

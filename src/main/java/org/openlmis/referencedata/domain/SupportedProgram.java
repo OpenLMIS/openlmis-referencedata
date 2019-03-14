@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -34,7 +33,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @AllArgsConstructor
 @TypeName("SupportedProgram")
 @EqualsAndHashCode(of = "facilityProgram")
-public final class SupportedProgram implements Serializable {
+public final class SupportedProgram {
 
   @EmbeddedId
   @Getter

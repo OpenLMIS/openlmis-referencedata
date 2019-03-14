@@ -17,7 +17,6 @@ package org.openlmis.referencedata.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.io.Serializable;
 import javax.persistence.Embeddable;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  * Represents a unique designation.
  */
 @Embeddable
-public class Code implements Serializable {
+public class Code {
   private final String code;
 
   protected Code() {

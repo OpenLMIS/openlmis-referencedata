@@ -18,7 +18,6 @@ package org.openlmis.referencedata.domain;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -49,7 +48,7 @@ import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
     @NamedQuery(name = "GeographicZone.findIdsByParent",
         query = "SELECT DISTINCT id FROM GeographicZone WHERE parent.id = :parentId")
     })
-public class GeographicZone extends BaseEntity implements FhirLocation, Serializable {
+public class GeographicZone extends BaseEntity implements FhirLocation {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter

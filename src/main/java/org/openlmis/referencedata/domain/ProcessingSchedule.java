@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -35,7 +34,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("ProcessingSchedule")
-public class ProcessingSchedule extends BaseEntity implements Serializable {
+public class ProcessingSchedule extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter

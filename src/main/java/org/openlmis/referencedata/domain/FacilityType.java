@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,7 +30,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("FacilityType")
-public class FacilityType extends BaseEntity implements Serializable {
+public class FacilityType extends BaseEntity {
 
   @Column(nullable = false, unique = true, columnDefinition = "text")
   @Getter
