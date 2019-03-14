@@ -66,15 +66,11 @@ public class SupervisoryNodeDtoRedisRepositoryImpl implements
 
   @Override
   public void save(SupervisoryNodeDto supervisoryNodeDto) {
-    if (null != supervisoryNodeDto) {
-      hashOperations.put(HASH_KEY, supervisoryNodeDto.getId(), supervisoryNodeDto);
-    }
+    hashOperations.put(HASH_KEY, supervisoryNodeDto.getId(), supervisoryNodeDto);
   }
 
   @Override
   public void delete(SupervisoryNodeDto supervisoryNodeDto) {
-    if (null != supervisoryNodeDto) {
-      hashOperations.delete(HASH_KEY, supervisoryNodeDto.getId().toString());
-    }
+    hashOperations.delete(HASH_KEY, supervisoryNodeDto.getId().toString());
   }
 }

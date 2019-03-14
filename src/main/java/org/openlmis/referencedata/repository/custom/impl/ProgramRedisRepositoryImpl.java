@@ -63,8 +63,6 @@ public class ProgramRedisRepositoryImpl implements ProgramRedisRepository {
 
   @Override
   public void save(Program program) {
-    if (null != program) {
-      hashOperations.put(HASH_KEY, program.getId(), program);
-    }
+    hashOperations.put(HASH_KEY, program.getId(), program);
   }
 }
