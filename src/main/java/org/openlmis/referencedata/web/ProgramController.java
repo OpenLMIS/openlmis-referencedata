@@ -30,7 +30,7 @@ import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
+import org.openlmis.referencedata.repository.custom.impl.ProgramRedisRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.validate.ProgramValidator;
@@ -68,7 +68,7 @@ public class ProgramController extends BaseController {
   private ProgramRepository programRepository;
 
   @Autowired
-  private BaseRedisRepository<Program> programRedisRepository;
+  private ProgramRedisRepository programRedisRepository;
 
   @Autowired
   private ProgramValidator validator;

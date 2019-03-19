@@ -17,7 +17,7 @@ package org.openlmis.referencedata.repository.custom;
 
 import java.util.UUID;
 
-public interface BaseRedisRepository<T> {
+public interface CrudRedisRepository<T> {
 
   boolean exists(UUID uuid);
 

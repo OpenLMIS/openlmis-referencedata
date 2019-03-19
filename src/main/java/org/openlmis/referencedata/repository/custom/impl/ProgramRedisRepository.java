@@ -13,27 +13,25 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.dto;
+package org.openlmis.referencedata.repository.custom.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.openlmis.referencedata.domain.BaseEntity.BaseExporter;
-import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
-import org.openlmis.referencedata.domain.Identifiable;
+import org.openlmis.referencedata.domain.Program;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Repository;
 
-@Getter
-@Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@EqualsAndHashCode
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public abstract class BaseDto implements BaseImporter, BaseExporter, Identifiable {
-  private UUID id;
+@Repository
+public class ProgramRedisRepository extends BaseRedisRepository<Program> {
+
+  private static final String HASH_KEY = "PROGRAM";
+
+  @Autowired
+  ProgramRedisRepository(RedisTemplate redisTemplate) {
+    super(redisTemplate, Program.class);
+  }
+
+  @Override
+  protected String getHashKey() {
+    return HASH_KEY;
+  }
 }

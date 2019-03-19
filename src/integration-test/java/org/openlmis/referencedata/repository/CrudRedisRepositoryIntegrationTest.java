@@ -15,10 +15,14 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.UUID;
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.dto.SupervisoryNodeDto;
-import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
+import org.openlmis.referencedata.domain.Identifiable;
+import org.openlmis.referencedata.repository.custom.CrudRedisRepository;
+import org.openlmis.referencedata.repository.custom.impl.ProgramRedisRepository;
+import org.openlmis.referencedata.repository.custom.impl.SupervisoryNodeDtoRedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,19 +34,22 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-public abstract class BaseRedisRepositoryIntegrationTest {
+public abstract class CrudRedisRepositoryIntegrationTest<T extends Identifiable> {
+
+  @Value("${service.url}")
+  protected String baseUri;
 
   @Autowired
   protected SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
-  protected BaseRedisRepository<SupervisoryNodeDto> supervisoryNodeDtoRedisRepository;
+  protected SupervisoryNodeDtoRedisRepository supervisoryNodeDtoRedisRepository;
 
   @Autowired
   protected ProgramRepository programRepository;
 
   @Autowired
-  protected BaseRedisRepository<Program> programRedisRepository;
+  protected ProgramRedisRepository programRedisRepository;
 
   @Autowired
   protected FacilityRepository facilityRepository;
@@ -59,6 +66,56 @@ public abstract class BaseRedisRepositoryIntegrationTest {
   @Autowired
   protected GeographicLevelRepository geographicLevelRepository;
 
-  @Value("${service.url}")
-  protected String baseUri;
+  abstract CrudRedisRepository<T> getRepository();
+
+  /*
+   * Generate a unique instance of given type.
+   * @return generated instance
+   */
+  abstract T generateInstance() throws Exception;
+
+  protected void assertInstance(T instance) {
+    Assert.assertNotNull(instance.getId());
+  }
+
+  @Test
+  public void shouldCreate() throws Exception {
+    CrudRedisRepository<T> repository = this.getRepository();
+
+    T instance = this.generateInstance();
+
+    repository.save(instance);
+
+    Assert.assertTrue(repository.exists(instance.getId()));
+  }
+
+  @Test
+  public void shouldFindOne() throws Exception {
+    CrudRedisRepository<T> repository = this.getRepository();
+
+    T instance = this.generateInstance();
+
+    repository.save(instance);
+
+    UUID id = instance.getId();
+
+    instance = repository.findById(id);
+    assertInstance(instance);
+    Assert.assertEquals(id, instance.getId());
+  }
+
+  @Test
+  public void shouldDelete() throws Exception {
+    CrudRedisRepository<T> repository = this.getRepository();
+
+    T instance = this.generateInstance();
+    Assert.assertNotNull(instance);
+
+    repository.save(instance);
+
+    UUID id = instance.getId();
+
+    repository.delete(instance);
+    Assert.assertFalse(repository.exists(id));
+  }
 }

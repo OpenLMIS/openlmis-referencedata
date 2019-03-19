@@ -38,7 +38,7 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
+import org.openlmis.referencedata.repository.custom.impl.SupervisoryNodeDtoRedisRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.SupervisoryNodeBuilder;
 import org.openlmis.referencedata.util.Pagination;
@@ -79,7 +79,7 @@ public class SupervisoryNodeController extends BaseController {
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
-  private BaseRedisRepository<SupervisoryNodeDto> supervisoryNodeDtoRedisRepository;
+  private SupervisoryNodeDtoRedisRepository supervisoryNodeDtoRedisRepository;
 
   @Autowired
   private ProgramRepository programRepository;

@@ -15,42 +15,24 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import java.util.UUID;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
+import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProgramRedisRepositoryImpl extends BaseRedisRepositoryUtil
-    implements BaseRedisRepository<Program> {
+public class SupervisoryNodeDtoRedisRepository
+    extends BaseRedisRepository<SupervisoryNodeDto> {
 
-  private static final String HASH_KEY = "PROGRAM";
+  private static final String HASH_KEY = "SUPERVISORY_NODE_DTO";
 
   @Autowired
-  public ProgramRedisRepositoryImpl(RedisTemplate redisTemplate) {
-    this.redisTemplate = redisTemplate;
+  SupervisoryNodeDtoRedisRepository(RedisTemplate redisTemplate) {
+    super(redisTemplate, SupervisoryNodeDto.class);
   }
 
   @Override
-  public boolean exists(UUID programId) {
-    return hashOperations.hasKey(HASH_KEY, programId.toString());
-  }
-
-  @Override
-  public Program findById(UUID programId) {
-    return mapper.convertValue(this.redisTemplate.opsForHash()
-        .get(HASH_KEY, programId), Program.class);
-  }
-
-  @Override
-  public void save(Program program) {
-    hashOperations.put(HASH_KEY, program.getId(), program);
-  }
-
-  @Override
-  public void delete(Program program) {
-    hashOperations.delete(HASH_KEY, program.getId().toString());
+  protected String getHashKey() {
+    return HASH_KEY;
   }
 }

@@ -24,20 +24,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
+import org.openlmis.referencedata.repository.custom.impl.ProgramRedisRepository;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 
-public class ProgramRedisRepositoryIntegrationTest extends BaseRedisRepositoryIntegrationTest {
+public class ProgramRedisRepositoryIntegrationTest
+    extends CrudRedisRepositoryIntegrationTest<Program> {
 
   private Program program;
   private ProgramDto programDto = new ProgramDto();
   private UUID programId;
 
+  @Override
+  ProgramRedisRepository getRepository() {
+    return this.programRedisRepository;
+  }
+
   @Before
   public void setUp() {
     programId = UUID.randomUUID();
-    program = new ProgramDataBuilder()
-        .withId(programId)
-        .build();
+    program = generateInstance();
     program.export(programDto);
 
     programRepository.save(program);
@@ -57,6 +62,17 @@ public class ProgramRedisRepositoryIntegrationTest extends BaseRedisRepositoryIn
 
     assertNotNull(programFromCache);
     assertEquals(programFromCache, program);
+  }
+
+  @Override
+  Program generateInstance() {
+    return getProgramDataBuilder()
+        .build();
+  }
+
+  private ProgramDataBuilder getProgramDataBuilder() {
+    return new ProgramDataBuilder()
+        .withId(programId);
   }
 
 }

@@ -30,6 +30,7 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
+import org.openlmis.referencedata.repository.custom.impl.SupervisoryNodeDtoRedisRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityOperatorDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
@@ -38,10 +39,16 @@ import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 
 public class SupervisoryNodeRedisRepositoryIntegrationTest
-    extends BaseRedisRepositoryIntegrationTest {
+    extends CrudRedisRepositoryIntegrationTest<SupervisoryNodeDto> {
 
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;
+  protected Facility facility;
+
+  @Override
+  SupervisoryNodeDtoRedisRepository getRepository() {
+    return this.supervisoryNodeDtoRedisRepository;
+  }
 
   @Before
   public void setUp() {
@@ -59,20 +66,14 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest
     FacilityOperator facilityOperator = new FacilityOperatorDataBuilder().build();
     facilityOperatorRepository.save(facilityOperator);
 
-    Facility facility = new FacilityDataBuilder()
+    facility = new FacilityDataBuilder()
         .withGeographicZone(geographicZone)
         .withOperator(facilityOperator)
         .withType(facilityType)
         .build();
     facilityRepository.save(facility);
 
-    supervisoryNode = new SupervisoryNodeDataBuilder()
-        .withFacility(facility)
-        .build();
-
-    supervisoryNodeDto = new SupervisoryNodeDto();
-    supervisoryNodeDto.setServiceUrl(baseUri);
-    supervisoryNode.export(supervisoryNodeDto);
+    supervisoryNodeDto = generateInstance();
 
     supervisoryNodeRepository.save(supervisoryNode);
     supervisoryNodeDtoRedisRepository.save(supervisoryNodeDto);
@@ -102,6 +103,19 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest
     supervisoryNodeDtoRedisRepository.delete(supervisoryNodeDto);
 
     assertFalse(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId));
+  }
+
+  @Override
+  SupervisoryNodeDto generateInstance() {
+    supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .build();
+
+    SupervisoryNodeDto supervisoryNodeDto = new SupervisoryNodeDto();
+    supervisoryNodeDto.setServiceUrl(baseUri);
+    supervisoryNode.export(supervisoryNodeDto);
+
+    return supervisoryNodeDto;
   }
 
 }
