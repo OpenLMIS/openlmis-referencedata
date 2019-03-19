@@ -171,7 +171,7 @@ public class SupplyLineRepositoryIntegrationTest
 
   @Test
   public void shouldSearchSupplyLinesWithSortingV2() {
-    Pageable pageable = new PageRequest(0, 10, new Sort(DESC, "supervisoryNode"));
+    Pageable pageable = new PageRequest(0, 10, new Sort(DESC, "supplyingFacility.name"));
     Page<SupplyLine> result = repository.searchV2(null, null, null, pageable);
 
     assertThat(result.getContent(), hasSize(5));

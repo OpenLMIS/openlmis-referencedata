@@ -19,7 +19,8 @@ import java.util.Collection;
 
 class SqlConstants {
 
-  static final String SELECT_DISTINCT = "SELECT DISTINCT";
+  static final String SELECT = "SELECT";
+  static final String SELECT_DISTINCT = join(SELECT, "DISTINCT");
   static final String SELECT_DISTINCT_COUNT = join(SELECT_DISTINCT, "COUNT(*)");
   static final String FROM = "FROM";
   static final String AS = "AS";

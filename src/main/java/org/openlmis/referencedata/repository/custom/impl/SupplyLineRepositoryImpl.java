@@ -24,7 +24,7 @@ import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.FRO
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ID;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.LEFT_JOIN_FETCH;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ORDER_BY;
-import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT_DISTINCT;
+import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT_DISTINCT_COUNT;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.WHERE;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.and;
@@ -91,7 +91,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
       getField(REQUISITION_GROUP_ALIAS, MEMBER_FACILITIES));
 
   private static final String FROM_SL = join(FROM, "SupplyLine", AS, SUPPLY_LINE_ALIAS);
-  private static final String SELECT_SL = join(SELECT_DISTINCT, SUPPLY_LINE_ALIAS, FROM_SL,
+  private static final String SELECT_SL = join(SELECT, SUPPLY_LINE_ALIAS, FROM_SL,
       SUPERVISORY_NODE_JOIN, REQUISITION_GROUP_JOIN, REQUISITION_GROUP_MEMBERS_JOIN);
   private static final String COUNT_SL = join(SELECT_DISTINCT_COUNT, FROM_SL);
 
