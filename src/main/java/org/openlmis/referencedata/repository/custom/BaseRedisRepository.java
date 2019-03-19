@@ -15,19 +15,15 @@
 
 package org.openlmis.referencedata.repository.custom;
 
-import java.util.Map;
 import java.util.UUID;
-import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 
-public interface SupervisoryNodeDtoRedisRepository {
+public interface BaseRedisRepository<T> {
 
-  boolean existsInCache(UUID supervisoryNodeId);
+  boolean exists(UUID uuid);
 
-  SupervisoryNodeDto findById(UUID supervisoryNodeId);
+  T findById(UUID uuid);
 
-  Map<Object,Object> findAll();
+  void save(T object);
 
-  void save(SupervisoryNodeDto supervisoryNode);
-
-  void delete(SupervisoryNodeDto supervisoryNode);
+  void delete(T object);
 }

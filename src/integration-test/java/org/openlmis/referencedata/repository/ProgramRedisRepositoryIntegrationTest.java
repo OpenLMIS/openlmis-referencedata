@@ -19,31 +19,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Map;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ProgramDto;
-import org.openlmis.referencedata.repository.custom.ProgramRedisRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 
-@RunWith(SpringRunner.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
-public class ProgramRedisRepositoryIntegrationTest {
-
-  @Autowired
-  private ProgramRedisRepository programRedisRepository;
-
-  @Autowired
-  private ProgramRepository programRepository;
+public class ProgramRedisRepositoryIntegrationTest extends BaseRedisRepositoryIntegrationTest {
 
   private Program program;
   private ProgramDto programDto = new ProgramDto();
@@ -51,12 +34,11 @@ public class ProgramRedisRepositoryIntegrationTest {
 
   @Before
   public void setUp() {
-    program = new Program("code");
-    program.setName("Program name");
-    program.export(programDto);
-
     programId = UUID.randomUUID();
-    program.setId(programId);
+    program = new ProgramDataBuilder()
+        .withId(programId)
+        .build();
+    program.export(programDto);
 
     programRepository.save(program);
     programRedisRepository.save(program);
@@ -64,7 +46,7 @@ public class ProgramRedisRepositoryIntegrationTest {
 
   @Test
   public void shouldReturnTrueIfProgramExistsInCacheWithGivenId() {
-    boolean exists = programRedisRepository.existsInCache(programId);
+    boolean exists = programRedisRepository.exists(programId);
 
     assertTrue(exists);
   }
@@ -75,14 +57,6 @@ public class ProgramRedisRepositoryIntegrationTest {
 
     assertNotNull(programFromCache);
     assertEquals(programFromCache, program);
-  }
-
-  @Test
-  public void shouldReturnAllEntries() {
-    Map<Object, Object> found = programRedisRepository.findAll();
-
-    assertNotNull(found);
-    assertTrue(found.containsKey(programId.toString()));
   }
 
 }

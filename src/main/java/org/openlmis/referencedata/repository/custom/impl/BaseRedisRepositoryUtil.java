@@ -13,19 +13,22 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.repository.custom;
+package org.openlmis.referencedata.repository.custom.impl;
 
-import java.util.Map;
-import java.util.UUID;
-import org.openlmis.referencedata.domain.Program;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.annotation.PostConstruct;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 
-public interface ProgramRedisRepository {
+public abstract class BaseRedisRepositoryUtil {
 
-  boolean existsInCache(UUID programId);
+  protected RedisTemplate redisTemplate;
+  protected HashOperations hashOperations;
+  protected ObjectMapper mapper = new ObjectMapper();
 
-  Program findById(UUID programId);
+  @PostConstruct
+  protected void init() {
+    hashOperations = redisTemplate.opsForHash();
+  }
 
-  Map<Object,Object> findAll();
-
-  void save(Program program);
 }

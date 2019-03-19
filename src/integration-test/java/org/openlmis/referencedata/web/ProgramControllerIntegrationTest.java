@@ -54,6 +54,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/search";
   private static final String NAME = "name";
+  private static final String DESCRIPTION = "OpenLMIS";
 
   private Program program;
   private ProgramDto programDto = new ProgramDto();
@@ -86,6 +87,29 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(204);
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldDeleteProgramFromCache() {
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
+    mockUserHasRight(RightName.PROGRAMS_MANAGE);
+
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRedisRepository.exists(programId)).willReturn(true);
+    given(programRedisRepository.findById(programId)).willReturn(program);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
+
+    verify(programRedisRepository, times(1)).delete(program);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -170,7 +194,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldPutProgram() {
     mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
-    programDto.setDescription("OpenLMIS");
+    programDto.setDescription(DESCRIPTION);
     given(programRepository.findOne(programId)).willReturn(program);
 
     Program response = restAssured
@@ -187,6 +211,34 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertEquals(program, response);
     assertEquals("OpenLMIS", response.getDescription());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldDeleteProgramFromCacheAfterUpdate() {
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
+    mockUserHasRight(RightName.PROGRAMS_MANAGE);
+
+    programDto.setDescription(DESCRIPTION);
+    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRedisRepository.findById(programId)).willReturn(program);
+    given(programRedisRepository.exists(programId)).willReturn(true);
+
+    Program response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", programId)
+        .body(programDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(Program.class);
+
+    assertEquals(program, response);
+    assertEquals("OpenLMIS", response.getDescription());
+    verify(programRedisRepository, times(1)).delete(program);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -331,7 +383,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(programRepository.exists(programId)).willReturn(true);
-    given(programRedisRepository.existsInCache(programId)).willReturn(false);
+    given(programRedisRepository.exists(programId)).willReturn(false);
     given(programRepository.findOne(programId)).willReturn(program);
 
     Program response = restAssured
@@ -376,7 +428,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(programRepository.exists(programId)).willReturn(true);
-    given(programRedisRepository.existsInCache(programId)).willReturn(true);
+    given(programRedisRepository.exists(programId)).willReturn(true);
     given(programRedisRepository.findById(programId)).willReturn(program);
 
     Program response = restAssured
@@ -399,7 +451,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(programId)).willReturn(false);
-    given(supervisoryNodeDtoRedisRepository.existsInCache(programId)).willReturn(false);
+    given(supervisoryNodeDtoRedisRepository.exists(programId)).willReturn(false);
 
     restAssured
         .given()

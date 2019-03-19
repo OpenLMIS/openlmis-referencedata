@@ -30,7 +30,7 @@ import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.custom.ProgramRedisRepository;
+import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.validate.ProgramValidator;
@@ -68,7 +68,7 @@ public class ProgramController extends BaseController {
   private ProgramRepository programRepository;
 
   @Autowired
-  private ProgramRedisRepository programRedisRepository;
+  private BaseRedisRepository<Program> programRedisRepository;
 
   @Autowired
   private ProgramValidator validator;
@@ -177,6 +177,11 @@ public class ProgramController extends BaseController {
     rightService.checkAdminRight(RightName.PROGRAMS_MANAGE);
 
     Program program = programRepository.findOne(programId);
+
+    if (AvailableFeatures.REDIS_CACHING.isActive()) {
+      deleteProgramFromCache(programId);
+    }
+
     if (program == null) {
       throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -220,8 +225,12 @@ public class ProgramController extends BaseController {
 
     Program updatedProgram = Program.newProgram(program);
 
-
     programRepository.save(updatedProgram);
+
+    if (AvailableFeatures.REDIS_CACHING.isActive()) {
+      deleteProgramFromCache(id);
+    }
+
     return updatedProgram;
   }
 
@@ -290,7 +299,7 @@ public class ProgramController extends BaseController {
 
     profiler.start("CHECK_IF_PROGRAM_EXISTS_IN_CACHE");
     boolean programInCache = programRedisRepository
-        .existsInCache(programId);
+        .exists(programId);
 
     if (programInCache) {
       profiler.start("GET_PROGRAM_FROM_CACHE");
@@ -306,5 +315,17 @@ public class ProgramController extends BaseController {
     }
 
     return program;
+  }
+
+  /**
+   * Delete the program from cache.
+   */
+  private void deleteProgramFromCache(UUID programId) {
+    if (!programRedisRepository.exists(programId)) {
+      throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
+    } else {
+      Program program = programRedisRepository.findById(programId);
+      programRedisRepository.delete(program);
+    }
   }
 }

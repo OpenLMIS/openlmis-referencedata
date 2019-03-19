@@ -20,11 +20,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Map;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -32,52 +30,18 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
-import org.openlmis.referencedata.repository.custom.SupervisoryNodeDtoRedisRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityOperatorDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
-public class SupervisoryNodeRedisRepositoryIntegrationTest {
-
-  @Autowired
-  private FacilityRepository facilityRepository;
-
-  @Autowired
-  private FacilityTypeRepository facilityTypeRepository;
-
-  @Autowired
-  private FacilityOperatorRepository facilityOperatorRepository;
-
-  @Autowired
-  private GeographicZoneRepository geographicZoneRepository;
-
-  @Autowired
-  private GeographicLevelRepository geographicLevelRepository;
-
-  @Autowired
-  private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Autowired
-  private SupervisoryNodeDtoRedisRepository supervisoryNodeDtoRedisRepository;
+public class SupervisoryNodeRedisRepositoryIntegrationTest
+    extends BaseRedisRepositoryIntegrationTest {
 
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;
-
-  @Value("${service.url}")
-  protected String baseUri;
 
   @Before
   public void setUp() {
@@ -117,9 +81,8 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
   @Test
   public void shouldReturnTrueIfSupervisoryNodeExistsInCacheWithGivenId() {
     UUID supervisoryNodeId = supervisoryNodeDto.getId();
-    boolean exists = supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId);
 
-    assertTrue(exists);
+    assertTrue(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId));
   }
 
   @Test
@@ -135,16 +98,10 @@ public class SupervisoryNodeRedisRepositoryIntegrationTest {
 
   @Test
   public void shouldDeleteSupervisoryNode() {
+    UUID supervisoryNodeId = supervisoryNodeDto.getId();
     supervisoryNodeDtoRedisRepository.delete(supervisoryNodeDto);
 
-    assertFalse(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNode.getId()));
-  }
-
-  @Test
-  public void shouldReturnAllEntries() {
-    Map<Object, Object> found = supervisoryNodeDtoRedisRepository.findAll();
-
-    assertNotNull(found);
+    assertFalse(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId));
   }
 
 }

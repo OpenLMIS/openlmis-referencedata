@@ -38,7 +38,7 @@ import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.repository.custom.SupervisoryNodeDtoRedisRepository;
+import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.SupervisoryNodeBuilder;
 import org.openlmis.referencedata.util.Pagination;
@@ -79,7 +79,7 @@ public class SupervisoryNodeController extends BaseController {
   private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
-  private SupervisoryNodeDtoRedisRepository supervisoryNodeDtoRedisRepository;
+  private BaseRedisRepository<SupervisoryNodeDto> supervisoryNodeDtoRedisRepository;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -196,6 +196,11 @@ public class SupervisoryNodeController extends BaseController {
     profiler.start("SAVE_SUPERVISORY_NODE");
     supervisoryNodeRepository.saveAndFlush(supervisoryNodeToUpdate);
 
+    profiler.start("DELETE_UPDATED_SUPERVISORY_NODE_FROM_CACHE");
+    if (AvailableFeatures.REDIS_CACHING.isActive()) {
+      deleteSupervisoryNodeDtoFromCache(supervisoryNodeId);
+    }
+
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
     rightAssignmentService.regenerateRightAssignments();
 
@@ -215,6 +220,10 @@ public class SupervisoryNodeController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteSupervisoryNode(@PathVariable("id") UUID supervisoryNodeId) {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
+
+    if (AvailableFeatures.REDIS_CACHING.isActive()) {
+      deleteSupervisoryNodeDtoFromCache(supervisoryNodeId);
+    }
 
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
     if (supervisoryNode == null) {
@@ -381,7 +390,7 @@ public class SupervisoryNodeController extends BaseController {
 
     profiler.start("CHECK_IF_SUPERVISORY_NODE_EXISTS_IN_CACHE");
     boolean supervisoryNodeIsInCache = supervisoryNodeDtoRedisRepository
-        .existsInCache(supervisoryNodeId);
+        .exists(supervisoryNodeId);
 
     if (supervisoryNodeIsInCache) {
       profiler.start("GET_SUPERVISORY_NODE_FROM_CACHE");
@@ -398,6 +407,19 @@ public class SupervisoryNodeController extends BaseController {
       supervisoryNodeDtoRedisRepository.save(supervisoryNodeDto);
     }
     return supervisoryNodeDto;
+  }
+
+  /**
+   * Delete the supervisory node from cache.
+   */
+  private void deleteSupervisoryNodeDtoFromCache(UUID supervisoryNodeId) {
+    if (!supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)) {
+      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
+    } else {
+      SupervisoryNodeDto supervisoryNodeDto = supervisoryNodeDtoRedisRepository
+          .findById(supervisoryNodeId);
+      supervisoryNodeDtoRedisRepository.delete(supervisoryNodeDto);
+    }
   }
 
   private SupervisoryNodeDto exportToDto(SupervisoryNode supervisoryNode) {

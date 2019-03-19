@@ -98,6 +98,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   private static final String SUPERVISING_USERS_URL = ID_URL + "/supervisingUsers";
   private static final String SUPERVISING_FACILITIES_URL = ID_URL + "/facilities";
   private static final String RIGHT_ID_PARAM = "rightId";
+  private static final String DESCRIPTION = "OpenLMIS";
 
   private SupervisoryNode supervisoryNode;
   private SupervisoryNodeDto supervisoryNodeDto;
@@ -166,6 +167,30 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .then()
         .statusCode(204);
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldDeleteSupervisoryNodeFromCache() {
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId))
+        .willReturn(supervisoryNodeDto);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(204);
+
+    verify(supervisoryNodeDtoRedisRepository, times(1))
+        .delete(supervisoryNodeDto);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -293,7 +318,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldPutSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    supervisoryNodeDto.setDescription("OpenLMIS");
+    supervisoryNodeDto.setDescription(DESCRIPTION);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
@@ -309,6 +334,34 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldUpdateSupervisoryNodeAndDeleteOneFromCache() {
+    togglzRule.enable(AvailableFeatures.REDIS_CACHING);
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    supervisoryNodeDto.setDescription(DESCRIPTION);
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId))
+        .willReturn(supervisoryNodeDto);
+
+    ValidatableResponse response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", supervisoryNodeId)
+        .body(supervisoryNodeDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(200);
+
+    assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
+    verify(supervisoryNodeDtoRedisRepository,
+        times(1)).delete(supervisoryNodeDto);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -503,7 +556,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
+    given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
@@ -525,7 +578,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
+    given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
@@ -547,7 +600,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldGetSupervisoryNodeFromCache() {
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId))
         .willReturn(supervisoryNodeDto);
 
@@ -571,7 +624,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
-    given(supervisoryNodeDtoRedisRepository.existsInCache(supervisoryNodeId)).willReturn(false);
+    given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(false);
 
     restAssured
         .given()

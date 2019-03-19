@@ -15,54 +15,42 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.repository.custom.ProgramRedisRepository;
+import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProgramRedisRepositoryImpl implements ProgramRedisRepository {
+public class ProgramRedisRepositoryImpl extends BaseRedisRepositoryUtil
+    implements BaseRedisRepository<Program> {
 
-  private static final String HASH_KEY = "SUPERVISORY_NODE";
-
-  private RedisTemplate redisTemplate;
-  private HashOperations hashOperations;
-  private ObjectMapper mapper = new ObjectMapper();
+  private static final String HASH_KEY = "PROGRAM";
 
   @Autowired
   public ProgramRedisRepositoryImpl(RedisTemplate redisTemplate) {
     this.redisTemplate = redisTemplate;
   }
 
-  @PostConstruct
-  private void init() {
-    hashOperations = redisTemplate.opsForHash();
-  }
-
   @Override
-  public boolean existsInCache(UUID programId) {
+  public boolean exists(UUID programId) {
     return hashOperations.hasKey(HASH_KEY, programId.toString());
   }
 
   @Override
   public Program findById(UUID programId) {
-    Map<Object, Object> found = findAll();
-    return mapper.convertValue(found.get(programId.toString()), Program.class);
-  }
-
-  @Override
-  public Map<Object,Object> findAll() {
-    return this.redisTemplate.opsForHash().entries(HASH_KEY);
+    return mapper.convertValue(this.redisTemplate.opsForHash()
+        .get(HASH_KEY, programId), Program.class);
   }
 
   @Override
   public void save(Program program) {
     hashOperations.put(HASH_KEY, program.getId(), program);
+  }
+
+  @Override
+  public void delete(Program program) {
+    hashOperations.delete(HASH_KEY, program.getId().toString());
   }
 }

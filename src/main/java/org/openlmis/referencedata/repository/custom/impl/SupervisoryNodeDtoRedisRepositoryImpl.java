@@ -15,53 +15,33 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
-import org.openlmis.referencedata.repository.custom.SupervisoryNodeDtoRedisRepository;
+import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class SupervisoryNodeDtoRedisRepositoryImpl implements
-    SupervisoryNodeDtoRedisRepository {
+public class SupervisoryNodeDtoRedisRepositoryImpl extends BaseRedisRepositoryUtil
+    implements BaseRedisRepository<SupervisoryNodeDto> {
 
   private static final String HASH_KEY = "SUPERVISORY_NODE_DTO";
-
-  private RedisTemplate redisTemplate;
-  private HashOperations hashOperations;
-  private ObjectMapper mapper = new ObjectMapper();
 
   @Autowired
   public SupervisoryNodeDtoRedisRepositoryImpl(RedisTemplate redisTemplate) {
     this.redisTemplate = redisTemplate;
   }
 
-  @PostConstruct
-  private void init() {
-    hashOperations = redisTemplate.opsForHash();
-  }
-
   @Override
-  public boolean existsInCache(UUID supervisoryNodeDtoId) {
+  public boolean exists(UUID supervisoryNodeDtoId) {
     return hashOperations.hasKey(HASH_KEY, supervisoryNodeDtoId.toString());
   }
 
   @Override
   public SupervisoryNodeDto findById(UUID supervisoryNodeDtoId) {
-    Map<Object, Object> found = findAll();
-
-    return mapper.convertValue(
-        found.get(supervisoryNodeDtoId.toString()), SupervisoryNodeDto.class);
-  }
-
-  @Override
-  public Map<Object, Object> findAll() {
-    return this.redisTemplate.opsForHash().entries(HASH_KEY);
+    return mapper.convertValue(this.redisTemplate.opsForHash()
+        .get(HASH_KEY, supervisoryNodeDtoId), SupervisoryNodeDto.class);
   }
 
   @Override

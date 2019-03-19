@@ -59,7 +59,9 @@ import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
@@ -88,8 +90,7 @@ import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.repository.SupplyPartnerRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.repository.UserRepository;
-import org.openlmis.referencedata.repository.custom.ProgramRedisRepository;
-import org.openlmis.referencedata.repository.custom.SupervisoryNodeDtoRedisRepository;
+import org.openlmis.referencedata.repository.custom.BaseRedisRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.FacilityTypeService;
@@ -213,7 +214,7 @@ public abstract class BaseWebIntegrationTest {
   protected ProgramRepository programRepository;
 
   @MockBean
-  protected ProgramRedisRepository programRedisRepository;
+  protected BaseRedisRepository<Program> programRedisRepository;
 
   @MockBean
   protected FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
@@ -222,7 +223,7 @@ public abstract class BaseWebIntegrationTest {
   protected SupervisoryNodeRepository supervisoryNodeRepository;
 
   @MockBean
-  protected SupervisoryNodeDtoRedisRepository supervisoryNodeDtoRedisRepository;
+  protected BaseRedisRepository<SupervisoryNodeDto> supervisoryNodeDtoRedisRepository;
 
   @MockBean
   protected FacilityOperatorRepository facilityOperatorRepository;
