@@ -24,22 +24,22 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.dstu3.model.Bundle;
-import org.hl7.fhir.dstu3.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.Coding;
-import org.hl7.fhir.dstu3.model.Identifier;
-import org.hl7.fhir.dstu3.model.Location;
-import org.hl7.fhir.dstu3.model.Location.LocationPositionComponent;
-import org.hl7.fhir.dstu3.model.Location.LocationStatus;
-import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Location;
+import org.hl7.fhir.r4.model.Location.LocationPositionComponent;
+import org.hl7.fhir.r4.model.Location.LocationStatus;
+import org.hl7.fhir.r4.model.Reference;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FhirMessageKeys;
 
 @AllArgsConstructor
-class Dstu3LocationConverterStrategy implements LocationConverterStrategy<Location> {
+class R4LocationConverterStrategy implements LocationConverterStrategy<Location> {
 
   private final IGenericClient client;
   private final CacheControlDirective cacheControlDirective;

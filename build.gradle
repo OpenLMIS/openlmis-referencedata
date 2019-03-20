@@ -69,8 +69,8 @@ dependencies {
     compile 'net.sf.supercsv:super-csv:2.4.0'
     compile 'net.sf.supercsv:super-csv-dozer:2.4.0'
 
-    compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.4.0'
-    compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:3.4.0'
+    compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.7.0'
+    compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:3.7.0'
     
     compile 'org.togglz:togglz-legacy-spring-boot-starter:2.6.1.Final'
     compile 'org.togglz:togglz-console:2.6.1.Final'
