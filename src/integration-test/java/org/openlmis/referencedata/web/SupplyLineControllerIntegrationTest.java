@@ -59,7 +59,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   private static final String SUPPLYING_FACILITY_ID = "supplyingFacilityId";
 
   private static final String RESOURCE_URL = "/api/supplyLines";
-  private static final String V2_RESOURCE_URL = RESOURCE_URL + "/v2";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
 
   private SupplyLine supplyLine;
@@ -79,22 +78,6 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     pageable = new PageRequest(0, 10);
 
     given(supplyLineRepository.save(any(SupplyLine.class))).willAnswer(new SaveAnswer<>());
-  }
-
-  @Test
-  public void searchShouldReturnUnauthorizedWithoutAuthorization() {
-    Map<String, Object> requestBody = getSearchParameters();
-
-    restAssured
-        .given()
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .params(requestBody)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(401);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
@@ -163,73 +146,8 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   }
 
   @Test
-  public void searchV2ShouldReturnBadRequestOnException() {
-    Map<String, Object> requestParams = getSearchParameters();
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .params(requestParams)
-        .param("some-unknown-parameter", "some-value")
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(V2_RESOURCE_URL)
-        .then()
-        .statusCode(400);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldFindSupplyLinesWithoutParametersV2() {
-    Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
-
-    given(supplyLineRepository.searchV2(null, null, emptySet(), pageable))
-        .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
-
-    PageImplRepresentation response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(V2_RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertEquals(1, response.getContent().size());
-  }
-
-  @Test
-  public void shouldFindSupplyLinesV2() {
-    given(supplyLineRepository.searchV2(
-        supplyLine.getProgram().getId(),
-        supplyLine.getSupervisoryNode().getId(),
-        singleton(supplyLine.getSupplyingFacility().getId()),
-        pageable))
-        .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
-
-    Map<String, Object> requestBody = getSearchParameters();
-
-    PageImplRepresentation response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .params(requestBody)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(V2_RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertEquals(1, response.getContent().size());
-  }
-
-  @Test
-  public void shouldFindSupplyLinesV2WithExpand() {
-    given(supplyLineRepository.searchV2(
+  public void shouldFindSupplyLinesWithExpand() {
+    given(supplyLineRepository.search(
         supplyLine.getProgram().getId(),
         supplyLine.getSupervisoryNode().getId(),
         singleton(supplyLine.getSupplyingFacility().getId()),
@@ -245,7 +163,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .params(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .get(V2_RESOURCE_URL)
+        .get(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().as(PageImplRepresentation.class);

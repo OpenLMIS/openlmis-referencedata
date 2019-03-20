@@ -28,8 +28,8 @@ public class SupplyLineV2DtoTest {
 
   @Test
   public void equalsContract() {
-    final SupplyLineDtoV2 line1 = new SupplyLineDtoV2();
-    final SupplyLineDtoV2 line2 = new SupplyLineDtoV2();
+    final SupplyLineObjectReferenceDto line1 = new SupplyLineObjectReferenceDto();
+    final SupplyLineObjectReferenceDto line2 = new SupplyLineObjectReferenceDto();
     new SupplyLineDataBuilder().build().export(line1);
     new SupplyLineDataBuilder().build().export(line2);
 
@@ -49,8 +49,8 @@ public class SupplyLineV2DtoTest {
     new GeographicZoneDataBuilder().build().export(zone2);
 
     EqualsVerifier
-        .forClass(SupplyLineDtoV2.class)
-        .withPrefabValues(SupplyLineDtoV2.class, line1, line2)
+        .forClass(SupplyLineObjectReferenceDto.class)
+        .withPrefabValues(SupplyLineObjectReferenceDto.class, line1, line2)
         .withPrefabValues(SupervisoryNodeObjectReferenceDto.class, node1, node2)
         .withPrefabValues(FacilityObjectReferenceDto.class, facility1, facility2)
         .withPrefabValues(GeographicZoneSimpleDto.class, zone1, zone2)
@@ -62,7 +62,7 @@ public class SupplyLineV2DtoTest {
 
   @Test
   public void shouldImplementToString() {
-    SupplyLineDtoV2 dto = new SupplyLineDtoV2();
-    ToStringTestUtils.verify(SupplyLineDtoV2.class, dto);
+    SupplyLineObjectReferenceDto dto = new SupplyLineObjectReferenceDto();
+    ToStringTestUtils.verify(SupplyLineObjectReferenceDto.class, dto);
   }
 }

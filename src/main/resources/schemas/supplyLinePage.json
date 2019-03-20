@@ -6,7 +6,7 @@
   "properties": {
     "content": {
       "type": "array",
-      "items": { "type": "object", "$ref": "supplyLineDto.json" }
+      "items": { "type": "object", "$ref": "supplyLineObjectReference.json" }
     },
     "totalPages": { "type": "integer", "title": "totalPages" },
     "totalElements": { "type": "integer", "title": "totalElements" },

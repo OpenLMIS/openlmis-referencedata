@@ -32,9 +32,6 @@ public enum AvailableFeatures implements Feature {
   @Label("Consolidate notifications")
   CONSOLIDATE_NOTIFICATIONS,
 
-  @Label("Supply lines expand")
-  SUPPLY_LINES_EXPAND,
-
   @Label("Redis caching")
   REDIS_CACHING;
 

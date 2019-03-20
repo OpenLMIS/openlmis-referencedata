@@ -25,7 +25,4 @@ public interface SupplyLineRepositoryCustom {
 
   Page<SupplyLine> search(UUID programId, UUID supervisoryNodeId, Set<UUID> supplyingFacilityIds,
       Pageable pageable);
-
-  Page<SupplyLine> searchV2(UUID programId, UUID supervisoryNodeId, Set<UUID> supplyingFacilityIds,
-      Pageable pageable);
 }

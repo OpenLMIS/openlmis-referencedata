@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.openlmis.referencedata.domain.SupplyLine;
-import org.openlmis.referencedata.dto.SupplyLineDtoV2;
+import org.openlmis.referencedata.dto.SupplyLineObjectReferenceDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
@@ -40,7 +40,7 @@ public class ObjectReferenceExpanderTest {
           .withRequisitionGroup(new RequisitionGroupDataBuilder().build())
           .build())
       .build();
-  private SupplyLineDtoV2 supplyLineDto = new SupplyLineDtoV2();
+  private SupplyLineObjectReferenceDto supplyLineDto = new SupplyLineObjectReferenceDto();
 
   @Before
   public void setUp() {

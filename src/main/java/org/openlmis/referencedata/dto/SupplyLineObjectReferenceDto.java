@@ -36,7 +36,7 @@ import org.openlmis.referencedata.domain.SupplyLine;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true, exclude = "serviceUrl")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class SupplyLineDtoV2 extends BaseDto implements SupplyLine.Exporter {
+public final class SupplyLineObjectReferenceDto extends BaseDto implements SupplyLine.Exporter {
 
   @Setter
   @JsonIgnore
@@ -99,8 +99,8 @@ public final class SupplyLineDtoV2 extends BaseDto implements SupplyLine.Exporte
   /**
    * Creates a new instance based on data from a domain object.
    */
-  public static SupplyLineDtoV2 newInstance(SupplyLine supplyLine, String serviceUrl) {
-    SupplyLineDtoV2 dto = new SupplyLineDtoV2();
+  public static SupplyLineObjectReferenceDto newInstance(SupplyLine supplyLine, String serviceUrl) {
+    SupplyLineObjectReferenceDto dto = new SupplyLineObjectReferenceDto();
     dto.setServiceUrl(serviceUrl);
 
     supplyLine.export(dto);

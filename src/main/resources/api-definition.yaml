@@ -202,8 +202,6 @@ schemas:
 
   - supplyLinePage: !include schemas/supplyLinePage.json
 
-  - supplyLineV2Page: !include schemas/supplyLineV2Page.json
-
   - requisitionGroup: !include schemas/requisitionGroupDto.json
 
   - requisitionGroupProgramSchedule: !include schemas/requisitionGroupProgramScheduleDto.json
@@ -1032,6 +1030,12 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: true
+              expand:
+                  displayName: expand
+                  description: expand
+                  type: string
+                  required: false
+                  repeat: true
           responses:
               "200":
                   body:
@@ -1062,49 +1066,6 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
-      /v2:
-          get:
-              is: [ secured, paginated, sorted ]
-              description: Returns supply lines that are matching given search params.
-              queryParameters:
-                  programId:
-                      displayName: programId
-                      description: program ID
-                      type: string
-                      required: false
-                      repeat: false
-                  supervisoryNodeId:
-                      displayName: supervisoryNodeId
-                      description: supervisoryNode ID
-                      type: string
-                      required: false
-                      repeat: false
-                  supplyingFacilityId:
-                      displayName: supplyingFacilityId
-                      description: supplyingFacility ID
-                      type: string
-                      required: false
-                      repeat: true
-                  expand:
-                      displayName: expand
-                      description: expand
-                      type: string
-                      required: false
-                      repeat: true
-              responses:
-                  "200":
-                      body:
-                          application/json:
-                              schema: supplyLineV2Page
-                  "400":
-                      body:
-                          application/json:
-                  "401":
-                      body:
-                          application/json:
-                  "404":
-                      body:
-                          application/json:
       /{id}:
           uriParameters:
               id:
