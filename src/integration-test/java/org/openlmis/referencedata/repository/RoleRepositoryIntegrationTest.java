@@ -17,6 +17,8 @@ package org.openlmis.referencedata.repository;
 
 import static java.lang.String.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -103,6 +105,12 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     assertThat(found)
         .hasSize(rightIds.size())
         .contains(roles[0], roles[4], roles[7]);
+  }
+
+  @Test
+  public void shouldCheckIfRoleExistByName() {
+    assertFalse(repository.existsByName("some-random-name"));
+    assertTrue(repository.existsByName(roles[0].getName()));
   }
 
   @Getter
