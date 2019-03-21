@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.validate;
 
 import java.util.Set;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -66,14 +67,14 @@ public class SupervisoryNodeValidator implements BaseValidator {
     rejectIfEmptyOrWhitespace(errors, NAME, SupervisoryNodeMessageKeys.ERROR_NAME_REQUIRED);
 
     SupervisoryNodeDto node = (SupervisoryNodeDto) target;
-
+    UUID nodeId = getId(node.getId());
     SupervisoryNode existingWithCode = repository.findByCode(node.getCode());
     if (null != existingWithCode && !existingWithCode.getId().equals(node.getId())) {
       rejectValue(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
     }
     Set<SupervisoryNode> existingSupervisoryNode =
             repository.findByCodeCaseInsensetive(
-                    node.getCode(), node.getId());
+                    node.getCode(), nodeId);
     if (null != existingSupervisoryNode && !existingSupervisoryNode.isEmpty()) {
       rejectValue(errors,CODE,
               SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
@@ -81,7 +82,7 @@ public class SupervisoryNodeValidator implements BaseValidator {
     }
     Set<SupervisoryNode> storedSupervisoryNode =
             repository.findByNameIgnoreCaseContaining(
-                    node.getName(), node.getId());
+                    node.getName(), nodeId);
     if (null != storedSupervisoryNode && !storedSupervisoryNode.isEmpty()) {
       rejectValue(errors,NAME,
               SupervisoryNodeMessageKeys.ERROR_NAME_MUST_BE_UNIQUE);
@@ -90,7 +91,7 @@ public class SupervisoryNodeValidator implements BaseValidator {
       rejectValue(errors, REQUISITION_GROUP,
           SupervisoryNodeMessageKeys.ERROR_REQUISITION_GROUP_REQUIRED);
     }
-    SupervisoryNode existingNode = repository.findOne(node.getId());
+    SupervisoryNode existingNode = repository.findOne(nodeId);
     if (isRequisitionGroupChanged(existingNode, node)) {
       rejectValue(errors, REQUISITION_GROUP,
           SupervisoryNodeMessageKeys.ERROR_UPDATING_REQUISITION_GROUP_SAVE_FAILED);
@@ -101,5 +102,9 @@ public class SupervisoryNodeValidator implements BaseValidator {
     return null != existing && null != dto.getRequisitionGroup()
         && null != existing.getRequisitionGroup()
         && !existing.getRequisitionGroup().getId().equals(dto.getRequisitionGroup().getId());
+  }
+
+  private UUID getId(UUID id) {
+    return id != null ? id : new UUID(0,0);
   }
 }
