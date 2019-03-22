@@ -219,6 +219,61 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   }
 
   @Test
+  public void shouldFindSupervisoryNodesIgnoringCaseByCode() {
+    SupervisoryNode supervisoryNode1 = (new SupervisoryNodeDataBuilder()
+            .withoutId()
+            .withFacility(facility)
+            .withName("some-name-test")
+            .withCode("some-code-test")
+            .build());
+    SupervisoryNode supervisoryNode = (new SupervisoryNodeDataBuilder()
+            .withFacility(facility)
+            .withName("some-name-test1")
+            .withCode("some-code-test1")
+            .build());
+    UUID id = new UUID(0,0);
+    supervisoryNodeRepository.save(supervisoryNode1);
+    supervisoryNodeRepository.save(supervisoryNode);
+    assertEquals(1, supervisoryNodeRepository
+            .findByCodeCaseInsensetive("somE-CODE-teSt", id).size());
+    assertEquals(1, supervisoryNodeRepository
+            .findByCodeCaseInsensetive("somE-CODE-teSt", id).size());
+    assertEquals(0, supervisoryNodeRepository
+            .findByCodeCaseInsensetive("somE-CODE-teSt1", supervisoryNode.getId()).size());
+    assertEquals(0, supervisoryNodeRepository
+            .findByCodeCaseInsensetive("some-code-test1", supervisoryNode.getId()).size());
+
+  }
+
+  @Test
+  public void shouldFindSupervisoryNodesIgnoringCaseByName() {
+    SupervisoryNode supervisoryNode1 = (new SupervisoryNodeDataBuilder()
+            .withoutId()
+            .withFacility(facility)
+            .withName("some-name-test")
+            .withCode("some-code-test")
+            .build());
+    SupervisoryNode supervisoryNode = (new SupervisoryNodeDataBuilder()
+            .withFacility(facility)
+            .withName("some-name-test1")
+            .withCode("some-code-test1")
+            .build());
+    UUID id = new UUID(0,0);
+    supervisoryNodeRepository.save(supervisoryNode1);
+    supervisoryNodeRepository.save(supervisoryNode);
+    assertEquals(1, supervisoryNodeRepository
+            .findByNameIgnoreCaseContaining("somE-NAME-tesT", id).size());
+    assertEquals(1, supervisoryNodeRepository
+            .findByNameIgnoreCaseContaining("some-name-test", id).size());
+    assertEquals(0, supervisoryNodeRepository
+            .findByNameIgnoreCaseContaining("some-name-test1", supervisoryNode.getId()).size());
+    assertEquals(0, supervisoryNodeRepository
+            .findByNameIgnoreCaseContaining("some-NAMe-test1", supervisoryNode.getId()).size());
+
+
+  }
+
+  @Test
   public void shouldSearchByZoneId() {
     supervisoryNodeRepository.save(generateInstance());
 
