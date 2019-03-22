@@ -46,5 +46,4 @@ public interface RoleRepository extends JpaRepository<Role, UUID>, RoleRepositor
       nativeQuery = true)
   Page<Role> findAllWithoutSnapshots(Pageable pageable);
 
-  boolean existsByName(String s);
 }

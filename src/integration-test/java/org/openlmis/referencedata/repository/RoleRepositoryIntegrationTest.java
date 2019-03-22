@@ -17,8 +17,6 @@ package org.openlmis.referencedata.repository;
 
 import static java.lang.String.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +27,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+
 import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +38,7 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.repository.custom.RoleRepositoryCustom;
+import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -44,6 +46,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 
 public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Role> {
+
+  @Autowired
+  private EntityManager entityManager;
 
   @Autowired
   RoleRepository repository;
@@ -72,6 +77,13 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         .mapToObj(idx -> generateInstance())
         .peek(repository::save)
         .toArray(Role[]::new);
+  }
+
+  private Role generateRoleInstance(String name) {
+    return new RoleDataBuilder()
+            .withName(name)
+            .withoutId()
+            .buildAsNew();
   }
 
   @Test
@@ -107,10 +119,15 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
         .contains(roles[0], roles[4], roles[7]);
   }
 
-  @Test
-  public void shouldCheckIfRoleExistByName() {
-    assertFalse(repository.existsByName("some-random-name"));
-    assertTrue(repository.existsByName(roles[0].getName()));
+  @Test(expected = PersistenceException.class)
+  public void shouldNotAllowDuplicates() {
+
+    Role role1 = generateRoleInstance("test-role-name");
+    Role role2 = generateRoleInstance("test-role-name");
+    repository.save(role1);
+    repository.save(role2);
+
+    entityManager.flush();
   }
 
   @Getter
