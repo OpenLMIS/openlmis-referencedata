@@ -122,7 +122,7 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   @Test(expected = PersistenceException.class)
   public void shouldNotAllowDuplicates() {
 
-    Role role1 = generateRoleInstance("test-role-name");
+    Role role1 = generateRoleInstance("test-role-namE");
     Role role2 = generateRoleInstance("test-role-name");
     repository.save(role1);
     repository.save(role2);
