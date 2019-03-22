@@ -52,20 +52,18 @@ public interface SupervisoryNodeRepository
   Page<SupervisoryNode> findAllWithoutSnapshots(Pageable pageable);
 
   @Query(value = "SELECT\n"
-          + "    sn.*\n"
+          + "    sn\n"
           + "FROM\n"
-          + "    referencedata.supervisory_nodes sn\n"
-          + " WHERE UPPER(sn.name) = UPPER(:name) and sn.id != :id ",
-          nativeQuery = true)
+          + "    SupervisoryNode sn\n"
+          + " WHERE UPPER(sn.name) = UPPER(:name) and sn.id != :id ")
   Set<SupervisoryNode> findByNameIgnoreCaseContaining(@Param("name") String name,
       @Param("id") UUID id);
 
   @Query(value = "SELECT\n"
-      + "    sn.*\n"
+      + "    sn\n"
       + "FROM\n"
-      + "    referencedata.supervisory_nodes sn\n"
-      + " WHERE UPPER(sn.code) = UPPER(:code) and sn.id != :id ",
-      nativeQuery = true)
+      + "    SupervisoryNode sn\n"
+      + " WHERE UPPER(sn.code) = UPPER(:code) and sn.id != :id ")
   Set<SupervisoryNode> findByCodeCaseInsensetive(@Param("code") String code,
       @Param("id") UUID id);
 }
