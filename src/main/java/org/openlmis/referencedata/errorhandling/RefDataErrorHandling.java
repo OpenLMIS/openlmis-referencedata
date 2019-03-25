@@ -65,7 +65,7 @@ public class RefDataErrorHandling extends BaseHandler {
     CONSTRAINT_MAP.put("unq_supply_partner_code", SupplyPartnerMessageKeys.ERROR_CODE_DUPLICATED);
     CONSTRAINT_MAP.put("unq_supply_partner_association_programid_supervisorynodeid",
         SupplyPartnerMessageKeys.ERROR_ASSOCIATION_DUPLICATED);
-    CONSTRAINT_MAP.put("unq_role_name", RoleMessageKeys.ERROR_DUPLICATED);
+    CONSTRAINT_MAP.put("unq_role_name", RoleMessageKeys.ERROR_MUST_HAVE_A_UNIQUE_NAME);
   }
 
   /**

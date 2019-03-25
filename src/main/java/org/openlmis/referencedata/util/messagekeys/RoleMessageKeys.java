@@ -19,9 +19,9 @@ public abstract class RoleMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, ROLE);
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_DUPLICATED = join(ERROR, DUPLICATED);
   public static final String ERROR_MUST_HAVE_A_RIGHT = join(ERROR, "mustHaveARight");
   public static final String ERROR_RIGHTS_ARE_DIFFERENT_TYPES =
       join(ERROR, "rightsAreDifferentTypes");
   public static final String ERROR_INVALID_PARAMS = join(ERROR, SEARCH, INVALID_PARAMS);
+  public static final String ERROR_MUST_HAVE_A_UNIQUE_NAME = join(ERROR, MUST_BE_UNIQUE);
 }
