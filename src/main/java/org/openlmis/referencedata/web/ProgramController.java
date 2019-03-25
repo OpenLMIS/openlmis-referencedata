@@ -107,7 +107,8 @@ public class ProgramController extends BaseController {
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Iterable<Program> search(@RequestParam MultiValueMap<String, Object> queryParams) {
+  public Iterable<Program> search(@RequestParam MultiValueMap<String, Object> queryParams,
+                                  Pageable pageable) {
     Profiler profiler = new Profiler("SEARCH_FOR_PROGRAMS");
     profiler.setLogger(XLOGGER);
 
@@ -126,7 +127,7 @@ public class ProgramController extends BaseController {
     } else if (null != name) {
       programs = programRepository.findByNameIgnoreCaseContaining(name);
     } else {
-      programs = programRepository.findAll();
+      programs = programRepository.findAll(pageable);
     }
 
     profiler.stop().log();
