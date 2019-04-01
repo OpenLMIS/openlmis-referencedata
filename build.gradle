@@ -44,7 +44,7 @@ dependencies {
     compile 'org.javers:javers-spring-boot-starter-sql:2.8.1'
     compile "org.projectlombok:lombok:1.16.8"
     compile "org.postgresql:postgresql:42.0.0"
-    compile "com.github.tomakehurst:wiremock:1.58"
+    compile "com.github.tomakehurst:wiremock:2.22.0"
     compile "org.springframework:spring-test"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-hibernate4"

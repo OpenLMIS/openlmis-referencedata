@@ -18,6 +18,7 @@ package org.openlmis.referencedata;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -25,20 +26,18 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 public class WireMockTest {
-
-  Logger logger = LoggerFactory.getLogger(WireMockTest.class);
 
   private class WireMockTestClient {
     String resourceUrl = "http://localhost:8080/api/resource";
@@ -58,7 +57,7 @@ public class WireMockTest {
       try {
         restTemplate.postForEntity(resourceUrl, entity, Object.class);
       } catch (HttpClientErrorException exception) {
-        logger.debug(exception.getMessage());
+        log.debug(exception.getMessage());
       }
     }
   }
@@ -76,6 +75,10 @@ public class WireMockTest {
             .withStatus(200)
             .withHeader("Content-Type", "application/json")
             .withBody(responseJson)));
+
+    stubFor(post(urlEqualTo("/api/resource"))
+        .willReturn(aResponse()
+            .withStatus(204)));
 
     String result = testClient.getResource();
 
