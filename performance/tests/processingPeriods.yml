@@ -73,8 +73,6 @@ scenarios:
 
           vars.put("processing_period", JsonOutput.toJson(period))
       body: ${processing_period}
-      extract-jsonpath:
-        processing_period_id: $.id
 
   get-processing-period:
     variables:
@@ -99,9 +97,14 @@ scenarios:
         Content-Type: application/json
 
   processing-periods-search:
+    variables:
+      program_id: dce17f2e-af3e-40ad-8e00-3496adef44c3
+      facility_id: 7938919f-6f61-4d1a-a4dc-923c31e9cd45
+      start_date: 2019-01-01
+      end_date: 2019-08-01
     requests:
     - include-scenario: get-user-token
-    - url: ${__P(base-uri)}/api/processingPeriods?program=dce17f2e-af3e-40ad-8e00-3496adef44c3&facility=7938919f-6f61-4d1a-a4dc-923c31e9cd45&startDate=2019-01-01&endDate=2019-08-01&page=0&size=10
+    - url: ${__P(base-uri)}/api/processingPeriods?programId=${program_id}&facilityId=${facility_id}&startDate=${start_date}&endDate=${end_date}&page=0&size=10
       method: GET
       label: ProcessingPeriodsSearch
       headers:
@@ -122,7 +125,7 @@ scenarios:
     variables:
       processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
     requests:
-    - include-scenario: get-user-token
+    - include-scenario: get-processing-period
     - url: ${__P(base-uri)}/api/processingPeriods/${processing_period_id}
       method: PUT
       label: PutProcessingPeriod
@@ -173,8 +176,8 @@ reporting:
   criteria:
     Create Processing Period too slow: p90 of CreateProcessingPeriod>150ms
     Get Processing Period too slow: p90 of GetProcessingPeriod>150ms
-    Get All Processing Periods too slow: p90 of GetAllProcessingPeriods>500ms
-    Processing Periods Search too slow: p90 of GetAllProcessingPeriods>150ms
+    Get All Processing Periods too slow: p90 of GetAllProcessingPeriods>150ms
+    Processing Periods Search too slow: p90 of ProcessingPeriodsSearch>1500ms
     Get Page of Ten Processing Periods too slow: p90 of GetPageOfTenProcessingPeriods>150ms
     Put Processing Period too slow: p90 of PutProcessingPeriod>150ms
     Get Processing Period Duration too slow: p90 of GetProcessingPeriodDuration>150ms
